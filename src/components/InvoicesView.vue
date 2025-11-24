@@ -131,44 +131,42 @@
               v-for="invoice in displayedInvoices"
               :key="invoice.id"
               @click="selectInvoice(invoice)"
-              class="px-4 py-4 cursor-pointer transition-all"
-              :style="{
-                borderBottom: '1px solid #F1F5F9',
-                backgroundColor: selectedInvoice?.id === invoice.id ? '#F0FDF4' : '#FFFFFF',
-                borderLeft: selectedInvoice?.id === invoice.id ? '4px solid #10B981' : '4px solid transparent'
-              }">
+              class="px-4 py-4 cursor-pointer transition-all border-b border-slate-100 hover:bg-slate-50 group relative"
+              :class="[
+                selectedInvoice?.id === invoice.id ? 'bg-indigo-50/50' : (isQuotation(invoice) ? 'bg-amber-50' : 'bg-white'),
+                selectedInvoice?.id === invoice.id ? 'border-l-4 border-indigo-500 pl-3' : 'border-l-4 border-transparent'
+              ]"
+            >
+              <!-- Indicador de selección -->
+              <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 transition-transform duration-200"
+                   :class="selectedInvoice?.id === invoice.id ? 'scale-y-100' : 'scale-y-0'"></div>
               
-              <!-- Contenido ultra minimalista -->
-              <div class="flex items-start justify-between mb-1">
+              <div class="flex items-start gap-3">
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold truncate" style="color: #0F172A; font-family: 'Inter', sans-serif;">
-                    {{ invoice.invoiceNumber || invoice.number || `DOC-${String(invoice.id).padStart(4, '0')}` }}
+                  <div class="flex justify-between items-start">
+                    <p class="text-sm font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                      {{ invoice.invoiceNumber || invoice.number || `DOC-${String(invoice.id).padStart(4, '0')}` }}
+                    </p>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border"
+                          :class="getStatusClasses(invoice.status)">
+                      {{ getStatusLabel(invoice.status) }}
+                    </span>
+                  </div>
+                  
+                  <p class="text-xs text-slate-500 truncate mt-0.5 font-medium">
+                    {{ invoice.customer || invoice.customer_name || 'Cliente General' }}
                   </p>
-                  <p class="text-xs truncate mt-0.5" style="color: #64748B;">{{ invoice.customer || invoice.customer_name || 'Cliente General' }}</p>
+                  
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="text-[10px] text-slate-400 flex items-center gap-1">
+                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                       {{ formatDate(invoice.date) }}
+                    </span>
+                    <span class="text-xs font-black text-slate-900">
+                      ${{ formatCurrency(invoice.total) }}
+                    </span>
+                  </div>
                 </div>
-                
-                <!-- Pill pequeña de estado -->
-                <span
-                  class="px-2 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ml-2"
-                  :style="{
-                    backgroundColor: (invoice.status === 'Pagada' || invoice.status === 'paid') ? '#D1FAE5' : '#FEF3C7',
-                    color: (invoice.status === 'Pagada' || invoice.status === 'paid') ? '#065F46' : '#92400E'
-                  }">
-                  {{ (invoice.status === 'Pagada' || invoice.status === 'paid') ? 'Pagada' : 'Pendiente' }}
-                </span>
-              </div>
-              
-              <!-- Info secundaria -->
-              <div class="flex items-center justify-between text-[11px] mt-1">
-                <span style="color: #94A3B8;">{{ formatDate(invoice.date) }}</span>
-                <span class="font-semibold" style="color: #0F172A;">${{ formatCurrency(invoice.total) }}</span>
-              </div>
-              
-              <!-- Badge COT discreto (sin botón) -->
-              <div v-if="invoice.type === 'Cotización' || invoice.type === 'quote'" class="mt-1.5">
-                <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold" style="background-color: #DBEAFE; color: #1E40AF;">
-                  COTIZACIÓN
-                </span>
               </div>
             </div>
             
@@ -200,48 +198,46 @@
         <div class="lg:col-span-7 bg-white rounded-xl overflow-hidden flex flex-col" style="border: 1px solid #E2E8F0;">
           
           <!-- Estado: No seleccionado -->
-          <div v-if="!selectedInvoice" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
-            <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            <h3 class="text-base font-bold text-gray-700 mb-1">Selecciona un documento</h3>
-            <p class="text-xs text-gray-500">Haz clic en cualquier factura o cotización de la lista</p>
+          <div v-if="!selectedInvoice" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-slate-50/50">
+            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 border border-slate-100">
+               <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+               </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Selecciona un documento</h3>
+            <p class="text-sm text-slate-500 max-w-xs mx-auto">Haz clic en cualquier factura o cotización de la lista izquierda para ver sus detalles completos.</p>
           </div>
 
           <!-- Estado: Documento seleccionado -->
-          <div v-else class="flex-1 flex flex-col overflow-hidden">
+          <div v-else class="flex-1 flex flex-col overflow-hidden bg-white transition-colors duration-300">
             
             <!-- Header del detalle con acciones contextuales -->
-            <div class="p-4" style="border-bottom: 1px solid #E2E8F0;">
+            <div class="p-6 border-b border-slate-100 bg-white">
               <div class="flex items-start justify-between">
                 <div class="flex-1">
-                  <div class="flex items-center gap-3 mb-2">
-                    <h2 class="text-2xl font-bold" style="color: #0F172A; font-family: 'Inter', sans-serif;">
+                  <div class="flex items-center gap-3 mb-3">
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">
                       {{ selectedInvoice.invoiceNumber || selectedInvoice.number || `DOC-${String(selectedInvoice.id).padStart(4, '0')}` }}
                     </h2>
                     <span
-                      class="px-2.5 py-1 rounded-full text-xs font-semibold"
-                      :style="{
-                        backgroundColor: (selectedInvoice.status === 'Pagada' || selectedInvoice.status === 'paid') ? '#D1FAE5' : '#FEF3C7',
-                        color: (selectedInvoice.status === 'Pagada' || selectedInvoice.status === 'paid') ? '#065F46' : '#92400E'
-                      }">
+                      class="px-3 py-1 rounded-full text-xs font-bold border"
+                      :class="getStatusClasses(selectedInvoice.status)">
                       {{ getStatusLabel(selectedInvoice.status) }}
                     </span>
                     <span v-if="selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote'" 
-                          class="px-2.5 py-1 rounded-full text-xs font-semibold"
-                          style="background-color: #DBEAFE; color: #1E40AF;">
+                          class="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
                       COTIZACIÓN
                     </span>
                   </div>
-                  <div class="flex items-center gap-4 text-sm" style="color: #64748B;">
-                    <span class="flex items-center gap-1.5">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="flex items-center gap-6 text-sm text-slate-500 font-medium">
+                    <span class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                       </svg>
                       {{ formatDate(selectedInvoice.date) }}
                     </span>
-                    <span class="flex items-center gap-1.5">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                       </svg>
                       {{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}
@@ -267,9 +263,8 @@
                   <!-- Botones de acción con texto descriptivo -->
                   <button
                     @click="viewAndPrintInvoice(selectedInvoice)"
-                    class="px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium"
-                    style="color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0;"
-                    :style="{ '&:hover': { backgroundColor: '#F1F5F9' } }">
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                     </svg>
@@ -278,9 +273,8 @@
                   
                   <button
                     @click="downloadPDF(selectedInvoice)"
-                    class="px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium"
-                    style="color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0;"
-                    :style="{ '&:hover': { backgroundColor: '#F1F5F9' } }">
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
@@ -289,9 +283,8 @@
                   
                   <button
                     @click="sendByEmail(selectedInvoice)"
-                    class="px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium"
-                    style="color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0;"
-                    :style="{ '&:hover': { backgroundColor: '#F1F5F9' } }">
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
@@ -363,35 +356,35 @@
                   <div class="bg-white rounded-lg overflow-hidden">
                     <table class="min-w-full">
                       <thead>
-                        <tr style="border-bottom: 1px solid #E5E7EB; background-color: #F9FAFB;">
-                          <th class="text-left text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">#</th>
-                          <th class="text-left text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">Descripción</th>
-                          <th class="text-center text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">Cantidad</th>
-                          <th class="text-right text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">Precio Unit.</th>
-                          <th class="text-right text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">Subtotal</th>
+                        <tr class="bg-slate-50 border-b border-slate-200">
+                          <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">#</th>
+                          <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Descripción</th>
+                          <th class="text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Cant.</th>
+                          <th class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Precio</th>
+                          <th class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Total</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr v-if="!selectedInvoice.items || selectedInvoice.items.length === 0" style="border-bottom: 1px solid #E5E7EB;">
-                          <td colspan="5" class="px-4 py-8 text-center">
-                            <p class="text-sm text-gray-500">No hay productos registrados</p>
+                      <tbody class="divide-y divide-slate-100">
+                        <tr v-if="!selectedInvoice.items || selectedInvoice.items.length === 0">
+                          <td colspan="5" class="px-6 py-12 text-center">
+                            <p class="text-sm text-slate-400">No hay productos registrados</p>
                           </td>
                         </tr>
-                        <tr v-else v-for="(item, index) in selectedInvoice.items" :key="`item-${index}`" style="border-bottom: 1px solid #E5E7EB;" class="last:border-0 hover:bg-gray-50 transition-colors">
-                          <td class="px-4 py-3 text-xs" style="color: #9CA3AF;">{{ index + 1 }}</td>
-                          <td class="px-4 py-3">
-                            <p class="text-sm font-semibold" style="color: #0F172A;">{{ item.product_name || item.name || 'N/A' }}</p>
-                            <p class="text-xs" style="color: #6B7280;">Código: {{ item.product_code || item.code || 'N/A' }}</p>
+                        <tr v-else v-for="(item, index) in selectedInvoice.items" :key="`item-${index}`" class="hover:bg-slate-50/80 transition-colors">
+                          <td class="px-6 py-4 text-xs text-slate-400 font-medium">{{ index + 1 }}</td>
+                          <td class="px-6 py-4">
+                            <p class="text-sm font-bold text-slate-800">{{ item.product_name || item.name || 'N/A' }}</p>
+                            <p class="text-xs text-slate-500 mt-0.5">SKU: {{ item.product_code || item.code || 'N/A' }}</p>
                           </td>
-                          <td class="text-center px-4 py-3">
-                            <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded" style="background-color: #EEF2FF; color: #4F46E5;">
+                          <td class="text-center px-6 py-4">
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-md bg-slate-100 text-slate-600">
                               {{ item.quantity }}
                             </span>
                           </td>
-                          <td class="text-right px-4 py-3 text-sm" style="color: #374151;">
+                          <td class="text-right px-6 py-4 text-sm font-medium text-slate-600">
                             ${{ formatCurrency(item.price || item.unit_price) }}
                           </td>
-                          <td class="text-right px-4 py-3 text-sm font-bold" style="color: #0F172A;">
+                          <td class="text-right px-6 py-4 text-sm font-bold text-slate-900">
                             ${{ formatCurrency(item.subtotal || (item.quantity * (item.price || item.unit_price))) }}
                           </td>
                         </tr>
@@ -736,6 +729,46 @@ const clearFilters = () => {
   searchTerm.value = ''
   statusFilter.value = ''
   typeFilter.value = ''
+}
+
+// Helpers para Avatar
+const getInitials = (name) => {
+  if (!name) return 'C'
+  const parts = name.split(' ')
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase()
+  return (parts[0][0] + parts[1][0]).toUpperCase()
+}
+
+const getColorForName = (name) => {
+  if (!name) return { bg: '#F1F5F9', text: '#64748B' }
+  const colors = [
+    { bg: '#EEF2FF', text: '#6366F1' }, // Indigo
+    { bg: '#F0FDF4', text: '#22C55E' }, // Green
+    { bg: '#FEF2F2', text: '#EF4444' }, // Red
+    { bg: '#FFF7ED', text: '#F97316' }, // Orange
+    { bg: '#FAF5FF', text: '#A855F7' }, // Purple
+    { bg: '#ECFEFF', text: '#06B6D4' }, // Cyan
+    { bg: '#FDF4FF', text: '#D946EF' }, // Fuchsia
+  ]
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return colors[Math.abs(hash) % colors.length]
+}
+
+const getStatusClasses = (status) => {
+  const s = status?.toLowerCase() || ''
+  if (s === 'pagada' || s === 'paid') return 'bg-emerald-50 text-emerald-700 border-emerald-100'
+  if (s === 'pendiente' || s === 'pending') return 'bg-amber-50 text-amber-700 border-amber-100'
+  if (s === 'anulada' || s === 'cancelled') return 'bg-rose-50 text-rose-700 border-rose-100'
+  return 'bg-slate-50 text-slate-600 border-slate-100'
+}
+
+const isQuotation = (invoice) => {
+  if (invoice.type === 'Cotización' || invoice.type === 'quote') return true
+  const num = invoice.invoiceNumber || invoice.number || ''
+  return num.toString().toUpperCase().startsWith('COT')
 }
 
 const toggleActionsMenu = (id) => {

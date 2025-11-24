@@ -133,37 +133,39 @@
               v-for="returnItem in filteredReturns"
               :key="returnItem.id"
               @click="selectReturn(returnItem)"
-              class="px-4 py-4 cursor-pointer transition-all"
-              :style="{
-                borderBottom: '1px solid #F1F5F9',
-                backgroundColor: selectedReturn?.id === returnItem.id ? '#FEF2F2' : '#FFFFFF',
-                borderLeft: selectedReturn?.id === returnItem.id ? '4px solid #EF4444' : '4px solid transparent'
-              }">
+              class="px-4 py-4 cursor-pointer transition-all border-b border-slate-100 hover:bg-slate-50 group relative"
+              :class="selectedReturn?.id === returnItem.id ? 'bg-indigo-50/50' : 'bg-white'"
+            >
+              <!-- Indicador de selección -->
+              <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 transition-transform duration-200"
+                   :class="selectedReturn?.id === returnItem.id ? 'scale-y-100' : 'scale-y-0'"></div>
               
-              <!-- Contenido ultra minimalista -->
-              <div class="flex items-start justify-between mb-1">
+              <div class="flex items-start gap-3">
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold truncate" style="color: #0F172A; font-family: 'Inter', sans-serif;">
-                    {{ returnItem.number }}
+                  <div class="flex justify-between items-start">
+                    <p class="text-sm font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                      {{ returnItem.number }}
+                    </p>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border"
+                          :class="getStatusClasses(returnItem.status)">
+                      {{ getStatusLabel(returnItem.status) }}
+                    </span>
+                  </div>
+                  
+                  <p class="text-xs text-slate-500 truncate mt-0.5 font-medium">
+                    {{ returnItem.customer?.name || 'Cliente General' }}
                   </p>
-                  <p class="text-xs truncate mt-0.5" style="color: #64748B;">{{ returnItem.customer?.name || 'Cliente General' }}</p>
+                  
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="text-[10px] text-slate-400 flex items-center gap-1">
+                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                       {{ formatDate(returnItem.return_date) }}
+                    </span>
+                    <span class="text-xs font-black text-slate-900">
+                      ${{ formatCurrency(returnItem.total) }}
+                    </span>
+                  </div>
                 </div>
-                
-                <!-- Pill pequeña de estado -->
-                <span
-                  class="px-2 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ml-2"
-                  :style="{
-                    backgroundColor: returnItem.status === 'completed' ? '#D1FAE5' : returnItem.status === 'pending' ? '#FEF3C7' : '#FEE2E2',
-                    color: returnItem.status === 'completed' ? '#065F46' : returnItem.status === 'pending' ? '#92400E' : '#991B1B'
-                  }">
-                  {{ returnItem.status === 'completed' ? 'C' : returnItem.status === 'pending' ? 'P' : 'X' }}
-                </span>
-              </div>
-              
-              <!-- Info secundaria -->
-              <div class="flex items-center justify-between text-[11px] mt-1">
-                <span style="color: #94A3B8;">{{ formatDate(returnItem.return_date) }}</span>
-                <span class="font-semibold" style="color: #EF4444;">${{ formatCurrency(returnItem.total) }}</span>
               </div>
             </div>
             
@@ -182,43 +184,42 @@
         <div class="lg:col-span-7 bg-white rounded-xl overflow-hidden flex flex-col" style="border: 1px solid #E2E8F0;">
           
           <!-- Estado: No seleccionado -->
-          <div v-if="!selectedReturn" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
-            <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
-            </svg>
-            <h3 class="text-base font-bold text-gray-700 mb-1">Selecciona una devolución</h3>
-            <p class="text-xs text-gray-500">Haz clic en cualquier devolución de la lista</p>
+          <div v-if="!selectedReturn" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-slate-50/50">
+            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 border border-slate-100">
+               <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
+               </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Selecciona una devolución</h3>
+            <p class="text-sm text-slate-500 max-w-xs mx-auto">Haz clic en cualquier devolución de la lista izquierda para ver sus detalles completos.</p>
           </div>
 
           <!-- Estado: Devolución seleccionada -->
           <div v-else class="flex-1 flex flex-col overflow-hidden">
             
             <!-- Header del detalle con acciones contextuales -->
-            <div class="p-4" style="border-bottom: 1px solid #E2E8F0;">
+            <div class="p-6 border-b border-slate-100 bg-white">
               <div class="flex items-start justify-between">
                 <div class="flex-1">
-                  <div class="flex items-center gap-3 mb-2">
-                    <h2 class="text-2xl font-bold" style="color: #0F172A; font-family: 'Inter', sans-serif;">
+                  <div class="flex items-center gap-3 mb-3">
+                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">
                       {{ selectedReturn.number }}
                     </h2>
                     <span
-                      class="px-2.5 py-1 rounded-full text-xs font-semibold"
-                      :style="{
-                        backgroundColor: selectedReturn.status === 'completed' ? '#D1FAE5' : selectedReturn.status === 'pending' ? '#FEF3C7' : '#FEE2E2',
-                        color: selectedReturn.status === 'completed' ? '#065F46' : selectedReturn.status === 'pending' ? '#92400E' : '#991B1B'
-                      }">
+                      class="px-3 py-1 rounded-full text-xs font-bold border"
+                      :class="getStatusClasses(selectedReturn.status)">
                       {{ getStatusLabel(selectedReturn.status) }}
                     </span>
                   </div>
-                  <div class="flex items-center gap-4 text-sm" style="color: #64748B;">
-                    <span class="flex items-center gap-1.5">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="flex items-center gap-6 text-sm text-slate-500 font-medium">
+                    <span class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                       </svg>
                       {{ formatDate(selectedReturn.return_date) }}
                     </span>
-                    <span class="flex items-center gap-1.5">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                       </svg>
                       {{ selectedReturn.customer?.name || 'Cliente General' }}
@@ -230,8 +231,8 @@
                 <div class="flex items-center gap-2">
                   <button
                     @click="printReturn"
-                    class="px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium"
-                    style="color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0;">
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                     </svg>
@@ -240,8 +241,8 @@
                   
                   <button
                     @click="sendByEmail"
-                    class="px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium"
-                    style="color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0;">
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
@@ -298,29 +299,31 @@
                 </div>
                 
                 <div class="overflow-x-auto">
-                  <table class="min-w-full divide-y" style="border-color: #E2E8F0;">
-                    <thead style="background-color: #F8FAFC;">
-                      <tr>
-                        <th class="text-left text-xs font-bold uppercase tracking-wide px-4 py-3" style="color: #64748B;">Producto</th>
-                        <th class="text-center text-xs font-bold uppercase tracking-wide px-4 py-3" style="color: #64748B;">Cant.</th>
-                        <th class="text-right text-xs font-bold uppercase tracking-wide px-4 py-3" style="color: #64748B;">P. Unit.</th>
-                        <th class="text-right text-xs font-bold uppercase tracking-wide px-4 py-3" style="color: #64748B;">Subtotal</th>
+                  <table class="min-w-full">
+                    <thead>
+                      <tr class="bg-slate-50 border-b border-slate-200">
+                        <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Producto</th>
+                        <th class="text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Cant.</th>
+                        <th class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">P. Unit.</th>
+                        <th class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Subtotal</th>
                       </tr>
                     </thead>
-                    <tbody class="bg-white divide-y" style="border-color: #E2E8F0;">
-                      <tr v-for="item in selectedReturn.return_items" :key="item.id" class="hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-3">
-                          <p class="text-sm font-semibold" style="color: #0F172A; font-family: 'Inter', sans-serif;">{{ item.product?.name || 'N/A' }}</p>
-                          <p class="text-xs" style="color: #94A3B8; font-family: 'Inter', sans-serif;">{{ item.product?.code || 'N/A' }}</p>
+                    <tbody class="divide-y divide-slate-100">
+                      <tr v-for="item in selectedReturn.return_items" :key="item.id" class="hover:bg-slate-50/80 transition-colors">
+                        <td class="px-6 py-4">
+                          <p class="text-sm font-bold text-slate-800">{{ item.product?.name || 'N/A' }}</p>
+                          <p class="text-xs text-slate-500 mt-0.5">{{ item.product?.code || 'N/A' }}</p>
                         </td>
-                        <td class="text-center px-4 py-3">
-                          <span class="text-sm font-semibold" style="color: #0F172A; font-family: 'Inter', sans-serif;">{{ item.quantity }}</span>
+                        <td class="text-center px-6 py-4">
+                          <span class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-md bg-slate-100 text-slate-600">
+                            {{ item.quantity }}
+                          </span>
                         </td>
-                        <td class="text-right px-4 py-3">
-                          <span class="text-sm" style="color: #64748B; font-family: 'Inter', sans-serif;">${{ formatCurrency(item.unit_price) }}</span>
+                        <td class="text-right px-6 py-4 text-sm font-medium text-slate-600">
+                          ${{ formatCurrency(item.unit_price) }}
                         </td>
-                        <td class="text-right px-4 py-3">
-                          <span class="text-sm font-bold" style="color: #0F172A; font-family: 'Inter', sans-serif;">${{ formatCurrency(item.subtotal) }}</span>
+                        <td class="text-right px-6 py-4 text-sm font-bold text-slate-900">
+                          ${{ formatCurrency(item.subtotal) }}
                         </td>
                       </tr>
                     </tbody>
@@ -603,6 +606,14 @@ const getStatusLabel = (status) => {
     cancelled: 'Cancelada'
   }
   return labels[status] || status
+}
+
+const getStatusClasses = (status) => {
+  const s = status?.toLowerCase() || ''
+  if (s === 'completed' || s === 'completada') return 'bg-emerald-50 text-emerald-700 border-emerald-100'
+  if (s === 'pending' || s === 'pendiente') return 'bg-amber-50 text-amber-700 border-amber-100'
+  if (s === 'cancelled' || s === 'cancelada') return 'bg-rose-50 text-rose-700 border-rose-100'
+  return 'bg-slate-50 text-slate-600 border-slate-100'
 }
 
 const getRefundMethodLabel = (method) => {
