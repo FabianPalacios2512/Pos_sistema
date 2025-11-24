@@ -1,0 +1,27 @@
+{
+    "type": "invoice",
+    "customer_id": 7,
+    "date": "2025-11-16",
+    "due_date": "2025-12-16",
+    "subtotal": 10000.00,
+    "tax_amount": 0.00,
+    "total": 8000.00,
+    "payment_method": "efectivo",
+    "notes": "Venta POS - Prueba FINAL de descuento",
+    "items": [
+        {
+            "product_id": 1,
+            "product_name": "Producto de Prueba Final",
+            "quantity": 1,
+            "unit_price": 10000.00
+        }
+    ],
+    "applied_discount": {
+        "code": "TEST2025",
+        "discount_id": 8,
+        "amount": 2000.00
+    },
+    "user_identifier": "test_session_final_authenticated",
+    "customer_email": null,
+    "customer_phone": null
+}

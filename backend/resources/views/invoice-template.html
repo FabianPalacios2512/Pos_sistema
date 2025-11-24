@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura POS</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            background: white;
+            color: black;
+        }
+        .invoice-container {
+            width: 80mm;
+            max-width: 300px;
+            margin: 0 auto;
+            border: 1px solid #000;
+            padding: 10px;
+        }
+        .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .invoice-number {
+            text-align: center;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .date-section {
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        .customer-section {
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .products-header {
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0 10px 0;
+            font-size: 14px;
+        }
+        .product-line {
+            font-size: 11px;
+            margin: 2px 0;
+        }
+        .totals {
+            margin-top: 15px;
+            font-size: 12px;
+        }
+        .total-line {
+            margin: 2px 0;
+        }
+        .payment-section {
+            margin-top: 15px;
+            font-size: 12px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 10px;
+        }
+        .separator {
+            text-align: center;
+            margin: 10px 0;
+        }
+        .qr-placeholder {
+            text-align: center;
+            margin: 15px 0;
+            border: 1px solid #000;
+            padding: 20px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="header">{{ company_name }}</div>
+
+        <div class="invoice-number">
+            <div>Factura #:</div>
+            <div><strong>{{ invoice_number }}</strong></div>
+        </div>
+
+        <div class="date-section">
+            <div>Fecha:</div>
+            <div>{{ date }}</div>
+            <div>Vence:</div>
+            <div>{{ due_date }}</div>
+        </div>
+
+        <div class="customer-section">
+            <div>Vendedor:</div>
+            <div>{{ seller }}</div>
+            <div>Cliente:</div>
+            <div>{{ customer_name }}</div>
+        </div>
+
+        <div class="products-header">PRODUCTOS</div>
+
+        {{ products_section }}
+
+        <div class="separator">================================</div>
+
+        <div class="totals">
+            <div class="total-line">Subtotal: ${{ subtotal }}</div>
+            <div class="total-line">IVA ({{ tax_rate }}%): ${{ tax_amount }}</div>
+            <div class="total-line"><strong>TOTAL: ${{ total }}</strong></div>
+        </div>
+
+        <div class="payment-section">
+            <div><strong>PAGO</strong></div>
+            <div>{{ payment_method }}: ${{ cash_received }}</div>
+            <div>Cambio: ${{ change_due }}</div>
+        </div>
+
+        <div class="qr-placeholder">
+            [QR CODE]<br>
+            Código QR de la factura
+        </div>
+
+        <div class="footer">
+            <div><strong>¡GRACIAS POR SU COMPRA!</strong></div>
+            <div>Conserve este recibo</div>
+            <div>Devoluciones: 30 días</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,887 @@
+<template>
+  <div class="min-h-screen font-sans" style="background-color: #F4F6F8;">
+    <div class="p-4 lg:p-6 space-y-4 lg:space-y-5 animate-fade-in">
+      
+      <!-- Header Minimalista Enterprise con KPIs que ocupan todo el espacio -->
+      <div class="flex items-center justify-between gap-4">
+        
+        <!-- Título -->
+        <div class="flex-shrink-0">
+          <h1 class="text-2xl font-bold" style="color: #0F172A; font-family: 'Inter', sans-serif;">Facturas</h1>
+          <p class="text-xs mt-1" style="color: #94A3B8;">Gestión y control de documentos fiscales</p>
+        </div>
+        
+        <!-- KPIs que ocupan todo el espacio disponible -->
+        <div class="flex-1 flex items-center justify-start gap-4 px-6">
+          
+          <!-- KPI: Facturas del Mes -->
+          <div class="flex items-center gap-3 px-6 py-2.5 bg-white rounded-lg border" style="border-color: #E2E8F0;">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: #EEF2FF;">
+              <svg class="w-5 h-5" style="color: #6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] font-medium uppercase tracking-wide" style="color: #94A3B8; font-family: 'Inter', sans-serif;">Facturas del Mes</p>
+              <p class="text-lg font-bold leading-tight mt-0.5" style="color: #0F172A; font-family: 'Inter', sans-serif;">{{ monthlyInvoices }}</p>
+            </div>
+          </div>
+
+          <!-- KPI: Total Facturado -->
+          <div class="flex items-center gap-3 px-6 py-2.5 bg-white rounded-lg border" style="border-color: #E2E8F0;">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: #ECFDF5;">
+              <svg class="w-5 h-5" style="color: #10B981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] font-medium uppercase tracking-wide" style="color: #94A3B8; font-family: 'Inter', sans-serif;">Total Facturado</p>
+              <p class="text-lg font-bold leading-tight mt-0.5" style="color: #0F172A; font-family: 'Inter', sans-serif;">${{ formatCurrency(totalInvoiced) }}</p>
+            </div>
+          </div>
+
+          <!-- KPI: Cotizaciones -->
+          <div class="flex items-center gap-3 px-6 py-2.5 bg-white rounded-lg border" style="border-color: #E2E8F0;">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: #EEF2FF;">
+              <svg class="w-5 h-5" style="color: #6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="text-[10px] font-medium uppercase tracking-wide" style="color: #94A3B8; font-family: 'Inter', sans-serif;">Cotizaciones</p>
+              <p class="text-lg font-bold leading-tight mt-0.5" style="color: #0F172A; font-family: 'Inter', sans-serif;">{{ quotations }}</p>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <button
+            @click="loadInvoices"
+            class="p-2 bg-white hover:bg-gray-50 rounded-lg border transition-all"
+            style="border-color: #E2E8F0; color: #64748B;"
+            title="Actualizar">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+          </button>
+          
+          <button
+            @click="showNewInvoiceModal = true"
+            class="px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2"
+            style="background-color: #0F172A; font-family: 'Inter', sans-serif; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nueva Factura
+          </button>
+        </div>
+        
+      </div>
+
+      <!-- Master-Detail Layout Enterprise: 30/70 -->
+      <div class="grid grid-cols-1 lg:grid-cols-10 gap-4" style="height: calc(100vh - 140px); min-height: 650px;">
+        
+        <!-- PANEL IZQUIERDO: Lista Minimalista (30%) -->
+        <div class="lg:col-span-3 bg-white rounded-xl overflow-hidden flex flex-col" style="border: 1px solid #E2E8F0;">
+          
+          <!-- Header minimalista con búsqueda -->
+          <div class="p-3" style="border-bottom: 1px solid #E2E8F0;">
+            <!-- Búsqueda limpia -->
+            <div class="relative mb-3">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style="color: #94A3B8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                v-model="searchTerm"
+                type="text"
+                placeholder="Buscar..."
+                class="w-full pl-9 pr-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2"
+                style="border: 1px solid #E2E8F0; color: #0F172A; font-family: 'Inter', sans-serif;"
+                :style="{ '&:focus': { borderColor: '#3B82F6', ring: '2px solid rgba(59, 130, 246, 0.1)' } }">
+            </div>
+            
+            <!-- Filtros compactos -->
+            <div class="flex gap-2">
+              <select
+                v-model="typeFilter"
+                class="flex-1 px-2 py-1.5 text-xs rounded-lg focus:outline-none focus:ring-2"
+                style="border: 1px solid #E2E8F0; color: #64748B; font-family: 'Inter', sans-serif;">
+                <option value="">Todos</option>
+                <option value="invoice">Facturas</option>
+                <option value="quote">Cotizaciones</option>
+              </select>
+              
+              <select
+                v-model="statusFilter"
+                class="flex-1 px-2 py-1.5 text-xs rounded-lg focus:outline-none focus:ring-2"
+                style="border: 1px solid #E2E8F0; color: #64748B; font-family: 'Inter', sans-serif;">
+                <option value="">Estado</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Pagada">Pagada</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Lista minimalista sin botones -->
+          <div class="flex-1 overflow-y-auto">
+            
+            <div
+              v-for="invoice in displayedInvoices"
+              :key="invoice.id"
+              @click="selectInvoice(invoice)"
+              class="px-4 py-4 cursor-pointer transition-all"
+              :style="{
+                borderBottom: '1px solid #F1F5F9',
+                backgroundColor: selectedInvoice?.id === invoice.id ? '#F0FDF4' : '#FFFFFF',
+                borderLeft: selectedInvoice?.id === invoice.id ? '4px solid #10B981' : '4px solid transparent'
+              }">
+              
+              <!-- Contenido ultra minimalista -->
+              <div class="flex items-start justify-between mb-1">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold truncate" style="color: #0F172A; font-family: 'Inter', sans-serif;">
+                    {{ invoice.invoiceNumber || invoice.number || `DOC-${String(invoice.id).padStart(4, '0')}` }}
+                  </p>
+                  <p class="text-xs truncate mt-0.5" style="color: #64748B;">{{ invoice.customer || invoice.customer_name || 'Cliente General' }}</p>
+                </div>
+                
+                <!-- Pill pequeña de estado -->
+                <span
+                  class="px-2 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 ml-2"
+                  :style="{
+                    backgroundColor: (invoice.status === 'Pagada' || invoice.status === 'paid') ? '#D1FAE5' : '#FEF3C7',
+                    color: (invoice.status === 'Pagada' || invoice.status === 'paid') ? '#065F46' : '#92400E'
+                  }">
+                  {{ (invoice.status === 'Pagada' || invoice.status === 'paid') ? 'Pagada' : 'Pendiente' }}
+                </span>
+              </div>
+              
+              <!-- Info secundaria -->
+              <div class="flex items-center justify-between text-[11px] mt-1">
+                <span style="color: #94A3B8;">{{ formatDate(invoice.date) }}</span>
+                <span class="font-semibold" style="color: #0F172A;">${{ formatCurrency(invoice.total) }}</span>
+              </div>
+              
+              <!-- Badge COT discreto (sin botón) -->
+              <div v-if="invoice.type === 'Cotización' || invoice.type === 'quote'" class="mt-1.5">
+                <span class="inline-block px-1.5 py-0.5 rounded text-[9px] font-semibold" style="background-color: #DBEAFE; color: #1E40AF;">
+                  COTIZACIÓN
+                </span>
+              </div>
+            </div>
+            
+            <!-- Botón Cargar Más -->
+            <div v-if="hasMoreInvoices" class="p-3 border-t" style="border-color: #E2E8F0;">
+              <button
+                @click="loadMoreInvoices"
+                class="w-full py-2.5 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-2 hover:bg-gray-50"
+                style="color: #64748B; border: 1px dashed #E2E8F0; font-family: 'Inter', sans-serif;">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+                Cargar más facturas... ({{ filteredInvoices.length - displayedInvoicesCount }} restantes)
+              </button>
+            </div>
+            
+            <!-- Estado vacío -->
+            <div v-if="filteredInvoices.length === 0" class="flex flex-col items-center justify-center py-8 text-center">
+              <svg class="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <p class="text-xs font-semibold text-gray-600">Sin resultados</p>
+              <p class="text-xs text-gray-500 mt-1">Intenta con otros filtros</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL DERECHO: Detalle Amplio (70%) -->
+        <div class="lg:col-span-7 bg-white rounded-xl overflow-hidden flex flex-col" style="border: 1px solid #E2E8F0;">
+          
+          <!-- Estado: No seleccionado -->
+          <div v-if="!selectedInvoice" class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <svg class="w-16 h-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="text-base font-bold text-gray-700 mb-1">Selecciona un documento</h3>
+            <p class="text-xs text-gray-500">Haz clic en cualquier factura o cotización de la lista</p>
+          </div>
+
+          <!-- Estado: Documento seleccionado -->
+          <div v-else class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- Header del detalle con acciones contextuales -->
+            <div class="p-4" style="border-bottom: 1px solid #E2E8F0;">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3 mb-2">
+                    <h2 class="text-2xl font-bold" style="color: #0F172A; font-family: 'Inter', sans-serif;">
+                      {{ selectedInvoice.invoiceNumber || selectedInvoice.number || `DOC-${String(selectedInvoice.id).padStart(4, '0')}` }}
+                    </h2>
+                    <span
+                      class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                      :style="{
+                        backgroundColor: (selectedInvoice.status === 'Pagada' || selectedInvoice.status === 'paid') ? '#D1FAE5' : '#FEF3C7',
+                        color: (selectedInvoice.status === 'Pagada' || selectedInvoice.status === 'paid') ? '#065F46' : '#92400E'
+                      }">
+                      {{ getStatusLabel(selectedInvoice.status) }}
+                    </span>
+                    <span v-if="selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote'" 
+                          class="px-2.5 py-1 rounded-full text-xs font-semibold"
+                          style="background-color: #DBEAFE; color: #1E40AF;">
+                      COTIZACIÓN
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-4 text-sm" style="color: #64748B;">
+                    <span class="flex items-center gap-1.5">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      {{ formatDate(selectedInvoice.date) }}
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                      </svg>
+                      {{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Acciones contextuales - AQUÍ va 'Facturar en POS' para cotizaciones -->
+                <div class="flex items-center gap-2">
+                  <!-- Botón principal: Facturar en POS (solo para cotizaciones) -->
+                  <button
+                    v-if="selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote'"
+                    @click="openInPos(selectedInvoice)"
+                    class="px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2"
+                    style="background-color: #10B981; font-family: 'Inter', sans-serif;"
+                    title="Convertir a factura">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    Facturar en POS
+                  </button>
+                  
+                  <!-- Botones de acción con texto descriptivo -->
+                  <button
+                    @click="viewAndPrintInvoice(selectedInvoice)"
+                    class="px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium"
+                    style="color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0;"
+                    :style="{ '&:hover': { backgroundColor: '#F1F5F9' } }">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                    Imprimir
+                  </button>
+                  
+                  <button
+                    @click="downloadPDF(selectedInvoice)"
+                    class="px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium"
+                    style="color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0;"
+                    :style="{ '&:hover': { backgroundColor: '#F1F5F9' } }">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Descargar
+                  </button>
+                  
+                  <button
+                    @click="sendByEmail(selectedInvoice)"
+                    class="px-3 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium"
+                    style="color: #64748B; background-color: #F8FAFC; border: 1px solid #E2E8F0;"
+                    :style="{ '&:hover': { backgroundColor: '#F1F5F9' } }">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Email
+                  </button>
+                  
+                  <!-- Menú de más acciones -->
+                  <div class="relative" @click.stop="">
+                    <button
+                      @click="toggleActionsMenu(selectedInvoice.id)"
+                      class="text-gray-400 hover:text-gray-700 transition-colors"
+                      title="Más opciones">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                      </svg>
+                    </button>
+                    
+                    <!-- Dropdown menu -->
+                    <div v-if="activeMenuId === selectedInvoice.id" 
+                         class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 py-1">
+                      <button @click="editInvoice(selectedInvoice); closeActionsMenu()" 
+                              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        <span>Editar</span>
+                      </button>
+                      <button @click="confirmDeleteInvoice(selectedInvoice); closeActionsMenu()" 
+                              class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        <span>Anular</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contenido scrollable - Factura digital limpia -->
+            <div class="flex-1 overflow-y-auto p-4" style="background-color: #F9FAFB;">
+              
+              <!-- Factura digital ocupa todo el ancho -->
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" style="border-color: #E2E8F0;">
+                
+                <!-- Encabezado de la factura digital -->
+                <div class="pb-5 mb-5" style="border-bottom: 1px solid #E5E7EB;">
+                  <div class="grid grid-cols-2 gap-6">
+                    <div>
+                      <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Información del Cliente</h4>
+                      <p class="text-sm font-bold" style="color: #0F172A;">{{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}</p>
+                      <p class="text-xs mt-1" style="color: #6B7280;">ID Cliente: {{ selectedInvoice.customer_id || 'N/A' }}</p>
+                    </div>
+                    
+                    <div class="text-right">
+                      <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Información del Documento</h4>
+                      <p class="text-sm font-bold" style="color: #0F172A;">Documento: {{ selectedInvoice.invoiceNumber || selectedInvoice.number }}</p>
+                      <p class="text-xs mt-1" style="color: #6B7280;">Fecha: {{ formatDate(selectedInvoice.date) }}</p>
+                      <p class="text-xs" style="color: #6B7280;">Vencimiento: {{ formatDate(selectedInvoice.due_date) }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Productos - Tabla limpia y espaciosa -->
+                <div class="mb-6">
+                  <h4 class="text-xs font-bold mb-4 uppercase" style="color: #0F172A; letter-spacing: 0.05em;">Productos / Servicios</h4>
+                  
+                  <div class="bg-white rounded-lg overflow-hidden">
+                    <table class="min-w-full">
+                      <thead>
+                        <tr style="border-bottom: 1px solid #E5E7EB; background-color: #F9FAFB;">
+                          <th class="text-left text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">#</th>
+                          <th class="text-left text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">Descripción</th>
+                          <th class="text-center text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">Cantidad</th>
+                          <th class="text-right text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">Precio Unit.</th>
+                          <th class="text-right text-xs font-semibold px-4 py-3 uppercase" style="color: #6B7280;">Subtotal</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-if="!selectedInvoice.items || selectedInvoice.items.length === 0" style="border-bottom: 1px solid #E5E7EB;">
+                          <td colspan="5" class="px-4 py-8 text-center">
+                            <p class="text-sm text-gray-500">No hay productos registrados</p>
+                          </td>
+                        </tr>
+                        <tr v-else v-for="(item, index) in selectedInvoice.items" :key="`item-${index}`" style="border-bottom: 1px solid #E5E7EB;" class="last:border-0 hover:bg-gray-50 transition-colors">
+                          <td class="px-4 py-3 text-xs" style="color: #9CA3AF;">{{ index + 1 }}</td>
+                          <td class="px-4 py-3">
+                            <p class="text-sm font-semibold" style="color: #0F172A;">{{ item.product_name || item.name || 'N/A' }}</p>
+                            <p class="text-xs" style="color: #6B7280;">Código: {{ item.product_code || item.code || 'N/A' }}</p>
+                          </td>
+                          <td class="text-center px-4 py-3">
+                            <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded" style="background-color: #EEF2FF; color: #4F46E5;">
+                              {{ item.quantity }}
+                            </span>
+                          </td>
+                          <td class="text-right px-4 py-3 text-sm" style="color: #374151;">
+                            ${{ formatCurrency(item.price || item.unit_price) }}
+                          </td>
+                          <td class="text-right px-4 py-3 text-sm font-bold" style="color: #0F172A;">
+                            ${{ formatCurrency(item.subtotal || (item.quantity * (item.price || item.unit_price))) }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    
+                    <!-- Totales dentro de la factura digital -->
+                    <div class="px-6 py-4" style="border-top: 1px solid #E5E7EB; background-color: #F9FAFB;">
+                      <div class="flex justify-end">
+                        <div class="w-72 space-y-2 text-sm">
+                          <div class="flex justify-between">
+                            <span style="color: #6B7280;">Subtotal:</span>
+                            <span class="font-semibold" style="color: #0F172A;">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
+                          </div>
+                          <div class="flex justify-between">
+                            <span style="color: #6B7280;">IVA (0%):</span>
+                            <span class="font-semibold" style="color: #0F172A;">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
+                          </div>
+                          <div class="pt-3 mt-2" style="border-top: 1px solid #D1D5DB;">
+                            <div class="flex justify-between items-center">
+                              <span class="text-base font-bold" style="color: #0F172A;">TOTAL:</span>
+                              <span class="text-2xl font-bold" style="color: #10B981;">${{ formatCurrency(selectedInvoice.total) }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="grid grid-cols-2 gap-6 pt-5" style="border-top: 1px solid #E5E7EB;">
+                  <div>
+                    <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Método de Pago</h4>
+                    <p class="text-sm" style="color: #0F172A;">{{ getPaymentMethodName(selectedInvoice.payment_method) }}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Vendedor</h4>
+                    <p class="text-sm" style="color: #0F172A;">{{ selectedInvoice.seller_name || selectedInvoice.created_by || 'N/A' }}</p>
+                  </div>
+                </div>
+
+                <!-- Nota/Observaciones si existen -->
+                <div v-if="selectedInvoice.notes" class="mt-5 pt-5" style="border-top: 1px solid #E5E7EB;">
+                  <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Observaciones</h4>
+                  <p class="text-sm p-3 rounded-lg" style="color: #374151; background-color: #F9FAFB;">{{ selectedInvoice.notes }}</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modales existentes se mantienen igual -->
+  <!-- Modal de Cotización -->
+  <QuotationModal 
+    v-if="showQuotationModal"
+    :show="showQuotationModal"
+    :type="quotationModalType"
+    :quotation-code="quotationData?.code || quotationData?.id || ''"
+    :quotation-data="quotationData"
+    @close="handleCloseQuotationModal"
+    @print="handlePrintQuotation"
+    @send-whatsapp="handleSendQuotationWhatsApp"
+  />
+
+  <!-- Modal para solicitar número de WhatsApp -->
+  <PhoneInputModal
+    :show="showPhoneModal"
+    :message="phoneModalMessage"
+    @confirm="handlePhoneConfirm"
+    @cancel="handlePhoneCancel"
+  />
+
+  <!-- Modal de Recibo para Facturas Normales -->
+  <ReceiptModal
+    v-if="showReceiptModal"
+    :sale="posCompatibleSale"
+    :system-settings="{}"
+    @close="closeInvoiceModal"
+    @new-sale="handleNewSale"
+    @send-whatsapp="handleSendWhatsApp"
+  />
+
+  <!-- Modal de Edición (simplificado) -->
+  <div v-if="showEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-4">Editar Documento</h3>
+      <p class="text-sm text-gray-600">Funcionalidad de edición próximamente...</p>
+      <button @click="showEditModal = false" class="mt-4 px-4 py-2 bg-gray-200 rounded-lg">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Nueva Factura (simplificado) -->
+  <div v-if="showNewInvoiceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-4">Nueva Factura</h3>
+      <p class="text-sm text-gray-600">Funcionalidad próximamente...</p>
+      <button @click="showNewInvoiceModal = false" class="mt-4 px-4 py-2 bg-gray-200 rounded-lg">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useToast } from '../composables/useToast.js'
+import { useAuth } from '../store/auth.js'
+import QuotationModal from './QuotationModal.vue'
+import PhoneInputModal from './PhoneInputModal.vue'
+import ReceiptModal from './ReceiptModal.vue'
+import { invoiceService } from '../services/invoiceService.js'
+import { formatInvoiceDate } from '@/utils/dateFormatter.js'
+
+// Props
+const props = defineProps({
+  invoices: {
+    type: Array,
+    default: () => []
+  },
+  moduleName: {
+    type: String,
+    default: 'invoices'
+  },
+  customers: {
+    type: Array,
+    default: () => []
+  },
+  products: {
+    type: Array,
+    default: () => []
+  }
+})
+
+// Emits
+const emit = defineEmits(['changeModule', 'open-quotation-in-pos', 'navigate'])
+
+// Composables
+const { showToast, showSuccess, showError } = useToast()
+const auth = useAuth()
+
+// Estado
+const selectedInvoice = ref(null)
+const searchTerm = ref('')
+const statusFilter = ref('')
+const typeFilter = ref('')
+const activeMenuId = ref(null)
+const showNewInvoiceModal = ref(false)
+const displayLimit = ref(20) // Cargar solo 20 facturas inicialmente
+const showEditModal = ref(false)
+const showQuotationModal = ref(false)
+const quotationModalType = ref('success')
+const quotationData = ref(null)
+const showReceiptModal = ref(false)
+const showPhoneModal = ref(false)
+const phoneModalMessage = ref('')
+const phoneModalResolve = ref(null)
+
+// Computed
+const filteredInvoices = computed(() => {
+  let filtered = props.invoices
+  
+  // Excluir cotizaciones canceladas por defecto
+  filtered = filtered.filter(invoice => invoice.status !== 'cancelled')
+
+  if (searchTerm.value) {
+    const term = searchTerm.value.toLowerCase()
+    filtered = filtered.filter(invoice => 
+      invoice.invoiceNumber?.toLowerCase().includes(term) ||
+      invoice.number?.toLowerCase().includes(term) ||
+      invoice.customer?.toLowerCase().includes(term) ||
+      invoice.customer_name?.toLowerCase().includes(term) ||
+      invoice.total?.toString().includes(term)
+    )
+  }
+
+  if (statusFilter.value) {
+    filtered = filtered.filter(invoice => invoice.status === statusFilter.value)
+  }
+
+  if (typeFilter.value) {
+    filtered = filtered.filter(invoice => {
+      if (typeFilter.value === 'invoice') {
+        return invoice.type !== 'Cotización' && invoice.type !== 'quote'
+      } else if (typeFilter.value === 'quote') {
+        return invoice.type === 'Cotización' || invoice.type === 'quote'
+      }
+      return true
+    })
+  }
+
+  return filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
+})
+
+// Invoices paginadas para optimizar rendimiento
+const displayedInvoices = computed(() => {
+  return filteredInvoices.value.slice(0, displayLimit.value)
+})
+
+const hasMoreInvoices = computed(() => {
+  return filteredInvoices.value.length > displayLimit.value
+})
+
+const displayedInvoicesCount = computed(() => {
+  return Math.min(displayLimit.value, filteredInvoices.value.length)
+})
+
+const monthlyInvoices = computed(() => {
+  const thisMonth = new Date().getMonth()
+  const thisYear = new Date().getFullYear()
+  return props.invoices.filter(invoice => {
+    const invoiceDate = new Date(invoice.date)
+    return invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+  }).length
+})
+
+const totalInvoiced = computed(() => {
+  const thisMonth = new Date().getMonth()
+  const thisYear = new Date().getFullYear()
+  return props.invoices.filter(invoice => {
+    const invoiceDate = new Date(invoice.date)
+    return invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+  }).reduce((sum, invoice) => sum + (invoice.total || 0), 0)
+})
+
+const pendingInvoices = computed(() => {
+  return props.invoices.filter(invoice => 
+    invoice.status?.toLowerCase() === 'pendiente' || invoice.status?.toLowerCase() === 'pending'
+  ).length
+})
+
+const quotations = computed(() => {
+  return props.invoices.filter(invoice => 
+    invoice.type === 'Cotización' || invoice.type === 'quote'
+  ).length
+})
+
+const posCompatibleSale = computed(() => {
+  if (!selectedInvoice.value) return {}
+  
+  // Parsear items
+  let items = []
+  try {
+    if (selectedInvoice.value.items) {
+      items = typeof selectedInvoice.value.items === 'string' 
+        ? JSON.parse(selectedInvoice.value.items)
+        : selectedInvoice.value.items
+    }
+  } catch (error) {
+    items = []
+  }
+
+  const posItems = items.map((item, index) => ({
+    id: item.id || item.product_id || index,
+    name: item.name || item.product_name || `Producto ${index + 1}`,
+    quantity: parseFloat(item.quantity || 1),
+    price: parseFloat(item.price || item.unit_price || 0),
+    subtotal: parseFloat(item.subtotal || (item.quantity * (item.price || item.unit_price)) || 0)
+  }))
+
+  return {
+    invoiceNumber: selectedInvoice.value.number || selectedInvoice.value.invoiceNumber || `FV-${selectedInvoice.value.id}`,
+    date: selectedInvoice.value.date || new Date().toISOString(),
+    cashier: selectedInvoice.value.seller_name || 'Vendedor',
+    customer: selectedInvoice.value.customer_name || selectedInvoice.value.customer || 'Cliente General',
+    items: posItems,
+    subtotal: parseFloat(selectedInvoice.value.subtotal || 0),
+    discount: parseFloat(selectedInvoice.value.discount_amount || 0),
+    tax: parseFloat(selectedInvoice.value.tax_amount || 0),
+    total: parseFloat(selectedInvoice.value.total || 0),
+    payments: [{
+      method: selectedInvoice.value.payment_method || 'efectivo',
+      amount: parseFloat(selectedInvoice.value.total || 0)
+    }]
+  }
+})
+
+// Métodos
+const loadMoreInvoices = () => {
+  displayLimit.value += 20
+  console.log(`📄 Cargando más facturas. Mostrando: ${displayLimit.value}`)
+}
+
+const selectInvoice = async (invoice) => {
+  try {
+    const fullInvoice = await invoiceService.getInvoice(invoice.id)
+    selectedInvoice.value = fullInvoice
+  } catch (error) {
+    console.error('Error al cargar factura:', error)
+    selectedInvoice.value = invoice
+  }
+}
+
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  try {
+    const [year, month, day] = dateString.split('-').map(num => parseInt(num, 10))
+    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`
+  } catch (error) {
+    return '-'
+  }
+}
+
+const formatCurrency = (value) => {
+  if (!value) return '0'
+  return parseFloat(value).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+}
+
+const getStatusLabel = (status) => {
+  const labels = {
+    'Pendiente': 'Pendiente',
+    'Pagada': 'Pagada',
+    'pending': 'Pendiente',
+    'paid': 'Pagada'
+  }
+  return labels[status] || 'Pendiente'
+}
+
+const getPaymentMethodName = (method) => {
+  const methodNames = {
+    efectivo: 'Efectivo',
+    tarjeta_debito: 'Tarjeta Débito',
+    tarjeta_credito: 'Tarjeta Crédito',
+    transferencia: 'Transferencia',
+    nequi: 'Nequi',
+    daviplata: 'Daviplata',
+    cash: 'Efectivo'
+  }
+  return methodNames[method] || 'Efectivo'
+}
+
+const clearFilters = () => {
+  searchTerm.value = ''
+  statusFilter.value = ''
+  typeFilter.value = ''
+}
+
+const toggleActionsMenu = (id) => {
+  activeMenuId.value = activeMenuId.value === id ? null : id
+}
+
+const closeActionsMenu = () => {
+  activeMenuId.value = null
+}
+
+const openInPos = (invoice) => {
+  // Mapear el invoice al formato que espera PosView (con campo 'code')
+  const quotationData = {
+    code: invoice.invoiceNumber || invoice.number || invoice.invoice_number || `DOC-${invoice.id}`,
+    id: invoice.id,
+    customer: invoice.customer || invoice.customer_name,
+    customer_id: invoice.customer_id,
+    items: invoice.items,
+    total: invoice.total,
+    status: invoice.status,
+    type: invoice.type,
+    date: invoice.date
+  }
+  
+  emit('open-quotation-in-pos', quotationData)
+  emit('changeModule', 'pos')
+}
+
+const viewAndPrintInvoice = (invoice) => {
+  selectedInvoice.value = invoice
+  showReceiptModal.value = true
+}
+
+const downloadPDF = (invoice) => {
+  showToast('Descarga de PDF próximamente', 'info')
+}
+
+const sendByEmail = (invoice) => {
+  showToast('Envío por email próximamente', 'info')
+}
+
+const editInvoice = (invoice) => {
+  showEditModal.value = true
+}
+
+const confirmDeleteInvoice = (invoice) => {
+  if (confirm('¿Está seguro de que desea anular este documento?')) {
+    showToast('Anulación próximamente', 'info')
+  }
+}
+
+const loadInvoices = () => {
+  showToast('Actualizando...', 'info')
+}
+
+const generateReport = () => {
+  emit('navigate', 'reports')
+}
+
+const closeInvoiceModal = () => {
+  showReceiptModal.value = false
+}
+
+const handleNewSale = () => {
+  emit('changeModule', 'pos')
+}
+
+const handleSendWhatsApp = () => {
+  showToast('WhatsApp próximamente', 'info')
+}
+
+const handleCloseQuotationModal = () => {
+  showQuotationModal.value = false
+}
+
+const handlePrintQuotation = () => {
+  showToast('Impresión próximamente', 'info')
+}
+
+const handleSendQuotationWhatsApp = () => {
+  showToast('WhatsApp próximamente', 'info')
+}
+
+const handlePhoneConfirm = (phone) => {
+  showPhoneModal.value = false
+  if (phoneModalResolve.value) {
+    phoneModalResolve.value(phone)
+    phoneModalResolve.value = null
+  }
+}
+
+const handlePhoneCancel = () => {
+  showPhoneModal.value = false
+  if (phoneModalResolve.value) {
+    phoneModalResolve.value(null)
+    phoneModalResolve.value = null
+  }
+}
+
+// Watchers - Resetear paginación cuando cambien filtros
+watch([searchTerm, statusFilter, typeFilter], () => {
+  displayLimit.value = 20 // Resetear a 20 cuando cambien los filtros
+})
+
+// Lifecycle
+onMounted(() => {
+  document.addEventListener('click', closeActionsMenu)
+  
+  // NO seleccionar automáticamente - dejar en blanco para que el usuario elija
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', closeActionsMenu)
+})
+</script>
+
+<style scoped>
+/* Fuente Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+</style>
