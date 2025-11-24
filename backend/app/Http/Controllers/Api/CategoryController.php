@@ -25,6 +25,18 @@ class CategoryController extends Controller
             ->orderBy('name')
             ->get();
 
+            // Calculate revenue for each category from paid invoices
+            foreach ($categories as $category) {
+                $revenue = \DB::table('invoice_items')
+                    ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                    ->join('products', 'invoice_items.product_id', '=', 'products.id')
+                    ->where('products.category_id', $category->id)
+                    ->where('invoices.status', 'paid')
+                    ->sum(\DB::raw('invoice_items.quantity * invoice_items.unit_price'));
+                
+                $category->revenue = round($revenue, 2);
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $categories,

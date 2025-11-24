@@ -32,7 +32,7 @@
         <div class="flex items-center space-x-3">
           <!-- Botón Neutro (Exportar) -->
           <button @click="exportCategories"
-                  class="px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl border border-slate-200 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:shadow-md hover:border-slate-300">
+                  class="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-600 text-sm font-bold rounded-xl border border-slate-200 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:border-slate-300">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
@@ -41,7 +41,7 @@
           
           <!-- Botón Principal (Nueva Categoría) - Negro -->
           <button @click="showAddCategoryModal = true"
-                  class="px-5 py-2.5 bg-black hover:bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+                  class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-900/20 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
@@ -53,7 +53,7 @@
       <!-- Métricas Principales -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <!-- Total Categorías -->
-        <div class="bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 transition-shadow duration-200 shadow-sm hover:shadow-lg">
+        <div class="bg-white rounded-xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200">
           <div class="flex items-center space-x-4">
             <div class="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,13 +62,10 @@
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-slate-700">Total Categorías</h3>
-                <span class="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
-                  TOTAL
-                </span>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Total Categorías</h3>
               </div>
-              <p class="text-2xl font-bold text-slate-900 mb-1">{{ totalCategories }}</p>
-              <p class="text-sm text-slate-500">en el sistema</p>
+              <p class="text-2xl font-black text-slate-900 mb-0.5">{{ totalCategories }}</p>
+              <p class="text-xs text-slate-400 font-medium">en el sistema</p>
             </div>
           </div>
         </div>
@@ -164,18 +161,37 @@
             <option value="inactive">Inactivas</option>
           </select>
           
+          
           <!-- Toggle Vista -->
-          <button
-            @click="setViewMode(viewMode === 'grid' ? 'table' : 'grid')"
-            class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-            :title="viewMode === 'grid' ? 'Cambiar a tabla' : 'Cambiar a tarjetas'">
-            <svg v-if="viewMode === 'grid'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
-            </svg>
-            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-            </svg>
-          </button>
+          <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
+            <button
+              @click="setViewMode('grid')"
+              :class="[
+                'flex items-center justify-center px-3 py-1.5 rounded-md transition-all text-xs font-bold',
+                viewMode === 'grid' 
+                  ? 'bg-white text-slate-900 shadow-sm' 
+                  : 'text-slate-500 hover:text-slate-700'
+              ]">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+              </svg>
+              Tarjetas
+            </button>
+            
+            <button
+              @click="setViewMode('table')"
+              :class="[
+                'flex items-center justify-center px-3 py-1.5 rounded-md transition-all text-xs font-bold',
+                viewMode === 'table' 
+                  ? 'bg-white text-slate-900 shadow-sm' 
+                  : 'text-slate-500 hover:text-slate-700'
+              ]">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+              </svg>
+              Tabla
+            </button>
+          </div>
           
           <!-- Limpiar Filtros -->
           <button
@@ -211,106 +227,98 @@
         </div>
         
         <!-- Grid de categorías -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-6">
           <div
             v-for="category in paginatedCategories"
             :key="category.id"
             :class="[
-              'bg-white rounded-2xl border border-gray-300 hover:border-gray-400 transition-all duration-200 hover:shadow-lg overflow-hidden',
+              'bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-300 overflow-hidden group flex flex-col',
               !category.active && 'opacity-75'
             ]">
             
             <!-- Header -->
-            <div class="bg-gray-50 border-b border-gray-200 p-4">
+            <div class="bg-slate-50 border-b border-slate-200 p-4">
               <div class="flex items-center space-x-3 mb-2">
                 <!-- Icono de la categoría -->
                 <div 
                   class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm"
                   :style="{ backgroundColor: category.color || '#3b82f6' }">
-                  <span class="text-2xl filter brightness-150">{{ getIconEmoji(category.icon) }}</span>
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" v-html="getIconSvg(category.icon)"></svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-sm font-bold text-gray-900 truncate">{{ category.name }}</h3>
+                  <h3 class="text-sm font-bold text-slate-900 truncate">{{ category.name }}</h3>
                   <span
                     v-if="!category.active"
-                    class="inline-block px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full mt-1">
+                    class="inline-block px-2 py-0.5 bg-rose-50 text-rose-700 text-[10px] font-bold rounded-full mt-1 border border-rose-100 uppercase tracking-wide">
                     Inactiva
                   </span>
                 </div>
               </div>
-              <p class="text-xs text-gray-600 line-clamp-2">{{ category.description }}</p>
+              <p class="text-xs text-slate-600 line-clamp-2">{{ category.description }}</p>
             </div>
             
             <!-- Contenido -->
-            <div class="p-4">
+            <div class="p-4 flex-1 flex flex-col">
               <!-- Estadísticas -->
-              <div class="grid grid-cols-2 gap-3 mb-4">
-                <div class="text-center bg-gray-50 rounded-xl p-3">
-                  <div class="text-lg font-bold text-gray-900">{{ category.products_count || 0 }}</div>
-                  <div class="text-xs text-gray-500">Productos</div>
+              <div class="grid grid-cols-2 gap-3 mb-4 flex-1">
+                <div class="text-center bg-slate-50 rounded-xl p-3 border border-slate-100">
+                  <div class="text-lg font-black text-slate-900">{{ category.products_count || 0 }}</div>
+                  <div class="text-[10px] text-slate-500 font-medium uppercase tracking-wide">Productos</div>
                 </div>
-                <div class="text-center bg-green-50 rounded-xl p-3">
-                  <div class="text-lg font-bold text-green-600">${{ formatCurrency(category.revenue || 0) }}</div>
-                  <div class="text-xs text-gray-500">Ventas</div>
+                <div class="text-center bg-emerald-50 rounded-xl p-3 border border-emerald-100">
+                  <div class="text-lg font-black text-emerald-700">${{ formatCurrency(category.revenue || 0) }}</div>
+                  <div class="text-[10px] text-slate-500 font-medium uppercase tracking-wide">Ventas</div>
                 </div>
               </div>
 
               <!-- Estado y fecha -->
-              <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
-                <span>{{ formatDate(category.created_at) }}</span>
-                <span :class="category.active ? 'text-green-600' : 'text-red-600'">
+              <div class="flex justify-between items-center text-xs text-slate-500 mb-4 pb-3 border-t border-slate-100 pt-3">
+                <span class="font-medium">{{ formatDate(category.created_at) }}</span>
+                <span :class="category.active ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'">
                   {{ category.active ? 'Activa' : 'Inactiva' }}
                 </span>
               </div>
 
-              <!-- Acciones -->
-              <div class="flex space-x-2">
+              <!-- Acciones (Ghost Style) -->
+              <div class="grid grid-cols-3 gap-2">
                 <button
                   @click="viewCategoryProducts(category)"
-                  class="flex-1 px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="flex items-center justify-center py-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
+                  title="Ver Productos">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                   </svg>
-                  Ver
                 </button>
                 
                 <button
                   @click="editCategory(category)"
-                  class="px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-600 rounded-lg text-xs font-medium transition-colors">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="flex items-center justify-center py-2 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all border border-transparent hover:border-amber-100"
+                  title="Editar">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
                 </button>
                 
                 <button
                   @click="toggleCategoryStatus(category)"
-                  :class="[
-                    'px-3 py-2 rounded-lg text-xs font-medium transition-colors',
-                    category.active 
-                      ? 'bg-red-100 hover:bg-red-200 text-red-600' 
-                      : 'bg-green-100 hover:bg-green-200 text-green-600'
-                  ]">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      v-if="category.active"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    <path
-                      v-else
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10 5a9 9 0 1118 0 9 9 0 01-18 0z"></path>
-                    </svg>
-                  </button>
-                </div>
+                  class="flex items-center justify-center py-2 rounded-lg transition-all border border-transparent"
+                  :class="category.active 
+                    ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-100' 
+                    : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-100'"
+                  :title="category.active ? 'Desactivar' : 'Activar'">
+                  <svg v-if="category.active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10 5a9 9 0 1118 0 9 9 0 01-18 0z"></path>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
       <!-- Vista de Tabla -->
       <div v-else>
@@ -357,7 +365,7 @@
                 <div 
                   class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
                   :style="{ backgroundColor: category.color || '#3b82f6' }">
-                  <span class="text-xl filter brightness-150">{{ getIconEmoji(category.icon) }}</span>
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" v-html="getIconSvg(category.icon)"></svg>
                 </div>
                 <div>
                   <div class="text-sm font-semibold text-slate-900">{{ category.name }}</div>
@@ -374,8 +382,8 @@
             <td class="px-6 py-4 text-center">
               <span
                 :class="[
-                  'px-3 py-1 rounded-full text-xs font-semibold',
-                  category.active ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                  'px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide',
+                  category.active ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'
                 ]">
                 {{ category.active ? 'Activa' : 'Inactiva' }}
               </span>
@@ -384,44 +392,36 @@
               <span class="text-sm text-slate-600">{{ formatDate(category.created_at) }}</span>
             </td>
             <td class="px-6 py-4">
-              <div class="flex items-center justify-center gap-1.5">
+              <div class="flex items-center justify-center gap-2">
                 <button
                   @click="viewCategoryProducts(category)"
-                  class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 rounded-lg transition-all hover:shadow-sm"
+                  class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                   title="Ver productos">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                   </svg>
                 </button>
                 <button
                   @click="editCategory(category)"
-                  class="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 rounded-lg transition-all hover:shadow-sm"
+                  class="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
                   title="Editar">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
                 </button>
                 <button
                   @click="toggleCategoryStatus(category)"
-                  class="p-1.5 transition-all rounded-lg border hover:shadow-sm"
+                  class="p-2.5 rounded-lg transition-all"
                   :class="category.active 
-                    ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200' 
-                    : 'bg-green-50 hover:bg-green-100 text-green-600 border-green-200'"
+                    ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50' 
+                    : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'"
                   :title="category.active ? 'Desactivar' : 'Activar'">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      v-if="category.active"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    <path
-                      v-else
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10 5a9 9 0 1118 0 9 9 0 01-18 0z"></path>
+                  <svg v-if="category.active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10 5a9 9 0 1118 0 9 9 0 01-18 0z"></path>
                   </svg>
                 </button>
               </div>
@@ -1135,11 +1135,31 @@ const formatDate = (dateString) => {
   }
 }
 
-// Helper para obtener el emoji del icono
-const getIconEmoji = (iconId) => {
-  const icon = availableIcons.find(i => i.id === iconId)
-  return icon ? icon.emoji : '🛍️' // Default: shopping bag
+// Helper para obtener el SVG del icono
+const getIconSvg = (iconId) => {
+  const iconMap = {
+    'shopping-bag': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>',
+    'gift': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>',
+    'package': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>',
+    'money': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>',
+    'food': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>',
+    'drink': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>',
+    'coffee': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>',
+    'perfume': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>',
+    'cosmetics': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>',
+    'book': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>',
+    'pencil': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>',
+    'tshirt': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>',
+    'shoe': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>',
+    'watch': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+    'pill': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
+    'toy': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10 5a9 9 0 1118 0 9 9 0 01-18 0z"/>',
+    'baby': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>',
+  }
+  
+  return iconMap[iconId] || iconMap['shopping-bag'] // Default: shopping bag
 }
+
 
 // Watchers
 watch([searchTerm, statusFilter], () => {
