@@ -266,7 +266,8 @@
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
         <div v-for="product in paginatedProducts" 
              :key="product.id" 
-             class="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all duration-300 overflow-hidden group flex flex-col">
+             @click="viewProduct(product)"
+             class="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all duration-300 overflow-hidden group flex flex-col cursor-pointer">
           
           <!-- Imagen del producto -->
           <div class="relative h-40 bg-slate-50 overflow-hidden">
@@ -326,7 +327,7 @@
 
             <!-- Acciones (Ghost Style) -->
             <div class="grid grid-cols-3 gap-2">
-              <button @click="viewProduct(product)" 
+              <button @click.stop="viewProduct(product)" 
                       class="flex items-center justify-center py-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
                       title="Ver Detalles">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -335,7 +336,7 @@
                 </svg>
               </button>
               
-              <button @click="editProduct(product)" 
+              <button @click.stop="editProduct(product)" 
                       class="flex items-center justify-center py-2 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all border border-transparent hover:border-amber-100"
                       title="Editar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,17 +344,17 @@
                 </svg>
               </button>
               
-              <button @click="toggleProductStatus(product)" 
+              <button @click.stop="toggleProductStatus(product)" 
                       class="flex items-center justify-center py-2 rounded-lg transition-all border border-transparent"
                       :class="getProductStatus(product) !== false 
                         ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-100' 
                         : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-100'"
                       :title="getProductStatus(product) !== false ? 'Desactivar' : 'Activar'">
                 <svg v-if="getProductStatus(product) !== false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                 </svg>
                 <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               </button>
             </div>
@@ -447,7 +448,8 @@
           <!-- Product Rows -->
           <tr v-for="product in paginatedProducts" 
               :key="product.id"
-              class="hover:bg-slate-50/80 transition-colors group">
+              @click="viewProduct(product)"
+              class="hover:bg-slate-50/80 transition-colors group cursor-pointer">
             <td class="px-6 py-4">
               <div class="flex items-center gap-4">
                 <div class="relative w-10 h-10 flex-shrink-0">
@@ -491,7 +493,7 @@
             </td>
             <td class="px-6 py-4">
               <div class="flex items-center justify-center gap-2">
-                <button @click="viewProduct(product)" 
+                <button @click.stop="viewProduct(product)" 
                   class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                   title="Ver detalles">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -499,14 +501,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                   </svg>
                 </button>
-                <button @click="editProduct(product)" 
+                <button @click.stop="editProduct(product)" 
                   class="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
                   title="Editar producto">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                   </svg>
                 </button>
-                <button @click="toggleProductStatus(product)" 
+                <button @click.stop="toggleProductStatus(product)" 
                   class="p-2.5 rounded-lg transition-all"
                   :class="getProductStatus(product) !== false 
                     ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50' 
@@ -573,6 +575,109 @@
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
             </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación para Cambio de Estado -->
+    <div v-if="showStatusConfirmModal" 
+         class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+         @click.self="showStatusConfirmModal = false">
+      <div class="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Confirmar Cambio de Estado</h3>
+              <p class="text-sm text-white/80">Esta acción modificará el estado del producto</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+          <p class="text-slate-700 mb-4">
+            ¿Estás seguro que deseas <span class="font-bold">{{ pendingStatusChange?.newStatus ? 'habilitar' : 'deshabilitar' }}</span> el producto:
+          </p>
+          <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 mb-6">
+            <p class="font-bold text-slate-900">{{ pendingStatusChange?.product?.name }}</p>
+            <p class="text-sm text-slate-500 mt-1">SKU: {{ pendingStatusChange?.product?.sku || 'N/A' }}</p>
+          </div>
+          <p class="text-sm text-slate-600">
+            {{ pendingStatusChange?.newStatus ? 'El producto estará disponible para la venta.' : 'El producto no estará disponible para la venta.' }}
+          </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="bg-slate-50 px-6 py-4 flex items-center justify-end space-x-3">
+          <button @click="showStatusConfirmModal = false" 
+                  class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">
+            Cancelar
+          </button>
+          <button @click="confirmStatusChange" 
+                  class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg transition-colors font-medium">
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Categoría Inactiva -->
+    <div v-if="showCategoryInactiveModal" 
+         class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+         @click.self="showCategoryInactiveModal = false">
+      <div class="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Categoría Inactiva</h3>
+              <p class="text-sm text-white/80">La categoría debe estar activa primero</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+          <p class="text-slate-700 mb-4">
+            No puedes activar el producto <span class="font-bold">{{ pendingStatusChange?.product?.name }}</span> porque su categoría está inactiva.
+          </p>
+          <div class="bg-blue-50 rounded-lg p-4 border border-blue-200 mb-6">
+            <div class="flex items-center space-x-2 mb-2">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              <p class="font-bold text-blue-900">{{ pendingStatusChange?.category?.name }}</p>
+            </div>
+            <p class="text-sm text-blue-700">Estado: Inactiva</p>
+          </div>
+          <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+            <p class="text-sm text-green-800">
+              <strong>Solución:</strong> Al activar la categoría, este producto se reactivará automáticamente junto con todos los demás productos que fueron desactivados con ella.
+            </p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="bg-slate-50 px-6 py-4 flex items-center justify-end space-x-3">
+          <button @click="showCategoryInactiveModal = false" 
+                  class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">
+            Cancelar
+          </button>
+          <button @click="activateCategoryAndProduct" 
+                  class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium">
+            Activar Categoría
           </button>
         </div>
       </div>
@@ -1713,11 +1818,66 @@ const removeNotification = (id) => {
 }
 
 // 🔄 Función para habilitar/deshabilitar productos
+// Estado para confirmación de cambio de estado
+const showStatusConfirmModal = ref(false)
+const showCategoryInactiveModal = ref(false)
+const pendingStatusChange = ref(null)
+
 const toggleProductStatus = async (product) => {
+  const currentStatus = getProductStatus(product)
+  const newStatus = currentStatus !== false ? false : true
+  
+  console.log('toggleProductStatus called:', {
+    product: product.name,
+    currentStatus,
+    newStatus,
+    categoryId: product.category_id,
+    categoriesLoaded: categories.value.length
+  })
+  
+  // Si se intenta activar un producto, verificar que la categoría esté activa
+  if (newStatus === true) {
+    const productCategory = categories.value.find(c => c.id === product.category_id)
+    console.log('Category found:', productCategory)
+    
+    if (!productCategory) {
+      showNotification(
+        'Error',
+        'No se encontró la categoría del producto. Por favor, recarga la página.',
+        'error'
+      )
+      return
+    }
+    
+    if (!productCategory.active) {
+      console.log('Category is inactive, showing modal')
+      // Mostrar modal para activar categoría primero
+      pendingStatusChange.value = {
+        product,
+        newStatus,
+        category: productCategory
+      }
+      showCategoryInactiveModal.value = true
+      return
+    }
+  }
+  
+  // Mostrar modal de confirmación normal
+  pendingStatusChange.value = {
+    product,
+    newStatus
+  }
+  showStatusConfirmModal.value = true
+}
+
+const confirmStatusChange = async () => {
+  if (!pendingStatusChange.value) return
+  
   try {
     loading.value = true
-    const currentStatus = getProductStatus(product)
-    const newStatus = currentStatus !== false ? false : true
+    showStatusConfirmModal.value = false
+    
+    const { product, newStatus } = pendingStatusChange.value
     
     await productsService.update(product.id, { 
       ...product, 
@@ -1742,6 +1902,54 @@ const toggleProductStatus = async (product) => {
     )
   } finally {
     loading.value = false
+    pendingStatusChange.value = null
+  }
+}
+
+const activateCategoryAndProduct = async () => {
+  if (!pendingStatusChange.value) return
+  
+  try {
+    loading.value = true
+    showCategoryInactiveModal.value = false
+    
+    const { product, category } = pendingStatusChange.value
+    
+    // Primero activar la categoría
+    await categoriesService.update(category.id, {
+      name: category.name,
+      description: category.description || '',
+      icon: category.icon || 'shopping-bag',
+      color: category.color || '#3b82f6',
+      active: true
+    })
+    
+    // Luego activar el producto
+    await productsService.update(product.id, { 
+      ...product, 
+      is_active: true,
+      active: true 
+    })
+    
+    // Recargar datos
+    await loadProducts()
+    await loadCategories()
+    
+    showNotification(
+      'Categoría y Producto activados',
+      `La categoría "${category.name}" y el producto "${product.name}" han sido activados exitosamente`,
+      'success'
+    )
+  } catch (error) {
+    console.error('Error al activar categoría y producto:', error)
+    showNotification(
+      'Error al activar',
+      'No se pudo activar la categoría y el producto: ' + (error.message || 'Error desconocido'),
+      'error'
+    )
+  } finally {
+    loading.value = false
+    pendingStatusChange.value = null
   }
 }
 

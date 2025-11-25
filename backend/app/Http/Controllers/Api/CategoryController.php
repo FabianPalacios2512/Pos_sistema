@@ -21,7 +21,7 @@ class CategoryController extends Controller
             ->withCount(['products' => function($query) {
                 $query->where('active', true);
             }])
-            ->where('active', true)
+            // Removed filter - show ALL categories (active and inactive)
             ->orderBy('name')
             ->get();
 
@@ -168,6 +168,24 @@ class CategoryController extends Controller
                     'message' => 'Error de validación',
                     'errors' => $validator->errors()
                 ], 422);
+            }
+
+            // Si se está desactivando la categoría
+            if ($request->has('active') && $request->active === false && $category->active === true) {
+                // Marcar y desactivar solo productos que están actualmente activos
+                $category->products()->where('active', true)->update([
+                    'active' => false,
+                    'deactivated_by_category' => true
+                ]);
+            }
+            
+            // Si se está reactivando la categoría
+            if ($request->has('active') && $request->active === true && $category->active === false) {
+                // Reactivar solo productos que fueron desactivados por la categoría
+                $category->products()->where('deactivated_by_category', true)->update([
+                    'active' => true,
+                    'deactivated_by_category' => false
+                ]);
             }
 
             $category->update($request->all());

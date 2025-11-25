@@ -21,11 +21,11 @@ export const inventoryService = {
         type: movementData.type === 'entrada' ? 'purchase' : 'sale',
         reference: movementData.reason
       }
-      
+
       console.log('Datos enviados a la API:', apiData)
       const response = await inventoryService.updateProductStock(movementData.product_id, apiData)
       console.log('Respuesta de la API:', response)
-      
+
       return response
     } catch (error) {
       console.error('Error en createMovement:', error)
@@ -39,16 +39,16 @@ export const inventoryService = {
       // Primero obtenemos el stock actual del producto
       const productsResponse = await api.get(`/products/${productId}`)
       const currentStock = productsResponse.data.current_stock || 0
-      
+
       // Calculamos la diferencia (lo que necesitamos sumar o restar)
       const difference = parseInt(newStock) - currentStock
-      
+
       const apiData = {
         quantity: difference, // Enviamos la diferencia, no el valor absoluto
         type: 'adjustment',
         reference: reason
       }
-      
+
       console.log('Ajustando stock:', {
         productId,
         currentStock,
@@ -56,11 +56,24 @@ export const inventoryService = {
         difference,
         apiData
       })
-      
+
       const response = await api.post(`/products/${productId}/update-stock`, apiData)
       return response
     } catch (error) {
       console.error('Error adjusting stock:', error)
+      throw error
+    }
+  },
+
+  // Obtener productos con métricas de inventario
+  getProducts: async (params = {}) => {
+    try {
+      const queryString = new URLSearchParams(params).toString()
+      const endpoint = `/inventory/products${queryString ? `?${queryString}` : ''}`
+      const response = await api.get(endpoint)
+      return response
+    } catch (error) {
+      console.error('Error fetching inventory products:', error)
       throw error
     }
   },

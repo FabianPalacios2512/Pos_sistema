@@ -231,8 +231,9 @@
           <div
             v-for="category in paginatedCategories"
             :key="category.id"
+            @click="viewCategoryProducts(category)"
             :class="[
-              'bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-300 overflow-hidden group flex flex-col',
+              'bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-300 overflow-hidden group flex flex-col cursor-pointer',
               !category.active && 'opacity-75'
             ]">
             
@@ -282,7 +283,7 @@
               <!-- Acciones (Ghost Style) -->
               <div class="grid grid-cols-3 gap-2">
                 <button
-                  @click="viewCategoryProducts(category)"
+                  @click.stop="viewCategoryProducts(category)"
                   class="flex items-center justify-center py-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all border border-transparent hover:border-blue-100"
                   title="Ver Productos">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,7 +293,7 @@
                 </button>
                 
                 <button
-                  @click="editCategory(category)"
+                  @click.stop="editCategory(category)"
                   class="flex items-center justify-center py-2 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all border border-transparent hover:border-amber-100"
                   title="Editar">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,7 +302,7 @@
                 </button>
                 
                 <button
-                  @click="toggleCategoryStatus(category)"
+                  @click.stop="toggleCategoryStatus(category)"
                   class="flex items-center justify-center py-2 rounded-lg transition-all border border-transparent"
                   :class="category.active 
                     ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-100' 
@@ -358,7 +359,8 @@
           <tr
             v-for="category in paginatedCategories"
             :key="category.id"
-            :class="['hover:bg-slate-50/50 transition-colors', !category.active && 'opacity-75']">
+            @click="viewCategoryProducts(category)"
+            :class="['hover:bg-slate-50/50 transition-colors cursor-pointer', !category.active && 'opacity-75']">
             <td class="px-6 py-4">
               <div class="flex items-center space-x-3">
                 <!-- Icono de la categoría -->
@@ -394,7 +396,7 @@
             <td class="px-6 py-4">
               <div class="flex items-center justify-center gap-2">
                 <button
-                  @click="viewCategoryProducts(category)"
+                  @click.stop="viewCategoryProducts(category)"
                   class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                   title="Ver productos">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -403,7 +405,7 @@
                   </svg>
                 </button>
                 <button
-                  @click="editCategory(category)"
+                  @click.stop="editCategory(category)"
                   class="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all"
                   title="Editar">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -411,7 +413,7 @@
                   </svg>
                 </button>
                 <button
-                  @click="toggleCategoryStatus(category)"
+                  @click.stop="toggleCategoryStatus(category)"
                   class="p-2.5 rounded-lg transition-all"
                   :class="category.active 
                     ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50' 
@@ -461,6 +463,66 @@
       </div>
 
       </template>
+
+    <!-- Modal de Confirmación para Cambio de Estado -->
+    <div v-if="showStatusConfirmModal" 
+         class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+         @click.self="showStatusConfirmModal = false">
+      <div class="bg-white rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Confirmar Cambio de Estado</h3>
+              <p class="text-sm text-white/80">Esta acción modificará el estado de la categoría</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+          <p class="text-slate-700 mb-4">
+            ¿Estás seguro que deseas <span class="font-bold">{{ pendingStatusChange?.newStatus ? 'activar' : 'desactivar' }}</span> la categoría:
+          </p>
+          <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 mb-6">
+            <p class="font-bold text-slate-900">{{ pendingStatusChange?.category?.name }}</p>
+            <p class="text-sm text-slate-500 mt-1">{{ pendingStatusChange?.category?.products_count || 0 }} productos</p>
+          </div>
+          <p class="text-sm text-slate-600">
+            {{ pendingStatusChange?.newStatus 
+              ? 'La categoría estará disponible en el POS. Los productos que fueron desactivados con la categoría se reactivarán automáticamente.' 
+              : 'La categoría NO estará disponible en el POS. Todos los productos activos de esta categoría se desactivarán automáticamente.' }}
+          </p>
+          <div v-if="!pendingStatusChange?.newStatus" class="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <p class="text-xs text-amber-800">
+              <strong>Nota:</strong> Los productos que ya estaban inactivos permanecerán inactivos. Solo se desactivarán los productos que están actualmente activos.
+            </p>
+          </div>
+          <div v-else class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p class="text-xs text-blue-800">
+              <strong>Reactivación inteligente:</strong> Solo se reactivarán los productos que fueron desactivados cuando se desactivó esta categoría. Los productos que fueron desactivados manualmente permanecerán inactivos.
+            </p>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="bg-slate-50 px-6 py-4 flex items-center justify-end space-x-3">
+          <button @click="showStatusConfirmModal = false" 
+                  class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">
+            Cancelar
+          </button>
+          <button @click="confirmStatusChange" 
+                  class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg transition-colors font-medium">
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal Agregar/Editar Categoría -->
     <div
@@ -1008,14 +1070,43 @@ const deleteCategory = async () => {
   }
 }
 
+// Estado para confirmación de cambio de estado
+const showStatusConfirmModal = ref(false)
+const pendingStatusChange = ref(null)
+
 const toggleCategoryStatus = async (category) => {
+  const newStatus = !category.active
+  
+  // Mostrar modal de confirmación
+  pendingStatusChange.value = {
+    category,
+    newStatus
+  }
+  showStatusConfirmModal.value = true
+}
+
+const confirmStatusChange = async () => {
+  if (!pendingStatusChange.value) return
+  
   try {
-    await categoriesService.update(category.id, { active: !category.active })
-    showToast(`Categoría ${!category.active ? 'activada' : 'desactivada'} exitosamente`, 'success')
+    showStatusConfirmModal.value = false
+    const { category, newStatus } = pendingStatusChange.value
+    
+    // Enviar todos los campos de la categoría, no solo active
+    await categoriesService.update(category.id, {
+      name: category.name,
+      description: category.description || '',
+      icon: category.icon || 'shopping-bag',
+      color: category.color || '#3b82f6',
+      active: newStatus
+    })
+    showToast(`Categoría ${newStatus ? 'activada' : 'desactivada'} exitosamente`, 'success')
     await loadCategories()
   } catch (error) {
     console.error('Error cambiando estado:', error)
     showToast('Error al cambiar estado', 'error')
+  } finally {
+    pendingStatusChange.value = null
   }
 }
 

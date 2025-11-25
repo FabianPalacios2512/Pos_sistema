@@ -94,6 +94,11 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        // Si se está activando manualmente el producto, limpiar la bandera
+        if ($request->has('active') && $request->active === true && $product->active === false) {
+            $request->merge(['deactivated_by_category' => false]);
+        }
+        
         $product->update($request->all());
         $product->load(['category', 'supplier']);
 

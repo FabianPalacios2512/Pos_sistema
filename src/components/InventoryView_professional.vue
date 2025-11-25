@@ -3,16 +3,16 @@
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Header Simple y Elegante -->
-      <div class="flex items-center justify-between pb-4 border-b border-gray-300">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div class="flex items-center space-x-4">
-          <div class="w-12 h-12 bg-black rounded-xl flex items-center justify-center shadow-lg">
+          <div class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg shadow-slate-900/20">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
             </svg>
           </div>
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Control de Inventario</h1>
-            <p class="text-sm text-gray-600">Gestiona el stock y movimientos de productos</p>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Control de Inventario</h1>
+            <p class="text-sm text-slate-500 font-medium">Gestiona el stock y movimientos de productos</p>
           </div>
         </div>
         
@@ -20,7 +20,7 @@
           <!-- Botón Neutro (Actualizar) -->
           <button @click="refreshInventoryData" 
                   :disabled="loading"
-                  class="px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl border border-slate-200 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:shadow-md hover:border-slate-300"
+                  class="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-600 text-sm font-bold rounded-xl border border-slate-200 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:border-slate-300"
                   :class="{ 'opacity-50 cursor-not-allowed': loading }">
             <svg class="w-4 h-4" :class="{'animate-spin': loading}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -30,7 +30,7 @@
           
           <!-- Botón Principal (Nuevo Movimiento) -->
           <button @click="openMovementModal"
-                  class="px-5 py-2.5 bg-black hover:bg-slate-900 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+                  class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-900/20 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
@@ -40,88 +40,68 @@
       </div>
       
       <!-- Métricas Principales -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <!-- Productos en Stock -->
-        <div class="bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 transition-shadow duration-200 shadow-sm hover:shadow-lg">
-          <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 group">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
               </svg>
             </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-slate-700">Productos en Stock</h3>
-                <span class="text-xs font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
-                  TOTAL
-                </span>
-              </div>
-              <p class="text-2xl font-bold text-slate-900 mb-1">{{ totalProductsInStock }}</p>
-              <p class="text-sm text-slate-500">con inventario</p>
-            </div>
+            <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded-full uppercase tracking-wide">Total</span>
+          </div>
+          <div>
+            <p class="text-2xl font-black text-slate-900 mb-0.5">{{ totalProductsInStock }}</p>
+            <p class="text-xs text-slate-500 font-medium">Productos en stock</p>
           </div>
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 transition-shadow duration-200 shadow-sm hover:shadow-lg">
-          <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 group">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-rose-50 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
             </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-slate-700">Stock Bajo</h3>
-                <span class="text-xs font-medium text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full">
-                  ALERTA
-                </span>
-              </div>
-              <p class="text-2xl font-bold text-slate-900 mb-1">{{ lowStockProducts }}</p>
-              <p class="text-sm text-slate-500">requieren reposición</p>
-            </div>
+            <span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-1 rounded-full uppercase tracking-wide">Alerta</span>
+          </div>
+          <div>
+            <p class="text-2xl font-black text-slate-900 mb-0.5">{{ lowStockProducts }}</p>
+            <p class="text-xs text-slate-500 font-medium">Requieren reposición</p>
           </div>
         </div>
 
         <!-- Valor Inventario -->
-        <div class="bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 transition-shadow duration-200 shadow-sm hover:shadow-lg">
-          <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 group">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>
             </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-slate-700">Valor Inventario</h3>
-                <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                  VALOR
-                </span>
-              </div>
-              <p class="text-2xl font-bold text-slate-900 mb-1">${{ totalInventoryValue.toLocaleString() }}</p>
-              <p class="text-sm text-slate-500">valor total</p>
-            </div>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full uppercase tracking-wide">Valor</span>
+          </div>
+          <div>
+            <p class="text-2xl font-black text-slate-900 mb-0.5">${{ totalInventoryValue.toLocaleString() }}</p>
+            <p class="text-xs text-slate-500 font-medium">Valor total inventario</p>
           </div>
         </div>
 
         <!-- Movimientos Hoy -->
-        <div class="bg-white rounded-xl p-5 border border-slate-200 hover:border-slate-300 transition-shadow duration-200 shadow-sm hover:shadow-lg">
-          <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 group">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
             </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-slate-700">Movimientos Hoy</h3>
-                <span class="text-xs font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
-                  HOY
-                </span>
-              </div>
-              <p class="text-2xl font-bold text-slate-900 mb-1">{{ todayMovements }}</p>
-              <p class="text-sm text-slate-500">entradas y salidas</p>
-            </div>
+            <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-full uppercase tracking-wide">Hoy</span>
+          </div>
+          <div>
+            <p class="text-2xl font-black text-slate-900 mb-0.5">{{ todayMovements }}</p>
+            <p class="text-xs text-slate-500 font-medium">Entradas y salidas</p>
           </div>
         </div>
       </div>
@@ -178,7 +158,7 @@
           
           <div v-else>
             <!-- Filtros Compactos -->
-            <div class="p-4 border-b border-slate-200">
+            <div class="p-4 border-b border-slate-200 bg-slate-50/50">
               <div class="flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-48 relative">
                   <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,11 +167,11 @@
                   <input v-model="searchTerm" 
                          type="text" 
                          placeholder="Buscar productos..." 
-                         class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                         class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all shadow-sm">
                 </div>
                 
                 <select v-model="categoryFilter" 
-                        class="pl-3 pr-8 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 min-w-36">
+                        class="pl-3 pr-8 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent min-w-36 shadow-sm bg-white">
                   <option value="">Todas las categorías</option>
                   <option v-for="category in categories" :key="category.id" :value="category.name">
                     {{ category.name }}
@@ -199,7 +179,7 @@
                 </select>
                 
                 <select v-model="stockFilter" 
-                        class="pl-3 pr-8 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 min-w-36">
+                        class="pl-3 pr-8 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent min-w-36 shadow-sm bg-white">
                   <option value="">Todo el stock</option>
                   <option value="low">Stock bajo</option>
                   <option value="normal">Stock normal</option>
@@ -207,7 +187,7 @@
                 </select>
                 
                 <button @click="searchTerm = ''; categoryFilter = ''; stockFilter = ''" 
-                        class="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+                        class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition-colors border border-transparent hover:border-slate-300"
                         title="Limpiar filtros">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -222,65 +202,76 @@
             <table class="min-w-full divide-y divide-slate-200">
               <thead class="bg-slate-50">
                 <tr>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Producto</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Categoría</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Stock Actual</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Stock Mínimo</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Precio</th>
-                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Estado</th>
-                  <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wide">Acciones</th>
+                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Producto</th>
+                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Categoría</th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Stock</th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Ventas</th>
+                  <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Ingresos</th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200">
-                <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-slate-50/50 transition-colors">
-                  <td class="px-6 py-4">
+              <tbody class="divide-y divide-slate-200 bg-white">
+                <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-slate-50 transition-colors group">
+                  <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <!-- Icono de producto mejorado -->
-                      <div class="w-12 h-12 rounded-lg flex items-center justify-center mr-4 shadow-sm" :style="{backgroundColor: `hsl(${product.id * 137.5 % 360}, 45%, 85%)`}">
-                        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                        </svg>
+                      <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4 shadow-sm border border-slate-100" :style="{backgroundColor: `hsl(${product.id * 137.5 % 360}, 70%, 95%)`}">
+                        <span class="text-lg font-bold" :style="{color: `hsl(${product.id * 137.5 % 360}, 70%, 45%)`}">
+                          {{ product.name.charAt(0) }}
+                        </span>
                       </div>
                       <div>
-                        <p class="text-sm font-semibold text-slate-900">{{ product.name }}</p>
-                        <p class="text-xs text-slate-500">{{ product.barcode }}</p>
+                        <p class="text-sm font-bold text-slate-900">{{ product.name }}</p>
+                        <p class="text-xs text-slate-500 font-medium">{{ product.barcode || 'Sin código' }}</p>
                       </div>
                     </div>
                   </td>
-                  <td class="px-6 py-4">
-                    <span class="text-sm text-slate-600">{{ product.category }}</span>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+                      {{ product.category }}
+                    </span>
                   </td>
-                  <td class="px-6 py-4">
-                    <span class="text-base font-black text-slate-900">{{ product.current_stock || 0 }}</span>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex flex-col items-center">
+                      <span class="text-sm font-black text-slate-900">{{ product.current_stock || 0 }}</span>
+                      <span class="text-[10px] text-slate-500">Min: {{ product.min_stock || 10 }}</span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4">
-                    <span class="text-sm text-slate-600">{{ product.min_stock || 10 }}</span>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex flex-col items-center">
+                      <span class="text-sm font-bold text-slate-700">{{ product.total_sold || 0 }}</span>
+                      <span class="text-[10px] text-slate-400">unidades</span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4">
-                    <span class="text-base font-black text-slate-900">${{ parseFloat(product.sale_price || 0).toLocaleString() }}</span>
+                  <td class="px-6 py-4 whitespace-nowrap text-right">
+                    <div class="flex flex-col items-end">
+                      <span class="text-sm font-black text-emerald-600">${{ parseFloat(product.total_revenue || 0).toLocaleString() }}</span>
+                      <span class="text-[10px] text-slate-400">Precio: ${{ parseFloat(product.sale_price || 0).toLocaleString() }}</span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4">
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
                     <span :class="[
-                      'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold',
+                      'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border',
                       getStockStatusClass(product.current_stock, product.min_stock)
                     ]">
                       {{ getStockStatusLabel(product.current_stock, product.min_stock) }}
                     </span>
                   </td>
-                  <td class="px-6 py-4">
-                    <div class="flex items-center justify-center gap-1.5">
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <div class="flex items-center justify-center gap-2">
                       <button @click="adjustStock(product)" 
-                              class="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 rounded-lg transition-all hover:shadow-sm"
+                              class="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                               title="Ajustar Stock">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                       </button>
                       <button @click="viewMovements(product)" 
-                              class="p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-lg transition-all hover:shadow-sm"
+                              class="p-2.5 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
                               title="Ver Historial">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                       </button>
@@ -394,69 +385,148 @@
         </div>
         
         <!-- Contenido Alertas -->
-        <div v-if="activeTab === 'alerts'" class="p-5">
-          <!-- Header de Alertas -->
-          <div class="mb-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div v-if="activeTab === 'alerts'" class="p-6 animate-fade-in">
+          <!-- Métricas de Resumen -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <!-- Total Alertas -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Total Alertas</p>
+                  <p class="text-2xl font-bold text-slate-900">{{ stockAlerts.length }}</p>
+                </div>
+                <div class="w-10 h-10 bg-slate-50 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                   </svg>
                 </div>
+              </div>
+            </div>
+            
+            <!-- Stock Agotado -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between">
                 <div>
-                  <h3 class="text-lg font-bold text-gray-900">Alertas de Stock Bajo</h3>
-                  <p class="text-sm text-gray-600">Productos que requieren reposición urgente</p>
+                  <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Agotado</p>
+                  <p class="text-2xl font-bold text-red-600">{{ stockAlerts.filter(a => a.stock === 0).length }}</p>
+                </div>
+                <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
                 </div>
               </div>
-              <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">
-                {{ stockAlerts.length }} alertas
-              </span>
+            </div>
+            
+            <!-- Stock Crítico -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Crítico</p>
+                  <p class="text-2xl font-bold text-orange-600">{{ stockAlerts.filter(a => a.stock > 0 && a.stock < a.min_stock / 2).length }}</p>
+                </div>
+                <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Stock Bajo -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Bajo</p>
+                  <p class="text-2xl font-bold text-amber-600">{{ stockAlerts.filter(a => a.stock >= a.min_stock / 2 && a.stock <= a.min_stock).length }}</p>
+                </div>
+                <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Lista de Alertas -->
-          <div class="space-y-4">
-            <div v-if="stockAlerts.length === 0" class="text-center py-12">
-              <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div class="space-y-3">
+            <div v-if="stockAlerts.length === 0" class="text-center py-12 bg-white rounded-xl border border-slate-200 shadow-sm">
+              <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
               </div>
-              <p class="text-lg font-semibold text-gray-700 mb-2">¡Todo en orden!</p>
-              <p class="text-sm text-gray-500">No hay productos con stock bajo en este momento</p>
+              <p class="text-lg font-semibold text-slate-900 mb-1">Sin alertas pendientes</p>
+              <p class="text-sm text-slate-500">Todos los productos tienen stock adecuado</p>
             </div>
 
             <div v-for="alert in stockAlerts" :key="alert.id" 
-                 class="bg-white border border-red-200 rounded-xl p-5 hover:shadow-md transition-all duration-200">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                  <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
+                 class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <div class="flex items-start justify-between">
+                <div class="flex items-start space-x-4 flex-1">
+                  <!-- Icono de producto -->
+                  <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span class="text-lg font-bold text-slate-600">{{ alert.name.charAt(0) }}</span>
                   </div>
-                  <div class="min-w-0 flex-1">
-                    <h4 class="text-base font-semibold text-gray-900 mb-1">{{ alert.name }}</h4>
-                    <div class="flex items-center space-x-4">
+                  
+                  <!-- Información del producto -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-3 mb-2">
+                      <h4 class="text-base font-semibold text-slate-900">{{ alert.name }}</h4>
+                      <span v-if="alert.stock === 0" 
+                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                        Agotado
+                      </span>
+                      <span v-else-if="alert.stock < alert.min_stock / 2" 
+                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-700">
+                        Crítico
+                      </span>
+                      <span v-else 
+                            class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">
+                        Bajo
+                      </span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-6 text-sm">
                       <div class="flex items-center space-x-2">
-                        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Stock Actual:</span>
-                        <span class="text-sm font-bold text-red-700">{{ alert.stock }}</span>
+                        <span class="text-slate-500">Stock:</span>
+                        <span :class="[
+                          'font-semibold',
+                          alert.stock === 0 ? 'text-red-600' : alert.stock < alert.min_stock / 2 ? 'text-orange-600' : 'text-amber-600'
+                        ]">{{ alert.stock }}</span>
+                        <span class="text-slate-400">/</span>
+                        <span class="text-slate-600">{{ alert.min_stock }}</span>
                       </div>
+                      
                       <div class="flex items-center space-x-2">
-                        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Mínimo:</span>
-                        <span class="text-sm font-semibold text-gray-700">{{ alert.min_stock }}</span>
+                        <span class="text-slate-500">Categoría:</span>
+                        <span class="text-slate-700">{{ alert.category }}</span>
+                      </div>
+                      
+                      <div v-if="alert.stock > 0" class="flex items-center space-x-2">
+                        <span class="text-slate-500">Falta:</span>
+                        <span class="font-medium text-slate-700">{{ Math.max(0, alert.min_stock - alert.stock) }}</span>
                       </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Categoría: {{ alert.category }}</p>
+                    
+                    <!-- Barra de progreso -->
+                    <div class="mt-3 w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                      <div 
+                        :class="[
+                          'h-full',
+                          alert.stock === 0 ? 'bg-red-500' : alert.stock < alert.min_stock / 2 ? 'bg-orange-500' : 'bg-amber-500'
+                        ]"
+                        :style="{ width: `${Math.min(100, (alert.stock / alert.min_stock) * 100)}%` }"
+                      ></div>
+                    </div>
                   </div>
                 </div>
-                <div class="flex items-center space-x-3">
-                  <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">
-                    Urgente
-                  </span>
+                
+                <!-- Botón de acción -->
+                <div class="ml-4">
                   <button @click="adjustStock(alert)" 
-                          class="px-4 py-2.5 bg-gradient-to-r from-lime-400 to-green-400 hover:from-lime-500 hover:to-green-500 text-white rounded-xl text-sm font-bold transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 shadow-lg">
+                          class="px-4 py-2 bg-slate-900 hover:bg-black text-white text-sm font-medium rounded-lg transition-colors flex items-center space-x-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
@@ -1320,10 +1390,9 @@ const loadProducts = async () => {
   try {
     loading.value = true
 
-    // Pedir todos los productos (evitar paginación por defecto que trae solo 15 items)
-    // Si la API soporta 'per_page' lo aprovechamos; usamos un número grande para cubrir todos
-    const response = await productsService.getAll({ per_page: 10000 })
-    console.log('Respuesta productos (todos):', response)
+    // Usar el endpoint de inventario que incluye métricas de ventas
+    const response = await inventoryService.getProducts({ per_page: 10000 })
+    console.log('Respuesta inventario (todos):', response)
 
     // Los productos pueden venir en response.data.data (paginación) o directamente en response.data
     const productsList = response.data?.data || response.data || []
