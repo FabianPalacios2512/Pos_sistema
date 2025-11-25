@@ -1249,10 +1249,23 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import TablePaginator from './TablePaginator.vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
+import TablePaginator from './TablePaginator.vue'
+
+// Props (para recibir filtros desde navegación AI)
+const props = defineProps({
+  queryParams: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+// Router - DEBE estar a nivel de setup, NO dentro de onMounted
+const route = useRoute()
+const router = useRouter()
 
 // 🖼️ Función utilitaria para manejo inteligente de imágenes
 const getProductImage = (product) => {
@@ -2202,6 +2215,56 @@ watch(statusFilter, async () => {
   await loadProducts()
 })
 
+// 🎯 Watcher para query params de navegación AI (filtros automáticos)
+watch(() => props.queryParams, (newParams) => {
+  if (!newParams || Object.keys(newParams).length === 0) return
+  
+  console.log('🔍 [ProductsView] Query params detectados:', newParams)
+  
+  // Aplicar filtro según queryParams
+  if (newParams.filter) {
+    switch(newParams.filter) {
+      case 'inactive':
+        statusFilter.value = 'inactive'
+        console.log('✅ [ProductsView] Filtro aplicado: Productos Inactivos')
+        showNotification(
+          'Filtro aplicado',
+          'Mostrando solo productos inactivos',
+          'info'
+        )
+        break
+      case 'active':
+        statusFilter.value = 'active'
+        console.log('✅ [ProductsView] Filtro aplicado: Productos Activos')
+        break
+      case 'low-stock':
+        statusFilter.value = 'low-stock'
+        console.log('✅ [ProductsView] Filtro aplicado: Productos con Stock Bajo')
+        showNotification(
+          'Filtro aplicado',
+          'Mostrando productos con stock bajo',
+          'warning'
+        )
+        break
+    }
+  }
+  
+  // Si hay filtro de categoría (ej: category:Alimentos)
+  if (newParams.filter && newParams.filter.startsWith('category:')) {
+    const categoryName = newParams.filter.replace('category:', '')
+    const category = categories.value.find(c => c.name.toLowerCase() === categoryName.toLowerCase())
+    if (category) {
+      categoryFilter.value = category.id
+      console.log('✅ [ProductsView] Filtro de categoría aplicado:', categoryName)
+      showNotification(
+        'Categoría seleccionada',
+        `Mostrando productos de ${categoryName}`,
+        'info'
+      )
+    }
+  }
+}, { deep: true, immediate: true })
+
 // Inicialización
 onMounted(async () => {
   console.log('Módulo de productos inicializado')
@@ -2211,63 +2274,79 @@ onMounted(async () => {
   
   await loadCategories()
   
-  // Verificar si hay datos de producto para editar desde otra vista
-  const editProductData = sessionStorage.getItem('editProductData')
-  if (editProductData) {
-    try {
-      const productData = JSON.parse(editProductData)
-      console.log('Producto detectado para edición inmediata:', productData)
-      
-      // Configurar el producto en productForm directamente sin esperar a cargar todos los productos
-      productForm.value = {
-        id: productData.id,
-        name: productData.name,
-        sku: productData.sku || '',
-        barcode: productData.barcode || '',
-        description: productData.description || '',
-        price: parseFloat(productData.price || 0),
-        cost: parseFloat(productData.cost || 0),
-        stock: parseInt(productData.stock || 0),
-        min_stock: parseInt(productData.min_stock || 5),
-        max_stock: parseInt(productData.max_stock || 100),
-        category_id: productData.category_id,
-        image: productData.image || '',
-        active: productData.active !== false
-      }
-      
-      // Abrir el modal inmediatamente
-      isEditing.value = true
-      showProductModal.value = true
-      
-      // Configurar estado de imágenes para edición
-      previewImage.value = null
-      imageLoadError.value = false
-      
-      // Detectar si es URL o archivo base64
-      if (productForm.value.image) {
-        if (productForm.value.image.startsWith('data:')) {
-          imageUploadMethod.value = 'file'
-          previewImage.value = productForm.value.image
+  // Verificar si hay acción de creación desde la URL (Deep Linking)
+  console.log('🔍 [ProductsView] route.query:', route.query);
+  console.log('🔍 [ProductsView] route.query.action:', route.query.action);
+  
+  if (route.query.action === 'create') {
+    console.log('✅ [ProductsView] Acción de creación detectada desde URL');
+    // Esperar un momento para asegurar que las categorías estén cargadas
+    setTimeout(() => {
+      console.log('🚀 [ProductsView] Llamando a openCreateModal()');
+      openCreateModal()
+      // Limpiar la query para evitar que se abra al recargar
+      router.replace({ query: null })
+    }, 500)
+  } else {
+    console.log('ℹ️ [ProductsView] No hay acción de creación en la URL');
+    // Verificar si hay datos de producto para editar desde otra vista (solo si no es creación)
+    const editProductData = sessionStorage.getItem('editProductData')
+    if (editProductData) {
+      try {
+        const productData = JSON.parse(editProductData)
+        console.log('Producto detectado para edición inmediata:', productData)
+        
+        // Configurar el producto en productForm directamente sin esperar a cargar todos los productos
+        productForm.value = {
+          id: productData.id,
+          name: productData.name,
+          sku: productData.sku || '',
+          barcode: productData.barcode || '',
+          description: productData.description || '',
+          price: parseFloat(productData.price || 0),
+          cost: parseFloat(productData.cost || 0),
+          stock: parseInt(productData.stock || 0),
+          min_stock: parseInt(productData.min_stock || 5),
+          max_stock: parseInt(productData.max_stock || 100),
+          category_id: productData.category_id,
+          image: productData.image || '',
+          active: productData.active !== false
+        }
+        
+        // Abrir el modal inmediatamente
+        isEditing.value = true
+        showProductModal.value = true
+        
+        // Configurar estado de imágenes para edición
+        previewImage.value = null
+        imageLoadError.value = false
+        
+        // Detectar si es URL o archivo base64
+        if (productForm.value.image) {
+          if (productForm.value.image.startsWith('data:')) {
+            imageUploadMethod.value = 'file'
+            previewImage.value = productForm.value.image
+          } else {
+            imageUploadMethod.value = 'url'
+          }
         } else {
           imageUploadMethod.value = 'url'
         }
-      } else {
-        imageUploadMethod.value = 'url'
+        
+        // Limpiar sessionStorage
+        sessionStorage.removeItem('editProductData')
+        
+        // Cargar productos en background sin bloquear la UI
+        loadProducts()
+        
+      } catch (error) {
+        console.error('Error al parsear datos del producto:', error)
+        await loadProducts()
       }
-      
-      // Limpiar sessionStorage
-      sessionStorage.removeItem('editProductData')
-      
-      // Cargar productos en background sin bloquear la UI
-      loadProducts()
-      
-    } catch (error) {
-      console.error('Error al parsear datos del producto:', error)
+    } else {
+      // Cargar productos normalmente
       await loadProducts()
     }
-  } else {
-    // Cargar productos normalmente
-    await loadProducts()
   }
 })
 </script>

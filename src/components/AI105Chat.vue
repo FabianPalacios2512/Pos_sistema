@@ -237,6 +237,9 @@
 
 <script>
 import { ref, nextTick, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useModuleNavigation } from '@/composables/useModuleNavigation'
+import api from '@/services/api'
 
 export default {
   name: 'AI105Chat',
@@ -246,8 +249,10 @@ export default {
       default: undefined // undefined = control interno, true/false = control externo
     }
   },
-  emits: ['close'],
+  emits: ['close', 'navigate'],
   setup(props, { emit }) {
+    const router = useRouter()
+    const { navigateToModule } = useModuleNavigation()
     const isChatOpen = ref(false)
     const messages = ref([])
     const inputMessage = ref('')
@@ -313,7 +318,7 @@ export default {
       return now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
     }
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
       if (!inputMessage.value.trim() || isTyping.value) return
 
       // Agregar mensaje del usuario
@@ -327,17 +332,133 @@ export default {
       inputMessage.value = ''
       scrollToBottom()
 
-      // Simular respuesta de IA (aquí irá la lógica real después)
+      // Llamada real al backend
       isTyping.value = true
-      setTimeout(() => {
-        isTyping.value = false
+      try {
+        // Usar el servicio de API centralizado
+        const response = await api.post('/ai/chat', {
+          message: userMessage
+        });
+
+        // Parsear la respuesta de la IA (que ahora es un JSON string dentro de response.reply)
+        let aiReply = response.reply;
+        let aiAction = null;
+        let executeAction = null;
+        let actionResult = null;
+
+        console.log('🔍 [AI Chat Debug] Raw response:', response);
+        console.log('🔍 [AI Chat Debug] response.reply type:', typeof response.reply);
+        console.log('🔍 [AI Chat Debug] response.reply:', response.reply);
+
+        try {
+          // Intentar parsear si la respuesta viene como string JSON
+          // A veces la IA puede devolver texto plano si falla, así que manejamos ambos casos
+          if (typeof response.reply === 'string' && (response.reply.trim().startsWith('{') || response.reply.trim().startsWith('['))) {
+             const parsed = JSON.parse(response.reply);
+             aiReply = parsed.reply || parsed.text || response.reply;
+             aiAction = parsed.action;
+             executeAction = parsed.execute_action;
+             actionResult = parsed.action_result;
+             console.log('✅ [AI Chat Debug] Parsed JSON - Reply:', aiReply);
+             console.log('✅ [AI Chat Debug] Parsed JSON - Action:', aiAction);
+             console.log('🚀 [AI Chat Debug] Parsed JSON - Execute Action:', executeAction);
+             console.log('📊 [AI Chat Debug] Parsed JSON - Action Result:', actionResult);
+          } else if (typeof response.reply === 'object') {
+             // Si ya viene parseado (dependiendo de cómo lo devuelva el controller/axios)
+             aiReply = response.reply.reply;
+             aiAction = response.reply.action;
+             executeAction = response.reply.execute_action;
+             actionResult = response.reply.action_result;
+             console.log('✅ [AI Chat Debug] Object - Reply:', aiReply);
+             console.log('✅ [AI Chat Debug] Object - Action:', aiAction);
+             console.log('🚀 [AI Chat Debug] Object - Execute Action:', executeAction);
+             console.log('📊 [AI Chat Debug] Object - Action Result:', actionResult);
+          }
+        } catch (e) {
+          console.warn('❌ [AI Chat Debug] Error parsing AI JSON response, using raw text', e);
+        }
+
+        // Mostrar resultado de acción ejecutada si existe
+        if (actionResult && actionResult.success) {
+          console.log('✅ [Action Result] Mostrando resultado exitoso:', actionResult);
+          
+          // Construir mensaje enriquecido con los datos reales
+          let enrichedReply = aiReply;
+          
+          if (actionResult.discount) {
+            enrichedReply += `\n\n✅ **Descuento creado:**\n`;
+            enrichedReply += `🆔 ID: ${actionResult.discount.id}\n`;
+            enrichedReply += `🎁 Código: ${actionResult.discount.code}\n`;
+            enrichedReply += `💰 Valor: ${actionResult.discount.value}${actionResult.discount.type === 'percentage' ? '%' : ' $'}\n`;
+            enrichedReply += `📅 Expira: ${actionResult.discount.expires_at}\n`;
+            enrichedReply += `🎫 Usos: ${actionResult.discount.usage_limit}`;
+          }
+          
+          if (actionResult.whatsapp) {
+            enrichedReply += `\n\n📱 **WhatsApp enviado:**\n`;
+            enrichedReply += `✅ Enviados: ${actionResult.whatsapp.sent}\n`;
+            enrichedReply += `📊 Total: ${actionResult.whatsapp.total}`;
+            if (actionResult.whatsapp.failed > 0) {
+              enrichedReply += `\n❌ Fallidos: ${actionResult.whatsapp.failed}`;
+            }
+          }
+          
+          aiReply = enrichedReply;
+        } else if (actionResult && !actionResult.success) {
+          console.error('❌ [Action Result] Acción falló:', actionResult);
+          aiReply += `\n\n❌ Error: ${actionResult.message || 'No se pudo ejecutar la acción'}`;
+        }
+
         messages.value.push({
           type: 'ai',
-          text: `Entiendo tu pregunta sobre "${userMessage}". Por el momento estoy en modo de diseño. Próximamente estaré completamente funcional para ayudarte con análisis detallados de inventario, recomendaciones y predicciones. 🚀`,
+          text: aiReply,
           timestamp: getCurrentTime()
         })
+
+        // Ejecutar acción de navegación si existe
+        console.log('🔍 [AI Chat Debug] Checking action...', aiAction);
+        if (aiAction && aiAction.type === 'navigate' && aiAction.payload) {
+             console.log('🚀 [AI Chat Debug] Navigating with payload:', aiAction.payload);
+             
+             // Navegar directamente usando el composable global
+             try {
+                 const targetModule = aiAction.payload.params?.module;
+                 const queryParams = aiAction.payload.query || {};
+                 
+                 console.log('🎯 [AI Chat Debug] Target module:', targetModule);
+                 console.log('🔍 [AI Chat Debug] Query params:', queryParams);
+                 
+                 if (targetModule) {
+                   // Usar navegación global con query params (filtros)
+                   console.log('🔄 [AI Chat Debug] Calling navigateToModule:', targetModule, queryParams);
+                   navigateToModule(targetModule, queryParams);
+                   console.log('✅ [AI Chat Debug] Navigation successful to:', targetModule, 'with query:', queryParams);
+                 } else {
+                   console.warn('⚠️ [AI Chat Debug] No target module specified');
+                 }
+                 
+             } catch (err) {
+                console.error('❌ [AI Chat Debug] Navigation error:', err);
+                messages.value.push({
+                  type: 'ai',
+                  text: 'Hubo un error al navegar. Por favor usa el menú lateral para ir a ' + (aiAction.payload.params?.module || 'ese módulo'),
+                  timestamp: getCurrentTime()
+                })
+             }
+        } else {
+          console.log('ℹ️ [AI Chat Debug] No navigation action to perform');
+        }
+      } catch (error) {
+        console.error('Error al contactar IA:', error);
+        messages.value.push({
+          type: 'ai',
+          text: 'Lo siento, tuve un problema al procesar tu solicitud. Por favor verifica tu conexión o intenta más tarde.',
+          timestamp: getCurrentTime()
+        })
+      } finally {
+        isTyping.value = false
         scrollToBottom()
-      }, 1500)
+      }
     }
 
     const sendQuickMessage = (suggestion) => {

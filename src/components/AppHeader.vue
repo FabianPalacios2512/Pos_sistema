@@ -282,12 +282,19 @@
   </Teleport>
 
   <!-- Componente de Chat IA 105 -->
-  <AI105Chat :is-open="aiChatOpen" @close="aiChatOpen = false" />
+  <AI105Chat 
+    :is-open="aiChatOpen" 
+    @close="aiChatOpen = false"
+    @navigate="handleAINavigation"
+  />
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import AI105Chat from './AI105Chat.vue'
+
+const router = useRouter()
 
 // Props
 const props = defineProps({
@@ -408,6 +415,22 @@ const toggleNotificationsSilent = () => {
 const toggleAIChat = () => {
   aiChatOpen.value = !aiChatOpen.value
   console.log('🤖 Chat IA 105:', aiChatOpen.value ? 'Abierto' : 'Cerrado')
+}
+
+// Manejar navegación desde el chat IA
+const handleAINavigation = async (payload) => {
+  console.log('🚀 [AppHeader] Navegación solicitada por IA:', payload)
+  
+  try {
+    // La navegación ya se ejecutó en AI105Chat.vue
+    // Solo logueamos aquí para tracking
+    console.log('✅ [AppHeader] Evento de navegación recibido')
+    
+    // NO cerrar el chat - dejar que el usuario vea que navegó correctamente
+    // El usuario puede cerrar manualmente el chat cuando quiera
+  } catch (error) {
+    console.error('❌ [AppHeader] Error en navegación:', error)
+  }
 }
 
 // Mostrar video tutorial

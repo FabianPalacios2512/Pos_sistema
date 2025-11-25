@@ -155,13 +155,14 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted, nextTick, defineAsyncComponent, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import authService from '../services/authService.js'
 import { invoicesService } from '../services/invoicesService.js'
 import { customersService } from '../services/customersService.js'
 import { inventoryService } from '../services/inventoryService.js'
 import { hasPermission, PERMISSIONS } from '../middleware/auth.js'
 import { useSessionTimeout } from '../composables/useSessionTimeout.js'
+import { useModuleNavigation } from '../composables/useModuleNavigation.js'
 
 // Importar componente Sidebar
 import Sidebar from '../components/Sidebar.vue'
@@ -171,6 +172,10 @@ import AppHeader from '../components/AppHeader.vue'
 
 // Router
 const router = useRouter()
+const route = useRoute()
+
+// Navegación global de módulos (para chat AI y otros componentes)
+const { onModuleChange } = useModuleNavigation()
 
 // Sistema de timeout de sesión
 const sessionTimeout = useSessionTimeout()
@@ -204,6 +209,7 @@ const isDarkMode = ref(false)
 const sidebarOpen = ref(true)
 const sidebarCollapsed = ref(true) // Nueva variable para estado colapsado del sidebar (inicia cerrado)
 const currentModule = ref('dashboard')
+const moduleQueryParams = ref({}) // Query params para módulos (ej: {filter: 'inactive'})
 
 // Usuario actual - obtenido de la autenticación
 const currentUser = ref({
@@ -1362,7 +1368,8 @@ const getModuleDescription = () => {
 const getModuleProps = () => {
   const baseProps = {
     moduleName: currentModule.value,
-    onNavigate: setCurrentModule
+    onNavigate: setCurrentModule,
+    queryParams: moduleQueryParams.value // Pasar query params a los módulos (filtros)
   }
   
   const specificProps = {
@@ -1395,6 +1402,26 @@ const loadSettings = () => {
 
 // ===== WATCHERS =====
 
+// Watcher para sincronizar módulo actual con cambios en la ruta (navegación desde IA o otros componentes)
+watch(() => route.params.module, (newModule, oldModule) => {
+  console.log('🔍 [Route Watcher] ==============================================')
+  console.log('🔍 [Route Watcher] Triggered!')
+  console.log('🔍 [Route Watcher] Old module:', oldModule)
+  console.log('🔍 [Route Watcher] New module:', newModule)
+  console.log('🔍 [Route Watcher] Current module:', currentModule.value)
+  console.log('🔍 [Route Watcher] Full route params:', route.params)
+  
+  if (newModule && newModule !== currentModule.value) {
+    console.log(`🚀 [Route Watcher] ✅ CAMBIO DETECTADO: ${currentModule.value} → ${newModule}`)
+    console.log(`🚀 [Route Watcher] Llamando a setCurrentModule('${newModule}')...`)
+    setCurrentModule(newModule)
+    console.log(`🚀 [Route Watcher] Después de setCurrentModule, currentModule.value =`, currentModule.value)
+  } else {
+    console.log(`⏭️ [Route Watcher] Sin cambios (newModule=${newModule}, current=${currentModule.value})`)
+  }
+  console.log('🔍 [Route Watcher] ==============================================')
+}, { immediate: true })
+
 // Watcher para ejecutar acciones pendientes cuando el componente PosView se monte
 watch(posViewRef, async (newRef) => {
   if (newRef && pendingPosAction.value) {
@@ -1420,6 +1447,20 @@ onMounted(() => {
     router.push('/login')
     return
   }
+  
+  // Registrar listener para navegación global (desde chat AI u otros componentes)
+  onModuleChange((moduleName, queryParams = {}) => {
+    console.log('🎯 [PosCompleto] Recibido cambio de módulo global:', moduleName, 'Query:', queryParams)
+    setCurrentModule(moduleName)
+    
+    // Si hay query params (filtros), almacenarlos para que los módulos los usen
+    if (Object.keys(queryParams).length > 0) {
+      moduleQueryParams.value = queryParams
+      console.log('🔍 [PosCompleto] Query params configurados:', moduleQueryParams.value)
+    } else {
+      moduleQueryParams.value = {}
+    }
+  })
   
   // Configurar token de autenticación temporal para desarrollo (si no existe uno real)
   if (!localStorage.getItem('auth_token')) {

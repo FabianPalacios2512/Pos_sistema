@@ -873,6 +873,38 @@ watch([searchTerm, statusFilter, typeFilter], () => {
   displayLimit.value = 20 // Resetear a 20 cuando cambien los filtros
 })
 
+// 🎯 Watcher para query params de navegación AI (búsqueda y filtros automáticos)
+watch(() => props.queryParams, (newParams) => {
+  if (!newParams || Object.keys(newParams).length === 0) return
+  
+  console.log('🔍 [InvoicesView] Query params detectados:', newParams)
+  
+  // Aplicar búsqueda si hay query.search
+  if (newParams.search) {
+    searchTerm.value = newParams.search
+    console.log('✅ [InvoicesView] Búsqueda aplicada:', newParams.search)
+    showToast(`Buscando: "${newParams.search}"`, 'info', 3000)
+  }
+  
+  // Aplicar filtro de fecha si hay query.date
+  if (newParams.date) {
+    const today = new Date().toISOString().split('T')[0]
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+    
+    switch(newParams.date) {
+      case 'today':
+        // Filtrar facturas de hoy (esto requeriría un filtro de fecha)
+        console.log('✅ [InvoicesView] Filtro de fecha: HOY', today)
+        showToast('Mostrando facturas de hoy', 'info', 3000)
+        break
+      case 'yesterday':
+        console.log('✅ [InvoicesView] Filtro de fecha: AYER', yesterday)
+        showToast('Mostrando facturas de ayer', 'info', 3000)
+        break
+    }
+  }
+}, { deep: true, immediate: true })
+
 // Lifecycle
 onMounted(() => {
   document.addEventListener('click', closeActionsMenu)

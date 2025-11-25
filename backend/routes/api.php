@@ -198,6 +198,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/returns/metrics/{period}', [App\Http\Controllers\Api\ReturnsController::class, 'getMetrics']);
     // ==================== FIN DEVOLUCIONES ====================
 
+    // ==================== AI CHAT ====================
+    Route::post('/ai/chat', [\App\Http\Controllers\Api\AIController::class, 'chat']);
+
+    // ==================== AI ACTIONS (Acciones ejecutables) ====================
+    Route::post('/ai/actions/create-discount', [\App\Http\Controllers\Api\AIActionsController::class, 'createDiscount']);
+    Route::post('/ai/actions/send-bulk-whatsapp', [\App\Http\Controllers\Api\AIActionsController::class, 'sendBulkWhatsApp']);
+    Route::post('/ai/actions/create-campaign', [\App\Http\Controllers\Api\AIActionsController::class, 'createCampaign']);
+    // ==================== FIN AI ====================
+
 });
 
 // ==================== RUTAS POS (SIN AUTH) ====================
