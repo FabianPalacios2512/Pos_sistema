@@ -32,6 +32,74 @@ class SupplierController extends Controller
     }
 
     /**
+     * Obtener proveedores con métricas analíticas
+     */
+    public function getAnalytics(): JsonResponse
+    {
+        try {
+            $suppliers = \DB::table('suppliers as s')
+                ->select([
+                    's.id',
+                    's.name',
+                    's.contact_name',
+                    's.phone',
+                    's.email',
+                    's.city',
+                    's.credit_limit',
+                    's.current_debt',
+                    's.active',
+                    \DB::raw('COUNT(DISTINCT p.id) as products_count'),
+                    \DB::raw('MAX(i.date) as last_purchase_date'),
+                    \DB::raw('COALESCE(SUM(ii.quantity * ii.price), 0) as total_purchases_amount'),
+                    \DB::raw('COUNT(DISTINCT i.id) as purchase_orders_count')
+                ])
+                ->leftJoin('products as p', 's.id', '=', 'p.supplier_id')
+                ->leftJoin('invoice_items as ii', 'p.id', '=', 'ii.product_id')
+                ->leftJoin('invoices as i', function($join) {
+                    $join->on('ii.invoice_id', '=', 'i.id')
+                         ->where('i.type', '=', 'invoice')
+                         ->where('i.status', '=', 'paid');
+                })
+                ->groupBy([
+                    's.id', 's.name', 's.contact_name', 's.phone', 's.email',
+                    's.city', 's.credit_limit', 's.current_debt', 's.active'
+                ])
+                ->orderBy('total_purchases_amount', 'desc')
+                ->get();
+
+            // Calcular métricas generales
+            $totalSuppliers = $suppliers->count();
+            $activeSuppliers = $suppliers->where('active', 1)->count();
+            $totalDebt = $suppliers->sum('current_debt');
+            $bestSupplier = $suppliers->sortByDesc('total_purchases_amount')->first();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'suppliers' => $suppliers,
+                    'summary' => [
+                        'total_suppliers' => $totalSuppliers,
+                        'active_suppliers' => $activeSuppliers,
+                        'total_debt' => $totalDebt,
+                        'best_supplier' => $bestSupplier ? [
+                            'id' => $bestSupplier->id,
+                            'name' => $bestSupplier->name,
+                            'total_purchases' => $bestSupplier->total_purchases_amount
+                        ] : null
+                    ]
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener analytics de proveedores',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request): JsonResponse

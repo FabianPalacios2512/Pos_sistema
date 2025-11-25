@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\InventoryTestController;
 use App\Http\Controllers\Api\CashSessionController;
 use App\Http\Controllers\Api\ReturnsController;
+use App\Http\Controllers\Api\ProductAnalyticsController;
 use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -192,6 +193,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Métricas de devoluciones para reportes
     Route::get('/returns/metrics/{period}', [App\Http\Controllers\Api\ReturnsController::class, 'getMetrics']);
     // ==================== FIN DEVOLUCIONES ====================
+
+    // ==================== ANALYTICS PRODUCTOS Y PROVEEDORES ====================
+    Route::get('/products/analytics', [ProductAnalyticsController::class, 'getProductsWithMetrics']);
+    Route::get('/suppliers/analytics', [SupplierController::class, 'getAnalytics']);
+    // ==================== FIN ANALYTICS ====================
 
 });
 

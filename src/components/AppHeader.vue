@@ -115,6 +115,18 @@
             </svg>
           </button>
           
+          <!-- Botón 105 IA -->
+          <button
+            @click="toggleAIChat"
+            class="hidden md:flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-600 hover:from-violet-600 hover:via-purple-600 hover:to-indigo-700 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+            title="Asistente IA 105"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            <span class="text-sm font-bold">105 IA</span>
+          </button>
+          
           <!-- Separador -->
           <div class="hidden md:block h-5 w-px bg-gray-200"></div>
           
@@ -268,10 +280,14 @@
       </div>
     </Transition>
   </Teleport>
+
+  <!-- Componente de Chat IA 105 -->
+  <AI105Chat :is-open="aiChatOpen" @close="aiChatOpen = false" />
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import AI105Chat from './AI105Chat.vue'
 
 // Props
 const props = defineProps({
@@ -326,6 +342,7 @@ const notificationsOpen = ref(false)
 const videoModalOpen = ref(false)
 const notificationCount = ref(3) // Ejemplo: 3 notificaciones
 const notificationsSilent = ref(false) // Estado del silenciador
+const aiChatOpen = ref(false) // Estado del chat IA
 
 // Videos por módulo/sección (URLs de ejemplo - reemplazar con videos reales)
 const videoUrls = {
@@ -385,6 +402,12 @@ const toggleNotificationsSilent = () => {
   } else {
     console.log('🔔 Notificaciones reactivadas - Las alertas del dashboard volverán a mostrarse')
   }
+}
+
+// Toggle del chat IA
+const toggleAIChat = () => {
+  aiChatOpen.value = !aiChatOpen.value
+  console.log('🤖 Chat IA 105:', aiChatOpen.value ? 'Abierto' : 'Cerrado')
 }
 
 // Mostrar video tutorial
