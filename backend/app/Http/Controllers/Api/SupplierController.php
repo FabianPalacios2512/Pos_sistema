@@ -50,7 +50,7 @@ class SupplierController extends Controller
                     's.active',
                     \DB::raw('COUNT(DISTINCT p.id) as products_count'),
                     \DB::raw('MAX(i.date) as last_purchase_date'),
-                    \DB::raw('COALESCE(SUM(ii.quantity * ii.price), 0) as total_purchases_amount'),
+                    \DB::raw('COALESCE(SUM(ii.quantity * ii.unit_price), 0) as total_purchases_amount'),
                     \DB::raw('COUNT(DISTINCT i.id) as purchase_orders_count')
                 ])
                 ->leftJoin('products as p', 's.id', '=', 'p.supplier_id')

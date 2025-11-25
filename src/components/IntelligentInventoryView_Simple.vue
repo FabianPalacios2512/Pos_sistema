@@ -37,10 +37,10 @@
 
           <!-- Botón Actualizar -->
           <button 
-            @click="testConnection"
+            @click="refreshCurrentSection"
             class="px-4 py-2.5 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white rounded-xl text-sm font-semibold transition-all duration-200 flex items-center space-x-2 shadow-sm hover:shadow-md"
           >
-            <svg class="w-4 h-4" :class="{ 'animate-spin': connectionStatus.includes('funcionando') }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" :class="{ 'animate-spin': connectionStatus === 'Cargando...' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
             <span>Actualizar</span>
@@ -51,6 +51,28 @@
       <!-- Contenido Principal -->
       <!-- Vista General -->
       <div v-if="activeSection === 'overview'" class="space-y-4">
+        
+        <!-- Estado de Conexión y Errores -->
+        <div v-if="connectionStatus || error" class="bg-white rounded-lg shadow-sm p-3 border border-gray-200">
+          <div v-if="error" class="flex items-center space-x-2 text-red-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-sm font-semibold">{{ error }}</span>
+          </div>
+          <div v-else-if="connectionStatus === 'Cargando...'" class="flex items-center space-x-2 text-blue-600">
+            <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span class="text-sm font-semibold">{{ connectionStatus }}</span>
+          </div>
+          <div v-else class="flex items-center space-x-2 text-green-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-sm font-semibold">{{ connectionStatus }}</span>
+          </div>
+        </div>
         
         <!-- Filtros de Período (Compactos) -->
         <div class="bg-white rounded-lg shadow-sm p-3 border border-gray-200">
@@ -411,7 +433,7 @@
                     en el sistema
                   </span>
                 </div>
-                <p class="text-2xl font-bold text-gray-900 mb-1">{{ productsData?.summary?.total_products || 0 }}</p>
+                <p class="text-2xl font-bold text-gray-900 mb-1">{{ productsMetrics.total }}</p>
               </div>
             </div>
           </div>
@@ -431,7 +453,7 @@
                     disponibles
                   </span>
                 </div>
-                <p class="text-2xl font-bold text-gray-900 mb-1">{{ productsData?.summary?.products_in_stock || 0 }}</p>
+                <p class="text-2xl font-bold text-gray-900 mb-1">{{ productsMetrics.active }}</p>
               </div>
             </div>
           </div>
@@ -451,7 +473,7 @@
                     alertas
                   </span>
                 </div>
-                <p class="text-2xl font-bold text-gray-900 mb-1">{{ productsData?.summary?.low_stock || 0 }}</p>
+                <p class="text-2xl font-bold text-gray-900 mb-1">{{ productsMetrics.lowStock }}</p>
               </div>
             </div>
           </div>
@@ -471,20 +493,20 @@
                     Inventario
                   </span>
                 </div>
-                <p class="text-2xl font-bold text-gray-900 mb-1">{{ formatCurrency(productsData?.summary?.total_value_sale || 0) }}</p>
-                <p class="text-sm text-gray-500">Costo: {{ formatCurrency(productsData?.summary?.total_value_cost || 0) }}</p>
+                <p class="text-2xl font-bold text-gray-900 mb-1">{{ formatCurrency(productsMetrics.totalValueSale) }}</p>
+                <p class="text-sm text-gray-500">Costo: {{ formatCurrency(productsMetrics.totalValueCost) }}</p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Tabla de Productos -->
-        <div v-if="productsData && productsData.products" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="text-base font-bold text-gray-900">Lista de Productos</h3>
-                <p class="text-xs text-gray-500 mt-1">{{ productsData.products?.length || 0 }} productos encontrados</p>
+                <p class="text-xs text-gray-500 mt-1">{{ productsData.products.length }} productos encontrados</p>
               </div>
             </div>
           </div>
@@ -495,9 +517,10 @@
                 <tr>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wide">Producto</th>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wide">Categoría</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wide">Stock</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wide">Precio</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wide">Estado</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Stock</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Precio</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Rotación</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Rentabilidad</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -509,32 +532,43 @@
                   </td>
                   <td class="px-4 py-3">
                     <span class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg border border-blue-100">
-                      {{ product.category || 'Sin categoría' }}
+                      {{ product.category_name || product.category || 'Sin categoría' }}
                     </span>
                   </td>
-                  <td class="px-4 py-3">
-                    <span :class="[
-                      'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold',
-                      product.current_stock <= 0 ? 'bg-rose-100 text-rose-700' :
-                      product.current_stock <= product.min_stock ? 'bg-amber-100 text-amber-700' :
-                      'bg-emerald-100 text-emerald-700'
+                  <td class="px-4 py-3 text-center">
+                    <div class="font-mono text-base font-bold" :class="[
+                      product.current_stock <= 0 ? 'text-red-600' :
+                      product.current_stock <= product.min_stock ? 'text-amber-600' :
+                      'text-gray-900'
                     ]">
-                      {{ product.current_stock }} unidades
-                    </span>
+                      {{ product.current_stock }}
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">{{ product.unit || 'unidades' }}</div>
                   </td>
-                  <td class="px-4 py-3">
-                    <div class="text-sm font-bold text-gray-900">{{ formatCurrency(product.sale_price) }}</div>
-                    <div class="text-xs text-gray-500">Costo: {{ formatCurrency(product.cost_price) }}</div>
+                  <td class="px-4 py-3 text-center">
+                    <div class="font-mono text-base font-bold text-gray-900">{{ formatCurrency(product.sale_price) }}</div>
+                    <div class="text-xs text-gray-500 mt-0.5">Costo: {{ formatCurrency(product.cost_price) }}</div>
                   </td>
-                  <td class="px-4 py-3">
+                  <td class="px-4 py-3 text-center">
                     <span :class="[
-                      'px-2.5 py-1 text-xs font-semibold rounded-full',
-                      product.stock_status === 'out' ? 'bg-rose-100 text-rose-700' :
-                      product.stock_status === 'low' ? 'bg-amber-100 text-amber-700' :
-                      'bg-emerald-100 text-emerald-700'
+                      'px-2.5 py-1 text-xs font-bold rounded-full',
+                      product.rotation_class === 'A' ? 'bg-green-100 text-green-700 border border-green-300' :
+                      product.rotation_class === 'B' ? 'bg-blue-100 text-blue-700 border border-blue-300' :
+                      'bg-amber-100 text-amber-700 border border-amber-300'
                     ]">
-                      {{ product.stock_status === 'out' ? 'AGOTADO' : product.stock_status === 'low' ? 'BAJO' : 'DISPONIBLE' }}
+                      Clase {{ product.rotation_class || 'C' }}
                     </span>
+                    <div class="text-xs text-gray-500 mt-1">{{ product.units_sold || 0 }} unidades vendidas</div>
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    <div class="font-mono text-lg font-bold" :class="[
+                      parseFloat(product.margin_percentage || 0) >= 40 ? 'text-green-600' :
+                      parseFloat(product.margin_percentage || 0) >= 20 ? 'text-blue-600' :
+                      'text-amber-600'
+                    ]">
+                      {{ parseFloat(product.margin_percentage || 0).toFixed(1) }}%
+                    </div>
+                    <div class="text-xs text-gray-500 mt-0.5">margen</div>
                   </td>
                 </tr>
               </tbody>
@@ -565,6 +599,28 @@
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+        
+        <!-- Estado Vacío -->
+        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-12">
+          <div class="text-center">
+            <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">No hay productos</h3>
+            <p class="text-sm text-gray-500">No se encontraron productos con los filtros seleccionados.</p>
+          </div>
+        </div>
+        
+        <!-- Cargando -->
+        <div v-else class="bg-white rounded-2xl shadow-sm border border-gray-200 p-12">
+          <div class="text-center">
+            <svg class="w-16 h-16 mx-auto text-blue-500 animate-spin mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Cargando productos...</h3>
+            <p class="text-sm text-gray-500">Por favor espera un momento.</p>
           </div>
         </div>
       </div>
@@ -1215,6 +1271,219 @@
                   </svg>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista de Proveedores -->
+      <div v-if="activeSection === 'suppliers'" class="space-y-6 animate-fade-in">
+        
+        <!-- Tarjetas de Resumen -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Total Proveedores -->
+          <div class="bg-white rounded-2xl p-5 border border-gray-300 hover:border-gray-400 transition-all duration-200 hover:shadow-lg">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-700">Total Proveedores</h3>
+                </div>
+                <p class="text-2xl font-bold text-gray-900 mb-1">{{ suppliersData?.summary?.total_suppliers || 0 }}</p>
+                <p class="text-sm text-gray-500">{{ suppliersData?.summary?.active_suppliers || 0 }} activos</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cuentas por Pagar -->
+          <div class="bg-white rounded-2xl p-5 border border-gray-300 hover:border-gray-400 transition-all duration-200 hover:shadow-lg">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-700">Cuentas por Pagar</h3>
+                </div>
+                <p class="text-2xl font-bold text-gray-900 mb-1">{{ formatCurrency(suppliersData?.summary?.total_debt || 0) }}</p>
+                <p class="text-sm text-gray-500">Dinero que debo a proveedores</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mejor Proveedor -->
+          <div class="bg-white rounded-2xl p-5 border border-gray-300 hover:border-gray-400 transition-all duration-200 hover:shadow-lg">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-gray-700">Mejor Proveedor</h3>
+                </div>
+                <p class="text-lg font-bold text-gray-900 mb-1 truncate">
+                  {{ suppliersData?.best_supplier?.name || 'N/A' }}
+                </p>
+                <p class="text-sm text-gray-500">Al que más le compro</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Proveedores -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-gray-900">Lista de Proveedores</h2>
+              <p class="text-xs text-gray-500 mt-0.5">{{ suppliersData?.suppliers?.length || 0 }} proveedores registrados</p>
+            </div>
+          </div>
+
+          <div v-if="!suppliersData" class="p-12 text-center">
+            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
+              <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <p class="text-sm font-semibold text-gray-700">Cargando proveedores...</p>
+          </div>
+
+          <div v-else-if="suppliersData?.suppliers?.length === 0" class="text-center py-12">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <p class="text-sm font-semibold text-gray-700">No hay proveedores</p>
+            <p class="text-xs text-gray-500 mt-1">Agrega proveedores para empezar</p>
+          </div>
+
+          <div v-else class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wide">Proveedor</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Tiempo Entrega</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Última Compra</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Estado</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wide">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="supplier in paginatedSuppliers" :key="supplier.id" class="hover:bg-gray-50 transition-colors">
+                  <td class="px-4 py-4">
+                    <div>
+                      <div class="text-sm font-semibold text-gray-900">{{ supplier.name }}</div>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        {{ supplier.contact_name || 'Sin contacto' }}
+                      </div>
+                      <div class="text-xs text-gray-400 mt-0.5 flex items-center space-x-2">
+                        <span v-if="supplier.phone">📞 {{ supplier.phone }}</span>
+                        <span v-if="supplier.city">📍 {{ supplier.city }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 text-center">
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ supplier.delivery_time || '2-3 días' }}
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 text-center">
+                    <div class="text-sm text-gray-900" v-if="supplier.last_purchase_date">
+                      {{ formatDate(supplier.last_purchase_date) }}
+                    </div>
+                    <div class="text-xs text-gray-400" v-else>Sin compras</div>
+                  </td>
+                  <td class="px-4 py-4 text-center">
+                    <span :class="[
+                      'px-2 py-1 text-xs font-semibold rounded-full',
+                      supplier.status === 'active' 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-gray-100 text-gray-700'
+                    ]">
+                      {{ supplier.status === 'active' ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-4 text-center">
+                    <div class="flex items-center justify-center space-x-2">
+                      <button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                        Ver Productos
+                      </button>
+                      <button class="px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                        Nuevo Pedido
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginador -->
+          <div v-if="suppliersData?.suppliers && suppliersData.suppliers.length > 0" class="bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-medium text-gray-700">Mostrar:</span>
+                <select v-model="suppliersFilters.itemsPerPage" @change="suppliersFilters.currentPage = 1"
+                        class="border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span class="text-xs text-gray-700">por página</span>
+              </div>
+              <div class="text-xs text-gray-700">
+                Mostrando {{ suppliersPaginationInfo.start }} a {{ suppliersPaginationInfo.end }} de {{ suppliersPaginationInfo.total }}
+              </div>
+            </div>
+            
+            <div class="flex items-center space-x-1">
+              <button @click="suppliersFilters.currentPage = 1" :disabled="suppliersFilters.currentPage === 1"
+                      class="p-1.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <button @click="suppliersFilters.currentPage--" :disabled="suppliersFilters.currentPage === 1"
+                      class="p-1.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              
+              <div class="flex items-center space-x-1">
+                <button v-for="page in suppliersTotalPages" :key="page" @click="suppliersFilters.currentPage = page"
+                        :class="[
+                          'px-2.5 py-1 text-xs font-medium rounded-lg transition-colors',
+                          page === suppliersFilters.currentPage 
+                            ? 'bg-blue-600 text-white border border-blue-600' 
+                            : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+                        ]">
+                  {{ page }}
+                </button>
+              </div>
+              
+              <button @click="suppliersFilters.currentPage++" :disabled="suppliersFilters.currentPage === suppliersTotalPages"
+                      class="p-1.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+              <button @click="suppliersFilters.currentPage = suppliersTotalPages" :disabled="suppliersFilters.currentPage === suppliersTotalPages"
+                      class="p-1.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -2148,6 +2417,15 @@ export default {
       itemsPerPage: 25
     })
 
+    // Datos para vista de proveedores
+    const suppliersData = ref(null)
+    const suppliersFilters = reactive({
+      supplier: '',
+      sortBy: 'total_purchases_amount',
+      currentPage: 1,
+      itemsPerPage: 25
+    })
+
     // Datos para vista de alertas
     const alertsData = ref(null)
     const alertsCurrentPage = ref(1)
@@ -2190,6 +2468,7 @@ export default {
       { id: 'products', name: 'Productos', icon: 'fas fa-boxes' },
       { id: 'movements', name: 'Movimientos', icon: 'fas fa-exchange-alt' },
       { id: 'customers', name: 'Clientes', icon: 'fas fa-users' },
+      { id: 'suppliers', name: 'Proveedores', icon: 'fas fa-building' },
       { id: 'alerts', name: 'Alertas', icon: 'fas fa-bell' },
       { id: 'predictions', name: 'Predicciones', icon: 'fas fa-chart-line' }
     ]
@@ -2290,62 +2569,34 @@ export default {
       return section ? section.icon : 'fas fa-question-circle'
     }
 
-    const testConnection = async () => {
-      connectionStatus.value = ''
-      error.value = ''
-      overviewData.value = null
-
-
-      try {
-        // Primero probar la conexión básica a la API
-        const response = await fetch(`${API_BASE_URL}/test`)
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-        }
-
-        const testData = await response.json()
-        connectionStatus.value = `API funcionando: ${testData.message}`
-
-        // Intentar cargar datos del inventario
-        try {
-          const inventoryResponse = await fetch(`${API_BASE_URL}/inventory/test/dashboard`)
-          
-          if (inventoryResponse.ok) {
-            const inventoryData = await inventoryResponse.json()
-            overviewData.value = inventoryData
-            
-            if (inventoryData.success && inventoryData.data) {
-              // Actualizar métricas si están disponibles
-              if (inventoryData.data.metrics) {
-                Object.assign(metrics, inventoryData.data.metrics)
-              }
-              
-              // Actualizar datos adicionales
-              if (inventoryData.data.monthlyTransactions) {
-                monthlyTransactions.value = inventoryData.data.monthlyTransactions
-              }
-              
-              if (inventoryData.data.stockVariation) {
-                stockVariation.value = inventoryData.data.stockVariation
-              }
-              
-              connectionStatus.value += ' • Dashboard completo cargado'
-            }
-          } else {
-            const errorText = await inventoryResponse.text()
-            connectionStatus.value += ` • Inventario: Error ${inventoryResponse.status}`
-            console.log('Respuesta de inventario:', errorText.substring(0, 200))
-          }
-        } catch (inventoryError) {
-          connectionStatus.value += ' • Inventario: pendiente de configuración'
-          console.log('Inventario aún no configurado:', inventoryError.message)
-        }
-
-      } catch (err) {
-        error.value = `Error de conexión: ${err.message}`
-        console.error('Error testing connection:', err)
+    // Función para refrescar la sección actual
+    const refreshCurrentSection = () => {
+      console.log('🔄 Refrescando sección:', activeSection.value)
+      switch (activeSection.value) {
+        case 'overview':
+          loadDashboardData()
+          break
+        case 'products':
+          loadProductsData()
+          break
+        case 'movements':
+          loadMovementsData()
+          break
+        case 'customers':
+          loadCustomersData()
+          break
+        case 'alerts':
+          loadAlertsData()
+          break
+        case 'predictions':
+          loadPredictionsData()
+          break
       }
+    }
+
+    const testConnection = async () => {
+      // Redirigir a loadDashboardData
+      await loadDashboardData()
     }
 
     // Método para obtener etiqueta del período
@@ -2806,10 +3057,9 @@ export default {
     }
 
     const loadDashboardData = async () => {
-      connectionStatus.value = ''
+      connectionStatus.value = 'Cargando...'
       error.value = ''
       overviewData.value = null
-
 
       try {
         // Construir URL con parámetros
@@ -2849,13 +3099,16 @@ export default {
             
             // Las alertas automáticas ya no se cargan aquí
             // Solo se mostrarán en el dashboard principal del POS
+          } else {
+            console.warn('⚠️ Respuesta sin success o data:', inventoryData)
           }
         } else {
-          throw new Error(`Error ${inventoryResponse.status}`)
+          const errorText = await inventoryResponse.text()
+          throw new Error(`Error ${inventoryResponse.status}: ${errorText}`)
         }
       } catch (err) {
         error.value = `Error cargando datos: ${err.message}`
-        console.error('Error loading dashboard:', err)
+        connectionStatus.value = 'Error al cargar'
       }
     }
 
@@ -2879,19 +3132,25 @@ export default {
         // Si es rango personalizado, agregar fechas
         if (selectedPeriod.value === 'custom' && customDateRange.start) {
           params.append('start_date', customDateRange.start)
-          // Si no hay end_date, usar la misma fecha que start_date (mismo día)
           const endDate = customDateRange.end || customDateRange.start
           params.append('end_date', endDate)
         }
         
-        const response = await fetch(`${API_BASE_URL}/inventory/test/products?${params}`)
+        const response = await fetch(`${API_BASE_URL}/products/analytics?${params}`)
         
         if (response.ok) {
           const data = await response.json()
-          if (data.success) {
-            productsData.value = data.data
-            availableCategories.value = data.data.filters.categories
-            availableSuppliers.value = data.data.filters.suppliers
+          
+          if (data.success && data.data) {
+            productsData.value = {
+              products: data.data.products || [],
+              pagination: data.data.pagination || {},
+              summary: data.data.summary || {},
+              filters: data.data.filters || { categories: [], suppliers: [] }
+            }
+            
+            availableCategories.value = productsData.value.filters.categories || []
+            availableSuppliers.value = productsData.value.filters.suppliers || []
           }
         }
       } catch (error) {
@@ -2992,6 +3251,27 @@ export default {
       }
     }
 
+    // Cargar datos de proveedores
+    const loadSuppliersData = async () => {
+      try {
+        console.log('🔄 Cargando datos de proveedores...')
+        const response = await fetch(`${API_BASE_URL}/suppliers/analytics`)
+        
+        console.log('📡 Response status:', response.status)
+        
+        if (response.ok) {
+          const data = await response.json()
+          console.log('📦 Datos recibidos:', data)
+          if (data.success) {
+            suppliersData.value = data.data
+            console.log('✅ suppliersData actualizado:', suppliersData.value)
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error cargando proveedores:', error)
+      }
+    }
+
     // Cargar datos de alertas
     const loadAlertsData = async () => {
       try {
@@ -3057,6 +3337,9 @@ export default {
           break
         case 'customers':
           loadCustomersData()
+          break
+        case 'suppliers':
+          loadSuppliersData()
           break
         case 'alerts':
           loadAlertsData()
@@ -3260,6 +3543,31 @@ export default {
       }
     })
 
+    // Computed properties para paginación de proveedores
+    const suppliersTotalPages = computed(() => {
+      if (!suppliersData.value?.suppliers) return 1
+      return Math.ceil(suppliersData.value.suppliers.length / suppliersFilters.itemsPerPage)
+    })
+
+    const suppliersPaginationInfo = computed(() => {
+      const totalItems = suppliersData.value?.suppliers?.length || 0
+      const start = (suppliersFilters.currentPage - 1) * suppliersFilters.itemsPerPage + 1
+      const end = Math.min(suppliersFilters.currentPage * suppliersFilters.itemsPerPage, totalItems)
+      
+      return {
+        start: totalItems > 0 ? start : 0,
+        end: totalItems > 0 ? end : 0,
+        total: totalItems
+      }
+    })
+
+    const paginatedSuppliers = computed(() => {
+      if (!suppliersData.value?.suppliers) return []
+      const start = (suppliersFilters.currentPage - 1) * suppliersFilters.itemsPerPage
+      const end = start + suppliersFilters.itemsPerPage
+      return suppliersData.value.suppliers.slice(start, end)
+    })
+
     // Computed properties para paginación de alertas
     const paginatedAlerts = computed(() => {
       if (!alertsData.value?.alerts) return []
@@ -3319,6 +3627,29 @@ export default {
       return predictionsData.value.stock_depletion.filter(i => i.days_until_depletion >= 30).length
     })
 
+    // Computed properties para métricas de productos calculadas
+    const productsMetrics = computed(() => {
+      if (!productsData.value?.products) {
+        return {
+          total: 0,
+          active: 0,
+          lowStock: 0,
+          totalValueSale: 0,
+          totalValueCost: 0
+        }
+      }
+      
+      const products = productsData.value.products
+      
+      return {
+        total: productsData.value.summary?.total_products || products.length,
+        active: products.filter(p => p.active && p.current_stock > 0).length,
+        lowStock: products.filter(p => p.current_stock <= p.min_stock && p.current_stock > 0).length,
+        totalValueSale: products.reduce((sum, p) => sum + (parseFloat(p.sale_price || 0) * parseFloat(p.current_stock || 0)), 0),
+        totalValueCost: products.reduce((sum, p) => sum + (parseFloat(p.cost_price || 0) * parseFloat(p.current_stock || 0)), 0)
+      }
+    })
+
     const paginatedPurchaseRecommendations = computed(() => {
       if (!predictionsData.value?.purchase_recommendations) return []
       const start = (predictionsCurrentPage.value - 1) * 10
@@ -3346,6 +3677,7 @@ export default {
       monthlyTransactions,
       stockVariation,
       productsData,
+      productsMetrics,
       availableCategories,
       availableSuppliers,
       filters,
@@ -3359,6 +3691,11 @@ export default {
       customersFilters,
       customersTotalPages,
       customersPaginationInfo,
+      suppliersData,
+      suppliersFilters,
+      suppliersTotalPages,
+      suppliersPaginationInfo,
+      paginatedSuppliers,
       alertsData,
       alertsCurrentPage,
       alertsFilters,
@@ -3397,9 +3734,12 @@ export default {
       handlePeriodChange,
       loadDashboardData,
       refreshOverviewData,
+      refreshCurrentSection,
+      testConnection,
       loadProductsData,
       loadMovementsData,
       loadCustomersData,
+      loadSuppliersData,
       loadAlertsData,
       loadPredictionsData,
       switchToSection,
@@ -3427,9 +3767,7 @@ export default {
       resolveAlertGroup,
       
       // Funciones de movimientos
-      viewMovementDocument,
-      
-      testConnection: loadDashboardData
+      viewMovementDocument
     }
   }
 }

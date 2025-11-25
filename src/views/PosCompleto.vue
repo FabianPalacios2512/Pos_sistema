@@ -1345,6 +1345,7 @@ const getModuleDescription = () => {
     products: 'Catálogo de Productos • Gestión inteligente de inventario',
     categories: 'Categorías • Organización perfecta de productos',
     stock: 'Control de Stock • Inventario optimizado',
+    intelligent_inventory: 'Inventario Inteligente • Análisis predictivo y optimización',
     suppliers: 'Proveedores • Gestión de compras y relaciones comerciales',
     customers: 'Base de Clientes • CRM integrado y seguimiento',
     invoices: 'Facturación • Historial completo de ventas',

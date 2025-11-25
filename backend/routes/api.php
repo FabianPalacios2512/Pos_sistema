@@ -61,6 +61,10 @@ Route::get('/inventory/test/predictions', [InventoryTestController::class, 'pred
 Route::get('/data/analysis/october-sales', [\App\Http\Controllers\Api\DataAnalysisController::class, 'compareOctoberSales']);
 Route::get('/data/analysis/inventory-value', [\App\Http\Controllers\Api\DataAnalysisController::class, 'analyzeInventoryValue']);
 
+// RUTAS DE ANALYTICS (sin autenticación temporal para desarrollo)
+Route::get('/products/analytics', [ProductAnalyticsController::class, 'getProductsWithMetrics']);
+Route::get('/suppliers/analytics', [SupplierController::class, 'getAnalytics']);
+
 // RUTAS OPTIMIZADAS PARA PRODUCCIÓN (sin auth para pruebas)
 Route::get('/optimized/dashboard', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'getDashboardData']);
 Route::get('/optimized/recent-transactions', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'getRecentTransactions']);
@@ -193,11 +197,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Métricas de devoluciones para reportes
     Route::get('/returns/metrics/{period}', [App\Http\Controllers\Api\ReturnsController::class, 'getMetrics']);
     // ==================== FIN DEVOLUCIONES ====================
-
-    // ==================== ANALYTICS PRODUCTOS Y PROVEEDORES ====================
-    Route::get('/products/analytics', [ProductAnalyticsController::class, 'getProductsWithMetrics']);
-    Route::get('/suppliers/analytics', [SupplierController::class, 'getAnalytics']);
-    // ==================== FIN ANALYTICS ====================
 
 });
 
