@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 use App\Models\Product;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
@@ -23,9 +22,6 @@ class AIController extends Controller
      */
     public function chat(Request $request)
     {
-        // Aumentar tiempo de ejecución para cadenas de pensamiento largas
-        set_time_limit(120);
-
         $request->validate([
             'message' => 'required|string',
         ]);
@@ -220,21 +216,6 @@ class AIController extends Controller
                 $sessionId = 'sess_' . md5($userId . '_' . date('Ymd'));
             }
 
-            // 🔒 PREVENIR DOBLES PETICIONES (Lock Mechanism)
-            $lockKey = 'ai_chat_lock_' . $sessionId . '_' . md5($userMessage);
-            if (Cache::has($lockKey)) {
-                Log::warning("[AI Lock] Bloqueando petición duplicada: {$userMessage}");
-                return response()->json([
-                    'reply' => json_encode([
-                        'reply' => '⏳ Ya estoy procesando este mensaje. Por favor espera un momento...',
-                        'action' => null
-                    ]),
-                    'session_id' => $sessionId,
-                    'status' => 'processing'
-                ]);
-            }
-            Cache::put($lockKey, true, 60); // Bloqueo por 60 segundos
-
             // 1. Build lightweight system prompt (NO CONTEXT STUFFING!)
             $systemPrompt = $this->buildSystemPrompt();
 
@@ -262,9 +243,6 @@ class AIController extends Controller
                 'content' => $assistantReply,
             ]);
 
-            // Liberar bloqueo
-            Cache::forget($lockKey);
-
             return response()->json([
                 'reply' => $response,
                 'session_id' => $sessionId,
@@ -273,18 +251,6 @@ class AIController extends Controller
 
         } catch (\Exception $e) {
             Log::error('AI Chat Error: ' . $e->getMessage());
-            if (isset($lockKey)) Cache::forget($lockKey);
-
-            // 🔴 FIX: Guardar mensaje de error en historial para evitar "comandos fantasma"
-            if (isset($sessionId)) {
-                ConversationHistory::create([
-                    'user_id' => auth()->id(),
-                    'session_id' => $sessionId,
-                    'role' => 'assistant',
-                    'content' => 'Lo siento, tuve un problema técnico al procesar tu solicitud anterior.',
-                ]);
-            }
-
             return response()->json([
                 'reply' => 'Lo siento, tuve un problema al procesar tu solicitud. Por favor intenta de nuevo.',
                 'error' => $e->getMessage(),
@@ -307,8 +273,8 @@ Eres "105 IA", asistente virtual inteligente del sistema POS. Sé amigable, conv
 🎯 TUS CAPACIDADES:
 Tienes herramientas para consultar datos en tiempo real:
 • search_products(query, filter, limit) - Buscar productos
-• search_customers(query) - Buscar clientes
-• search_categories(query) - Buscar categorías
+• search_customers(query) - Buscar clientes [CRÍTICO: usar para obtener IDs]
+• search_categories(query) - Buscar categorías [CRÍTICO: usar para obtener IDs de categorías]
 • get_sales_report(period) - Estadísticas de ventas
 • get_low_stock_products(limit) - Productos con stock bajo
 • search_invoices(customer_name, date, limit) - Buscar facturas
@@ -321,7 +287,7 @@ Tienes herramientas para consultar datos en tiempo real:
 2. **NAVEGACIÓN** (NO es herramienta - va en respuesta JSON):
    Frases: "llevame a X", "muestra X", "abre X", "ve a X", "ir a X", "quiero ver X"
    Módulos: products, pos, dashboard, invoices, customers, suppliers, categories, reports, settings
-
+   
    Ejemplo:
    Usuario: "llevame a productos"
    Respuesta: {"reply": "¡Claro! Te llevo al módulo de productos 📦", "action": {"type": "navigate", "payload": {"name": "POSModule", "params": {"module": "products"}}}}
@@ -332,19 +298,15 @@ Tienes herramientas para consultar datos en tiempo real:
 
 4. **CREAR PRODUCTOS** - SÉ PROACTIVO:
    Usuario: "crea producto X con categoría Y"
-
-   SI FALTA INFO (especialmente CATEGORÍA) → Pídela específicamente:
-   "Para crear el producto necesito: nombre, categoría, precio de venta, precio de costo, y stock inicial. ¿A qué categoría pertenece?"
-
-   ⚠️ IMPORTANTE: SI NO DA CATEGORÍA EN EL MENSAJE ACTUAL: PREGUNTA.
-   NO ASUMAS NINGUNA. NO uses el contexto de mensajes anteriores para adivinar la categoría.
-
+   
+   SI FALTA INFO → Pídela específicamente:
+   "Para crear el producto necesito: nombre, categoría, precio de venta, precio de costo, y stock inicial."
+   
    SI TIENE INFO COMPLETA:
    - Paso 1: Si usuario da nombre categoría → search_categories(query='nombre categoría') para obtener category_id
    - Paso 2: Si categoría no existe → Pregunta si quiere crearla o usar otra
    - Paso 3: execute_action('create_product', params con category_id numérico)
-   - Paso 4: RESPONDE con éxito Y ACCIÓN DE NAVEGACIÓN para editar:
-     {"reply": "¡Producto creado! Te abro el editor por si quieres ajustar algo.", "action": {"type": "navigate", "payload": {"name": "POSModule", "params": {"module": "products"}, "query": {"action": "edit", "id": ID_DEL_PRODUCTO}}}}
+   - Paso 4: RESPONDE con resultado
 
 5. **ACCIONES MULTI-PASO**:
    Ejemplo: "crea descuento para Maria"
@@ -362,39 +324,9 @@ Tienes herramientas para consultar datos en tiempo real:
 
 9. **WhatsApp**: target debe ser "all", "active" o "specific" (con customer_ids)
 
-10. **EDICIÓN DE PRODUCTOS**:
-   - Si el usuario dice "abreme el editor", "editarlo", "modificarlo" justo después de crear o mencionar un producto:
-     - Usa la acción `navigate` con `query: { "action": "edit", "id": [ID_DEL_PRODUCTO] }`.
-     - El ID del producto recién creado estará en el historial de conversación o en tu memoria inmediata.
-     - Ejemplo:
-       Usuario: "abreme el editor"
-       Respuesta: {
-         "reply": "¡Claro! Abriendo el editor para 'Carne Molida' 📝",
-         "action": {"type": "navigate", "payload": {"name": "POSModule", "params": {"module": "products"}, "query": {"action": "edit", "id": 39}}}
-       }
-
-11. **CREACIÓN PROACTIVA Y EDICIÓN OPCIONAL**:
-   - Si el usuario pregunta "¿podemos crear X?" o "¿puedes crear X?", ASUME QUE ES UNA ORDEN.
-   - NO preguntes "¿quieres que lo cree?". HAZLO.
-   - Si faltan datos, créalo con valores por defecto (precio 0, stock 0) y avisa al usuario que puede editarlo después.
-   - **IMPORTANTE**: Después de crear un producto, **NO** navegues automáticamente al editor.
-   - En su lugar, usa `suggested_action` para mostrar un botón que diga "✏️ Editar Producto".
-   - Así el usuario puede decidir si quiere editarlo o seguir conversando.
-   - Ejemplo:
-     Usuario: "podemos crear una categoria llamada empanadas"
-     Respuesta: {
-       "reply": "¡Listo! Categoría 'empanadas' creada ✅. ¿Quieres agregar productos a ella?",
-       "execute_action": { "type": "create_category", "params": { "name": "empanadas" } }
-     }
-
-12. **FORMATO RESPUESTA**:
-   SIEMPRE JSON: {"reply": "texto amigable y útil", "action": null o objeto_navegación, "suggested_action": { "type": "navigate", "label": "Texto del Botón", "payload": { ... } } o null}
-
-13. **ERRORES PREVIOS**:
-   - Si ves en el historial que tuviste un problema o error en el turno anterior, NO intentes reintentar la acción automáticamente a menos que el usuario lo pida de nuevo.
-   - Prioriza SIEMPRE el último mensaje del usuario.
-   - Si el usuario pregunta algo nuevo (ej: "¿cuántos productos hay?"), responde a ESO, no a la orden fallida anterior.
-
+10. **FORMATO RESPUESTA**:
+   SIEMPRE JSON: {"reply": "texto amigable y útil", "action": null o objeto_navegación}
+   
 ¡Sé inteligente, proactivo y ayuda al usuario a completar sus tareas!
 
 Hoy: {$currentDate}, {$currentTime}
@@ -438,7 +370,7 @@ EOT;
                 'type' => 'function',
                 'function' => [
                     'name' => 'search_customers',
-                    'description' => 'Buscar clientes por nombre, teléfono, email o documento para obtener su ID.',
+                    'description' => 'CRÍTICO: Buscar clientes por nombre, teléfono, email o documento. SIEMPRE usa esta herramienta para encontrar el ID de un cliente antes de ejecutar acciones que lo requieran.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -490,23 +422,6 @@ EOT;
             [
                 'type' => 'function',
                 'function' => [
-                    'name' => 'search_categories',
-                    'description' => 'Buscar categorías por nombre para obtener su ID.',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'query' => [
-                                'type' => 'string',
-                                'description' => 'Término de búsqueda (nombre de la categoría). Deja vacío para listar todas.'
-                            ]
-                        ],
-                        'required' => []
-                    ]
-                ]
-            ],
-            [
-                'type' => 'function',
-                'function' => [
                     'name' => 'search_invoices',
                     'description' => 'Buscar facturas por cliente, fecha u otros criterios',
                     'parameters' => [
@@ -535,7 +450,7 @@ EOT;
                 'type' => 'function',
                 'function' => [
                     'name' => 'execute_action',
-                    'description' => 'Ejecutar acciones de negocio. Si requiere customer_ids, busca primero al cliente. DESPUÉS DE EJECUTAR, responde al usuario.',
+                    'description' => 'Ejecutar acciones de negocio como crear descuentos, enviar WhatsApp, crear productos, etc. IMPORTANTE: Si la acción requiere customer_ids, primero busca al cliente con search_customers. DESPUÉS DE EJECUTAR, NO VUELVAS A LLAMAR ESTA FUNCIÓN - responde al usuario con el resultado.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -546,7 +461,7 @@ EOT;
                             ],
                             'params' => [
                                 'type' => 'object',
-                                'description' => 'Parámetros específicos. create_product: {name, category_id, sale_price, cost_price, current_stock}. create_discount: {name, code, type, value, duration_days}. send_whatsapp: {message, target, customer_ids}.'
+                                'description' => 'Parámetros específicos de la acción. Para create_discount: {name, code, type, value, duration_days}. Para send_whatsapp: {message, target (all|active|specific), customer_ids (si target=specific)}. Para create_campaign: {discount: {...}, whatsapp: {...}}.'
                             ]
                         ],
                         'required' => ['action_type', 'params']
@@ -559,7 +474,7 @@ EOT;
     /**
      * Call Groq API with agent loop (handles tools automatically)
      */
-private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory = [], $maxIterations = 10)
+    private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory = [], $maxIterations = 5)
     {
         // Build initial messages array
         $messages = [
@@ -660,7 +575,7 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
         // Max iterations reached or error occurred
         Log::warning("[Agent Loop] Ended after {$iterations} iterations");
         return json_encode([
-            'reply' => 'Tuve un problema procesando tu solicitud compleja. ¿Podrías intentarlo de nuevo o simplificarla?',
+            'reply' => 'Lo siento, la consulta es muy compleja. ¿Puedes ser más específico?',
             'action' => null
         ]);
     }
@@ -928,34 +843,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             'customers' => $customers,
             'count' => count($customers)
         ];
-    }
-
-    /**
-     * Tool: Search categories
-     */
-    private function toolSearchCategories($args)
-    {
-        try {
-            $query = $args['query'] ?? '';
-
-            $categories = \App\Models\Category::query()
-                ->when($query, function ($q) use ($query) {
-                    $q->where('name', 'LIKE', "%{$query}%")
-                      ->orWhere('description', 'LIKE', "%{$query}%");
-                })
-                ->limit(20)
-                ->get(['id', 'name', 'description']);
-
-            return [
-                'result' => [
-                    'categories' => $categories->toArray(),
-                    'count' => $categories->count()
-                ]
-            ];
-        } catch (\Exception $e) {
-            Log::error('[Tool] search_categories error: ' . $e->getMessage());
-            return ['result' => ['categories' => [], 'count' => 0, 'error' => $e->getMessage()]];
-        }
     }
 
     /**

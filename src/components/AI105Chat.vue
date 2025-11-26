@@ -172,6 +172,19 @@
                 ]"
               >
                 <p class="whitespace-pre-line">{{ message.text }}</p>
+
+                <!-- Botón de Acción Sugerida -->
+                <div v-if="message.suggested_action" class="mt-3 pt-3 border-t border-gray-100">
+                  <button 
+                    @click="executeSuggestedAction(message.suggested_action)"
+                    class="w-full py-2 px-3 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition-colors flex items-center justify-center space-x-2 group"
+                  >
+                    <span>{{ message.suggested_action.label || 'Ver detalles' }}</span>
+                    <svg class="w-3 h-3 text-slate-400 group-hover:text-slate-600 transform group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <p 
                 class="text-[10px] mt-1.5 px-1"
@@ -326,6 +339,20 @@ export default {
       return now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
     }
 
+    const executeSuggestedAction = (action) => {
+      if (action && action.type === 'navigate' && action.payload) {
+         try {
+             const targetModule = action.payload.params?.module;
+             const queryParams = action.payload.query || {};
+             
+             console.log('🔄 [AI Chat] Executing suggested action:', targetModule, queryParams);
+             navigateToModule(targetModule, queryParams);
+         } catch (err) {
+            console.error('❌ [AI Chat] Suggested action error:', err);
+         }
+      }
+    }
+
     const sendMessage = async () => {
       if (!inputMessage.value.trim() || isTyping.value) return
 
@@ -358,6 +385,7 @@ export default {
         // Parsear la respuesta de la IA (que ahora es un JSON string dentro de response.reply)
         let aiReply = response.reply;
         let aiAction = null;
+        let suggestedAction = null;
         let executeAction = null;
         let actionResult = null;
 
@@ -372,20 +400,24 @@ export default {
              const parsed = JSON.parse(response.reply);
              aiReply = parsed.reply || parsed.text || response.reply;
              aiAction = parsed.action;
+             suggestedAction = parsed.suggested_action;
              executeAction = parsed.execute_action;
              actionResult = parsed.action_result;
              console.log('✅ [AI Chat Debug] Parsed JSON - Reply:', aiReply);
              console.log('✅ [AI Chat Debug] Parsed JSON - Action:', aiAction);
+             console.log('💡 [AI Chat Debug] Parsed JSON - Suggested Action:', suggestedAction);
              console.log('🚀 [AI Chat Debug] Parsed JSON - Execute Action:', executeAction);
              console.log('📊 [AI Chat Debug] Parsed JSON - Action Result:', actionResult);
           } else if (typeof response.reply === 'object') {
              // Si ya viene parseado (dependiendo de cómo lo devuelva el controller/axios)
              aiReply = response.reply.reply;
              aiAction = response.reply.action;
+             suggestedAction = response.reply.suggested_action;
              executeAction = response.reply.execute_action;
              actionResult = response.reply.action_result;
              console.log('✅ [AI Chat Debug] Object - Reply:', aiReply);
              console.log('✅ [AI Chat Debug] Object - Action:', aiAction);
+             console.log('💡 [AI Chat Debug] Object - Suggested Action:', suggestedAction);
              console.log('🚀 [AI Chat Debug] Object - Execute Action:', executeAction);
              console.log('📊 [AI Chat Debug] Object - Action Result:', actionResult);
           }
@@ -431,7 +463,8 @@ export default {
         messages.value.push({
           type: 'ai',
           text: aiReply,
-          timestamp: getCurrentTime()
+          timestamp: getCurrentTime(),
+          suggested_action: suggestedAction
         })
 
         // Ejecutar acción de navegación si existe
@@ -538,7 +571,8 @@ export default {
       sendMessage,
       sendQuickMessage,
       startNewConversation,
-      handleShiftEnter
+      handleShiftEnter,
+      executeSuggestedAction
     }
   }
 }

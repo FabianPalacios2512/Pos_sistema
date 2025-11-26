@@ -2216,7 +2216,7 @@ watch(statusFilter, async () => {
 })
 
 // 🎯 Watcher para query params de navegación AI (filtros automáticos)
-watch(() => props.queryParams, (newParams) => {
+watch(() => props.queryParams, async (newParams) => {
   if (!newParams || Object.keys(newParams).length === 0) return
   
   console.log('🔍 [ProductsView] Query params detectados:', newParams)
@@ -2263,6 +2263,22 @@ watch(() => props.queryParams, (newParams) => {
       )
     }
   }
+
+  // 🔍 Manejar acciones (create/edit) desde props (AI Navigation)
+  if (newParams.action === 'create') {
+    console.log('✅ [ProductsView] Acción de creación detectada desde Props');
+    setTimeout(() => openCreateModal(), 500);
+  } else if (newParams.action === 'edit' && newParams.id) {
+    console.log('✅ [ProductsView] Acción de edición detectada desde Props');
+    // Asegurar que los productos estén cargados
+    if (products.value.length === 0) await loadProducts();
+    
+    const productToEdit = products.value.find(p => p.id == newParams.id);
+    if (productToEdit) {
+      console.log('🚀 [ProductsView] Abriendo modal de edición para:', productToEdit.name);
+      editProduct(productToEdit);
+    }
+  }
 }, { deep: true, immediate: true })
 
 // Inicialización
@@ -2274,21 +2290,38 @@ onMounted(async () => {
   
   await loadCategories()
   
-  // Verificar si hay acción de creación desde la URL (Deep Linking)
+  // Verificar si hay acción de creación desde la URL (Deep Linking) O desde props
+  const action = route.query.action || props.queryParams?.action;
+  const actionId = route.query.id || props.queryParams?.id;
+
   console.log('🔍 [ProductsView] route.query:', route.query);
-  console.log('🔍 [ProductsView] route.query.action:', route.query.action);
+  console.log('🔍 [ProductsView] props.queryParams:', props.queryParams);
   
-  if (route.query.action === 'create') {
-    console.log('✅ [ProductsView] Acción de creación detectada desde URL');
+  if (action === 'create') {
+    console.log('✅ [ProductsView] Acción de creación detectada');
     // Esperar un momento para asegurar que las categorías estén cargadas
     setTimeout(() => {
       console.log('🚀 [ProductsView] Llamando a openCreateModal()');
       openCreateModal()
       // Limpiar la query para evitar que se abra al recargar
-      router.replace({ query: null })
+      if (route.query.action) router.replace({ query: null })
     }, 500)
+  } else if (action === 'edit' && actionId) {
+    console.log('✅ [ProductsView] Acción de edición detectada');
+    // Esperar a que carguen los productos
+    await loadProducts()
+    
+    const productToEdit = products.value.find(p => p.id == actionId)
+    if (productToEdit) {
+      console.log('🚀 [ProductsView] Abriendo modal de edición para:', productToEdit.name)
+      editProduct(productToEdit)
+      // Limpiar la query
+      if (route.query.action) router.replace({ query: null })
+    } else {
+      console.warn('⚠️ [ProductsView] Producto no encontrado para edición:', actionId)
+    }
   } else {
-    console.log('ℹ️ [ProductsView] No hay acción de creación en la URL');
+    console.log('ℹ️ [ProductsView] No hay acción de creación en la URL/Props');
     // Verificar si hay datos de producto para editar desde otra vista (solo si no es creación)
     const editProductData = sessionStorage.getItem('editProductData')
     if (editProductData) {
