@@ -58,14 +58,29 @@
             </div>
           </div>
           
-          <button 
-            @click="closeChat"
-            class="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-lg"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
+          <div class="flex items-center space-x-2">
+            <!-- Botón Nueva Conversación (solo si hay mensajes) -->
+            <button 
+              v-if="messages.length > 0"
+              @click="startNewConversation"
+              class="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-lg"
+              title="Nueva conversación"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+            </button>
+            
+            <!-- Botón Cerrar -->
+            <button 
+              @click="closeChat"
+              class="text-white/80 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-lg"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Sugerencias Rápidas (Solo cuando no hay mensajes) -->
@@ -259,6 +274,7 @@ export default {
     const isTyping = ref(false)
     const messagesContainer = ref(null)
     const messageInput = ref(null)
+    const sessionId = ref(null) // 🆕 ID de sesión conversacional
 
     // Computed para saber si se controla externamente
     const isControlledExternally = computed(() => props.isOpen !== undefined)
@@ -337,8 +353,15 @@ export default {
       try {
         // Usar el servicio de API centralizado
         const response = await api.post('/ai/chat', {
-          message: userMessage
+          message: userMessage,
+          session_id: sessionId.value // 🆕 Enviar session_id si existe
         });
+
+        // 🆕 Guardar session_id devuelto por el backend
+        if (response.session_id) {
+          sessionId.value = response.session_id;
+          console.log('💾 [Session] ID guardado:', sessionId.value);
+        }
 
         // Parsear la respuesta de la IA (que ahora es un JSON string dentro de response.reply)
         let aiReply = response.reply;
@@ -394,12 +417,16 @@ export default {
             enrichedReply += `🎫 Usos: ${actionResult.discount.usage_limit}`;
           }
           
-          if (actionResult.whatsapp) {
+          // Verificar stats de WhatsApp (viene en actionResult.stats)
+          if (actionResult.stats) {
             enrichedReply += `\n\n📱 **WhatsApp enviado:**\n`;
-            enrichedReply += `✅ Enviados: ${actionResult.whatsapp.sent}\n`;
-            enrichedReply += `📊 Total: ${actionResult.whatsapp.total}`;
-            if (actionResult.whatsapp.failed > 0) {
-              enrichedReply += `\n❌ Fallidos: ${actionResult.whatsapp.failed}`;
+            enrichedReply += `✅ Enviados: ${actionResult.stats.sent}\n`;
+            enrichedReply += `📊 Números únicos: ${actionResult.stats.unique}`;
+            if (actionResult.stats.duplicates_removed > 0) {
+              enrichedReply += `\n🔄 Duplicados omitidos: ${actionResult.stats.duplicates_removed}`;
+            }
+            if (actionResult.stats.failed > 0) {
+              enrichedReply += `\n❌ Fallidos: ${actionResult.stats.failed}`;
             }
           }
           
@@ -466,6 +493,32 @@ export default {
       sendMessage()
     }
 
+    const startNewConversation = async () => {
+      if (!sessionId.value) {
+        // Si no hay sesión activa, solo limpiamos localmente
+        messages.value = [];
+        return;
+      }
+
+      try {
+        // Llamar al endpoint para limpiar el historial en el backend
+        await api.post('/ai/clear-history', {
+          session_id: sessionId.value
+        });
+
+        // Limpiar mensajes locales y session_id
+        messages.value = [];
+        sessionId.value = null;
+        
+        console.log('🔄 [Session] Nueva conversación iniciada');
+      } catch (error) {
+        console.error('❌ [Session] Error limpiando historial:', error);
+        // Limpiar localmente de todos modos
+        messages.value = [];
+        sessionId.value = null;
+      }
+    }
+
     const handleShiftEnter = (e) => {
       // Permitir Shift+Enter para nueva línea
       const textarea = e.target
@@ -486,11 +539,13 @@ export default {
       isTyping,
       messagesContainer,
       messageInput,
+      sessionId,
       quickSuggestions,
       toggleChat,
       closeChat,
       sendMessage,
       sendQuickMessage,
+      startNewConversation,
       handleShiftEnter
     }
   }

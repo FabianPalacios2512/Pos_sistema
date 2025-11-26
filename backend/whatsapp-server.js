@@ -126,27 +126,35 @@ async function sendMessage(phone, message, pdfPath = null) {
 
         console.log(`📤 Enviando mensaje a ${jid}`);
 
-        if (pdfPath && fs.existsSync(pdfPath)) {
-            // Enviar PDF
-            const mediaMessage = {
-                document: fs.readFileSync(pdfPath),
-                mimetype: 'application/pdf',
-                fileName: 'factura.pdf',
-                caption: message
-            };
+        // ✅ NO USAR AWAIT - Enviar en background
+        const sendPromise = (async () => {
+            try {
+                if (pdfPath && fs.existsSync(pdfPath)) {
+                    // Enviar PDF
+                    const mediaMessage = {
+                        document: fs.readFileSync(pdfPath),
+                        mimetype: 'application/pdf',
+                        fileName: 'factura.pdf',
+                        caption: message
+                    };
 
-            await sock.sendMessage(jid, mediaMessage);
-            console.log('✅ PDF enviado exitosamente');
-        } else {
-            // Enviar solo texto
-            await sock.sendMessage(jid, { text: message });
-            console.log('✅ Mensaje enviado exitosamente');
-        }
+                    await sock.sendMessage(jid, mediaMessage);
+                    console.log('✅ PDF enviado exitosamente a', phone);
+                } else {
+                    // Enviar solo texto
+                    await sock.sendMessage(jid, { text: message });
+                    console.log('✅ Mensaje enviado exitosamente a', phone);
+                }
+            } catch (error) {
+                console.error('❌ Error enviando mensaje a', phone, ':', error.message);
+            }
+        })();
 
-        return { success: true, message: 'Mensaje enviado' };
+        // ✅ RESPONDER INMEDIATAMENTE sin esperar
+        return { success: true, message: 'Mensaje en cola para envío' };
 
     } catch (error) {
-        console.error('❌ Error enviando mensaje:', error);
+        console.error('❌ Error preparando mensaje:', error);
         return { success: false, error: error.message };
     }
 }

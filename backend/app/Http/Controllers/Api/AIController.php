@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Product;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\AiUsageLog;
+use App\Models\ConversationHistory;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class AIController extends Controller
 {
@@ -90,16 +93,138 @@ class AIController extends Controller
                             'params' => ['module' => 'reports']
                         ]
                     ]
+                ],
+                // 🎯 ACCIONES EJECUTABLES (sin gastar créditos)
+                'testuno' => [
+                    'reply' => '🎯 [TEST] Creando descuento y enviando solo al 3134540533...',
+                    'action' => null,
+                    'execute_action' => [
+                        'type' => 'create_campaign',
+                        'params' => [
+                            'discount' => [
+                                'name' => 'Test Uno ' . date('His'),
+                                'code' => 'UNO' . date('His'),
+                                'type' => 'percentage',
+                                'value' => 50,
+                                'duration_days' => 2
+                            ],
+                            'whatsapp' => [
+                                'message' => '🎁 Código exclusivo UNO' . date('His') . ' para 50% de descuento por 2 días',
+                                'target' => 'specific',
+                                'customer_ids' => [10] // Fabian Andres - 3134540533
+                            ]
+                        ]
+                    ]
+                ],
+                'debug_wa' => [
+                    'reply' => '🐛 [DEBUG] Enviando 1 mensaje WhatsApp a 3134540533 para depurar...',
+                    'action' => null,
+                    'execute_action' => [
+                        'type' => 'send_whatsapp',
+                        'params' => [
+                            'message' => '🐛 Test de depuración WhatsApp',
+                            'target' => 'specific',
+                            'customer_ids' => [1] // ID del primer cliente
+                        ]
+                    ]
+                ],
+                'test_whatsapp' => [
+                    'reply' => '🔧 [DEV] Enviando WhatsApp a todos los clientes...\n\n⏳ Esto puede tomar unos segundos, por favor espera...',
+                    'action' => null,
+                    'execute_action' => [
+                        'type' => 'send_whatsapp',
+                        'params' => [
+                            'message' => '¡Oferta especial! Usa el código KAEL891 para 100% de descuento solo hoy 🎁',
+                            'target' => 'all'
+                        ]
+                    ]
+                ],
+                'test_discount' => [
+                    'reply' => '🔧 [DEV] Creando descuento de prueba: TEST50 con 50% de descuento por 7 días...',
+                    'action' => null,
+                    'execute_action' => [
+                        'type' => 'create_discount',
+                        'params' => [
+                            'name' => 'Descuento Prueba',
+                            'code' => 'TEST50',
+                            'type' => 'percentage',
+                            'value' => 50,
+                            'duration_days' => 7
+                        ]
+                    ]
+                ],
+                'test_campaign' => [
+                    'reply' => '🔧 [DEV] Creando campaña completa: descuento + WhatsApp...',
+                    'action' => null,
+                    'execute_action' => [
+                        'type' => 'create_campaign',
+                        'params' => [
+                            'discount' => [
+                                'name' => 'Campaña Test ' . date('His'),
+                                'code' => 'TEST' . date('His'), // Código único con hora/minuto/segundo
+                                'type' => 'percentage',
+                                'value' => 30,
+                                'duration_days' => 3
+                            ],
+                            'whatsapp' => [
+                                'message' => '🎉 ¡Nueva promoción! Usa TEST' . date('His') . ' para 30% descuento por 3 días',
+                                'target' => 'all'
+                            ]
+                        ]
+                    ]
+                ],
+                '000' => [
+                    'reply' => '🔧 [DEV] Códigos disponibles:\n\n📍 NAVEGACIÓN:\n• 123 = Productos\n• 456 = POS\n• 789 = Dashboard\n• 111 = Facturas\n• 222 = Clientes\n• 333 = Reportes\n\n🎯 ACCIONES:\n• testuno = Descuento + WhatsApp a 3134540533\n• debug_wa = WhatsApp test a 1 número\n• test_whatsapp = Enviar WhatsApp a todos\n• test_discount = Crear descuento TEST50\n• test_campaign = Campaña completa',
+                    'action' => null
                 ]
             ];
 
             // Verificar si es un código de desarrollo
             if (isset($devCodes[$userMessage])) {
+                // Obtener ID único del usuario (autenticado o IP)
+                $userId = auth()->id() ?? $request->ip();
+                $executionKey = "dev_code_{$userMessage}_" . md5($userId);
+
+                // Prevenir ejecuciones múltiples (debounce de 3 segundos)
+                $lastExecution = cache($executionKey);
+                if ($lastExecution && (time() - $lastExecution) < 3) {
+                    Log::warning("[DEV CODE] Ejecución duplicada bloqueada: {$userMessage}");
+                    return response()->json([
+                        'reply' => json_encode(['reply' => '⏳ Espera un momento antes de ejecutar de nuevo...']),
+                        'status' => 'success'
+                    ]);
+                }
+
+                cache([$executionKey => time()], 5); // Cache por 5 segundos
+
                 Log::info("[DEV CODE] Usuario usó código: {$userMessage}");
+
+                $devResponse = $devCodes[$userMessage];
+
+                // Si tiene execute_action, ejecutarla
+                if (isset($devResponse['execute_action'])) {
+                    $actionResult = $this->executeAIAction($devResponse['execute_action']);
+                    $devResponse['action_result'] = $actionResult;
+
+                    // Agregar mensaje de resultado a la respuesta
+                    if (isset($actionResult['message'])) {
+                        $devResponse['reply'] .= "\n\n✅ " . $actionResult['message'];
+                    }
+                }
+
                 return response()->json([
-                    'reply' => json_encode($devCodes[$userMessage]),
+                    'reply' => json_encode($devResponse),
                     'status' => 'success'
                 ]);
+            }
+
+            // 📝 GESTIÓN DE SESIÓN CONVERSACIONAL
+            // Obtener o crear session_id
+            $sessionId = $request->input('session_id');
+            if (!$sessionId) {
+                // Generar nuevo session_id único por usuario
+                $userId = auth()->id() ?? 'guest_' . $request->ip();
+                $sessionId = 'sess_' . md5($userId . '_' . date('Ymd'));
             }
 
             // 1. Build Context from Database
@@ -108,10 +233,21 @@ class AIController extends Controller
             // 2. Prepare System Prompt
             $systemPrompt = $this->buildSystemPrompt($context);
 
-            // 3. Call AI Provider (Groq)
-            $response = $this->callGroqAPI($systemPrompt, $userMessage);
+            // 3. Recuperar historial de conversación (últimos 10 mensajes)
+            $conversationHistory = ConversationHistory::getRecentMessages($sessionId, 10);
 
-            // 4. Detectar y ejecutar acciones si la IA las solicitó
+            // 4. Guardar mensaje del usuario en historial
+            ConversationHistory::create([
+                'user_id' => auth()->id(),
+                'session_id' => $sessionId,
+                'role' => 'user',
+                'content' => $userMessage,
+            ]);
+
+            // 5. Call AI Provider (Groq) con historial
+            $response = $this->callGroqAPI($systemPrompt, $userMessage, $conversationHistory);
+
+            // 6. Detectar y ejecutar acciones si la IA las solicitó
             $aiResponse = json_decode($response, true);
 
             if ($aiResponse && isset($aiResponse['execute_action'])) {
@@ -124,8 +260,18 @@ class AIController extends Controller
                 }
             }
 
+            // 7. Guardar respuesta del asistente en historial
+            $assistantReply = $aiResponse['reply'] ?? 'Sin respuesta';
+            ConversationHistory::create([
+                'user_id' => auth()->id(),
+                'session_id' => $sessionId,
+                'role' => 'assistant',
+                'content' => $assistantReply,
+            ]);
+
             return response()->json([
                 'reply' => $response,
+                'session_id' => $sessionId, // Devolver session_id al frontend
                 'status' => 'success'
             ]);
 
@@ -181,11 +327,11 @@ class AIController extends Controller
             ->limit(10)
             ->get();
 
-        // Clientes (CON LISTA DE PRIMEROS 10)
+        // Clientes (CON LISTA COMPLETA para búsquedas)
         $totalCustomers = \App\Models\Customer::count();
         $customersList = \App\Models\Customer::select('id', 'name', 'email', 'phone', 'document_number')
             ->orderBy('created_at', 'desc')
-            ->limit(10)
+            ->limit(50) // Aumentado para mejor búsqueda
             ->get();
 
         // --- Sales Context (Using Invoices) ---
@@ -414,41 +560,58 @@ Eres "105 IA", asistente virtual del sistema POS. Sé amigable, conversacional y
 
 🎯 REGLAS CRÍTICAS:
 
-1. **RESPUESTAS CON PERSONALIDAD**:
+1. **USA SOLO DATOS REALES DEL CONTEXTO**:
+   - NUNCA inventes IDs, números de factura, totales o fechas
+   - Si buscas una factura de "ayer" de un cliente, usa SOLO los datos de "invoices.yesterday"
+   - Verifica que el nombre del cliente coincida EXACTAMENTE
+   - Si no encuentras algo en el contexto, di "No encontré [X]" en lugar de inventar datos
+
+2. **BÚSQUEDAS DE CLIENTES**:
+   - Para encontrar un cliente por nombre, busca en "customers.recent_list"
+   - Nombres pueden ser parciales: "maria jose" coincide con "Maria Jose gonzalez"
+   - Anota el ID del cliente para usarlo en acciones de WhatsApp
+
+3. **RESPUESTAS CON PERSONALIDAD**:
    - Usa emojis 📦🛒💰📊
    - Sé conversacional (no robótico)
    - Explica QUÉ va a pasar cuando navegues
    - Anticipa lo que el usuario necesitará
 
-2. **NAVEGACIÓN INTELIGENTE**:
+4. **NAVEGACIÓN INTELIGENTE**:
    ❌ MAL: "¡Listo!" (muy seco)
    ✅ BIEN: "¡Perfecto! Te llevo al módulo de productos donde podrás ver todo tu inventario 📦"
 
    ❌ MAL: "¡Vamos!"
    ✅ BIEN: "¡Claro! Abriendo el POS para que puedas registrar ventas 🛒"
 
-3. **MANEJO DE CONTEXTO CONVERSACIONAL**:
+5. **MANEJO DE CONTEXTO CONVERSACIONAL** 🔥:
+   - **RECUERDA la conversación anterior**: Si hay historial de mensajes, léelo para entender el contexto
    - Si acabas de sugerir ver algo y el usuario dice "sí", "claro", "ok", "si", "dale": NAVEGA inmediatamente a lo que sugeriste
    - Si sugeriste ver productos inactivos y el usuario dice "sí", navega a products con filter=inactive
    - Si preguntaste "¿quieres ir a X?" y responden afirmativamente, NO preguntes otra vez, ve directo
-   - RECUERDA lo que sugeriste en TU mensaje anterior
+   - **Mantén coherencia**: Si el usuario dijo "quiero crear un producto" y luego responde con detalles (nombre, precio), ENTIENDE que está continuando la conversación
 
-   Ejemplos:
-   TÚ: "¿Quieres ver productos inactivos?"
-   Usuario: "sí" o "si" o "claro"
-   TÚ: {reply: "¡Perfecto! Te muestro los productos inactivos", action: {navigate con filter=inactive}}
+   📝 **Ejemplo de conversación con memoria**:
+   Usuario: "me puedes enseñar a crear un producto?"
+   TÚ: "¡Claro! Para crear un producto, necesito saber algunos detalles. ¿Cuál es el nombre del producto que deseas crear? 📦"
 
-   TÚ: "¿Te llevo al POS?"
-   Usuario: "dale" o "ok"
-   TÚ: {reply: "¡Listo! Abriendo POS", action: {navigate a pos}}
+   Usuario: "papas fritas"
+   TÚ (CON MEMORIA): "Perfecto! Vamos a crear 'papas fritas'. ¿Cuánto costará? (precio de venta)"
+   TÚ (❌ SIN MEMORIA): "No encontré 'papas fritas' en el inventario. ¿Quieres agregar un nuevo producto o buscar algo más?" ← ESTO ESTÁ MAL
 
-4. **CUANDO MUESTRES DATOS**:
+   Usuario: "crearlo"
+   TÚ (CON MEMORIA): "¡Entendido! Creando 'papas fritas'. ¿Cuál será el precio de venta?"
+   TÚ (❌ SIN MEMORIA): "¡Claro! Para crear algo, necesito saber qué es..." ← ESTO ESTÁ MAL
+
+   **REGLA DE ORO**: Si en mensajes anteriores el usuario pidió crear/modificar/buscar algo, CONTINÚA esa conversación, NO empieces desde cero.
+
+6. **CUANDO MUESTRES DATOS**:
    - Formatea bonito (usa saltos de línea)
    - Menciona cuántos hay
    - Destaca lo importante
    - Ofrece acciones relacionadas
 
-5. **NAVEGACIÓN CON FILTROS**:
+7. **NAVEGACIÓN CON FILTROS**:
    - Cuando el usuario pide ver "productos inactivos", navega con query.filter = "inactive"
    - "productos activos" → filter = "active"
    - "productos con bajo stock" → filter = "low-stock"
@@ -618,6 +781,28 @@ Usuario: "entra a configuraciones y mira si hay promociones"
      }
    }
 
+   Usuario: "crea código X Y envíaselo a [cliente/clientes]"
+   {
+     "reply": "✅ Descuento creado y enviado por WhatsApp!",
+     "execute_action": {
+       "type": "create_campaign",
+       "params": {
+         "discount": {
+           "name": "Nombre del descuento",
+           "code": "CODIGO",
+           "type": "percentage",
+           "value": 100,
+           "duration_days": 1
+         },
+         "whatsapp": {
+           "message": "🎁 ¡Usa el código CODIGO para [X]% de descuento!",
+           "target": "specific",
+           "customer_ids": [10]
+         }
+       }
+     }
+   }
+
    B) **ENVIAR WHATSAPP MASIVO:**
 
    Usuario: "envía por WhatsApp el código caña22 a todos los clientes"
@@ -668,11 +853,86 @@ Usuario: "entra a configuraciones y mira si hay promociones"
    }
 
    **REGLAS PARA ACCIONES:**
+   - **IMPORTANTE:** Si el usuario dice "crea X Y envíaselo/mándalo a [cliente]" SIEMPRE usa "create_campaign" (NO solo create_discount)
+   - Para buscar cliente por nombre, consulta la base de datos primero
    - Solo USA execute_action cuando el usuario PIDA explícitamente crear/enviar
    - GENERA códigos automáticamente si no mencionan uno
    - duration_days por defecto = 1 día
    - type puede ser "percentage" o "fixed_amount"
    - target puede ser "all", "active", o "specific"
+   - Si target="specific" DEBES incluir customer_ids con los IDs correctos del cliente
+
+8. **CREAR PRODUCTOS Y CATEGORÍAS** 📦:
+
+   **FLUJO CONVERSACIONAL PARA CREAR PRODUCTOS:**
+   1. Usuario pide crear un producto → Pregunta el NOMBRE
+   2. Usuario da nombre → Pregunta el PRECIO DE VENTA
+   3. Usuario da precio → Pregunta la CATEGORÍA (muestra categorías disponibles)
+   4. Usuario da categoría:
+      - Si existe en categories.active_list → Úsala
+      - Si NO existe → Ofrece crearla primero
+   5. Usuario confirma → Pregunta CANTIDAD EN STOCK (opcional, default 0)
+   6. Tienes todos los datos → EJECUTA create_product
+
+   **CATEGORÍAS DISPONIBLES:**
+   - Consulta categories.active_list para mostrar categorías existentes
+   - Total de categorías: {$context['categories']['total']}
+   - Activas: {$context['categories']['active']}
+
+   **CREAR CATEGORÍA PRIMERO (si no existe):**
+   Si el usuario menciona una categoría que NO está en categories.active_list:
+
+   {
+     "reply": "La categoría '[NOMBRE]' no existe. ¿Quieres que la cree primero? 🏷️",
+     "execute_action": {
+       "type": "create_category",
+       "params": {
+         "name": "[NOMBRE CATEGORÍA]",
+         "description": "[Descripción breve]"
+       }
+     }
+   }
+
+   **LUEGO CREAR PRODUCTO:**
+   Una vez que tengas: nombre, precio, category_id (del contexto o recién creada), y opcionalmente stock:
+
+   {
+     "reply": "¡Perfecto! Creando el producto '[NOMBRE]' con precio $[PRECIO] en la categoría '[CATEGORÍA]' con [STOCK] unidades en stock 📦",
+     "execute_action": {
+       "type": "create_product",
+       "params": {
+         "name": "[NOMBRE DEL PRODUCTO]",
+         "sale_price": [PRECIO NUMÉRICO],
+         "category_id": [ID DE LA CATEGORÍA],
+         "current_stock": [CANTIDAD O 0],
+         "description": "[Descripción opcional]"
+       }
+     },
+     "action": {
+       "type": "navigate",
+       "payload": {
+         "name": "POSModule",
+         "params": {"module": "products"}
+       }
+     }
+   }
+
+   **EJEMPLO COMPLETO:**
+   Usuario: "me puedes ayudar a crear un producto?"
+   TÚ: "¡Claro! Para crear un producto, necesito saber algunos detalles. ¿Cuál es el nombre del producto que deseas crear? 📦"
+
+   Usuario: "Jabón en polvo"
+   TÚ: "Perfecto! Vamos a crear 'Jabón en polvo'. ¿Cuál será el precio de venta?"
+
+   Usuario: "10000"
+   TÚ: "Genial! Ahora dime en qué categoría va. Las categorías disponibles son:\n[LISTA categories.active_list]\n\n¿Cuál prefieres?"
+
+   Usuario: "Aseo Personal"
+   TÚ (si existe): "Perfecto! ¿Cuántas unidades tendrás en stock inicialmente? (puedes decir 0 si no tienes aún)"
+   TÚ (si NO existe): "La categoría 'Aseo Personal' no existe. ¿Quieres que la cree primero? 🏷️"
+
+   Usuario: "100" o "si, créala"
+   TÚ: {crea categoría si hace falta, luego crea producto con todos los datos}
 
 🎯 MÓDULOS DISPONIBLES (úsalos en params.module):
 - products (productos) 📦
@@ -708,9 +968,9 @@ EOT;
     }
 
     /**
-     * Call the Groq API.
+     * Call the Groq API with conversation history.
      */
-    private function callGroqAPI($systemPrompt, $userMessage)
+    private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory = [])
     {
         // Sistema de rotación de múltiples API Keys
         $apiKeys = array_filter([
@@ -735,28 +995,71 @@ EOT;
 
         // Intentar con cada API key hasta encontrar una que funcione
         $lastError = null;
+        $startTime = microtime(true);
+
         foreach ($apiKeys as $index => $apiKey) {
-            Log::info("[Groq API] Intentando con API Key #{" . ($index + 1) . "}");
+            $keyIndex = $index + 1;
+            $keyLast4 = substr($apiKey, -4);
+            Log::info("[Groq API] Intentando con API Key #{$keyIndex}");
+
+            // Construir array de mensajes con historial
+            $messages = [
+                ['role' => 'system', 'content' => $systemPrompt]
+            ];
+
+            // Añadir historial de conversación (si existe)
+            if (!empty($conversationHistory)) {
+                $messages = array_merge($messages, $conversationHistory);
+            }
+
+            // Añadir mensaje actual del usuario
+            $messages[] = ['role' => 'user', 'content' => $userMessage];
 
             $response = Http::timeout(30)->withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
                 'Content-Type' => 'application/json',
             ])->post('https://api.groq.com/openai/v1/chat/completions', [
             'model' => 'llama-3.3-70b-versatile',
-            'messages' => [
-                ['role' => 'system', 'content' => $systemPrompt],
-                ['role' => 'user', 'content' => $userMessage],
-            ],
+            'messages' => $messages,
             'temperature' => 0.3, // Más consistente y precisa
             'max_tokens' => 500, // Respuestas concisas para ahorrar tokens
             'top_p' => 0.9,
             'response_format' => ['type' => 'json_object'], // Forzar JSON
         ]);
 
-            if ($response->successful()) {
-                Log::info("[Groq API] ✅ Respuesta exitosa con API Key #{" . ($index + 1) . "}");
+            $responseTime = (int)((microtime(true) - $startTime) * 1000); // ms
 
-                $content = $response->json()['choices'][0]['message']['content'] ?? null;
+            if ($response->successful()) {
+                Log::info("[Groq API] ✅ Respuesta exitosa con API Key #{$keyIndex}");
+
+                $responseData = $response->json();
+                $content = $responseData['choices'][0]['message']['content'] ?? null;
+
+                // Extraer métricas de uso de tokens
+                $usage = $responseData['usage'] ?? [];
+                $promptTokens = $usage['prompt_tokens'] ?? 0;
+                $completionTokens = $usage['completion_tokens'] ?? 0;
+                $totalTokens = $usage['total_tokens'] ?? 0;
+
+                // Registrar uso exitoso
+                try {
+                    AiUsageLog::create([
+                        'user_id' => auth()->id(),
+                        'api_key_index' => $keyIndex,
+                        'api_key_last_4' => $keyLast4,
+                        'user_message' => substr($userMessage, 0, 1000), // Limitar longitud
+                        'prompt_tokens' => $promptTokens,
+                        'completion_tokens' => $completionTokens,
+                        'total_tokens' => $totalTokens,
+                        'status' => 'success',
+                        'response_time_ms' => $responseTime,
+                        'model' => 'llama-3.3-70b-versatile',
+                        'endpoint' => 'chat',
+                        'ip_address' => request()->ip(),
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("[AI Usage Log] Error guardando log: " . $e->getMessage());
+                }
 
                 if (!$content) {
                     return json_encode([
@@ -783,13 +1086,51 @@ EOT;
             $errorBody = $response->body();
 
             if ($statusCode === 429) {
-                Log::warning("[Groq API] ⚠️ Rate limit alcanzado en API Key #{" . ($index + 1) . "}, probando siguiente...");
+                Log::warning("[Groq API] ⚠️ Rate limit alcanzado en API Key #{$keyIndex}, probando siguiente...");
+
+                // Registrar rate limit
+                try {
+                    AiUsageLog::create([
+                        'user_id' => auth()->id(),
+                        'api_key_index' => $keyIndex,
+                        'api_key_last_4' => $keyLast4,
+                        'user_message' => substr($userMessage, 0, 1000),
+                        'status' => 'rate_limited',
+                        'error_message' => 'Rate limit exceeded',
+                        'response_time_ms' => $responseTime,
+                        'model' => 'llama-3.3-70b-versatile',
+                        'endpoint' => 'chat',
+                        'ip_address' => request()->ip(),
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("[AI Usage Log] Error guardando rate limit log: " . $e->getMessage());
+                }
+
                 $lastError = "Rate limit excedido";
                 continue; // Probar con siguiente API key
             }
 
             // Si es otro error, también intentar con siguiente
-            Log::error("[Groq API] ❌ Error {$statusCode} con API Key #{" . ($index + 1) . "}: {$errorBody}");
+            Log::error("[Groq API] ❌ Error {$statusCode} con API Key #{$keyIndex}: {$errorBody}");
+
+            // Registrar error
+            try {
+                AiUsageLog::create([
+                    'user_id' => auth()->id(),
+                    'api_key_index' => $keyIndex,
+                    'api_key_last_4' => $keyLast4,
+                    'user_message' => substr($userMessage, 0, 1000),
+                    'status' => 'error',
+                    'error_message' => substr($errorBody, 0, 1000),
+                    'response_time_ms' => $responseTime,
+                    'model' => 'llama-3.3-70b-versatile',
+                    'endpoint' => 'chat',
+                    'ip_address' => request()->ip(),
+                ]);
+            } catch (\Exception $e) {
+                Log::error("[AI Usage Log] Error guardando error log: " . $e->getMessage());
+            }
+
             $lastError = $errorBody;
             continue;
         }
@@ -819,6 +1160,12 @@ EOT;
 
                 case 'create_campaign':
                     return $this->createCampaignAction($actionData['params'] ?? []);
+
+                case 'create_product':
+                    return $this->createProductAction($actionData['params'] ?? []);
+
+                case 'create_category':
+                    return $this->createCategoryAction($actionData['params'] ?? []);
 
                 default:
                     return [
@@ -873,5 +1220,62 @@ EOT;
         $response = $controller->createCampaign($request);
 
         return $response->getData(true);
+    }
+
+    /**
+     * Crear producto desde IA
+     */
+    private function createProductAction($params)
+    {
+        $controller = new \App\Http\Controllers\Api\AIActionsController();
+        $request = new \Illuminate\Http\Request($params);
+        $response = $controller->createProduct($request);
+
+        return $response->getData(true);
+    }
+
+    /**
+     * Crear categoría desde IA
+     */
+    private function createCategoryAction($params)
+    {
+        $controller = new \App\Http\Controllers\Api\AIActionsController();
+        $request = new \Illuminate\Http\Request($params);
+        $response = $controller->createCategory($request);
+
+        return $response->getData(true);
+    }
+
+    /**
+     * Limpiar historial de conversación (nueva conversación)
+     */
+    public function clearHistory(Request $request)
+    {
+        try {
+            $sessionId = $request->input('session_id');
+
+            if (!$sessionId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'session_id es requerido'
+                ], 400);
+            }
+
+            // Eliminar historial de esta sesión
+            $deleted = ConversationHistory::where('session_id', $sessionId)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Historial limpiado correctamente',
+                'deleted_messages' => $deleted
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error limpiando historial: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al limpiar historial'
+            ], 500);
+        }
     }
 }

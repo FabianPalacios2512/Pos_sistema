@@ -517,6 +517,11 @@ const props = defineProps({
   moduleName: {
     type: String,
     default: 'invoices'
+    
+  },
+  queryParams: {
+    type: Object,
+    default: () => ({})
   },
   customers: {
     type: Array,

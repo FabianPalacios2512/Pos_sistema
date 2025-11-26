@@ -5,6 +5,7 @@ import authService from '../services/authService.js'
 // Componentes
 const LoginView = () => import('../components/LoginView.vue')
 const PosCompleto = () => import('../views/PosCompleto.vue')
+const AdminDashboardView = () => import('../views/AdminDashboardView.vue')
 
 const routes = [
   // Ruta raíz - redirige según autenticación - TODOS van al POS
@@ -53,6 +54,19 @@ const routes = [
       title: 'Dashboard - 105 POS',
       requiresAuth: true
       // Todos pueden acceder al dashboard, pero la UI se mostrará según permisos
+    }
+  },
+
+  // Panel de Administrador - Monitoreo de IA
+  {
+    path: '/admin/ai-monitoring',
+    name: 'AdminAIMonitoring',
+    component: AdminDashboardView,
+    beforeEnter: requireAuth,
+    meta: {
+      title: 'Monitoreo de IA - Admin',
+      requiresAuth: true,
+      roles: ['admin', 'Administrador'] // Soportar tanto inglés como español
     }
   },
 
@@ -113,15 +127,24 @@ router.beforeEach((to, from, next) => {
   // Si está autenticado pero no tiene el rol adecuado
   if (to.meta.roles && authService.isAuthenticated()) {
     const user = authService.getUser()
-    if (!to.meta.roles.includes(user.role)) {
+    const userRole = user.role?.name || user.role // Soportar tanto objeto como string
+    
+    console.log('🔍 [Router Guard] Verificando acceso a:', to.path)
+    console.log('👤 [Router Guard] Usuario:', user.name, '| Rol:', userRole)
+    console.log('🎯 [Router Guard] Roles permitidos:', to.meta.roles)
+    
+    if (!to.meta.roles.includes(userRole)) {
+      console.log('❌ [Router Guard] Acceso denegado - redirigiendo...')
       // Redirigir según el rol del usuario
-      if (user.role === 'admin') {
+      if (userRole === 'admin') {
         next('/dashboard')
       } else {
         next('/pos')
       }
       return
     }
+    
+    console.log('✅ [Router Guard] Acceso permitido')
   }
   
   next()

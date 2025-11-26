@@ -1,19 +1,21 @@
 import apiClient from './apiClient.js'
+import axios from 'axios'
 
 export const whatsappService = {
   // Obtener estado de conexión de WhatsApp
   async getStatus() {
     try {
-      const response = await apiClient.get('/whatsapp/status')
+      // Llamar directamente al servidor WhatsApp para evitar timeout
+      const response = await axios.get('http://localhost:3002/status', { timeout: 3000 })
       return {
         success: true,
-        ...response.data
+        status: response.data
       }
     } catch (error) {
-      console.error('Error obteniendo estado de WhatsApp:', error)
+      // Error silencioso - no mostrar en consola para evitar spam
       return {
         success: false,
-        status: { connected: false, error: error.message }
+        status: { connected: false }
       }
     }
   },

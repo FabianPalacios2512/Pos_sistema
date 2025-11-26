@@ -200,11 +200,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // ==================== AI CHAT ====================
     Route::post('/ai/chat', [\App\Http\Controllers\Api\AIController::class, 'chat']);
+    Route::post('/ai/clear-history', [\App\Http\Controllers\Api\AIController::class, 'clearHistory']);
 
     // ==================== AI ACTIONS (Acciones ejecutables) ====================
     Route::post('/ai/actions/create-discount', [\App\Http\Controllers\Api\AIActionsController::class, 'createDiscount']);
     Route::post('/ai/actions/send-bulk-whatsapp', [\App\Http\Controllers\Api\AIActionsController::class, 'sendBulkWhatsApp']);
     Route::post('/ai/actions/create-campaign', [\App\Http\Controllers\Api\AIActionsController::class, 'createCampaign']);
+    Route::post('/ai/actions/create-product', [\App\Http\Controllers\Api\AIActionsController::class, 'createProduct']);
+    Route::post('/ai/actions/create-category', [\App\Http\Controllers\Api\AIActionsController::class, 'createCategory']);
+
+    // ==================== AI MONITORING (Solo Admin) ====================
+    Route::get('/admin/ai-monitoring/dashboard', [\App\Http\Controllers\Api\AdminAIMonitoringController::class, 'dashboard']);
+    Route::get('/admin/ai-monitoring/key/{keyIndex}', [\App\Http\Controllers\Api\AdminAIMonitoringController::class, 'keyDetails']);
     // ==================== FIN AI ====================
 
 });
