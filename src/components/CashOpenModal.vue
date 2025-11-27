@@ -1,19 +1,19 @@
 <template>
   <div v-if="show" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl border border-gray-200">
-      <!-- Header Compacto -->
-      <div class="bg-gray-50 border-b border-gray-200 px-6 py-4">
+      <!-- Header Compacto con saludo personalizado -->
+      <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 px-6 py-5">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shadow-sm">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                       d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-bold text-gray-900">Apertura de Caja</h3>
-              <p class="text-xs text-gray-500">Iniciar nueva sesión de ventas</p>
+              <h3 class="text-lg font-black text-gray-900">¡Hola, {{ userInfo.name ? userInfo.name.split(' ')[0] : 'Compañero' }}! 👋</h3>
+              <p class="text-sm text-gray-600 font-medium">Vamos a abrir la caja para comenzar</p>
             </div>
           </div>
           <button 
@@ -95,14 +95,16 @@
             </div>
           </div>
 
-          <!-- Warning compacto -->
-          <div v-if="forceOpen" class="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start space-x-2">
-            <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-            </svg>
+          <!-- Warning mejorado y amigable -->
+          <div v-if="forceOpen" class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-start space-x-3">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
             <div class="flex-1">
-              <h4 class="text-sm font-bold text-red-900">Sistema Bloqueado</h4>
-              <p class="text-xs text-red-800 mt-0.5">Debe abrir caja para ventas o usar modo cotización.</p>
+              <h4 class="text-sm font-bold text-blue-900 mb-1">Para acceder a esta vista necesitas:</h4>
+              <p class="text-sm text-blue-800">Abrir una caja para registrar ventas, o activar el modo cotización para crear presupuestos sin afectar el inventario.</p>
             </div>
           </div>
           <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start space-x-2">

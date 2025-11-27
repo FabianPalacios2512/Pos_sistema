@@ -38,7 +38,8 @@
           </button>
           
           <!-- Botón Principal (Nuevo Producto) - Negro -->
-          <button @click="openCreateModal"
+          <button id="tour-new-product"
+                  @click="openCreateModal"
                   class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-900/20 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -64,7 +65,7 @@
               <div class="flex items-center justify-between mb-2">
                 <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Total Productos</h3>
               </div>
-              <p class="text-2xl font-black text-slate-900 mb-0.5">{{ products.length }}</p>
+              <p class="text-2xl font-black text-slate-900 mb-0.5">{{ displayProducts.length }}</p>
               <p class="text-xs text-slate-400 font-medium">en el sistema</p>
             </div>
           </div>
@@ -147,6 +148,8 @@
         </div>
       </div>
 
+      <!-- Contenedor Principal Tour - Filtros + Productos -->
+      <div id="tour-products-main">
       <!-- Filtros -->
     <div class="bg-white rounded-xl shadow-sm p-4 border border-slate-200 mb-6">
       <div class="flex flex-wrap items-center gap-4">
@@ -197,7 +200,7 @@
         </div>
         
         <!-- Toggle Vista -->
-        <div class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
+        <div id="tour-view-toggle" class="flex items-center bg-slate-100 rounded-lg p-1 border border-slate-200">
           <button
             @click="setViewMode('grid')"
             :class="[
@@ -539,6 +542,8 @@
         />
       </div>
     </div>
+    </div>
+    <!-- Fin Contenedor Tour -->
 
     <!-- Sistema de Notificaciones Toast -->
     <div class="fixed top-4 right-4 z-50 space-y-2" v-if="notifications.length > 0">
@@ -1246,14 +1251,148 @@
       </div>
     </div>
   </div>
+
+  <!-- TOUR FINAL ÉPICO -->
+  <ContextualTour
+    ref="productsTourRef"
+    :steps="productsTourSteps"
+    :auto-start="false"
+    @complete="handleProductsTourComplete"
+    @skip="handleProductsTourComplete"
+  />
+
+  <!-- Modal de Bienvenida al Tour Final -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="showProductsWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4" style="background-color: rgba(0, 0, 0, 0.7);">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
+          <div class="bg-gradient-to-r from-indigo-600 to-blue-600 px-8 py-6 text-center">
+            <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">¡Prueba Final!</h2>
+            <p class="text-indigo-100 text-sm">Última lección antes de empezar a vender</p>
+          </div>
+          
+          <div class="px-8 py-6">
+            <p class="text-gray-700 text-center mb-6 leading-relaxed">
+              Esta es tu última prueba. Te mostraremos cómo funciona el módulo de productos y las diferentes formas de visualizar tu inventario.
+            </p>
+            
+            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
+              <p class="text-sm text-indigo-900 font-medium">Con esto quedarás listo para:</p>
+              <ul class="mt-2 space-y-1 text-sm text-indigo-800">
+                <li>✓ Gestionar tu inventario completo</li>
+                <li>✓ Crear y editar productos</li>
+                <li>✓ Cambiar entre vistas (Tarjetas/Tabla)</li>
+                <li>✓ ¡Empezar a vender!</li>
+              </ul>
+            </div>
+            
+            <div class="flex gap-3">
+              <button
+                @click="showProductsWelcomeModal = false"
+                class="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors"
+              >
+                Omitir
+              </button>
+              <button
+                @click="handleProductsWelcomeStart"
+                class="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold rounded-xl shadow-lg transition-all"
+              >
+                ¡Vamos!
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
+  <!-- Modal de Finalización del Tour -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div v-if="showFinalModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4" style="background-color: rgba(0, 0, 0, 0.7);">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform">
+          <div class="bg-gradient-to-r from-green-600 to-emerald-600 px-8 py-6 text-center">
+            <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">¡Felicitaciones!</h2>
+            <p class="text-green-100 text-sm">Entrenamiento completado exitosamente</p>
+          </div>
+          
+          <div class="px-8 py-6">
+            <p class="text-gray-700 text-center mb-6 leading-relaxed font-medium">
+              Ya dominas todas las funciones del sistema POS
+            </p>
+            
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <p class="text-sm text-green-900 font-bold mb-2">Ahora puedes:</p>
+              <ul class="space-y-1.5 text-sm text-green-800">
+                <li class="flex items-center space-x-2">
+                  <span class="text-green-600">✓</span>
+                  <span>Gestionar el control de caja</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                  <span class="text-green-600">✓</span>
+                  <span>Realizar ventas y cotizaciones</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                  <span class="text-green-600">✓</span>
+                  <span>Administrar clientes y descuentos</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                  <span class="text-green-600">✓</span>
+                  <span>Controlar tu inventario completo</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6 text-center">
+              <p class="text-sm text-blue-900 font-bold">
+                ¡A trabajar! Crea tus productos y empieza a vender 🚀
+              </p>
+            </div>
+            
+            <button
+              @click="closeFinalModal"
+              class="w-full px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-xl shadow-lg transition-all"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch, nextTick, Teleport, Transition } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
 import TablePaginator from './TablePaginator.vue'
+import ContextualTour from './ContextualTour.vue'
 
 // Props (para recibir filtros desde navegación AI)
 const props = defineProps({
@@ -1358,6 +1497,193 @@ const categoryFilter = ref('')
 const statusFilter = ref('')
 const sortBy = ref('name')
 const viewMode = ref('table')
+
+// 🎓 TOUR FINAL ÉPICO - Prueba final antes de empezar a vender
+const DEV_MODE_PRODUCTS = false // false = Tour solo primera vez | true = Tour siempre
+const isFirstVisitProducts = ref(DEV_MODE_PRODUCTS || !localStorage.getItem('products_tour_completed'))
+const showProductsWelcomeModal = ref(false)
+const productsTourRef = ref(null)
+const isTourActive = ref(false)
+
+// 👻 PRODUCTOS FANTASMA para demostración del tour
+const demoProducts = ref([
+  {
+    id: 'demo-1',
+    name: 'Coca Cola 350ml',
+    sku: 'BEB-001',
+    barcode: '7891234567890',
+    description: 'Bebida gaseosa sabor cola',
+    sale_price: 2500,
+    cost_price: 1500,
+    current_stock: 150,
+    min_stock: 20,
+    max_stock: 300,
+    category_id: 1,
+    category_name: 'Bebidas',
+    image_url: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400',
+    active: true
+  },
+  {
+    id: 'demo-2',
+    name: 'Pan Integral',
+    sku: 'PAN-002',
+    barcode: '7899876543210',
+    description: 'Pan de molde integral 500g',
+    sale_price: 4200,
+    cost_price: 2800,
+    current_stock: 45,
+    min_stock: 10,
+    max_stock: 80,
+    category_id: 2,
+    category_name: 'Panadería',
+    image_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400',
+    active: true
+  },
+  {
+    id: 'demo-3',
+    name: 'Leche Entera 1L',
+    sku: 'LAC-003',
+    barcode: '7891111222333',
+    description: 'Leche entera pasteurizada',
+    sale_price: 3800,
+    cost_price: 2500,
+    current_stock: 85,
+    min_stock: 15,
+    max_stock: 150,
+    category_id: 3,
+    category_name: 'Lácteos',
+    image_url: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400',
+    active: true
+  },
+  {
+    id: 'demo-4',
+    name: 'Arroz Diana 500g',
+    sku: 'GRA-004',
+    barcode: '7894444555666',
+    description: 'Arroz blanco premium',
+    sale_price: 3200,
+    cost_price: 2000,
+    current_stock: 120,
+    min_stock: 25,
+    max_stock: 200,
+    category_id: 4,
+    category_name: 'Granos',
+    image_url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400',
+    active: true
+  },
+  {
+    id: 'demo-5',
+    name: 'Aceite Girasol 900ml',
+    sku: 'ACE-005',
+    barcode: '7897777888999',
+    description: 'Aceite vegetal de girasol',
+    sale_price: 8500,
+    cost_price: 5500,
+    current_stock: 35,
+    min_stock: 8,
+    max_stock: 60,
+    category_id: 5,
+    category_name: 'Aceites',
+    image_url: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400',
+    active: true
+  },
+  {
+    id: 'demo-6',
+    name: 'Huevos AA x30',
+    sku: 'HUE-006',
+    barcode: '7892222333444',
+    description: 'Huevos frescos cubeta x30',
+    sale_price: 12000,
+    cost_price: 8000,
+    current_stock: 25,
+    min_stock: 5,
+    max_stock: 40,
+    category_id: 3,
+    category_name: 'Lácteos',
+    image_url: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400',
+    active: true
+  }
+])
+
+// Computed para mostrar productos reales o fantasma según el tour
+const displayProducts = computed(() => {
+  if (isTourActive.value && products.value.length === 0) {
+    return demoProducts.value
+  }
+  return products.value
+})
+
+const productsTourSteps = ref([
+  {
+    selector: '#tour-view-toggle',
+    title: 'Vistas de Productos',
+    content: `
+      <p class="text-sm text-gray-700 mb-2">
+        Cambia entre <strong>Tarjetas</strong> (visual) y <strong>Tabla</strong> (compacta).
+      </p>
+      <p class="text-xs text-gray-600 italic">
+        Observa el cambio automático en unos segundos...
+      </p>
+    `,
+    position: 'bottom'
+  },
+  {
+    selector: '#tour-new-product',
+    title: 'Crear Productos',
+    content: `
+      <p class="text-sm text-gray-700 mb-2">
+        Haz clic aquí para <strong>agregar nuevos productos</strong> a tu inventario.
+      </p>
+      <div class="bg-blue-50 rounded-lg p-2 mt-2">
+        <p class="text-xs text-blue-800">
+          <strong>Datos necesarios:</strong> Nombre, precio, stock, categoría y código de barras.
+        </p>
+      </div>
+    `,
+    position: 'left'
+  }
+])
+
+// Variable para guardar la vista original del usuario
+const originalViewMode = ref('table')
+
+const handleProductsWelcomeStart = () => {
+  showProductsWelcomeModal.value = false
+  isTourActive.value = true // Activar productos fantasma
+  loading.value = false // Desactivar loading para mostrar productos
+  
+  // Guardar vista original del usuario
+  originalViewMode.value = viewMode.value
+  
+  productsTourRef.value.startTourConfirmed()
+  
+  // 🎬 Demo AUTOMÁTICA: cambiar vista después de 3 segundos
+  setTimeout(() => {
+    // Cambiar a la vista contraria
+    viewMode.value = originalViewMode.value === 'table' ? 'grid' : 'table'
+  }, 3000)
+}
+
+const showFinalModal = ref(false)
+
+const handleProductsTourComplete = () => {
+  // Mostrar modal de finalización
+  showFinalModal.value = true
+  isTourActive.value = false // Desactivar productos fantasma
+  
+  // Restaurar vista original del usuario
+  viewMode.value = originalViewMode.value
+}
+
+const closeFinalModal = () => {
+  showFinalModal.value = false
+  localStorage.setItem('products_tour_completed', 'true')
+  isFirstVisitProducts.value = false
+  
+  // 🔥 IMPORTANTE: Marcar tour del POS como completado también
+  // Esto asegura que el modal de bloqueo de caja ahora SÍ aparezca
+  localStorage.setItem('pos_tour_completed', 'true')
+}
 
 // Sistema de notificaciones
 const notifications = ref([])
@@ -1579,14 +1905,14 @@ const productForm = ref({
 
 // Computed properties
 const filteredProducts = computed(() => {
-  let filtered = products.value
+  let filtered = displayProducts.value
 
   if (searchTerm.value) {
     const term = searchTerm.value.toLowerCase()
     filtered = filtered.filter(product => 
       (product.name || '').toLowerCase().includes(term) ||
       (product.sku || '').toLowerCase().includes(term) ||
-      ((product.category?.name || '').toLowerCase().includes(term))
+      ((product.category?.name || product.category_name || '').toLowerCase().includes(term))
     )
   }
 
@@ -1639,13 +1965,13 @@ const paginatedProducts = computed(() => {
   return filtered.slice(start, end)
 })
 
-const activeProducts = computed(() => products.value.filter(p => getProductStatus(p) !== false).length)
-const lowStockProducts = computed(() => products.value.filter(p => (p.current_stock || 0) <= (p.min_stock || 0)).length)
+const activeProducts = computed(() => displayProducts.value.filter(p => getProductStatus(p) !== false).length)
+const lowStockProducts = computed(() => displayProducts.value.filter(p => (p.current_stock || 0) <= (p.min_stock || 0)).length)
 const totalValue = computed(() => 
-  products.value.reduce((sum, p) => sum + (parseFloat(p.sale_price || 0) * (p.current_stock || 0)), 0)
+  displayProducts.value.reduce((sum, p) => sum + (parseFloat(p.sale_price || 0) * (p.current_stock || 0)), 0)
 )
 const uniqueCategories = computed(() => {
-  const categoryIds = products.value.map(p => p.category_id).filter(Boolean)
+  const categoryIds = displayProducts.value.map(p => p.category_id).filter(Boolean)
   return new Set(categoryIds).size
 })
 
@@ -2289,6 +2615,14 @@ onMounted(async () => {
   loadUserPreferences()
   
   await loadCategories()
+  
+  // 🎓 Mostrar tour si es primera visita
+  if (isFirstVisitProducts.value) {
+    await nextTick()
+    setTimeout(() => {
+      showProductsWelcomeModal.value = true
+    }, 800)
+  }
   
   // Verificar si hay acción de creación desde la URL (Deep Linking) O desde props
   const action = route.query.action || props.queryParams?.action;

@@ -1,6 +1,15 @@
 <template>
   <div class="min-h-screen font-sans bg-[#EEF2F6] text-slate-600 selection:bg-indigo-500 selection:text-white pb-12">
     
+    <!-- 🎯 Tour Contextual del Dashboard -->
+    <ContextualTour 
+      module-name="dashboard"
+      :steps="tourSteps"
+      :auto-start="false"
+      @complete="handleTourComplete"
+      @skip="handleTourSkip"
+    />
+    
     <div class="pt-6 px-4 sm:px-6 lg:px-8 space-y-6 animate-fade-in w-full max-w-[1600px] mx-auto">
     
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 bg-white/50 p-4 rounded-[24px] border border-white shadow-sm backdrop-blur-sm">
@@ -35,8 +44,10 @@
             <span>Refrescar</span>
           </button>
           
-          <button @click="newSale" 
-                  class="px-6 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 hover:shadow-slate-400/60 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
+          <button 
+            id="tour-nueva-venta-btn"
+            @click="newSale" 
+            class="px-6 py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 hover:shadow-slate-400/60 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -47,7 +58,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <div class="bg-white rounded-[24px] p-5 border border-white shadow-[0_2px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all duration-300 flex items-center justify-between group relative overflow-hidden">
+        <div id="tour-estado-caja" class="bg-white rounded-[24px] p-5 border border-white shadow-[0_2px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg transition-all duration-300 flex items-center justify-between group relative overflow-hidden">
             <div class="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-emerald-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
             
             <div class="flex items-center gap-5 relative z-10">
@@ -171,8 +182,10 @@
            </div>
         </div>
 
-        <div class="group bg-white rounded-[24px] p-5 border shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex items-center gap-4"
-             :class="lowStockComputed.length > 0 ? 'border-rose-200' : 'border-white'">
+        <div 
+          id="tour-alertas-stock"
+          class="group bg-white rounded-[24px] p-5 border shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex items-center gap-4"
+          :class="lowStockComputed.length > 0 ? 'border-rose-200' : 'border-white'">
            
            <div class="w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center transition-colors duration-300 border shadow-inner"
                 :class="lowStockComputed.length > 0 ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'">
@@ -196,7 +209,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <div class="lg:col-span-8 bg-white rounded-[24px] p-6 border border-white shadow-sm flex flex-col relative overflow-hidden">
+        <div id="tour-analisis-ingresos" class="lg:col-span-8 bg-white rounded-[24px] p-6 border border-white shadow-sm flex flex-col relative overflow-hidden">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 relative z-10">
              <div>
                 <h3 class="text-lg font-black text-slate-900">Análisis de Ingresos</h3>
@@ -338,6 +351,7 @@
 <script setup>
 import { computed, ref, onMounted, nextTick, watch } from 'vue'
 import ToastNotifications from './ToastNotifications.vue'
+import ContextualTour from './ContextualTour.vue'
 import authService from '../services/authService.js'
 import { reportsService } from '../services/reportsService.js'
 import { productsService } from '../services/productsService.js'
@@ -360,6 +374,55 @@ import {
   Filler
 } from 'chart.js'
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler)
+
+// 🎯 Tour Steps del Dashboard  
+const tourSteps = ref([
+  {
+    title: 'Asistente Inteligente',
+    description: 'Usa la IA para obtener ayuda inmediata, analizar datos, generar reportes o hacer preguntas sobre tu negocio. Puede ayudarte a tomar decisiones basadas en tus métricas.',
+    selector: '#tour-ia-button' // Necesitaremos agregar este ID al header
+  },
+  {
+    title: 'Radio Corporativa',
+    description: '¡Sintonízanos! Disfruta de nuestra radio exclusiva con la mejor música y energía para acompañar tu jornada laboral.',
+    selector: '#tour-voice-button'
+  },
+  {
+    title: 'Centro de Ayuda',
+    description: 'Accede a tutoriales, guías paso a paso y documentación completa del sistema. Siempre disponible para cuando lo necesites.',
+    selector: '#tour-help-button'
+  },
+  {
+    title: 'Nueva Venta',
+    description: 'Inicia una nueva transacción de venta. Te llevará directamente al punto de venta donde podrás escanear productos y procesar pagos.',
+    selector: '#tour-nueva-venta-btn'
+  },
+  {
+    title: 'Estado de Caja',
+    description: 'Muestra si la caja está abierta o cerrada. Debes abrir una caja antes de realizar ventas. Aquí ves el total acumulado del turno actual.',
+    selector: '#tour-estado-caja'
+  },
+  {
+    title: 'Análisis de Ingresos',
+    description: 'Gráfico en tiempo real de tus ventas. Alterna entre vista de 24 horas, 7 días o 30 días para analizar tendencias y tomar decisiones informadas.',
+    selector: '#tour-analisis-ingresos'
+  },
+  {
+    title: 'Alertas de Stock',
+    description: 'Sistema de alertas que te avisa automáticamente cuando tienes productos con stock bajo. Te ayuda a mantener siempre inventario disponible.',
+    selector: '#tour-alertas-stock'
+  }
+])
+
+const handleTourComplete = () => {
+  console.log('✅ Dashboard tour completado')
+  localStorage.setItem('dashboard_tour_completed', 'true')
+}
+
+const handleTourSkip = () => {
+  console.log('⏭️ Dashboard tour omitido')
+  localStorage.setItem('dashboard_tour_completed', 'true')
+}
 
 // 🏦 Composable para manejo de sesiones de caja
 const { 

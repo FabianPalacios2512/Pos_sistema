@@ -26,7 +26,8 @@ class User extends Authenticatable
         'role_id',
         'phone',
         'active',
-        'last_login'
+        'last_login',
+        'tour_completed'
     ];
 
     /**
@@ -50,7 +51,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'active' => 'boolean',
-            'last_login' => 'datetime'
+            'last_login' => 'datetime',
+            'tour_completed' => 'boolean'
         ];
     }
 

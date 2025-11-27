@@ -62,6 +62,7 @@
             @create-invoice="handleCreateQuote"
             @search-quote="handleSearchQuote"
             @cart-status-changed="handleCartStatusChanged"
+            @change-module="setCurrentModule"
           />
         </div>
 
@@ -1447,6 +1448,102 @@ watch(posViewRef, async (newRef) => {
   }
 })
 
+// ===== MOUSE HANDLING (AUTO-HIDE MENU) =====
+
+const handleMouseMove = (event) => {
+  if (!autoHideEnabled.value) return
+  
+  // Calcular velocidad del mouse para detectar "golpe"
+  const currentMouseX = event.clientX
+  mouseSpeed.value = Math.abs(currentMouseX - lastMouseX.value)
+  lastMouseX.value = currentMouseX
+  
+  // Detección de borde y zona segura más precisas
+  const nearEdge = currentMouseX <= edgeDetectionZone
+  const sidebarWidth = sidebarCollapsed.value ? 80 : 288 // w-20 vs w-72
+  const inSidebarSafeZone = currentMouseX <= sidebarWidth + sidebarSafeZone // Solo +20px
+  
+  isMouseNearEdge.value = nearEdge
+  
+  // ACTIVACIÓN: Solo expandir con "golpe" rápido al borde (velocidad > 10px)
+  if (nearEdge && sidebarCollapsed.value && mouseSpeed.value > 10) {
+    sidebarCollapsed.value = false
+    console.log('Expandiendo menú por golpe rápido al borde, velocidad:', mouseSpeed.value)
+  }
+  
+  // ZONA SEGURA: Sidebar + pequeño margen
+  if (isMouseOnSidebar.value || inSidebarSafeZone) {
+    if (autoHideTimeout.value) {
+      clearTimeout(autoHideTimeout.value)
+      autoHideTimeout.value = null
+    }
+    return
+  }
+  
+  // ZONA DE CIERRE: Fuera de la zona segura
+  if (!sidebarCollapsed.value && !isMouseOnSidebar.value) {
+    if (autoHideTimeout.value) {
+      clearTimeout(autoHideTimeout.value)
+    }
+    
+    autoHideTimeout.value = setTimeout(() => {
+      if (!isMouseOnSidebar.value && !isMouseNearEdge.value && autoHideEnabled.value) {
+        console.log('Colapsando menú - fuera de zona segura')
+        sidebarCollapsed.value = true
+      }
+    }, autoHideDelay)
+  }
+}
+
+const handleSidebarMouseEnter = () => {
+  console.log('Mouse ENTRA al sidebar') // Debug temporal
+  isMouseOnSidebar.value = true
+  // Cancelar INMEDIATAMENTE cualquier timeout de cierre
+  if (autoHideTimeout.value) {
+    clearTimeout(autoHideTimeout.value)
+    autoHideTimeout.value = null
+  }
+}
+
+const handleSidebarMouseLeave = () => {
+  console.log('Mouse SALE del sidebar') // Debug temporal
+  isMouseOnSidebar.value = false
+  
+  // Solo iniciar el cierre si el auto-hide está habilitado y el menú está expandido
+  if (autoHideEnabled.value && !sidebarCollapsed.value) {
+    console.log('Iniciando timeout de cierre desde mouseLeave...') // Debug temporal
+    // Tiempo más corto - máximo 2 segundos
+    autoHideTimeout.value = setTimeout(() => {
+      console.log('Ejecutando cierre desde mouseLeave - Mouse en sidebar:', isMouseOnSidebar.value, 'Cerca del borde:', isMouseNearEdge.value) // Debug
+      // Verificación final antes de cerrar
+      if (!isMouseOnSidebar.value && !isMouseNearEdge.value && autoHideEnabled.value) {
+        sidebarCollapsed.value = true
+        console.log('Menú cerrado desde mouseLeave') // Debug
+      }
+    }, 2000) // Exactamente 2 segundos
+  }
+}
+
+// Función para manejar clicks fuera del sidebar (más preciso)
+const handleClickOutsideSidebar = (event) => {
+  if (!autoHideEnabled.value || sidebarCollapsed.value) return
+  
+  // Click más preciso - según la imagen, después de donde empieza el contenido verde
+  const clickX = event.clientX
+  const sidebarWidth = 288 // w-72 expandido
+  const safeClickZone = sidebarWidth + sidebarSafeZone // Solo +20px como en mousemove
+  
+  if (clickX > safeClickZone) {
+    console.log('Click fuera de zona segura - cerrando menú') // Debug
+    sidebarCollapsed.value = true
+    // Cancelar cualquier timeout pendiente
+    if (autoHideTimeout.value) {
+      clearTimeout(autoHideTimeout.value)
+      autoHideTimeout.value = null
+    }
+  }
+}
+
 // ===== LIFECYCLE HOOKS =====
 
 let timeInterval
@@ -1503,99 +1600,6 @@ onMounted(() => {
   lastMouseX.value = 0
   
   // ===== MENÚ INTELIGENTE - AUTO-HIDE =====
-  const handleMouseMove = (event) => {
-    if (!autoHideEnabled.value) return
-    
-    // Calcular velocidad del mouse para detectar "golpe"
-    const currentMouseX = event.clientX
-    mouseSpeed.value = Math.abs(currentMouseX - lastMouseX.value)
-    lastMouseX.value = currentMouseX
-    
-    // Detección de borde y zona segura más precisas
-    const nearEdge = currentMouseX <= edgeDetectionZone
-    const sidebarWidth = sidebarCollapsed.value ? 80 : 288 // w-20 vs w-72
-    const inSidebarSafeZone = currentMouseX <= sidebarWidth + sidebarSafeZone // Solo +20px
-    
-    isMouseNearEdge.value = nearEdge
-    
-    // ACTIVACIÓN: Solo expandir con "golpe" rápido al borde (velocidad > 10px)
-    if (nearEdge && sidebarCollapsed.value && mouseSpeed.value > 10) {
-      sidebarCollapsed.value = false
-      console.log('Expandiendo menú por golpe rápido al borde, velocidad:', mouseSpeed.value)
-    }
-    
-    // ZONA SEGURA: Sidebar + pequeño margen
-    if (isMouseOnSidebar.value || inSidebarSafeZone) {
-      if (autoHideTimeout.value) {
-        clearTimeout(autoHideTimeout.value)
-        autoHideTimeout.value = null
-      }
-      return
-    }
-    
-    // ZONA DE CIERRE: Fuera de la zona segura
-    if (!sidebarCollapsed.value && !isMouseOnSidebar.value) {
-      if (autoHideTimeout.value) {
-        clearTimeout(autoHideTimeout.value)
-      }
-      
-      autoHideTimeout.value = setTimeout(() => {
-        if (!isMouseOnSidebar.value && !isMouseNearEdge.value && autoHideEnabled.value) {
-          console.log('Colapsando menú - fuera de zona segura')
-          sidebarCollapsed.value = true
-        }
-      }, autoHideDelay)
-    }
-  }
-  
-  const handleSidebarMouseEnter = () => {
-    console.log('Mouse ENTRA al sidebar') // Debug temporal
-    isMouseOnSidebar.value = true
-    // Cancelar INMEDIATAMENTE cualquier timeout de cierre
-    if (autoHideTimeout.value) {
-      clearTimeout(autoHideTimeout.value)
-      autoHideTimeout.value = null
-    }
-  }
-  
-  const handleSidebarMouseLeave = () => {
-    console.log('Mouse SALE del sidebar') // Debug temporal
-    isMouseOnSidebar.value = false
-    
-    // Solo iniciar el cierre si el auto-hide está habilitado y el menú está expandido
-    if (autoHideEnabled.value && !sidebarCollapsed.value) {
-      console.log('Iniciando timeout de cierre desde mouseLeave...') // Debug temporal
-      // Tiempo más corto - máximo 2 segundos
-      autoHideTimeout.value = setTimeout(() => {
-        console.log('Ejecutando cierre desde mouseLeave - Mouse en sidebar:', isMouseOnSidebar.value, 'Cerca del borde:', isMouseNearEdge.value) // Debug
-        // Verificación final antes de cerrar
-        if (!isMouseOnSidebar.value && !isMouseNearEdge.value && autoHideEnabled.value) {
-          sidebarCollapsed.value = true
-          console.log('Menú cerrado desde mouseLeave') // Debug
-        }
-      }, 2000) // Exactamente 2 segundos
-    }
-  }
-  
-  // Función para manejar clicks fuera del sidebar (más preciso)
-  const handleClickOutsideSidebar = (event) => {
-    if (!autoHideEnabled.value || sidebarCollapsed.value) return
-    
-    // Click más preciso - según la imagen, después de donde empieza el contenido verde
-    const clickX = event.clientX
-    const sidebarWidth = 288 // w-72 expandido
-    const safeClickZone = sidebarWidth + sidebarSafeZone // Solo +20px como en mousemove
-    
-    if (clickX > safeClickZone) {
-      console.log('Click fuera de zona segura - cerrando menú') // Debug
-      sidebarCollapsed.value = true
-      // Cancelar cualquier timeout pendiente
-      if (autoHideTimeout.value) {
-        clearTimeout(autoHideTimeout.value)
-        autoHideTimeout.value = null
-      }
-    }
-  }
   
   // Event listeners para menú inteligente
   document.addEventListener('mousemove', handleMouseMove)

@@ -94,6 +94,7 @@
           
           <!-- Video Tutorial -->
           <button
+            id="tour-video-button"
             @click="showVideoTutorial"
             class="hidden md:flex p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
             title="Video tutorial"
@@ -106,6 +107,7 @@
           
           <!-- Ayuda -->
           <button
+            id="tour-help-button"
             @click="showHelp"
             class="hidden md:flex p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200"
             title="Ayuda"
@@ -117,6 +119,7 @@
           
           <!-- Botón Radio - Indicadores solo cuando reproduce -->
           <button
+            id="tour-voice-button"
             @click="$emit('toggle-radio')"
             class="hidden md:flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white hover:scale-105"
             :title="isRadioActive ? `Reproduciendo: ${currentRadioName}` : 'Radio'"
@@ -151,6 +154,7 @@
 
           <!-- Botón 105 IA -->
           <button
+            id="tour-ia-button"
             @click="toggleAIChat"
             class="hidden md:flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-600 hover:from-violet-600 hover:via-purple-600 hover:to-indigo-700 text-white rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
             title="Asistente IA 105"

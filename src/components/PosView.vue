@@ -1,6 +1,80 @@
 <template>
   <div class="h-full relative" style="background-color: #EEEFF2; padding-bottom: 0px;">
     
+    <!-- 🎯 Modal de Bienvenida Primera Vez -->
+    <Teleport to="body">
+      <div v-if="showWelcomeModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 animate-scale-in">
+          
+          <!-- Header con gradiente -->
+          <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6 rounded-t-2xl">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-white">¡Bienvenido a 105 POS! 👋</h2>
+                <p class="text-blue-100 text-sm mt-1">El corazón del sistema que te llevará al éxito</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contenido -->
+          <div class="px-8 py-6 space-y-4">
+            <p class="text-gray-700 text-base leading-relaxed">
+              Vemos que es tu <strong class="text-blue-600">primera vez aquí</strong>. 
+              Este módulo es fundamental para gestionar tus ventas de manera profesional.
+            </p>
+            
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+              <p class="text-sm font-semibold text-blue-900 mb-2">🚀 ¿Te gustaría hacer un recorrido rápido?</p>
+              <p class="text-xs text-blue-800">
+                Te mostraremos las funciones principales para que domines el POS en menos de 3 minutos.
+              </p>
+            </div>
+            
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p class="text-xs text-amber-900">
+                <strong>💡 Consejo:</strong> El tour te ayudará a conocer WhatsApp, devoluciones, descuentos y mucho más.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Botones -->
+          <div class="px-8 py-6 bg-gray-50 rounded-b-2xl flex items-center justify-between gap-3">
+            <button 
+              @click="handleWelcomeSkip"
+              class="px-5 py-2.5 text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors rounded-xl hover:bg-white border border-transparent hover:border-gray-200"
+            >
+              No, gracias
+            </button>
+            <button 
+              @click="handleWelcomeStart"
+              class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 flex items-center gap-2"
+            >
+              <span>¡Sí, vamos!</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+              </svg>
+            </button>
+          </div>
+          
+        </div>
+      </div>
+    </Teleport>
+    
+    <!-- 🎯 Tour Educativo del POS -->
+    <ContextualTour 
+      ref="posTourRef"
+      module-name="pos"
+      :steps="posTourSteps"
+      :auto-start="false"
+      @complete="handlePosTourComplete"
+      @skip="handlePosTourSkip"
+    />
+    
     <!-- Loading inicial para evitar parpadeo -->
     <div v-if="initializing" class="absolute inset-0 flex items-center justify-center z-50" style="background-color: #EEEFF2;">
       <div class="flex flex-col items-center space-y-4">
@@ -9,18 +83,14 @@
       </div>
     </div>
     
-    <!-- Overlay oscuro cuando caja está cerrada Y no está en modo cotización (SOLO después de inicializar) -->
-    <Transition 
-      name="overlay-fade"
-      enter-active-class="transition-all duration-500 ease-out"
-      leave-active-class="transition-all duration-300 ease-in"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div v-if="!initializing && !hasOpenSession && !quotationMode" class="absolute inset-0 bg-black/40 backdrop-blur-sm z-50 pointer-events-none"></div>
-    </Transition>
+    
+    <!-- Loading inicial para evitar parpadeo -->
+    <div v-if="initializing" class="absolute inset-0 flex items-center justify-center z-50" style="background-color: #EEEFF2;">
+      <div class="flex flex-col items-center space-y-4">
+        <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p class="text-sm text-gray-600 font-medium">Cargando punto de venta...</p>
+      </div>
+    </div>
     
     <!-- BARRA DE HERRAMIENTAS EMPRESARIAL -->
     <div class="sticky top-0 z-30 bg-white backdrop-blur-xl border-b border-slate-200/60 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] transition-all duration-300">
@@ -93,6 +163,7 @@
           </button>
 
           <button
+            id="tour-pos-returns"
             @click="showReturnsModal = true"
             :disabled="quotationMode"
             class="hidden sm:flex items-center gap-3 pl-1.5 pr-4 h-12 rounded-full border transition-all duration-300 group"
@@ -108,9 +179,10 @@
             </div>
           </button>
           
-          <WhatsAppStatus ref="whatsappStatus" class="hidden sm:block" />
+          <WhatsAppStatus id="tour-pos-whatsapp" ref="whatsappStatus" class="hidden sm:block" />
           
           <button 
+            id="tour-pos-cash-btn"
             @click="hasOpenSession ? showCloseCashModal() : showOpenCashModal()"
             class="relative flex items-center gap-3 pl-1.5 pr-4 h-12 rounded-full border transition-all duration-300 group"
             :class="hasOpenSession 
@@ -174,7 +246,8 @@
       
       <div class="flex-1 p-4 overflow-y-auto bg-gray-50" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
-        <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
+        <!-- Loading skeleton -->
+      <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
           <div v-for="n in 10" :key="n" class="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm animate-pulse">
             <div class="aspect-square bg-slate-100 rounded-xl mb-3"></div>
             <div class="h-5 bg-slate-100 rounded-lg w-2/3 mb-2"></div>
@@ -182,7 +255,30 @@
         </div>
       </div>
       
-      <div v-else-if="filteredProducts.length === 0" class="h-full flex flex-col items-center justify-center text-center py-12">
+      <!-- Primera vez: NO hay productos en la base de datos -->
+      <div v-else-if="isFirstTimeNoProducts" class="h-full flex flex-col items-center justify-center text-center py-12">
+        <div class="w-28 h-28 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl flex items-center justify-center mb-6 shadow-lg border-2 border-indigo-100">
+           <svg class="w-14 h-14 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+           </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-2">¿Quieres crear tu primer producto?</h3>
+        <p class="text-sm text-slate-600 max-w-xs leading-relaxed mb-6">
+           Aún no tienes productos registrados. Crea tu primer producto para comenzar a vender.
+        </p>
+        <button
+          @click="emit('change-module', 'products')"
+          class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <span>Crear Primer Producto</span>
+        </button>
+      </div>
+      
+      <!-- Filtros/búsqueda sin resultados -->
+      <div v-else-if="isEmptyByFilters" class="h-full flex flex-col items-center justify-center text-center py-12">
         <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-4 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)] border border-slate-100">
            <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -280,6 +376,7 @@
       </div>
 
       <button
+        id="tour-customer-btn"
         @click="showCustomerSelector = true"
         class="w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 group active:scale-[0.99] border-2 border-dashed"
         :class="selectedCustomer 
@@ -382,7 +479,7 @@
 
 <!-- fin bloque de ventas -->  
 
-<div class="lg:col-span-3 h-full overflow-hidden">
+<div id="tour-pos-cart" class="lg:col-span-3 h-full overflow-hidden">
   
   <div class="bg-white rounded-2xl border border-gray-200 flex flex-col h-full overflow-hidden shadow-[0_0_40px_-10px_rgba(0,0,0,0.15)]">
     
@@ -439,6 +536,7 @@
           <!-- Cupón -->
           <div class="mt-4 pt-3 border-t border-dashed border-slate-200">
             <button
+              id="tour-discount-btn"
               v-if="!showPromoCodeInput"
               @click="showPromoCodeInput = true"
               class="text-[10px] font-bold text-slate-700 hover:text-slate-900 flex items-center gap-1.5 transition-colors uppercase tracking-wide group"
@@ -749,7 +847,7 @@
     <CashOpenModal
       :show="showCashOpenModal"
       :user-info="currentUser"
-      :force-open="!hasOpenSession"
+      :force-open="!hasOpenSession && !isFirstVisit"
       @close="handleCloseCashOpenModal"
       @success="handleOpenCashSession"
       @quotation-mode="handleQuotationMode"
@@ -975,7 +1073,7 @@
   />
 
   <!-- 🎫 BARRA DE MULTI-TABS INFERIOR (Footer Fijo) -->
-  <div class="fixed bottom-0 left-0 right-0" style="background-color: #FFFFFF; border-top: 1px solid #E2E8F0; box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.04); z-index: 50; height: 44px;">
+  <div id="tour-pos-multisales" class="fixed bottom-0 left-0 right-0" style="background-color: #FFFFFF; border-top: 1px solid #E2E8F0; box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.04); z-index: 50; height: 44px;">
     <div class="flex items-center h-full px-1 max-w-screen-2xl mx-auto">
       
       <!-- Pestañas de ventas -->
@@ -1091,6 +1189,7 @@ import WhatsAppStatus from './WhatsAppStatus.vue'
 import PhoneInputModal from './PhoneInputModal.vue'
 import ReturnsView from './ReturnsView.vue'
 import QrScanner from 'qr-scanner'
+import ContextualTour from './ContextualTour.vue'
 
 // Switch para tipo de método de pago
 const paymentType = ref('contado')
@@ -1125,15 +1224,232 @@ const currentSession = ref(null)
 const hasOpenSession = ref(false)
 
 // Current user info
-const currentUser = ref({
-  name: 'Usuario Actual' // TODO: obtener del store de auth
-})
+// Current user info
+const currentUser = computed(() => user.value || { name: 'Compañero' })
 
 // Loading state para WhatsApp y Email
 const isLoading = ref(false)
 
 // Estado inicial para evitar parpadeo del overlay
 const initializing = ref(true)
+
+// 🎯 TOUR DEL POS - Control de bienvenida y primera visita
+// ⚠️ MODO DESARROLLO: Cambiar a false en producción
+const DEV_MODE = false // false = Tour solo primera vez | true = Tour siempre disponible
+const isFirstVisit = ref(DEV_MODE || !localStorage.getItem('pos_tour_completed'))
+const showWelcomeModal = ref(false)
+const posTourRef = ref(null)
+
+// 🎯 TOUR EDUCATIVO DEL POS - Pasos amigables y didácticos
+const posTourSteps = ref([
+  {
+    selector: '#tour-pos-cash-btn',
+    title: 'Sistema de Control de Caja',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          Este es el <strong class="text-emerald-600">núcleo del sistema</strong>. 
+          Para comenzar a vender, primero debes <strong>abrir una caja</strong>.
+        </p>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2">
+          <p class="text-xs text-blue-900 font-medium mb-1">Por qué es importante:</p>
+          <ul class="text-xs text-blue-800 space-y-0.5">
+            <li>• Controla el dinero en efectivo de tu turno</li>
+            <li>• Registra automáticamente todas las ventas</li>
+            <li>• Facilita el cuadre y cierre de caja</li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  {
+    selector: '[placeholder="Buscar productos, SKU o escanear..."]',
+    title: 'Buscador Inteligente de Productos',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          El buscador permite <strong>4 formas de búsqueda</strong>:
+        </p>
+        <div class="space-y-1">
+          <div class="flex items-start gap-1.5">
+            <span class="flex-shrink-0 text-indigo-600 font-bold text-xs">1.</span>
+            <div>
+              <p class="text-xs font-semibold text-gray-800">Por nombre del producto</p>
+              <p class="text-xs text-gray-600">Ejemplo: "Coca Cola", "Arroz"</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-1.5">
+            <span class="flex-shrink-0 text-indigo-600 font-bold text-xs">2.</span>
+            <div>
+              <p class="text-xs font-semibold text-gray-800">Escanear código de barras</p>
+              <p class="text-xs text-gray-600">Usa lector USB o cámara</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-1.5">
+            <span class="flex-shrink-0 text-indigo-600 font-bold text-xs">3.</span>
+            <div>
+              <p class="text-xs font-semibold text-gray-800">Por SKU (código interno)</p>
+              <p class="text-xs text-gray-600">Ejemplo: "SKU-12345"</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-1.5">
+            <span class="flex-shrink-0 text-indigo-600 font-bold text-xs">4.</span>
+            <div>
+              <p class="text-xs font-semibold text-gray-800">Cargar cotización</p>
+              <p class="text-xs text-gray-600">Escribe el número completo y presiona Enter</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `
+  },
+  {
+    selector: '.flex.items-center.gap-1\\.5.min-w-max',
+    title: 'Filtros por Categorías',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          Organiza y filtra productos por categoría para acceso rápido.
+        </p>
+        <div class="bg-purple-50 border border-purple-200 rounded-lg p-2">
+          <p class="text-xs text-purple-900 font-medium mb-1">Ventajas:</p>
+          <ul class="text-xs text-purple-800 space-y-0.5">
+            <li>• Encuentra productos más rápido</li>
+            <li>• Organiza el inventario visualmente</li>
+            <li>• Ideal para tiendas con muchos productos</li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  {
+    selector: '#tour-pos-returns',
+    title: 'Gestión de Devoluciones',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          Maneja devoluciones de productos de forma <strong>profesional y controlada</strong>.
+        </p>
+        <div class="bg-red-50 border border-red-200 rounded-lg p-2">
+          <p class="text-xs text-red-900 font-medium mb-1">Características:</p>
+          <ul class="text-xs text-red-800 space-y-0.5">
+            <li>• Registra motivo de la devolución</li>
+            <li>• Actualiza inventario automáticamente</li>
+            <li>• Genera documentos de soporte</li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  {
+    selector: '#tour-pos-whatsapp',
+    title: 'Integración con WhatsApp Business',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          <strong class="text-green-600">Función Premium:</strong> Envía facturas y cotizaciones por WhatsApp.
+        </p>
+        <div class="bg-green-50 border border-green-200 rounded-lg p-2">
+          <p class="text-xs text-green-900 font-medium mb-1">Beneficios:</p>
+          <ul class="text-xs text-green-800 space-y-0.5">
+            <li>• Envía facturas en PDF automáticamente</li>
+            <li>• Mantén comunicación directa</li>
+            <li>• Acelera el proceso de venta</li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  {
+    selector: '#tour-customer-btn',
+    title: 'Agregar Clientes',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          Gestiona tu <strong class="text-cyan-600">base de clientes</strong> de forma profesional.
+        </p>
+        <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-2">
+          <p class="text-xs text-cyan-900 font-medium mb-1">Funciones:</p>
+          <ul class="text-xs text-cyan-800 space-y-0.5">
+            <li>• Registra nuevos clientes con su información</li>
+            <li>• Asigna clientes a ventas y cotizaciones</li>
+            <li>• Consulta historial de compras</li>
+            <li>• Gestiona créditos y pagos pendientes</li>
+          </ul>
+        </div>
+      </div>
+    `
+  },
+  {
+    selector: '#tour-discount-btn',
+    title: 'Aplicar Descuentos',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          Aplica <strong class="text-orange-600">descuentos inteligentes</strong> a tus ventas.
+        </p>
+        <div class="bg-orange-50 border border-orange-200 rounded-lg p-2">
+          <p class="text-xs text-orange-900 font-medium mb-1">Opciones disponibles:</p>
+          <ul class="text-xs text-orange-800 space-y-0.5">
+            <li>• Descuentos por porcentaje o monto fijo</li>
+            <li>• Descuentos por producto o venta completa</li>
+            <li>• Crea descuentos con IA desde aquí</li>
+            <li>• Gestiona descuentos en Panel de Configuración</li>
+          </ul>
+        </div>
+      </div>
+    `
+  }
+])
+
+// Handlers del tour
+const handlePosTourComplete = () => {
+  console.log('✅ Tour del POS completado')
+  if (!DEV_MODE) {
+    localStorage.setItem('pos_tour_completed', 'true')
+    isFirstVisit.value = false
+  }
+  showSuccess('¡Felicidades! Ya dominas el POS como un profesional 🎉')
+}
+
+const handlePosTourSkip = () => {
+  console.log('⏭️ Tour del POS omitido')
+  if (!DEV_MODE) {
+    localStorage.setItem('pos_tour_skipped', 'true')
+    isFirstVisit.value = false
+  }
+  showInfo('Puedes volver a ver el tour desde el menú de ayuda')
+}
+
+// Handlers del modal de bienvenida
+const handleWelcomeStart = () => {
+  showWelcomeModal.value = false
+  // Iniciar el tour manualmente después de cerrar el modal
+  setTimeout(() => {
+    if (posTourRef.value) {
+      posTourRef.value.startTourConfirmed()
+    }
+  }, 300)
+}
+
+const handleWelcomeSkip = () => {
+  showWelcomeModal.value = false
+  if (!DEV_MODE) {
+    localStorage.setItem('pos_tour_completed', 'true')
+    isFirstVisit.value = false
+  }
+  showInfo('¡Entendido! Puedes explorar por tu cuenta')
+}
+
+// Mostrar modal de bienvenida si es primera visita
+onMounted(() => {
+  if (isFirstVisit.value) {
+    // Mostrar modal de bienvenida después de que el POS esté listo
+    setTimeout(() => {
+      showWelcomeModal.value = true
+    }, 800) // Delay aumentado para asegurar que todo esté cargado
+  }
+})
 
 // Toast simple local (deprecated - usar el sistema global)
 const showToast = (message, type = 'success') => {
@@ -1304,7 +1620,7 @@ const refreshData = (dataType = 'all') => {
 }
 
 // Emits
-const emit = defineEmits(['sale-completed', 'create-invoice', 'search-quote', 'cart-status-changed'])
+const emit = defineEmits(['sale-completed', 'create-invoice', 'search-quote', 'cart-status-changed', 'change-module'])
 
 // Estado reactivo para datos de la API (usando store global)
 const products = computed(() => appStore.products)
@@ -1397,6 +1713,25 @@ const originalQuotationProducts = ref([])
 
 // Variable para mostrar/ocultar input de código promocional
 const showPromoCodeInput = ref(false)
+
+// Detectar si es primera vez (NO hay productos en la base de datos)
+const isFirstTimeNoProducts = computed(() => {
+  // Si está cargando, no es primera vez
+  if (productsLoading.value) return false
+  
+  // Si NO hay productos en absoluto (sin filtros ni búsqueda)
+  const totalProducts = products.value?.length || 0
+  return totalProducts === 0
+})
+
+// Detectar si el resultado vacío es por filtros/búsqueda
+const isEmptyByFilters = computed(() => {
+  if (productsLoading.value || isFirstTimeNoProducts.value) return false
+  
+  // Hay productos en la BD pero filteredProducts está vacío
+  const totalProducts = products.value?.length || 0
+  return totalProducts > 0 && filteredProducts.value.length === 0
+})
 
 const taxRate = computed(() => { // Usar computed del store
   const settings = appStore.systemSettings
@@ -3877,14 +4212,17 @@ onMounted(async () => {
       // Esperar un tick para que se actualice el DOM y luego mostrar modal si es necesario
       await nextTick()
       
-      if (!hasOpenSession.value) {
+      // 🎯 NO mostrar modal de caja si es primera visita (durante el tour)
+      if (!hasOpenSession.value && !isFirstVisit.value) {
         console.log('⚠️ No hay sesión abierta, mostrando modal...')
         setTimeout(() => {
           showOpenCashModal()
           showWarning('Sistema bloqueado: Debe abrir caja para procesar ventas. Solo se permiten cotizaciones.')
         }, 100)
-      } else {
+      } else if (hasOpenSession.value) {
         console.log('✅ Sesión de caja activa, POS listo para usar')
+      } else {
+        console.log('👋 Primera visita detectada, omitiendo modal de caja para permitir tour')
       }
     } else {
       // Fallback: cargar sesión individualmente solo si el store no está inicializado
@@ -3909,14 +4247,17 @@ onMounted(async () => {
         initializing.value = false
         await nextTick()
         
-        if (!hasOpenSession.value) {
+        // 🎯 NO mostrar modal de caja si es primera visita (durante el tour)
+        if (!hasOpenSession.value && !isFirstVisit.value) {
           console.log('⚠️ No hay sesión abierta, mostrando modal...')
           setTimeout(() => {
             showOpenCashModal()
             showWarning('Sistema bloqueado: Debe abrir caja para procesar ventas. Solo se permiten cotizaciones.')
           }, 100)
-        } else {
+        } else if (hasOpenSession.value) {
           console.log('✅ Sesión de caja activa, POS listo para usar')
+        } else {
+          console.log('👋 Primera visita detectada, omitiendo modal de caja para permitir tour')
         }
       } catch (error) {
         console.error('Error cargando sesión de caja:', error)
@@ -4913,14 +5254,14 @@ const showOpenCashModal = () => {
 
 /**
  * Manejar cierre del modal de apertura de caja
- * Solo permite cerrar si hay sesión abierta
+ * Permite cerrar si hay sesión abierta O si es primera visita (tour)
  */
 const handleCloseCashOpenModal = () => {
-  // Solo permitir cerrar si hay sesión abierta
-  if (hasOpenSession.value) {
+  // Permitir cerrar si hay sesión abierta O si es primera visita (para el tour)
+  if (hasOpenSession.value || isFirstVisit.value) {
     showCashOpenModal.value = false
   } else {
-    // Si no hay sesión, mostrar advertencia pero mantener modal abierto
+    // Si no hay sesión y no es primera visita, mostrar advertencia pero mantener modal abierto
     showWarning('Debe abrir una caja o seleccionar modo cotización para continuar')
   }
 }
@@ -5092,6 +5433,35 @@ defineExpose({
 
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
+}
+
+/* Animaciones del modal de bienvenida */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s ease-out;
 }
 
 /* Scrollbar personalizado */

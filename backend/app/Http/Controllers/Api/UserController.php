@@ -119,7 +119,8 @@ class UserController extends Controller
                 'password' => 'sometimes|nullable|string|min:6',
                 'role_id' => 'sometimes|nullable|exists:roles,id',
                 'phone' => 'sometimes|nullable|string|max:20',
-                'active' => 'sometimes|nullable|boolean'
+                'active' => 'sometimes|nullable|boolean',
+                'tour_completed' => 'sometimes|nullable|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -130,7 +131,7 @@ class UserController extends Controller
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $updateData = $request->only(['name', 'email', 'cc', 'role_id', 'phone', 'active']);
+            $updateData = $request->only(['name', 'email', 'cc', 'role_id', 'phone', 'active', 'tour_completed']);
 
             if ($request->has('password') && !empty($request->password)) {
                 $updateData['password'] = Hash::make($request->password);
