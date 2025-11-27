@@ -56,7 +56,7 @@ class Invoice extends Model
     public static function generateNextNumber($type = 'invoice')
     {
         $prefix = match($type) {
-            'invoice' => 'FV',
+            'invoice' => 'FACT',
             'quote' => 'COT',
             'credit_note' => 'NC',
             default => 'DOC'

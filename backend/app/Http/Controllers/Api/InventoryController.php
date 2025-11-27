@@ -191,6 +191,7 @@ class InventoryController extends Controller
                 'totalExits' => abs($query->clone()->exits()->sum('quantity')),
                 'totalValue' => $query->clone()->get()->sum('total_value'),
                 'typeBreakdown' => $query->clone()
+                    ->reorder()
                     ->selectRaw('type, COUNT(*) as count, SUM(ABS(quantity)) as total_quantity')
                     ->groupBy('type')
                     ->get()

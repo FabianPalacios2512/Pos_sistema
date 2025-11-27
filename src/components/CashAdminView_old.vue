@@ -828,6 +828,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { apiCall } from '../services/api.js'
 
 // Data
 const sessions = ref([])
@@ -927,20 +928,9 @@ const refreshSessions = async () => {
   try {
     showToast('🔄 Actualizando...', 'Obteniendo datos más recientes del sistema', 'info')
     
-    const response = await fetch(`${API_BASE_URL}/api/cash-sessions', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Accept': 'application/json'
-      }
-    })
-    
-    if (response.ok) {
-      const data = await response.json()
-      sessions.value = data.sessions || []
-      showToast('✅ Actualización completa', `Se cargaron ${sessions.value.length} sesiones correctamente`, 'success')
-    } else {
-      throw new Error('Error en la respuesta del servidor')
-    }
+    const data = await apiCall('/cash-sessions')
+    sessions.value = data.sessions || []
+    showToast('✅ Actualización completa', `Se cargaron ${sessions.value.length} sesiones correctamente`, 'success')
   } catch (error) {
     console.error('Error fetching sessions:', error)
     showToast('❌ Error de conexión', 'No se pudieron cargar las sesiones. Verifica la conexión.', 'error')
@@ -1049,26 +1039,17 @@ const closeSession = async (session) => {
   try {
     showToast('🔄 Cerrando sesión...', 'Procesando cierre de caja', 'info')
     
-    const response = await fetch(`http://localhost:8000/api/cash-sessions/${session.id}/close`, {
+    await apiCall(`/cash-sessions/${session.id}/close`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         actual_amount: session.opening_amount,
         closing_notes: 'Cerrada desde panel administrativo'
       })
     })
     
-    if (response.ok) {
-      showToast('✅ Sesión cerrada', `La sesión de ${session.user?.name} se cerró correctamente`, 'success')
-      selectedSession.value = null
-      refreshSessions()
-    } else {
-      throw new Error('Error al cerrar la sesión')
-    }
+    showToast('✅ Sesión cerrada', `La sesión de ${session.user?.name} se cerró correctamente`, 'success')
+    selectedSession.value = null
+    refreshSessions()
   } catch (error) {
     console.error('Error closing session:', error)
     showToast('❌ Error al cerrar', 'No se pudo cerrar la sesión. Intenta nuevamente.', 'error')

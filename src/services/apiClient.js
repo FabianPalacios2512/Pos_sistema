@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Configuración base del cliente API
 const apiClient = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:8000') + '/api',
+  baseURL: '/api',
   timeout: 15000, // 15 segundos para operaciones normales (AI puede tardar)
   headers: {
     'Content-Type': 'application/json',

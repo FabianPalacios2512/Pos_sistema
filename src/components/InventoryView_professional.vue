@@ -1076,6 +1076,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import api from '../services/api.js'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { inventoryService } from '../services/inventoryService.js'
@@ -1391,7 +1392,7 @@ const loadProducts = async () => {
     loading.value = true
 
     // Usar el endpoint de inventario que incluye métricas de ventas
-    const response = await inventoryService.getProducts({ per_page: 10000 })
+    const response = await inventoryService.getProducts({ per_page: 1000 })
     console.log('Respuesta inventario (todos):', response)
 
     // Los productos pueden venir en response.data.data (paginación) o directamente en response.data
@@ -1444,20 +1445,7 @@ const loadMovementsData = async (filters = null) => {
     })
     
     // Llamada a la API de movimientos (usando endpoint de prueba con parámetros)
-    const apiUrl = import.meta.env.VITE_API_URL || `${API_BASE_URL}`
-    const response = await fetch(`${apiUrl}/api/inventory/test/movements?${params}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    
-    const data = await response.json()
+    const data = await api.get(`/inventory/test/movements?${params}`)
     console.log('✅ Movimientos cargados:', data)
     
     // El endpoint de prueba devuelve: { success: true, data: { movements: [...], summary: {...} } }

@@ -13,12 +13,20 @@ return new class extends Migration
     {
         Schema::table('products', function (Blueprint $table) {
             // Campos de costos e inventario
-            $table->decimal('cost_price', 10, 2)->default(0)->after('sale_price'); // Precio de compra
-            $table->decimal('avg_cost', 10, 2)->default(0)->after('cost_price'); // Costo promedio móvil
+            if (!Schema::hasColumn('products', 'cost_price')) {
+                $table->decimal('cost_price', 10, 2)->default(0)->after('sale_price'); // Precio de compra
+            }
+            if (!Schema::hasColumn('products', 'avg_cost')) {
+                $table->decimal('avg_cost', 10, 2)->default(0)->after('cost_price'); // Costo promedio móvil
+            }
 
             // Control de stock
-            $table->integer('min_stock')->default(5)->after('current_stock'); // Stock mínimo
-            $table->integer('ideal_stock')->default(50)->after('min_stock'); // Stock ideal
+            if (!Schema::hasColumn('products', 'min_stock')) {
+                $table->integer('min_stock')->default(5)->after('current_stock'); // Stock mínimo
+            }
+            if (!Schema::hasColumn('products', 'ideal_stock')) {
+                $table->integer('ideal_stock')->default(50)->after('min_stock'); // Stock ideal
+            }
 
             // Métricas de ventas
             $table->integer('total_sold')->default(0)->after('ideal_stock'); // Total vendido histórico

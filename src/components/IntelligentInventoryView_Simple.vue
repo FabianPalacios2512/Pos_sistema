@@ -2358,7 +2358,7 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import ToastNotifications from './ToastNotifications.vue'
 import AI105Chat from './AI105Chat.vue'
-import { API_CONFIG } from '../services/api.js'
+import { API_CONFIG, apiCall } from '../services/api.js'
 import { getInitials } from '../utils/avatarUtils.js'
 
 export default {
@@ -2957,8 +2957,7 @@ export default {
       }
       
       try {
-        const response = await fetch(`http://localhost:8000/api/inventory/test/alerts?period=${selectedPeriod.value}`)
-        const data = await response.json()
+        const data = await apiCall(`/inventory/test/alerts?period=${selectedPeriod.value}`)
         
         if (data.success && data.data.alerts?.length > 0) {
           // Mostrar solo las alertas críticas automáticamente en la vista general
@@ -3022,12 +3021,8 @@ export default {
 
     const handleDismissForever = async (alert) => {
       try {
-        const response = await fetch('http://localhost:8000/api/inventory/test/alerts/dismiss', {
+        const data = await apiCall('/inventory/test/alerts/dismiss', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
           body: JSON.stringify({
             alert_key: alert.alert_key || alert.id,
             alert_type: alert.category,
@@ -3035,8 +3030,6 @@ export default {
             user_id: 1 // Default user para pruebas
           })
         })
-
-        const data = await response.json()
         
         if (data.success) {
           console.log('Alerta descartada correctamente')
@@ -3063,21 +3056,20 @@ export default {
 
       try {
         // Construir URL con parámetros
-        let url = `${API_BASE_URL}/inventory/test/dashboard?period=${selectedPeriod.value}`
+        let endpoint = `/inventory/test/dashboard?period=${selectedPeriod.value}`
         
         // Si es rango personalizado, agregar fechas
         if (selectedPeriod.value === 'custom' && customDateRange.start) {
-          url += `&start_date=${customDateRange.start}`
+          endpoint += `&start_date=${customDateRange.start}`
           // Si no hay end_date, usar la misma fecha que start_date (mismo día)
           const endDate = customDateRange.end || customDateRange.start
-          url += `&end_date=${endDate}`
+          endpoint += `&end_date=${endDate}`
         }
         
         // Cargar datos del dashboard
-        const inventoryResponse = await fetch(url)
+        const inventoryData = await apiCall(endpoint)
         
-        if (inventoryResponse.ok) {
-          const inventoryData = await inventoryResponse.json()
+        if (inventoryData) {
           overviewData.value = inventoryData
           
           if (inventoryData.success && inventoryData.data) {
@@ -3103,8 +3095,9 @@ export default {
             console.warn('⚠️ Respuesta sin success o data:', inventoryData)
           }
         } else {
-          const errorText = await inventoryResponse.text()
-          throw new Error(`Error ${inventoryResponse.status}: ${errorText}`)
+          // const errorText = await inventoryResponse.text()
+          // throw new Error(`Error ${inventoryResponse.status}: ${errorText}`)
+          throw new Error('Error al cargar datos del dashboard')
         }
       } catch (err) {
         error.value = `Error cargando datos: ${err.message}`
@@ -3136,10 +3129,9 @@ export default {
           params.append('end_date', endDate)
         }
         
-        const response = await fetch(`${API_BASE_URL}/products/analytics?${params}`)
+        const data = await apiCall(`/products/analytics?${params}`)
         
-        if (response.ok) {
-          const data = await response.json()
+        if (data) {
           
           if (data.success && data.data) {
             productsData.value = {
@@ -3181,16 +3173,12 @@ export default {
           params.append('end_date', endDate)
         }
         
-        const fullUrl = `${API_BASE_URL}/inventory/test/movements?${params}`
-        console.log('📡 URL completa:', fullUrl)
+        const endpoint = `/inventory/test/movements?${params}`
+        console.log('📡 Endpoint:', endpoint)
         
-        const response = await fetch(fullUrl)
-        console.log('📊 Response status:', response.status)
-        console.log('📊 Response ok:', response.ok)
-        console.log('📊 Response headers:', Object.fromEntries(response.headers.entries()))
+        const data = await apiCall(endpoint)
         
-        if (response.ok) {
-          const data = await response.json()
+        if (data) {
           console.log('✅ Data recibida completa:', data)
           console.log('🔑 Keys en data:', Object.keys(data))
           console.log('🔑 Keys en data.data:', Object.keys(data.data || {}))
@@ -3238,10 +3226,9 @@ export default {
           params.append('end_date', endDate)
         }
         
-        const response = await fetch(`${API_BASE_URL}/inventory/test/customers?${params}`)
+        const data = await apiCall(`/inventory/test/customers?${params}`)
         
-        if (response.ok) {
-          const data = await response.json()
+        if (data) {
           if (data.success) {
             customersData.value = data.data
           }
@@ -3255,12 +3242,9 @@ export default {
     const loadSuppliersData = async () => {
       try {
         console.log('🔄 Cargando datos de proveedores...')
-        const response = await fetch(`${API_BASE_URL}/suppliers/analytics`)
+        const data = await apiCall(`/suppliers/analytics`)
         
-        console.log('📡 Response status:', response.status)
-        
-        if (response.ok) {
-          const data = await response.json()
+        if (data) {
           console.log('📦 Datos recibidos:', data)
           if (data.success) {
             suppliersData.value = data.data
@@ -3281,10 +3265,9 @@ export default {
         if (alertsFilters.severity) params.append('severity', alertsFilters.severity)
         if (alertsFilters.category) params.append('category', alertsFilters.category)
         
-        const response = await fetch(`${API_BASE_URL}/inventory/test/alerts?${params}`)
+        const data = await apiCall(`/inventory/test/alerts?${params}`)
         
-        if (response.ok) {
-          const data = await response.json()
+        if (data) {
           if (data.success) {
             alertsData.value = data.data
           }
@@ -3302,10 +3285,9 @@ export default {
         params.append('period', selectedPeriod.value)
         params.append('forecast_days', predictionsFilters.forecastDays)
         
-        const response = await fetch(`${API_BASE_URL}/inventory/test/predictions?${params}`)
+        const data = await apiCall(`/inventory/test/predictions?${params}`)
         
-        if (response.ok) {
-          const data = await response.json()
+        if (data) {
           if (data.success) {
             predictionsData.value = data.data
           }

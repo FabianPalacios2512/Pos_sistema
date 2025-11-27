@@ -26,7 +26,7 @@ export const customersService = {
         method: 'POST',
         body: JSON.stringify(customerData)
       })
-      return response.data
+      return response
     } catch (error) {
       console.error('Error creating customer:', error)
       throw error
@@ -39,7 +39,7 @@ export const customersService = {
         method: 'PUT',
         body: JSON.stringify(customerData)
       })
-      return response.data
+      return response
     } catch (error) {
       console.error('Error updating customer:', error)
       throw error

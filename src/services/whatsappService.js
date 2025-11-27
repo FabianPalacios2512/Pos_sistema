@@ -5,11 +5,11 @@ export const whatsappService = {
   // Obtener estado de conexión de WhatsApp
   async getStatus() {
     try {
-      // Llamar directamente al servidor WhatsApp para evitar timeout
-      const response = await axios.get('http://localhost:3002/status', { timeout: 3000 })
+      // Llamar al backend en lugar de directamente al servicio
+      const response = await apiClient.get('/whatsapp/status')
       return {
         success: true,
-        status: response.data
+        status: response.data.status
       }
     } catch (error) {
       // Error silencioso - no mostrar en consola para evitar spam

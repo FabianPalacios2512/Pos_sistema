@@ -394,7 +394,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import { apiCall } from '../services/api.js';
 
 // Estado
 const returns = ref([]);
@@ -408,11 +408,8 @@ const dateTo = ref('');
 // Cargar devoluciones
 const loadReturns = async () => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:8000/api/returns', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    returns.value = response.data.data || [];
+    const response = await apiCall('/returns');
+    returns.value = response.data || [];
     
     // Seleccionar la primera automáticamente si hay datos
     if (returns.value.length > 0 && !selectedReturn.value) {

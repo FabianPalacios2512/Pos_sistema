@@ -13,39 +13,35 @@ class CashSession extends Model
 
     protected $fillable = [
         'user_id',
-        'opening_date',
-        'opening_time',
+        'opened_at',
         'opening_amount',
-        'opening_notes',
-        'closing_date',
-        'closing_time',
+        'closed_at',
+        'closing_amount',
         'expected_amount',
         'actual_amount',
-        'difference',
+        'difference_amount',
         'closing_notes',
         'closing_status',
         'expenses_detail',
         'closing_breakdown',
-        'status',
+        'status'
+    ];
+
+    protected $appends = [
         'total_sales',
-        'total_expenses',
         'cash_sales',
         'card_sales',
         'transfer_sales'
     ];
 
     protected $casts = [
-        'opening_date' => 'date',
-        'closing_date' => 'date',
+        'opened_at' => 'datetime',
+        'closed_at' => 'datetime',
         'opening_amount' => 'decimal:2',
+        'closing_amount' => 'decimal:2',
         'expected_amount' => 'decimal:2',
         'actual_amount' => 'decimal:2',
-        'difference' => 'decimal:2',
-        'total_sales' => 'decimal:2',
-        'total_expenses' => 'decimal:2',
-        'cash_sales' => 'decimal:2',
-        'card_sales' => 'decimal:2',
-        'transfer_sales' => 'decimal:2',
+        'difference_amount' => 'decimal:2',
         'closing_breakdown' => 'array',
     ];
 
@@ -137,9 +133,41 @@ class CashSession extends Model
     public function calculateDifference()
     {
         if ($this->actual_amount !== null && $this->expected_amount !== null) {
-            $this->difference = $this->actual_amount - $this->expected_amount;
+            $this->difference_amount = $this->actual_amount - $this->expected_amount;
         }
-        return $this->difference;
+        return $this->difference_amount;
+    }
+
+    /**
+     * Accessor para obtener el total de ventas desde closing_breakdown
+     */
+    public function getTotalSalesAttribute()
+    {
+        return $this->closing_breakdown['sales']['total'] ?? 0;
+    }
+
+    /**
+     * Accessor para obtener el total de ventas en efectivo desde closing_breakdown
+     */
+    public function getCashSalesAttribute()
+    {
+        return $this->closing_breakdown['sales']['cash'] ?? 0;
+    }
+
+    /**
+     * Accessor para obtener el total de ventas con tarjeta desde closing_breakdown
+     */
+    public function getCardSalesAttribute()
+    {
+        return $this->closing_breakdown['sales']['card'] ?? 0;
+    }
+
+    /**
+     * Accessor para obtener el total de ventas por transferencia desde closing_breakdown
+     */
+    public function getTransferSalesAttribute()
+    {
+        return $this->closing_breakdown['sales']['transfer'] ?? 0;
     }
 
     /**
@@ -147,7 +175,12 @@ class CashSession extends Model
      */
     public function updateSalesTotals()
     {
-        // Obtener totales por método de pago desde invoices
+        // NOTA: La tabla 'invoices' en el VPS no tiene la columna 'payment_method'.
+        // Por lo tanto, no podemos agrupar por método de pago.
+        // Asumiremos temporalmente que todo es efectivo o simplemente sumaremos el total.
+
+        /*
+        // Código original que falla por falta de columna payment_method
         $invoiceTotals = $this->invoices()
             ->selectRaw('
                 payment_method,
@@ -156,46 +189,33 @@ class CashSession extends Model
             ')
             ->groupBy('payment_method')
             ->get();
+        */
 
-        // Inicializar totales
-        $cashSales = 0;
+        // Solución temporal: Sumar todo el total de las facturas asociadas
+        $totalSales = $this->invoices()->sum('total');
+
+        // Inicializar totales (Asumimos todo como efectivo por defecto para evitar errores)
+        $cashSales = $totalSales;
         $cardSales = 0;
         $transferSales = 0;
 
-        // Categorizar por método de pago
+        /*
+        // Categorizar por método de pago (Deshabilitado hasta que exista la columna)
         foreach ($invoiceTotals as $total) {
-            $amount = $total->total_amount ?? 0;
-
-            switch (strtolower($total->payment_method)) {
-                case 'cash':
-                case 'efectivo':
-                    $cashSales += $amount;
-                    break;
-                case 'card':
-                case 'tarjeta':
-                case 'credito':
-                case 'debito':
-                    $cardSales += $amount;
-                    break;
-                case 'transfer':
-                case 'transferencia':
-                case 'nequi':
-                case 'daviplata':
-                case 'bancolombia':
-                    $transferSales += $amount;
-                    break;
-                default:
-                    // Si no se reconoce el método, asumimos efectivo
-                    $cashSales += $amount;
-                    break;
-            }
+            // ...
         }
+        */
 
-        // Actualizar campos
-        $this->cash_sales = $cashSales;
-        $this->card_sales = $cardSales;
-        $this->transfer_sales = $transferSales;
-        $this->total_sales = $cashSales + $cardSales + $transferSales;
+        // Actualizar closing_breakdown en lugar de columnas inexistentes
+        $breakdown = $this->closing_breakdown ?? [];
+        $breakdown['sales'] = [
+            'total' => $cashSales + $cardSales + $transferSales,
+            'cash' => $cashSales,
+            'card' => $cardSales,
+            'transfer' => $transferSales
+        ];
+
+        $this->closing_breakdown = $breakdown;
 
         return $this;
     }
@@ -212,16 +232,19 @@ class CashSession extends Model
 
         return self::create([
             'user_id' => $userId,
-            'opening_date' => now()->toDateString(),
-            'opening_time' => now()->toTimeString(),
+            'opened_at' => now(),
             'opening_amount' => $openingAmount,
-            'opening_notes' => $notes,
+            // 'opening_notes' => $notes, // Columna no existe en DB
             'status' => self::STATUS_OPEN,
-            'total_sales' => 0,
             'total_expenses' => 0,
-            'cash_sales' => 0,
-            'card_sales' => 0,
-            'transfer_sales' => 0
+            'closing_breakdown' => [
+                'sales' => [
+                    'total' => 0,
+                    'cash' => 0,
+                    'card' => 0,
+                    'transfer' => 0
+                ]
+            ]
         ]);
     }
 
@@ -243,8 +266,7 @@ class CashSession extends Model
         $this->calculateDifference();
 
         // Establecer datos de cierre
-        $this->closing_date = now()->toDateString();
-        $this->closing_time = now()->toTimeString();
+        $this->closed_at = now();
         $this->closing_notes = $notes;
         $this->status = self::STATUS_CLOSED;
 

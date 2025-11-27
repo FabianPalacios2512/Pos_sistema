@@ -167,7 +167,7 @@ export const invoicesService = {
         // Crear nueva factura usando los datos de la cotización
         const newInvoiceData = {
           type: 'invoice',
-          customer_id: conversionData.customer_id || quotation.customer_id || 7,
+          customer_id: conversionData.customer_id || quotation.customer_id || 1,
           customer_name: conversionData.customer_name || quotation.customer_name || 'Cliente General',
           date: new Date().toISOString().split('T')[0],
           due_date: conversionData.due_date || new Date().toISOString().split('T')[0],

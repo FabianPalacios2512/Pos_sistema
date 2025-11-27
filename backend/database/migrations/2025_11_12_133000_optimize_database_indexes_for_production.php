@@ -12,6 +12,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Asegurar que la columna cash_session_id exista en invoices antes de indexar
+        if (Schema::hasTable('invoices') && !Schema::hasColumn('invoices', 'cash_session_id')) {
+            Schema::table('invoices', function (Blueprint $table) {
+                $table->foreignId('cash_session_id')->nullable()->after('customer_id');
+
+                if (Schema::hasTable('cash_sessions')) {
+                    $table->foreign('cash_session_id')->references('id')->on('cash_sessions')->nullOnDelete();
+                }
+            });
+        }
+
         // Verificar si los índices ya existen antes de crearlos
         $indexes = DB::select("SHOW INDEX FROM invoices WHERE Key_name = 'idx_invoices_date_status'");
 
@@ -62,7 +73,7 @@ return new class extends Migration
                 $table->index('user_id', 'idx_sessions_user');
 
                 // Índice compuesto para fecha y estado
-                $table->index(['opening_date', 'status'], 'idx_sessions_date_status');
+                $table->index(['opened_at', 'status'], 'idx_sessions_date_status');
             });
         }
 

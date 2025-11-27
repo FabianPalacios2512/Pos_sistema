@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('user_notification_views')) {
-            return;
-        }
+        Schema::dropIfExists('user_notification_views');
+
         Schema::create('user_notification_views', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

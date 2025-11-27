@@ -1062,6 +1062,7 @@
 
 
 <script setup>
+import { apiCall } from '../services/api.js'
 import { ref, reactive, computed, onMounted, onBeforeUnmount, onUnmounted, watch, nextTick } from 'vue'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
@@ -1760,60 +1761,14 @@ const applyPromoCode = async () => {
   
   try {
     // Validar código promocional usando la API del backend (incluye validación de uso por usuario)
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-    const apiUrl = `${baseUrl}/api/discounts/validate-code`
-    console.log('🔍 URL API completa:', apiUrl)
-    console.log('🔍 VITE_API_URL:', import.meta.env.VITE_API_URL)
-    
-    const validationResponse = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        code: promoCode.value.trim(),
-        customer_id: selectedCustomer.value?.id,
-        cart_total: subtotal.value,
-        customer_email: selectedCustomer.value?.email,
-        customer_phone: selectedCustomer.value?.phone,
-        user_identifier: getUserIdentifier() // Identificador consistente de usuario
-      })
+    const validationResult = await apiCall('/discounts/validate-code', 'POST', {
+      code: promoCode.value.trim(),
+      customer_id: selectedCustomer.value?.id,
+      cart_total: subtotal.value,
+      customer_email: selectedCustomer.value?.email,
+      customer_phone: selectedCustomer.value?.phone,
+      user_identifier: getUserIdentifier() // Identificador consistente de usuario
     })
-
-    // Verificar si la respuesta es válida
-    if (!validationResponse.ok) {
-      try {
-        const errorData = await validationResponse.json()
-        console.error('❌ Error en respuesta de API:', validationResponse.status, errorData)
-        
-        // Mostrar el mensaje específico del backend si está disponible
-        if (errorData.message) {
-          promoError.value = errorData.message
-        } else {
-          // Mensajes específicos según el código de error HTTP
-          switch (validationResponse.status) {
-            case 404:
-              promoError.value = 'Código de descuento no encontrado'
-              break
-            case 422:
-              promoError.value = 'Datos de validación incorrectos'
-              break
-            case 429:
-              promoError.value = 'Demasiados intentos, espera un momento'
-              break
-            default:
-              promoError.value = 'Error al validar el código de descuento'
-          }
-        }
-      } catch (parseError) {
-        console.error('❌ Error al parsear respuesta de error:', parseError)
-        promoError.value = 'Error al conectar con el servidor'
-      }
-      return
-    }
-
-    const validationResult = await validationResponse.json()
 
     if (!validationResult.success) {
       promoError.value = validationResult.message
@@ -1847,7 +1802,7 @@ const applyPromoCode = async () => {
     
   } catch (error) {
     console.error('❌ Error al validar código promocional:', error)
-    promoError.value = 'Error al aplicar el código promocional'
+    promoError.value = error.message || 'Error al aplicar el código promocional'
   }
 }
 
@@ -2380,7 +2335,7 @@ const handlePaymentConfirmed = async (paymentData) => {
         invoiceNumber: 'Generando...', // Placeholder temporal hasta crear en backend
         date: toMySQLDateTime(currentDate),
         due_date: toMySQLDateTime(dueDate),
-        customer_id: selectedCustomer.value?.id || 7, // Cliente General por defecto (ID 7)
+        customer_id: selectedCustomer.value?.id || 1, // Cliente General por defecto (ID 1)
         customer: selectedCustomer.value?.name || 'Cliente General',
         cashier: getCurrentSeller(),
         companyInfo: {
@@ -2427,7 +2382,7 @@ const handlePaymentConfirmed = async (paymentData) => {
       
       const invoiceData = {
         type: 'invoice',
-        customer_id: lastSale.value.customer_id || 7, // Asegurar que siempre haya un customer_id (Cliente General)
+        customer_id: lastSale.value.customer_id || 1, // Asegurar que siempre haya un customer_id (Cliente General)
         date: lastSale.value.date.split('T')[0],
         due_date: lastSale.value.due_date.split('T')[0],
         subtotal: parseFloat(lastSale.value.subtotal),
@@ -2653,13 +2608,8 @@ const handleSendWhatsApp = async () => {
     
     if ((!customerInfo || customerInfo.id === 7) && lastSale.value?.customer_id) {
       try {
-        const customerResponse = await fetch(`http://localhost:8000/api/customers/${lastSale.value.customer_id}`, {
-          headers: {
-            'Authorization': `Bearer ${authService.getToken()}`
-          }
-        })
-        if (customerResponse.ok) {
-          const result = await customerResponse.json()
+        const result = await apiCall(`/customers/${lastSale.value.customer_id}`)
+        if (result.success) {
           customerInfo = result.data
         }
       } catch (error) {
@@ -2979,15 +2929,16 @@ Saludos cordiales,
 ${systemSettings.company_name || 'Mi Empresa'}`)
     
     // Enviar al endpoint de email
-    const response = await fetch('http://localhost:8000/api/email/send-invoice', {
+    const headers = {
+      'Authorization': `Bearer ${authService.getToken()}`,
+      'Accept': 'application/json'
+    }
+    
+    const result = await apiCall('/email/send-invoice', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authService.getToken()}`
-      },
+      headers: headers,
       body: formData
     })
-    
-    const result = await response.json()
     
     if (!response.ok || !result.success) {
       // Manejar errores específicos
@@ -3153,7 +3104,7 @@ const confirmQuotation = async () => {
     // Preparar datos de la cotización
     const quoteData = {
       type: 'quote', // Campo requerido
-      customer_id: selectedCustomer.value?.id || 7, // Usar cliente por defecto ID=7 (Cliente General) si no hay seleccionado
+      customer_id: selectedCustomer.value?.id || 1, // Usar cliente por defecto ID=1 (Cliente General) si no hay seleccionado
       date: new Date().toISOString().split('T')[0], // Campo requerido formato YYYY-MM-DD
       subtotal: subtotal.value,
       tax_amount: tax.value,

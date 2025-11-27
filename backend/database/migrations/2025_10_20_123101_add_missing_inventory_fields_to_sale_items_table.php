@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sale_items', function (Blueprint $table) {
-            $table->decimal('unit_cost', 10, 2)->nullable()->after('unit_price')->comment('Costo unitario del producto al momento de la venta');
-            $table->decimal('profit_margin', 5, 2)->nullable()->after('unit_cost')->comment('Margen de ganancia en porcentaje');
-            $table->decimal('profit_amount', 10, 2)->nullable()->after('profit_margin')->comment('Monto de ganancia total');
+            if (!Schema::hasColumn('sale_items', 'unit_cost')) {
+                $table->decimal('unit_cost', 10, 2)->nullable()->after('unit_price')->comment('Costo unitario del producto al momento de la venta');
+            }
+            if (!Schema::hasColumn('sale_items', 'profit_margin')) {
+                $table->decimal('profit_margin', 5, 2)->nullable()->after('unit_cost')->comment('Margen de ganancia en porcentaje');
+            }
+            if (!Schema::hasColumn('sale_items', 'profit_amount')) {
+                $table->decimal('profit_amount', 10, 2)->nullable()->after('profit_margin')->comment('Monto de ganancia total');
+            }
         });
     }
 

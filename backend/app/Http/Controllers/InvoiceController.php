@@ -171,6 +171,7 @@ class InvoiceController extends Controller
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
+            \Log::error('POS Invoice Error: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear la factura',
@@ -401,6 +402,15 @@ class InvoiceController extends Controller
         try {
             // Log para debug
             \Log::info('POS Invoice Request Data:', $request->all());
+
+            // Fix for legacy frontend sending customer_id 7 (Cliente General) which might not exist
+            if ($request->customer_id == 7) {
+                $customerExists = DB::table('customers')->where('id', 7)->exists();
+                if (!$customerExists) {
+                    $request->merge(['customer_id' => 1]);
+                    \Log::info('Mapped customer_id 7 to 1 because 7 does not exist.');
+                }
+            }
 
             // Obtener códigos de métodos de pago válidos de la base de datos
             $validPaymentMethods = DB::table('payment_methods')

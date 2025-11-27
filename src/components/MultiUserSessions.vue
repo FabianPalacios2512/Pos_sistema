@@ -129,6 +129,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { apiCall } from '../services/api.js'
 
 // Estados reactivos
 const activeSessions = ref([])
@@ -164,11 +165,9 @@ const loadActiveSessions = async () => {
     loading.value = true
     
     // Obtener lista de usuarios
-    const usersResponse = await fetch('http://localhost:8000/api/users', {
-      headers: { 'Accept': 'application/json' }
-    })
+    const usersData = await apiCall('/users')
     
-    if (!usersResponse.ok) {
+    if (!usersData || !usersData.data) {
       // Si no tenemos endpoint de usuarios, simular con datos conocidos
       const mockUsers = [
         { id: 1, name: 'Administrador Sistema', email: 'admin@pos.com' },
@@ -179,7 +178,6 @@ const loadActiveSessions = async () => {
       return
     }
     
-    const usersData = await usersResponse.json()
     await loadSessionsForUsers(usersData.data || usersData)
     
   } catch (error) {
@@ -193,11 +191,7 @@ const loadActiveSessions = async () => {
 const loadSessionsForUsers = async (users) => {
   const sessionsPromises = users.map(async (user) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/cash-sessions/user/${user.id}/current`, {
-        headers: { 'Accept': 'application/json' }
-      })
-      
-      const data = await response.json()
+      const data = await apiCall(`/cash-sessions/user/${user.id}/current`)
       
       if (data.success && data.session) {
         return {

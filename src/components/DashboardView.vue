@@ -1060,25 +1060,10 @@ const loadAndShowInventoryAlerts = async () => {
     }
     
     // Cargar alertas y predicciones en paralelo
-    const [alertsResponse, predictionsResponse] = await Promise.all([
-      fetch('http://localhost:8000/api/inventory/test/alerts?period=month', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      }),
-      fetch('http://localhost:8000/api/inventory/test/predictions?period=month', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      })
+    const [alertsData, predictionsData] = await Promise.all([
+      apiCall('/inventory/test/alerts?period=month'),
+      apiCall('/inventory/test/predictions?period=month')
     ])
-    
-    const alertsData = await alertsResponse.json()
-    const predictionsData = await predictionsResponse.json()
     
     const notificationsToShow = []
     
@@ -1190,13 +1175,8 @@ const handleDismissForever = async (alert) => {
         return
       }
       
-      const response = await fetch('http://localhost:8000/api/inventory/test/alerts/dismiss', {
+      const data = await apiCall('/inventory/test/alerts/dismiss', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({
           alert_key: alert.alert_key || alert.id,
           alert_type: alert.category,
@@ -1204,8 +1184,6 @@ const handleDismissForever = async (alert) => {
           user_id: 1 // Default user para pruebas
         })
       })
-
-      const data = await response.json()
       
       if (data.success) {
         // Debug logs removed for production

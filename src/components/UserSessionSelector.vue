@@ -83,6 +83,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import authService from '../services/authService.js'
 import { cashSessionService } from '../services/cashSessionService.js'
+import { apiCall } from '../services/api.js'
 
 const props = defineProps({
   currentUser: {
@@ -110,29 +111,16 @@ const loadAvailableUsers = async () => {
     loading.value = true
     
     // Obtener lista de usuarios (necesitaremos crear este endpoint)
-    const usersResponse = await fetch('http://localhost:8000/api/users', {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${authService.getToken()}`
-      }
-    })
+    const usersData = await apiCall('/users')
     
-    if (usersResponse.ok) {
-      const usersData = await usersResponse.json()
+    if (usersData && usersData.data) {
       
       // Para cada usuario, verificar si tiene sesión abierta
       const usersWithSessions = await Promise.all(
         usersData.data.map(async (user) => {
           try {
             // Verificar sesión de caja de cada usuario
-            const sessionResponse = await fetch(`http://localhost:8000/api/cash-sessions/user/${user.id}/current`, {
-              headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${authService.getToken()}`
-              }
-            })
-            
-            const sessionData = await sessionResponse.json()
+            const sessionData = await apiCall(`/cash-sessions/user/${user.id}/current`)
             
             return {
               ...user,

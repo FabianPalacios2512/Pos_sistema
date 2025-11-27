@@ -30,11 +30,11 @@ class CashSessionController extends Controller
             }
 
             if ($request->filled('date_from')) {
-                $query->whereDate('opening_date', '>=', $request->date_from);
+                $query->whereDate('opened_at', '>=', $request->date_from);
             }
 
             if ($request->filled('date_to')) {
-                $query->whereDate('opening_date', '<=', $request->date_to);
+                $query->whereDate('opened_at', '<=', $request->date_to);
             }
 
             $sessions = $query->get();
@@ -300,11 +300,10 @@ class CashSessionController extends Controller
 
             // Actualizar sesión con detalles de cierre
             $session->update([
-                'closing_date' => now()->toDateString(),
-                'closing_time' => now()->toTimeString(),
+                'closed_at' => now(),
                 'expected_amount' => $expectedAmount,
                 'actual_amount' => $actualAmount,
-                'difference' => $difference,
+                'difference_amount' => $difference,
                 'closing_notes' => $request->closing_notes,
                 'expenses_detail' => $request->expenses_detail,
                 'closing_status' => $closingStatus,
@@ -400,13 +399,13 @@ class CashSessionController extends Controller
             if ($session->status === 'closed') {
                 $timeline[] = [
                     'type' => 'closing',
-                    'timestamp' => "{$session->closing_date} {$session->closing_time}",
+                    'timestamp' => $session->closed_at,
                     'description' => 'Cierre de caja',
                     'amount' => $session->actual_amount,
                     'details' => [
                         'expected_amount' => $session->expected_amount,
                         'actual_amount' => $session->actual_amount,
-                        'difference' => $session->difference,
+                        'difference' => $session->difference_amount,
                         'status' => $session->closing_status,
                         'notes' => $session->closing_notes,
                         'expenses' => $session->expenses_detail,
@@ -506,8 +505,8 @@ class CashSessionController extends Controller
                 'session_info' => [
                     'id' => $session->id,
                     'opening_amount' => $session->opening_amount,
-                    'opening_time' => $session->opening_time,
-                    'opening_date' => $session->opening_date,
+                    'opening_time' => $session->opened_at ? $session->opened_at->toTimeString() : null,
+                    'opening_date' => $session->opened_at ? $session->opened_at->toDateString() : null,
                     'status' => $session->status
                 ],
                 'sales_summary' => [
@@ -587,7 +586,7 @@ class CashSessionController extends Controller
             $today = now()->toDateString();
 
             $sessions = CashSession::forUser($userId)
-                ->whereDate('opening_date', $today)
+                ->whereDate('opened_at', $today)
                 ->get();
 
             $summary = [

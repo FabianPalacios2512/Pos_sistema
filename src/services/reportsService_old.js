@@ -4,7 +4,7 @@ import { productsService } from './productsService.js'
 import { customersService } from './customersService.js'
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8000/api'
+const API_URL = '/api'
 
 export const reportsService = {
   // Obtener datos de ventas por período
