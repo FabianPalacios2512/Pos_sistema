@@ -32,6 +32,7 @@
         @toggleAutoHide="autoHideEnabled = !autoHideEnabled"
         @toggleSidebarCollapsed="sidebarCollapsed = !sidebarCollapsed"
         @navigate-to-settings="setCurrentModule('settings')"
+        @toggle-radio="radioWidgetOpen = !radioWidgetOpen"
         @logout="handleLogout"
       />
 
@@ -150,6 +151,12 @@
       </div>
     </div>
 
+    <!-- Radio Widget Flotante (Global) -->
+    <RadioWidget 
+      :is-open="radioWidgetOpen"
+      @close="radioWidgetOpen = false"
+    />
+
   </div>
 </template>
 
@@ -169,6 +176,9 @@ import Sidebar from '../components/Sidebar.vue'
 
 // Importar componente AppHeader
 import AppHeader from '../components/AppHeader.vue'
+
+// Importar RadioWidget
+import RadioWidget from '../components/RadioWidget.vue'
 
 // Router
 const router = useRouter()
@@ -210,6 +220,9 @@ const sidebarOpen = ref(true)
 const sidebarCollapsed = ref(true) // Nueva variable para estado colapsado del sidebar (inicia cerrado)
 const currentModule = ref('dashboard')
 const moduleQueryParams = ref({}) // Query params para módulos (ej: {filter: 'inactive'})
+
+// Estado del Radio Widget
+const radioWidgetOpen = ref(false)
 
 // Usuario actual - obtenido de la autenticación
 const currentUser = ref({

@@ -115,6 +115,40 @@
             </svg>
           </button>
           
+          <!-- Botón Radio - Indicadores solo cuando reproduce -->
+          <button
+            @click="$emit('toggle-radio')"
+            class="hidden md:flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white hover:scale-105"
+            :title="isRadioActive ? `Reproduciendo: ${currentRadioName}` : 'Radio'"
+          >
+            <!-- Punto rojo pulsante (SOLO cuando está reproduciendo) -->
+            <span 
+              v-if="isRadioActive"
+              class="absolute -top-1 -right-1 flex h-3 w-3"
+            >
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+
+            <!-- Icono de Radio -->
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+            
+            <!-- Texto siempre "Radio" -->
+            <span class="text-sm font-bold">Radio</span>
+
+            <!-- Barras de sonido animadas (SOLO cuando está reproduciendo) -->
+            <div 
+              v-if="isRadioActive" 
+              class="flex items-center space-x-0.5 ml-1"
+            >
+              <div class="w-0.5 h-2 bg-white rounded-full animate-sound-bar" style="animation-delay: 0s"></div>
+              <div class="w-0.5 h-3 bg-white rounded-full animate-sound-bar" style="animation-delay: 0.1s"></div>
+              <div class="w-0.5 h-2.5 bg-white rounded-full animate-sound-bar" style="animation-delay: 0.2s"></div>
+            </div>
+          </button>
+
           <!-- Botón 105 IA -->
           <button
             @click="toggleAIChat"
@@ -293,8 +327,12 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AI105Chat from './AI105Chat.vue'
+import { useRadioState } from '../composables/useRadioState'
 
 const router = useRouter()
+
+// Composable de estado de radio - Destructurado para reactividad correcta
+const { isPlaying, currentRadioName, currentRadioId, isRadioActive, radioStatus } = useRadioState()
 
 // Props
 const props = defineProps({
@@ -340,7 +378,8 @@ const emit = defineEmits([
   'show-video-tutorial',
   'toggleSidebar',
   'toggleAutoHide',
-  'toggleSidebarCollapsed'
+  'toggleSidebarCollapsed',
+  'toggle-radio'
 ])
 
 // Estados reactivos
@@ -499,3 +538,19 @@ onMounted(() => {
   })
 })
 </script>
+
+<style scoped>
+/* Animación de barras de sonido para el botón de radio */
+@keyframes sound-bar {
+  0%, 100% {
+    height: 0.5rem;
+  }
+  50% {
+    height: 0.75rem;
+  }
+}
+
+.animate-sound-bar {
+  animation: sound-bar 0.6s ease-in-out infinite;
+}
+</style>

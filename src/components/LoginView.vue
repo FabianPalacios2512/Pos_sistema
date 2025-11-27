@@ -28,29 +28,29 @@
 
         <form @submit.prevent="handleLogin" class="space-y-6">
           
-          <!-- Campo Cédula -->
+          <!-- Campo Email -->
           <div>
-            <label for="cc" class="block text-sm font-medium text-gray-700 mb-2">
-              Cédula de Ciudadanía
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+              Correo Electrónico
             </label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 011-1h2a2 2 0 011 1v2m-4 0a2 2 0 01-2 2h2a2 2 0 01-2-2m0 0h4v2m-6 4h2m4 0h2"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                 </svg>
               </div>
               <input
-                id="cc"
-                v-model="credentials.cc"
-                type="text"
-                autocomplete="username"
+                id="email"
+                v-model="credentials.email"
+                type="email"
+                autocomplete="email"
                 required
-                placeholder="Ingrese su cédula"
+                placeholder="ejemplo@correo.com"
                 class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500': errors.cc }"
+                :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-500': errors.email }"
               />
             </div>
-            <p v-if="errors.cc" class="mt-1 text-sm text-red-600">{{ errors.cc }}</p>
+            <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
           </div>
 
           <!-- Campo Contraseña -->
@@ -179,7 +179,7 @@ const showPassword = ref(false)
 
 // Credenciales del formulario
 const credentials = reactive({
-  cc: '',
+  email: '',
   password: '',
   remember: false
 })
@@ -191,7 +191,7 @@ const message = reactive({
 })
 
 const errors = reactive({
-  cc: '',
+  email: '',
   password: ''
 })
 
@@ -204,7 +204,7 @@ const isDevelopment = computed(() => {
 const clearMessages = () => {
   message.text = ''
   message.type = ''
-  errors.cc = ''
+  errors.email = ''
   errors.password = ''
 }
 
@@ -213,11 +213,11 @@ const validateForm = () => {
   clearMessages()
   let isValid = true
 
-  if (!credentials.cc.trim()) {
-    errors.cc = 'La cédula es requerida'
+  if (!credentials.email.trim()) {
+    errors.email = 'El correo es requerido'
     isValid = false
-  } else if (!/^\d{8,12}$/.test(credentials.cc.trim())) {
-    errors.cc = 'La cédula debe tener entre 8 y 12 dígitos'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credentials.email.trim())) {
+    errors.email = 'Ingrese un correo válido'
     isValid = false
   }
 
@@ -241,7 +241,7 @@ const handleLogin = async () => {
 
   try {
     const response = await authService.login({
-      cc: credentials.cc.trim(),
+      email: credentials.email.trim(),
       password: credentials.password
     })
 
@@ -276,8 +276,8 @@ const handleLogin = async () => {
     
     if (error.errors) {
       // Errores de validación del servidor
-      if (error.errors.cc) {
-        errors.cc = error.errors.cc[0]
+      if (error.errors.email) {
+        errors.email = error.errors.email[0]
       }
       if (error.errors.password) {
         errors.password = error.errors.password[0]

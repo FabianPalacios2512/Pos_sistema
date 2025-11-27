@@ -14,22 +14,22 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'cc' => 'required|string', // Cambiar a cédula
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // Buscar usuario por cédula en lugar de email
-        $user = User::with('role')->where('cc', $request->cc)->first();
+        // Buscar usuario por email
+        $user = User::with('role')->where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'cc' => ['Las credenciales proporcionadas son incorrectas.'],
+                'email' => ['Las credenciales proporcionadas son incorrectas.'],
             ]);
         }
 
         if (!$user->active) {
             throw ValidationException::withMessages([
-                'cc' => ['Tu cuenta está desactivada.'],
+                'email' => ['Tu cuenta está desactivada.'],
             ]);
         }
 

@@ -15,7 +15,7 @@ const authService = {
         response = { data: await mockAuthService.login(credentials) };
       } else {
         response = await apiClient.post('/login', {
-          cc: credentials.cc, // Usar cédula como lo diseñamos
+          email: credentials.email, // Usar email
           password: credentials.password
         });
       }

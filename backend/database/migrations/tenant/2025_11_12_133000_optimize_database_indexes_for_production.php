@@ -125,7 +125,8 @@ return new class extends Migration
             });
         }
 
-        echo "✅ Índices de optimización aplicados correctamente\n";
+        // Log en lugar de echo para no contaminar respuestas JSON
+        \Log::info('✅ Índices de optimización aplicados correctamente');
     }
 
     /**
@@ -195,10 +196,10 @@ return new class extends Migration
                 });
             }
 
-            echo "✅ Rollback de índices completado\n";
+            \Log::info('✅ Rollback de índices completado');
 
         } catch (Exception $e) {
-            echo "⚠️ Error durante el rollback: " . $e->getMessage() . "\n";
+            \Log::error('⚠️ Error durante el rollback: ' . $e->getMessage());
         }
     }
 };

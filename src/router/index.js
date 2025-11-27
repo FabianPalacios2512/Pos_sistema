@@ -4,10 +4,21 @@ import authService from '../services/authService.js'
 
 // Componentes
 const LoginView = () => import('../components/LoginView.vue')
+const SaasRegister = () => import('../views/SaasRegister.vue') // Importar el nuevo componente
 const PosCompleto = () => import('../views/PosCompleto.vue')
 const AdminDashboardView = () => import('../views/AdminDashboardView.vue')
 
 const routes = [
+  // Ruta de Registro SaaS
+  {
+    path: '/register',
+    name: 'Register',
+    component: SaasRegister,
+    meta: {
+      title: 'Crear Cuenta - 105 POS',
+      requiresAuth: false
+    }
+  },
   // Ruta raíz - redirige según autenticación - TODOS van al POS
   {
     path: '/',

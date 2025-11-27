@@ -30,7 +30,7 @@ export function usePermissions() {
     }
     
     // Si el usuario tiene el permiso especial 'ALL' o 'admin', tiene todos los permisos
-    if (userPermissions.value.includes('ALL') || userPermissions.value.includes('admin')) {
+    if (userPermissions.value.includes('ALL') || userPermissions.value.includes('all') || userPermissions.value.includes('admin')) {
       return true
     }
     
@@ -49,7 +49,7 @@ export function usePermissions() {
     }
     
     // Si tiene permiso ALL o admin
-    if (userPermissions.value.includes('ALL') || userPermissions.value.includes('admin')) {
+    if (userPermissions.value.includes('ALL') || userPermissions.value.includes('all') || userPermissions.value.includes('admin')) {
       return true
     }
     
@@ -92,7 +92,7 @@ export function usePermissions() {
     }
     
     // Si tiene permiso ALL o admin, tiene acceso a todos
-    if (userPermissions.value.includes('ALL') || userPermissions.value.includes('admin')) {
+    if (userPermissions.value.includes('ALL') || userPermissions.value.includes('all') || userPermissions.value.includes('admin')) {
       return [
         'dashboard', 'pos', 'invoices', 'returns', 
         'products', 'categories', 'stock', 'intelligent_inventory',

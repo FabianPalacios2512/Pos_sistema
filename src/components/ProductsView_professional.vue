@@ -2145,7 +2145,7 @@ const saveProduct = async () => {
       sku: productForm.value.sku?.trim() || `SKU-${Date.now()}`, // Generar SKU automático si está vacío
       barcode: productForm.value.barcode?.trim() || '',
       category_id: parseInt(productForm.value.category_id),
-      supplier_id: 1, // Por ahora usar proveedor por defecto
+      supplier_id: null, // Permitir nulo ya que no hay selector de proveedor en el formulario
       cost_price: parseFloat(productForm.value.cost),
       sale_price: parseFloat(productForm.value.price),
       wholesale_price: null,
