@@ -168,10 +168,26 @@
                 :class="[
                   message.type === 'user' 
                     ? 'bg-slate-900 text-white rounded-tr-none' 
-                    : 'bg-white border border-gray-100 text-slate-700 rounded-tl-none shadow-sm'
+                    : message.isLimit
+                      ? 'bg-white border-l-4 border-orange-500 text-slate-800 rounded-tl-none shadow-md'
+                      : message.isError
+                        ? 'bg-red-50 border border-red-200 text-slate-800 rounded-tl-none shadow-sm'
+                        : 'bg-white border border-gray-100 text-slate-700 rounded-tl-none shadow-sm'
                 ]"
               >
-                <p class="whitespace-pre-line">{{ message.text }}</p>
+                <!-- Mensaje de límite con diseño profesional -->
+                <div v-if="message.isLimit" class="space-y-3">
+                  <div class="flex items-center gap-2 pb-2 border-b border-gray-200">
+                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="font-bold text-slate-900 text-xs uppercase tracking-wide">Límite Alcanzado</span>
+                  </div>
+                  <p class="whitespace-pre-line text-slate-700">{{ message.text }}</p>
+                </div>
+                
+                <!-- Mensajes normales -->
+                <p v-else class="whitespace-pre-line">{{ message.text }}</p>
 
                 <!-- Botón de Acción Sugerida -->
                 <div v-if="message.suggested_action" class="mt-3 pt-3 border-t border-gray-100">
@@ -502,11 +518,41 @@ export default {
         }
       } catch (error) {
         console.error('Error al contactar IA:', error);
-        messages.value.push({
-          type: 'ai',
-          text: 'Lo siento, tuve un problema al procesar tu solicitud. Por favor verifica tu conexión o intenta más tarde.',
-          timestamp: getCurrentTime()
-        })
+        
+        // Manejar específicamente el error 429 (límite de IA alcanzado)
+        if (error.response && error.response.status === 429) {
+          const errorData = error.response.data;
+          let errorMessage = 'LÍMITE DE PETICIONES ALCANZADO';
+          
+          // Mostrar tiempo de espera si está disponible
+          if (errorData.minutes_remaining && errorData.wait_until) {
+            const mins = Math.ceil(errorData.minutes_remaining); // Redondear hacia arriba
+            errorMessage = `LÍMITE DE PETICIONES ALCANZADO\n\n`;
+            errorMessage += `Has alcanzado tu límite de ${errorData.usage?.limit_hour || 8} peticiones por hora.\n\n`;
+            errorMessage += `Disponible nuevamente en ${mins} minuto${mins !== 1 ? 's' : ''} (${errorData.wait_until}).\n\n`;
+            errorMessage += `USO ACTUAL\n`;
+            errorMessage += `Esta hora: ${errorData.usage?.current_hour || 0} de ${errorData.usage?.limit_hour || 8}\n`;
+            errorMessage += `Hoy: ${errorData.usage?.current_day || 0} de ${errorData.usage?.limit_day || 50}\n\n`;
+            errorMessage += `Actualiza tu plan para obtener más peticiones.`;
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+          
+          messages.value.push({
+            type: 'ai',
+            text: errorMessage,
+            timestamp: getCurrentTime(),
+            isError: true,
+            isLimit: true
+          });
+        } else {
+          // Error genérico
+          messages.value.push({
+            type: 'ai',
+            text: 'Lo siento, tuve un problema al procesar tu solicitud. Por favor verifica tu conexión o intenta más tarde.',
+            timestamp: getCurrentTime()
+          });
+        }
       } finally {
         isTyping.value = false
         scrollToBottom()

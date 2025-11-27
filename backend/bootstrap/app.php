@@ -12,7 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Registrar middleware de super admin y AI limits
+        $middleware->alias([
+            'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+            'ai.limit' => \App\Http\Middleware\CheckAiUsageLimit::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

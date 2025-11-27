@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\CashSessionController;
 use App\Http\Controllers\Api\ReturnsController;
 use App\Http\Controllers\Api\ProductAnalyticsController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\Tenant\AiUsageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,6 +75,10 @@ Route::post('/optimized/clear-cache', [\App\Http\Controllers\Api\OptimizedDashbo
 
 // Dashboard ventas hoy en hora Colombia (sin auth para pruebas)
 Route::get('/dashboard/ventas-hoy', [\App\Http\Controllers\DashboardController::class, 'ventasHoy']);
+
+// ===== AI USAGE - Endpoints públicos para monitoreo =====
+Route::get('/ai/usage-status', [AiUsageController::class, 'getUsageStatus']);
+Route::get('/ai/check-limit', [AiUsageController::class, 'checkLimit']);
 
 // Rutas protegidas (requieren autenticación)
 // ===== RUTAS AUTENTICADAS =====
@@ -199,15 +204,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/returns/metrics/{period}', [App\Http\Controllers\Api\ReturnsController::class, 'getMetrics']);
     // ==================== FIN DEVOLUCIONES ====================
 
-    // ==================== AI CHAT ====================
-    Route::post('/ai/chat', [\App\Http\Controllers\Api\AIController::class, 'chat']);
-    Route::post('/ai/clear-history', [\App\Http\Controllers\Api\AIController::class, 'clearHistory']);
+    // ==================== AI CHAT (con límites de uso) ====================
+    Route::middleware(['ai.limit'])->group(function () {
+        Route::post('/ai/chat', [\App\Http\Controllers\Api\AIController::class, 'chat']);
 
-    // ==================== AI ACTIONS (Acciones ejecutables) ====================
-    Route::post('/ai/actions/create-discount', [\App\Http\Controllers\Api\AIActionsController::class, 'createDiscount']);
-    Route::post('/ai/actions/send-bulk-whatsapp', [\App\Http\Controllers\Api\AIActionsController::class, 'sendBulkWhatsApp']);
-    Route::post('/ai/actions/create-campaign', [\App\Http\Controllers\Api\AIActionsController::class, 'createCampaign']);
-    Route::post('/ai/actions/create-product', [\App\Http\Controllers\Api\AIActionsController::class, 'createProduct']);
+        // AI ACTIONS (Acciones ejecutables con límites)
+        Route::post('/ai/actions/create-discount', [\App\Http\Controllers\Api\AIActionsController::class, 'createDiscount']);
+        Route::post('/ai/actions/send-bulk-whatsapp', [\App\Http\Controllers\Api\AIActionsController::class, 'sendBulkWhatsApp']);
+        Route::post('/ai/actions/create-campaign', [\App\Http\Controllers\Api\AIActionsController::class, 'createCampaign']);
+        Route::post('/ai/actions/create-product', [\App\Http\Controllers\Api\AIActionsController::class, 'createProduct']);
+    });
+
+    // Rutas de IA sin límite (no consumen tokens)
+    Route::post('/ai/clear-history', [\App\Http\Controllers\Api\AIController::class, 'clearHistory']);
     Route::post('/ai/actions/create-category', [\App\Http\Controllers\Api\AIActionsController::class, 'createCategory']);
 
     // ==================== AI MONITORING (Solo Admin) ====================

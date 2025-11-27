@@ -45,6 +45,16 @@ export const handleApiResponse = async (response) => {
       throw new Error(`Error de validación: ${errorMessages}`)
     }
     
+    // Si es error 429 (límite de IA), crear un error especial con los datos completos
+    if (response.status === 429) {
+      const error = new Error(data.message || 'Límite alcanzado')
+      error.response = {
+        status: 429,
+        data: data
+      }
+      throw error
+    }
+    
     throw new Error(data.message || `HTTP error! status: ${response.status}`)
   }
   

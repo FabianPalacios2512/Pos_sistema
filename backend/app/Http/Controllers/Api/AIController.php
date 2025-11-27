@@ -13,6 +13,7 @@ use App\Models\InvoiceItem;
 use App\Models\AiUsageLog;
 use App\Models\ConversationHistory;
 use App\Models\Customer;
+use App\Services\AiUsageService;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -736,6 +737,7 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                             }
                         }
 
+                        // Registrar en tabla tenant (histórico local)
                         AiUsageLog::create([
                             'user_id' => auth()->id(),
                             'api_key_index' => $keyIndex,
@@ -750,6 +752,11 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                             'endpoint' => 'chat',
                             'ip_address' => request()->ip(),
                         ]);
+
+                        // ✅ Registrar en tabla central para límites y facturación
+                        $aiUsageService = app(AiUsageService::class);
+                        $cost = ($totalTokens / 1000000) * 0.50; // Costo aproximado
+                        $aiUsageService->logUsage(tenant('id'), $totalTokens, $cost);
                     } catch (\Exception $e) {
                         Log::error("[AI Usage Log] Error: " . $e->getMessage());
                     }
