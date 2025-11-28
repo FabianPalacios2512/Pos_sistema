@@ -102,21 +102,23 @@ export const appStore = reactive({
     
     try {
       this.loading.paymentMethods = true
-  // console.log('💳 Precargando métodos de pago...')
+      console.log('💳 Precargando métodos de pago...')
       
       const response = await apiClient.get('/payment-methods')
+      console.log('📦 Respuesta payment-methods:', response.data)
       if (response.data.success) {
         this.paymentMethods = response.data.data
+        console.log('✅ Métodos de pago cargados:', this.paymentMethods.length)
       }
     } catch (error) {
-  // console.error('❌ Error precargando métodos de pago:', error)
+      console.error('❌ Error precargando métodos de pago:', error.response?.data || error.message)
     } finally {
       this.loading.paymentMethods = false
     }
   },
 
-  async loadSystemSettings() {
-    if (this.loading.systemSettings) return
+  async loadSystemSettings(force = false) {
+    if (this.loading.systemSettings && !force) return
     
     try {
       this.loading.systemSettings = true
@@ -125,6 +127,7 @@ export const appStore = reactive({
       if (response.data.success) {
         // El backend devuelve un objeto directo, no un array de key-value
         this.systemSettings = response.data.data
+        console.log('⚙️ System settings loaded/reloaded:', this.systemSettings)
       }
     } catch (error) {
   // console.error('❌ Error precargando configuración:', error)
@@ -183,6 +186,14 @@ export const appStore = reactive({
   async initialize() {
     if (this.initialized) return
     
+    // Verificar si es super admin
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user?.is_super_admin) {
+      console.log('🔐 Super Admin detectado - omitiendo carga de datos de tenant');
+      this.initialized = true;
+      return;
+    }
+  
   // console.log('🚀 Inicializando store global...')
     
     // Cargar todos los datos en paralelo (incluyendo sesión de caja)

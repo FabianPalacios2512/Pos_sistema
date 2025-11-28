@@ -75,6 +75,14 @@ class CashSession extends Model
     */
 
     /**
+     * Gastos asociados a esta sesión de caja
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(\App\Models\Expense::class);
+    }
+
+    /**
      * Scope para sesiones abiertas
      */
     public function scopeOpen($query)
@@ -173,46 +181,72 @@ class CashSession extends Model
     /**
      * Actualizar totales de ventas basado en facturas con métodos de pago
      */
+    /**
+     * Actualizar totales de ventas basado en facturas y abonos
+     */
     public function updateSalesTotals()
     {
-        // NOTA: La tabla 'invoices' en el VPS no tiene la columna 'payment_method'.
-        // Por lo tanto, no podemos agrupar por método de pago.
-        // Asumiremos temporalmente que todo es efectivo o simplemente sumaremos el total.
-
-        /*
-        // Código original que falla por falta de columna payment_method
-        $invoiceTotals = $this->invoices()
-            ->selectRaw('
-                payment_method,
-                SUM(total) as total_amount,
-                COUNT(*) as count
-            ')
-            ->groupBy('payment_method')
-            ->get();
-        */
-
+        // 1. Totales de Ventas (Facturas)
         // Solución temporal: Sumar todo el total de las facturas asociadas
-        $totalSales = $this->invoices()->sum('total');
+        // Asumimos que las facturas en 'invoices' son ventas de contado o ya procesadas como tal
+        // Si hay ventas a crédito en 'invoices', deberíamos filtrarlas si tuvieran payment_method='credit'
+        // Pero como SalesController escribe en 'sales' y CashSession lee 'invoices', 
+        // asumimos que 'invoices' son las que deben contar (o el sistema está dividido).
+        // Si 'invoices' tiene payment_method, lo usamos.
+        
+        $invoices = $this->invoices;
+        $invoiceCash = 0;
+        $invoiceCard = 0;
+        $invoiceTransfer = 0;
 
-        // Inicializar totales (Asumimos todo como efectivo por defecto para evitar errores)
-        $cashSales = $totalSales;
-        $cardSales = 0;
-        $transferSales = 0;
+        foreach ($invoices as $invoice) {
+            // Si la factura tiene payment_method, lo usamos. Si no, asumimos efectivo.
+            // Si es crédito, NO suma.
+            $method = $invoice->payment_method ?? 'cash';
+            
+            if ($method === 'credit') continue;
 
-        /*
-        // Categorizar por método de pago (Deshabilitado hasta que exista la columna)
-        foreach ($invoiceTotals as $total) {
-            // ...
+            if ($method === 'cash') $invoiceCash += $invoice->total;
+            elseif ($method === 'card') $invoiceCard += $invoice->total;
+            elseif ($method === 'transfer') $invoiceTransfer += $invoice->total;
+            else $invoiceCash += $invoice->total; // Default mixed or other to cash for now
         }
-        */
 
-        // Actualizar closing_breakdown en lugar de columnas inexistentes
+        // 2. Totales de Abonos (CreditPayments)
+        // Buscamos pagos realizados por este usuario durante la sesión
+        $endTime = $this->closed_at ?? now();
+        $creditPayments = \App\Models\CreditPayment::where('user_id', $this->user_id)
+            ->where('payment_date', '>=', $this->opened_at)
+            ->where('payment_date', '<=', $endTime)
+            ->get();
+
+        $paymentCash = 0;
+        $paymentCard = 0;
+        $paymentTransfer = 0;
+
+        foreach ($creditPayments as $payment) {
+            if ($payment->method === 'cash') $paymentCash += $payment->amount;
+            elseif ($payment->method === 'card') $paymentCard += $payment->amount;
+            elseif ($payment->method === 'transfer') $paymentTransfer += $payment->amount;
+        }
+
+        // 3. Totales Combinados
+        $cashSales = $invoiceCash + $paymentCash;
+        $cardSales = $invoiceCard + $paymentCard;
+        $transferSales = $invoiceTransfer + $paymentTransfer;
+
+        // Actualizar gastos de esta sesión de caja
+        $this->total_expenses = $this->expenses()->sum('amount');
+
+        // Actualizar closing_breakdown
         $breakdown = $this->closing_breakdown ?? [];
         $breakdown['sales'] = [
             'total' => $cashSales + $cardSales + $transferSales,
             'cash' => $cashSales,
             'card' => $cardSales,
-            'transfer' => $transferSales
+            'transfer' => $transferSales,
+            'invoices_total' => $invoiceCash + $invoiceCard + $invoiceTransfer,
+            'credit_payments_total' => $paymentCash + $paymentCard + $paymentTransfer
         ];
 
         $this->closing_breakdown = $breakdown;

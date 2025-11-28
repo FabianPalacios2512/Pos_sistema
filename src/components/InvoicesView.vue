@@ -120,6 +120,7 @@
                 <option value="">Estado</option>
                 <option value="Pendiente">Pendiente</option>
                 <option value="Pagada">Pagada</option>
+                <option value="Devuelta">Devuelta</option>
               </select>
             </div>
           </div>
@@ -345,6 +346,10 @@
                       <p class="text-sm font-bold" style="color: #0F172A;">Documento: {{ selectedInvoice.invoiceNumber || selectedInvoice.number }}</p>
                       <p class="text-xs mt-1" style="color: #6B7280;">Fecha: {{ formatDate(selectedInvoice.date) }}</p>
                       <p class="text-xs" style="color: #6B7280;">Vencimiento: {{ formatDate(selectedInvoice.due_date) }}</p>
+                      <p v-if="selectedInvoice.status === 'returned' && selectedInvoice.return_reference" 
+                         class="text-xs mt-2 px-2 py-1 bg-purple-50 text-purple-700 rounded-md inline-block font-semibold border border-purple-200">
+                        🔁 Devuelta: {{ selectedInvoice.return_reference }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -400,7 +405,7 @@
                             <span class="font-semibold" style="color: #0F172A;">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
                           </div>
                           <div class="flex justify-between">
-                            <span style="color: #6B7280;">IVA (0%):</span>
+                            <span style="color: #6B7280;">IVA ({{ displayTaxRate }}%):</span>
                             <span class="font-semibold" style="color: #0F172A;">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
                           </div>
                           <div class="pt-3 mt-2" style="border-top: 1px solid #D1D5DB;">
@@ -502,6 +507,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useToast } from '../composables/useToast.js'
 import { useAuth } from '../store/auth.js'
+import { appStore } from '../store/appStore.js'
 import QuotationModal from './QuotationModal.vue'
 import PhoneInputModal from './PhoneInputModal.vue'
 import ReceiptModal from './ReceiptModal.vue'
@@ -539,6 +545,13 @@ const emit = defineEmits(['changeModule', 'open-quotation-in-pos', 'navigate'])
 // Composables
 const { showToast, showSuccess, showError } = useToast()
 const auth = useAuth()
+
+// Computed para IVA
+const displayTaxRate = computed(() => {
+  const settings = appStore.systemSettings
+  if (!settings || !settings.iva_enabled) return 0
+  return parseFloat(settings.iva_percentage || 0)
+})
 
 // Estado
 const selectedInvoice = ref(null)
@@ -711,8 +724,10 @@ const getStatusLabel = (status) => {
   const labels = {
     'Pendiente': 'Pendiente',
     'Pagada': 'Pagada',
+    'Devuelta': 'Devuelta',
     'pending': 'Pendiente',
-    'paid': 'Pagada'
+    'paid': 'Pagada',
+    'returned': 'Devuelta'
   }
   return labels[status] || 'Pendiente'
 }
@@ -767,6 +782,7 @@ const getStatusClasses = (status) => {
   if (s === 'pagada' || s === 'paid') return 'bg-emerald-50 text-emerald-700 border-emerald-100'
   if (s === 'pendiente' || s === 'pending') return 'bg-amber-50 text-amber-700 border-amber-100'
   if (s === 'anulada' || s === 'cancelled') return 'bg-rose-50 text-rose-700 border-rose-100'
+  if (s === 'devuelta' || s === 'returned') return 'bg-purple-50 text-purple-700 border-purple-100'
   return 'bg-slate-50 text-slate-600 border-slate-100'
 }
 

@@ -57,6 +57,9 @@ class SystemSettingsController extends Controller
                 'products_per_page' => 'integer|min:1|max:50',
                 'low_stock_alerts' => 'boolean',
                 'low_stock_threshold' => 'integer|min:0',
+                'enable_credit_system' => 'boolean',
+                'creditienda_enabled' => 'boolean',
+                'credit_surcharge_percentage' => 'numeric|min:0|max:100',
             ]);
 
             $settings->update($validated);

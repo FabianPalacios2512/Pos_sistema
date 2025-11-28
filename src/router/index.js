@@ -7,6 +7,7 @@ const LoginView = () => import('../components/LoginView.vue')
 const SaasRegister = () => import('../views/SaasRegister.vue') // Importar el nuevo componente
 const PosCompleto = () => import('../views/PosCompleto.vue')
 const AdminDashboardView = () => import('../views/AdminDashboardView.vue')
+const GodModeAdminPanel = () => import('../components/admin/GodModeAdminPanel.vue')
 
 const routes = [
   // Ruta de Registro SaaS
@@ -78,6 +79,19 @@ const routes = [
       title: 'Monitoreo de IA - Admin',
       requiresAuth: true,
       roles: ['admin', 'Administrador'] // Soportar tanto inglés como español
+    }
+  },
+
+  // Panel Super Admin - Gestión de Tenants (GOD MODE)
+  {
+    path: '/admin/god-mode',
+    name: 'GodModeAdmin',
+    component: GodModeAdminPanel,
+    beforeEnter: requireAuth,
+    meta: {
+      title: 'Super Admin - Gestión de Tenants',
+      requiresAuth: true,
+      roles: ['admin', 'Administrador', 'superadmin'] // Super admins y admins pueden acceder
     }
   },
 

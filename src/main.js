@@ -3,9 +3,6 @@ import App from './App.vue'
 import router from './router/index.js'
 import './style.css'
 
-// Importar componente de Super Admin Dashboard
-import SuperAdminDashboard from './components/SuperAdminDashboard.vue'
-
 const app = createApp(App)
 
 	// Suppress verbose console.log/debug output application-wide unless explicitly enabled.
@@ -27,9 +24,6 @@ const app = createApp(App)
 			// ignore any error accessing localStorage in restricted contexts
 		}
 	})()
-
-// Registrar componente global para Super Admin
-app.component('SuperAdminDashboard', SuperAdminDashboard)
 
 app.use(router)
 app.mount('#app')

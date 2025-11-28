@@ -84,7 +84,7 @@
             
             <div class="text-right relative z-10">
                <p v-if="hasOpenSession && currentSession" class="text-2xl font-black text-slate-900 tracking-tighter mb-1">
-                 ${{ formatCurrency(currentSession.total_sales || 0) }}
+                 ${{ formatCurrency(realCashAvailable) }}
                </p>
                <button @click="hasOpenSession ? handleCloseCash() : handleOpenCash()" 
                        :disabled="cashLoading"
@@ -176,7 +176,7 @@
                  </span>
               </div>
               <h3 class="text-2xl font-black text-slate-900 tracking-tighter leading-none mb-1">
-                 ${{ hasOpenSession && currentSession ? formatCurrency(currentSession.total_sales || 0) : '0' }}
+                 ${{ hasOpenSession && currentSession ? formatCurrency(realCashAvailable) : '0' }}
               </h3>
               <p class="text-[10px] font-bold text-emerald-600">Disponible cierre</p>
            </div>
@@ -845,6 +845,17 @@ const salesDataComputed = computed(() => {
       average_ticket: todayCount > 0 ? todayAmount / todayCount : 0
     }
   }
+})
+
+// Computed para efectivo real disponible en caja
+const realCashAvailable = computed(() => {
+  if (!hasOpenSession.value || !currentSession.value) return 0
+  
+  const opening = parseFloat(currentSession.value.opening_amount || 0)
+  const sales = parseFloat(currentSession.value.total_sales || 0)
+  const expenses = parseFloat(currentSession.value.total_expenses || 0)
+  
+  return opening + sales - expenses
 })
 
 // Computed para tendencias de crecimiento

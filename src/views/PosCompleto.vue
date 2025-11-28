@@ -209,6 +209,8 @@ const InvoicesView = defineAsyncComponent(() => import('../components/InvoicesVi
 const CashAdminView = defineAsyncComponent(() => import('../components/CashAdminView.vue'))
 const ReturnsManagementView = defineAsyncComponent(() => import('../components/ReturnsManagementView.vue'))
 const UsersManagementView = defineAsyncComponent(() => import('../components/UsersManagementView_WORKING.vue'))
+const ExpensesManager = defineAsyncComponent(() => import('./ExpensesManager.vue'))
+const AccountsReceivableView = defineAsyncComponent(() => import('../components/AccountsReceivableView.vue'))
 
 // Componentes temporales para módulos no desarrollados aún
 const PlaceholderView = defineAsyncComponent(() => import('../components/PlaceholderView.vue'))
@@ -1100,12 +1102,14 @@ const currentModuleComponent = computed(() => {
     suppliers: SuppliersView,
     customers: CustomersView,
     invoices: InvoicesView,
+    'accounts-receivable': AccountsReceivableView,
     users: UsersManagementView,
     roles: RolesView,
     reports: ReportsMenuView,
     settings: SettingsView,
     'cash-admin': CashAdminView,
-    'returns-management': ReturnsManagementView
+    'returns-management': ReturnsManagementView,
+    expenses: ExpensesManager
   }
   return moduleComponents[currentModule.value] || null
 })
@@ -1247,6 +1251,8 @@ const getModuleName = (module) => {
     'intelligent_inventory': 'Inventario Inteligente',
     'customers': 'Clientes',
     'suppliers': 'Proveedores',
+    'expenses': 'Gastos Operativos',
+    'expense-categories': 'Categorías de Gastos',
     'reports': 'Reportes',
     'settings': 'Configuración'
   }
@@ -1370,6 +1376,8 @@ const getModuleDescription = () => {
     customers: 'Base de Clientes • CRM integrado y seguimiento',
     invoices: 'Facturación • Historial completo de ventas',
     'returns-management': 'Devoluciones • Control y seguimiento administrativo',
+    expenses: 'Gastos Operativos • Control de egresos y caja',
+    'expense-categories': 'Categorías de Gastos • Organización de egresos',
     users: 'Usuarios • Gestión de accesos y perfiles',
     roles: 'Roles y Permisos • Control de seguridad avanzado',
     reports: 'Reportes • Análisis inteligente de datos',

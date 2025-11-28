@@ -254,7 +254,10 @@ const handleLogin = async () => {
 
     // Esperar un momento para mostrar el mensaje de éxito
     setTimeout(() => {
-      if (user?.role) {
+      // Si es super admin, ir directo al panel god mode
+      if (user?.is_super_admin || user?.role?.name === 'superadmin') {
+        router.push('/admin/god-mode')
+      } else if (user?.role) {
         const roleName = user.role.name || user.role
         if (roleName === 'Administrador' || roleName === 'admin' || roleName === 'Gerente') {
           router.push('/dashboard')

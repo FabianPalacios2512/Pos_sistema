@@ -19,6 +19,8 @@ use App\Http\Controllers\Api\InventoryTestController;
 use App\Http\Controllers\Api\CashSessionController;
 use App\Http\Controllers\Api\ReturnsController;
 use App\Http\Controllers\Api\ProductAnalyticsController;
+use App\Http\Controllers\Api\ExpenseController;
+use App\Http\Controllers\Api\ExpenseCategoryController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Tenant\AiUsageController;
 use Illuminate\Support\Facades\Route;
@@ -203,6 +205,32 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Métricas de devoluciones para reportes
     Route::get('/returns/metrics/{period}', [App\Http\Controllers\Api\ReturnsController::class, 'getMetrics']);
     // ==================== FIN DEVOLUCIONES ====================
+
+    // ==================== GASTOS OPERATIVOS ====================
+    Route::get('/expenses', [ExpenseController::class, 'index']);
+    Route::post('/expenses', [ExpenseController::class, 'store']);
+    Route::get('/expenses/statistics', [ExpenseController::class, 'statistics']);
+    Route::get('/expenses/categories', [ExpenseController::class, 'getCategories']);
+    Route::get('/expenses/check-cash-session', [ExpenseController::class, 'checkCashSession']);
+    Route::get('/expenses/{id}', [ExpenseController::class, 'show']);
+    Route::put('/expenses/{id}', [ExpenseController::class, 'update']);
+    Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy']);
+
+    // Gestión de Categorías de Gastos
+    Route::get('/expense-categories', [ExpenseCategoryController::class, 'index']);
+    Route::post('/expense-categories', [ExpenseCategoryController::class, 'store']);
+    Route::get('/expense-categories/statistics', [ExpenseCategoryController::class, 'statistics']);
+    Route::get('/expense-categories/{id}', [ExpenseCategoryController::class, 'show']);
+    Route::put('/expense-categories/{id}', [ExpenseCategoryController::class, 'update']);
+    Route::patch('/expense-categories/{id}/toggle', [ExpenseCategoryController::class, 'toggleActive']);
+    Route::delete('/expense-categories/{id}', [ExpenseCategoryController::class, 'destroy']);
+    // ==================== FIN GASTOS OPERATIVOS ====================
+
+    // ==================== CRÉDITOS Y CUENTAS POR COBRAR ====================
+    Route::get('/credit-payments', [\App\Http\Controllers\Api\CreditPaymentController::class, 'index']);
+    Route::post('/credit-payments', [\App\Http\Controllers\Api\CreditPaymentController::class, 'store']);
+    Route::post('/credit-reminders', [\App\Http\Controllers\Api\CreditPaymentController::class, 'sendReminder']);
+    // ==================== FIN CRÉDITOS ====================
 
     // ==================== AI CHAT (con límites de uso) ====================
     Route::middleware(['ai.limit'])->group(function () {

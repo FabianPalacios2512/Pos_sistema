@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes 105 POS Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            dark: '#0F172A', // Tu azul oscuro
+                            primary: '#4F46E5', // Indigo
+                            accent: '#10B981' // Verde Esmeralda
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #4F46E5;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #4F46E5;
+        }
+        .best-seller-shadow {
+            box-shadow: 0 0 40px rgba(79, 70, 229, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-brand-dark text-slate-300 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-brand-accent font-semibold tracking-wide uppercase text-sm mb-2">Precios Transparentes</h2>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Elige el motor para tu negocio</h1>
+            <p class="text-lg text-slate-400">Comienza gratis y escala a medida que creces. Sin contratos forzosos.</p>
+            
+            <div class="mt-8 flex items-center justify-center gap-4">
+                <span class="text-sm font-medium" id="monthly-label">Mensual</span>
+                <div class="relative inline-block w-14 mr-2 align-middle select-none transition duration-200 ease-in">
+                    <input type="checkbox" name="toggle" id="billing-toggle" checked class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 border-slate-700 appearance-none cursor-pointer transition-all duration-300 left-0 checked:left-7" onclick="updatePrices()"/>
+                    <label for="billing-toggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-slate-700 cursor-pointer transition-colors duration-300"></label>
+                </div>
+                <span class="text-sm font-bold text-white" id="yearly-label">Anual <span class="text-brand-accent text-xs ml-1">(Ahorra 20%)</span></span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-start">
+
+            <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-slate-600 transition-all">
+                <div class="mb-4">
+                    <h3 class="text-xl font-bold text-white">Piloto</h3>
+                    <p class="text-sm text-slate-400 mt-2">Para probar el sistema sin compromiso.</p>
+                </div>
+                <div class="mb-6">
+                    <span class="text-4xl font-bold text-white">$0</span>
+                    <span class="text-slate-500">/ por 15 días</span>
+                </div>
+                <button class="w-full py-2.5 px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors mb-6">
+                    Crear Cuenta Gratis
+                </button>
+                <ul class="space-y-3 text-sm text-slate-300">
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-slate-500"></i> 1 Usuario Admin</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-slate-500"></i> Hasta 50 productos</li>
+                    <li class="flex items-center gap-2"><i class="fa-solid fa-check text-slate-500"></i> POS Básico</li>
+                    <li class="flex items-center gap-2 text-slate-500"><i class="fa-solid fa-xmark"></i> Sin Facturación Electrónica</li>
+                    <li class="flex items-center gap-2 text-slate-500"><i class="fa-solid fa-xmark"></i> Sin IA</li>
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 text-slate-900 shadow-xl transform transition-transform hover:-translate-y-1">
+                <div class="mb-4">
+                    <h3 class="text-xl font-bold text-slate-900">Emprendedor</h3>
+                    <p class="text-sm text-slate-500 mt-2">Para tiendas de barrio y papelerías.</p>
+                </div>
+                <div class="mb-6 flex items-end gap-1">
+                    <span class="text-4xl font-bold text-slate-900 price-text" data-monthly="35.000" data-yearly="25.000">$25.000</span>
+                    <span class="text-slate-500 mb-1">/ mes</span>
+                </div>
+                <button class="w-full py-2.5 px-4 border border-slate-300 hover:border-slate-400 text-slate-700 rounded-lg font-bold transition-colors mb-6">
+                    Elegir Emprendedor
+                </button>
+                <div class="border-t border-slate-100 pt-4">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Incluye:</p>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> 1 Usuario</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> 1 Bodega</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Hasta 500 Productos</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-500"></i> Reportes Básicos</li>
+                        <li class="flex items-center gap-2 text-slate-400"><i class="fa-solid fa-minus"></i> Sin Facturación Electrónica</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="relative bg-white rounded-2xl p-6 text-slate-900 shadow-2xl ring-4 ring-indigo-600 scale-105 z-10 best-seller-shadow">
+                <div class="absolute top-0 right-0 -mt-3 -mr-3">
+                    <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Más Popular</span>
+                </div>
+                <div class="mb-4">
+                    <h3 class="text-xl font-bold text-indigo-700">Negocio Pro</h3>
+                    <p class="text-sm text-slate-500 mt-2">Para minimarkets y negocios que fían.</p>
+                </div>
+                <div class="mb-6 flex items-end gap-1">
+                    <span class="text-5xl font-bold text-slate-900 price-text" data-monthly="70.000" data-yearly="50.000">$50.000</span>
+                    <span class="text-slate-500 mb-1">/ mes</span>
+                </div>
+                <button class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold transition-colors mb-6 shadow-lg shadow-indigo-200">
+                    Comenzar con Pro
+                </button>
+                <div class="border-t border-slate-100 pt-4">
+                    <p class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-3">Todo lo anterior, más:</p>
+                    <ul class="space-y-3 text-sm text-slate-700 font-medium">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> <strong>Creditienda</strong> (Fiado)</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> <strong>Catálogo Web</strong> (Pedidos)</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> Gestión de Gastos</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> <strong>IA Asistente</strong> (50 tokens)</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-indigo-600"></i> 3 Usuarios / 2 Bodegas</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-slate-600 transition-all">
+                <div class="mb-4">
+                    <h3 class="text-xl font-bold text-white">Empresario Élite</h3>
+                    <p class="text-sm text-slate-400 mt-2">Para empresas que declaran impuestos.</p>
+                </div>
+                <div class="mb-6 flex items-end gap-1">
+                    <span class="text-4xl font-bold text-white price-text" data-monthly="160.000" data-yearly="120.000">$120.000</span>
+                    <span class="text-slate-400 mb-1">/ mes</span>
+                </div>
+                <button class="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-lg font-medium transition-all mb-6">
+                    Contactar Ventas
+                </button>
+                <div class="border-t border-slate-700 pt-4">
+                    <p class="text-xs font-bold text-brand-accent uppercase tracking-wider mb-3">Poder total:</p>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-accent"></i> <strong>Facturación Electrónica</strong></li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-accent"></i> Usuarios Ilimitados</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-accent"></i> Multibodega Real</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-accent"></i> Fidelización (Puntos)</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-accent"></i> <strong>IA Avanzada</strong> (Predicciones)</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-16 text-center">
+            <p class="text-slate-500 text-sm">Precios en Pesos Colombianos (COP). *El plan anual incluye 2 meses gratis.</p>
+        </div>
+
+    </div>
+
+    <script>
+        function updatePrices() {
+            const isYearly = document.getElementById('billing-toggle').checked;
+            const priceElements = document.querySelectorAll('.price-text');
+            
+            priceElements.forEach(el => {
+                if (isYearly) {
+                    el.textContent = '$' + el.dataset.yearly;
+                    // Animación sutil
+                    el.classList.add('animate-pulse');
+                    setTimeout(() => el.classList.remove('animate-pulse'), 500);
+                } else {
+                    el.textContent = '$' + el.dataset.monthly;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

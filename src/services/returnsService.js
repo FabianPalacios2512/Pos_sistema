@@ -136,14 +136,18 @@ class ReturnsService {
       if (originalItem && originalItem.unit_price) {
         const itemSubtotal = (item.quantity || 0) * originalItem.unit_price
         subtotal += itemSubtotal
-        
-        // Calcular IVA proporcional real del item original
-        if (originalItem.quantity > 0 && originalItem.tax_amount) {
-          const itemTaxAmount = (originalItem.tax_amount / originalItem.quantity) * (item.quantity || 0)
-          taxAmount += itemTaxAmount
-        }
       }
     })
+
+    // Calcular IVA proporcional basado en los totales de la factura
+    // Esto funciona incluso si los items no tienen tax_amount
+    const invoiceSubtotal = parseFloat(originalInvoice.subtotal || 0)
+    const invoiceTaxAmount = parseFloat(originalInvoice.tax_amount || 0)
+    
+    if (invoiceSubtotal > 0 && subtotal > 0) {
+      // IVA proporcional: (subtotal devuelto / subtotal factura) * IVA total factura
+      taxAmount = (subtotal / invoiceSubtotal) * invoiceTaxAmount
+    }
 
     const total = subtotal + taxAmount
 

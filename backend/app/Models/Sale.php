@@ -17,10 +17,12 @@ class Sale extends Model
         'tax_amount',
         'discount_amount',
         'total_amount',
+        'surcharge_amount',
         'payment_method',
         'cash_received',
         'change_given',
         'status',
+        'payment_status',
         'notes',
         'sale_date'
     ];

@@ -350,6 +350,11 @@ class CashSessionController extends Controller
             // Obtener todas las facturas de esta sesión con detalles
             $invoices = $session->invoices()->with(['customer'])->get();
 
+            // Obtener todas las devoluciones de esta sesión
+            $returns = \App\Models\ProductReturn::where('cash_session_id', $sessionId)
+                ->with(['customer', 'originalInvoice'])
+                ->get();
+
             // Crear timeline de eventos
             $timeline = [];
 
@@ -394,6 +399,43 @@ class CashSessionController extends Controller
                     ]
                 ];
             }
+
+            // Eventos de devoluciones
+            foreach ($returns as $return) {
+                $items = is_string($return->items) ? json_decode($return->items, true) : $return->items;
+                $itemsCount = is_array($items) ? count($items) : 0;
+
+                $timeline[] = [
+                    'type' => 'return',
+                    'timestamp' => $return->created_at,
+                    'description' => "Devolución #{$return->number}",
+                    'amount' => -$return->total, // Negativo porque es una devolución
+                    'details' => [
+                        'return_id' => $return->id,
+                        'return_number' => $return->number,
+                        'original_invoice' => $return->originalInvoice->number ?? 'N/A',
+                        'customer' => $return->customer->name ?? 'Cliente General',
+                        'refund_method' => $return->refund_method,
+                        'reason' => $return->reason,
+                        'items_count' => $itemsCount,
+                        'items' => is_array($items) ? array_map(function($item) {
+                            return [
+                                'product' => $item['product_name'] ?? 'Producto',
+                                'quantity' => $item['quantity'] ?? 0,
+                                'unit_price' => $item['unit_price'] ?? 0,
+                                'subtotal' => ($item['quantity'] ?? 0) * ($item['unit_price'] ?? 0)
+                            ];
+                        }, $items) : []
+                    ]
+                ];
+            }
+
+            // Ordenar timeline cronológicamente (excluyendo apertura que debe estar primera)
+            $opening = array_shift($timeline); // Remover apertura temporalmente
+            usort($timeline, function($a, $b) {
+                return strtotime($a['timestamp']) - strtotime($b['timestamp']);
+            });
+            array_unshift($timeline, $opening); // Volver a poner apertura al inicio
 
             // Evento de cierre (si existe)
             if ($session->status === 'closed') {

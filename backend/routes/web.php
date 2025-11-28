@@ -2,10 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Central\DashboardController;
+use App\Http\Controllers\Api\AuthController;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+/**
+ * ============================================
+ * AUTENTICACIÓN DE SUPER ADMIN
+ * ============================================
+ */
+Route::post('/api/admin/login', [AuthController::class, 'login'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->name('admin.login');
 
 /**
  * ============================================
@@ -30,6 +40,16 @@ Route::prefix('admin')->middleware('superadmin')->group(function () {
         Route::get('/tenants/{id}', [DashboardController::class, 'getTenantDetails'])->name('admin.api.tenant.details');
         Route::put('/tenants/{id}', [DashboardController::class, 'updateTenant'])->name('admin.api.tenant.update');
         Route::delete('/tenants/{id}', [DashboardController::class, 'deleteTenant'])->name('admin.api.tenant.delete');
+
+        // Gestión de usuarios de tenants
+        Route::get('/tenants/{id}/users', [DashboardController::class, 'getTenantUsers'])->name('admin.api.tenant.users');
+        Route::post('/tenants/{tenantId}/users/{userId}/reset-password', [DashboardController::class, 'resetUserPassword'])->name('admin.api.tenant.user.reset-password');
+
+        // Gestión de productos de tenants
+        Route::get('/tenants/{id}/products', [DashboardController::class, 'getTenantProducts'])->name('admin.api.tenant.products');
+
+        // Generación de links de registro
+        Route::post('/generate-signup-link', [DashboardController::class, 'generateSignupLink'])->name('admin.api.generate-signup-link');
 
         // Monitor de IA
         Route::get('/ai-usage', [DashboardController::class, 'getAiUsage'])->name('admin.api.ai-usage');

@@ -105,26 +105,17 @@ class ReturnsController extends Controller
                 ], 404);
             }
 
-            // Obtener devoluciones previas para esta factura
+            // Obtener devoluciones previas para esta factura (solo para información)
             $previousReturns = ProductReturn::where('original_invoice_id', $invoice->id)
                 ->where('status', '!=', 'cancelled')
                 ->get();
 
-            // Calcular cantidades ya devueltas por producto
-            $returnedQuantities = [];
-            foreach ($previousReturns as $return) {
-                $returnItemsArray = is_string($return->items) ? json_decode($return->items, true) : $return->items;
-                foreach ($returnItemsArray ?? [] as $item) {
-                    $productId = $item['product_id'];
-                    $returnedQuantities[$productId] = ($returnedQuantities[$productId] ?? 0) + $item['quantity'];
-                }
-            }
-
-            // Agregar información de cantidades disponibles para devolución
+            // La cantidad disponible para devolución es simplemente la cantidad ACTUAL del item
+            // porque la factura ya fue actualizada en devoluciones previas
             foreach ($invoice->invoiceItems as $item) {
-                $returned = $returnedQuantities[$item->product_id] ?? 0;
-                $item->returned_quantity = $returned;
-                $item->available_for_return = $item->quantity - $returned;
+                // La cantidad actual del item ES lo disponible para devolver
+                $item->returned_quantity = 0; // No necesitamos este dato porque la factura ya está actualizada
+                $item->available_for_return = $item->quantity; // Toda la cantidad actual es devolvible
             }
 
             return response()->json([
@@ -207,7 +198,6 @@ class ReturnsController extends Controller
                 'user_name' => Auth::user()->name ?? 'Unknown'
             ]);
 
-            \Log::info('Starting transaction');
             DB::beginTransaction();
 
             // Obtener la factura original
@@ -314,27 +304,100 @@ class ReturnsController extends Controller
             $originalInvoice = Invoice::find($request->original_invoice_id);
 
             if ($originalInvoice) {
+                // 💳 CRÍTICO: Si la venta era a crédito, restar la deuda del cliente
+                if ($originalInvoice->payment_method === 'credit') {
+                    $customer = \App\Models\Customer::find($originalInvoice->customer_id);
+                    if ($customer) {
+                        $previousDebt = $customer->current_debt ?? 0;
+
+                        // Calcular recargo proporcional a los items devueltos
+                        $surchargeToRefund = 0;
+                        if ($originalInvoice->surcharge_amount > 0 && $originalInvoice->subtotal > 0) {
+                            // Proporción del recargo basado en el subtotal devuelto
+                            $surchargePercentage = $originalInvoice->surcharge_amount / $originalInvoice->subtotal;
+                            $surchargeToRefund = $subtotal * $surchargePercentage;
+                        }
+
+                        $totalToRefund = $total + $surchargeToRefund; // Total + recargo proporcional
+                        $newDebt = max(0, $previousDebt - $totalToRefund); // No puede quedar negativo
+
+                        $customer->current_debt = $newDebt;
+                        $customer->save();
+
+                        \Log::info('💳 Deuda del cliente actualizada por devolución de venta a crédito', [
+                            'customer_id' => $customer->id,
+                            'customer_name' => $customer->name,
+                            'previous_debt' => $previousDebt,
+                            'subtotal_returned' => $subtotal,
+                            'tax_returned' => $taxAmount,
+                            'surcharge_returned' => $surchargeToRefund,
+                            'total_amount_refunded' => $totalToRefund,
+                            'new_debt' => $newDebt,
+                            'return_number' => $return->number,
+                            'original_invoice' => $originalInvoice->number
+                        ]);
+                    }
+                }
+
                 // Calcular nuevos totales de la factura
                 $newSubtotal = $originalInvoice->subtotal - $subtotal;
                 $newTaxAmount = $originalInvoice->tax_amount - $taxAmount;
                 $newTotal = $originalInvoice->total - $total;
 
-                // Si la devolución es completa (total llega a 0), eliminar la factura
+                // Si la devolución es completa (total llega a 0), marcar como devuelta
                 if ($newTotal <= 0) {
-                    \Log::info("Eliminando factura completa #{$originalInvoice->number} - Total devuelto completamente");
+                    \Log::info("Marcando factura #{$originalInvoice->number} como DEVUELTA - Total devuelto completamente - Referencia: {$return->number}");
 
-                    // Eliminar items de la factura
-                    InvoiceItem::where('invoice_id', $originalInvoice->id)->delete();
-                    // Eliminar la factura
-                    $originalInvoice->delete();
+                    try {
+                        // Primero eliminar los invoice_items
+                        \Log::info("Eliminando invoice_items de la factura #{$originalInvoice->number}");
+                        $deletedItems = InvoiceItem::where('invoice_id', $originalInvoice->id)->delete();
+                        \Log::info("Items eliminados: {$deletedItems}");
+
+                        // Luego actualizar la factura - usar array vacío, no json_encode
+                        \Log::info("Actualizando factura a estado 'returned'");
+                        $originalInvoice->update([
+                            'subtotal' => 0,
+                            'tax_amount' => 0,
+                            'total' => 0,
+                            'surcharge_amount' => 0, // Resetear recargo en devolución completa
+                            'status' => 'returned',
+                            'return_reference' => $return->number,
+                            'items' => [] // Array vacío (Laravel lo convertirá a JSON automáticamente)
+                        ]);
+
+                        \Log::info("Factura actualizada exitosamente a estado 'returned'");
+                    } catch (\Exception $e) {
+                        \Log::error("Error al actualizar factura a returned: " . $e->getMessage());
+                        \Log::error("Stack trace: " . $e->getTraceAsString());
+                        throw $e;
+                    }
                 } else {
                     \Log::info("Actualizando factura #{$originalInvoice->number} - Nuevo total: {$newTotal}");
+
+                    // Calcular nuevo surcharge_amount proporcional si es venta a crédito
+                    $newSurchargeAmount = 0;
+                    if ($originalInvoice->payment_method === 'credit' && $originalInvoice->surcharge_amount > 0) {
+                        // Calcular proporción del recargo basado en el nuevo subtotal
+                        $originalSubtotalWithSurcharge = $originalInvoice->subtotal + $originalInvoice->surcharge_amount;
+                        $surchargePercentage = $originalSubtotalWithSurcharge > 0
+                            ? ($originalInvoice->surcharge_amount / $originalInvoice->subtotal)
+                            : 0;
+                        $newSurchargeAmount = $newSubtotal * $surchargePercentage;
+
+                        \Log::info("Recargo proporcional calculado", [
+                            'original_surcharge' => $originalInvoice->surcharge_amount,
+                            'new_surcharge' => $newSurchargeAmount,
+                            'percentage' => $surchargePercentage * 100 . '%'
+                        ]);
+                    }
 
                     // Devolución parcial: actualizar totales de la factura
                     $originalInvoice->update([
                         'subtotal' => max(0, $newSubtotal),
                         'tax_amount' => max(0, $newTaxAmount),
-                        'total' => max(0, $newTotal)
+                        'total' => max(0, $newTotal),
+                        'surcharge_amount' => max(0, $newSurchargeAmount)
                     ]);
 
                     // Actualizar o eliminar invoice_items devueltos
@@ -411,6 +474,7 @@ class ReturnsController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al procesar la devolución',
@@ -421,23 +485,13 @@ class ReturnsController extends Controller
 
     /**
      * Validar que los items pueden ser devueltos
+     *
+     * IMPORTANTE: Los invoice_items ya tienen la cantidad actualizada después de cada devolución.
+     * Por lo tanto, NO debemos restar las devoluciones previas nuevamente.
+     * Solo validamos contra la cantidad actual del invoice_item.
      */
     private function validateReturnItems($items, $originalInvoice)
     {
-        // Obtener devoluciones previas
-        $previousReturns = ProductReturn::where('original_invoice_id', $originalInvoice->id)
-            ->where('status', '!=', 'cancelled')
-            ->get();
-
-        $returnedQuantities = [];
-        foreach ($previousReturns as $return) {
-            $returnItemsArray = is_string($return->items) ? json_decode($return->items, true) : $return->items;
-            foreach ($returnItemsArray ?? [] as $item) {
-                $productId = $item['product_id'];
-                $returnedQuantities[$productId] = ($returnedQuantities[$productId] ?? 0) + $item['quantity'];
-            }
-        }
-
         foreach ($items as $itemData) {
             $originalItem = $originalInvoice->invoiceItems->where('product_id', $itemData['product_id'])->first();
 
@@ -445,8 +499,9 @@ class ReturnsController extends Controller
                 throw new \Exception("El producto ID {$itemData['product_id']} no existe en la factura original");
             }
 
-            $alreadyReturned = $returnedQuantities[$itemData['product_id']] ?? 0;
-            $availableForReturn = $originalItem->quantity - $alreadyReturned;
+            // La cantidad del invoice_item YA refleja las devoluciones previas
+            // Solo validamos que no se devuelva más de lo que hay actualmente
+            $availableForReturn = $originalItem->quantity;
 
             if ($itemData['quantity'] > $availableForReturn) {
                 $product = Product::find($itemData['product_id']);

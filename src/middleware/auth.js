@@ -24,6 +24,23 @@ export const requireRole = (allowedRoles) => {
       return
     }
 
+    console.log('DEBUG: No hay usuario o rol')
+    console.log('Usuario:', user)
+    console.log('Rol:', user.role)
+
+    // Si el usuario no tiene rol definido, asignar un rol por defecto
+    if (!user.role) {
+      console.warn('⚠️ Usuario sin rol definido, asignando rol por defecto')
+      // Permitir acceso como cajero por defecto
+      const mappedRole = 'cajero'
+      if (allowedRoles.includes(mappedRole)) {
+        next()
+      } else {
+        next('/pos')
+      }
+      return
+    }
+
     const roleName = user.role?.name || user.role
     
     // Mapear roles del backend a roles esperados

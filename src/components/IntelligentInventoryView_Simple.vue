@@ -255,6 +255,42 @@
               <p class="text-xs text-gray-600 mt-1">{{ getPeriodLabel() }}</p>
             </div>
           </div>
+
+          <!-- Gastos Totales -->
+          <div class="bg-white rounded-2xl p-4 border border-gray-300">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                  </svg>
+                </div>
+                <h3 class="text-sm font-semibold text-gray-900">Gastos Totales</h3>
+              </div>
+            </div>
+            <div class="text-center">
+              <p class="text-xl font-bold text-red-600">{{ formatCurrency(metrics.totalExpenses || 0) }}</p>
+              <p class="text-xs text-gray-600 mt-1">{{ getPeriodLabel() }}</p>
+            </div>
+          </div>
+
+          <!-- Ganancia Neta Real -->
+          <div class="bg-white rounded-2xl p-4 border border-gray-300">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center" :class="metrics.netProfit >= 0 ? 'bg-blue-50' : 'bg-orange-50'">
+                  <svg class="w-4 h-4" :class="metrics.netProfit >= 0 ? 'text-blue-600' : 'text-orange-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+                <h3 class="text-sm font-semibold text-gray-900">Ganancia Neta</h3>
+              </div>
+            </div>
+            <div class="text-center">
+              <p class="text-xl font-bold" :class="metrics.netProfit >= 0 ? 'text-blue-600' : 'text-orange-600'">{{ formatCurrency(metrics.netProfit || 0) }}</p>
+              <p class="text-xs text-gray-600 mt-1">ventas - gastos</p>
+            </div>
+          </div>
         </div>
 
         <!-- Sección de Productos y Movimientos - 2 Columnas Compactas -->
@@ -2451,7 +2487,9 @@ export default {
       outOfStockProducts: 0,
       totalInventoryValue: 0,
       monthlySales: 0,
-      averageProfitMargin: 0
+      averageProfitMargin: 0,
+      totalExpenses: 0,
+      netProfit: 0
     })
 
     // Datos adicionales para el dashboard
@@ -3087,6 +3125,9 @@ export default {
               stockVariation.value = inventoryData.data.stockVariation
             }
             
+            // Cargar gastos del período
+            await loadExpensesData()
+            
             connectionStatus.value = 'Dashboard actualizado correctamente'
             
             // Las alertas automáticas ya no se cargan aquí
@@ -3102,6 +3143,54 @@ export default {
       } catch (err) {
         error.value = `Error cargando datos: ${err.message}`
         connectionStatus.value = 'Error al cargar'
+      }
+    }
+
+    // Método para cargar gastos del período
+    const loadExpensesData = async () => {
+      try {
+        // Construir parámetros según el período seleccionado
+        let startDate, endDate
+        const now = new Date()
+        
+        if (selectedPeriod.value === 'custom' && customDateRange.start) {
+          startDate = customDateRange.start
+          endDate = customDateRange.end || customDateRange.start
+        } else if (selectedPeriod.value === 'week') {
+          const weekAgo = new Date(now)
+          weekAgo.setDate(weekAgo.getDate() - 7)
+          startDate = weekAgo.toISOString().split('T')[0]
+          endDate = now.toISOString().split('T')[0]
+        } else if (selectedPeriod.value === 'month') {
+          const monthAgo = new Date(now.getFullYear(), now.getMonth(), 1)
+          startDate = monthAgo.toISOString().split('T')[0]
+          endDate = now.toISOString().split('T')[0]
+        } else if (selectedPeriod.value === 'year') {
+          const yearStart = new Date(now.getFullYear(), 0, 1)
+          startDate = yearStart.toISOString().split('T')[0]
+          endDate = now.toISOString().split('T')[0]
+        }
+        
+        // Llamar al endpoint de gastos con filtros de fecha
+        const params = new URLSearchParams()
+        if (startDate) params.append('start_date', startDate)
+        if (endDate) params.append('end_date', endDate)
+        
+        const expensesData = await apiCall(`/expenses?${params.toString()}`)
+        
+        if (expensesData && expensesData.success && expensesData.data) {
+          // Calcular total de gastos
+          const expenses = expensesData.data.data || expensesData.data
+          const totalExpenses = expenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0)
+          
+          metrics.totalExpenses = totalExpenses
+          metrics.netProfit = (metrics.monthlySales || 0) - totalExpenses
+        }
+      } catch (err) {
+        console.error('Error cargando gastos:', err)
+        // No mostrar error al usuario, solo usar 0 como default
+        metrics.totalExpenses = 0
+        metrics.netProfit = metrics.monthlySales || 0
       }
     }
 

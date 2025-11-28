@@ -12,6 +12,9 @@
       @extend="sessionTimeout.extendSession"
       @logout="handleManualLogout"
     />
+    
+    <!-- Modal de actualización de Creditienda -->
+    <CreditiendaUpgradeModal />
   </div>
 </template>
 
@@ -21,6 +24,7 @@ import authStore from './store/auth.js'
 import { appStore } from './store/appStore.js'
 import ToastContainer from './components/ToastContainer.vue'
 import SessionTimeoutWarning from './components/SessionTimeoutWarning.vue'
+import CreditiendaUpgradeModal from './components/CreditiendaUpgradeModal.vue'
 import { useSessionTimeout } from './composables/useSessionTimeout.js'
 
 // Inicializar el sistema de timeout de sesión

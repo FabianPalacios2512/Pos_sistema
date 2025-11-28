@@ -407,7 +407,8 @@ const form = reactive({
   company_name: '',
   subdomain: '',
   email: '',
-  password: ''
+  password: '',
+  token: '' // Token del link generado
 })
 
 // Methods
@@ -536,6 +537,16 @@ const registerTenant = async () => {
     alert(errorMessage)
   }
 }
+
+// Detectar token de la URL al cargar
+onMounted(() => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const token = urlParams.get('token')
+  if (token) {
+    form.token = token
+    console.log('Token detectado:', token)
+  }
+})
 
 onUnmounted(() => {
   if (messageInterval) clearInterval(messageInterval)

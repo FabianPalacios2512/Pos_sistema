@@ -49,6 +49,7 @@ class CustomerController extends Controller
                 'birth_date' => 'nullable|date',
                 'credit_limit' => 'nullable|numeric|min:0',
                 'current_debt' => 'nullable|numeric|min:0',
+                'credit_active' => 'boolean',
                 'active' => 'boolean'
             ]);
 
@@ -114,6 +115,7 @@ class CustomerController extends Controller
                 'birth_date' => 'nullable|date',
                 'credit_limit' => 'nullable|numeric|min:0',
                 'current_debt' => 'nullable|numeric|min:0',
+                'credit_active' => 'boolean',
                 'active' => 'boolean'
             ]);
 

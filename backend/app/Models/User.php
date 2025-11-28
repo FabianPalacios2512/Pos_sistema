@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->hasMany(InventoryMovement::class);
     }
 
+    public function expenses()
+    {
+        return $this->hasMany(\App\Models\Expense::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

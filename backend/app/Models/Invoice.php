@@ -19,8 +19,11 @@ class Invoice extends Model
         'tax_amount',
         'total',
         'payment_method',
+        'surcharge_amount',
         'status',
-        'notes'
+        'return_reference',
+        'notes',
+        'items'
     ];
 
     protected $casts = [
@@ -28,7 +31,9 @@ class Invoice extends Model
         'due_date' => 'date',
         'subtotal' => 'decimal:2',
         'tax_amount' => 'decimal:2',
-        'total' => 'decimal:2'
+        'total' => 'decimal:2',
+        'surcharge_amount' => 'decimal:2',
+        'items' => 'array' // Auto-convierte entre array y JSON
     ];
 
     public function customer(): BelongsTo

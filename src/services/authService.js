@@ -14,10 +14,29 @@ const authService = {
       if (USE_MOCK) {
         response = { data: await mockAuthService.login(credentials) };
       } else {
-        response = await apiClient.post('/login', {
-          email: credentials.email, // Usar email
-          password: credentials.password
-        });
+        // Intentar primero como super admin
+        try {
+          response = await apiClient.post('/admin/login', {
+            email: credentials.email,
+            password: credentials.password
+          });
+          
+          // Si llegamos aquí, el login de super admin funcionó
+          if (response.data.success && response.data.data?.token) {
+            localStorage.setItem('authToken', response.data.data.token);
+            localStorage.setItem('user', JSON.stringify(response.data.data.user));
+            apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
+            return response.data.data;
+          }
+        } catch (adminError) {
+          // Si falla el login de super admin, intentar como tenant normal
+          console.log('No es super admin, intentando login de tenant...');
+          
+          response = await apiClient.post('/login', {
+            email: credentials.email,
+            password: credentials.password
+          });
+        }
       }
       
       if (response.data.success && response.data.data?.token) {
@@ -51,10 +70,15 @@ const authService = {
   // Logout
   async logout() {
     try {
+      const user = this.getUser();
+      
       if (USE_MOCK) {
         await mockAuthService.logout();
       } else {
-        await apiClient.post('/logout');
+        // Solo llamar logout API si NO es super admin
+        if (!user?.is_super_admin) {
+          await apiClient.post('/logout');
+        }
       }
     } catch (error) {
       console.error('Error al hacer logout:', error);
@@ -69,6 +93,15 @@ const authService = {
   // Obtener usuario actual
   async getCurrentUser() {
     try {
+      // Si es super admin, retornar desde localStorage
+      const localUser = this.getUser();
+      if (localUser?.is_super_admin) {
+        return {
+          success: true,
+          data: { user: localUser }
+        };
+      }
+      
       let response;
       
       if (USE_MOCK) {

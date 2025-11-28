@@ -17,7 +17,14 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: false, // Important: Keep the original host header (e.g. tenant.localhost)
         secure: false,
+      },
+      '/admin/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: false,
+        secure: false,
       }
-    }
+    },
+    // Configurar para que las rutas de Vue Router funcionen al refrescar
+    historyApiFallback: true
   }
 })

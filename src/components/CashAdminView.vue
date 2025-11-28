@@ -780,6 +780,7 @@
                   <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path v-if="event.type === 'opening'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                     <path v-else-if="event.type === 'sale'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                    <path v-else-if="event.type === 'return'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                     <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </div>
@@ -788,9 +789,17 @@
                     <p class="font-semibold text-gray-900">{{ event.description }}</p>
                     <span class="text-sm text-gray-500">{{ formatTimestamp(event.timestamp) }}</span>
                   </div>
-                  <p class="text-lg font-bold text-green-600">${{ parseFloat(event.amount || 0).toLocaleString() }}</p>
+                  <p class="text-lg font-bold" :class="event.amount < 0 ? 'text-orange-600' : 'text-green-600'">
+                    ${{ parseFloat(event.amount || 0).toLocaleString() }}
+                  </p>
                   <div v-if="event.details.customer" class="text-sm text-gray-600">
                     Cliente: {{ event.details.customer }}
+                  </div>
+                  <div v-if="event.type === 'return' && event.details.original_invoice" class="text-sm text-gray-600">
+                    Factura original: {{ event.details.original_invoice }}
+                  </div>
+                  <div v-if="event.type === 'return' && event.details.reason" class="text-sm text-gray-500 italic">
+                    Razón: {{ event.details.reason }}
                   </div>
                 </div>
               </div>
@@ -859,7 +868,7 @@ const uniqueUsers = computed(() => {
 
 const totalCashAmount = computed(() => {
   return activeSessions.value.reduce((total, session) => {
-    return total + parseFloat(session.opening_amount || 0) + parseFloat(session.total_sales || 0)
+    return total + parseFloat(session.opening_amount || 0) + parseFloat(session.total_sales || 0) - parseFloat(session.total_expenses || 0)
   }, 0)
 })
 
@@ -1125,6 +1134,7 @@ const getEventIconClass = (type) => {
   const classes = {
     opening: 'bg-green-500',
     sale: 'bg-blue-500', 
+    return: 'bg-orange-500',
     closing: 'bg-red-500'
   }
   return classes[type] || 'bg-gray-500'

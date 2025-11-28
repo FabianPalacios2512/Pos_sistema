@@ -248,18 +248,20 @@
                 </div>
               </div>
               
-              <div class="flex justify-between items-center text-sm mt-2">
-                <span class="text-gray-500">Crédito:</span>
-                <span class="font-medium">${{ formatCurrency(customer.credit_limit) }}</span>
-              </div>
-              
-              <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Deuda:</span>
-                <span :class="parseFloat(customer.current_debt) > parseFloat(customer.credit_limit) ? 'text-red-600 font-semibold' : 'text-gray-900'" 
-                      class="font-medium">
-                  ${{ formatCurrency(customer.current_debt) }}
-                </span>
-              </div>
+              <template v-if="isCreditiendaEnabled">
+                <div class="flex justify-between items-center text-sm mt-2">
+                  <span class="text-gray-500">Crédito:</span>
+                  <span class="font-medium">${{ formatCurrency(customer.credit_limit) }}</span>
+                </div>
+                
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-500">Deuda:</span>
+                  <span :class="parseFloat(customer.current_debt) > parseFloat(customer.credit_limit) ? 'text-red-600 font-semibold' : 'text-gray-900'" 
+                        class="font-medium">
+                    ${{ formatCurrency(customer.current_debt) }}
+                  </span>
+                </div>
+              </template>
             </div>
           </div>
 
@@ -301,7 +303,7 @@
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Cliente</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Contacto</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Compras</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Crédito</th>
+                <th v-if="isCreditiendaEnabled" class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Crédito</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Estado</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Acciones</th>
               </tr>
@@ -342,7 +344,7 @@
                 </td>
                 
                 <!-- Crédito -->
-                <td class="px-6 py-4">
+                <td v-if="isCreditiendaEnabled" class="px-6 py-4">
                   <div class="text-sm text-slate-600">
                     <span class="text-xs text-slate-500">Límite:</span> 
                     <span class="font-semibold">${{ formatCurrency(customer.credit_limit) }}</span>
@@ -601,7 +603,7 @@
                        placeholder="Bogotá">
               </div>
               
-              <div>
+              <div v-if="isCreditiendaEnabled">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Límite de Crédito</label>
                 <input v-model="customerForm.credit_limit" 
                        type="number" 
@@ -619,12 +621,28 @@
             </div>
           </div>
 
-          <!-- Estado Activo -->
-          <div class="mt-6 flex items-center">
-            <input v-model="customerForm.active" 
-                   type="checkbox" 
-                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-            <label class="ml-2 text-sm font-medium text-gray-700">Cliente activo</label>
+          <!-- Estado Activo y Crédito -->
+          <div class="mt-6 flex items-center space-x-6">
+            <div class="flex items-center">
+              <input v-model="customerForm.active" 
+                     type="checkbox" 
+                     class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+              <label class="ml-2 text-sm font-medium text-gray-700">Cliente activo</label>
+            </div>
+
+            <div class="flex items-center">
+              <input v-model="customerForm.credit_active" 
+                     type="checkbox" 
+                     :disabled="!isCreditiendaEnabled"
+                     @click="handleCreditCheckboxClick"
+                     class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+              <label class="ml-2 text-sm font-medium text-gray-700">
+                Habilitar Crédito
+                <span v-if="!isCreditiendaEnabled" class="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
+                  Premium
+                </span>
+              </label>
+            </div>
           </div>
           
           </div>
@@ -658,10 +676,14 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { customersService } from '../services/customersService.js'
 import { useToast } from '../composables/useToast.js'
+import { useCreditienda } from '../composables/useCreditienda.js'
 import CustomerHistoryModal from './CustomerHistoryModal.vue'
 
 // Sistema de toasts
 const { showSuccess, showError, showWarning, showInfo } = useToast()
+
+// Sistema de Creditienda
+const { isCreditiendaEnabled, showCreditiendaUpgradeModal } = useCreditienda()
 
 // Estado reactivo
 const loading = ref(false)
@@ -696,7 +718,8 @@ const customerForm = ref({
   gender: '',
   credit_limit: 0,
   current_debt: 0,
-  active: true
+  active: true,
+  credit_active: false
 })
 
 // Cargar preferencias del usuario
@@ -749,25 +772,35 @@ const validateForm = () => {
   formErrors.value = {}
   
   // Validar nombre (requerido)
-  if (!customerForm.value.name.trim()) {
+  if (!customerForm.value.name || !customerForm.value.name.trim()) {
     formErrors.value.name = 'El nombre es requerido'
   }
   
   // Validar email (requerido y formato)
-  if (!customerForm.value.email.trim()) {
+  if (!customerForm.value.email || !customerForm.value.email.trim()) {
     formErrors.value.email = 'El email es requerido'
   } else if (!/\S+@\S+\.\S+/.test(customerForm.value.email)) {
     formErrors.value.email = 'El formato del email no es válido'
   }
   
   // Validar teléfono (requerido)
-  if (!customerForm.value.phone.trim()) {
+  if (!customerForm.value.phone || !customerForm.value.phone.trim()) {
     formErrors.value.phone = 'El teléfono es requerido'
   }
   
   // Validar número de documento (requerido)
-  if (!customerForm.value.document_number.trim()) {
+  if (!customerForm.value.document_number || !customerForm.value.document_number.trim()) {
     formErrors.value.document_number = 'El número de documento es requerido'
+  }
+  
+  // Validar dirección (opcional pero si existe debe tener contenido)
+  if (customerForm.value.address && !customerForm.value.address.trim()) {
+    formErrors.value.address = 'La dirección no puede estar vacía'
+  }
+  
+  // Validar ciudad (opcional pero si existe debe tener contenido)
+  if (customerForm.value.city && !customerForm.value.city.trim()) {
+    formErrors.value.city = 'La ciudad no puede estar vacía'
   }
   
   // Validar límite de crédito (no negativo)
@@ -909,6 +942,14 @@ const openCreateModal = () => {
   showCustomerModal.value = true
 }
 
+// Manejar click en checkbox de crédito
+const handleCreditCheckboxClick = (event) => {
+  if (!isCreditiendaEnabled.value) {
+    event.preventDefault()
+    showCreditiendaUpgradeModal()
+  }
+}
+
 const editCustomer = (customer) => {
   isEditing.value = true
   customerForm.value = { ...customer }
@@ -1032,6 +1073,9 @@ onMounted(async () => {
   loadUserPreferences()
   
   await loadCustomers()
+  
+  // Log para debug
+  console.log('💳 [Customers] Creditienda enabled:', isCreditiendaEnabled.value)
 })
 </script>
 

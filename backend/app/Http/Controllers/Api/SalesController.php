@@ -95,20 +95,65 @@ class SalesController extends Controller
         try {
             DB::beginTransaction();
 
+            $data = $request->all();
+            $surchargeAmount = 0;
+            $paymentStatus = 'paid'; // Default for non-credit sales
+
+            // Lógica de Creditienda
+            if ($request->payment_method === 'credit') {
+                $settings = \App\Models\SystemSetting::first();
+                
+                if (!$settings || !$settings->enable_credit_system) {
+                    throw new \Exception('El sistema de créditos no está habilitado.');
+                }
+
+                if (!$request->customer_id) {
+                    throw new \Exception('Se requiere un cliente para ventas a crédito.');
+                }
+
+                $customer = \App\Models\Customer::find($request->customer_id);
+                
+                if (!$customer->credit_active) {
+                    throw new \Exception('El cliente no tiene habilitado el crédito.');
+                }
+
+                // Calcular recargo
+                if ($settings->credit_surcharge_percentage > 0) {
+                    $surchargeAmount = $request->total_amount * ($settings->credit_surcharge_percentage / 100);
+                    $data['total_amount'] += $surchargeAmount;
+                }
+
+                // Verificar cupo
+                $newDebt = $customer->current_debt + $data['total_amount']; // Usamos current_debt que ya existe
+                if ($newDebt > $customer->credit_limit) {
+                    throw new \Exception("El cliente excede su cupo de crédito. Cupo disponible: " . ($customer->credit_limit - $customer->current_debt));
+                }
+
+                // Actualizar deuda del cliente
+                $customer->current_debt = $newDebt;
+                $customer->save();
+
+                $data['status'] = 'pending'; // Venta pendiente
+                $paymentStatus = 'pending';
+                $data['surcharge_amount'] = $surchargeAmount;
+            }
+
             // Crear la venta/cotización
             $sale = Sale::create([
-                'invoice_number' => $request->invoice_number,
-                'customer_id' => $request->customer_id,
+                'invoice_number' => $data['invoice_number'],
+                'customer_id' => $data['customer_id'],
                 'user_id' => auth()->id() ?? 1,
-                'subtotal' => $request->subtotal,
-                'tax_amount' => $request->tax_amount ?? 0,
-                'discount_amount' => $request->discount_amount ?? 0,
-                'total_amount' => $request->total_amount,
-                'payment_method' => $request->payment_method,
-                'cash_received' => $request->cash_received,
-                'change_given' => $request->change_given,
-                'status' => $request->status,
-                'notes' => $request->notes,
+                'subtotal' => $data['subtotal'],
+                'tax_amount' => $data['tax_amount'] ?? 0,
+                'discount_amount' => $data['discount_amount'] ?? 0,
+                'total_amount' => $data['total_amount'],
+                'surcharge_amount' => $surchargeAmount,
+                'payment_method' => $data['payment_method'],
+                'cash_received' => $data['cash_received'],
+                'change_given' => $data['change_given'],
+                'status' => $data['status'],
+                'payment_status' => $paymentStatus,
+                'notes' => $data['notes'],
                 'sale_date' => now()
             ]);
 

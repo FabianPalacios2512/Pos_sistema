@@ -1912,29 +1912,42 @@ const mapPaymentIcon = (iconType, methodName) => {
 
 // Computed properties
 const paymentMethods = computed(() => {
+  let methods = []
+
+  // 1. Métodos de la API
   if (Array.isArray(paymentMethodsFromApi.value) && paymentMethodsFromApi.value.length > 0) {
     let filtered = paymentMethodsFromApi.value.filter(method => method.active)
     
-    // ACEPTAR TODOS LOS MÉTODOS ACTIVOS INDEPENDIENTEMENTE DEL TIPO
-    // Si es 'contado', incluir todos los métodos disponibles (efectivo, tarjeta, transferencia, nequi)
-    if (paymentType.value === 'contado') {
-      // Incluir TODOS los métodos activos - no filtrar por type
-      // Esto permite usar efectivo, tarjeta de crédito/débito, transferencia, nequi, etc.
-      filtered = filtered
-    } else if (paymentType.value === 'financiado') {
+    if (paymentType.value === 'financiado') {
       filtered = filtered.filter(m => m.type === 'financiado')
     }
     
-    return filtered.map(method => ({
+    methods = filtered.map(method => ({
       id: method.code || method.slug || method.name.toLowerCase().replace(/\s+/g, '_'),
       name: method.name,
       icon: mapPaymentIcon(method.icon, method.name),
       description: method.description,
-      fee: method.fee || 0,
+      fee_amount: method.fee || 0, // Mapear correctamente para ConfirmPaymentModal
+      fee_type: method.fee_type || 'fixed',
       requires_reference: method.requires_reference || false
     }))
   }
-  return []
+
+  // 2. Inyectar Creditienda si está habilitado
+  if (systemSettings.value.creditienda_enabled) {
+    methods.push({
+      id: 'credit',
+      name: 'Creditienda',
+      icon: 'card', // Reutilizamos icono de tarjeta o definimos uno nuevo
+      description: 'Venta a crédito con recargo',
+      fee_amount: parseFloat(systemSettings.value.credit_surcharge_percentage) || 0,
+      fee_type: 'percentage',
+      requires_reference: false,
+      is_credit: true // Flag para identificarlo fácilmente
+    })
+  }
+
+  return methods
 })
 
 const onlyStock = ref(false)
@@ -2578,6 +2591,37 @@ const handleCobrarClick = async () => {
   }
   
   if (!canShowPaymentModal.value) return
+
+  // VALIDACIÓN DE CRÉDITO
+  if (selectedPaymentMethod.value === 'credit') {
+    // 1. Validar que haya cliente seleccionado
+    if (!selectedCustomer.value || !selectedCustomer.value.id || selectedCustomer.value.name === 'Cliente General') {
+      showError('Debe seleccionar un cliente registrado para ventas a crédito')
+      return
+    }
+
+    // 2. Validar que el cliente tenga crédito activo
+    if (!selectedCustomer.value.credit_active) {
+      showError('El cliente seleccionado no tiene crédito habilitado')
+      return
+    }
+
+    // 3. Calcular recargo y total estimado
+    const surchargePercent = parseFloat(systemSettings.value.credit_surcharge_percentage) || 0
+    const surcharge = Math.round((total.value * surchargePercent) / 100)
+    const estimatedTotal = total.value + surcharge
+
+    // 4. Validar cupo disponible
+    const currentDebt = parseFloat(selectedCustomer.value.current_debt || 0)
+    const creditLimit = parseFloat(selectedCustomer.value.credit_limit || 0)
+    const availableCredit = creditLimit - currentDebt
+
+    if (estimatedTotal > availableCredit) {
+      showError(`Crédito insuficiente. Disponible: $${availableCredit.toLocaleString()} - Requerido: $${estimatedTotal.toLocaleString()}`)
+      return
+    }
+  }
+
   showPaymentModal.value = true
 }
 
@@ -2599,6 +2643,7 @@ const handlePaymentConfirmed = async (paymentData) => {
       const conversionData = {
         status: 'completed',
         payment_method: paymentData.method,
+        surcharge_amount: paymentData.method === 'credit' ? paymentData.fee : 0,
         cash_received: paymentData.amount,
         change_given: paymentData.change || 0,
         // Actualizar items si fueron modificados
@@ -2692,6 +2737,7 @@ const handlePaymentConfirmed = async (paymentData) => {
           methodName: paymentData.methodName || getPaymentMethodName(paymentData.method),
           amount: paymentData.amount || total.value
         }],
+        surcharge: paymentData.method === 'credit' ? paymentData.fee : 0,
         change: paymentData.change || 0
       }
     }
@@ -2724,6 +2770,7 @@ const handlePaymentConfirmed = async (paymentData) => {
         tax_amount: parseFloat(lastSale.value.tax),
         total: parseFloat(lastSale.value.total),
         payment_method: selectedPaymentMethod.value, // Usar directamente el código del método de pago
+        surcharge_amount: selectedPaymentMethod.value === 'credit' ? paymentData.fee : 0,
         notes: `Venta POS - ${lastSale.value.cashier}`,
         items: lastSale.value.items.map(item => ({
           product_id: item.id,
@@ -5013,8 +5060,9 @@ const generateQuotationPDFBlob = async (quotationData) => {
     yPos += 4
     
     // IVA
-    pdf.text('IVA (0%):', leftMargin + 35, yPos)
-    pdf.text('$0', leftMargin + 72, yPos, { align: 'right' })
+    const taxRate = displayTaxRate.value || 0
+    pdf.text(`IVA (${taxRate}%):`, leftMargin + 35, yPos)
+    pdf.text(`$${parseFloat(tax.value || 0).toLocaleString()}`, leftMargin + 72, yPos, { align: 'right' })
     yPos += 4
     
     // Total final

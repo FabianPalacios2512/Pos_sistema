@@ -82,7 +82,7 @@ class DashboardController extends Controller
         $tenants->getCollection()->transform(function ($tenant) {
             return [
                 'id' => $tenant->id,
-                'business_name' => $tenant->data['business_name'] ?? 'Sin Nombre',
+                'business_name' => $tenant->business_name ?? 'Sin Nombre',
                 'plan' => $tenant->plan ?? 'free',
                 'domains' => $tenant->domains->pluck('domain')->toArray(),
                 'primary_domain' => $tenant->domains->first()?->domain ?? 'N/A',
@@ -201,7 +201,7 @@ class DashboardController extends Controller
             'success' => true,
             'data' => [
                 'id' => $tenant->id,
-                'business_name' => $tenant->data['business_name'] ?? 'Sin Nombre',
+                'business_name' => $tenant->business_name ?? 'Sin Nombre',
                 'plan' => $tenant->plan ?? 'free_trial',
                 'status' => $tenant->data['status'] ?? 'active',
                 'domains' => $tenant->domains->pluck('domain')->toArray(),
@@ -227,12 +227,15 @@ class DashboardController extends Controller
         ]);
 
         try {
+            // Reemplazar guiones por guiones bajos en el ID para evitar problemas con nombres de BD
+            $tenantId = str_replace('-', '_', $validated['tenant_id']);
+
             // Crear tenant
             $tenant = Tenant::create([
-                'id' => $validated['tenant_id'],
+                'id' => $tenantId,
+                'business_name' => $validated['business_name'],
                 'plan' => $validated['plan'] ?? 'free_trial',
                 'data' => [
-                    'business_name' => $validated['business_name'],
                     'status' => 'active',
                 ]
             ]);
@@ -247,7 +250,7 @@ class DashboardController extends Controller
                 'message' => 'Tienda creada exitosamente',
                 'data' => [
                     'id' => $tenant->id,
-                    'business_name' => $tenant->data['business_name'],
+                    'business_name' => $tenant->business_name,
                     'domain' => $validated['domain'],
                     'plan' => $tenant->plan,
                 ]
@@ -352,6 +355,160 @@ class DashboardController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar la tienda: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Obtiene los usuarios de un tenant específico
+     */
+    public function getTenantUsers($id)
+    {
+        try {
+            $tenant = Tenant::findOrFail($id);
+
+            // Conectar a la base de datos del tenant
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            // Obtener usuarios del tenant con sus roles
+            $users = DB::connection('mysql')
+                ->table($tenantDbName . '.users')
+                ->leftJoin($tenantDbName . '.roles', $tenantDbName . '.users.role_id', '=', $tenantDbName . '.roles.id')
+                ->select(
+                    $tenantDbName . '.users.id',
+                    $tenantDbName . '.users.name',
+                    $tenantDbName . '.users.email',
+                    $tenantDbName . '.users.active',
+                    $tenantDbName . '.users.created_at',
+                    $tenantDbName . '.roles.name as role'
+                )
+                ->orderBy($tenantDbName . '.users.id', 'asc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $users
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cargar usuarios: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Resetea la contraseña de un usuario de un tenant
+     */
+    public function resetUserPassword($tenantId, $userId, Request $request)
+    {
+        try {
+            $tenant = Tenant::findOrFail($tenantId);
+            $newPassword = $request->input('password');
+
+            if (!$newPassword) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La contraseña es requerida'
+                ], 400);
+            }
+
+            // Conectar a la base de datos del tenant
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            // Actualizar la contraseña del usuario
+            DB::connection('mysql')
+                ->table($tenantDbName . '.users')
+                ->where('id', $userId)
+                ->update([
+                    'password' => bcrypt($newPassword)
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Contraseña actualizada correctamente'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al resetear contraseña: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Obtiene los productos de un tenant específico
+     */
+    public function getTenantProducts($id)
+    {
+        try {
+            $tenant = Tenant::findOrFail($id);
+
+            // Conectar a la base de datos del tenant
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            // Obtener productos del tenant
+            $products = DB::connection('mysql')
+                ->table($tenantDbName . '.products')
+                ->select('id', 'name', 'price', 'stock', 'created_at')
+                ->orderBy('name', 'asc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $products
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cargar productos: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Genera un link de registro con plan preseleccionado
+     */
+    public function generateSignupLink(Request $request)
+    {
+        $validated = $request->validate([
+            'plan' => 'required|string|in:free_trial,basic,premium,enterprise',
+        ]);
+
+        try {
+            // Generar token único
+            $token = bin2hex(random_bytes(32));
+
+            // Guardar en base de datos con expiración de 7 días
+            DB::connection('mysql')->table('signup_tokens')->insert([
+                'token' => $token,
+                'plan' => $validated['plan'],
+                'expires_at' => Carbon::now()->addDays(7),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Generar URL
+            $baseUrl = config('app.url'); // En producción será tu dominio VPS
+            $signupUrl = "{$baseUrl}/register?token={$token}";
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'token' => $token,
+                    'plan' => $validated['plan'],
+                    'url' => $signupUrl,
+                    'expires_at' => Carbon::now()->addDays(7)->toDateTimeString(),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al generar link: ' . $e->getMessage()
             ], 500);
         }
     }

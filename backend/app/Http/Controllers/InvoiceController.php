@@ -24,15 +24,37 @@ class InvoiceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
-            $invoices = Invoice::with(['customer', 'items.product'])
-                ->orderBy('created_at', 'desc')
-                ->get()
+            $query = Invoice::with(['customer', 'items.product'])
+                ->orderBy('created_at', 'desc');
+
+            // Filter by customer_id if provided
+            if ($request->has('customer_id')) {
+                $query->where('customer_id', $request->customer_id);
+            }
+
+            // Filter by payment_method if provided
+            if ($request->has('payment_method')) {
+                $query->where('payment_method', $request->payment_method);
+            }
+
+            // Filter by status if provided
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
+
+            // Filter by type if provided
+            if ($request->has('type')) {
+                $query->where('type', $request->type);
+            }
+
+            $invoices = $query->get()
                 ->map(function ($invoice) {
                     return [
                         'id' => $invoice->id,
+                        'invoice_number' => $invoice->invoice_number ?? $invoice->number,
                         'number' => $invoice->number,
                         'type' => $invoice->type,
                         'customer_id' => $invoice->customer_id,
@@ -46,6 +68,8 @@ class InvoiceController extends Controller
                         'tax' => (float) $invoice->tax_amount,
                         'total' => (float) $invoice->total,
                         'status' => $invoice->status,
+                        'payment_method' => $invoice->payment_method,
+                        'surcharge_amount' => (float) ($invoice->surcharge_amount ?? 0),
                         'notes' => $invoice->notes,
                         'items' => $this->getInvoiceItems($invoice),
                         'created_at' => $invoice->created_at,
@@ -418,12 +442,27 @@ class InvoiceController extends Controller
                 ->pluck('code')
                 ->toArray();
 
+            // ✅ Agregar 'credit' si Creditienda está habilitado
+            $systemSettings = DB::table('system_settings')->first();
+            if ($systemSettings && $systemSettings->creditienda_enabled) {
+                $validPaymentMethods[] = 'credit';
+            }
+
+            // 🐛 DEBUG: Ver qué payment_method llega desde el frontend
+            \Log::info('🔍 Payment Method Debug:', [
+                'received_payment_method' => $request->payment_method,
+                'valid_payment_methods' => $validPaymentMethods,
+                'type_of_received' => gettype($request->payment_method),
+                'creditienda_enabled' => $systemSettings->creditienda_enabled ?? false
+            ]);
+
             $validator = Validator::make($request->all(), [
                 'type' => 'required|in:invoice,quote,credit_note',
                 'customer_id' => 'required|exists:customers,id',
                 'date' => 'required|date',
                 'due_date' => 'nullable|date|after_or_equal:date',
                 'payment_method' => 'nullable|in:' . implode(',', $validPaymentMethods),
+                'surcharge_amount' => 'nullable|numeric|min:0',
                 'items' => 'required|array',
                 'items.*.product_id' => 'required|integer',
                 'items.*.product_name' => 'required|string',
@@ -455,7 +494,10 @@ class InvoiceController extends Controller
             DB::beginTransaction();
 
             $data = $validator->validated();
+
+            \Log::info('📝 Generando número de factura para tipo: ' . $data['type']);
             $data['number'] = Invoice::generateNextNumber($data['type']);
+            \Log::info('✅ Número generado: ' . $data['number']);
 
             // Establecer status según el tipo de documento
             if ($data['type'] === 'quote') {
@@ -464,12 +506,20 @@ class InvoiceController extends Controller
                 $data['status'] = 'paid'; // Las ventas del POS están pagadas
             }
 
-            // Asignar cash_session_id automáticamente para ventas (no cotizaciones)
-            if ($data['type'] !== 'quote') {
+            // Asignar cash_session_id SOLO para ventas de contado (no cotizaciones ni crédito)
+            if ($data['type'] !== 'quote' && (!isset($data['payment_method']) || $data['payment_method'] !== 'credit')) {
                 // Obtener el usuario autenticado
                 $userId = Auth::id();
 
+                \Log::info('Auth check in createPosInvoice', [
+                    'user_id' => $userId,
+                    'auth_check' => Auth::check(),
+                    'auth_user' => Auth::user() ? Auth::user()->toArray() : null,
+                    'request_user' => $request->user() ? $request->user()->toArray() : null
+                ]);
+
                 if (!$userId) {
+                    \Log::error('Usuario no autenticado en createPosInvoice');
                     return response()->json([
                         'success' => false,
                         'message' => 'Usuario no autenticado'
@@ -481,21 +531,140 @@ class InvoiceController extends Controller
 
                 if ($currentCashSession) {
                     $data['cash_session_id'] = $currentCashSession->id;
+                    \Log::info("✅ Venta de contado asignada a sesión de caja {$currentCashSession->id}");
                 } else {
                     // Log warning pero no bloquear la venta
                     \Log::warning("Factura {$data['number']} creada sin sesión de caja abierta para usuario {$userId}");
                 }
+            } elseif (isset($data['payment_method']) && $data['payment_method'] === 'credit') {
+                // Las ventas a crédito NO se asignan a caja porque no hay dinero físico
+                $data['cash_session_id'] = null;
+                \Log::info("💳 Venta a crédito NO asignada a caja - El dinero entrará cuando se registre el abono");
+            }
+
+            // VALIDACIÓN CRÍTICA: VENTAS A CRÉDITO (antes de crear la factura)
+            if (isset($data['payment_method']) && $data['payment_method'] === 'credit') {
+                \Log::info('💳 Validando venta a crédito', [
+                    'customer_id' => $data['customer_id'],
+                    'total' => $data['total'],
+                    'surcharge_amount' => $data['surcharge_amount'] ?? 0
+                ]);
+
+                // 1. Obtener cliente
+                $customer = \App\Models\Customer::find($data['customer_id']);
+                if (!$customer) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cliente no encontrado'
+                    ], 404);
+                }
+
+                // 2. Validar que el cliente tenga crédito activo
+                if (!$customer->credit_active) {
+                    \Log::warning('❌ Cliente sin crédito activo', [
+                        'customer_id' => $customer->id,
+                        'customer_name' => $customer->name
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'El cliente no tiene crédito habilitado'
+                    ], 400);
+                }
+
+                // 3. Calcular total con recargo
+                $totalWithSurcharge = $data['total'] + ($data['surcharge_amount'] ?? 0);
+
+                // 4. Validar cupo disponible
+                $currentDebt = floatval($customer->current_debt ?? 0);
+                $creditLimit = floatval($customer->credit_limit ?? 0);
+                $availableCredit = $creditLimit - $currentDebt;
+                $newDebt = $currentDebt + $totalWithSurcharge;
+
+                \Log::info('🔍 Validación de cupo', [
+                    'customer_id' => $customer->id,
+                    'customer_name' => $customer->name,
+                    'credit_limit' => $creditLimit,
+                    'current_debt' => $currentDebt,
+                    'available_credit' => $availableCredit,
+                    'required_credit' => $totalWithSurcharge,
+                    'new_debt_if_approved' => $newDebt
+                ]);
+
+                if ($totalWithSurcharge > $availableCredit) {
+                    \Log::error('❌ Crédito insuficiente', [
+                        'customer_id' => $customer->id,
+                        'available_credit' => $availableCredit,
+                        'required' => $totalWithSurcharge,
+                        'deficit' => $totalWithSurcharge - $availableCredit
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => sprintf(
+                            'Crédito insuficiente. Disponible: $%s - Requerido: $%s',
+                            number_format($availableCredit, 0),
+                            number_format($totalWithSurcharge, 0)
+                        )
+                    ], 400);
+                }
+
+                \Log::info('✅ Validación de cupo exitosa, procesando venta a crédito');
             }
 
             // Crear la factura principal
             $invoice = Invoice::create($data);
 
+            // PROCESAR VENTA A CRÉDITO (después de crear y validar)
+            if (isset($data['payment_method']) && $data['payment_method'] === 'credit') {
+                \Log::info('💳 Procesando venta a crédito', [
+                    'invoice_id' => $invoice->id,
+                    'invoice_number' => $invoice->number,
+                    'customer_id' => $data['customer_id'],
+                    'total' => $data['total'],
+                    'surcharge_amount' => $data['surcharge_amount'] ?? 0
+                ]);
+
+                // IMPORTANTE: Mantener status = 'paid' para que cuente en reportes de ventas
+                // El payment_method='credit' ya indica que es a crédito
+                // La columna cash_session_id=null indica que no está en caja
+                \Log::info("✅ Factura a crédito mantiene status='paid' para contar en ventas, pero sin cash_session_id");
+
+                // Actualizar deuda del cliente (ya validamos antes)
+                $customer = \App\Models\Customer::find($data['customer_id']);
+                if ($customer) {
+                    $previousDebt = $customer->current_debt ?? 0;
+                    $totalWithSurcharge = $data['total'] + ($data['surcharge_amount'] ?? 0);
+                    $customer->current_debt = $previousDebt + $totalWithSurcharge;
+                    $customer->save();
+
+                    \Log::info('✅ Deuda del cliente actualizada', [
+                        'customer_id' => $customer->id,
+                        'customer_name' => $customer->name,
+                        'previous_debt' => $previousDebt,
+                        'added_amount' => $totalWithSurcharge,
+                        'new_debt' => $customer->current_debt,
+                        'credit_limit' => $customer->credit_limit,
+                        'available_credit' => $customer->credit_limit - $customer->current_debt
+                    ]);
+                }
+            }
+
+
             // Preparar array de items para el campo JSON
             $itemsForJson = [];
+
+            // Calcular IVA proporcional para cada item
+            $totalSubtotal = $data['subtotal'];
+            $totalTaxAmount = $data['tax_amount'];
 
             // Insertar items detallados en invoice_items
             foreach ($data['items'] as $item) {
                 $subtotal = $item['quantity'] * $item['unit_price'];
+
+                // Calcular IVA proporcional basado en el subtotal del item
+                $itemTaxAmount = $totalSubtotal > 0
+                    ? ($subtotal / $totalSubtotal) * $totalTaxAmount
+                    : 0;
 
                 // Agregar al array JSON
                 $itemsForJson[] = [
@@ -514,7 +683,7 @@ class InvoiceController extends Controller
                     'unit_price' => $item['unit_price'],
                     'subtotal' => $subtotal,
                     'discount_amount' => 0,
-                    'tax_amount' => 0,
+                    'tax_amount' => $itemTaxAmount,
                     'notes' => null
                 ]);
 
@@ -673,6 +842,12 @@ class InvoiceController extends Controller
 
             $invoice->load(['customer', 'invoiceItems']);
 
+            \Log::info('✅ Factura POS creada exitosamente', [
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->number,
+                'total' => $invoice->total
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Factura creada exitosamente desde POS',
@@ -680,10 +855,19 @@ class InvoiceController extends Controller
             ], 201);
         } catch (\Exception $e) {
             DB::rollback();
+
+            \Log::error('❌ ERROR CRÍTICO al crear factura POS', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear la factura desde POS',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'details' => config('app.debug') ? $e->getTraceAsString() : null
             ], 500);
         }
     }

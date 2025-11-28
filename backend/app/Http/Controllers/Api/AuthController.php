@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -18,7 +19,49 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Buscar usuario por email
+        // PRIMERO: Intentar autenticar como Super Admin (Base Central)
+        $centralUser = DB::connection('mysql')->table('central_users')
+            ->where('email', $request->email)
+            ->first();
+
+        if ($centralUser && Hash::check($request->password, $centralUser->password)) {
+            if (!$centralUser->is_active) {
+                throw ValidationException::withMessages([
+                    'email' => ['Tu cuenta de super admin está desactivada.'],
+                ]);
+            }
+
+            // Crear token para super admin (sin modelo Eloquent)
+            $token = bin2hex(random_bytes(40));
+
+            // Actualizar último login
+            DB::connection('mysql')->table('central_users')
+                ->where('id', $centralUser->id)
+                ->update(['updated_at' => now()]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Inicio de sesión exitoso como Super Admin',
+                'data' => [
+                    'user' => [
+                        'id' => $centralUser->id,
+                        'name' => $centralUser->name,
+                        'email' => $centralUser->email,
+                        'phone' => null,
+                        'role' => [
+                            'id' => 0,
+                            'name' => $centralUser->role,
+                            'permissions' => ['*'] // Super admin tiene todos los permisos
+                        ],
+                        'is_super_admin' => true,
+                        'last_login' => now()
+                    ],
+                    'token' => $token
+                ]
+            ]);
+        }
+
+        // SEGUNDO: Si no es super admin, buscar en tenant
         $user = User::with('role')->where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -52,6 +95,7 @@ class AuthController extends Controller
                         'name' => $user->role->name,
                         'permissions' => $user->role->permissions
                     ] : null,
+                    'is_super_admin' => false,
                     'last_login' => $user->last_login
                 ],
                 'token' => $token

@@ -16,7 +16,30 @@ export function usePermissions() {
     if (!currentUser.value || !currentUser.value.role) {
       return []
     }
-    return currentUser.value.role.permissions || []
+    
+    const permissions = currentUser.value.role.permissions
+    
+    // Si permissions es un objeto (ej: {"*": true}), convertir a array
+    if (permissions && typeof permissions === 'object' && !Array.isArray(permissions)) {
+      // Si tiene la clave "*", dar todos los permisos
+      if (permissions['*'] === true) {
+        return ['*', 'ALL', 'admin']
+      }
+      // Convertir objeto a array de claves
+      return Object.keys(permissions).filter(key => permissions[key] === true)
+    }
+    
+    // Si ya es array, retornarlo
+    if (Array.isArray(permissions)) {
+      return permissions
+    }
+    
+    // Si es string con todos los permisos
+    if (permissions === '*' || permissions === 'ALL') {
+      return ['*', 'ALL', 'admin']
+    }
+    
+    return []
   })
   
   /**
@@ -29,8 +52,11 @@ export function usePermissions() {
       return false
     }
     
-    // Si el usuario tiene el permiso especial 'ALL' o 'admin', tiene todos los permisos
-    if (userPermissions.value.includes('ALL') || userPermissions.value.includes('all') || userPermissions.value.includes('admin')) {
+    // Si el usuario tiene el permiso especial '*', 'ALL' o 'admin', tiene todos los permisos
+    if (userPermissions.value.includes('*') || 
+        userPermissions.value.includes('ALL') || 
+        userPermissions.value.includes('all') || 
+        userPermissions.value.includes('admin')) {
       return true
     }
     
@@ -48,17 +74,22 @@ export function usePermissions() {
       return false
     }
     
-    // Si tiene permiso ALL o admin
-    if (userPermissions.value.includes('ALL') || userPermissions.value.includes('all') || userPermissions.value.includes('admin')) {
+    // Si tiene permiso ALL, admin o *
+    if (userPermissions.value.includes('*') || 
+        userPermissions.value.includes('ALL') || 
+        userPermissions.value.includes('all') || 
+        userPermissions.value.includes('admin')) {
       return true
     }
     
     // Verificar si tiene al menos un permiso del módulo (ej: 'products.view')
-    const hasAccess = userPermissions.value.some(permission => permission.startsWith(`${module}.`))
+    const hasAccess = userPermissions.value.some(permission => 
+      permission.startsWith(`${module}.`) || permission === module
+    )
     
     // Log solo para módulos críticos
     if (module === 'pos' || module === 'dashboard') {
-      console.log(`🔍 [hasModuleAccess] ${module}: ${hasAccess} (permisos: ${userPermissions.value.length})`)
+      console.log(`🔍 [hasModuleAccess] ${module}: ${hasAccess} (permisos: ${JSON.stringify(userPermissions.value)})`)
     }
     
     return hasAccess
@@ -97,7 +128,7 @@ export function usePermissions() {
         'dashboard', 'pos', 'invoices', 'returns', 
         'products', 'categories', 'stock', 'intelligent_inventory',
         'customers', 'suppliers', 
-        'users', 'cash_register', 'reports', 'settings'
+        'users', 'cash_register', 'expenses', 'reports', 'settings'
       ]
     }
     

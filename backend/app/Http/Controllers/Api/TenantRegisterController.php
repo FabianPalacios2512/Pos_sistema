@@ -29,6 +29,7 @@ class TenantRegisterController extends Controller
             ],
             'email' => 'required|email|max:255',
             'password' => 'required|string|min:8',
+            'token' => 'nullable|string', // Token opcional para plan preseleccionado
         ]);
 
         // Validación manual del dominio para ser más precisos
@@ -63,9 +64,29 @@ class TenantRegisterController extends Controller
         }
 
         try {
+            // Determinar el plan según el token (si existe)
+            $plan = 'free_trial'; // Plan por defecto
+
+            if ($request->token) {
+                // Buscar el token en la base de datos
+                $signupToken = \DB::connection('mysql')->table('signup_tokens')
+                    ->where('token', $request->token)
+                    ->where('used', false)
+                    ->where('expires_at', '>', now())
+                    ->first();
+
+                if ($signupToken) {
+                    $plan = $signupToken->plan;
+                }
+            }
+
+            // Reemplazar guiones por guiones bajos en el ID para evitar problemas con nombres de BD
+            $tenantId = str_replace('-', '_', $request->subdomain);
+
             $tenant = Tenant::create([
-                'id' => $request->subdomain, // Usamos el subdominio como ID del tenant para facilidad
-                'plan' => 'free_trial',
+                'id' => $tenantId,
+                'business_name' => $request->company_name,
+                'plan' => $plan,
                 // Aquí podrías guardar más datos del dueño en la data del tenant si quisieras
                 // o esperar a que se ejecuten los seeders/migraciones del tenant para crear el usuario en la DB del tenant
             ]);
@@ -73,6 +94,17 @@ class TenantRegisterController extends Controller
             $tenant->domains()->create([
                 'domain' => $domainToCreate
             ]);
+
+            // Marcar el token como usado si existe
+            if ($request->token) {
+                \DB::connection('mysql')->table('signup_tokens')
+                    ->where('token', $request->token)
+                    ->update([
+                        'used' => true,
+                        'tenant_id' => $tenant->id,
+                        'updated_at' => now()
+                    ]);
+            }
 
             // Aquí es donde ocurre la magia: Crear el usuario administrador DENTRO de la base de datos del tenant
             // Stancl Tenancy permite ejecutar código en el contexto del tenant

@@ -24,6 +24,7 @@ class Customer extends Model
         'total_purchases',
         'total_orders',
         'active',
+        'credit_active',
         'last_purchase'
     ];
 
@@ -34,6 +35,7 @@ class Customer extends Model
         'total_purchases' => 'decimal:2',
         'total_orders' => 'integer',
         'active' => 'boolean',
+        'credit_active' => 'boolean',
         'last_purchase' => 'datetime'
     ];
 

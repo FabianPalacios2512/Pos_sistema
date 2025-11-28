@@ -349,6 +349,50 @@
       <!-- Configuración POS -->
       <div v-if="activeSection === 'pos'" class="space-y-6">
         
+        <!-- Configuración de Creditienda -->
+        <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
+          <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-gray-900">Creditienda (Sistema de Créditos)</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Gestión de ventas a crédito y recargos</p>
+            </div>
+            <span :class="systemSettings.creditienda_enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" 
+                  class="px-2 py-1 rounded-full text-xs font-semibold">
+              {{ systemSettings.creditienda_enabled ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+          <div class="p-5">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Habilitar sistema de créditos</p>
+                  <p class="text-xs text-gray-600">Permitir ventas a crédito en el POS</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input v-model="systemSettings.creditienda_enabled" type="checkbox" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+
+              <div v-if="systemSettings.creditienda_enabled" class="animate-fade-in-down">
+                <label class="block text-xs font-semibold text-gray-700 mb-2">Porcentaje de Recargo (%)</label>
+                <div class="relative">
+                  <input v-model.number="systemSettings.credit_surcharge_percentage" 
+                         type="number" 
+                         min="0" 
+                         max="100"
+                         step="0.1"
+                         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all pl-10">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-gray-500 font-bold">%</span>
+                  </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Este porcentaje se sumará al total de la venta cuando se seleccione "Crédito".</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Configuración de Ventas -->
         <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
           <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
@@ -623,6 +667,129 @@
         </div>
       </div>
 
+      <!-- Sección de Gastos -->
+      <div v-if="activeSection === 'expenses'" class="space-y-6">
+        
+        <!-- Categorías de Gastos -->
+        <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
+          <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-gray-900">Categorías de Gastos</h2>
+              <p class="text-xs text-gray-500 mt-0.5">{{ expenseCategories.total || 0 }} categorías registradas</p>
+            </div>
+            <button @click="openCreateCategoryModal" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium flex items-center space-x-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              <span>Nueva Categoría</span>
+            </button>
+          </div>
+
+          <!-- Métricas -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-5 bg-gray-50 border-b border-gray-200">
+            <div class="bg-white rounded-lg p-3 border border-gray-200">
+              <p class="text-xs font-medium text-gray-500">Total</p>
+              <p class="text-xl font-bold text-purple-600 mt-1">{{ expenseCategories.total || 0 }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-gray-200">
+              <p class="text-xs font-medium text-gray-500">Activas</p>
+              <p class="text-xl font-bold text-green-600 mt-1">{{ expenseCategoriesStats.active_count || 0 }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-gray-200">
+              <p class="text-xs font-medium text-gray-500">Con Gastos</p>
+              <p class="text-xl font-bold text-blue-600 mt-1">{{ expenseCategoriesStats.with_expenses_count || 0 }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-3 border border-gray-200">
+              <p class="text-xs font-medium text-gray-500">Inactivas</p>
+              <p class="text-xl font-bold text-gray-600 mt-1">{{ (expenseCategories.total || 0) - (expenseCategoriesStats.active_count || 0) }}</p>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="p-5 bg-white border-b border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input v-model="expenseCategoryFilters.search" @input="loadExpenseCategories" type="text" placeholder="Buscar categoría..." class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <select v-model="expenseCategoryFilters.is_active" @change="loadExpenseCategories" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="">Todos los estados</option>
+                <option value="1">Activas</option>
+                <option value="0">Inactivas</option>
+              </select>
+              <button @click="loadExpenseCategories" :disabled="loadingCategories" class="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-lg text-sm font-medium">
+                <span v-if="!loadingCategories">Actualizar</span>
+                <span v-else>Cargando...</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Color</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Nombre</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Descripción</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Gastos</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Total</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Estado</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-if="loadingCategories">
+                  <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                    <div class="flex items-center justify-center space-x-2">
+                      <div class="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                      <span>Cargando categorías...</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-else-if="!expenseCategories.data || expenseCategories.data.length === 0">
+                  <td colspan="7" class="px-4 py-8 text-center text-gray-500">No se encontraron categorías</td>
+                </tr>
+                <tr v-else v-for="category in (Array.isArray(expenseCategories.data) ? expenseCategories.data : []).filter(c => c !== null && c !== undefined)" :key="category.id" class="hover:bg-gray-50">
+                  <td class="px-4 py-3">
+                    <div class="w-6 h-6 rounded-full border-2 border-gray-300" :style="{ backgroundColor: category.color }"></div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="text-sm font-medium text-gray-900">{{ category.name }}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="text-sm text-gray-500 max-w-xs truncate">{{ category.description || '-' }}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="text-sm text-gray-900">{{ category.expenses_count || 0 }}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="text-sm font-medium text-gray-900">${{ Number(category.total_amount || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 }) }}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span :class="category.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'" class="px-2 py-1 text-xs font-semibold rounded-full">
+                      {{ category.is_active ? 'Activa' : 'Inactiva' }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center space-x-2">
+                      <button @click="editExpenseCategory(category)" class="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                      </button>
+                      <button @click="deleteExpenseCategory(category.id)" class="p-1 text-red-600 hover:bg-red-50 rounded">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
@@ -809,11 +976,51 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal: Crear/Editar Categoría de Gasto -->
+  <div v-if="showCategoryModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-bold text-gray-900">{{ editingCategory ? 'Editar Categoría' : 'Nueva Categoría' }}</h3>
+      </div>
+      <form @submit.prevent="saveExpenseCategory" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+            <input v-model="categoryForm.name" type="text" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Color *</label>
+            <input v-model="categoryForm.color" type="color" required class="w-full h-10 px-1 py-1 border border-gray-300 rounded-lg">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <textarea v-model="categoryForm.description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"></textarea>
+        </div>
+        <div>
+          <label class="flex items-center space-x-2">
+            <input v-model="categoryForm.is_active" type="checkbox" class="w-4 h-4 text-purple-600 border-gray-300 rounded">
+            <span class="text-sm font-medium text-gray-700">Categoría activa</span>
+          </label>
+        </div>
+        <div class="flex justify-end space-x-3 pt-4 border-t">
+          <button type="button" @click="closeCategoryModal" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button type="submit" :disabled="savingCategory" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium">
+            {{ savingCategory ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axiosInstance from '../services/apiClient'
+import { appStore } from '../store/appStore.js'
 
 // Props para evitar warnings de Vue
 const props = defineProps({
@@ -823,7 +1030,22 @@ const props = defineProps({
 })
 
 // Emits para eventos
-defineEmits(['navigate', 'changeModule'])
+const emit = defineEmits(['navigate', 'changeModule', 'change-module'])
+
+// Estados para modal de categorías de gastos
+const showCategoryModal = ref(false)
+const loadingCategories = ref(false)
+const savingCategory = ref(false)
+const editingCategory = ref(null)
+const expenseCategories = ref({ data: [], total: 0 })
+const expenseCategoriesStats = ref({})
+const expenseCategoryFilters = ref({ search: '', is_active: '' })
+const categoryForm = ref({
+  name: '',
+  description: '',
+  color: '#3B82F6',
+  is_active: true
+})
 
 // Sistema de notificaciones simple sin Vuex
 const showNotification = (message, type = 'success') => {
@@ -853,7 +1075,8 @@ const sections = ref([
   { id: 'general', name: 'General', icon: '🏢' },
   { id: 'pos', name: 'POS', icon: '🛒' },
   { id: 'discounts', name: 'Descuentos', icon: '🎯' },
-  { id: 'payments', name: 'Pagos', icon: '💳' }
+  { id: 'payments', name: 'Pagos', icon: '💳' },
+  { id: 'expenses', name: 'Gastos', icon: '💰' }
 ])
 
 // Configuraciones del sistema desde API
@@ -911,7 +1134,21 @@ const loadSystemSettings = async () => {
   try {
     const response = await axiosInstance.get('/system-settings')
     if (response.data.success) {
-      Object.assign(systemSettings.value, response.data.data)
+      const settings = response.data.data
+      
+      // Asegurar que los campos de crédito tengan valores por defecto
+      if (settings.enable_credit_system === undefined || settings.enable_credit_system === null) {
+        settings.enable_credit_system = false
+      }
+      if (settings.credit_surcharge_percentage === undefined || settings.credit_surcharge_percentage === null) {
+        settings.credit_surcharge_percentage = 0
+      }
+      
+      console.log('📥 [Settings] Configuración cargada:', settings)
+      console.log('📥 [Settings] enable_credit_system:', settings.enable_credit_system)
+      console.log('📥 [Settings] credit_surcharge_percentage:', settings.credit_surcharge_percentage)
+      
+      Object.assign(systemSettings.value, settings)
     }
   } catch (error) {
     console.error('Error al cargar configuración:', error)
@@ -943,12 +1180,25 @@ const loadPaymentMethods = async () => {
 const saveAllSettings = async () => {
   loading.value = true
   try {
+    console.log('💾 [Settings] Guardando configuración:', systemSettings.value)
+    console.log('💾 [Settings] creditienda_enabled:', systemSettings.value.creditienda_enabled)
+    console.log('💾 [Settings] credit_surcharge_percentage:', systemSettings.value.credit_surcharge_percentage)
+    
     const response = await axiosInstance.put('/system-settings', systemSettings.value)
+    
+    console.log('✅ [Settings] Respuesta del servidor:', response.data)
+    
     if (response.data.success) {
       showNotification('Configuraciones guardadas exitosamente', 'success')
+      // Recargar settings para confirmar que se guardaron
+      await loadSystemSettings()
+      // 🔄 IMPORTANTE: Recargar appStore para que POS vea los cambios (force=true)
+      await appStore.loadSystemSettings(true)
+      console.log('🔄 [Settings] appStore actualizado con nuevos settings')
     }
   } catch (error) {
-    console.error('Error al guardar configuración:', error)
+    console.error('❌ [Settings] Error al guardar configuración:', error)
+    console.error('❌ [Settings] Response:', error.response?.data)
     showNotification('Error al guardar configuración', 'error')
   } finally {
     loading.value = false
@@ -1083,6 +1333,116 @@ const formatDate = (dateString) => {
   if (!dateString) return ''
   return new Date(dateString).toLocaleDateString('es-ES')
 }
+
+// Funciones para categorías de gastos
+const loadExpenseCategories = async () => {
+  loadingCategories.value = true
+  try {
+    const params = {}
+    if (expenseCategoryFilters.value.search) params.search = expenseCategoryFilters.value.search
+    if (expenseCategoryFilters.value.is_active !== '') params.is_active = expenseCategoryFilters.value.is_active
+    
+    const response = await axiosInstance.get('/expense-categories', { params })
+    console.log('Response de categorías:', response.data)
+    
+    // Asegurar estructura correcta
+    if (response.data) {
+      // Si la respuesta tiene success y data, es el formato del backend
+      if (response.data.success && response.data.data) {
+        expenseCategories.value = response.data.data
+      } else {
+        expenseCategories.value = response.data
+      }
+    } else {
+      expenseCategories.value = { data: [], total: 0 }
+    }
+    
+    console.log('expenseCategories después de asignar:', expenseCategories.value)
+    
+    // Cargar estadísticas
+    const statsResponse = await axiosInstance.get('/expense-categories/statistics')
+    console.log('Stats response:', statsResponse.data)
+    if (statsResponse.data && statsResponse.data.success) {
+      expenseCategoriesStats.value = statsResponse.data.data || {}
+    } else {
+      expenseCategoriesStats.value = statsResponse.data || {}
+    }
+  } catch (error) {
+    console.error('Error al cargar categorías:', error)
+    expenseCategories.value = { data: [], total: 0 }
+    expenseCategoriesStats.value = {}
+  } finally {
+    loadingCategories.value = false
+  }
+}
+
+const openCreateCategoryModal = () => {
+  editingCategory.value = null
+  categoryForm.value = { name: '', description: '', color: '#3B82F6', is_active: true }
+  showCategoryModal.value = true
+}
+
+const editExpenseCategory = (category) => {
+  editingCategory.value = category
+  categoryForm.value = {
+    name: category.name,
+    description: category.description || '',
+    color: category.color,
+    is_active: category.is_active === 1 || category.is_active === true
+  }
+  showCategoryModal.value = true
+}
+
+const saveExpenseCategory = async () => {
+  savingCategory.value = true
+  try {
+    const data = {
+      ...categoryForm.value,
+      is_active: categoryForm.value.is_active ? 1 : 0
+    }
+    
+    if (editingCategory.value) {
+      await axiosInstance.put(`/expense-categories/${editingCategory.value.id}`, data)
+    } else {
+      await axiosInstance.post('/expense-categories', data)
+    }
+    
+    await loadExpenseCategories()
+    closeCategoryModal()
+    showNotification(editingCategory.value ? '✅ Categoría actualizada' : '✅ Categoría creada', 'success')
+  } catch (error) {
+    console.error('Error al guardar categoría:', error)
+    showNotification('❌ Error al guardar categoría', 'error')
+  } finally {
+    savingCategory.value = false
+  }
+}
+
+const deleteExpenseCategory = async (id) => {
+  if (confirm('¿Estás seguro de eliminar esta categoría?')) {
+    try {
+      await axiosInstance.delete(`/expense-categories/${id}`)
+      await loadExpenseCategories()
+      showNotification('✅ Categoría eliminada', 'success')
+    } catch (error) {
+      console.error('Error al eliminar categoría:', error)
+      showNotification('❌ Error al eliminar categoría', 'error')
+    }
+  }
+}
+
+const closeCategoryModal = () => {
+  showCategoryModal.value = false
+  editingCategory.value = null
+  categoryForm.value = { name: '', description: '', color: '#3B82F6', is_active: true }
+}
+
+// Watch para cargar categorías cuando se selecciona la sección de gastos
+watch(activeSection, (newVal) => {
+  if (newVal === 'expenses') {
+    loadExpenseCategories()
+  }
+})
 
 // Inicialización
 onMounted(async () => {

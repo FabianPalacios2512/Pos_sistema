@@ -15,6 +15,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     {
         return [
             'id',
+            'business_name',
             'plan', // Ejemplo: Free, Premium
             'subscription_ends_at',
         ];

@@ -25,6 +25,7 @@ class SystemSetting extends Model
         'invoice_footer_message',
         'require_customer',
         'require_customer_quotations',
+        'creditienda_enabled',
         'discounts_enabled',
         'customer_discounts_enabled',
         'promo_codes_enabled',
@@ -34,12 +35,15 @@ class SystemSetting extends Model
         'products_per_page',
         'low_stock_alerts',
         'low_stock_threshold',
+        'enable_credit_system',
+        'credit_surcharge_percentage',
     ];
 
     protected $casts = [
         'iva_enabled' => 'boolean',
         'require_customer' => 'boolean',
         'require_customer_quotations' => 'boolean',
+        'creditienda_enabled' => 'boolean',
         'discounts_enabled' => 'boolean',
         'customer_discounts_enabled' => 'boolean',
         'promo_codes_enabled' => 'boolean',
@@ -48,6 +52,8 @@ class SystemSetting extends Model
         'low_stock_alerts' => 'boolean',
         'payment_methods' => 'array',
         'iva_percentage' => 'decimal:2',
+        'enable_credit_system' => 'boolean',
+        'credit_surcharge_percentage' => 'decimal:2',
     ];
 
     /**
