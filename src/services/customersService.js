@@ -20,6 +20,42 @@ export const customersService = {
     }
   },
 
+  async findByPhone(phone) {
+    try {
+      const response = await this.getAll()
+      // La respuesta puede ser un array directamente o un objeto con propiedad data/customers
+      const customersList = Array.isArray(response) ? response : (response.data || response.customers || [])
+      
+      // Normalizar teléfonos (remover espacios, guiones, etc.)
+      const normalizedPhone = phone.replace(/[\s\-()]/g, '')
+      return customersList.find(c => {
+        const customerPhone = (c.phone || '').replace(/[\s\-()]/g, '')
+        return customerPhone === normalizedPhone
+      })
+    } catch (error) {
+      console.error('Error finding customer by phone:', error)
+      return null
+    }
+  },
+
+  async findByDocument(document) {
+    try {
+      const response = await this.getAll()
+      // La respuesta puede ser un array directamente o un objeto con propiedad data/customers
+      const customersList = Array.isArray(response) ? response : (response.data || response.customers || [])
+      
+      // Normalizar documento (remover espacios, guiones, puntos)
+      const normalizedDocument = document.replace(/[\s\-\.]/g, '').toUpperCase()
+      return customersList.find(c => {
+        const customerDocument = (c.document_number || '').replace(/[\s\-\.]/g, '').toUpperCase()
+        return customerDocument === normalizedDocument
+      })
+    } catch (error) {
+      console.error('Error finding customer by document:', error)
+      return null
+    }
+  },
+
   async create(customerData) {
     try {
       const response = await apiCall('/customers', {

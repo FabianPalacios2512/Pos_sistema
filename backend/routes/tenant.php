@@ -36,3 +36,18 @@ Route::middleware([
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
     });
 });
+
+// Rutas públicas del catálogo (sin autenticación)
+Route::middleware([
+    'api',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+])->prefix('api/public')->group(function () {
+    Route::get('/catalog', [App\Http\Controllers\PublicCatalogController::class, 'index']);
+    Route::get('/catalog/categories', [App\Http\Controllers\PublicCatalogController::class, 'categories']);
+    Route::post('/orders', [App\Http\Controllers\PublicCatalogController::class, 'store']);
+    Route::get('/orders/{uuid}', [App\Http\Controllers\PublicCatalogController::class, 'show']);
+
+    // Ruta para buscar pedido por código (para el POS)
+    Route::post('/orders/find-by-code', [App\Http\Controllers\PublicCatalogController::class, 'findByCode']);
+});

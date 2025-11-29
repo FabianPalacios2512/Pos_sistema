@@ -479,7 +479,10 @@ class InvoiceController extends Controller
                 'applied_discount.amount' => 'nullable|numeric|min:0',
                 'customer_email' => 'nullable|email',
                 'customer_phone' => 'nullable|string',
-                'user_identifier' => 'nullable|string'
+                'user_identifier' => 'nullable|string',
+                // Campos para loyalty points
+                'loyalty_points_redeemed' => 'nullable|integer|min:1',
+                'loyalty_discount_amount' => 'nullable|numeric|min:0'
             ]);
 
             if ($validator->fails()) {
@@ -613,6 +616,59 @@ class InvoiceController extends Controller
 
             // Crear la factura principal
             $invoice = Invoice::create($data);
+
+            // 🎁 LOYALTY POINTS: Redimir puntos si el cliente los usó (ANTES de procesar items)
+            if (isset($data['loyalty_points_redeemed']) && $data['loyalty_points_redeemed'] > 0) {
+                try {
+                    $systemSettings = \App\Models\SystemSetting::first();
+
+                    if ($systemSettings && $systemSettings->enable_loyalty_system) {
+                        $customer = \App\Models\Customer::find($data['customer_id']);
+
+                        if ($customer) {
+                            // Validar que el cliente tenga puntos suficientes
+                            if (!$customer->hasLoyaltyPoints($data['loyalty_points_redeemed'])) {
+                                \Log::warning('⚠️ Cliente no tiene suficientes puntos de fidelización', [
+                                    'customer_id' => $customer->id,
+                                    'available_points' => $customer->loyalty_points,
+                                    'requested_points' => $data['loyalty_points_redeemed']
+                                ]);
+
+                                DB::rollback();
+                                return response()->json([
+                                    'success' => false,
+                                    'message' => sprintf(
+                                        'El cliente no tiene suficientes puntos. Disponible: %d - Solicitado: %d',
+                                        $customer->loyalty_points,
+                                        $data['loyalty_points_redeemed']
+                                    )
+                                ], 400);
+                            }
+
+                            // Redimir los puntos
+                            $customer->redeemLoyaltyPoints(
+                                $data['loyalty_points_redeemed'],
+                                $invoice->id,
+                                Auth::id()
+                            );
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // Fallar la venta si hay error al redimir puntos (está dentro de la transacción)
+                    \Log::error('❌ Error al redimir puntos de fidelización', [
+                        'error' => $e->getMessage(),
+                        'invoice_id' => $invoice->id,
+                        'customer_id' => $data['customer_id'],
+                        'points_requested' => $data['loyalty_points_redeemed']
+                    ]);
+
+                    DB::rollback();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Error al procesar puntos de fidelización: ' . $e->getMessage()
+                    ], 500);
+                }
+            }
 
             // PROCESAR VENTA A CRÉDITO (después de crear y validar)
             if (isset($data['payment_method']) && $data['payment_method'] === 'credit') {
@@ -838,6 +894,36 @@ class InvoiceController extends Controller
             if ($data['type'] !== 'quote' && isset($currentCashSession)) {
                 $currentCashSession->updateSalesTotals();
                 $currentCashSession->save();
+            }
+
+            // 🎁 LOYALTY POINTS: Ganar puntos por compra (solo para ventas pagadas, no cotizaciones)
+            if ($data['type'] !== 'quote' && $data['status'] === 'paid') {
+                try {
+                    $systemSettings = \App\Models\SystemSetting::first();
+
+                    if ($systemSettings && $systemSettings->enable_loyalty_system) {
+                        $customer = \App\Models\Customer::find($data['customer_id']);
+
+                        if ($customer) {
+                            // Calcular puntos ganados basados en el total de la compra
+                            $pointsEarned = \App\Models\Customer::calculatePointsToEarn($invoice->total);
+
+                            if ($pointsEarned > 0) {
+                                $customer->earnLoyaltyPoints(
+                                    $invoice->total,
+                                    $invoice->id,
+                                    Auth::id()
+                                );
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // No fallar la venta si hay error en loyalty points
+                    \Log::error('❌ Error al procesar puntos de fidelización', [
+                        'error' => $e->getMessage(),
+                        'invoice_id' => $invoice->id
+                    ]);
+                }
             }
 
             $invoice->load(['customer', 'invoiceItems']);

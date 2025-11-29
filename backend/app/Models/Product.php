@@ -47,7 +47,10 @@ class Product extends Model
         'manage_stock',
         'active',
         'image_url',
-        'tags'
+        'tags',
+        'is_public',
+        'public_description',
+        'public_image'
     ];
 
     protected $casts = [
@@ -59,6 +62,7 @@ class Product extends Model
         'max_stock' => 'integer',
         'manage_stock' => 'boolean',
         'active' => 'boolean',
+        'is_public' => 'boolean',
         'tags' => 'array'
     ];
 
@@ -98,6 +102,18 @@ class Product extends Model
     public function scopeInStock($query)
     {
         return $query->where('current_stock', '>', 0);
+    }
+
+    public function scopePublic($query)
+    {
+        return $query->where('is_public', true)
+                    ->where('active', true);
+    }
+
+    public function scopeAvailableForOnline($query)
+    {
+        return $query->public()
+                    ->where('current_stock', '>', 0);
     }
 
     // Métodos auxiliares

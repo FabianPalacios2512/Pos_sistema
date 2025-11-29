@@ -393,6 +393,73 @@
           </div>
         </div>
 
+        <!-- Configuración de Loyalty Points (Fidelización) -->
+        <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
+          <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-gray-900">🎁 Sistema de Fidelización (Loyalty Points)</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Programa de puntos y recompensas para clientes</p>
+            </div>
+            <span :class="systemSettings.enable_loyalty_system ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" 
+                  class="px-2 py-1 rounded-full text-xs font-semibold">
+              {{ systemSettings.enable_loyalty_system ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+          <div class="p-5">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Habilitar programa de fidelización</p>
+                  <p class="text-xs text-gray-600">Los clientes acumulan puntos por compras y pueden redimirlos</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input v-model="systemSettings.enable_loyalty_system" type="checkbox" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                </label>
+              </div>
+
+              <div v-if="systemSettings.enable_loyalty_system" class="animate-fade-in-down space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-2">Puntos por cada peso gastado</label>
+                  <div class="relative">
+                    <input v-model.number="systemSettings.loyalty_points_per_currency" 
+                           type="number" 
+                           min="0"
+                           step="0.0001"
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">Ejemplo: 0.001 = 1 punto por cada $1,000 gastados</p>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 mb-2">Valor de cada punto ($)</label>
+                  <div class="relative">
+                    <input v-model.number="systemSettings.loyalty_point_value" 
+                           type="number" 
+                           min="0"
+                           step="1"
+                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all pl-8">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500 font-bold">$</span>
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">Ejemplo: $10 = cada punto vale $10 al redimirlo</p>
+                </div>
+
+                <!-- Ejemplo de cálculo -->
+                <div class="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg p-3">
+                  <p class="text-xs font-semibold text-amber-800 mb-2">📊 Ejemplo con configuración actual:</p>
+                  <div class="space-y-1 text-xs text-amber-700">
+                    <p>• Cliente compra: <span class="font-bold">$100,000</span></p>
+                    <p>• Puntos ganados: <span class="font-bold">{{ Math.floor(100000 * (systemSettings.loyalty_points_per_currency || 0.001)) }} puntos</span></p>
+                    <p>• Valor de puntos: <span class="font-bold">${{ (Math.floor(100000 * (systemSettings.loyalty_points_per_currency || 0.001)) * (systemSettings.loyalty_point_value || 10)).toLocaleString() }}</span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Configuración de Ventas -->
         <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
           <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
@@ -1136,17 +1203,28 @@ const loadSystemSettings = async () => {
     if (response.data.success) {
       const settings = response.data.data
       
-      // Asegurar que los campos de crédito tengan valores por defecto
-      if (settings.enable_credit_system === undefined || settings.enable_credit_system === null) {
-        settings.enable_credit_system = false
-      }
-      if (settings.credit_surcharge_percentage === undefined || settings.credit_surcharge_percentage === null) {
-        settings.credit_surcharge_percentage = 0
-      }
+      // Convertir valores de base de datos (1/0) a booleanos (true/false)
+      const booleanFields = [
+        'creditienda_enabled',
+        'enable_loyalty_system',
+        'require_customer',
+        'require_customer_quotations',
+        'iva_enabled',
+        'show_product_images',
+        'low_stock_alerts',
+        'discounts_enabled',
+        'customer_discounts_enabled',
+        'promo_codes_enabled',
+        'auto_apply_discounts',
+        'enable_credit_system'
+      ]
       
-      console.log('📥 [Settings] Configuración cargada:', settings)
-      console.log('📥 [Settings] enable_credit_system:', settings.enable_credit_system)
-      console.log('📥 [Settings] credit_surcharge_percentage:', settings.credit_surcharge_percentage)
+      booleanFields.forEach(field => {
+        if (settings[field] !== undefined && settings[field] !== null) {
+          // Convertir a booleano: 1/"1"/true → true, 0/"0"/false/null → false
+          settings[field] = Boolean(Number(settings[field]))
+        }
+      })
       
       Object.assign(systemSettings.value, settings)
     }
@@ -1180,13 +1258,23 @@ const loadPaymentMethods = async () => {
 const saveAllSettings = async () => {
   loading.value = true
   try {
-    console.log('💾 [Settings] Guardando configuración:', systemSettings.value)
-    console.log('💾 [Settings] creditienda_enabled:', systemSettings.value.creditienda_enabled)
-    console.log('💾 [Settings] credit_surcharge_percentage:', systemSettings.value.credit_surcharge_percentage)
+    // Convertir booleanos a enteros para MySQL
+    const settingsToSave = {
+      ...systemSettings.value,
+      creditienda_enabled: systemSettings.value.creditienda_enabled ? 1 : 0,
+      enable_loyalty_system: systemSettings.value.enable_loyalty_system ? 1 : 0,
+      require_customer: systemSettings.value.require_customer ? 1 : 0,
+      require_customer_quotations: systemSettings.value.require_customer_quotations ? 1 : 0,
+      iva_enabled: systemSettings.value.iva_enabled ? 1 : 0,
+      show_product_images: systemSettings.value.show_product_images ? 1 : 0,
+      low_stock_alerts: systemSettings.value.low_stock_alerts ? 1 : 0,
+      discounts_enabled: systemSettings.value.discounts_enabled ? 1 : 0,
+      customer_discounts_enabled: systemSettings.value.customer_discounts_enabled ? 1 : 0,
+      promo_codes_enabled: systemSettings.value.promo_codes_enabled ? 1 : 0,
+      auto_apply_discounts: systemSettings.value.auto_apply_discounts ? 1 : 0,
+    }
     
-    const response = await axiosInstance.put('/system-settings', systemSettings.value)
-    
-    console.log('✅ [Settings] Respuesta del servidor:', response.data)
+    const response = await axiosInstance.put('/system-settings', settingsToSave)
     
     if (response.data.success) {
       showNotification('Configuraciones guardadas exitosamente', 'success')
@@ -1194,7 +1282,6 @@ const saveAllSettings = async () => {
       await loadSystemSettings()
       // 🔄 IMPORTANTE: Recargar appStore para que POS vea los cambios (force=true)
       await appStore.loadSystemSettings(true)
-      console.log('🔄 [Settings] appStore actualizado con nuevos settings')
     }
   } catch (error) {
     console.error('❌ [Settings] Error al guardar configuración:', error)

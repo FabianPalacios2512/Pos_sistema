@@ -8,8 +8,21 @@ const SaasRegister = () => import('../views/SaasRegister.vue') // Importar el nu
 const PosCompleto = () => import('../views/PosCompleto.vue')
 const AdminDashboardView = () => import('../views/AdminDashboardView.vue')
 const GodModeAdminPanel = () => import('../components/admin/GodModeAdminPanel.vue')
+const PublicCatalog = () => import('../views/PublicCatalog.vue')
 
 const routes = [
+  // Ruta Pública del Catálogo (SIN autenticación)
+  {
+    path: '/catalog',
+    name: 'PublicCatalog',
+    component: PublicCatalog,
+    meta: {
+      title: 'Catálogo Online - Tienda',
+      requiresAuth: false,
+      public: true // Marca como ruta pública
+    }
+  },
+
   // Ruta de Registro SaaS
   {
     path: '/register',

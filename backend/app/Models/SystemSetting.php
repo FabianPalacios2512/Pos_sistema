@@ -37,6 +37,9 @@ class SystemSetting extends Model
         'low_stock_threshold',
         'enable_credit_system',
         'credit_surcharge_percentage',
+        'enable_loyalty_system',
+        'loyalty_points_per_currency',
+        'loyalty_point_value',
     ];
 
     protected $casts = [
@@ -54,6 +57,9 @@ class SystemSetting extends Model
         'iva_percentage' => 'decimal:2',
         'enable_credit_system' => 'boolean',
         'credit_surcharge_percentage' => 'decimal:2',
+        'enable_loyalty_system' => 'boolean',
+        'loyalty_points_per_currency' => 'decimal:6',
+        'loyalty_point_value' => 'decimal:2',
     ];
 
     /**

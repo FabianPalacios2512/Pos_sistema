@@ -106,18 +106,36 @@
               <p class="text-sm text-gray-500 dark:text-gray-400">
                 {{ customer.document_type }}: {{ customer.document_number }}
               </p>
-              <div class="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400 mt-1">
-                <span class="flex items-center space-x-1">
+              
+              <!-- Información dinámica según funcionalidades activas -->
+              <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                <!-- Teléfono (siempre visible) -->
+                <span v-if="customer.phone" class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-xs">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                   </svg>
-                  <span>{{ customer.phone || 'Sin teléfono' }}</span>
+                  {{ customer.phone }}
                 </span>
-                <span class="flex items-center space-x-1">
+                
+                <!-- Crédito disponible (solo si Creditienda está activo) -->
+                <span v-if="isCreditiendaEnabled && customer.credit_active" 
+                      class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
+                      :class="(customer.credit_limit - customer.current_debt) > 0 
+                        ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' 
+                        : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                   </svg>
-                  <span>${{ formatCurrency(customer.total_purchases || 0) }}</span>
+                  ${{ formatCurrency(customer.credit_limit - customer.current_debt) }} disponible
+                </span>
+                
+                <!-- Puntos de fidelización (solo si Loyalty está activo) -->
+                <span v-if="isLoyaltyEnabled && (customer.loyalty_points || 0) > 0" 
+                      class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-full text-xs font-semibold">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                  {{ customer.loyalty_points }} pts (${{ formatCurrency(customer.loyalty_points_value || 0) }})
                 </span>
               </div>
             </div>
@@ -238,6 +256,15 @@ const creating = ref(false)
 
 // Usar clientes del store global
 const customers = computed(() => appStore.customers)
+
+// Verificar si las funcionalidades están activas
+const isCreditiendaEnabled = computed(() => {
+  return appStore.systemSettings?.creditienda_enabled === 1 || appStore.systemSettings?.creditienda_enabled === true
+})
+
+const isLoyaltyEnabled = computed(() => {
+  return appStore.systemSettings?.enable_loyalty_system === 1 || appStore.systemSettings?.enable_loyalty_system === true
+})
 
 const quickCustomer = ref({
   name: '',

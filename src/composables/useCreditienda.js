@@ -6,9 +6,7 @@ const showUpgradeModal = ref(false)
 export function useCreditienda() {
   // Usar directamente el appStore que ya tiene los settings cargados
   const isCreditiendaEnabled = computed(() => {
-    const enabled = appStore.systemSettings?.creditienda_enabled === true
-    console.log('🔍 [useCreditienda] creditienda_enabled:', enabled, 'settings:', appStore.systemSettings)
-    return enabled
+    return appStore.systemSettings?.creditienda_enabled === true
   })
 
   const showCreditiendaUpgradeModal = () => {

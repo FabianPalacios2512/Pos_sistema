@@ -60,6 +60,9 @@ class SystemSettingsController extends Controller
                 'enable_credit_system' => 'boolean',
                 'creditienda_enabled' => 'boolean',
                 'credit_surcharge_percentage' => 'numeric|min:0|max:100',
+                'enable_loyalty_system' => 'boolean',
+                'loyalty_points_per_currency' => 'numeric|min:0',
+                'loyalty_point_value' => 'numeric|min:0',
             ]);
 
             $settings->update($validated);

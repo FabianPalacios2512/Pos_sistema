@@ -232,6 +232,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/credit-reminders', [\App\Http\Controllers\Api\CreditPaymentController::class, 'sendReminder']);
     // ==================== FIN CRÉDITOS ====================
 
+    // ==================== LOYALTY POINTS (PUNTOS DE FIDELIZACIÓN) ====================
+    Route::get('/loyalty/settings', [\App\Http\Controllers\LoyaltyController::class, 'getSettings']);
+    Route::post('/loyalty/calculate-points', [\App\Http\Controllers\LoyaltyController::class, 'calculatePointsToEarn']);
+    Route::post('/loyalty/calculate-value', [\App\Http\Controllers\LoyaltyController::class, 'calculatePointsValue']);
+    Route::get('/loyalty/customer/{customerId}/points', [\App\Http\Controllers\LoyaltyController::class, 'getCustomerPoints']);
+    Route::get('/loyalty/customer/{customerId}/transactions', [\App\Http\Controllers\LoyaltyController::class, 'getCustomerTransactions']);
+    Route::post('/loyalty/validate-redemption', [\App\Http\Controllers\LoyaltyController::class, 'validateRedemption']);
+    Route::post('/loyalty/adjust-points', [\App\Http\Controllers\LoyaltyController::class, 'adjustPoints']);
+    // ==================== FIN LOYALTY POINTS ====================
+
     // ==================== AI CHAT (con límites de uso) ====================
     Route::middleware(['ai.limit'])->group(function () {
         Route::post('/ai/chat', [\App\Http\Controllers\Api\AIController::class, 'chat']);

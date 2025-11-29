@@ -1067,15 +1067,10 @@ watch(statusFilter, (newValue, oldValue) => {
 
 // Inicialización
 onMounted(async () => {
-  console.log('Módulo de clientes inicializado')
-  
   // 🔧 Cargar preferencias del usuario primero
   loadUserPreferences()
   
   await loadCustomers()
-  
-  // Log para debug
-  console.log('💳 [Customers] Creditienda enabled:', isCreditiendaEnabled.value)
 })
 </script>
 

@@ -142,6 +142,17 @@
           </div>
 
           <button 
+            @click="showLoadWebOrderModal = true" 
+            class="h-12 px-4 flex-shrink-0 flex items-center justify-center gap-2 bg-white text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] ring-1 ring-blue-200 transition-all duration-200 font-semibold text-sm"
+            title="Cargar pedido web"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <span class="hidden md:inline">Pedido Web</span>
+          </button>
+
+          <button 
             @click="clearFilters" 
             class="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-white text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] ring-1 ring-slate-100 transition-all duration-200"
             title="Resetear filtros"
@@ -397,7 +408,7 @@
             <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
           </div>
 
-          <div class="flex flex-col text-left overflow-hidden">
+          <div class="flex flex-col text-left overflow-hidden flex-1">
              <span class="text-[10px] font-bold uppercase tracking-wider mb-0.5"
                    :class="selectedCustomer ? 'text-indigo-500' : 'text-slate-500'">
                {{ selectedCustomer ? 'Cliente Asignado' : 'Asignar Cliente' }}
@@ -406,6 +417,20 @@
                    :class="selectedCustomer ? 'text-slate-900' : 'text-slate-400 group-hover:text-indigo-600'">
                {{ selectedCustomer ? selectedCustomer.name : 'Seleccionar o Crear...' }}
              </span>
+             
+             <!-- 🎁 Badge de Puntos de Fidelización -->
+             <div v-if="selectedCustomer && loyaltyEnabled && (selectedCustomer.loyalty_points || 0) > 0" 
+                  class="flex items-center gap-1.5 mt-1">
+               <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200">
+                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                 </svg>
+                 {{ selectedCustomer.loyalty_points }}
+               </span>
+               <span class="text-[9px] text-amber-600 font-semibold">
+                 {{ formatPointsAsMoney(selectedCustomer.loyalty_points) }}
+               </span>
+             </div>
           </div>
         </div>
         
@@ -530,6 +555,52 @@
                 <span v-else>{{ systemSettings.iva_display_name || 'IVA' }}</span>
               </span>
               <span class="font-bold text-slate-900">${{ tax.toLocaleString() }}</span>
+            </div>
+          </div>
+
+          <!-- 🎁 Usar Puntos de Lealtad -->
+          <div v-if="canUseLoyaltyPoints" class="mt-4 pt-3 border-t border-dashed border-slate-200">
+            <button
+              @click="usePoints = !usePoints"
+              class="text-[10px] font-bold flex items-center gap-1.5 transition-colors uppercase tracking-wide group w-full"
+              :class="usePoints ? 'text-amber-700 hover:text-amber-900' : 'text-slate-700 hover:text-slate-900'"
+            >
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
+                   :class="usePoints ? 'bg-amber-100 group-hover:bg-amber-200' : 'bg-slate-100 group-hover:bg-slate-200'">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+              </div>
+              <span class="flex-1 text-left">{{ usePoints ? 'Usar Puntos' : 'Usar Puntos' }}</span>
+              <span class="text-[9px] font-black" :class="usePoints ? 'text-amber-600' : 'text-slate-500'">
+                {{ selectedCustomer.loyalty_points.toLocaleString() }} pts
+              </span>
+            </button>
+            
+            <!-- Input de Puntos (cuando está activado) -->
+            <div v-if="usePoints" class="mt-2 space-y-2 animate-fade-in">
+              <div class="flex gap-2">
+                <input 
+                  type="number" 
+                  v-model.number="pointsToRedeem"
+                  :max="maxPointsToUse"
+                  min="0"
+                  class="flex-1 px-3 py-2 border border-amber-300 rounded-lg text-xs font-bold text-amber-800 bg-white focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+                  placeholder="Puntos"
+                />
+                <button 
+                  @click="pointsToRedeem = maxPointsToUse"
+                  class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg transition-colors uppercase"
+                >
+                  Máx
+                </button>
+              </div>
+              
+              <!-- Mostrar descuento -->
+              <div v-if="pointsDiscount > 0" class="flex items-center justify-between text-xs bg-amber-50 text-amber-700 px-2 py-1.5 rounded-lg border border-amber-100">
+                <span class="font-semibold">Descuento puntos:</span>
+                <span class="font-black">-${{ pointsDiscount.toLocaleString() }}</span>
+              </div>
             </div>
           </div>
 
@@ -1072,6 +1143,22 @@
     @success="handleReturnSuccess"
   />
 
+  <!-- Modal de Cargar Pedido Web -->
+  <LoadWebOrderModal
+    :is-open="showLoadWebOrderModal"
+    @close="showLoadWebOrderModal = false"
+    @order-loaded="handleWebOrderLoaded"
+  />
+
+  <!-- Modal de Confirmación de Cliente Nuevo -->
+  <ConfirmCustomerModal
+    :is-open="showConfirmCustomerModal"
+    :customer-data="pendingCustomerData || {}"
+    @confirm="handleConfirmNewCustomer"
+    @cancel="handleCancelNewCustomer"
+    @close="showConfirmCustomerModal = false"
+  />
+
   <!-- 🎫 BARRA DE MULTI-TABS INFERIOR (Footer Fijo) -->
   <div id="tour-pos-multisales" class="fixed bottom-0 left-0 right-0" style="background-color: #FFFFFF; border-top: 1px solid #E2E8F0; box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.04); z-index: 50; height: 44px;">
     <div class="flex items-center h-full px-1 max-w-screen-2xl mx-auto">
@@ -1173,6 +1260,7 @@ import { useCashSession } from '../services/cashSessionService.js'
 import { appStore } from '../store/appStore.js' // Importar store global
 import axiosInstance from '../services/apiClient.js'
 import { useToast } from '../composables/useToast.js'
+import { useLoyaltyPoints } from '../composables/useLoyaltyPoints.js'
 import { useAuth } from '../store/auth.js'
 import authService from '../services/authService.js'
 import { whatsappService } from '../services/whatsappService.js'
@@ -1190,6 +1278,8 @@ import PhoneInputModal from './PhoneInputModal.vue'
 import ReturnsView from './ReturnsView.vue'
 import QrScanner from 'qr-scanner'
 import ContextualTour from './ContextualTour.vue'
+import LoadWebOrderModal from './pos/LoadWebOrderModal.vue'
+import ConfirmCustomerModal from './pos/ConfirmCustomerModal.vue'
 
 // Switch para tipo de método de pago
 const paymentType = ref('contado')
@@ -1197,6 +1287,13 @@ const paymentType = ref('contado')
 // Composables
 const { showSuccess, showError, showWarning, showInfo } = useToast()
 const { user } = useAuth()
+const { 
+  loyaltySettings, 
+  isEnabled: loyaltyEnabled, 
+  loadSettings: loadLoyaltySettings, 
+  calculatePointsValue, 
+  formatPointsAsMoney 
+} = useLoyaltyPoints()
 
 // Obtener nombre del vendedor actual
 const getCurrentSeller = () => {
@@ -1644,6 +1741,11 @@ const cashReceived = ref(0)
 const processing = ref(false)
 const searchingQuotation = ref(false) // Evitar múltiples búsquedas simultáneas
 
+// 🎁 Loyalty Points - Variables para redimir puntos
+const usePoints = ref(false)
+const pointsToRedeem = ref(0)
+const pointsDiscount = ref(0)
+
 // Toast simple
 const showToastMessage = ref(false)
 const toastMessage = ref('')
@@ -1692,7 +1794,13 @@ const quotationMode = ref(false)
 // Estado del modal de devoluciones
 const showReturnsModal = ref(false)
 
+// Estado del modal de cargar pedido web
+const showLoadWebOrderModal = ref(false)
 
+// Estado del modal de confirmación de cliente nuevo
+const showConfirmCustomerModal = ref(false)
+const pendingCustomerData = ref(null)
+const pendingWebOrder = ref(null)
 
 // Estado del escáner QR
 const showQRScanner = ref(false)
@@ -2039,11 +2147,46 @@ const displayTaxRate = computed(() => {
 })
 
 const total = computed(() => {
-  return subtotal.value - discount.value + tax.value
+  const baseTotal = subtotal.value - discount.value + tax.value
+  // 🎁 Aplicar descuento por puntos si están activados
+  if (usePoints.value && pointsDiscount.value > 0) {
+    return Math.max(0, baseTotal - pointsDiscount.value)
+  }
+  return baseTotal
 })
 
 const totalItems = computed(() => {
   return cart.items.reduce((total, item) => total + item.quantity, 0)
+})
+
+// 🎁 Loyalty Points - Computed properties
+const canUseLoyaltyPoints = computed(() => {
+  // 🔥 OPTIMIZACIÓN SaaS: Si loyalty está desactivado, retornar inmediatamente sin procesar
+  const enabled = loyaltyEnabled.value
+  if (!enabled) return false
+  
+  const hasCustomer = !!selectedCustomer.value
+  const customerPoints = selectedCustomer.value?.loyalty_points || 0
+  const hasItems = cart.items.length > 0
+  
+  return hasCustomer && customerPoints > 0 && hasItems
+})
+
+const maxPointsToUse = computed(() => {
+  if (!canUseLoyaltyPoints.value) return 0
+  
+  const customerPoints = selectedCustomer.value.loyalty_points || 0
+  const baseTotal = subtotal.value - discount.value + tax.value
+  const maxDiscountFromPoints = calculatePointsValue(customerPoints)
+  
+  // No puede redimir más del total de la compra
+  if (maxDiscountFromPoints >= baseTotal) {
+    // Calcular cuántos puntos necesita para cubrir el total
+    const pointsNeeded = Math.ceil(baseTotal / loyaltySettings.value.point_value)
+    return Math.min(pointsNeeded, customerPoints)
+  }
+  
+  return customerPoints
 })
 
 const canProcessPayment = computed(() => {
@@ -2092,6 +2235,37 @@ watch(paymentMethods, (newMethods) => {
     resetToDefaultPaymentMethod()
   }
 }, { immediate: true })
+
+// 🎁 Watchers para loyalty points
+watch(pointsToRedeem, (newPoints) => {
+  if (!usePoints.value || !canUseLoyaltyPoints.value) {
+    pointsDiscount.value = 0
+    return
+  }
+  
+  // Validar que no exceda el máximo
+  if (newPoints > maxPointsToUse.value) {
+    pointsToRedeem.value = maxPointsToUse.value
+    return
+  }
+  
+  // Calcular descuento en dinero
+  pointsDiscount.value = calculatePointsValue(newPoints)
+})
+
+watch(usePoints, (enabled) => {
+  if (!enabled) {
+    pointsToRedeem.value = 0
+    pointsDiscount.value = 0
+  }
+})
+
+// Resetear puntos cuando cambia el cliente o el carrito se vacía
+watch([selectedCustomer, () => cart.items.length], () => {
+  usePoints.value = false
+  pointsToRedeem.value = 0
+  pointsDiscount.value = 0
+})
 
 const applyPromoCode = async () => {
   if (!promoCode.value.trim()) return
@@ -2537,6 +2711,13 @@ const selectCustomer = (customer) => {
   selectedCustomer.value = customer
   showCustomerSelector.value = false
   
+  console.log('👤 [Customer Selected]', {
+    name: customer?.name,
+    loyalty_points: customer?.loyalty_points,
+    loyalty_points_value: customer?.loyalty_points_value,
+    fullCustomer: customer
+  })
+  
   // Actualizar nombre de la pestaña activa con el nombre del cliente
   if (activeTab.value && customer && customer.name) {
     activeTab.value.customer = customer
@@ -2788,6 +2969,11 @@ const handlePaymentConfirmed = async (paymentData) => {
           user_identifier: getUserIdentifier(), // Identificador consistente de usuario
           customer_email: lastSale.value.customer_email || null,
           customer_phone: lastSale.value.customer_phone || null
+        } : {}),
+        // 🎁 Información de puntos redimidos
+        ...(usePoints.value && pointsToRedeem.value > 0 ? {
+          loyalty_points_redeemed: pointsToRedeem.value,
+          loyalty_discount_amount: pointsDiscount.value
         } : {})
       }
       
@@ -4234,6 +4420,9 @@ onMounted(async () => {
     // Solo cargar descuentos (que aún no están en el store global)
     loadDiscounts()
     
+    // Cargar configuración de loyalty points
+    await loadLoyaltySettings()
+    
     // Asegurar que el store esté inicializado
     if (!appStore.initialized) {
       console.log('🔄 Inicializando appStore desde PosView...')
@@ -5412,6 +5601,150 @@ const handleReturnSuccess = async (returnData) => {
 }
 
 // ==================== FIN FUNCIONES DE DEVOLUCIONES ====================
+
+// ==================== FUNCIONES DE PEDIDOS WEB ====================
+
+/**
+ * Manejar cuando se carga un pedido web
+ */
+const handleWebOrderLoaded = async (order) => {
+  try {
+    console.log('📦 Cargando pedido web:', order)
+    
+    // Buscar cliente por documento (prioridad) o teléfono
+    let customer = null
+    
+    // 1. Intentar encontrar el cliente por documento (si está disponible)
+    if (order.customer_document) {
+      customer = await customersService.findByDocument(order.customer_document)
+      if (customer) {
+        console.log('✅ Cliente encontrado por documento:', customer)
+      }
+    }
+    
+    // 2. Si no se encontró por documento, intentar por teléfono
+    if (!customer) {
+      customer = await customersService.findByPhone(order.customer_phone)
+      if (customer) {
+        console.log('✅ Cliente encontrado por teléfono:', customer)
+      }
+    }
+    
+    // 3. Si el cliente existe, asignarlo directamente
+    if (customer) {
+      // Asignar al selectedCustomer global
+      selectedCustomer.value = customer
+      
+      // También asignarlo al tab actual
+      const currentTab = salesTabs.value.find(t => t.id === activeTabId.value)
+      if (currentTab) {
+        currentTab.customer = customer
+        currentTab.selectedCustomer = customer
+      }
+      
+      // Cargar productos al carrito
+      await loadOrderProductsToCart(order)
+      
+      showSuccess(`Pedido #${order.order_number} cargado. Cliente: ${customer.name}`)
+      
+    } else {
+      // 4. Si el cliente NO existe, pedir confirmación antes de crear
+      pendingCustomerData.value = {
+        name: order.customer_name,
+        document: order.customer_document || 'No proporcionado',
+        phone: order.customer_phone,
+        address: order.customer_address || ''
+      }
+      pendingWebOrder.value = order
+      showConfirmCustomerModal.value = true
+    }
+    
+  } catch (error) {
+    console.error('❌ Error cargando pedido web:', error)
+    showError('Error al cargar el pedido web')
+  }
+}
+
+/**
+ * Cargar productos del pedido web al carrito
+ */
+const loadOrderProductsToCart = async (order) => {
+  // Agregar los productos al carrito
+  for (const item of order.items) {
+    const product = filteredProducts.value.find(p => p.id === item.product_id)
+    
+    if (product) {
+      await addToCart(product, item.quantity)
+    } else {
+      console.warn(`⚠️ Producto no encontrado: ${item.product_name}`)
+    }
+  }
+  
+  // Agregar nota del pedido si existe
+  const currentTab = salesTabs.value.find(t => t.id === activeTabId.value)
+  if (currentTab && order.note) {
+    currentTab.note = `Pedido Web #${order.order_number}\n${order.note}`
+  }
+}
+
+/**
+ * Confirmar y crear nuevo cliente desde pedido web
+ */
+const handleConfirmNewCustomer = async () => {
+  try {
+    if (!pendingWebOrder.value || !pendingCustomerData.value) return
+    
+    // Crear el cliente
+    const newCustomer = await customersService.create({
+      name: pendingCustomerData.value.name,
+      phone: pendingCustomerData.value.phone,
+      address: pendingCustomerData.value.address,
+      document_type: 'CC',
+      document_number: pendingCustomerData.value.document === 'No proporcionado' ? '' : pendingCustomerData.value.document,
+      email: '',
+      active: true
+    })
+    
+    console.log('✅ Cliente creado:', newCustomer)
+    
+    // Actualizar la lista de clientes en el store para que aparezca de inmediato
+    await appStore.refresh('customers')
+    
+    // Asignar el cliente al carrito actual (selectedCustomer global)
+    selectedCustomer.value = newCustomer
+    
+    // También asignarlo al tab actual
+    const currentTab = salesTabs.value.find(t => t.id === activeTabId.value)
+    if (currentTab) {
+      currentTab.customer = newCustomer
+      currentTab.selectedCustomer = newCustomer
+    }
+    
+    // Cargar productos al carrito
+    await loadOrderProductsToCart(pendingWebOrder.value)
+    
+    showSuccess(`Pedido #${pendingWebOrder.value.order_number} cargado. Cliente: ${newCustomer.name}`)
+    
+    // Limpiar datos pendientes
+    pendingCustomerData.value = null
+    pendingWebOrder.value = null
+    
+  } catch (error) {
+    console.error('❌ Error creando cliente:', error)
+    showError('Error al crear el cliente')
+  }
+}
+
+/**
+ * Cancelar creación de cliente
+ */
+const handleCancelNewCustomer = () => {
+  showInfo('Pedido web cancelado. No se creó el cliente.')
+  pendingCustomerData.value = null
+  pendingWebOrder.value = null
+}
+
+// ==================== FIN FUNCIONES DE PEDIDOS WEB ====================
 
 // Cleanup del scanner al desmontar el componente
 onBeforeUnmount(() => {

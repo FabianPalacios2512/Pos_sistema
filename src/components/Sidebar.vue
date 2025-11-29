@@ -302,14 +302,8 @@ const { hasModuleAccess, currentUser, userPermissions } = usePermissions()
 // Creditienda
 const { isCreditiendaEnabled } = useCreditienda()
 
-// Debug al montar
 onMounted(async () => {
-  console.log('🔧 [Sidebar] Montado')
-  console.log('👤 Usuario:', currentUser.value)
-  console.log('🔑 Permisos:', userPermissions.value)
-  console.log('📍 hasModuleAccess(pos):', hasModuleAccess('pos'))
-  console.log('📍 hasModuleAccess(dashboard):', hasModuleAccess('dashboard'))
-  console.log('💳 Creditienda habilitado:', isCreditiendaEnabled.value)
+  // Sidebar inicializado
 })
 </script>
 
