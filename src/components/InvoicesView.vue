@@ -513,6 +513,8 @@ import PhoneInputModal from './PhoneInputModal.vue'
 import ReceiptModal from './ReceiptModal.vue'
 import { invoiceService } from '../services/invoiceService.js'
 import { formatInvoiceDate } from '@/utils/dateFormatter.js'
+import { generateInvoicePDF, downloadPDF as downloadPDFHelper, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
+import { whatsappService } from '../services/whatsappService.js'
 
 // Props
 const props = defineProps({
@@ -823,8 +825,51 @@ const viewAndPrintInvoice = (invoice) => {
   showReceiptModal.value = true
 }
 
-const downloadPDF = (invoice) => {
-  showToast('Descarga de PDF próximamente', 'info')
+const downloadPDF = async (invoice) => {
+  try {
+    // Preparar datos de la factura
+    let items = []
+    try {
+      if (invoice.items) {
+        items = typeof invoice.items === 'string' 
+          ? JSON.parse(invoice.items)
+          : invoice.items
+      }
+    } catch (error) {
+      console.error('Error parseando items:', error)
+      items = []
+    }
+
+    const invoiceData = {
+      invoice_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      date: invoice.date || new Date(),
+      customer_name: invoice.customer_name || invoice.customer || 'Cliente General',
+      cashier: invoice.seller_name || 'Vendedor',
+      items: items,
+      subtotal: parseFloat(invoice.subtotal || 0),
+      discount: parseFloat(invoice.discount_amount || 0),
+      tax: parseFloat(invoice.tax_amount || 0),
+      total: parseFloat(invoice.total || 0),
+      payments: invoice.payments || [{
+        method: invoice.payment_method || 'efectivo',
+        amount: parseFloat(invoice.total || 0)
+      }],
+      change: 0,
+      notes: invoice.notes || ''
+    }
+
+    // Generar PDF usando plantilla centralizada
+    const pdf = await generateInvoicePDF(invoiceData, appStore.systemSettings)
+    
+    // Descargar
+    const filename = `factura-${invoiceData.invoice_number}.pdf`
+    downloadPDFHelper(pdf, filename)
+    
+    showToast('PDF descargado correctamente', 'success')
+  } catch (error) {
+    console.error('Error descargando PDF:', error)
+    showToast('Error al descargar el PDF', 'error')
+  }
 }
 
 const sendByEmail = (invoice) => {
@@ -857,8 +902,74 @@ const handleNewSale = () => {
   emit('changeModule', 'pos')
 }
 
-const handleSendWhatsApp = () => {
-  showToast('WhatsApp próximamente', 'info')
+const handleSendWhatsApp = async () => {
+  try {
+    if (!selectedInvoice.value) {
+      showToast('Seleccione una factura primero', 'warning')
+      return
+    }
+
+    // Mostrar modal de teléfono
+    showPhoneModal.value = true
+    
+    // Esperar confirmación del teléfono
+    const phone = await new Promise((resolve) => {
+      phoneModalResolve.value = resolve
+    })
+
+    if (!phone) {
+      showToast('Envío cancelado', 'info')
+      return
+    }
+
+    showToast('Generando PDF...', 'info')
+
+    // Preparar datos de la factura
+    let items = []
+    try {
+      if (selectedInvoice.value.items) {
+        items = typeof selectedInvoice.value.items === 'string' 
+          ? JSON.parse(selectedInvoice.value.items)
+          : selectedInvoice.value.items
+      }
+    } catch (error) {
+      console.error('Error parseando items:', error)
+      items = []
+    }
+
+    const invoiceData = {
+      invoice_number: selectedInvoice.value.number || selectedInvoice.value.invoiceNumber || `FV-${selectedInvoice.value.id}`,
+      date: selectedInvoice.value.date || new Date(),
+      customer_name: selectedInvoice.value.customer_name || selectedInvoice.value.customer || 'Cliente General',
+      cashier: selectedInvoice.value.seller_name || 'Vendedor',
+      items: items,
+      subtotal: parseFloat(selectedInvoice.value.subtotal || 0),
+      discount: parseFloat(selectedInvoice.value.discount_amount || 0),
+      tax: parseFloat(selectedInvoice.value.tax_amount || 0),
+      total: parseFloat(selectedInvoice.value.total || 0),
+      payments: selectedInvoice.value.payments || [{
+        method: selectedInvoice.value.payment_method || 'efectivo',
+        amount: parseFloat(selectedInvoice.value.total || 0)
+      }],
+      change: 0,
+      notes: selectedInvoice.value.notes || ''
+    }
+
+    // Generar PDF usando plantilla centralizada
+    const pdf = await generateInvoicePDF(invoiceData, appStore.systemSettings)
+    const pdfBlob = getPDFBlob(pdf)
+
+    // Enviar por WhatsApp
+    const companyName = appStore.systemSettings.company_name || 'Nuestra Empresa'
+    const message = `¡Hola! ${companyName} le envía su factura No. ${invoiceData.invoice_number}. Total: $${invoiceData.total.toLocaleString()}. ¡Gracias por su compra! 🙏`
+
+    await whatsappService.sendInvoiceWithPDF(phone, pdfBlob, message, invoiceData.invoice_number)
+    
+    showToast('Factura enviada por WhatsApp correctamente', 'success')
+  } catch (error) {
+    console.error('Error enviando por WhatsApp:', error)
+    showToast(error.message || 'Error al enviar por WhatsApp', 'error')
+  }
 }
 
 const handleCloseQuotationModal = () => {

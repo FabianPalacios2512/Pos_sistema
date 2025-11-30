@@ -192,29 +192,206 @@
           </div>
         </div>
 
+        <!-- Selección de Plantilla de Factura -->
+        <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
+          <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-gray-900">Plantilla de Factura</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Selecciona el diseño para tus facturas impresas</p>
+            </div>
+          </div>
+          <div class="p-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Classic Template -->
+              <button @click="systemSettings.invoice_template = 'classic'"
+                      class="group relative overflow-hidden rounded-xl border-2 transition-all duration-300 hover:shadow-xl"
+                      :class="systemSettings.invoice_template === 'classic' 
+                        ? 'border-gray-900 shadow-lg bg-gray-50' 
+                        : 'border-gray-200 hover:border-gray-400'">
+                <div class="p-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-base font-bold text-gray-900">Clásica</h3>
+                    <div v-if="systemSettings.invoice_template === 'classic'"
+                         class="w-6 h-6 bg-gray-900 rounded-full flex items-center justify-center">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-600 mb-4">Diseño profesional y elegante con bordes suaves</p>
+                  <!-- Mini preview -->
+                  <div class="border border-gray-300 rounded-lg p-3 bg-white text-center">
+                    <div class="border-b border-gray-200 pb-2 mb-2">
+                      <div class="text-xs font-bold text-gray-900">MI EMPRESA</div>
+                      <div class="text-[10px] text-gray-500">NIT: 123456789</div>
+                    </div>
+                    <div class="bg-gray-50 px-2 py-1 rounded text-[10px] mb-2">
+                      <div class="flex justify-between">
+                        <span class="font-semibold">Factura:</span>
+                        <span>FV-001</span>
+                      </div>
+                    </div>
+                    <div class="text-[10px] text-gray-600 mb-2">Producto ejemplo - $10,000</div>
+                    <div class="border-t border-gray-300 pt-2">
+                      <div class="text-xs font-bold text-gray-900">TOTAL: $10,000</div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <!-- Modern Template -->
+              <button @click="systemSettings.invoice_template = 'modern'"
+                      class="group relative overflow-hidden rounded-xl border-2 transition-all duration-300 hover:shadow-xl"
+                      :class="systemSettings.invoice_template === 'modern' 
+                        ? 'border-indigo-600 shadow-lg bg-indigo-50' 
+                        : 'border-gray-200 hover:border-indigo-300'">
+                <div class="p-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-base font-bold text-indigo-900">Moderna</h3>
+                    <div v-if="systemSettings.invoice_template === 'modern'"
+                         class="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-600 mb-4">Diseño vibrante con gradientes y colores</p>
+                  <!-- Mini preview -->
+                  <div class="border-2 border-indigo-300 rounded-lg overflow-hidden bg-white">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-center py-2">
+                      <div class="text-xs font-bold">MI EMPRESA</div>
+                      <div class="text-[10px] opacity-90">NIT: 123456789</div>
+                    </div>
+                    <div class="p-3">
+                      <div class="bg-indigo-100 border border-indigo-200 px-2 py-1 rounded text-[10px] mb-2">
+                        <div class="flex justify-between text-indigo-700">
+                          <span class="font-semibold">Factura:</span>
+                          <span class="font-bold">FV-001</span>
+                        </div>
+                      </div>
+                      <div class="text-[10px] text-gray-600 mb-2">Producto ejemplo - $10,000</div>
+                      <div class="bg-indigo-50 border border-indigo-100 px-2 py-1 rounded">
+                        <div class="text-xs font-bold text-indigo-600">TOTAL: $10,000</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              <!-- Minimal Template -->
+              <button @click="systemSettings.invoice_template = 'minimal'"
+                      class="group relative overflow-hidden rounded-xl border-2 transition-all duration-300 hover:shadow-xl"
+                      :class="systemSettings.invoice_template === 'minimal' 
+                        ? 'border-black shadow-lg bg-gray-50' 
+                        : 'border-gray-200 hover:border-gray-600'">
+                <div class="p-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-base font-bold text-black">Minimalista</h3>
+                    <div v-if="systemSettings.invoice_template === 'minimal'"
+                         class="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-600 mb-4">Diseño ultra limpio blanco y negro</p>
+                  <!-- Mini preview -->
+                  <div class="border-4 border-black rounded-lg p-3 bg-white">
+                    <div class="border-b-3 border-black pb-2 mb-2 text-center">
+                      <div class="text-xs font-bold text-black">MI EMPRESA</div>
+                      <div class="text-[10px] text-gray-700">NIT: 123456789</div>
+                    </div>
+                    <div class="border-2 border-black px-2 py-1 rounded text-[10px] mb-2">
+                      <div class="flex justify-between font-bold">
+                        <span>Factura:</span>
+                        <span>FV-001</span>
+                      </div>
+                    </div>
+                    <div class="text-[10px] text-black mb-2 font-mono">Producto ejemplo - $10,000</div>
+                    <div class="border-t-3 border-black pt-2">
+                      <div class="text-xs font-bold text-black">TOTAL: $10,000</div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Vista Previa de Factura -->
         <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
           <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
             <div>
-              <h2 class="text-base font-bold text-gray-900">Vista Previa de Factura</h2>
-              <p class="text-xs text-gray-500 mt-0.5">Cómo se verá tu factura con la configuración actual</p>
+              <h2 class="text-base font-bold text-gray-900">Vista Previa Detallada</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Template seleccionado: <span class="font-semibold capitalize">{{ systemSettings.invoice_template || 'classic' }}</span></p>
             </div>
           </div>
           <div class="p-5">
-            <!-- Mini preview de la factura -->
-            <div class="max-w-sm mx-auto bg-white border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-              <div class="text-center border-b border-gray-300 pb-2 mb-2">
-                <h3 class="text-sm font-bold text-gray-900">{{ systemSettings.company_name || 'Mi Empresa' }}</h3>
-                <p class="text-xs text-gray-600">{{ systemSettings.company_address || 'Dirección no configurada' }}</p>
-                <p class="text-xs text-gray-600">{{ systemSettings.company_phone || 'Teléfono no configurado' }}</p>
-                <p v-if="systemSettings.company_document" class="text-xs text-gray-600">NIT: {{ systemSettings.company_document }}</p>
+            <!-- Mini preview de la factura con template aplicado -->
+            <div class="max-w-sm mx-auto bg-white border-2 rounded-lg p-4 text-center"
+                 :class="{
+                   'border-gray-300': systemSettings.invoice_template === 'classic',
+                   'border-indigo-400 shadow-lg': systemSettings.invoice_template === 'modern',
+                   'border-black border-4': systemSettings.invoice_template === 'minimal'
+                 }">
+              
+              <!-- Header según template -->
+              <div class="text-center pb-2 mb-2"
+                   :class="{
+                     'border-b border-gray-300': systemSettings.invoice_template === 'classic',
+                     'bg-gradient-to-r from-indigo-500 to-purple-500 text-white -m-4 p-4 mb-2 rounded-t': systemSettings.invoice_template === 'modern',
+                     'border-b-4 border-black': systemSettings.invoice_template === 'minimal'
+                   }">
+                <h3 class="text-sm font-bold" 
+                    :class="{
+                      'text-gray-900': systemSettings.invoice_template !== 'modern',
+                      'text-white': systemSettings.invoice_template === 'modern'
+                    }">
+                  {{ systemSettings.company_name || 'Mi Empresa' }}
+                </h3>
+                <p class="text-xs"
+                   :class="{
+                     'text-gray-600': systemSettings.invoice_template !== 'modern',
+                     'text-white/90': systemSettings.invoice_template === 'modern'
+                   }">
+                  {{ systemSettings.company_address || 'Dirección no configurada' }}
+                </p>
+                <p class="text-xs"
+                   :class="{
+                     'text-gray-600': systemSettings.invoice_template !== 'modern',
+                     'text-white/90': systemSettings.invoice_template === 'modern'
+                   }">
+                  {{ systemSettings.company_phone || 'Teléfono no configurado' }}
+                </p>
+                <p v-if="systemSettings.company_document" class="text-xs"
+                   :class="{
+                     'text-gray-600': systemSettings.invoice_template !== 'modern',
+                     'text-white/90': systemSettings.invoice_template === 'modern'
+                   }">
+                  NIT: {{ systemSettings.company_document }}
+                </p>
+              </div>
+              
+              <!-- Número de factura según template -->
+              <div class="text-xs mb-2 p-2 rounded"
+                   :class="{
+                     'bg-gray-100': systemSettings.invoice_template === 'classic',
+                     'bg-indigo-100 border border-indigo-200': systemSettings.invoice_template === 'modern',
+                     'border-2 border-black': systemSettings.invoice_template === 'minimal'
+                   }">
+                <div class="flex justify-between">
+                  <span class="font-semibold">Factura #:</span>
+                  <span class="font-bold"
+                        :class="{
+                          'text-gray-900': systemSettings.invoice_template !== 'modern',
+                          'text-indigo-700': systemSettings.invoice_template === 'modern'
+                        }">
+                    FV-000123
+                  </span>
+                </div>
               </div>
               
               <div class="text-xs mb-2 space-y-0.5">
-                <div class="flex justify-between">
-                  <span>Factura #:</span>
-                  <span class="font-semibold">FV-000123</span>
-                </div>
                 <div class="flex justify-between">
                   <span>Fecha:</span>
                   <span>{{ new Date().toLocaleDateString('es-CO') }}</span>
@@ -225,32 +402,59 @@
                 </div>
               </div>
               
-              <div class="border-t border-gray-300 pt-2 mb-2">
+              <div class="pt-2 mb-2"
+                   :class="{
+                     'border-t border-gray-300': systemSettings.invoice_template === 'classic',
+                     'border-t-2 border-indigo-200': systemSettings.invoice_template === 'modern',
+                     'border-t-2 border-black': systemSettings.invoice_template === 'minimal'
+                   }">
                 <div class="text-xs font-semibold mb-1">PRODUCTOS</div>
                 <div class="text-xs">Producto ejemplo - $10,000</div>
               </div>
               
-              <div class="border-t border-gray-300 pt-2 mb-2">
+              <div class="pt-2 mb-2 p-2 rounded"
+                   :class="{
+                     'border-t border-gray-300 bg-gray-50': systemSettings.invoice_template === 'classic',
+                     'border-t-2 border-indigo-200 bg-indigo-50': systemSettings.invoice_template === 'modern',
+                     'border-t-4 border-black bg-black text-white': systemSettings.invoice_template === 'minimal'
+                   }">
                 <div class="flex justify-between text-xs font-bold">
                   <span>TOTAL:</span>
-                  <span>$10,000</span>
+                  <span :class="{
+                    'text-gray-900': systemSettings.invoice_template !== 'minimal',
+                    'text-white': systemSettings.invoice_template === 'minimal'
+                  }">
+                    $10,000
+                  </span>
                 </div>
               </div>
               
-              <div class="border-t border-dashed border-gray-300 pt-2">
-                <p class="text-xs font-semibold">¡GRACIAS POR SU COMPRA!</p>
-                <div class="text-xs text-gray-500 mt-1 space-y-0.5">
-                  <p>Régimen Común - No responsable de IVA</p>
-                  <p>Factura de venta Art. 617 del E.T.</p>
-                </div>
-                <div class="text-xs text-gray-500 mt-2 pt-1 border-t border-gray-300">
-                  <p class="font-medium">{{ systemSettings.company_name || '105 POS' }}</p>
-                  <p>Sistema de facturación</p>
+              <div class="pt-2"
+                   :class="{
+                     'border-t border-dashed border-gray-300': systemSettings.invoice_template === 'classic',
+                     'border-t-2 border-dashed border-indigo-300': systemSettings.invoice_template === 'modern',
+                     'border-t-2 border-dashed border-black': systemSettings.invoice_template === 'minimal'
+                   }">
+                <p class="text-xs font-semibold">{{ systemSettings.invoice_footer_message || '¡GRACIAS POR SU COMPRA!' }}</p>
+                <div class="text-xs text-gray-500 mt-2 pt-1 border-t"
+                     :class="{
+                       'border-gray-300': systemSettings.invoice_template !== 'modern',
+                       'border-indigo-200': systemSettings.invoice_template === 'modern'
+                     }">
+                  <p class="font-medium text-gray-700">Powered by 105 POS</p>
                 </div>
               </div>
             </div>
-            <p class="text-xs text-gray-500 text-center mt-3">
-              Esta es una vista previa de cómo se verá tu factura. Los cambios se reflejan automáticamente.
+            <p class="text-xs text-center mt-3">
+              <span class="text-gray-500">Vista previa del template:</span>
+              <span class="font-bold capitalize ml-1"
+                    :class="{
+                      'text-gray-700': systemSettings.invoice_template === 'classic',
+                      'text-indigo-600': systemSettings.invoice_template === 'modern',
+                      'text-black': systemSettings.invoice_template === 'minimal'
+                    }">
+                {{ systemSettings.invoice_template || 'classic' }}
+              </span>
             </p>
           </div>
         </div>
@@ -1161,6 +1365,7 @@ const systemSettings = ref({
   invoice_number_start: 1,
   invoice_current_number: 1,
   invoice_footer_message: '',
+  invoice_template: 'modern',
   require_customer: false,
   require_customer_quotations: false,
   discounts_enabled: true,

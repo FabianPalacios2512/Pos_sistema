@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('sku')->unique();
             $table->string('barcode')->nullable()->unique();
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
-            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('set null');
+            // No crear foreign key aquí, se crea después en add_supplier_relation_to_products_table
+            $table->unsignedBigInteger('supplier_id')->nullable();
             $table->decimal('cost_price', 10, 2);
             $table->decimal('sale_price', 10, 2);
             $table->decimal('wholesale_price', 10, 2)->nullable();

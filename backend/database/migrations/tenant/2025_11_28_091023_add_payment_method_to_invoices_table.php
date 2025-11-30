@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            $table->string('payment_method', 50)->nullable()->after('total');
-        });
+        if (Schema::hasTable('invoices')) {
+            Schema::table('invoices', function (Blueprint $table) {
+if (!Schema::hasColumn('invoices', 'payment_method')) {
+    $table->string('payment_method', 50)->nullable()->after('total');
+}
+            
+                    });
+        }
     }
 
     /**

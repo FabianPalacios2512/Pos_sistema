@@ -11,10 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            // Relación con proveedor principal (después de crear la tabla suppliers)
-            $table->foreignId('main_supplier_id')->nullable()->constrained('suppliers')->after('last_purchase_date');
-        });
+        if (Schema::hasTable('products') && Schema::hasTable('suppliers')) {
+            Schema::table('products', function (Blueprint $table) {
+                // Crear foreign key para supplier_id si no existe
+                if (!Schema::hasColumn('products', 'main_supplier_id')) {
+                    // Si supplier_id existe pero no tiene foreign key, crearla
+                    if (Schema::hasColumn('products', 'supplier_id')) {
+                        $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('set null');
+                    }
+
+                    // Relación con proveedor principal (después de crear la tabla suppliers)
+                    $table->foreignId('main_supplier_id')->nullable()->constrained('suppliers')->after('last_purchase_date');
+                }
+            });
+        }
     }
 
     /**

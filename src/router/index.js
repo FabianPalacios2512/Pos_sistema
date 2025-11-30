@@ -4,13 +4,37 @@ import authService from '../services/authService.js'
 
 // Componentes
 const LoginView = () => import('../components/LoginView.vue')
-const SaasRegister = () => import('../views/SaasRegister.vue') // Importar el nuevo componente
+const SaasRegister = () => import('../views/SaasRegister.vue')
+const WelcomeIntro = () => import('../views/WelcomeIntro.vue')
+const InitialOnboardingView = () => import('../views/InitialOnboardingView.vue')
 const PosCompleto = () => import('../views/PosCompleto.vue')
 const AdminDashboardView = () => import('../views/AdminDashboardView.vue')
 const GodModeAdminPanel = () => import('../components/admin/GodModeAdminPanel.vue')
 const PublicCatalog = () => import('../views/PublicCatalog.vue')
 
 const routes = [
+  // Ruta de Pantalla de Bienvenida (Intro)
+  {
+    path: '/welcome',
+    name: 'Welcome',
+    component: WelcomeIntro,
+    beforeEnter: requireAuth,
+    meta: {
+      title: '¡Bienvenido a 105 POS!',
+      requiresAuth: true
+    }
+  },
+  // Ruta de Onboarding Inicial (Primera configuración)
+  {
+    path: '/onboarding',
+    name: 'Onboarding',
+    component: InitialOnboardingView,
+    beforeEnter: requireAuth,
+    meta: {
+      title: 'Configuración Inicial - 105 POS',
+      requiresAuth: true
+    }
+  },
   // Ruta Pública del Catálogo (SIN autenticación)
   {
     path: '/catalog',
@@ -150,7 +174,47 @@ router.beforeEach((to, from, next) => {
   if (to.meta.title) {
     document.title = to.meta.title
   }
+
+  next()
+})
+
+// Guard para redirección a onboarding (primera vez)
+router.beforeEach((to, from, next) => {
+  // Excluir SOLO rutas públicas reales (login, register, catalog)
+  const publicRoutes = ['/login', '/register', '/catalog']
   
+  // Si es una ruta pública real, permitir acceso sin verificar onboarding
+  if (publicRoutes.includes(to.path)) {
+    next()
+    return
+  }
+
+  // Si está autenticado, verificar el flujo welcome → onboarding
+  if (authService.isAuthenticated()) {
+    const onboardingCompleted = localStorage.getItem('onboarding_completed')
+    const welcomeSeen = localStorage.getItem('welcome_seen')
+
+    // 🎯 REGLA 1: Si no ha visto welcome, SIEMPRE redirigir a /welcome (incluso si viene de /onboarding)
+    if (!welcomeSeen && to.path !== '/welcome') {
+      console.log('🎯 Primera vez detectada - redirigiendo a welcome')
+      next('/welcome')
+      return
+    }
+
+    // 🎯 REGLA 2: Si ya vio welcome pero no completó onboarding, redirigir a /onboarding
+    if (welcomeSeen && !onboardingCompleted && to.path !== '/onboarding') {
+      console.log('🎯 Welcome visto, continuando con onboarding')
+      next('/onboarding')
+      return
+    }
+
+    // 🎯 REGLA 3: Si ya completó onboarding, permitir acceso a cualquier ruta protegida
+    if (onboardingCompleted) {
+      next()
+      return
+    }
+  }
+
   next()
 })
 
@@ -161,16 +225,16 @@ router.beforeEach((to, from, next) => {
     next('/login')
     return
   }
-  
+
   // Si está autenticado pero no tiene el rol adecuado
   if (to.meta.roles && authService.isAuthenticated()) {
     const user = authService.getUser()
     const userRole = user.role?.name || user.role // Soportar tanto objeto como string
-    
+
     console.log('🔍 [Router Guard] Verificando acceso a:', to.path)
     console.log('👤 [Router Guard] Usuario:', user.name, '| Rol:', userRole)
     console.log('🎯 [Router Guard] Roles permitidos:', to.meta.roles)
-    
+
     if (!to.meta.roles.includes(userRole)) {
       console.log('❌ [Router Guard] Acceso denegado - redirigiendo...')
       // Redirigir según el rol del usuario
@@ -181,10 +245,10 @@ router.beforeEach((to, from, next) => {
       }
       return
     }
-    
+
     console.log('✅ [Router Guard] Acceso permitido')
   }
-  
+
   next()
 })
 

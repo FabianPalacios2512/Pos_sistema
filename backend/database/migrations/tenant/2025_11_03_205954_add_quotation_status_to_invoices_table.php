@@ -12,10 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            // Modificar el enum para agregar 'quotation'
-            DB::statement("ALTER TABLE invoices MODIFY COLUMN status ENUM('draft','sent','paid','overdue','cancelled','quotation') NOT NULL DEFAULT 'draft'");
-        });
+        if (Schema::hasTable('invoices')) {
+            Schema::table('invoices', function (Blueprint $table) {
+                        // Modificar el enum para agregar 'quotation'
+                        DB::statement("ALTER TABLE invoices MODIFY COLUMN status ENUM('draft','sent','paid','overdue','cancelled','quotation') NOT NULL DEFAULT 'draft'");
+                    });
+        }
     }
 
     /**

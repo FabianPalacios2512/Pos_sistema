@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            // Cambiar el tipo de la columna image_url de string (255 chars) a longText
-            // para soportar imágenes base64 que pueden ser muy grandes
-            $table->longText('image_url')->nullable()->change();
-        });
+        if (Schema::hasTable('products') && Schema::hasColumn('products', 'image_url')) {
+            Schema::table('products', function (Blueprint $table) {
+                // Cambiar el tipo de la columna image_url de string (255 chars) a longText
+                // para soportar imágenes base64 que pueden ser muy grandes
+                $table->longText('image_url')->nullable()->change();
+            });
+        }
     }
 
     /**

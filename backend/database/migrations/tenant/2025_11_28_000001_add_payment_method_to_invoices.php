@@ -12,9 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('invoices', function (Blueprint $table) {
-            // Solo agregar surcharge_amount si no existe (payment_method y cash_session_id ya existen)
+            // Solo agregar surcharge_amount si no existe
             if (!Schema::hasColumn('invoices', 'surcharge_amount')) {
-                $table->decimal('surcharge_amount', 12, 2)->default(0)->after('payment_method');
+                // Verificar si payment_method existe para usar after(), sino agregar al final
+                if (Schema::hasColumn('invoices', 'payment_method')) {
+                    $table->decimal('surcharge_amount', 12, 2)->default(0)->after('payment_method');
+                } else {
+                    $table->decimal('surcharge_amount', 12, 2)->default(0);
+                }
             }
         });
     }

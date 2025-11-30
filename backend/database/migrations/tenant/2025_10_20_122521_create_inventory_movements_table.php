@@ -21,7 +21,8 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null'); // Usuario responsable
             $table->foreignId('sale_id')->nullable()->constrained()->onDelete('set null'); // Si es por venta
-            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('set null'); // Si es compra
+            // No crear foreign key para supplier aquí, se puede crear después si suppliers existe
+            $table->unsignedBigInteger('supplier_id')->nullable(); // Si es compra
 
             // Datos del movimiento
             $table->enum('type', ['in', 'out']); // Entrada o salida

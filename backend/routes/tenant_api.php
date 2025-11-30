@@ -98,6 +98,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/system-settings', [SystemSettingsController::class, 'update']);
     Route::get('/system-settings/next-invoice-number', [SystemSettingsController::class, 'getNextInvoiceNumber']);
     Route::post('/system-settings/reset', [SystemSettingsController::class, 'reset']);
+    Route::post('/settings/initial-onboarding', [SystemSettingsController::class, 'saveOnboarding']);
 
     // Descuentos y Promociones
     Route::apiResource('discounts', DiscountsController::class);

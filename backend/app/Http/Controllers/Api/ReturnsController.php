@@ -273,7 +273,7 @@ class ReturnsController extends Controller
                 // Registrar movimiento de inventario
                 InventoryMovement::create([
                     'product_id' => $itemData['product_id'],
-                    'type' => 'return',
+                    'type' => 'in',
                     'quantity' => $itemData['quantity'],
                     'previous_stock' => $previousStock,
                     'new_stock' => $newStock,
@@ -583,7 +583,7 @@ class ReturnsController extends Controller
                 // Registrar movimiento de reversa
                 InventoryMovement::create([
                     'product_id' => $item['product_id'],
-                    'type' => 'adjustment',
+                    'type' => 'in',
                     'quantity' => -$item['quantity'],
                     'previous_stock' => $previousStock,
                     'new_stock' => $newStock,

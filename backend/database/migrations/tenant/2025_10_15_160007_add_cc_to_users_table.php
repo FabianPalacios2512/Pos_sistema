@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('cc')->unique()->nullable()->after('email'); // Cédula única
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+if (!Schema::hasColumn('users', 'cc')) {
+    $table->string('cc')->unique()->nullable()->after('email'); // Cédula única
+}
+            
+                    });
+        }
     }
 
     /**

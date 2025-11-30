@@ -1,15 +1,72 @@
 import apiClient from './apiClient.js'
 import axios from 'axios'
 
+// Version: 3.0 - Multi-tenant WhatsApp Service con detección automática de contexto
+/**
+ * Helper para detectar tenant_id y crear cliente apropiado
+ * SIEMPRE usa modo directo (puerto 3002) cuando hay un tenant_id identificable
+ */
+const getWhatsAppClient = () => {
+  let tenantId = null
+  
+  // 1. Intentar desde localStorage (onboarding)
+  const registrationData = localStorage.getItem('registration_data')
+  if (registrationData) {
+    const data = JSON.parse(registrationData)
+    tenantId = data.subdomain
+  }
+  
+  // 2. Extraer del hostname (tenant.localhost:3000 → tenant)
+  if (!tenantId && window.location.hostname !== 'localhost' && window.location.hostname.includes('.')) {
+    tenantId = window.location.hostname.split('.')[0]
+  }
+  
+  // 3. Extraer de query params (?subdomain=XXX o ?tenant=XXX)
+  if (!tenantId) {
+    const urlParams = new URLSearchParams(window.location.search)
+    tenantId = urlParams.get('subdomain') || urlParams.get('tenant')
+  }
+  
+  // 4. Fallback: extraer del pathname (ej: /onboarding/tenant-name)
+  if (!tenantId) {
+    const pathParts = window.location.pathname.split('/').filter(p => p)
+    const onboardingIndex = pathParts.indexOf('onboarding')
+    if (onboardingIndex !== -1 && pathParts[onboardingIndex + 1]) {
+      tenantId = pathParts[onboardingIndex + 1]
+    }
+  }
+  
+  // Si tenemos tenant_id: SIEMPRE usar modo directo (puerto 3002)
+  if (tenantId) {
+    return {
+      isDirect: true,
+      client: axios.create({
+        baseURL: 'http://localhost:3002',
+        headers: {
+          'X-Tenant-Id': tenantId
+        }
+      })
+    }
+  }
+  
+  // Sin tenant_id: usar apiClient (raro, solo para super admin sin contexto)
+  return {
+    isDirect: false,
+    client: apiClient
+  }
+}
+
 export const whatsappService = {
   // Obtener estado de conexión de WhatsApp
   async getStatus() {
     try {
-      // Llamar al backend en lugar de directamente al servicio
-      const response = await apiClient.get('/whatsapp/status')
+      const { isDirect, client } = getWhatsAppClient()
+      const endpoint = isDirect ? '/status' : '/whatsapp/status'
+      
+      const response = await client.get(endpoint)
       return {
         success: true,
-        status: response.data.status
+        status: isDirect ? response.data.status : response.data.status
       }
     } catch (error) {
       // Error silencioso - no mostrar en consola para evitar spam
@@ -23,10 +80,16 @@ export const whatsappService = {
   // Obtener código QR para autenticación
   async getQRCode() {
     try {
-      const response = await apiClient.get('/whatsapp/qr')
+      const { isDirect, client } = getWhatsAppClient()
+      const endpoint = isDirect ? '/qr' : '/whatsapp/qr'
+      
+      const response = await client.get(endpoint)
       return response.data
     } catch (error) {
-      console.error('Error obteniendo QR code:', error)
+      // Error silencioso - solo loguear en modo desarrollo
+      if (import.meta.env.DEV) {
+        console.warn('WhatsApp QR no disponible:', error.message)
+      }
       return {
         success: false,
         message: error.message
@@ -37,10 +100,16 @@ export const whatsappService = {
   // Inicializar servicio WhatsApp
   async initialize() {
     try {
-      const response = await apiClient.post('/whatsapp/initialize')
+      const { isDirect, client } = getWhatsAppClient()
+      const endpoint = isDirect ? '/initialize' : '/whatsapp/initialize'
+      
+      const response = await client.post(endpoint)
       return response.data
     } catch (error) {
-      console.error('Error inicializando WhatsApp:', error)
+      // Error silencioso - solo loguear en modo desarrollo
+      if (import.meta.env.DEV) {
+        console.warn('WhatsApp initialize falló:', error.message)
+      }
       return {
         success: false,
         message: error.message
@@ -79,19 +148,45 @@ export const whatsappService = {
   // Enviar factura por WhatsApp (usando PDF generado)
   async sendInvoiceWithPDF(phone, pdfBlob, message, fileName, customerName = '') {
     try {
-      const formData = new FormData()
-      formData.append('phone', phone)
-      formData.append('message', message)
-      formData.append('customerName', customerName)
-      formData.append('pdf', pdfBlob, fileName)
+      const { isDirect, client } = getWhatsAppClient()
+      
+      if (isDirect) {
+        // Modo directo: Convertir PDF Blob a base64 y enviar al servidor Node.js
+        const reader = new FileReader()
+        const base64Promise = new Promise((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result)
+          reader.onerror = reject
+          reader.readAsDataURL(pdfBlob)
+        })
+        
+        const base64Data = await base64Promise
+        
+        // Enviar al servidor multi-tenant
+        const response = await client.post('/send', {
+          phone: phone,
+          message: message,
+          pdfBase64: base64Data,
+          fileName: fileName,
+          customerName: customerName
+        })
+        
+        return response.data
+      } else {
+        // Modo Laravel (fallback antiguo)
+        const formData = new FormData()
+        formData.append('phone', phone)
+        formData.append('message', message)
+        formData.append('customerName', customerName)
+        formData.append('pdf', pdfBlob, fileName)
 
-      const response = await apiClient.post('/whatsapp/send-pdf', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        timeout: 60000 // 60 segundos para envío de PDF por WhatsApp
-      })
-      return response.data
+        const response = await client.post('/whatsapp/send-pdf', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          timeout: 60000
+        })
+        return response.data
+      }
     } catch (error) {
       console.error('Error enviando PDF por WhatsApp:', error)
       return {
@@ -130,19 +225,45 @@ export const whatsappService = {
         messageLength: message.length
       })
 
-      const formData = new FormData()
-      formData.append('phone', phone)
-      formData.append('message', message)
-      formData.append('customerName', customerName)
-      formData.append('pdf', pdfBlob, fileName)
+      const { isDirect, client } = getWhatsAppClient()
+      
+      if (isDirect) {
+        // Modo directo: Convertir PDF Blob a base64 y enviar al servidor Node.js
+        const reader = new FileReader()
+        const base64Promise = new Promise((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result)
+          reader.onerror = reject
+          reader.readAsDataURL(pdfBlob)
+        })
+        
+        const base64Data = await base64Promise
+        
+        // Enviar al servidor multi-tenant
+        const response = await client.post('/send', {
+          phone: phone,
+          message: message,
+          pdfBase64: base64Data,
+          fileName: fileName,
+          customerName: customerName
+        })
+        
+        return response.data
+      } else {
+        // Modo Laravel (fallback antiguo)
+        const formData = new FormData()
+        formData.append('phone', phone)
+        formData.append('message', message)
+        formData.append('customerName', customerName)
+        formData.append('pdf', pdfBlob, fileName)
 
-      const response = await apiClient.post('/whatsapp/send-quotation-pdf', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        timeout: 60000 // 60 segundos para envío de PDF por WhatsApp
-      })
-      return response.data
+        const response = await client.post('/whatsapp/send-quotation-pdf', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          timeout: 60000
+        })
+        return response.data
+      }
     } catch (error) {
       console.error('Error enviando cotización PDF por WhatsApp:', error)
       

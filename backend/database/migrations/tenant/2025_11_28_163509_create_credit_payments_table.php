@@ -11,19 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('credit_payments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
-            $table->decimal('amount', 12, 2);
-            $table->enum('method', ['cash', 'card', 'transfer'])->default('cash');
-            $table->text('notes')->nullable();
-            $table->timestamps();
+        if (!Schema::hasTable('credit_payments')) {
+            Schema::create('credit_payments', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+                $table->decimal('amount', 12, 2);
+                $table->enum('method', ['cash', 'card', 'transfer'])->default('cash');
+                $table->text('notes')->nullable();
+                $table->timestamps();
 
-            // Indexes for better performance
-            $table->index('customer_id');
-            $table->index('created_at');
-        });
+                // Indexes for better performance
+                $table->index('customer_id');
+                $table->index('created_at');
+            });
+        }
     }
 
     /**

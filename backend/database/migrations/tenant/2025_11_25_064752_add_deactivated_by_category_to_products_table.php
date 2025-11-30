@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->boolean('deactivated_by_category')->default(false)->after('active');
-        });
+        if (Schema::hasTable('products')) {
+            Schema::table('products', function (Blueprint $table) {
+if (!Schema::hasColumn('products', 'deactivated_by_category')) {
+    $table->boolean('deactivated_by_category')->default(false)->after('active');
+}
+            
+                    });
+        }
     }
 
     /**

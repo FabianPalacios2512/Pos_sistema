@@ -29,17 +29,31 @@ return new class extends Migration
             }
 
             // Métricas de ventas
-            $table->integer('total_sold')->default(0)->after('ideal_stock'); // Total vendido histórico
-            $table->decimal('total_revenue', 12, 2)->default(0)->after('total_sold'); // Ingresos totales
-            $table->decimal('total_profit', 12, 2)->default(0)->after('total_revenue'); // Ganancia total
+            if (!Schema::hasColumn('products', 'total_sold')) {
+                $table->integer('total_sold')->default(0)->after('ideal_stock'); // Total vendido histórico
+            }
+            if (!Schema::hasColumn('products', 'total_revenue')) {
+                $table->decimal('total_revenue', 12, 2)->default(0)->after('total_sold'); // Ingresos totales
+            }
+            if (!Schema::hasColumn('products', 'total_profit')) {
+                $table->decimal('total_profit', 12, 2)->default(0)->after('total_revenue'); // Ganancia total
+            }
 
             // Fechas importantes
-            $table->datetime('last_sale_date')->nullable()->after('total_profit');
-            $table->datetime('last_purchase_date')->nullable()->after('last_sale_date');
+            if (!Schema::hasColumn('products', 'last_sale_date')) {
+                $table->datetime('last_sale_date')->nullable()->after('total_profit');
+            }
+            if (!Schema::hasColumn('products', 'last_purchase_date')) {
+                $table->datetime('last_purchase_date')->nullable()->after('last_sale_date');
+            }
 
             // Métricas calculadas (sin relación aún)
-            $table->decimal('avg_discount_applied', 5, 2)->default(0)->after('last_purchase_date'); // Descuento promedio
-            $table->integer('days_to_sell_avg')->default(0)->after('avg_discount_applied'); // Días promedio para vender
+            if (!Schema::hasColumn('products', 'avg_discount_applied')) {
+                $table->decimal('avg_discount_applied', 5, 2)->default(0)->after('last_purchase_date'); // Descuento promedio
+            }
+            if (!Schema::hasColumn('products', 'days_to_sell_avg')) {
+                $table->integer('days_to_sell_avg')->default(0)->after('avg_discount_applied'); // Días promedio para vender
+            }
 
             // Índices para optimizar consultas
             $table->index(['active', 'current_stock']);

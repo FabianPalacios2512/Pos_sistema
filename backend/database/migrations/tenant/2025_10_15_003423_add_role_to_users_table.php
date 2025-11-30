@@ -11,10 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('role_id')->nullable()->constrained()->onDelete('set null');
-            $table->index(['role_id']);
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+if (!Schema::hasColumn('users', 'role_id')) {
+    $table->foreignId('role_id')->nullable()->constrained()->onDelete('set null');
+}
+                        $table->index(['role_id']);
+            
+                    });
+        }
     }
 
     /**

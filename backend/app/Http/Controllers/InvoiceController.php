@@ -755,14 +755,14 @@ class InvoiceController extends Controller
                         // Log de movimiento de inventario
                         \App\Models\InventoryMovement::create([
                             'product_id' => $item['product_id'],
-                            'type' => 'sale',
+                            'type' => 'out', // ✅ CORREGIDO: Usar 'out' para salidas (el ENUM solo acepta 'in' o 'out')
                             'quantity' => -$item['quantity'], // Negativo para salida
                             'previous_stock' => $previousStock,
                             'new_stock' => $newStock,
                             'unit_cost' => $product->cost_price ?? 0,
                             'reference' => 'Factura ' . $invoice->number,
                             'notes' => 'Venta POS - Factura ' . $invoice->number,
-                            'user_id' => 1, // Usuario admin por defecto
+                            'user_id' => auth()->id() ?? 1, // ✅ Usar el usuario autenticado
                             'movement_date' => now()
                         ]);
                     }
@@ -1488,12 +1488,16 @@ startxref
     public function getWhatsAppStatus(): JsonResponse
     {
         try {
+            // Obtener tenant_id del contexto
+            $tenantId = tenant('id');
+
             // Hacer petición al servidor de WhatsApp
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, 'http://localhost:3002/status');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 15); // 15 segundos para estado
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Tenant-Id: ' . $tenantId]);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -1532,12 +1536,16 @@ startxref
     public function getWhatsAppQR(): JsonResponse
     {
         try {
+            // Obtener tenant_id del contexto
+            $tenantId = tenant('id');
+
             // Hacer petición al servidor de WhatsApp para obtener QR
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, 'http://localhost:3002/qr');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 5);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Tenant-Id: ' . $tenantId]);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -1573,6 +1581,9 @@ startxref
     public function initializeWhatsApp(): JsonResponse
     {
         try {
+            // Obtener tenant_id del contexto
+            $tenantId = tenant('id');
+
             // Hacer petición al servicio de WhatsApp para inicializar
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, 'http://localhost:3002/initialize');
@@ -1580,6 +1591,7 @@ startxref
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 10);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Tenant-Id: ' . $tenantId]);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -1623,6 +1635,9 @@ startxref
     public function disconnectWhatsApp(): JsonResponse
     {
         try {
+            // Obtener tenant_id del contexto
+            $tenantId = tenant('id');
+
             // Hacer petición al servicio de WhatsApp para desconectar
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, 'http://localhost:3002/disconnect');
@@ -1630,6 +1645,7 @@ startxref
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 10);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Tenant-Id: ' . $tenantId]);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -1671,6 +1687,9 @@ startxref
     public function cleanWhatsAppSession(): JsonResponse
     {
         try {
+            // Obtener tenant_id del contexto
+            $tenantId = tenant('id');
+
             // Hacer petición al servicio de WhatsApp para limpiar sesión
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, 'http://localhost:3002/clean-session');
@@ -1678,6 +1697,7 @@ startxref
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_TIMEOUT, 10);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Tenant-Id: ' . $tenantId]);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

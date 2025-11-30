@@ -1253,9 +1253,7 @@ import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { customersService } from '../services/customersService.js'
 import { invoicesService } from '../services/invoicesService.js'
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
-import QRCode from 'qrcode'
+import { generateInvoicePDF as generateInvoicePDFTemplate, generateQuotationPDF as generateQuotationPDFTemplate, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
 import { useCashSession } from '../services/cashSessionService.js'
 import { appStore } from '../store/appStore.js' // Importar store global
 import axiosInstance from '../services/apiClient.js'
@@ -3330,7 +3328,8 @@ const isValidPhoneNumber = (phone) => {
 }
 
 /**
- * Generar PDF capturando exactamente la factura que está en pantalla
+ * Generar PDF de factura usando plantilla centralizada
+ * SIEMPRE genera el mismo PDF (vectorial, alta calidad) para: imprimir, descargar, WhatsApp
  */
 const generateInvoicePDF = async () => {
   try {
@@ -3338,55 +3337,40 @@ const generateInvoicePDF = async () => {
       throw new Error('No hay datos de venta para generar el PDF')
     }
 
-    console.log('Capturando factura de pantalla...')
-
-    // Mostrar el recibo temporalmente si no está visible
-    const wasReceiptVisible = showReceiptModal.value
-    if (!wasReceiptVisible) {
-      showReceiptModal.value = true
-      await nextTick()
-      await new Promise(resolve => setTimeout(resolve, 500)) // Esperar renderizado
-    }
-
-    // Obtener el elemento del recibo visible
-    const receiptElement = document.getElementById('receipt-content')
-    if (!receiptElement) {
-      throw new Error('No se encontró el recibo en pantalla')
-    }
-
-    // Crear canvas del recibo usando html2canvas
-    const canvas = await html2canvas(receiptElement, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      width: receiptElement.scrollWidth,
-      height: receiptElement.scrollHeight,
-      logging: false
+    console.log('📄 Generando PDF con datos:', {
+      invoiceNumber: lastSale.value.invoiceNumber,
+      date: lastSale.value.date,
+      created_at: lastSale.value.created_at,
+      customer: lastSale.value.customer,
+      total: lastSale.value.total
     })
 
-    // Crear PDF con jsPDF
-    const imgWidth = 80 // Ancho del ticket en mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: [imgWidth, Math.max(imgHeight, 100)]
-    })
-
-    const imgData = canvas.toDataURL('image/png', 1.0)
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, '', 'FAST')
-
-    // Ocultar el recibo si no estaba visible antes
-    if (!wasReceiptVisible) {
-      showReceiptModal.value = false
+    // Preparar datos de la factura para la plantilla
+    const invoiceData = {
+      invoice_number: lastSale.value.invoiceNumber || lastSale.value.invoice_number || 'SIN-NUMERO',
+      created_at: lastSale.value.date || lastSale.value.created_at || new Date(),
+      customer_name: lastSale.value.customer || lastSale.value.customer_name || 'Cliente General',
+      cashier: lastSale.value.cashier || currentUser?.name || 'Vendedor',
+      items: lastSale.value.items || [],
+      subtotal: parseFloat(lastSale.value.subtotal || 0),
+      discount: parseFloat(lastSale.value.discount || 0),
+      tax: parseFloat(lastSale.value.tax || 0),
+      total: parseFloat(lastSale.value.total || 0),
+      payments: lastSale.value.payments || [],
+      change: parseFloat(lastSale.value.change || 0),
+      notes: lastSale.value.notes || ''
     }
 
+    console.log('✅ Datos preparados para PDF:', invoiceData)
+
+    // Generar PDF usando plantilla centralizada (jsPDF vectorial)
+    const pdf = await generateInvoicePDFTemplate(invoiceData, systemSettings)
+    
     // Convertir a blob
-    return pdf.output('blob')
+    return getPDFBlob(pdf)
 
   } catch (error) {
-    console.error('Error generando PDF:', error)
+    console.error('❌ Error generando PDF:', error)
     throw new Error('No se pudo generar el PDF de la factura: ' + error.message)
   }
 }
@@ -5092,231 +5076,34 @@ const printQuotationTicket = async () => {
   }
 }
 
-// Función para generar PDF Blob de cotización (igual al de impresión)
+/**
+ * Generar PDF Blob de cotización usando plantilla centralizada
+ * SIEMPRE genera el mismo PDF (vectorial, alta calidad) para: imprimir, descargar, WhatsApp
+ */
 const generateQuotationPDFBlob = async (quotationData) => {
   try {
-    console.log('📋 Generando PDF Blob de cotización igual al de impresión...')
-    
-    // Obtener código de cotización
-    const quotationCode = quotationData.code
-    
-    // Generar el QR como imagen base64
-    const qrDataURL = await QRCode.toDataURL(quotationCode, {
-      width: 80,
-      margin: 1,
-      color: {
-        dark: '#000000',
-        light: '#FFFFFF'
-      }
-    })
-    
-    // Calcular altura necesaria dinámicamente
-    const baseHeight = 120 // Altura base mínima
-    const itemHeight = 4 // Altura por item
-    const itemCount = Array.isArray(quotationData.items) ? quotationData.items.length : 0
-    const qrSectionHeight = 60 // Altura para QR y footer
-    const dynamicHeight = Math.max(200, baseHeight + (itemCount * itemHeight) + qrSectionHeight)
-    
-    // Crear PDF con formato ticket (altura dinámica)
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: [80, dynamicHeight] // Altura dinámica según contenido
-    })
-    
-    // Configuración del ticket
-    let yPos = 8
-    const pageWidth = 80
-    const leftMargin = 4
-    const rightMargin = pageWidth - 4
-    const centerX = pageWidth / 2
-    
-    // ==================== HEADER EMPRESARIAL ====================
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(12)
-    pdf.text('SISTEMA POS', centerX, yPos, { align: 'center' })
-    yPos += 5
-    
-    pdf.setFontSize(8)
-    pdf.setFont('helvetica', 'normal')
-    pdf.text('Soluciones de Punto de Venta', centerX, yPos, { align: 'center' })
-    yPos += 4
-    pdf.text('Tel: (+57) 1 234-5678', centerX, yPos, { align: 'center' })
-    yPos += 4
-    pdf.text('ventas@sistemapos.com', centerX, yPos, { align: 'center' })
-    yPos += 6
-    
-    // Línea separadora
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 6
-    
-    // ==================== INFORMACIÓN DE COTIZACIÓN ====================
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(10)
-    pdf.text('COTIZACIÓN', leftMargin, yPos)
-    yPos += 5
-    
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(8)
-    pdf.text(`Código: ${quotationCode}`, leftMargin, yPos)
-    yPos += 4
-    pdf.text(`Fecha: ${new Date(quotationData.created_at || new Date()).toLocaleDateString('es-CO')}`, leftMargin, yPos)
-    yPos += 4
-    pdf.text(`Hora: ${new Date(quotationData.created_at || new Date()).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`, leftMargin, yPos)
-    yPos += 4
-    pdf.text('Vendedor: Usuario Sistema', leftMargin, yPos)
-    yPos += 6
-    
-    // Línea punteada
-    pdf.setLineDashPattern([1, 1], 0)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    pdf.setLineDashPattern([], 0)
-    yPos += 6
-    
-    // ==================== INFORMACIÓN DEL CLIENTE ====================
-    const customerName = typeof quotationData.customer === 'object' && quotationData.customer !== null 
-      ? (quotationData.customer.name || quotationData.customer.customer_name || 'Cliente General')
-      : (typeof quotationData.customer === 'string' ? quotationData.customer : 'Cliente General')
-    
-    pdf.setFont('helvetica', 'bold')
-    pdf.text('CLIENTE:', leftMargin, yPos)
-    yPos += 4
-    pdf.setFont('helvetica', 'normal')
-    pdf.text(`${customerName}`, leftMargin, yPos)
-    yPos += 6
-    
-    // Línea punteada
-    pdf.setLineDashPattern([1, 1], 0)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    pdf.setLineDashPattern([], 0)
-    yPos += 6
-    
-    // ==================== TABLA DE PRODUCTOS ====================
-    // Headers
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(7)
-    pdf.text('Descripción', leftMargin, yPos)
-    pdf.text('Cant', leftMargin + 40, yPos)
-    pdf.text('Precio', leftMargin + 50, yPos)
-    pdf.text('Total', leftMargin + 65, yPos)
-    yPos += 3
-    
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 3
-    
-    // Items
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(7)
-    
-    if (Array.isArray(quotationData.items)) {
-      quotationData.items.forEach(item => {
-        const itemTotal = (parseFloat(item.price || 0) * parseInt(item.quantity || 1))
-        
-        // Descripción (máximo 20 caracteres)
-        const description = (item.name || item.description || 'Sin descripción').substring(0, 20)
-        pdf.text(description, leftMargin, yPos)
-        
-        // Cantidad
-        pdf.text(String(item.quantity || 1), leftMargin + 40, yPos)
-        
-        // Precio
-        pdf.text(`$${parseFloat(item.price || 0).toLocaleString()}`, leftMargin + 50, yPos, { align: 'right' })
-        
-        // Total
-        pdf.text(`$${itemTotal.toLocaleString()}`, leftMargin + 72, yPos, { align: 'right' })
-        
-        yPos += 4
-      })
+    // Preparar datos de la cotización para la plantilla
+    const quotationForTemplate = {
+      quotation_number: quotationData.code,
+      date: quotationData.created_at || new Date(),
+      customer_name: typeof quotationData.customer === 'object' && quotationData.customer !== null 
+        ? (quotationData.customer.name || quotationData.customer.customer_name || 'Cliente General')
+        : (typeof quotationData.customer === 'string' ? quotationData.customer : 'Cliente General'),
+      cashier: currentUser?.name || 'Vendedor',
+      items: quotationData.items || [],
+      subtotal: parseFloat(quotationData.subtotal || quotationData.total || 0),
+      discount: parseFloat(quotationData.discount_amount || 0),
+      tax: parseFloat(tax.value || 0),
+      total: parseFloat(quotationData.total || 0),
+      notes: quotationData.notes || '',
+      validity_days: 15
     }
+
+    // Generar PDF usando plantilla centralizada (jsPDF vectorial)
+    const pdf = await generateQuotationPDFTemplate(quotationForTemplate, systemSettings)
     
-    yPos += 3
-    
-    // ==================== TOTALES ====================
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 4
-    
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(8)
-    
-    // Subtotal
-    pdf.text('Subtotal:', leftMargin + 35, yPos)
-    pdf.text(`$${parseFloat(quotationData.subtotal || quotationData.total || 0).toLocaleString()}`, leftMargin + 72, yPos, { align: 'right' })
-    yPos += 4
-    
-    // Descuento
-    pdf.text('Descuento:', leftMargin + 35, yPos)
-    pdf.text(`$${parseFloat(quotationData.discount_amount || 0).toLocaleString()}`, leftMargin + 72, yPos, { align: 'right' })
-    yPos += 4
-    
-    // IVA
-    const taxRate = displayTaxRate.value || 0
-    pdf.text(`IVA (${taxRate}%):`, leftMargin + 35, yPos)
-    pdf.text(`$${parseFloat(tax.value || 0).toLocaleString()}`, leftMargin + 72, yPos, { align: 'right' })
-    yPos += 4
-    
-    // Total final
-    pdf.line(leftMargin + 35, yPos, rightMargin, yPos)
-    yPos += 3
-    
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(10)
-    pdf.text('TOTAL:', leftMargin + 35, yPos)
-    pdf.text(`$${parseFloat(quotationData.total || 0).toLocaleString()}`, leftMargin + 72, yPos, { align: 'right' })
-    yPos += 10
-    
-    // ==================== CÓDIGO QR (POSICIÓN FIJA AL FINAL) ====================
-    pdf.setLineDashPattern([1, 1], 0)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    pdf.setLineDashPattern([], 0)
-    yPos += 6
-    
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(9)
-    pdf.text('Código de Cotización', centerX, yPos, { align: 'center' })
-    yPos += 6
-    
-    // Añadir QR code - SIEMPRE VISIBLE
-    pdf.addImage(qrDataURL, 'PNG', centerX - 15, yPos, 30, 30)
-    yPos += 35
-    
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(8)
-    pdf.text(quotationCode, centerX, yPos, { align: 'center' })
-    yPos += 10
-    
-    // ==================== FOOTER ====================
-    pdf.setLineDashPattern([1, 1], 0)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    pdf.setLineDashPattern([], 0)
-    yPos += 5
-    
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(8)
-    pdf.text('COTIZACIÓN VÁLIDA', centerX, yPos, { align: 'center' })
-    yPos += 4
-    
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(7)
-    pdf.text('El cliente puede usar este código para', centerX, yPos, { align: 'center' })
-    yPos += 3
-    pdf.text('realizar la compra posteriormente.', centerX, yPos, { align: 'center' })
-    yPos += 6
-    
-    pdf.setFont('helvetica', 'bold')
-    pdf.text('¡Gracias por su preferencia!', centerX, yPos, { align: 'center' })
-    
-    // Convertir a Blob con tipo MIME explícito
-    const pdfArrayBuffer = pdf.output('arraybuffer')
-    const pdfBlob = new Blob([pdfArrayBuffer], { type: 'application/pdf' })
-    
-    console.log('✅ PDF Blob igual al de impresión generado exitosamente:', {
-      size: pdfBlob.size,
-      type: pdfBlob.type,
-      sizeKB: Math.round(pdfBlob.size / 1024),
-      dynamicHeight: dynamicHeight + 'mm',
-      itemCount: itemCount
-    })
-    return pdfBlob
+    // Convertir a blob
+    return getPDFBlob(pdf)
     
   } catch (error) {
     console.error('❌ Error al generar PDF Blob:', error)

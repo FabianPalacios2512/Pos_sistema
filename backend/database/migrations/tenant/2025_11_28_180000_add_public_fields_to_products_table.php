@@ -11,13 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->boolean('is_public')->default(true)->after('active');
-            $table->text('public_description')->nullable()->after('is_public');
-            $table->string('public_image')->nullable()->after('public_description');
-
-            $table->index(['is_public', 'active']);
-        });
+        if (Schema::hasTable('products')) {
+            Schema::table('products', function (Blueprint $table) {
+if (!Schema::hasColumn('products', 'is_public')) {
+    $table->boolean('is_public')->default(true)->after('active');
+}
+                        if (!Schema::hasColumn('products', 'public_description')) {
+                            $table->text('public_description')->nullable()->after('is_public');
+                        }
+                        if (!Schema::hasColumn('products', 'public_image')) {
+                            $table->string('public_image')->nullable()->after('public_description');
+                        }
+                        $table->index(['is_public', 'active']);
+            
+                    });
+        }
     }
 
     /**

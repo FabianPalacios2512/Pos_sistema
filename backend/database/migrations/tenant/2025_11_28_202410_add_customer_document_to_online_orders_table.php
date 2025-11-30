@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('online_orders', function (Blueprint $table) {
-            $table->string('customer_document', 20)->nullable()->after('customer_phone');
-        });
+        if (Schema::hasTable('online_orders') && !Schema::hasColumn('online_orders', 'customer_document')) {
+            Schema::table('online_orders', function (Blueprint $table) {
+                $table->string('customer_document', 20)->nullable()->after('customer_phone');
+            });
+        }
     }
 
     /**

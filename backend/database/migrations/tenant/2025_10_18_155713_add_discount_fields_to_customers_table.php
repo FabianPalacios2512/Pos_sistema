@@ -11,12 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->boolean('has_discount')->default(false);
-            $table->enum('discount_type', ['percentage', 'fixed_amount'])->nullable();
-            $table->decimal('discount_value', 10, 2)->nullable();
-            $table->text('discount_description')->nullable();
-        });
+        if (Schema::hasTable('customers')) {
+            Schema::table('customers', function (Blueprint $table) {
+if (!Schema::hasColumn('customers', 'has_discount')) {
+    $table->boolean('has_discount')->default(false);
+}
+                        if (!Schema::hasColumn('customers', 'discount_type')) {
+                            $table->enum('discount_type', ['percentage', 'fixed_amount'])->nullable();
+                        }
+                        if (!Schema::hasColumn('customers', 'discount_value')) {
+                            $table->decimal('discount_value', 10, 2)->nullable();
+                        }
+                        if (!Schema::hasColumn('customers', 'discount_description')) {
+                            $table->text('discount_description')->nullable();
+                        }
+            
+                    });
+        }
     }
 
     /**

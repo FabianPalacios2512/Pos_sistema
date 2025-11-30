@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('system_settings', function (Blueprint $table) {
-            $table->boolean('creditienda_enabled')->default(false)->after('require_customer');
-        });
+        if (Schema::hasTable('system_settings')) {
+            Schema::table('system_settings', function (Blueprint $table) {
+if (!Schema::hasColumn('system_settings', 'creditienda_enabled')) {
+    $table->boolean('creditienda_enabled')->default(false)->after('require_customer');
+}
+            
+                    });
+        }
     }
 
     /**

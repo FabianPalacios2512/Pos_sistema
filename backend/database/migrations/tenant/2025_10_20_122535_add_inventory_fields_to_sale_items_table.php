@@ -11,18 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sale_items', function (Blueprint $table) {
-            // Costos y rentabilidad por item
-            $table->decimal('unit_cost', 10, 2)->default(0)->after('unit_price'); // Costo unitario en el momento de la venta
-            $table->decimal('discount_allocated', 10, 2)->default(0)->after('unit_cost'); // Descuento asignado a este item
-            $table->decimal('revenue', 12, 2)->default(0)->after('discount_allocated'); // Ingresos = (unit_price - discount_allocated) * quantity
-            $table->decimal('profit', 12, 2)->default(0)->after('revenue'); // Ganancia = revenue - (unit_cost * quantity)
-            $table->decimal('profit_margin', 5, 2)->default(0)->after('profit'); // Margen = (profit / revenue) * 100
-
-            // Índices para análisis
-            $table->index(['product_id', 'created_at']);
-            $table->index(['profit_margin']);
-        });
+        if (Schema::hasTable('sale_items')) {
+            Schema::table('sale_items', function (Blueprint $table) {
+// Costos y rentabilidad por item
+                        if (!Schema::hasColumn('sale_items', 'unit_cost')) {
+                            $table->decimal('unit_cost', 10, 2)->default(0)->after('unit_price'); // Costo unitario en el momento de la venta
+                        }
+                        if (!Schema::hasColumn('sale_items', 'discount_allocated')) {
+                            $table->decimal('discount_allocated', 10, 2)->default(0)->after('unit_cost'); // Descuento asignado a este item
+                        }
+                        if (!Schema::hasColumn('sale_items', 'revenue')) {
+                            $table->decimal('revenue', 12, 2)->default(0)->after('discount_allocated'); // Ingresos = (unit_price - discount_allocated) * quantity
+                        }
+                        if (!Schema::hasColumn('sale_items', 'profit')) {
+                            $table->decimal('profit', 12, 2)->default(0)->after('revenue'); // Ganancia = revenue - (unit_cost * quantity)
+                        }
+                        if (!Schema::hasColumn('sale_items', 'profit')) {
+                            $table->decimal('profit_margin', 5, 2)->default(0)->after('profit'); // Margen = (profit / revenue) * 100
+                        }
+                        // Índices para análisis
+                        $table->index(['product_id', 'created_at']);
+                        $table->index(['profit_margin']);
+            
+                    });
+        }
     }
 
     /**

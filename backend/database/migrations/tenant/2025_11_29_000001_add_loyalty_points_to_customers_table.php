@@ -11,10 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('customers', function (Blueprint $table) {
-            $table->integer('loyalty_points')->default(0)->after('total_orders');
-            $table->index(['loyalty_points']);
-        });
+        if (Schema::hasTable('customers')) {
+            Schema::table('customers', function (Blueprint $table) {
+if (!Schema::hasColumn('customers', 'loyalty_points')) {
+    $table->integer('loyalty_points')->default(0)->after('total_orders');
+}
+                        $table->index(['loyalty_points']);
+            
+                    });
+        }
     }
 
     /**

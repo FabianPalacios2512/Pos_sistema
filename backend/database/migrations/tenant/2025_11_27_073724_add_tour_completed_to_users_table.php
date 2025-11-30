@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('tour_completed')->default(false)->after('active');
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+if (!Schema::hasColumn('users', 'tour_completed')) {
+    $table->boolean('tour_completed')->default(false)->after('active');
+}
+            
+                    });
+        }
     }
 
     /**

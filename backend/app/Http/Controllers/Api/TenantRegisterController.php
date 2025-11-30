@@ -124,6 +124,19 @@ class TenantRegisterController extends Controller
                     'password' => bcrypt($request->password),
                     'role_id' => $role->id,
                 ]);
+
+                // Actualizar system_settings con datos del registro
+                \DB::table('system_settings')->where('id', 1)->update([
+                    'company_name' => $request->company_name,
+                    'company_email' => $request->email,
+                    'updated_at' => now(),
+                ]);
+
+                // ✅ YA NO ES NECESARIO: Los payment_methods y expense_categories
+                // se crean automáticamente por Jobs\SeedDatabase::class en TenancyServiceProvider
+                // (Ver: backend/app/Providers/TenancyServiceProvider.php línea 30)
+
+                \Log::info('✅ Tenant inicializado - Seeders se ejecutarán automáticamente');
             });
 
             // Construir la URL de redirección

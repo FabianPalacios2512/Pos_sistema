@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sales', function (Blueprint $table) {
-            // Modificar el enum para incluir 'quotation'
-            $table->enum('status', ['completed', 'pending', 'cancelled', 'refunded', 'quotation'])->default('completed')->change();
-        });
+        if (Schema::hasTable('sales') && Schema::hasColumn('sales', 'status')) {
+            Schema::table('sales', function (Blueprint $table) {
+                // Modificar el enum para incluir 'quotation'
+                $table->enum('status', ['completed', 'pending', 'cancelled', 'refunded', 'quotation'])->default('completed')->change();
+            });
+        }
     }
 
     /**

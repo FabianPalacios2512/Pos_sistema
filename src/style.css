@@ -122,6 +122,10 @@ html, body {
   transform: scale(1.02);
 }
 
+/* Border width personalizado para MinimalTemplate */
+.border-3 {
+  border-width: 3px;
+}
 
       .custom-scrollbar::-webkit-scrollbar {
         height: 6px; /* Altura para scroll horizontal */

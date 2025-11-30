@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('expenses', function (Blueprint $table) {
+        if (!Schema::hasTable('expenses')) {
+            Schema::create('expenses', function (Blueprint $table) {
             $table->id();
 
             // Relaciones
@@ -54,6 +55,7 @@ return new class extends Migration
             $table->index(['payment_method']);
             $table->index(['date']);
         });
+        }
     }
 
     /**

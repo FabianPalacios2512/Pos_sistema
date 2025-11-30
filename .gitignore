@@ -41,8 +41,15 @@ bootstrap/cache/*
 .cache/
 *.cache
 
-# WhatsApp session
+# WhatsApp session (NUNCA subir estas claves privadas)
 whatsapp_session/
+whatsapp_sessions/
+backend/whatsapp_sessions/
+backend/whatsapp_session/
+whatsapp_qrs/
+backend/whatsapp_qrs/
+*.qr
+whatsapp_qr.txt
 
 # Database
 *.sql

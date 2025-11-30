@@ -218,9 +218,9 @@
         </div>
       </div>
 
-      <!-- Footer con Acciones - Solo 3 opciones: Imprimir, WhatsApp y Nueva Venta -->
+      <!-- Footer con Acciones - 4 opciones: Imprimir, Descargar PDF, WhatsApp y Nueva Venta -->
       <div class="p-4 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
-        <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="grid grid-cols-3 gap-3 mb-3">
           <button
             @click="printReceipt"
             class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
@@ -229,6 +229,15 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
             </svg>
             <span class="text-sm">Imprimir</span>
+          </button>
+          <button
+            @click="downloadPDF"
+            class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span class="text-sm">Descargar PDF</span>
           </button>
           <button
             @click="sendWhatsApp"
@@ -256,6 +265,9 @@
 import { ref, computed, defineProps, defineEmits, onMounted, watch } from 'vue'
 import qrcode from 'qrcode-generator'
 import { formatInvoiceDate, formatShortDate, formatColombianTime } from '@/utils/dateFormatter.js'
+import { generateInvoicePDF, downloadPDF as downloadPDFHelper } from '../utils/pdfTemplates/pdfGenerator.js'
+import { appStore } from '../store/appStore.js'
+import { useToast } from '../composables/useToast.js'
 
 // Props
 const props = defineProps({
@@ -361,6 +373,42 @@ const getPaymentMethodName = (method) => {
     'digital': 'Pago Digital'
   }
   return methods[method] || method
+}
+
+const { showToast } = useToast()
+
+const downloadPDF = async () => {
+  try {
+    showToast('Generando PDF...', 'info')
+
+    // Preparar datos de la factura
+    const invoiceData = {
+      invoice_number: props.sale.invoiceNumber || 'SIN-NUMERO',
+      date: props.sale.date || new Date(),
+      customer_name: props.sale.customer || 'Cliente General',
+      cashier: props.sale.cashier || 'Vendedor',
+      items: props.sale.items || [],
+      subtotal: parseFloat(props.sale.subtotal || 0),
+      discount: parseFloat(props.sale.discount || 0),
+      tax: parseFloat(props.sale.tax || 0),
+      total: parseFloat(props.sale.total || 0),
+      payments: props.sale.payments || [],
+      change: parseFloat(props.sale.change || 0),
+      notes: props.sale.notes || ''
+    }
+
+    // Generar PDF usando plantilla centralizada
+    const pdf = await generateInvoicePDF(invoiceData, props.systemSettings || appStore.systemSettings)
+    
+    // Descargar
+    const filename = `factura-${invoiceData.invoice_number}.pdf`
+    downloadPDFHelper(pdf, filename)
+    
+    showToast('PDF descargado correctamente', 'success')
+  } catch (error) {
+    console.error('Error descargando PDF:', error)
+    showToast('Error al descargar el PDF', 'error')
+  }
 }
 
 const printReceipt = () => {

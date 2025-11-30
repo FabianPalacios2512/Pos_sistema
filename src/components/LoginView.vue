@@ -168,6 +168,7 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 import authService from '../services/authService.js'
 
 // Router
@@ -247,6 +248,19 @@ const handleLogin = async () => {
 
     message.text = 'Inicio de sesión exitoso'
     message.type = 'success'
+
+    // Aplicar configuración pendiente del onboarding si existe
+    const pendingConfig = localStorage.getItem('pending_onboarding_config')
+    if (pendingConfig) {
+      try {
+        const config = JSON.parse(pendingConfig)
+        await axios.put('/api/tenant/system-settings', config)
+        localStorage.removeItem('pending_onboarding_config')
+        console.log('✅ Configuración de onboarding aplicada exitosamente')
+      } catch (error) {
+        console.error('Error aplicando configuración pendiente:', error)
+      }
+    }
 
     // Verificar rol y redireccionar
     const user = response.data?.user || response.user // Compatibilidad con ambas estructuras

@@ -23,6 +23,8 @@ class SystemSetting extends Model
         'invoice_number_start',
         'invoice_current_number',
         'invoice_footer_message',
+        'invoice_template',
+        'qr_style',
         'require_customer',
         'require_customer_quotations',
         'creditienda_enabled',

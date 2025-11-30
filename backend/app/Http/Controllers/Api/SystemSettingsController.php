@@ -47,6 +47,8 @@ class SystemSettingsController extends Controller
                 'iva_display_name' => 'string|max:255',
                 'invoice_prefix' => 'string|max:10',
                 'invoice_footer_message' => 'nullable|string',
+                'invoice_template' => 'nullable|in:classic,modern,minimal',
+                'qr_style' => 'nullable|in:rounded,square,modern',
                 'require_customer' => 'boolean',
                 'require_customer_quotations' => 'boolean',
                 'discounts_enabled' => 'boolean',
@@ -143,6 +145,55 @@ class SystemSettingsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al restablecer configuración: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Guardar configuración inicial del onboarding
+     */
+    public function saveOnboarding(Request $request)
+    {
+        try {
+            $settings = SystemSetting::getSettings();
+
+            $validated = $request->validate([
+                'invoice_template' => 'required|in:classic,modern,minimal',
+                'company_logo' => 'nullable|string',
+                'company_name' => 'required|string|max:255',
+                'company_email' => 'required|email|max:255',
+                'company_phone' => 'required|string|max:255',
+                'company_address' => 'required|string|max:500',
+                'thank_you_message' => 'nullable|string|max:500',
+                'qr_style' => 'required|in:rounded,square,circle',
+                'whatsapp_number' => 'nullable|string|max:20',
+                'onboarding_completed' => 'boolean'
+            ]);
+
+            // Actualizar configuración
+            $settings->update([
+                'company_name' => $validated['company_name'],
+                'company_email' => $validated['company_email'],
+                'company_phone' => $validated['company_phone'],
+                'company_address' => $validated['company_address'],
+                'company_logo' => $validated['company_logo'] ?? null,
+                'invoice_template' => $validated['invoice_template'],
+                'invoice_footer_message' => $validated['thank_you_message'] ?? '¡Gracias por su compra!',
+                'qr_style' => $validated['qr_style'],
+                'whatsapp_business_number' => $validated['whatsapp_number'] ?? null,
+                'onboarding_completed' => true
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Configuración inicial guardada exitosamente',
+                'data' => $settings->fresh()
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error en onboarding:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar configuración inicial: ' . $e->getMessage()
             ], 500);
         }
     }
