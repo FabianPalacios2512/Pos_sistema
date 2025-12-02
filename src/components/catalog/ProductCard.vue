@@ -1,16 +1,16 @@
 <template>
-  <div class="group relative bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
+  <div class="group relative bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
     
     <!-- 📸 Image Container -->
-    <div class="relative aspect-square overflow-hidden bg-slate-50">
+    <div class="relative aspect-square overflow-hidden bg-gray-100 dark:bg-zinc-800">
       <img 
         v-if="product.image" 
         :src="product.image" 
         :alt="product.name"
         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
       >
-      <div v-else class="w-full h-full flex items-center justify-center bg-slate-100">
-        <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-else class="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-zinc-800">
+        <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
         </svg>
       </div>
@@ -20,7 +20,7 @@
         <span v-if="product.stock <= 5 && product.stock > 0" class="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold uppercase rounded-md shadow-sm">
           ¡Quedan {{ product.stock }}!
         </span>
-        <span v-if="product.category" class="px-2 py-0.5 bg-white/90 backdrop-blur-sm text-slate-700 text-[10px] font-bold uppercase rounded-md border border-slate-200">
+        <span v-if="product.category" class="px-2 py-0.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] font-bold uppercase rounded-md border border-gray-200 dark:border-zinc-700">
           {{ product.category }}
         </span>
       </div>
@@ -30,7 +30,7 @@
         <button 
           v-if="quantity === 0 && product.stock > 0"
           @click.stop="addToCart"
-          class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 text-sm"
+          class="w-full py-2.5 bg-gray-900 dark:bg-emerald-600 hover:bg-gray-800 dark:hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 text-sm"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
           Agregar
@@ -41,18 +41,18 @@
     <!-- 📝 Content (Compact) -->
     <div class="p-3 md:p-4 flex flex-col flex-1">
       <div class="mb-2 flex-1">
-        <h3 class="text-sm md:text-base font-bold text-slate-900 mb-1 leading-tight line-clamp-2">
+        <h3 class="text-sm md:text-base font-bold text-gray-900 dark:text-gray-100 mb-1 leading-tight line-clamp-2">
           {{ product.name }}
         </h3>
-        <p class="hidden md:block text-xs text-slate-500 line-clamp-2">
+        <p class="hidden md:block text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
           {{ product.description || 'Calidad garantizada.' }}
         </p>
       </div>
 
       <!-- Price & Mobile Actions -->
-      <div class="flex items-end justify-between gap-2 mt-auto pt-2 border-t border-slate-50">
+      <div class="flex items-end justify-between gap-2 mt-auto pt-2 border-t border-gray-100 dark:border-zinc-800">
         <div>
-          <span class="text-lg md:text-xl font-black text-slate-900">${{ formatPrice(product.price) }}</span>
+          <span class="text-lg md:text-xl font-black text-gray-900 dark:text-white">${{ formatPrice(product.price) }}</span>
         </div>
 
         <!-- Mobile Add / Quantity -->
@@ -69,18 +69,18 @@
           </button>
 
           <!-- Quantity Control -->
-          <div v-else-if="quantity > 0" class="flex items-center bg-slate-100 rounded-lg p-0.5">
+          <div v-else-if="quantity > 0" class="flex items-center bg-gray-100 dark:bg-zinc-800 rounded-lg p-0.5">
             <button 
               @click="decreaseQuantity"
-              class="w-7 h-7 flex items-center justify-center bg-white rounded-md text-slate-600 shadow-sm"
+              class="w-7 h-7 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-md text-gray-600 dark:text-gray-300 shadow-sm"
             >
               -
             </button>
-            <span class="w-6 text-center font-bold text-slate-900 text-xs">{{ quantity }}</span>
+            <span class="w-6 text-center font-bold text-gray-900 dark:text-white text-xs">{{ quantity }}</span>
             <button 
               @click="increaseQuantity"
               :disabled="quantity >= product.stock"
-              class="w-7 h-7 flex items-center justify-center bg-white rounded-md text-slate-600 shadow-sm"
+              class="w-7 h-7 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-md text-gray-600 dark:text-gray-300 shadow-sm disabled:opacity-50"
             >
               +
             </button>

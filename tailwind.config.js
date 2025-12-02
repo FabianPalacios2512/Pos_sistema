@@ -22,6 +22,13 @@ export default {
           500: '#8b5cf6',
           600: '#7c3aed',
           700: '#6d28d9',
+        },
+        // 🎨 High-Contrast Dark Mode Palette (Linear/Vercel Style)
+        'dark': {
+          'bg': '#09090b',      // Zinc-950 - Fondo principal casi negro
+          'card': '#18181b',    // Zinc-900 - Tarjetas y contenedores
+          'border': '#27272a',  // Zinc-800 - Bordes sutiles
+          'hover': '#27272a',   // Zinc-800 - Hover states
         }
       },
       animation: {

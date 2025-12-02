@@ -1,33 +1,31 @@
 <template>
   <!-- Sidebar Empresarial Limpio (Shopify/Stripe Style) -->
   <div 
-    class="sidebar-container fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out flex flex-col lg:translate-x-0"
+    class="sidebar-container fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out flex flex-col lg:translate-x-0 bg-gray-50 dark:bg-[#18181b] border-r border-gray-200 dark:border-white/10"
     :style="{
-      width: sidebarCollapsed ? '80px' : '260px',
-      backgroundColor: '#F9FAFB',
-      borderRight: '1px solid #E5E7EB'
+      width: sidebarCollapsed ? '80px' : '260px'
     }"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
   >
     
     <!-- Logo y Marca - Estilo Empresarial Sobrio -->
-    <div class="flex items-center" :style="sidebarCollapsed ? 'height: 64px; padding: 0 16px; justify-content: center;' : 'padding: 20px 20px; border-bottom: 1px solid #E5E7EB;'">
+    <div class="flex items-center border-b border-gray-200 dark:border-white/10" :class="sidebarCollapsed ? 'h-16 px-4 justify-center' : 'p-5'">
       <div class="flex items-center" :class="sidebarCollapsed ? '' : 'gap-3'">
         <!-- Logo Personalizado -->
-        <div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-          <img src="/logo.png" alt="Logo" style="width: 40px; height: 40px; object-fit: contain;">
+        <div class="flex items-center justify-center flex-shrink-0">
+          <img src="/logo.png" alt="Logo" class="w-10 h-10 object-contain">
         </div>
         
         <!-- Texto Negro Sobrio -->
         <div v-show="!sidebarCollapsed">
-          <h1 style="font-size: 17px; font-weight: 700; color: #111827; margin: 0; line-height: 1.3; letter-spacing: -0.3px;">105 POS</h1>
-          <p style="font-size: 11px; color: #6B7280; margin: 0; line-height: 1.3; font-weight: 500;">Sistema Empresarial</p>
+          <h1 class="text-[17px] font-bold text-gray-900 dark:text-white leading-tight tracking-tight">105 POS</h1>
+          <p class="text-[11px] text-gray-600 dark:text-gray-400 leading-tight font-medium">Sistema Empresarial</p>
         </div>
       </div>
     </div>
 
     <!-- Navegación Principal -->
-    <nav class="flex-1 overflow-y-auto py-6" style="scrollbar-width: thin; scrollbar-color: #D1D5DB transparent;">
+    <nav class="flex-1 overflow-y-auto py-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700">
       
       <!-- Dashboard -->
       <div v-if="hasModuleAccess('dashboard')" :style="sidebarCollapsed ? 'padding: 0 16px;' : 'padding: 0 16px;'">
@@ -45,9 +43,9 @@
       </div>
 
       <!-- OPERACIONES -->
-      <div v-if="hasModuleAccess('pos') || hasModuleAccess('invoices') || hasModuleAccess('returns')" style="margin-top: 28px;" :style="sidebarCollapsed ? 'padding: 0 16px;' : 'padding: 0 16px;'">
+      <div v-if="hasModuleAccess('pos') || hasModuleAccess('invoices') || hasModuleAccess('returns')" class="mt-7 px-4">
         <!-- Línea divisoria cuando está colapsado -->
-        <div v-if="sidebarCollapsed" style="border-top: 1px solid #E5E7EB; margin-bottom: 16px;"></div>
+        <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
         <h3 v-show="!sidebarCollapsed" class="section-title">OPERACIONES</h3>
         
         <div
@@ -91,9 +89,9 @@
       </div>
 
       <!-- INVENTARIO -->
-      <div v-if="hasModuleAccess('products') || hasModuleAccess('categories') || hasModuleAccess('stock') || hasModuleAccess('intelligent_inventory')" style="margin-top: 28px;" :style="sidebarCollapsed ? 'padding: 0 16px;' : 'padding: 0 16px;'">
+      <div v-if="hasModuleAccess('products') || hasModuleAccess('categories') || hasModuleAccess('stock') || hasModuleAccess('intelligent_inventory')" class="mt-7 px-4">
         <!-- Línea divisoria cuando está colapsado -->
-        <div v-if="sidebarCollapsed" style="border-top: 1px solid #E5E7EB; margin-bottom: 16px;"></div>
+        <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
         <h3 v-show="!sidebarCollapsed" class="section-title">INVENTARIO</h3>
         
         <div
@@ -150,9 +148,9 @@
       </div>
 
       <!-- MULTISEDE -->
-      <div v-if="hasModuleAccess('warehouses')" style="margin-top: 28px;" :style="sidebarCollapsed ? 'padding: 0 16px;' : 'padding: 0 16px;'">
+      <div v-if="hasModuleAccess('warehouses')" class="mt-7 px-4">
         <!-- Línea divisoria cuando está colapsado -->
-        <div v-if="sidebarCollapsed" style="border-top: 1px solid #E5E7EB; margin-bottom: 16px;"></div>
+        <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
         <h3 v-show="!sidebarCollapsed" class="section-title">MULTISEDE</h3>
         
         <div
@@ -181,9 +179,9 @@
       </div>
 
       <!-- RELACIONES -->
-      <div v-if="hasModuleAccess('customers') || hasModuleAccess('suppliers')" style="margin-top: 28px;" :style="sidebarCollapsed ? 'padding: 0 16px;' : 'padding: 0 16px;'">
+      <div v-if="hasModuleAccess('customers') || hasModuleAccess('suppliers')" class="mt-7 px-4">
         <!-- Línea divisoria cuando está colapsado -->
-        <div v-if="sidebarCollapsed" style="border-top: 1px solid #E5E7EB; margin-bottom: 16px;"></div>
+        <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
         <h3 v-show="!sidebarCollapsed" class="section-title">RELACIONES</h3>
         
         <div
@@ -227,9 +225,9 @@
       </div>
 
       <!-- SISTEMA -->
-      <div v-if="hasModuleAccess('users') || hasModuleAccess('cash_register') || hasModuleAccess('reports') || hasModuleAccess('settings')" style="margin-top: 28px; margin-bottom: 24px;" :style="sidebarCollapsed ? 'padding: 0 16px;' : 'padding: 0 16px;'">
+      <div v-if="hasModuleAccess('users') || hasModuleAccess('cash_register') || hasModuleAccess('reports') || hasModuleAccess('settings')" class="mt-7 mb-6 px-4">
         <!-- Línea divisoria cuando está colapsado -->
-        <div v-if="sidebarCollapsed" style="border-top: 1px solid #E5E7EB; margin-bottom: 16px;"></div>
+        <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
         <h3 v-show="!sidebarCollapsed" class="section-title">SISTEMA</h3>
         
         <div
@@ -372,6 +370,10 @@ onMounted(async () => {
   padding: 0 8px;
 }
 
+.dark .section-title {
+  color: #71717a; /* Zinc-500 - Más visible en dark */
+}
+
 /* Items del Menú - Estilo Empresarial Sobrio (Shopify/Stripe) */
 .menu-item {
   display: flex;
@@ -389,6 +391,10 @@ onMounted(async () => {
   background-color: transparent;
 }
 
+.dark .menu-item {
+  color: #a1a1aa; /* Zinc-400 - High contrast en dark */
+}
+
 /* Menu Item Colapsado */
 .menu-item.collapsed {
   justify-content: center;
@@ -402,8 +408,17 @@ onMounted(async () => {
   color: #111827;
 }
 
+.dark .menu-item:hover {
+  background-color: #27272a; /* Zinc-800 - High contrast hover */
+  color: #ffffff;
+}
+
 .menu-item:hover svg {
   color: #374151;
+}
+
+.dark .menu-item:hover svg {
+  color: #e4e4e7; /* Zinc-200 */
 }
 
 /* Active State - Minimalismo Puro */
@@ -412,6 +427,12 @@ onMounted(async () => {
   color: #065F46;
   font-weight: 600;
   padding-left: 20px;
+}
+
+.dark .menu-item.active {
+  background-color: #10b98133; /* Emerald con alpha - Brilla en dark */
+  color: #34d399; /* Emerald-400 - High contrast */
+  font-weight: 600;
 }
 
 /* Barra Verde Sutil a la Izquierda */
@@ -427,8 +448,16 @@ onMounted(async () => {
   border-radius: 0 2px 2px 0;
 }
 
+.dark .menu-item.active::before {
+  background-color: #10b981; /* Emerald-500 - Más brillante en dark */
+}
+
 .menu-item.active svg {
   color: #059669;
+}
+
+.dark .menu-item.active svg {
+  color: #34d399; /* Emerald-400 */
 }
 
 /* Texto del Menú */

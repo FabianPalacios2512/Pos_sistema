@@ -1,6 +1,6 @@
 <template>
   <!-- Sistema POS Empresarial Completo -->
-  <div :class="{ 'dark': isDarkMode }" class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:bg-gray-900 transition-colors duration-300">
+  <div :class="{ 'dark': isDarkMode }" class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 dark:bg-[#09090b] transition-colors duration-300">
     
     <!-- Sidebar Component -->
     <Sidebar 
@@ -90,7 +90,7 @@
 
     <!-- Modal de Confirmación - Salir del POS con productos en carrito -->
     <div v-if="showCartWarningModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-100 border border-orange-200 dark:border-orange-800">
+      <div class="bg-white dark:bg-[#18181b] rounded-3xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-100 border border-orange-200 dark:border-white/10">
         <!-- Header -->
         <div class="bg-gradient-to-r from-orange-600 via-orange-500 to-red-600 dark:from-orange-900 dark:via-orange-800 dark:to-red-900 p-6 rounded-t-3xl border-b border-orange-300 dark:border-orange-700">
           <div class="flex items-center gap-4">

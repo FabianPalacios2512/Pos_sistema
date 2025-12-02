@@ -36,13 +36,26 @@ html, body {
   background: #f1f5f9;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #18181b;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 3px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
 
 /* Animaciones personalizadas */
@@ -98,13 +111,13 @@ html, body {
   @apply bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-3 transition-all duration-200 hover:shadow-md;
 }
 
-/* Modo oscuro mejorado */
+/* 🎨 High-Contrast Dark Mode (Linear/Vercel Style) */
 .dark .product-card {
-  @apply bg-gray-800 border-gray-700 hover:bg-gray-700;
+  @apply bg-[#18181b] border-white/10 hover:bg-[#27272a];
 }
 
 .dark .cart-item {
-  @apply bg-gray-800 border-gray-700;
+  @apply bg-[#18181b] border-white/10;
 }
 
 /* Efectos de glassmorphism */
@@ -114,7 +127,9 @@ html, body {
 }
 
 .dark .glass {
-  background: rgba(17, 24, 39, 0.9);
+  backdrop-filter: blur(16px);
+  background: rgba(9, 9, 11, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Utilidades personalizadas */

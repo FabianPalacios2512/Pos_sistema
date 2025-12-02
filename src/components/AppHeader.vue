@@ -1,14 +1,14 @@
 <template>
   <!-- Header Empresarial Profesional - Diseño Limpio y Minimalista -->
-  <header class="sticky top-0 z-50 bg-white border-b border-gray-200">
+  <header class="sticky top-0 z-50 bg-white dark:bg-[#18181b] border-b border-gray-200 dark:border-white/10 transition-colors duration-300">
     <div class="h-16 px-4 lg:px-6">
       <div class="flex items-center justify-between h-full">
         
         <!-- Sección Izquierda: Marca Minimalista -->
         <div class="flex items-center space-x-4">
           <div>
-            <h1 class="text-lg font-bold text-gray-900">105 POS Pro</h1>
-            <p class="text-xs text-gray-500 font-medium">Sistema de Gestión Empresarial</p>
+            <h1 class="text-lg font-bold text-gray-900 dark:text-white transition-colors duration-300">105 POS Pro</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium transition-colors duration-300">Sistema de Gestión Empresarial</p>
           </div>
         </div>
         
@@ -19,7 +19,7 @@
           <div class="relative">
             <button
               @click="toggleNotifications"
-              class="relative p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+              class="relative p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
               title="Notificaciones"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@
             >
               <div 
                 v-if="notificationsOpen"
-                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50"
+                class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50 transition-colors duration-300"
                 @click.stop
               >
                 <div class="px-4 py-3 border-b border-gray-50">
@@ -92,11 +92,11 @@
             </Transition>
           </div>
           
-          <!-- Video Tutorial -->
+          <!-- Video Tutorial - GHOST BUTTON -->
           <button
             id="tour-video-button"
             @click="showVideoTutorial"
-            class="hidden md:flex p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+            class="hidden md:flex p-2 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-lg transition-colors duration-200"
             title="Video tutorial"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@
           <button
             id="tour-help-button"
             @click="showHelp"
-            class="hidden md:flex p-2 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+            class="hidden md:flex p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
             title="Ayuda"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,11 +117,11 @@
             </svg>
           </button>
           
-          <!-- Botón Radio - Estilo Ghost Limpio -->
+          <!-- Botón Radio - 100% Ghost -->
           <button
             id="tour-voice-button"
             @click="$emit('toggle-radio')"
-            class="hidden md:flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 relative bg-white border border-gray-200 hover:bg-emerald-50 hover:border-emerald-300"
+            class="hidden md:flex items-center space-x-1.5 px-3 py-2 rounded-lg transition-all duration-200 relative bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-400"
             :title="isRadioActive ? `Reproduciendo: ${currentRadioName}` : 'Radio'"
           >
             <!-- Punto indicador (SOLO cuando está reproduciendo) -->
@@ -134,44 +134,45 @@
             </span>
 
             <!-- Icono de Radio -->
-            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
             
             <!-- Texto -->
-            <span class="text-sm font-semibold text-gray-700">Radio</span>
+            <span class="text-sm font-medium">Radio</span>
           </button>
 
-          <!-- Botón 105 IA - Estilo Ghost Limpio -->
+          <!-- Botón 105 IA - 100% Ghost (ya corregido previamente) -->
           <button
             id="tour-ia-button"
             @click="toggleAIChat"
-            class="hidden md:flex items-center space-x-2 px-3 py-2 bg-white border border-gray-200 rounded-lg transition-all duration-200 hover:bg-purple-50 hover:border-purple-300"
+            class="hidden md:flex items-center space-x-1.5 px-3 py-2 bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-400 rounded-lg transition-all duration-200"
             title="Asistente IA 105"
           >
-            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
             </svg>
-            <span class="text-sm font-semibold text-gray-700">105 IA</span>
+            <span class="text-sm font-medium">105 IA</span>
           </button>
           
           <!-- Separador -->
-          <div class="hidden md:block h-5 w-px bg-gray-200"></div>
+          <div class="hidden md:block h-5 w-px bg-gray-200 dark:bg-gray-600"></div>
           
-          <!-- Indicador de Tienda (Solo en módulo POS) - Estilo Discreto -->
+          <!-- Contexto de Sede - TEXTO PLANO (no botón) -->
           <div v-if="currentModule === 'pos' && currentWarehouse" 
-               class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5"
+               class="hidden md:flex items-center gap-1.5 px-2 py-1"
                title="Tienda actual">
-            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-3.5 h-3.5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
-            <span class="text-xs font-medium text-gray-600">{{ currentWarehouse.name }}</span>
+            <span class="text-sm font-medium text-gray-600 dark:text-zinc-400">{{ currentWarehouse.name }}</span>
           </div>
           
           <!-- Perfil de Usuario - Solo Avatar -->
-          <div class="relative">
+          <div class="relative" id="user-dropdown-container">
             <button
+              id="user-profile-button"
               @click="toggleUserDropdown"
               class="p-1 rounded-full hover:ring-2 hover:ring-gray-300 transition-all duration-200"
               :title="`${currentUser.name} - ${currentUser.role?.name || 'User'}`"
@@ -193,6 +194,7 @@
             >
               <div 
                 v-if="userDropdownOpen"
+                id="user-dropdown-menu"
                 class="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
                 style="box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);"
                 @click.stop
@@ -337,22 +339,22 @@
     >
       <div 
         v-if="videoModalOpen"
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 dark:bg-opacity-70 backdrop-blur-sm"
         @click="closeVideoModal"
       >
         <div 
-          class="bg-white rounded-xl shadow-2xl max-w-6xl w-full mx-4 overflow-hidden"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-6xl w-full mx-4 overflow-hidden"
           @click.stop
         >
           <!-- Header del Modal -->
-          <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-semibold text-gray-900">Tutorial: {{ currentModuleTitle }}</h3>
-              <p class="text-sm text-gray-500">Video guía para esta sección</p>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tutorial: {{ currentModuleTitle }}</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Video guía para esta sección</p>
             </div>
             <button
               @click="closeVideoModal"
-              class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+              class="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -370,13 +372,13 @@
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
             ></iframe>
-            <div v-else class="absolute inset-0 flex items-center justify-center bg-gray-100">
+            <div v-else class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
               <div class="text-center">
-                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 002 2v8a2 2 0 002 2z"></path>
                 </svg>
-                <p class="text-gray-500">No hay video tutorial disponible para esta sección</p>
-                <p class="text-sm text-gray-400 mt-1">Pronto estará disponible</p>
+                <p class="text-gray-500 dark:text-gray-400">No hay video tutorial disponible para esta sección</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Pronto estará disponible</p>
               </div>
             </div>
           </div>
@@ -626,12 +628,21 @@ const showHelp = () => {
 
 // Cerrar dropdown al hacer clic fuera
 const handleClickOutside = (event) => {
+  // Verificar si el clic fue dentro del dropdown de usuario
+  const userContainer = document.getElementById('user-dropdown-container')
+  const isInsideUserDropdown = userContainer?.contains(event.target)
+  
   // Cerrar dropdown de usuario si se hace clic fuera
-  if (userDropdownOpen.value && !event.target.closest('.relative')) {
+  if (userDropdownOpen.value && !isInsideUserDropdown) {
     userDropdownOpen.value = false
   }
+  
+  // Verificar si el clic fue dentro del dropdown de notificaciones
+  const notificationsButton = event.target.closest('button[title="Notificaciones"]')
+  const notificationsMenu = event.target.closest('div[class*="w-80"]')
+  
   // Cerrar dropdown de notificaciones si se hace clic fuera
-  if (notificationsOpen.value && !event.target.closest('.relative')) {
+  if (notificationsOpen.value && !notificationsButton && !notificationsMenu) {
     notificationsOpen.value = false
   }
 }
