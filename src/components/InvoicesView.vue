@@ -1,126 +1,126 @@
 <template>
-  <div class="min-h-screen font-sans" style="background-color: #F4F6F8;">
+  <div class="min-h-screen font-sans bg-gray-100 dark:bg-black transition-colors duration-300">
     <div class="p-4 lg:p-6 space-y-4 lg:space-y-5 animate-fade-in">
       
-      <!-- Header Minimalista Enterprise con KPIs que ocupan todo el espacio -->
-      <div class="flex items-center justify-between gap-4">
+      <!-- Header Profesional Limpio -->
+      <div class="flex items-center justify-between">
         
-        <!-- Título -->
-        <div class="flex-shrink-0">
-          <h1 class="text-2xl font-bold" style="color: #0F172A; font-family: 'Inter', sans-serif;">Facturas</h1>
-          <p class="text-xs mt-1" style="color: #94A3B8;">Gestión y control de documentos fiscales</p>
+        <!-- Título Simple -->
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Facturas</h1>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestión y control de documentos fiscales</p>
         </div>
         
-        <!-- KPIs que ocupan todo el espacio disponible -->
-        <div class="flex-1 flex items-center justify-start gap-4 px-6">
+        <!-- KPIs Modernos -->
+        <div class="flex-1 flex items-center justify-center gap-6">
           
           <!-- KPI: Facturas del Mes -->
-          <div class="flex items-center gap-3 px-6 py-2.5 bg-white rounded-lg border" style="border-color: #E2E8F0;">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: #EEF2FF;">
-              <svg class="w-5 h-5" style="color: #6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="text-[10px] font-medium uppercase tracking-wide" style="color: #94A3B8; font-family: 'Inter', sans-serif;">Facturas del Mes</p>
-              <p class="text-lg font-bold leading-tight mt-0.5" style="color: #0F172A; font-family: 'Inter', sans-serif;">{{ monthlyInvoices }}</p>
+          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-blue-600 dark:bg-blue-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Facturas del Mes</h3>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ monthlyInvoices }}</p>
+              </div>
             </div>
           </div>
 
           <!-- KPI: Total Facturado -->
-          <div class="flex items-center gap-3 px-6 py-2.5 bg-white rounded-lg border" style="border-color: #E2E8F0;">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: #ECFDF5;">
-              <svg class="w-5 h-5" style="color: #10B981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="text-[10px] font-medium uppercase tracking-wide" style="color: #94A3B8; font-family: 'Inter', sans-serif;">Total Facturado</p>
-              <p class="text-lg font-bold leading-tight mt-0.5" style="color: #0F172A; font-family: 'Inter', sans-serif;">${{ formatCurrency(totalInvoiced) }}</p>
+          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-emerald-600 dark:bg-emerald-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Total Facturado</h3>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">${{ formatCurrency(totalInvoiced) }}</p>
+              </div>
             </div>
           </div>
 
           <!-- KPI: Cotizaciones -->
-          <div class="flex items-center gap-3 px-6 py-2.5 bg-white rounded-lg border" style="border-color: #E2E8F0;">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: #EEF2FF;">
-              <svg class="w-5 h-5" style="color: #6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="text-[10px] font-medium uppercase tracking-wide" style="color: #94A3B8; font-family: 'Inter', sans-serif;">Cotizaciones</p>
-              <p class="text-lg font-bold leading-tight mt-0.5" style="color: #0F172A; font-family: 'Inter', sans-serif;">{{ quotations }}</p>
+          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-slate-600 dark:bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Cotizaciones</h3>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ quotations }}</p>
+              </div>
             </div>
           </div>
           
         </div>
         
         <!-- Botones de acción -->
-        <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="flex items-center gap-3 flex-shrink-0">
           <button
             @click="loadInvoices"
-            class="p-2 bg-white hover:bg-gray-50 rounded-lg border transition-all"
-            style="border-color: #E2E8F0; color: #64748B;"
-            title="Actualizar">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 active:scale-95 flex items-center gap-2 group">
+            <svg class="w-4 h-4 text-slate-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
+            <span>Refrescar</span>
           </button>
           
           <button
-            @click="showNewInvoiceModal = true"
-            class="px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2"
-            style="background-color: #0F172A; font-family: 'Inter', sans-serif; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            @click="navigateToPos"
+            class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-slate-400/60 dark:hover:shadow-slate-900/70 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
             </svg>
-            Nueva Factura
+            <span>Nueva Factura</span>
           </button>
         </div>
         
       </div>
 
       <!-- Master-Detail Layout Enterprise: 30/70 -->
-      <div class="grid grid-cols-1 lg:grid-cols-10 gap-4" style="height: calc(100vh - 140px); min-height: 650px;">
+      <div class="grid grid-cols-1 lg:grid-cols-10 gap-6" style="height: calc(100vh - 180px); min-height: 650px;">
         
         <!-- PANEL IZQUIERDO: Lista Minimalista (30%) -->
-        <div class="lg:col-span-3 bg-white rounded-xl overflow-hidden flex flex-col" style="border: 1px solid #E2E8F0;">
+        <div class="lg:col-span-3 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden flex flex-col border border-gray-300 dark:border-zinc-800 shadow-sm transition-colors duration-300">
           
           <!-- Header minimalista con búsqueda -->
-          <div class="p-3" style="border-bottom: 1px solid #E2E8F0;">
+          <div class="p-4 border-b border-gray-200 dark:border-zinc-800">
             <!-- Búsqueda limpia -->
-            <div class="relative mb-3">
-              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style="color: #94A3B8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="relative mb-4">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
               <input
                 v-model="searchTerm"
                 type="text"
-                placeholder="Buscar..."
-                class="w-full pl-9 pr-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2"
-                style="border: 1px solid #E2E8F0; color: #0F172A; font-family: 'Inter', sans-serif;"
-                :style="{ '&:focus': { borderColor: '#3B82F6', ring: '2px solid rgba(59, 130, 246, 0.1)' } }">
+                placeholder="Buscar facturas o clientes..."
+                class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300">
             </div>
             
             <!-- Filtros compactos -->
-            <div class="flex gap-2">
+            <div class="flex gap-3">
               <select
                 v-model="typeFilter"
-                class="flex-1 px-2 py-1.5 text-xs rounded-lg focus:outline-none focus:ring-2"
-                style="border: 1px solid #E2E8F0; color: #64748B; font-family: 'Inter', sans-serif;">
-                <option value="">Todos</option>
-                <option value="invoice">Facturas</option>
-                <option value="quote">Cotizaciones</option>
+                class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
+                <option value="">📄 Todos</option>
+                <option value="invoice">🧾 Facturas</option>
+                <option value="quote">📋 Cotizaciones</option>
               </select>
               
               <select
                 v-model="statusFilter"
-                class="flex-1 px-2 py-1.5 text-xs rounded-lg focus:outline-none focus:ring-2"
-                style="border: 1px solid #E2E8F0; color: #64748B; font-family: 'Inter', sans-serif;">
+                class="flex-1 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
                 <option value="">Estado</option>
-                <option value="Pendiente">Pendiente</option>
-                <option value="Pagada">Pagada</option>
-                <option value="Devuelta">Devuelta</option>
+                <option value="Pendiente">⏳ Pendiente</option>
+                <option value="Pagada">✅ Pagada</option>
+                <option value="Devuelta">↩️ Devuelta</option>
               </select>
             </div>
           </div>
@@ -132,9 +132,9 @@
               v-for="invoice in displayedInvoices"
               :key="invoice.id"
               @click="selectInvoice(invoice)"
-              class="px-4 py-4 cursor-pointer transition-all border-b border-slate-100 hover:bg-slate-50 group relative"
+              class="px-4 py-4 cursor-pointer transition-all border-b border-gray-100 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/50 group relative"
               :class="[
-                selectedInvoice?.id === invoice.id ? 'bg-indigo-50/50' : (isQuotation(invoice) ? 'bg-amber-50' : 'bg-white'),
+                selectedInvoice?.id === invoice.id ? 'bg-indigo-50 dark:bg-indigo-500/10' : (isQuotation(invoice) ? 'bg-amber-50 dark:bg-amber-500/10' : 'bg-white dark:bg-zinc-900'),
                 selectedInvoice?.id === invoice.id ? 'border-l-4 border-indigo-500 pl-3' : 'border-l-4 border-transparent'
               ]"
             >
@@ -145,7 +145,7 @@
               <div class="flex items-start gap-3">
                 <div class="flex-1 min-w-0">
                   <div class="flex justify-between items-start">
-                    <p class="text-sm font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                    <p class="text-sm font-bold text-gray-800 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {{ invoice.invoiceNumber || invoice.number || `DOC-${String(invoice.id).padStart(4, '0')}` }}
                     </p>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border"
@@ -154,16 +154,16 @@
                     </span>
                   </div>
                   
-                  <p class="text-xs text-slate-500 truncate mt-0.5 font-medium">
+                  <p class="text-xs text-gray-500 dark:text-zinc-400 truncate mt-0.5 font-medium">
                     {{ invoice.customer || invoice.customer_name || 'Cliente General' }}
                   </p>
                   
                   <div class="flex items-center justify-between mt-2">
-                    <span class="text-[10px] text-slate-400 flex items-center gap-1">
+                    <span class="text-[10px] text-gray-400 dark:text-zinc-500 flex items-center gap-1">
                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                        {{ formatDate(invoice.date) }}
                     </span>
-                    <span class="text-xs font-black text-slate-900">
+                    <span class="text-xs font-black text-gray-900 dark:text-white">
                       ${{ formatCurrency(invoice.total) }}
                     </span>
                   </div>
@@ -172,11 +172,10 @@
             </div>
             
             <!-- Botón Cargar Más -->
-            <div v-if="hasMoreInvoices" class="p-3 border-t" style="border-color: #E2E8F0;">
+            <div v-if="hasMoreInvoices" class="p-3 border-t border-gray-200 dark:border-zinc-800">
               <button
                 @click="loadMoreInvoices"
-                class="w-full py-2.5 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-2 hover:bg-gray-50"
-                style="color: #64748B; border: 1px dashed #E2E8F0; font-family: 'Inter', sans-serif;">
+                class="w-full py-2.5 text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-dashed border-gray-300 dark:border-zinc-700">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
@@ -186,38 +185,38 @@
             
             <!-- Estado vacío -->
             <div v-if="filteredInvoices.length === 0" class="flex flex-col items-center justify-center py-8 text-center">
-              <svg class="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-8 h-8 text-gray-300 dark:text-zinc-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
-              <p class="text-xs font-semibold text-gray-600">Sin resultados</p>
-              <p class="text-xs text-gray-500 mt-1">Intenta con otros filtros</p>
+              <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300">Sin resultados</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Intenta con otros filtros</p>
             </div>
           </div>
         </div>
 
         <!-- PANEL DERECHO: Detalle Amplio (70%) -->
-        <div class="lg:col-span-7 bg-white rounded-xl overflow-hidden flex flex-col" style="border: 1px solid #E2E8F0;">
+        <div class="lg:col-span-7 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden flex flex-col border border-gray-300 dark:border-zinc-800 shadow-sm transition-colors duration-300">
           
           <!-- Estado: No seleccionado -->
-          <div v-if="!selectedInvoice" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-slate-50/50">
-            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm mb-6 border border-slate-100">
-               <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div v-if="!selectedInvoice" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gray-50 dark:bg-zinc-900/50">
+            <div class="w-24 h-24 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center shadow-sm mb-6 border border-gray-100 dark:border-zinc-700">
+               <svg class="w-10 h-10 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                </svg>
             </div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Selecciona un documento</h3>
-            <p class="text-sm text-slate-500 max-w-xs mx-auto">Haz clic en cualquier factura o cotización de la lista izquierda para ver sus detalles completos.</p>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Selecciona un documento</h3>
+            <p class="text-sm text-gray-500 dark:text-zinc-400 max-w-xs mx-auto">Haz clic en cualquier factura o cotización de la lista izquierda para ver sus detalles completos.</p>
           </div>
 
           <!-- Estado: Documento seleccionado -->
-          <div v-else class="flex-1 flex flex-col overflow-hidden bg-white transition-colors duration-300">
+          <div v-else class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-300">
             
             <!-- Header del detalle con acciones contextuales -->
-            <div class="p-6 border-b border-slate-100 bg-white">
+            <div class="p-8 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center gap-3 mb-3">
-                    <h2 class="text-3xl font-black text-slate-900 tracking-tight">
+                    <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
                       {{ selectedInvoice.invoiceNumber || selectedInvoice.number || `DOC-${String(selectedInvoice.id).padStart(4, '0')}` }}
                     </h2>
                     <span
@@ -230,9 +229,9 @@
                       COTIZACIÓN
                     </span>
                   </div>
-                  <div class="flex items-center gap-6 text-sm text-slate-500 font-medium">
+                  <div class="flex items-center gap-6 text-sm text-gray-500 dark:text-zinc-400 font-medium">
                     <span class="flex items-center gap-2">
-                      <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                       </svg>
                       {{ formatDate(selectedInvoice.date) }}
@@ -252,11 +251,10 @@
                   <button
                     v-if="selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote'"
                     @click="openInPos(selectedInvoice)"
-                    class="px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2"
-                    style="background-color: #10B981; font-family: 'Inter', sans-serif;"
+                    class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-slate-400/60 dark:hover:shadow-slate-900/70 transition-all duration-300 transform active:scale-95 flex items-center gap-2"
                     title="Convertir a factura">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
                     Facturar en POS
                   </button>
@@ -264,7 +262,7 @@
                   <!-- Botones de acción con texto descriptivo -->
                   <button
                     @click="viewAndPrintInvoice(selectedInvoice)"
-                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200"
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 border border-transparent hover:border-gray-200 dark:hover:border-zinc-700"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
@@ -274,7 +272,7 @@
                   
                   <button
                     @click="downloadPDF(selectedInvoice)"
-                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200"
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 border border-transparent hover:border-gray-200 dark:hover:border-zinc-700"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -284,7 +282,7 @@
                   
                   <button
                     @click="sendByEmail(selectedInvoice)"
-                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent hover:border-slate-200"
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 border border-transparent hover:border-gray-200 dark:hover:border-zinc-700"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
@@ -296,7 +294,7 @@
                   <div class="relative" @click.stop="">
                     <button
                       @click="toggleActionsMenu(selectedInvoice.id)"
-                      class="text-gray-400 hover:text-gray-700 transition-colors"
+                      class="text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors"
                       title="Más opciones">
                       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
@@ -305,16 +303,16 @@
                     
                     <!-- Dropdown menu -->
                     <div v-if="activeMenuId === selectedInvoice.id" 
-                         class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 py-1">
+                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-gray-200 dark:border-zinc-700 z-50 py-1">
                       <button @click="editInvoice(selectedInvoice); closeActionsMenu()" 
-                              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
                         <span>Editar</span>
                       </button>
                       <button @click="confirmDeleteInvoice(selectedInvoice); closeActionsMenu()" 
-                              class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                              class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
@@ -327,25 +325,25 @@
             </div>
 
             <!-- Contenido scrollable - Factura digital limpia -->
-            <div class="flex-1 overflow-y-auto p-4" style="background-color: #F9FAFB;">
+            <div class="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-zinc-950/50">
               
               <!-- Factura digital ocupa todo el ancho -->
-              <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6" style="border-color: #E2E8F0;">
+              <div class="bg-white dark:bg-zinc-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 p-6">
                 
                 <!-- Encabezado de la factura digital -->
-                <div class="pb-5 mb-5" style="border-bottom: 1px solid #E5E7EB;">
+                <div class="pb-5 mb-5 border-b border-gray-200 dark:border-zinc-700">
                   <div class="grid grid-cols-2 gap-6">
                     <div>
-                      <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Información del Cliente</h4>
-                      <p class="text-sm font-bold" style="color: #0F172A;">{{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}</p>
-                      <p class="text-xs mt-1" style="color: #6B7280;">ID Cliente: {{ selectedInvoice.customer_id || 'N/A' }}</p>
+                      <h4 class="text-xs font-bold uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Información del Cliente</h4>
+                      <p class="text-sm font-bold text-gray-900 dark:text-white">{{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}</p>
+                      <p class="text-xs mt-1 text-gray-500 dark:text-zinc-400">ID Cliente: {{ selectedInvoice.customer_id || 'N/A' }}</p>
                     </div>
                     
                     <div class="text-right">
-                      <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Información del Documento</h4>
-                      <p class="text-sm font-bold" style="color: #0F172A;">Documento: {{ selectedInvoice.invoiceNumber || selectedInvoice.number }}</p>
-                      <p class="text-xs mt-1" style="color: #6B7280;">Fecha: {{ formatDate(selectedInvoice.date) }}</p>
-                      <p class="text-xs" style="color: #6B7280;">Vencimiento: {{ formatDate(selectedInvoice.due_date) }}</p>
+                      <h4 class="text-xs font-bold uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Información del Documento</h4>
+                      <p class="text-sm font-bold text-gray-900 dark:text-white">Documento: {{ selectedInvoice.invoiceNumber || selectedInvoice.number }}</p>
+                      <p class="text-xs mt-1 text-gray-500 dark:text-zinc-400">Fecha: {{ formatDate(selectedInvoice.date) }}</p>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400">Vencimiento: {{ formatDate(selectedInvoice.due_date) }}</p>
                       <p v-if="selectedInvoice.status === 'returned' && selectedInvoice.return_reference" 
                          class="text-xs mt-2 px-2 py-1 bg-purple-50 text-purple-700 rounded-md inline-block font-semibold border border-purple-200">
                         🔁 Devuelta: {{ selectedInvoice.return_reference }}
@@ -356,40 +354,40 @@
 
                 <!-- Productos - Tabla limpia y espaciosa -->
                 <div class="mb-6">
-                  <h4 class="text-xs font-bold mb-4 uppercase" style="color: #0F172A; letter-spacing: 0.05em;">Productos / Servicios</h4>
+                  <h4 class="text-xs font-bold mb-4 uppercase text-gray-900 dark:text-white" style="letter-spacing: 0.05em;">Productos / Servicios</h4>
                   
-                  <div class="bg-white rounded-lg overflow-hidden">
+                  <div class="bg-white dark:bg-zinc-900/50 rounded-lg overflow-hidden">
                     <table class="min-w-full">
                       <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200">
-                          <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">#</th>
-                          <th class="text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Descripción</th>
-                          <th class="text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Cant.</th>
-                          <th class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Precio</th>
-                          <th class="text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider px-6 py-3">Total</th>
+                        <tr class="bg-gray-50 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700">
+                          <th class="text-left text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">#</th>
+                          <th class="text-left text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">Descripción</th>
+                          <th class="text-center text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">Cant.</th>
+                          <th class="text-right text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">Precio</th>
+                          <th class="text-right text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">Total</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-slate-100">
+                      <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
                         <tr v-if="!selectedInvoice.items || selectedInvoice.items.length === 0">
                           <td colspan="5" class="px-6 py-12 text-center">
-                            <p class="text-sm text-slate-400">No hay productos registrados</p>
+                            <p class="text-sm text-gray-400 dark:text-zinc-500">No hay productos registrados</p>
                           </td>
                         </tr>
-                        <tr v-else v-for="(item, index) in selectedInvoice.items" :key="`item-${index}`" class="hover:bg-slate-50/80 transition-colors">
-                          <td class="px-6 py-4 text-xs text-slate-400 font-medium">{{ index + 1 }}</td>
+                        <tr v-else v-for="(item, index) in selectedInvoice.items" :key="`item-${index}`" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+                          <td class="px-6 py-4 text-xs text-gray-400 dark:text-zinc-500 font-medium">{{ index + 1 }}</td>
                           <td class="px-6 py-4">
-                            <p class="text-sm font-bold text-slate-800">{{ item.product_name || item.name || 'N/A' }}</p>
-                            <p class="text-xs text-slate-500 mt-0.5">SKU: {{ item.product_code || item.code || 'N/A' }}</p>
+                            <p class="text-sm font-bold text-gray-800 dark:text-white">{{ item.product_name || item.name || 'N/A' }}</p>
+                            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">SKU: {{ item.product_code || item.code || 'N/A' }}</p>
                           </td>
                           <td class="text-center px-6 py-4">
-                            <span class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-md bg-slate-100 text-slate-600">
+                            <span class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-md bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-zinc-300">
                               {{ item.quantity }}
                             </span>
                           </td>
-                          <td class="text-right px-6 py-4 text-sm font-medium text-slate-600">
+                          <td class="text-right px-6 py-4 text-sm font-medium text-gray-600 dark:text-zinc-300">
                             ${{ formatCurrency(item.price || item.unit_price) }}
                           </td>
-                          <td class="text-right px-6 py-4 text-sm font-bold text-slate-900">
+                          <td class="text-right px-6 py-4 text-sm font-bold text-gray-900 dark:text-white">
                             ${{ formatCurrency(item.subtotal || (item.quantity * (item.price || item.unit_price))) }}
                           </td>
                         </tr>
@@ -397,21 +395,21 @@
                     </table>
                     
                     <!-- Totales dentro de la factura digital -->
-                    <div class="px-6 py-4" style="border-top: 1px solid #E5E7EB; background-color: #F9FAFB;">
+                    <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900/30">
                       <div class="flex justify-end">
                         <div class="w-72 space-y-2 text-sm">
                           <div class="flex justify-between">
-                            <span style="color: #6B7280;">Subtotal:</span>
-                            <span class="font-semibold" style="color: #0F172A;">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
+                            <span class="text-gray-500 dark:text-zinc-400">Subtotal:</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
                           </div>
                           <div class="flex justify-between">
-                            <span style="color: #6B7280;">IVA ({{ displayTaxRate }}%):</span>
-                            <span class="font-semibold" style="color: #0F172A;">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
+                            <span class="text-gray-500 dark:text-zinc-400">IVA ({{ displayTaxRate }}%):</span>
+                            <span class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
                           </div>
-                          <div class="pt-3 mt-2" style="border-top: 1px solid #D1D5DB;">
+                          <div class="pt-3 mt-2 border-t border-gray-300 dark:border-zinc-600">
                             <div class="flex justify-between items-center">
-                              <span class="text-base font-bold" style="color: #0F172A;">TOTAL:</span>
-                              <span class="text-2xl font-bold" style="color: #10B981;">${{ formatCurrency(selectedInvoice.total) }}</span>
+                              <span class="text-base font-bold text-gray-900 dark:text-white">TOTAL:</span>
+                              <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">${{ formatCurrency(selectedInvoice.total) }}</span>
                             </div>
                           </div>
                         </div>
@@ -421,10 +419,10 @@
                 </div>
 
                 <!-- Información adicional -->
-                <div class="grid grid-cols-2 gap-6 pt-5" style="border-top: 1px solid #E5E7EB;">
+                <div class="grid grid-cols-2 gap-6 pt-5 border-t border-gray-200 dark:border-zinc-700">
                   <div>
-                    <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Método de Pago</h4>
-                    <p class="text-sm" style="color: #0F172A;">{{ getPaymentMethodName(selectedInvoice.payment_method) }}</p>
+                    <h4 class="text-xs font-bold uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Método de Pago</h4>
+                    <p class="text-sm text-gray-900 dark:text-white">{{ getPaymentMethodName(selectedInvoice.payment_method) }}</p>
                   </div>
                   
                   <div>
@@ -434,9 +432,9 @@
                 </div>
 
                 <!-- Nota/Observaciones si existen -->
-                <div v-if="selectedInvoice.notes" class="mt-5 pt-5" style="border-top: 1px solid #E5E7EB;">
-                  <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Observaciones</h4>
-                  <p class="text-sm p-3 rounded-lg" style="color: #374151; background-color: #F9FAFB;">{{ selectedInvoice.notes }}</p>
+                <div v-if="selectedInvoice.notes" class="mt-5 pt-5 border-t border-gray-200 dark:border-zinc-700">
+                  <h4 class="text-xs font-bold uppercase mb-2 text-gray-600 dark:text-zinc-400 tracking-wider">Observaciones</h4>
+                  <p class="text-sm p-3 rounded-lg text-gray-700 dark:text-zinc-300 bg-gray-50 dark:bg-zinc-800/50">{{ selectedInvoice.notes }}</p>
                 </div>
               </div>
 
@@ -626,7 +624,10 @@ const monthlyInvoices = computed(() => {
   const thisYear = new Date().getFullYear()
   return props.invoices.filter(invoice => {
     const invoiceDate = new Date(invoice.date)
-    return invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+    const isThisMonth = invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+    const isInvoice = invoice.type === 'Factura' || invoice.type === 'invoice'
+    const isPaid = invoice.status?.toLowerCase() === 'pagada' || invoice.status?.toLowerCase() === 'paid'
+    return isThisMonth && isInvoice && isPaid
   }).length
 })
 
@@ -635,7 +636,10 @@ const totalInvoiced = computed(() => {
   const thisYear = new Date().getFullYear()
   return props.invoices.filter(invoice => {
     const invoiceDate = new Date(invoice.date)
-    return invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+    const isThisMonth = invoiceDate.getMonth() === thisMonth && invoiceDate.getFullYear() === thisYear
+    const isInvoice = invoice.type === 'Factura' || invoice.type === 'invoice'
+    const isPaid = invoice.status?.toLowerCase() === 'pagada' || invoice.status?.toLowerCase() === 'paid'
+    return isThisMonth && isInvoice && isPaid
   }).reduce((sum, invoice) => sum + (invoice.total || 0), 0)
 })
 
@@ -888,6 +892,11 @@ const confirmDeleteInvoice = (invoice) => {
 
 const loadInvoices = () => {
   showToast('Actualizando...', 'info')
+}
+
+const navigateToPos = () => {
+  // Navegar al POS para crear nueva factura
+  emit('changeModule', 'pos')
 }
 
 const generateReport = () => {

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full relative bg-gray-50 dark:bg-black" style="padding-bottom: 0px;" @click="handlePosClick">
+  <div class="h-full relative bg-gray-50 dark:bg-black" @click="handlePosClick">
     
     <!-- 🎯 Modal de Bienvenida Primera Vez -->
     <Teleport to="body">
@@ -102,7 +102,7 @@
               v-model="searchTerm"
               type="text"
               placeholder="Buscar productos, SKU o escanear..."
-              class="block w-full h-12 pl-12 pr-24 text-sm font-semibold bg-white dark:bg-zinc-800 border-2 border-slate-400 dark:border-zinc-600 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-zinc-400 rounded-2xl shadow-md focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/30 dark:focus:ring-indigo-400/30 transition-all duration-200 hover:border-slate-500 dark:hover:border-zinc-500"
+              class="block w-full h-10 pl-12 pr-24 text-sm font-semibold bg-white dark:bg-zinc-800 border-2 border-slate-400 dark:border-zinc-600 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-zinc-400 rounded-xl shadow-md focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/30 dark:focus:ring-indigo-400/30 transition-all duration-200 hover:border-slate-500 dark:hover:border-zinc-500"
               @keydown.escape="clearSearch"
               @keydown.enter.prevent="handleSearchEnter"
               @input="handleBarcodeInput"
@@ -136,7 +136,7 @@
           <button
             v-if="hasOpenSession && currentSession?.warehouse"
             @click="toggleGlobalSearch"
-            class="flex items-center gap-2 px-4 h-12 rounded-xl border-2 transition-all duration-200 font-bold text-xs shadow-sm hover:shadow-md"
+            class="flex items-center gap-2 px-3 h-10 rounded-lg border-2 transition-all duration-200 font-bold text-xs shadow-sm hover:shadow-md"
             :class="globalSearch 
               ? 'bg-blue-600 dark:bg-blue-700 border-blue-600 dark:border-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600' 
               : 'bg-white dark:bg-zinc-800 border-slate-300 dark:border-zinc-600 text-slate-700 dark:text-zinc-300 hover:border-slate-400 dark:hover:border-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-700'"
@@ -155,11 +155,11 @@
           <!-- Botón Pedido Web -->
           <button 
             @click="showLoadWebOrderModal = true" 
-            class="hidden sm:flex items-center gap-3 pl-1.5 pr-4 h-12 rounded-full border transition-all duration-300 group bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm"
+            class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm"
             title="Cargar pedido web"
           >
-            <div class="w-9 h-9 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
               </svg>
             </div>
@@ -172,12 +172,12 @@
             id="tour-pos-returns"
             @click="showReturnsModal = true"
             :disabled="quotationMode"
-            class="hidden sm:flex items-center gap-3 pl-1.5 pr-4 h-12 rounded-full border transition-all duration-300 group"
+            class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group"
             :class="quotationMode ? 'bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-600' : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm'"
           >
-            <div class="w-9 h-9 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700"
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700"
                  :class="quotationMode ? 'text-slate-400 dark:text-zinc-600' : 'text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300'">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
             </div>
             <div class="flex flex-col text-left leading-none">
               
@@ -190,15 +190,15 @@
           <button 
             id="tour-pos-cash-btn"
             @click="hasOpenSession ? showCloseCashModal() : showOpenCashModal()"
-            class="relative flex items-center gap-3 pl-1.5 pr-4 h-12 rounded-full border transition-all duration-300 group"
+            class="relative flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group"
             :class="hasOpenSession 
               ? 'bg-white dark:bg-zinc-900 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 shadow-sm' 
               : 'bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900 hover:border-rose-300 dark:hover:border-rose-700'"
           >
-            <div class="w-9 h-9 rounded-full flex items-center justify-center shadow-sm transition-colors"
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors"
                  :class="hasOpenSession ? 'bg-emerald-500 dark:bg-emerald-600 text-white' : 'bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-600 group-hover:text-rose-500 dark:group-hover:text-rose-400'">
-              <svg v-if="hasOpenSession" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-              <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              <svg v-if="hasOpenSession" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+              <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             </div>
             
             <div class="flex flex-col text-left leading-none">
@@ -216,16 +216,16 @@
       </div>
     </div>
 
-    <div class="px-4 lg:px-6 pb-4 bg-white dark:bg-zinc-900 overflow-x-auto scrollbar-hide">
+    <div class="px-4 lg:px-6 py-2 bg-white dark:bg-zinc-900 overflow-x-auto scrollbar-hide">
         <div class="flex items-center gap-1.5 min-w-max">
             <button 
                 @click="selectedCategory = null"
-                class="px-5 py-2 rounded-full text-xs font-bold border-2 transition-all duration-200 flex items-center gap-2 hover:scale-105 active:scale-95"
+                class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 flex items-center gap-2 hover:scale-105 active:scale-95"
                 :class="!selectedCategory 
                     ? 'bg-indigo-600 dark:bg-indigo-700 text-white border-indigo-600 dark:border-indigo-700 shadow-lg shadow-indigo-500/30' 
                     : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 shadow-sm'"
             >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Todas
             </button>
 
@@ -233,7 +233,7 @@
                 v-for="cat in categories" 
                 :key="cat.id"
                 @click="selectedCategory = cat.id"
-                class="px-5 py-2 rounded-full text-xs font-bold border-2 transition-all duration-200 whitespace-nowrap hover:scale-105 active:scale-95"
+                class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 whitespace-nowrap hover:scale-105 active:scale-95"
                 :class="selectedCategory === cat.id
                     ? 'bg-indigo-600 dark:bg-indigo-700 text-white border-indigo-600 dark:border-indigo-700 shadow-lg shadow-indigo-500/30' 
                     : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 shadow-sm'"
@@ -245,7 +245,7 @@
 </div>
     <!-- FIN BARRA DE HERRAMIENTAS EMPRESARIAL -->
     
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 px-4 lg:px-6 pt-2 pb-4" style="height: calc(100vh - 12rem - 44px);">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5" style="height: calc(100vh - 11rem - 54px); margin-bottom: 10px;">
   <!-- Panel Izquierdo: Catálogo de Productos - 50% (6/12) -->
   <div class="lg:col-span-6 h-full overflow-hidden">
     <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-gray-200 dark:border-zinc-700/50 h-full flex flex-col overflow-hidden">
@@ -544,21 +544,21 @@
   <div class="bg-white dark:bg-zinc-800 rounded-2xl border border-gray-200 dark:border-zinc-700/50 flex flex-col h-full overflow-hidden shadow-[0_0_40px_-10px_rgba(0,0,0,0.15)]">
     
     <!-- Header Destacado con Jerarquía Visual -->
-    <div class="relative bg-slate-900 dark:bg-zinc-950 px-5 py-5 border-b border-slate-800 dark:border-zinc-800 flex-shrink-0 shadow-md z-10">
+    <div class="relative bg-slate-900 dark:bg-zinc-950 px-5 py-3.5 border-b border-slate-800 dark:border-zinc-800 flex-shrink-0 shadow-md z-10">
       
       <div class="flex items-center justify-between">
         <div>
-          <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Total a Pagar</h3>
+          <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Total a Pagar</h3>
           <div class="flex items-baseline gap-1">
-            <span class="text-4xl font-black text-white tracking-tight">
+            <span class="text-3xl font-black text-white tracking-tight">
               ${{ total.toLocaleString() }}
             </span>
           </div>
         </div>
         <div class="text-right">
-           <div class="bg-slate-800/50 dark:bg-zinc-900 px-3 py-2 rounded-xl border border-slate-700/50 dark:border-zinc-800 backdrop-blur-sm">
-              <div class="text-[10px] text-slate-400 dark:text-zinc-500 font-medium uppercase tracking-wider">Items</div>
-              <div class="text-xl font-bold text-white dark:text-zinc-100">{{ totalItems }}</div>
+           <div class="bg-slate-800/50 dark:bg-zinc-900 px-2.5 py-1.5 rounded-xl border border-slate-700/50 dark:border-zinc-800 backdrop-blur-sm">
+              <div class="text-[9px] text-slate-400 dark:text-zinc-500 font-medium uppercase tracking-wider">Items</div>
+              <div class="text-lg font-bold text-white dark:text-zinc-100">{{ totalItems }}</div>
            </div>
         </div>
       </div>
@@ -763,7 +763,7 @@
        <button
           @click="handleCobrarClick"
           :disabled="!canShowPaymentModal || quotationMode || (selectedPaymentMethod === 'efectivo' && (!cashReceived || cashReceived < total))"
-          class="w-full py-4 rounded-xl font-black text-base shadow-xl transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 group relative overflow-hidden border-2"
+          class="w-full py-3.5 rounded-xl font-black text-base shadow-xl transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 group relative overflow-hidden border-2"
           :class="[
             (!canShowPaymentModal || quotationMode)
               ? 'bg-slate-200 dark:bg-zinc-700 text-slate-500 dark:text-zinc-400 cursor-not-allowed shadow-none border-slate-300 dark:border-zinc-600'
@@ -5694,7 +5694,8 @@ defineExpose({
   showCloseCashModal,
   openCloseCashModal: showCloseCashModal,
   showOpenCashModal,
-  openOpenCashModal: showOpenCashModal
+  openOpenCashModal: showOpenCashModal,
+  showReturnsModal
 })
 </script>
 

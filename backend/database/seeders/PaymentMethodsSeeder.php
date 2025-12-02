@@ -30,7 +30,7 @@ class PaymentMethodsSeeder extends Seeder
             [
                 'name' => 'Tarjeta de Crédito/Débito',
                 'code' => 'tarjeta',
-                'description' => 'Pago con tarjeta',
+                'description' => 'Pago con tarjeta de crédito o débito',
                 'icon' => '💳',
                 'active' => true,
                 'requires_reference' => true,
@@ -43,56 +43,23 @@ class PaymentMethodsSeeder extends Seeder
             [
                 'name' => 'Transferencia Bancaria',
                 'code' => 'transferencia',
-                'description' => 'Transferencia electrónica',
+                'description' => 'Transferencia bancaria, Nequi, Daviplata u otras plataformas',
                 'icon' => '🏦',
                 'active' => true,
                 'requires_reference' => true,
                 'sort_order' => 3,
                 'config' => [
-                    'require_reference' => true
-                ]
-            ],
-            [
-                'name' => 'Cheque',
-                'code' => 'cheque',
-                'description' => 'Pago con cheque',
-                'icon' => '📝',
-                'active' => false,
-                'requires_reference' => true,
-                'sort_order' => 4,
-                'config' => [
-                    'require_bank' => true,
-                    'require_check_number' => true
-                ]
-            ],
-            [
-                'name' => 'Nequi',
-                'code' => 'nequi',
-                'description' => 'Pago con Nequi',
-                'icon' => '📱',
-                'active' => true,
-                'requires_reference' => true,
-                'sort_order' => 5,
-                'config' => [
-                    'require_phone' => true
-                ]
-            ],
-            [
-                'name' => 'Daviplata',
-                'code' => 'daviplata',
-                'description' => 'Pago con Daviplata',
-                'icon' => '📱',
-                'active' => true,
-                'requires_reference' => true,
-                'sort_order' => 6,
-                'config' => [
-                    'require_phone' => true
+                    'require_reference' => true,
+                    'platforms' => ['Bancolombia', 'Nequi', 'Daviplata', 'Banco de Bogotá', 'PSE']
                 ]
             ]
         ];
 
         foreach ($paymentMethods as $method) {
-            PaymentMethod::create($method);
+            PaymentMethod::updateOrCreate(
+                ['code' => $method['code']],
+                $method
+            );
         }
     }
 }

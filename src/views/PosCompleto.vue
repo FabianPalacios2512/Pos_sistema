@@ -15,7 +15,7 @@
     <!-- Área Principal de Contenido Adaptable -->
     <div class="transition-all duration-300" 
          :class="{
-           'lg:ml-60': !sidebarCollapsed,
+           'lg:ml-60 lg:pl-4': !sidebarCollapsed,
            'lg:ml-20': sidebarCollapsed
          }">
       
@@ -1174,6 +1174,12 @@ const setCurrentModule = (module, options = {}) => {
     }
   }
   
+  // Manejar apertura del modal de devoluciones
+  if (options.openReturnsModal && module === 'pos') {
+    console.log('🔄 Guardando acción pendiente: openReturnsModal')
+    pendingPosAction.value = 'openReturnsModal'
+  }
+  
   // Cerrar sidebar en móvil después de selección
   if (window.innerWidth < 1024) {
     sidebarOpen.value = false
@@ -1227,6 +1233,20 @@ const triggerPosAction = async (action) => {
             } else {
               console.warn('🎯 ❌ No se encontró ninguna forma de abrir el modal de abrir caja')
             }
+          }
+          break
+        case 'openReturnsModal':
+          console.log('🎯 Intentando abrir modal de devoluciones')
+          // Acceder a la función del PosView para abrir el modal de devoluciones
+          if (posViewRef.value.openReturnsModal) {
+            console.log('🎯 Llamando a openReturnsModal() directamente')
+            posViewRef.value.openReturnsModal()
+          } else if (posViewRef.value.showReturnsModal !== undefined) {
+            console.log('🎯 Intentando acceso directo a showReturnsModal')
+            posViewRef.value.showReturnsModal = true
+            console.log('🎯 showReturnsModal asignado a true')
+          } else {
+            console.warn('🎯 ❌ No se encontró ninguna forma de abrir el modal de devoluciones')
           }
           break
         default:
