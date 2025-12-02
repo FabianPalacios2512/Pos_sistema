@@ -164,6 +164,89 @@ class InvoiceController extends Controller
                     'tax_amount' => $taxAmount,
                     'notes' => $item['notes'] ?? null
                 ]);
+
+                // 🏭 MULTI-WAREHOUSE: Descontar stock SOLO para facturas (no cotizaciones ni créditos)
+                if ($data['type'] === 'invoice') {
+                    $product = \App\Models\Product::find($item['product_id']);
+                    if ($product) {
+                        $previousStock = $product->current_stock;
+
+                        // Obtener warehouse_id desde la sesión de caja si existe
+                        $warehouseId = null;
+                        if (isset($data['cash_session_id']) && $data['cash_session_id']) {
+                            $cashSession = \App\Models\CashSession::find($data['cash_session_id']);
+                            if ($cashSession && $cashSession->warehouse_id) {
+                                $warehouseId = $cashSession->warehouse_id;
+
+                                // Descontar del product_warehouse específico
+                                DB::table('product_warehouse')
+                                    ->where('product_id', $item['product_id'])
+                                    ->where('warehouse_id', $warehouseId)
+                                    ->decrement('stock', $item['quantity']);
+
+                                \Log::info('✅ Stock descontado de almacén (store)', [
+                                    'product_id' => $item['product_id'],
+                                    'warehouse_id' => $warehouseId,
+                                    'quantity' => $item['quantity']
+                                ]);
+                            }
+                        }
+
+                        // Si no hay warehouse_id, descontar del primer almacén disponible
+                        if (!$warehouseId) {
+                            $firstWarehouseStock = DB::table('product_warehouse')
+                                ->where('product_id', $item['product_id'])
+                                ->where('stock', '>', 0)
+                                ->orderBy('stock', 'desc')
+                                ->first();
+
+                            if ($firstWarehouseStock) {
+                                DB::table('product_warehouse')
+                                    ->where('product_id', $item['product_id'])
+                                    ->where('warehouse_id', $firstWarehouseStock->warehouse_id)
+                                    ->decrement('stock', $item['quantity']);
+
+                                $warehouseId = $firstWarehouseStock->warehouse_id;
+
+                                \Log::warning('⚠️ Stock descontado del primer almacén disponible (store)', [
+                                    'product_id' => $item['product_id'],
+                                    'warehouse_id' => $warehouseId,
+                                    'quantity' => $item['quantity']
+                                ]);
+                            }
+                        }
+
+                        // Recalcular current_stock total sumando todos los almacenes
+                        $totalStock = DB::table('product_warehouse')
+                            ->where('product_id', $item['product_id'])
+                            ->sum('stock');
+
+                        $product->current_stock = $totalStock;
+                        $newStock = $totalStock;
+                        $product->save();
+
+                        \Log::info('✅ Stock total actualizado (store)', [
+                            'product_id' => $item['product_id'],
+                            'previous_total' => $previousStock,
+                            'new_total' => $newStock,
+                            'quantity_sold' => $item['quantity']
+                        ]);
+
+                        // Log de movimiento de inventario
+                        \App\Models\InventoryMovement::create([
+                            'product_id' => $item['product_id'],
+                            'type' => 'out',
+                            'quantity' => -$item['quantity'],
+                            'previous_stock' => $previousStock,
+                            'new_stock' => $newStock,
+                            'unit_cost' => $product->cost_price ?? 0,
+                            'reference' => 'Factura ' . $invoice->number,
+                            'notes' => "Factura {$invoice->number}" . ($warehouseId ? " - Almacén ID: {$warehouseId}" : ''),
+                            'user_id' => auth()->id() ?? 1,
+                            'movement_date' => now()
+                        ]);
+                    }
+                }
             }
 
             // Insertar descuentos aplicados si existen
@@ -748,9 +831,69 @@ class InvoiceController extends Controller
                     $product = \App\Models\Product::find($item['product_id']);
                     if ($product) {
                         $previousStock = $product->current_stock;
-                        $product->current_stock -= $item['quantity']; // Usar current_stock en lugar de quantity
-                        $newStock = $product->current_stock;
+
+                        // 🏭 MULTI-WAREHOUSE: Descontar del almacén correspondiente
+                        $warehouseId = null;
+
+                        // Obtener warehouse_id desde la sesión de caja si existe
+                        if (isset($data['cash_session_id']) && $data['cash_session_id']) {
+                            $cashSession = \App\Models\CashSession::find($data['cash_session_id']);
+                            if ($cashSession && $cashSession->warehouse_id) {
+                                $warehouseId = $cashSession->warehouse_id;
+
+                                // Descontar del product_warehouse específico
+                                DB::table('product_warehouse')
+                                    ->where('product_id', $item['product_id'])
+                                    ->where('warehouse_id', $warehouseId)
+                                    ->decrement('stock', $item['quantity']);
+
+                                \Log::info('✅ Stock descontado de almacén', [
+                                    'product_id' => $item['product_id'],
+                                    'warehouse_id' => $warehouseId,
+                                    'quantity' => $item['quantity']
+                                ]);
+                            }
+                        }
+
+                        // Si no hay warehouse_id, descontar del primer almacén disponible
+                        if (!$warehouseId) {
+                            $firstWarehouseStock = DB::table('product_warehouse')
+                                ->where('product_id', $item['product_id'])
+                                ->where('stock', '>', 0)
+                                ->orderBy('stock', 'desc')
+                                ->first();
+
+                            if ($firstWarehouseStock) {
+                                DB::table('product_warehouse')
+                                    ->where('product_id', $item['product_id'])
+                                    ->where('warehouse_id', $firstWarehouseStock->warehouse_id)
+                                    ->decrement('stock', $item['quantity']);
+
+                                $warehouseId = $firstWarehouseStock->warehouse_id;
+
+                                \Log::warning('⚠️ Stock descontado del primer almacén disponible', [
+                                    'product_id' => $item['product_id'],
+                                    'warehouse_id' => $warehouseId,
+                                    'quantity' => $item['quantity']
+                                ]);
+                            }
+                        }
+
+                        // Recalcular current_stock total sumando todos los almacenes
+                        $totalStock = DB::table('product_warehouse')
+                            ->where('product_id', $item['product_id'])
+                            ->sum('stock');
+
+                        $product->current_stock = $totalStock;
+                        $newStock = $totalStock;
                         $product->save();
+
+                        \Log::info('✅ Stock total actualizado', [
+                            'product_id' => $item['product_id'],
+                            'previous_total' => $previousStock,
+                            'new_total' => $newStock,
+                            'quantity_sold' => $item['quantity']
+                        ]);
 
                         // Log de movimiento de inventario
                         \App\Models\InventoryMovement::create([
@@ -761,7 +904,7 @@ class InvoiceController extends Controller
                             'new_stock' => $newStock,
                             'unit_cost' => $product->cost_price ?? 0,
                             'reference' => 'Factura ' . $invoice->number,
-                            'notes' => 'Venta POS - Factura ' . $invoice->number,
+                            'notes' => "Venta POS - Factura {$invoice->number}" . ($warehouseId ? " - Almacén ID: {$warehouseId}" : ''),
                             'user_id' => auth()->id() ?? 1, // ✅ Usar el usuario autenticado
                             'movement_date' => now()
                         ]);

@@ -228,31 +228,68 @@
               </div>
             </div>
 
-            <!-- Inventario -->
+            <!-- Inventario Multi-Tienda -->
             <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-              <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Inventario</h4>
-              
-                            <!-- Stock Inicial -->
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Stock Inicial *
-                  <span class="text-xs text-gray-500 ml-1">(Cantidad en inventario)</span>
-                </label>
-                <input
-                  v-model.number="formData.stock"
-                  type="number"
-                  min="0"
-                  required
-                  placeholder="10"
-                  class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                />
-                <p class="text-xs text-gray-500 mt-1">Cantidad de productos que tiene disponible para vender</p>
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-lg font-medium text-gray-900 dark:text-white">Inventario por Tienda</h4>
+                <button
+                  type="button"
+                  @click="showWarehouseStockHelp = !showWarehouseStockHelp"
+                  class="text-blue-600 hover:text-blue-700"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </button>
               </div>
 
-              <!-- Stock Mínimo -->
-              <div class="mb-4">
+              <!-- Ayuda contextual -->
+              <div v-if="showWarehouseStockHelp" class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-xs text-blue-900 dark:text-blue-100">
+                <p class="font-semibold mb-1">💡 Gestión Multi-Tienda:</p>
+                <ul class="space-y-1 ml-4 list-disc">
+                  <li>Puedes asignar stock diferente en cada tienda para el mismo producto</li>
+                  <li>El mismo producto (ej: "Cuaderno") puede tener 4 unidades en Tienda A y 10 en Tienda B</li>
+                  <li>Si dejas una tienda sin stock, el producto NO estará disponible en esa tienda</li>
+                </ul>
+              </div>
+              
+              <!-- Stock por cada tienda -->
+              <div class="space-y-3">
+                <div v-for="warehouse in warehouses" :key="warehouse.id" 
+                     class="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ warehouse.name }}</span>
+                    </div>
+                  </div>
+                  <input
+                    v-model.number="formData.warehouseStock[warehouse.id]"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                </div>
+              </div>
+
+              <!-- Stock Total (calculado) -->
+              <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium text-blue-900 dark:text-blue-100">Stock Total:</span>
+                  <span class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                    {{ totalStock }} unidades
+                  </span>
+                </div>
+              </div>
+
+              <!-- Stock Mínimo Global -->
+              <div class="mt-4">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Stock Mínimo *
+                  Stock Mínimo (Alerta) *
                 </label>
                 <input
                   v-model.number="formData.min_stock"
@@ -263,7 +300,7 @@
                   class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  Se generará una alerta cuando el stock esté por debajo de este nivel
+                  Se generará una alerta cuando el stock total esté por debajo de este nivel
                 </p>
               </div>
 
@@ -399,6 +436,10 @@ const props = defineProps({
   categories: {
     type: Array,
     required: true
+  },
+  warehouses: {
+    type: Array,
+    required: true
   }
 })
 
@@ -418,19 +459,24 @@ const formData = ref({
   min_stock: 0,
   unit: 'unidad',
   image: '',
-  active: true
+  active: true,
+  warehouseStock: {} // { warehouse_id: stock_quantity }
 })
 
 const imagePreview = ref('')
 const fileInput = ref(null)
+const showWarehouseStockHelp = ref(false)
 
 // Computed
+const totalStock = computed(() => {
+  return Object.values(formData.value.warehouseStock).reduce((sum, stock) => sum + (parseInt(stock) || 0), 0)
+})
+
 const isFormValid = computed(() => {
   return formData.value.name?.trim() &&
          formData.value.category_id &&
          formData.value.cost > 0 &&
          formData.value.price > 0 &&
-         formData.value.stock >= 0 &&
          formData.value.min_stock >= 0
          // SKU no es requerido porque se genera automáticamente
 })
@@ -444,6 +490,12 @@ watch(() => formData.value.image, (newUrl) => {
 
 // Métodos
 const initializeForm = () => {
+  // Inicializar warehouseStock con todas las tiendas en 0
+  const warehouseStock = {}
+  props.warehouses?.forEach(warehouse => {
+    warehouseStock[warehouse.id] = 0
+  })
+
   if (props.product) {
     // Editar producto existente
     formData.value = {
@@ -459,8 +511,23 @@ const initializeForm = () => {
       min_stock: props.product.min_stock,
       unit: props.product.unit || 'unidad',
       image: props.product.image || '',
-      active: props.product.active
+      active: props.product.active,
+      warehouseStock: { ...warehouseStock }
     }
+
+    // Cargar el stock por tienda si existe
+    if (props.product.alternative_warehouses && Array.isArray(props.product.alternative_warehouses)) {
+      props.product.alternative_warehouses.forEach(warehouse => {
+        if (warehouse.id) {
+          formData.value.warehouseStock[warehouse.id] = warehouse.stock || 0
+        }
+      })
+    }
+    // Si el producto tiene warehouse_id (tienda actual), cargar su stock
+    if (props.product.warehouse_id) {
+      formData.value.warehouseStock[props.product.warehouse_id] = props.product.stock || 0
+    }
+
     imagePreview.value = props.product.image || ''
   } else {
     // Crear nuevo producto
@@ -477,7 +544,8 @@ const initializeForm = () => {
       min_stock: 0,
       unit: 'unidad',
       image: '',
-      active: true
+      active: true,
+      warehouseStock: { ...warehouseStock }
     }
     imagePreview.value = ''
   }
@@ -529,7 +597,17 @@ const handleSubmit = () => {
   
   if (!isFormValid.value) return
   
-  emit('save', { ...formData.value })
+  // Calcular stock total sumando todas las tiendas
+  const totalStockValue = totalStock.value
+  
+  // Preparar datos con stock total y stock por tienda
+  const dataToSend = {
+    ...formData.value,
+    stock: totalStockValue, // Stock total calculado
+    warehouse_stocks: formData.value.warehouseStock // Stock por cada tienda
+  }
+  
+  emit('save', dataToSend)
 }
 
 // Lifecycle

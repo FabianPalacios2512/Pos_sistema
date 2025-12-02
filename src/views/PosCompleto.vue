@@ -25,6 +25,7 @@
         :module-description="getModuleDescription()"
         :current-user="currentUser"
         :current-module="currentModule"
+        :current-warehouse="currentWarehouse"
         :auto-hide-enabled="autoHideEnabled"
         :sidebar-collapsed="sidebarCollapsed"
         :should-show-settings="shouldShowModule('settings')"
@@ -62,6 +63,7 @@
             @create-invoice="handleCreateQuote"
             @search-quote="handleSearchQuote"
             @cart-status-changed="handleCartStatusChanged"
+            @warehouse-changed="handleWarehouseChange"
             @change-module="setCurrentModule"
           />
         </div>
@@ -212,6 +214,10 @@ const UsersManagementView = defineAsyncComponent(() => import('../components/Use
 const ExpensesManager = defineAsyncComponent(() => import('./ExpensesManager.vue'))
 const AccountsReceivableView = defineAsyncComponent(() => import('../components/AccountsReceivableView.vue'))
 
+// Multisede
+const WarehousesView = defineAsyncComponent(() => import('../components/WarehousesView.vue'))
+const StockTransfersView = defineAsyncComponent(() => import('../components/StockTransfersView.vue'))
+
 // Componentes temporales para módulos no desarrollados aún
 const PlaceholderView = defineAsyncComponent(() => import('../components/PlaceholderView.vue'))
 
@@ -234,6 +240,9 @@ const currentUser = ref({
   initials: '??',
   permissions: []
 })
+
+// Warehouse actual (para mostrar en header cuando está en POS)
+const currentWarehouse = ref(null)
 
 // ===== MENÚ INTELIGENTE =====
 const autoHideEnabled = ref(true) // Habilitar auto-hide
@@ -524,6 +533,11 @@ const updateSoldProductsStock = async (soldItems) => {
     console.error('❌ Error general actualizando stock de productos vendidos:', error)
     // No lanzamos el error para que no interrumpa la venta
   }
+}
+
+// Handler para actualizar warehouse actual desde PosView
+const handleWarehouseChange = (warehouse) => {
+  currentWarehouse.value = warehouse
 }
 
 // Manejar ventas completadas desde el POS
@@ -1109,7 +1123,9 @@ const currentModuleComponent = computed(() => {
     settings: SettingsView,
     'cash-admin': CashAdminView,
     'returns-management': ReturnsManagementView,
-    expenses: ExpensesManager
+    expenses: ExpensesManager,
+    warehouses: WarehousesView,
+    'stock-transfers': StockTransfersView
   }
   return moduleComponents[currentModule.value] || null
 })

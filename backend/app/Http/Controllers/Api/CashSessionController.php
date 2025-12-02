@@ -85,7 +85,7 @@ class CashSessionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Sesión de caja obtenida correctamente',
-                'session' => $session->load('user')
+                'session' => $session->load(['user', 'warehouse'])
             ]);
 
         } catch (\Exception $e) {
@@ -134,6 +134,7 @@ class CashSessionController extends Controller
     {
         try {
             $request->validate([
+                'warehouse_id' => 'required|exists:warehouses,id',
                 'opening_amount' => 'required|numeric|min:0',
                 'opening_notes' => 'nullable|string|max:500'
             ]);
@@ -158,13 +159,14 @@ class CashSessionController extends Controller
             $session = CashSession::openSession(
                 $userId,
                 $request->opening_amount,
-                $request->opening_notes
+                $request->opening_notes,
+                $request->warehouse_id
             );
 
             return response()->json([
                 'success' => true,
                 'message' => 'Sesión de caja abierta correctamente',
-                'session' => $session->load('user')
+                'session' => $session->load(['user', 'warehouse'])
             ], 201);
 
         } catch (ValidationException $e) {
@@ -219,7 +221,7 @@ class CashSessionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Sesión de caja cerrada correctamente',
-                'session' => $session->load('user')
+                'session' => $session->load(['user', 'warehouse'])
             ]);
 
         } catch (ValidationException $e) {
@@ -314,7 +316,7 @@ class CashSessionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Sesión de caja cerrada correctamente',
-                'session' => $session->load('user'),
+                'session' => $session->load(['user', 'warehouse']),
                 'closing_details' => [
                     'status' => $closingStatus,
                     'difference' => $difference,
@@ -680,7 +682,7 @@ class CashSessionController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Sesión de caja obtenida correctamente',
-                'session' => $session->load('user')
+                'session' => $session->load(['user', 'warehouse'])
             ]);
 
         } catch (\Exception $e) {

@@ -51,6 +51,33 @@
         </div>
 
         <form @submit.prevent="handleSubmit" class="space-y-4">
+          <!-- Selector de Tienda/Bodega -->
+          <div>
+            <label for="warehouse_id" class="block text-sm font-semibold text-gray-900 mb-2">
+              Tienda / Sede <span class="text-red-600">*</span>
+            </label>
+            <div class="relative">
+              <select
+                id="warehouse_id"
+                v-model="formData.warehouse_id"
+                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium appearance-none"
+                :class="{ 'border-red-500 focus:ring-red-500': errors.warehouse_id }"
+                required
+                :disabled="loadingWarehouses"
+              >
+                <option value="" disabled>{{ loadingWarehouses ? 'Cargando tiendas...' : 'Seleccionar tienda' }}</option>
+                <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">
+                  {{ warehouse.name }} {{ warehouse.is_default ? '(Principal)' : '' }}
+                </option>
+              </select>
+              <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+            <p v-if="errors.warehouse_id" class="mt-1 text-xs text-red-600">{{ errors.warehouse_id }}</p>
+            <p class="mt-1 text-xs text-gray-500">Seleccione la tienda donde va a trabajar hoy</p>
+          </div>
+
           <!-- Monto inicial -->
           <div>
             <label for="opening_amount" class="block text-sm font-semibold text-gray-900 mb-2">
@@ -160,6 +187,7 @@
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useToast } from '../composables/useToast'
+import { warehouseService } from '../services/warehouseService'
 
 // Props
 const props = defineProps({
@@ -189,9 +217,12 @@ const amountInput = ref(null)
 // Estado del formulario
 const formData = ref({
   opening_amount: '',
-  opening_notes: ''
+  opening_notes: '',
+  warehouse_id: null
 })
 
+const warehouses = ref([])
+const loadingWarehouses = ref(false)
 const errors = ref({})
 const isLoading = ref(false)
 
@@ -213,7 +244,8 @@ const currentTime = computed(() => {
 })
 
 const isFormValid = computed(() => {
-  return formData.value.opening_amount && 
+  return formData.value.warehouse_id &&
+         formData.value.opening_amount && 
          parseFloat(formData.value.opening_amount) >= 0 &&
          !Object.keys(errors.value).length
 })
@@ -240,6 +272,16 @@ watch(() => formData.value.opening_notes, (newVal) => {
 })
 
 // Métodos de validación
+const validateWarehouse = () => {
+  if (!formData.value.warehouse_id) {
+    errors.value.warehouse_id = 'Debe seleccionar una tienda'
+    return false
+  }
+  
+  delete errors.value.warehouse_id
+  return true
+}
+
 const validateAmount = () => {
   const amount = parseFloat(formData.value.opening_amount)
   
@@ -268,10 +310,11 @@ const validateNotes = () => {
 }
 
 const validateForm = () => {
+  const warehouseValid = validateWarehouse()
   const amountValid = validateAmount()
   const notesValid = validateNotes()
   
-  return amountValid && notesValid
+  return warehouseValid && amountValid && notesValid
 }
 
 // Manejo del formulario
@@ -285,6 +328,7 @@ const handleSubmit = async () => {
   
   try {
     const sessionData = {
+      warehouse_id: formData.value.warehouse_id,
       opening_amount: parseFloat(formData.value.opening_amount),
       opening_notes: formData.value.opening_notes || null
     }
@@ -298,11 +342,32 @@ const handleSubmit = async () => {
   }
 }
 
+// Cargar bodegas/tiendas
+const loadWarehouses = async () => {
+  try {
+    loadingWarehouses.value = true
+    const data = await warehouseService.getAll()
+    warehouses.value = Array.isArray(data) ? data.filter(w => w.active) : []
+    
+    // Auto-seleccionar la bodega predeterminada
+    const defaultWarehouse = warehouses.value.find(w => w.is_default)
+    if (defaultWarehouse) {
+      formData.value.warehouse_id = defaultWarehouse.id
+    }
+  } catch (error) {
+    console.error('Error cargando tiendas:', error)
+    showToast('Error al cargar las tiendas disponibles', 'error')
+  } finally {
+    loadingWarehouses.value = false
+  }
+}
+
 // Reset form cuando se cierra
 const resetForm = () => {
   formData.value = {
     opening_amount: '',
-    opening_notes: ''
+    opening_notes: '',
+    warehouse_id: null
   }
   errors.value = {}
 }
@@ -316,6 +381,8 @@ watch(() => props.show, (newVal) => {
 
 // Lifecycle
 onMounted(() => {
+  loadWarehouses()
+  
   if (props.show) {
     nextTick(() => {
       amountInput.value?.focus()

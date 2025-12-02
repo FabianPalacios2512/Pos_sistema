@@ -11,6 +11,7 @@ class InventoryMovement extends Model
 
     protected $fillable = [
         'product_id',
+        'warehouse_id',
         'type',
         'quantity',
         'previous_stock',
@@ -18,6 +19,7 @@ class InventoryMovement extends Model
         'unit_cost',
         'reference',
         'notes',
+        'reason',
         'user_id',
         'movement_date'
     ];
@@ -34,6 +36,11 @@ class InventoryMovement extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     public function user()

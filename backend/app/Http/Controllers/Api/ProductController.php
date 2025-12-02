@@ -10,7 +10,11 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'supplier']);
+        $query = Product::with([
+            'category',
+            'supplier',
+            'warehouses:warehouses.id,warehouses.name' // 🏢 Incluir bodegas con stock
+        ]);
 
         // Filtrar por estado (activo/inactivo/todos)
         $status = $request->get('status', 'active'); // Por defecto solo activos
@@ -38,25 +42,88 @@ class ProductController extends Controller
     // Endpoint optimizado para POS - sin paginación, solo campos necesarios
     public function forPos(Request $request)
     {
-        $products = Product::select([
+        $warehouseId = $request->query('warehouse_id');
+        $searchScope = $request->query('scope', 'local'); // 'local' o 'global'
+
+        $query = Product::select([
                 'id', 'name', 'sku', 'barcode', 'sale_price as price',
                 'current_stock as stock', 'category_id', 'image_url as image',
                 'active', 'manage_stock'
             ])
-            ->with(['category:id,name,color'])
-            ->where('active', true)
-            ->where('current_stock', '>', 0) // Solo productos con stock
-            ->orderBy('name')
+            ->with([
+                'category:id,name,color',
+                'warehouses' => function($q) {
+                    $q->select('warehouses.id', 'warehouses.name', 'stock');
+                }
+            ])
+            ->where('active', true);
+
+        // 🏪 BÚSQUEDA LOCAL vs GLOBAL
+        if ($warehouseId) {
+            if ($searchScope === 'global') {
+                // 🌍 MODO GLOBAL: Mostrar productos con stock en CUALQUIER bodega
+                $query->whereHas('warehouses', function($q) {
+                    $q->where('stock', '>', 0);
+                });
+            } else {
+                // 📍 MODO LOCAL: SOLO productos de la bodega actual
+                $query->whereHas('warehouses', function($q) use ($warehouseId) {
+                    $q->where('warehouse_id', $warehouseId)
+                      ->where('stock', '>', 0);
+                });
+            }
+        } else {
+            // Sin bodega especificada, mostrar productos con stock en CUALQUIER bodega
+            $query->where('current_stock', '>', 0);
+        }
+
+        $products = $query->orderBy('name')
             ->get()
-            ->map(function ($product) {
+            ->map(function ($product) use ($warehouseId, $searchScope) {
                 // Añadir el nombre de la categoría directamente al producto
                 $product->category_name = $product->category ? $product->category->name : 'Sin categoría';
+                $product->category_color = $product->category ? $product->category->color : '#6b7280';
+
+                // Información de stock por bodega
+                $product->warehouse_stock = $product->warehouses ? $product->warehouses->toArray() : [];
+
+                // Determinar stock local y bodegas alternativas
+                $localStock = 0;
+                $alternativeWarehouses = [];
+
+                if ($warehouseId && $product->warehouses) {
+                    $currentWarehouse = $product->warehouses->firstWhere('id', $warehouseId);
+
+                    if ($currentWarehouse) {
+                        $localStock = (int) $currentWarehouse->pivot->stock;
+                    }
+
+                    // Si es búsqueda global, encontrar bodegas alternativas
+                    if ($searchScope === 'global') {
+                        foreach ($product->warehouses as $warehouse) {
+                            if ($warehouse->id != $warehouseId && $warehouse->pivot->stock > 0) {
+                                $alternativeWarehouses[] = [
+                                    'id' => $warehouse->id,
+                                    'name' => $warehouse->name,
+                                    'stock' => (int) $warehouse->pivot->stock
+                                ];
+                            }
+                        }
+                    }
+                }
+
+                $product->stock = $localStock;
+                $product->is_remote = $searchScope === 'global' && $localStock === 0 && count($alternativeWarehouses) > 0;
+                $product->alternative_warehouses = $alternativeWarehouses;
+
                 return $product;
             });
 
         return response()->json([
             'success' => true,
             'data' => $products,
+            'warehouse_id' => $warehouseId,
+            'search_scope' => $searchScope,
             'message' => 'Productos para POS obtenidos exitosamente'
         ]);
     }
@@ -70,11 +137,39 @@ class ProductController extends Controller
             'cost_price' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0',
             'current_stock' => 'required|integer|min:0',
-            'min_stock' => 'required|integer|min:0'
+            'min_stock' => 'required|integer|min:0',
+            'warehouse_stocks' => 'nullable|array' // 🏢 Stock por cada tienda { warehouse_id: cantidad }
         ]);
 
-        $product = Product::create($request->all());
+        $product = Product::create($request->except(['warehouse_id', 'warehouse_stocks']));
         $product->load(['category', 'supplier']);
+
+        // 🏢 NUEVO: Sistema Multi-Tienda - Asignar stock a múltiples tiendas
+        if ($request->has('warehouse_stocks') && is_array($request->warehouse_stocks)) {
+            foreach ($request->warehouse_stocks as $warehouseId => $stock) {
+                $stockValue = intval($stock);
+                if ($stockValue > 0) { // Solo guardar si hay stock
+                    $product->warehouses()->attach($warehouseId, [
+                        'stock' => $stockValue
+                    ]);
+                }
+            }
+        } else {
+            // Fallback al sistema anterior (una sola bodega)
+            if ($request->has('warehouse_id') && $request->warehouse_id) {
+                $product->warehouses()->attach($request->warehouse_id, [
+                    'stock' => $request->current_stock ?? 0
+                ]);
+            } else {
+                // Si no se especificó bodega, buscar la bodega predeterminada
+                $defaultWarehouse = \App\Models\Warehouse::where('is_default', true)->first();
+                if ($defaultWarehouse) {
+                    $product->warehouses()->attach($defaultWarehouse->id, [
+                        'stock' => $request->current_stock ?? 0
+                    ]);
+                }
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -98,8 +193,24 @@ class ProductController extends Controller
         if ($request->has('active') && $request->active === true && $product->active === false) {
             $request->merge(['deactivated_by_category' => false]);
         }
-        
-        $product->update($request->all());
+
+        $product->update($request->except(['warehouse_id', 'warehouse_stocks']));
+
+        // 🏢 NUEVO: Sistema Multi-Tienda - Actualizar stock en múltiples tiendas
+        if ($request->has('warehouse_stocks') && is_array($request->warehouse_stocks)) {
+            // Sincronizar stock: actualizar existentes, agregar nuevos, mantener antiguos
+            $warehouseStocks = [];
+            foreach ($request->warehouse_stocks as $warehouseId => $stock) {
+                $stockValue = intval($stock);
+                if ($stockValue >= 0) { // Incluir stock 0 para actualizar
+                    $warehouseStocks[$warehouseId] = ['stock' => $stockValue];
+                }
+            }
+
+            // sync() actualiza/inserta/elimina según sea necesario
+            $product->warehouses()->sync($warehouseStocks);
+        }
+
         $product->load(['category', 'supplier']);
 
         return response()->json([

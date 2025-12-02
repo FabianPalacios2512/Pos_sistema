@@ -445,7 +445,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import apiClient from '@/services/apiClient.js'
 import QRCode from 'qrcode'
 import { whatsappService } from '@/services/whatsappService.js'
 // ✅ IMPORTAR LOS TICKETS TÉRMICOS REALES (los que genera invoiceTemplate.js)
@@ -655,12 +655,14 @@ const nextStep = async () => {
   if (currentStep.value === 1) {
     // Guardar template seleccionado al pasar a Step 2
     try {
-      await axios.put('/api/tenant/system-settings', {
+      await apiClient.put('/tenant/system-settings', {
         invoice_template: selectedTemplate.value
       })
     } catch (error) {
-      // En onboarding inicial, puede fallar por falta de autenticación
-      console.log('Template se guardará después del login:', error.message)
+      // Silenciar errores 401/404 - es normal en onboarding inicial
+      if (error.response?.status !== 401 && error.response?.status !== 404) {
+        console.warn('Error guardando template:', error.message)
+      }
     }
   }
   
@@ -669,9 +671,9 @@ const nextStep = async () => {
     try {
       await saveConfig()
     } catch (error) {
-      // Si el error es de autenticación/404, continuar de todos modos
+      // Silenciar errores 401/404 - normal en onboarding inicial
       if (error.response && (error.response.status === 404 || error.response.status === 401)) {
-        console.log('Configuración pendiente, continuando...')
+        // Es normal que no esté autenticado durante el onboarding inicial
       } else {
         alert('Por favor verifica los datos ingresados.')
         return
@@ -704,7 +706,7 @@ onMounted(async () => {
 
   // SEGUNDO: Intentar cargar datos guardados del backend
   try {
-    const response = await axios.get('/api/tenant/system-settings')
+    const response = await apiClient.get('/tenant/system-settings')
     const settings = response.data.data || response.data
     
     // Cargar datos existentes si están disponibles (sobrescribir pre-llenado si existe)
@@ -726,15 +728,18 @@ onMounted(async () => {
     
     isLoading.value = false
   } catch (error) {
-    // Si es un tenant nuevo, usar los datos pre-llenados del registro
-    console.log('Usando datos del registro:', error.message)
+    // Silenciar errores 401/404 - es normal en onboarding inicial sin autenticación
+    if (error.response?.status !== 401 && error.response?.status !== 404) {
+      console.warn('Error cargando configuración:', error.message)
+    }
+    // Usar los datos pre-llenados del registro
     isLoading.value = false
   }
 })
 
 const saveConfig = async () => {
   try {
-    const response = await axios.put('/api/tenant/system-settings', {
+    const response = await apiClient.put('/tenant/system-settings', {
       company_name: config.storeName,
       company_document: config.nit,
       company_phone: config.phone,
@@ -761,7 +766,7 @@ const finishOnboarding = async () => {
   try {
     // Intentar guardar toda la configuración en una sola llamada
     try {
-      await axios.put('/api/tenant/system-settings', {
+      await apiClient.put('/tenant/system-settings', {
         company_name: config.storeName,
         company_document: config.nit,
         company_phone: config.phone,

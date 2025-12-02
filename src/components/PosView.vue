@@ -99,7 +99,7 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         
         <div class="flex items-center gap-3 flex-1 w-full md:w-auto">
-          <div class="flex-1 max-w-3xl relative group z-20">
+          <div class="flex-1 max-w-2xl relative group z-20">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -111,7 +111,7 @@
               v-model="searchTerm"
               type="text"
               placeholder="Buscar productos, SKU o escanear..."
-              class="block w-full h-12 pl-12 pr-24 text-sm font-medium bg-white border border-slate-300 text-slate-900 placeholder-slate-400 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] ring-1 ring-slate-100 focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
+              class="block w-full h-12 pl-12 pr-24 text-sm font-medium bg-white border-2 border-slate-300 text-slate-900 placeholder-slate-400 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
               @keydown.escape="clearSearch"
               @keydown.enter.prevent="handleSearchEnter"
               @input="handleBarcodeInput"
@@ -141,36 +141,40 @@
             </div>
           </div>
 
-          <button 
-            @click="showLoadWebOrderModal = true" 
-            class="h-12 px-4 flex-shrink-0 flex items-center justify-center gap-2 bg-white text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] ring-1 ring-blue-200 transition-all duration-200 font-semibold text-sm"
-            title="Cargar pedido web"
+          <!-- 🌍 Toggle Búsqueda Global (Estilo Ghost Minimalista) -->
+          <button
+            v-if="hasOpenSession && currentSession?.warehouse"
+            @click="toggleGlobalSearch"
+            class="flex items-center gap-2 px-3 h-12 bg-white rounded-lg border border-gray-200 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50"
+            :class="globalSearch ? 'border-blue-300 bg-blue-50' : ''"
+            :title="globalSearch ? 'Buscando en todas las tiendas' : 'Buscar solo en tienda actual'"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            <svg class="w-4 h-4" :class="globalSearch ? 'text-blue-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span class="hidden md:inline">Pedido Web</span>
+            <span class="text-xs font-semibold" :class="globalSearch ? 'text-blue-700' : 'text-gray-600'">
+              {{ globalSearch ? 'Global' : 'Local' }}
+            </span>
           </button>
 
-          <button 
-            @click="clearFilters" 
-            class="h-12 w-12 flex-shrink-0 flex items-center justify-center bg-white text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] ring-1 ring-slate-100 transition-all duration-200"
-            title="Resetear filtros"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-          </button>
         </div>
         
         <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-          
+
+          <!-- Botón Pedido Web -->
           <button 
-            @click="refreshPosData" 
-            class="h-10 w-10 flex items-center justify-center text-slate-500 hover:text-indigo-600 bg-white hover:bg-indigo-50 rounded-xl ring-1 ring-slate-200/60 shadow-sm transition-all duration-200"
-            title="Sincronizar"
+            @click="showLoadWebOrderModal = true" 
+            class="hidden sm:flex items-center gap-3 pl-1.5 pr-4 h-12 rounded-full border transition-all duration-300 group bg-white border-slate-200 hover:border-blue-300 shadow-sm"
+            title="Cargar pedido web"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M20 4l-5.5 5.5M4 20l5.5-5.5"/></svg>
+            <div class="w-9 h-9 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white border border-slate-200 text-blue-500 group-hover:text-blue-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+            </div>
+            <div class="flex flex-col text-left leading-none">
+              <span class="text-xs font-bold text-slate-900">Pedido Web</span>
+            </div>
           </button>
 
           <button
@@ -312,11 +316,28 @@
         <div
           v-for="product in filteredProducts"
           :key="product.id"
-          class="group bg-white rounded-2xl p-3 border border-transparent hover:border-indigo-200 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_25px_-8px_rgba(99,102,241,0.15)] transition-all duration-300 cursor-pointer relative flex flex-col overflow-hidden hover:-translate-y-1"
+          :class="[
+            'group bg-white rounded-2xl p-3 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_25px_-8px_rgba(99,102,241,0.15)] transition-all duration-300 cursor-pointer relative flex flex-col overflow-hidden hover:-translate-y-1',
+            product.is_remote 
+              ? 'opacity-90 border border-amber-100/60 hover:border-amber-200' 
+              : 'border border-transparent hover:border-indigo-200'
+          ]"
           @click="addToCart(product)"
         >
           
           <div class="aspect-square rounded-xl overflow-hidden bg-slate-50 relative mb-3">
+             
+             <!-- Badge de Producto Remoto (Esquina Superior Izquierda) -->
+             <div v-if="product.is_remote && product.alternative_warehouses && product.alternative_warehouses.length > 0" 
+                  class="absolute top-2 left-2 z-10 px-1.5 py-0.5 bg-amber-500/95 backdrop-blur-sm text-white rounded-md shadow-lg flex items-center gap-1">
+              <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span class="text-[9px] font-black uppercase tracking-wide">
+                {{ product.alternative_warehouses.map(w => w.stock + ' en ' + w.name).join(', ') }}
+              </span>
+            </div>
              
              <!-- Badge de cantidad en carrito (solo si tiene items) -->
              <div v-if="getProductQuantityInCart(product.id) > 0" 
@@ -335,13 +356,17 @@
             <div class="absolute inset-0 bg-indigo-900/0 group-hover:bg-indigo-900/5 transition-colors duration-300"></div>
 
             <div class="absolute bottom-2 right-2 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out">
-               <div class="bg-indigo-600 text-white rounded-lg p-1.5 shadow-lg">
+               <div :class="[
+                 'text-white rounded-lg p-1.5 shadow-lg',
+                 product.is_remote ? 'bg-amber-500' : 'bg-indigo-600'
+               ]">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                </div>
             </div>
           </div>
 
           <div class="flex flex-col gap-1">
+            
             <div class="flex items-center justify-between">
                <span class="text-xl font-black text-slate-900 tracking-tight">
                  ${{ product.price.toLocaleString() }}
@@ -1715,7 +1740,7 @@ const refreshData = (dataType = 'all') => {
 }
 
 // Emits
-const emit = defineEmits(['sale-completed', 'create-invoice', 'search-quote', 'cart-status-changed', 'change-module'])
+const emit = defineEmits(['sale-completed', 'create-invoice', 'search-quote', 'cart-status-changed', 'change-module', 'warehouse-changed'])
 
 // Estado reactivo para datos de la API (usando store global)
 const products = computed(() => appStore.products)
@@ -1738,6 +1763,12 @@ const selectedPaymentMethod = ref('efectivo') // 💰 Por defecto EFECTIVO como 
 const cashReceived = ref(0)
 const processing = ref(false)
 const searchingQuotation = ref(false) // Evitar múltiples búsquedas simultáneas
+const globalSearch = ref(localStorage.getItem('posGlobalSearch') === 'true') // 🌍 Toggle para búsqueda global de productos
+
+// Persistir el estado de búsqueda global
+watch(globalSearch, (newValue) => {
+  localStorage.setItem('posGlobalSearch', newValue.toString())
+})
 
 // 🎁 Loyalty Points - Variables para redimir puntos
 const usePoints = ref(false)
@@ -3793,6 +3824,36 @@ const clearFilters = () => {
   }
 }
 
+// 🌍 Toggle para búsqueda global de productos
+const toggleGlobalSearch = async () => {
+  globalSearch.value = !globalSearch.value
+  
+  const scope = globalSearch.value ? 'global' : 'local'
+  const icon = globalSearch.value ? '🌍' : '📍'
+  const label = globalSearch.value ? 'GLOBAL' : 'LOCAL'
+  
+  console.log(`${icon} Cambiando modo de búsqueda a: ${label}`)
+  
+  // Recargar productos con el nuevo scope
+  if (currentSession.value?.warehouse_id) {
+    await appStore.loadProducts(currentSession.value.warehouse_id, scope)
+    
+    if (globalSearch.value) {
+      showSuccess('🌍 Búsqueda global - Todas las tiendas')
+    } else {
+      showSuccess(`📍 Búsqueda local - ${currentSession.value.warehouse?.name || 'Tienda actual'}`)
+    }
+  }
+}
+
+// Aplicar el filtro global al cargar productos inicialmente
+watch(() => currentSession.value?.warehouse_id, async (warehouseId) => {
+  if (warehouseId) {
+    const scope = globalSearch.value ? 'global' : 'local'
+    await appStore.loadProducts(warehouseId, scope)
+  }
+}, { immediate: false })
+
 const focusFirstProduct = () => {
   if (filteredProducts.value.length > 0) {
     addToCart(filteredProducts.value[0])
@@ -4419,6 +4480,11 @@ onMounted(async () => {
       hasOpenSession.value = appStore.cashSession.hasOpenSession
       currentSession.value = appStore.cashSession.current
       
+      // Emitir warehouse actual al parent
+      if (currentSession.value?.warehouse) {
+        emit('warehouse-changed', currentSession.value.warehouse)
+      }
+      
       console.log('🔄 Usando sesión de caja desde appStore:', {
         hasOpenSession: hasOpenSession.value,
         sessionId: currentSession.value?.id,
@@ -4453,6 +4519,11 @@ onMounted(async () => {
         // Sincronizar nuestras variables locales con el composable
         currentSession.value = composableCurrentSession.value
         hasOpenSession.value = composableHasOpenSession.value
+        
+        // Emitir warehouse actual al parent
+        if (currentSession.value?.warehouse) {
+          emit('warehouse-changed', currentSession.value.warehouse)
+        }
         
         console.log('🔄 Sesión cargada individualmente:', {
           hasOpenSession: hasOpenSession.value,
@@ -5223,6 +5294,12 @@ const handleOpenCashSession = async (sessionData) => {
       
       // ✅ SINCRONIZAR CON APPSTORE (evitar verificaciones futuras)
       appStore.updateCashSession(currentSession.value, hasOpenSession.value)
+      
+      // 🏪 RECARGAR PRODUCTOS DE LA BODEGA SELECCIONADA
+      if (currentSession.value?.warehouse_id) {
+        console.log(`🏪 Recargando productos de bodega: ${currentSession.value.warehouse?.name || currentSession.value.warehouse_id}`)
+        await appStore.loadProducts(currentSession.value.warehouse_id)
+      }
       
       // Asegurar que no estamos en estado de inicialización
       initializing.value = false

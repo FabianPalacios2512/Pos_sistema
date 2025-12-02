@@ -100,6 +100,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/system-settings/reset', [SystemSettingsController::class, 'reset']);
     Route::post('/settings/initial-onboarding', [SystemSettingsController::class, 'saveOnboarding']);
 
+    // Alias para compatibilidad con frontend (rutas con /tenant/)
+    Route::get('/tenant/system-settings', [SystemSettingsController::class, 'index']);
+    Route::put('/tenant/system-settings', [SystemSettingsController::class, 'update']);
+
     // Descuentos y Promociones
     Route::apiResource('discounts', DiscountsController::class);
     Route::get('/discounts-generate-code', [DiscountsController::class, 'generateCode']);
@@ -139,6 +143,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Proveedores
     Route::apiResource('suppliers', SupplierController::class);
     Route::put('/suppliers/{id}/toggle-status', [SupplierController::class, 'toggleStatus']);
+
+    // ==================== BODEGAS/SEDES MULTITIENDA ====================
+    Route::get('/warehouses', [App\Http\Controllers\WarehouseController::class, 'index']);
+    Route::get('/warehouses/default', [App\Http\Controllers\WarehouseController::class, 'getDefault']);
+    Route::get('/warehouses/{id}', [App\Http\Controllers\WarehouseController::class, 'show']);
+    Route::post('/warehouses', [App\Http\Controllers\WarehouseController::class, 'store']);
+    Route::put('/warehouses/{id}', [App\Http\Controllers\WarehouseController::class, 'update']);
+    Route::delete('/warehouses/{id}', [App\Http\Controllers\WarehouseController::class, 'destroy']);
+    Route::get('/warehouses/{id}/inventory', [App\Http\Controllers\WarehouseController::class, 'inventory']);
+    Route::post('/warehouses/{id}/update-stock', [App\Http\Controllers\WarehouseController::class, 'updateStock']);
+
+    // ==================== TRASLADOS DE MERCANCÍA ====================
+    Route::get('/stock-transfers', [App\Http\Controllers\StockTransferController::class, 'index']);
+    Route::get('/stock-transfers/{id}', [App\Http\Controllers\StockTransferController::class, 'show']);
+    Route::post('/stock-transfers', [App\Http\Controllers\StockTransferController::class, 'store']);
+    Route::post('/stock-transfers/{id}/complete', [App\Http\Controllers\StockTransferController::class, 'complete']);
+    Route::post('/stock-transfers/{id}/cancel', [App\Http\Controllers\StockTransferController::class, 'cancel']);
+    Route::delete('/stock-transfers/{id}', [App\Http\Controllers\StockTransferController::class, 'destroy']);
+    // ==================== FIN MULTITIENDA ====================
 
     // Ventas y Cotizaciones
     Route::apiResource('sales', SalesController::class);

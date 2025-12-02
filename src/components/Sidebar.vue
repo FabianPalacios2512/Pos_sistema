@@ -149,6 +149,37 @@
         </div>
       </div>
 
+      <!-- MULTISEDE -->
+      <div v-if="hasModuleAccess('warehouses')" style="margin-top: 28px;" :style="sidebarCollapsed ? 'padding: 0 16px;' : 'padding: 0 16px;'">
+        <!-- Línea divisoria cuando está colapsado -->
+        <div v-if="sidebarCollapsed" style="border-top: 1px solid #E5E7EB; margin-bottom: 16px;"></div>
+        <h3 v-show="!sidebarCollapsed" class="section-title">MULTISEDE</h3>
+        
+        <div
+          @click="$emit('change-module', 'warehouses')"
+          class="menu-item"
+          :class="[currentModule === 'warehouses' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
+          :title="sidebarCollapsed ? 'Gestión de Sedes' : ''"
+        >
+          <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+          <span v-show="!sidebarCollapsed" class="menu-text">Gestión de Sedes</span>
+        </div>
+
+        <div
+          @click="$emit('change-module', 'stock-transfers')"
+          class="menu-item"
+          :class="[currentModule === 'stock-transfers' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
+          :title="sidebarCollapsed ? 'Traslados' : ''"
+        >
+          <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+          </svg>
+          <span v-show="!sidebarCollapsed" class="menu-text">Traslados</span>
+        </div>
+      </div>
+
       <!-- RELACIONES -->
       <div v-if="hasModuleAccess('customers') || hasModuleAccess('suppliers')" style="margin-top: 28px;" :style="sidebarCollapsed ? 'padding: 0 16px;' : 'padding: 0 16px;'">
         <!-- Línea divisoria cuando está colapsado -->

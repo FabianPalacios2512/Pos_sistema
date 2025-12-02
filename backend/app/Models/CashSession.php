@@ -13,6 +13,7 @@ class CashSession extends Model
 
     protected $fillable = [
         'user_id',
+        'warehouse_id',
         'opened_at',
         'opening_amount',
         'closed_at',
@@ -54,6 +55,14 @@ class CashSession extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Bodega/Sede de esta sesión de caja
+     */
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     /**
@@ -190,10 +199,10 @@ class CashSession extends Model
         // Solución temporal: Sumar todo el total de las facturas asociadas
         // Asumimos que las facturas en 'invoices' son ventas de contado o ya procesadas como tal
         // Si hay ventas a crédito en 'invoices', deberíamos filtrarlas si tuvieran payment_method='credit'
-        // Pero como SalesController escribe en 'sales' y CashSession lee 'invoices', 
+        // Pero como SalesController escribe en 'sales' y CashSession lee 'invoices',
         // asumimos que 'invoices' son las que deben contar (o el sistema está dividido).
         // Si 'invoices' tiene payment_method, lo usamos.
-        
+
         $invoices = $this->invoices;
         $invoiceCash = 0;
         $invoiceCard = 0;
@@ -203,7 +212,7 @@ class CashSession extends Model
             // Si la factura tiene payment_method, lo usamos. Si no, asumimos efectivo.
             // Si es crédito, NO suma.
             $method = $invoice->payment_method ?? 'cash';
-            
+
             if ($method === 'credit') continue;
 
             if ($method === 'cash') $invoiceCash += $invoice->total;
@@ -257,7 +266,7 @@ class CashSession extends Model
     /**
      * Abrir una nueva sesión de caja
      */
-    public static function openSession($userId, $openingAmount, $notes = null)
+    public static function openSession($userId, $openingAmount, $notes = null, $warehouseId = null)
     {
         // Verificar que no hay sesión abierta
         if (self::hasOpenSession($userId)) {
@@ -266,6 +275,7 @@ class CashSession extends Model
 
         return self::create([
             'user_id' => $userId,
+            'warehouse_id' => $warehouseId,
             'opened_at' => now(),
             'opening_amount' => $openingAmount,
             // 'opening_notes' => $notes, // Columna no existe en DB

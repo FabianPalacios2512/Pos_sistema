@@ -3,6 +3,7 @@
     
     <!-- 🎯 Tour Contextual del Dashboard -->
     <ContextualTour 
+      ref="dashboardTourRef"
       module-name="dashboard"
       :steps="tourSteps"
       :auto-start="false"
@@ -378,50 +379,168 @@ Chart.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement
 // 🎯 Tour Steps del Dashboard  
 const tourSteps = ref([
   {
-    title: 'Asistente Inteligente',
-    description: 'Usa la IA para obtener ayuda inmediata, analizar datos, generar reportes o hacer preguntas sobre tu negocio. Puede ayudarte a tomar decisiones basadas en tus métricas.',
-    selector: '#tour-ia-button' // Necesitaremos agregar este ID al header
+    selector: '#tour-ia-button',
+    title: 'Asistente Inteligente 105 IA',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          Tu <strong class="text-purple-600">asistente personal impulsado por IA</strong> 
+          que puede ayudarte con:
+        </p>
+        <div class="bg-purple-50 border border-purple-200 rounded-lg p-2">
+          <ul class="text-xs text-purple-900 space-y-1">
+            <li>• <strong>Análisis de datos</strong> y tendencias de ventas</li>
+            <li>• <strong>Generación de reportes</strong> personalizados</li>
+            <li>• <strong>Respuestas instantáneas</strong> sobre tu negocio</li>
+            <li>• <strong>Recomendaciones</strong> para mejorar ventas</li>
+          </ul>
+        </div>
+      </div>
+    `
   },
   {
+    selector: '#tour-voice-button',
     title: 'Radio Corporativa',
-    description: '¡Sintonízanos! Disfruta de nuestra radio exclusiva con la mejor música y energía para acompañar tu jornada laboral.',
-    selector: '#tour-voice-button'
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          ¡Sintoniza nuestra <strong class="text-emerald-600">radio exclusiva</strong>! 
+        </p>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2">
+          <p class="text-xs text-emerald-900 font-medium mb-1">Música para trabajar:</p>
+          <ul class="text-xs text-emerald-800 space-y-0.5">
+            <li>• Energía positiva para tu jornada</li>
+            <li>• Reproducción continua en segundo plano</li>
+            <li>• Control fácil desde el header</li>
+          </ul>
+        </div>
+      </div>
+    `
   },
   {
+    selector: '#tour-help-button',
     title: 'Centro de Ayuda',
-    description: 'Accede a tutoriales, guías paso a paso y documentación completa del sistema. Siempre disponible para cuando lo necesites.',
-    selector: '#tour-help-button'
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          Accede a <strong class="text-blue-600">documentación completa</strong> del sistema.
+        </p>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-2">
+          <ul class="text-xs text-blue-900 space-y-1">
+            <li>• Tutoriales paso a paso</li>
+            <li>• Guías de funciones avanzadas</li>
+            <li>• Solución de problemas comunes</li>
+            <li>• Siempre disponible cuando lo necesites</li>
+          </ul>
+        </div>
+      </div>
+    `
   },
   {
-    title: 'Nueva Venta',
-    description: 'Inicia una nueva transacción de venta. Te llevará directamente al punto de venta donde podrás escanear productos y procesar pagos.',
-    selector: '#tour-nueva-venta-btn'
+    selector: '#tour-nueva-venta-btn',
+    title: 'Botón Nueva Venta',
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          <strong class="text-green-600">Inicia una nueva transacción</strong> con un solo clic.
+        </p>
+        <div class="bg-green-50 border border-green-200 rounded-lg p-2">
+          <p class="text-xs text-green-900 font-medium mb-1">Te llevará al POS para:</p>
+          <ul class="text-xs text-green-800 space-y-0.5">
+            <li>• Escanear o buscar productos</li>
+            <li>• Procesar pagos (efectivo, tarjeta, mixto)</li>
+            <li>• Imprimir o enviar facturas por WhatsApp</li>
+            <li>• Gestionar clientes y descuentos</li>
+          </ul>
+        </div>
+      </div>
+    `
   },
   {
+    selector: '#tour-estado-caja',
     title: 'Estado de Caja',
-    description: 'Muestra si la caja está abierta o cerrada. Debes abrir una caja antes de realizar ventas. Aquí ves el total acumulado del turno actual.',
-    selector: '#tour-estado-caja'
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          Muestra el <strong class="text-amber-600">estado actual de tu caja</strong>.
+        </p>
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-2">
+          <p class="text-xs text-amber-900 font-medium mb-1">Importante saber:</p>
+          <ul class="text-xs text-amber-800 space-y-0.5">
+            <li>• <strong>Abierta:</strong> Puedes realizar ventas</li>
+            <li>• <strong>Cerrada:</strong> Debes abrir caja primero</li>
+            <li>• Muestra el total acumulado del turno</li>
+            <li>• Facilita el cuadre al final del día</li>
+          </ul>
+        </div>
+      </div>
+    `
   },
   {
+    selector: '#tour-analisis-ingresos',
     title: 'Análisis de Ingresos',
-    description: 'Gráfico en tiempo real de tus ventas. Alterna entre vista de 24 horas, 7 días o 30 días para analizar tendencias y tomar decisiones informadas.',
-    selector: '#tour-analisis-ingresos'
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          <strong class="text-indigo-600">Gráfico interactivo</strong> de tus ventas en tiempo real.
+        </p>
+        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-2">
+          <p class="text-xs text-indigo-900 font-medium mb-1">3 vistas disponibles:</p>
+          <ul class="text-xs text-indigo-800 space-y-0.5">
+            <li>• <strong>24 Horas:</strong> Ventas hora por hora</li>
+            <li>• <strong>7 Días:</strong> Tendencia semanal</li>
+            <li>• <strong>30 Días:</strong> Análisis mensual</li>
+          </ul>
+          <p class="text-xs text-indigo-700 mt-1 italic">
+            Usa estos datos para identificar tus mejores horarios y días de venta.
+          </p>
+        </div>
+      </div>
+    `
   },
   {
+    selector: '#tour-alertas-stock',
     title: 'Alertas de Stock',
-    description: 'Sistema de alertas que te avisa automáticamente cuando tienes productos con stock bajo. Te ayuda a mantener siempre inventario disponible.',
-    selector: '#tour-alertas-stock'
+    content: `
+      <div class="space-y-2">
+        <p class="text-sm text-gray-700">
+          <strong class="text-red-600">Sistema de alertas automático</strong> para inventario.
+        </p>
+        <div class="bg-red-50 border border-red-200 rounded-lg p-2">
+          <p class="text-xs text-red-900 font-medium mb-1">Te avisa cuando:</p>
+          <ul class="text-xs text-red-800 space-y-0.5">
+            <li>• Un producto tiene stock bajo (menos de 10)</li>
+            <li>• Necesitas reabastecer urgentemente</li>
+            <li>• Hay productos a punto de agotarse</li>
+          </ul>
+          <p class="text-xs text-red-700 mt-1 italic">
+            ¡Evita quedarte sin productos populares!
+          </p>
+        </div>
+      </div>
+    `
   }
 ])
 
+// 🎓 Control del Tour del Dashboard
+const DEV_MODE_DASHBOARD = false // false = Tour solo primera vez | true = Tour siempre
+const isFirstVisitDashboard = ref(DEV_MODE_DASHBOARD || !localStorage.getItem('dashboard_tour_completed'))
+const dashboardTourRef = ref(null)
+
 const handleTourComplete = () => {
   console.log('✅ Dashboard tour completado')
-  localStorage.setItem('dashboard_tour_completed', 'true')
+  if (!DEV_MODE_DASHBOARD) {
+    localStorage.setItem('dashboard_tour_completed', 'true')
+    isFirstVisitDashboard.value = false
+  }
 }
 
 const handleTourSkip = () => {
   console.log('⏭️ Dashboard tour omitido')
-  localStorage.setItem('dashboard_tour_completed', 'true')
+  if (!DEV_MODE_DASHBOARD) {
+    localStorage.setItem('dashboard_tour_completed', 'true')
+    isFirstVisitDashboard.value = false
+  }
 }
 
 // 🏦 Composable para manejo de sesiones de caja
@@ -1301,6 +1420,13 @@ onMounted(async () => {
   setTimeout(() => {
     loadAndShowInventoryAlerts()
   }, 2000)
+  
+  // 🎓 Iniciar tour si es primera visita
+  if (isFirstVisitDashboard.value && dashboardTourRef.value) {
+    setTimeout(() => {
+      dashboardTourRef.value.startTour()
+    }, 1500) // Esperar 1.5s para que todo esté cargado y visible
+  }
 })
 
 // Watch para cambios en el período seleccionado

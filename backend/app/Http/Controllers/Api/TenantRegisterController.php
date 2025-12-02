@@ -83,19 +83,19 @@ class TenantRegisterController extends Controller
             // Reemplazar guiones por guiones bajos en el ID para evitar problemas con nombres de BD
             $tenantId = str_replace('-', '_', $request->subdomain);
 
+            // 🎯 PASO 1: Crear tenant en base de datos central
             $tenant = Tenant::create([
                 'id' => $tenantId,
                 'business_name' => $request->company_name,
                 'plan' => $plan,
-                // Aquí podrías guardar más datos del dueño en la data del tenant si quisieras
-                // o esperar a que se ejecuten los seeders/migraciones del tenant para crear el usuario en la DB del tenant
             ]);
 
+            // 🎯 PASO 2: Crear dominio asociado
             $tenant->domains()->create([
                 'domain' => $domainToCreate
             ]);
 
-            // Marcar el token como usado si existe
+            // 🎯 PASO 3: Marcar el token como usado si existe
             if ($request->token) {
                 \DB::connection('mysql')->table('signup_tokens')
                     ->where('token', $request->token)
@@ -106,37 +106,52 @@ class TenantRegisterController extends Controller
                     ]);
             }
 
-            // Aquí es donde ocurre la magia: Crear el usuario administrador DENTRO de la base de datos del tenant
-            // Stancl Tenancy permite ejecutar código en el contexto del tenant
+            // 🎯 PASO 4: Actualizar datos del tenant después de que el seeder se ejecute
+            // NOTA: Los seeders se ejecutan AUTOMÁTICAMENTE por TenancyServiceProvider (Jobs\SeedDatabase)
+            // Esto crea roles, usuarios admin, categorías, etc.
+            // Aquí solo actualizamos los datos del usuario admin con la info del registro
             $tenant->run(function () use ($request) {
-                // Crear rol de administrador
-                $role = \App\Models\Role::create([
-                    'name' => 'admin',
-                    'description' => 'Administrador del Sistema',
-                    'permissions' => ['ALL'], // Permisos completos (Uppercase)
-                    'active' => true
-                ]);
+                try {
+                    // El seeder ya creó un usuario admin con role_id 1
+                    // Vamos a actualizarlo con los datos del registro
+                    $adminUser = \App\Models\User::where('role_id', 1)->first();
 
-                \App\Models\User::create([
-                    'name' => $request->owner_name,
-                    'email' => $request->email,
-                    'cc' => $request->cedula,
-                    'password' => bcrypt($request->password),
-                    'role_id' => $role->id,
-                ]);
+                    if ($adminUser) {
+                        $adminUser->update([
+                            'name' => $request->owner_name,
+                            'email' => $request->email,
+                            'cc' => $request->cedula,
+                            'password' => bcrypt($request->password),
+                        ]);
 
-                // Actualizar system_settings con datos del registro
-                \DB::table('system_settings')->where('id', 1)->update([
-                    'company_name' => $request->company_name,
-                    'company_email' => $request->email,
-                    'updated_at' => now(),
-                ]);
+                        \Log::info('✅ Usuario admin actualizado con datos del registro', [
+                            'name' => $request->owner_name,
+                            'email' => $request->email,
+                            'cc' => $request->cedula
+                        ]);
+                    }
 
-                // ✅ YA NO ES NECESARIO: Los payment_methods y expense_categories
-                // se crean automáticamente por Jobs\SeedDatabase::class en TenancyServiceProvider
-                // (Ver: backend/app/Providers/TenancyServiceProvider.php línea 30)
+                    // Actualizar system_settings con datos del registro
+                    \DB::table('system_settings')->where('id', 1)->update([
+                        'company_name' => $request->company_name,
+                        'company_email' => $request->email,
+                        'company_document' => $request->cedula, // NIT/Documento del negocio
+                        'onboarding_completed' => true, // Marcar onboarding como completado
+                        'updated_at' => now(),
+                    ]);
 
-                \Log::info('✅ Tenant inicializado - Seeders se ejecutarán automáticamente');
+                    \Log::info('✅ Tenant inicializado correctamente - Datos del negocio guardados', [
+                        'company_name' => $request->company_name,
+                        'company_email' => $request->email,
+                        'company_document' => $request->cedula
+                    ]);
+
+                } catch (\Exception $e) {
+                    \Log::error('❌ Error al actualizar datos del tenant', [
+                        'error' => $e->getMessage()
+                    ]);
+                    throw $e; // Re-lanzar para que se capture en el catch externo
+                }
             });
 
             // Construir la URL de redirección
@@ -154,7 +169,7 @@ class TenantRegisterController extends Controller
                 $redirectUrl = $protocol . $domainToCreate . '/login';
             }
 
-            \Log::info('Tenant registrado exitosamente', [
+            \Log::info('✅ Tenant registrado exitosamente', [
                 'tenant_id' => $tenant->id,
                 'domain' => $domainToCreate,
                 'redirect_url' => $redirectUrl
@@ -169,15 +184,44 @@ class TenantRegisterController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            \Log::error('Error al registrar tenant', [
+            // 🧹 LIMPIEZA: Intentar eliminar la base de datos del tenant si se creó
+            try {
+                if (isset($tenant)) {
+                    \Log::warning('🧹 Intentando limpiar tenant fallido', ['tenant_id' => $tenant->id]);
+
+                    // Eliminar la base de datos del tenant si existe
+                    $databaseName = 'tenant' . $tenant->id;
+                    \DB::statement("DROP DATABASE IF EXISTS `{$databaseName}`");
+
+                    // Eliminar el tenant de la tabla central (por si el rollback no funcionó)
+                    Tenant::where('id', $tenant->id)->forceDelete();
+
+                    \Log::info('✅ Tenant fallido limpiado correctamente');
+                }
+            } catch (\Exception $cleanupError) {
+                \Log::error('⚠️ No se pudo limpiar el tenant fallido', [
+                    'error' => $cleanupError->getMessage()
+                ]);
+            }
+
+            \Log::error('❌ Error al registrar tenant', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'subdomain' => $request->subdomain ?? 'N/A'
             ]);
 
+            // Mensaje de error más amigable
+            $userMessage = 'Error al crear la tienda. Por favor, intenta nuevamente.';
+
+            // Si es un error de CC duplicado, dar mensaje específico
+            if (strpos($e->getMessage(), 'cc_unique') !== false || strpos($e->getMessage(), 'Duplicate entry') !== false) {
+                $userMessage = 'Parece que ya existe una cuenta con ese número de cédula. Si crees que es un error, contacta con soporte.';
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear la tienda: ' . $e->getMessage()
+                'message' => $userMessage,
+                'debug' => app()->environment('local') ? $e->getMessage() : null // Solo en desarrollo
             ], 500);
         }
     }

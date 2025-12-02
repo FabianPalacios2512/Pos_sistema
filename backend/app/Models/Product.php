@@ -87,6 +87,47 @@ class Product extends Model
         return $this->hasMany(InventoryMovement::class);
     }
 
+    /**
+     * Bodegas/Sedes donde está este producto
+     */
+    public function warehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'product_warehouse')
+            ->withPivot('stock')
+            ->withTimestamps();
+    }
+
+    /**
+     * Obtener stock total sumando todas las bodegas
+     */
+    public function getTotalStockAttribute()
+    {
+        return $this->warehouses()->sum('product_warehouse.stock');
+    }
+
+    /**
+     * Obtener stock de una bodega específica
+     */
+    public function getStockInWarehouse($warehouseId)
+    {
+        $warehouse = $this->warehouses()->where('warehouse_id', $warehouseId)->first();
+        return $warehouse ? $warehouse->pivot->stock : 0;
+    }
+
+    /**
+     * Obtener desglose de stock por bodega
+     */
+    public function getStockBreakdown()
+    {
+        return $this->warehouses()->get()->map(function ($warehouse) {
+            return [
+                'warehouse_id' => $warehouse->id,
+                'warehouse_name' => $warehouse->name,
+                'stock' => $warehouse->pivot->stock,
+            ];
+        });
+    }
+
     // Scopes
     public function scopeActive($query)
     {

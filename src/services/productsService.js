@@ -10,8 +10,10 @@ export const productsService = {
   },
 
   // Obtener productos optimizados para POS (sin paginación, campos mínimos)
-  async getForPos() {
-    return await apiCall('/products-pos')
+  async getForPos(params = {}) {
+    const queryString = new URLSearchParams(params).toString()
+    const url = queryString ? `/products-pos?${queryString}` : '/products-pos'
+    return await apiCall(url)
   },
 
   // Obtener un producto específico

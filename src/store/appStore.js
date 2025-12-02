@@ -36,26 +36,42 @@ export const appStore = reactive({
   initialized: false,
   
   // Métodos para cargar datos
-  async loadProducts() {
+  async loadProducts(warehouseId = null, searchScope = 'local') {
     if (this.loading.products) return // Evitar cargas duplicadas
 
     try {
       this.loading.products = true
-      // Usar endpoint optimizado para POS
-      const response = await productsService.getForPos()
+      
+      // 🏪 Si no se pasa warehouse_id, intentar usar el de la sesión activa
+      const targetWarehouseId = warehouseId || this.cashSession.current?.warehouse_id
+      
+      // Usar endpoint optimizado para POS con filtro de bodega y scope
+      const params = targetWarehouseId ? { 
+        warehouse_id: targetWarehouseId,
+        scope: searchScope 
+      } : {}
+      
+      const response = await productsService.getForPos(params)
+      
       if (response.success) {
         this.products = response.data
-          .filter(product => product.active && product.stock > 0)
+          .filter(product => product.active)
           .map(product => ({
             ...product,
-            stock: product.stock,
+            stock: product.stock || 0,
+            warehouse_stock: product.warehouse_stock || [],
+            is_remote: product.is_remote || false,
+            alternative_warehouses: product.alternative_warehouses || [],
             price: parseFloat(product.price || 0),
             category_name: product.category_name || 'Sin categoría',
             category_color: product.category_color || '#6b7280'
           }))
+        
+        const scopeLabel = searchScope === 'global' ? '🌍 GLOBAL' : '📍 LOCAL'
+        console.log(`${scopeLabel} Productos cargados${targetWarehouseId ? ` para bodega ${targetWarehouseId}` : ''}: ${this.products.length} productos`)
       }
     } catch (error) {
-      // console.error('❌ Error precargando productos:', error)
+      console.error('❌ Error precargando productos:', error)
     } finally {
       this.loading.products = false
     }
@@ -196,14 +212,18 @@ export const appStore = reactive({
   
   // console.log('🚀 Inicializando store global...')
     
-    // Cargar todos los datos en paralelo (incluyendo sesión de caja)
+    // 🏪 PRIMERO: Cargar sesión de caja para obtener el warehouse_id
+    await this.loadCashSession()
+    
+    // SEGUNDO: Cargar productos usando el warehouse_id de la sesión (si existe)
+    await this.loadProducts()
+    
+    // TERCERO: Cargar el resto de datos en paralelo
     await Promise.all([
-      this.loadProducts(),
       this.loadCategories(),
       this.loadCustomers(),
       this.loadPaymentMethods(),
-      this.loadSystemSettings(),
-      this.loadCashSession() // ✅ Cargar sesión de caja SOLO UNA VEZ
+      this.loadSystemSettings()
     ])
     
     this.initialized = true

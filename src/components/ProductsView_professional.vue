@@ -12,7 +12,7 @@
           </div>
           <div>
             <h1 class="text-2xl font-bold text-gray-900">Productos</h1>
-            <p class="text-sm text-gray-600">Administra tu inventario y catálogo</p>
+            <p class="text-sm text-gray-600">Manage your inventory and catalog</p>
           </div>
         </div>
         
@@ -478,8 +478,17 @@
               </div>
             </td>
             <td class="px-6 py-4 text-center">
-              <div class="flex flex-col items-center">
-                <span class="text-sm font-bold text-slate-700">{{ product.current_stock || 0 }}</span>
+              <div class="flex flex-col items-center relative">
+                <!-- Stock total con icono de bodega -->
+                <button 
+                  @mouseenter="showStockTooltip($event, product)"
+                  @mouseleave="hideStockTooltip"
+                  class="flex items-center space-x-1 hover:bg-gray-100 px-2 py-1 rounded transition-colors">
+                  <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                  <span class="text-sm font-bold text-slate-700">{{ product.current_stock || 0 }}</span>
+                </button>
                 <span v-if="(product.current_stock || 0) <= (product.min_stock || 0)" 
                       class="text-[10px] font-bold text-rose-500 animate-pulse">
                   ¡Stock Bajo!
@@ -848,6 +857,67 @@
                            min="0"
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                            placeholder="0">
+                  </div>
+                  
+                  <!-- Stock por Tienda -->
+                  <div class="md:col-span-2">
+                    <div class="flex items-center justify-between mb-3">
+                      <label class="block text-xs font-bold text-gray-700">
+                        Stock por Tienda *
+                        <span class="text-xs font-normal text-gray-500 ml-1">(Asigna stock a cada sede)</span>
+                      </label>
+                      <button type="button"
+                              @click="showStockHelp = !showStockHelp"
+                              class="text-blue-600 hover:text-blue-700">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    <!-- Ayuda -->
+                    <div v-if="showStockHelp" class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
+                      <p class="font-semibold mb-1">💡 ¿Cómo funciona?</p>
+                      <ul class="space-y-1 ml-4 list-disc">
+                        <li>Puedes poner <strong>diferente stock en cada tienda</strong></li>
+                        <li>Ejemplo: 20 unidades en Sede Principal, 5 en Margaritas</li>
+                        <li>Si dejas en 0, el producto NO estará disponible en esa tienda</li>
+                      </ul>
+                    </div>
+                    
+                    <!-- Inputs por cada tienda -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div v-for="warehouse in warehouses" :key="warehouse.id"
+                           class="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex items-center gap-2 mb-2">
+                          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          </svg>
+                          <span class="text-xs font-bold text-gray-900">
+                            {{ warehouse.name }}
+                            <span v-if="warehouse.is_default" class="text-blue-600">(Principal)</span>
+                          </span>
+                        </div>
+                        <input 
+                          v-model.number="productForm.warehouseStock[warehouse.id]"
+                          type="number" 
+                          min="0"
+                          placeholder="0"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        />
+                      </div>
+                    </div>
+                    
+                    <!-- Stock Total -->
+                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-blue-900">Stock Total:</span>
+                        <span class="text-base font-bold text-blue-600">
+                          {{ calculateTotalStock() }} unidades
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   
                   <div>
@@ -1384,6 +1454,32 @@
       </div>
     </Transition>
   </Teleport>
+
+  <!-- 🏭 Tooltip: Stock por Bodega -->
+  <Teleport to="body">
+    <div v-if="stockTooltip.visible" 
+         class="fixed z-[9999] bg-white shadow-xl rounded-lg border border-gray-300 p-3 min-w-[200px]"
+         :style="{ left: stockTooltip.x + 'px', top: stockTooltip.y + 'px' }">
+      <div class="flex items-center space-x-2 mb-2 pb-2 border-b border-gray-200">
+        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <h4 class="text-sm font-bold text-gray-900">Stock por Bodega</h4>
+      </div>
+      <div v-if="stockTooltip.warehouses && stockTooltip.warehouses.length > 0" class="space-y-2">
+        <div v-for="wh in stockTooltip.warehouses" :key="wh.id" class="flex items-center justify-between text-sm">
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+            <span class="text-gray-700">{{ wh.name }}</span>
+          </div>
+          <span class="font-bold text-gray-900">{{ wh.pivot.stock }}</span>
+        </div>
+      </div>
+      <div v-else class="text-xs text-gray-500 text-center py-2">
+        Sin stock asignado
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -1391,6 +1487,7 @@ import { ref, reactive, computed, onMounted, watch, nextTick, Teleport, Transiti
 import { useRoute, useRouter } from 'vue-router'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
+import { warehouseService } from '../services/warehouseService.js'
 import TablePaginator from './TablePaginator.vue'
 import ContextualTour from './ContextualTour.vue'
 
@@ -1888,6 +1985,8 @@ const imageUploadMethod = ref('url') // 'file' o 'url'
 const previewImage = ref(null)
 const imageLoadError = ref(false)
 
+const showStockHelp = ref(false)
+
 const productForm = ref({
   name: '',
   sku: '',
@@ -1899,8 +1998,23 @@ const productForm = ref({
   min_stock: 5,
   max_stock: 100,
   category_id: '',
+  warehouse_id: null, // 🏢 Bodega donde se guardará el producto
+  warehouseStock: {}, // 🏢 Stock por cada tienda { warehouse_id: cantidad }
   image: '',
   active: true
+})
+
+// 🏢 Lista de bodegas disponibles
+const warehouses = ref([])
+const loadingWarehouses = ref(false)
+
+// 🏢 Tooltip de stock por bodega
+const stockTooltip = ref({
+  visible: false,
+  productId: null,
+  x: 0,
+  y: 0,
+  warehouses: []
 })
 
 // Computed properties
@@ -2045,12 +2159,59 @@ const loadCategories = async () => {
   }
 }
 
+// 🏢 Cargar bodegas disponibles
+const loadWarehouses = async () => {
+  try {
+    loadingWarehouses.value = true
+    const data = await warehouseService.getAll()
+    warehouses.value = Array.isArray(data) ? data : []
+    console.log('Bodegas cargadas:', warehouses.value.length)
+    
+    // Seleccionar automáticamente la bodega predeterminada
+    const defaultWarehouse = warehouses.value.find(w => w.is_default)
+    if (defaultWarehouse && !productForm.value.warehouse_id) {
+      productForm.value.warehouse_id = defaultWarehouse.id
+    }
+  } catch (error) {
+    console.error('Error cargando bodegas:', error)
+    showNotification(
+      'Error al cargar bodegas',
+      'No se pudieron cargar las bodegas disponibles',
+      'error'
+    )
+  } finally {
+    loadingWarehouses.value = false
+  }
+}
+
+// 🏭 Mostrar tooltip de stock por bodega
+const showStockTooltip = (event, product) => {
+  if (product.warehouses && product.warehouses.length > 0) {
+    stockTooltip.value.visible = true
+    stockTooltip.value.productId = product.id
+    stockTooltip.value.warehouses = product.warehouses
+    
+    // Posicionar tooltip cerca del mouse
+    stockTooltip.value.x = event.clientX + 10
+    stockTooltip.value.y = event.clientY + 10
+  }
+}
+
+// 🏭 Ocultar tooltip de stock por bodega
+const hideStockTooltip = () => {
+  stockTooltip.value.visible = false
+  stockTooltip.value.productId = null
+  stockTooltip.value.warehouses = []
+  stockTooltip.value.x = 0
+  stockTooltip.value.y = 0
+}
+
 const refreshProducts = async () => {
   console.log('Refrescando productos...')
   await loadProducts()
 }
 
-const openCreateModal = () => {
+const openCreateModal = async () => {
   // VALIDACIÓN: Verificar si existen categorías primero
   if (!categories.value || categories.value.length === 0) {
     showNotification(
@@ -2063,6 +2224,16 @@ const openCreateModal = () => {
   }
   
   isEditing.value = false
+  
+  // Cargar bodegas antes de abrir el modal
+  await loadWarehouses()
+  
+  // Inicializar warehouseStock con todas las tiendas en 0
+  const warehouseStock = {}
+  warehouses.value.forEach(warehouse => {
+    warehouseStock[warehouse.id] = 0
+  })
+  
   productForm.value = {
     name: '',
     sku: '',
@@ -2074,6 +2245,8 @@ const openCreateModal = () => {
     min_stock: 5,
     max_stock: 100,
     category_id: '',
+    warehouse_id: warehouses.value.find(w => w.is_default)?.id || null,
+    warehouseStock: warehouseStock,
     image: '',
     active: true
   }
@@ -2086,9 +2259,31 @@ const openCreateModal = () => {
   showProductModal.value = true
 }
 
-const editProduct = (product) => {
+const editProduct = async (product) => {
   // Cerrar modal de detalles si está abierto
   showViewModal.value = false
+  
+  // Cargar bodegas para obtener todas las tiendas disponibles
+  await loadWarehouses()
+  
+  // Inicializar warehouseStock con todas las tiendas en 0
+  const warehouseStock = {}
+  warehouses.value.forEach(warehouse => {
+    warehouseStock[warehouse.id] = 0
+  })
+  
+  // Cargar el stock por tienda si existe
+  if (product.alternative_warehouses && Array.isArray(product.alternative_warehouses)) {
+    product.alternative_warehouses.forEach(warehouse => {
+      if (warehouse.id) {
+        warehouseStock[warehouse.id] = parseInt(warehouse.stock || 0)
+      }
+    })
+  }
+  // Si el producto tiene warehouse_id (tienda actual), cargar su stock
+  if (product.warehouse_id) {
+    warehouseStock[product.warehouse_id] = parseInt(product.current_stock || product.stock || 0)
+  }
   
   isEditing.value = true
   // Mapear correctamente los campos del API a los campos del formulario
@@ -2104,6 +2299,7 @@ const editProduct = (product) => {
     min_stock: parseInt(product.min_stock || 5),
     max_stock: parseInt(product.max_stock || 100),
     category_id: product.category_id,
+    warehouseStock: warehouseStock,
     image: product.image_url || product.image || '',
     active: getProductStatus(product) !== false
   }
@@ -2443,6 +2639,14 @@ const saveCategory = async () => {
   }
 }
 
+// Calcular stock total sumando todas las tiendas
+const calculateTotalStock = () => {
+  if (!productForm.value.warehouseStock) return 0
+  return Object.values(productForm.value.warehouseStock).reduce((sum, stock) => {
+    return sum + (parseInt(stock) || 0)
+  }, 0)
+}
+
 const saveProduct = async () => {
   try {
     loading.value = true
@@ -2460,10 +2664,13 @@ const saveProduct = async () => {
     if (!productForm.value.price || productForm.value.price <= 0) {
       throw new Error('El precio de venta debe ser mayor a 0')
     }
-    if (productForm.value.stock === undefined || productForm.value.stock === null || productForm.value.stock < 0) {
-      throw new Error('El stock inicial debe ser un número válido (0 o mayor)')
+    
+    // Calcular stock total
+    const totalStock = calculateTotalStock()
+    if (totalStock === undefined || totalStock === null || totalStock < 0) {
+      throw new Error('El stock total debe ser un número válido (0 o mayor)')
     }
-
+    
     // Transformar los datos para que coincidan con los campos esperados por la API
     const apiData = {
       name: productForm.value.name.trim(),
@@ -2475,15 +2682,17 @@ const saveProduct = async () => {
       cost_price: parseFloat(productForm.value.cost),
       sale_price: parseFloat(productForm.value.price),
       wholesale_price: null,
-      current_stock: parseInt(productForm.value.stock),
+      current_stock: totalStock, // 🏢 Stock total calculado de todas las tiendas
       min_stock: productForm.value.min_stock ? parseInt(productForm.value.min_stock) : 0,
-      max_stock: productForm.value.max_stock ? parseInt(productForm.value.max_stock) : (parseInt(productForm.value.stock) || 0) * 3,
+      max_stock: productForm.value.max_stock ? parseInt(productForm.value.max_stock) : totalStock * 3,
       unit: productForm.value.unit?.trim() || 'unidad',
       manage_stock: true,
       active: productForm.value.active !== false,
       // Manejo inteligente de imágenes: URLs normales o base64 (archivos subidos)
       image_url: productForm.value.image ? productForm.value.image.trim() : null,
-      tags: null
+      tags: null,
+      // 🏢 Stock por cada tienda (nuevo sistema multi-tienda)
+      warehouse_stocks: productForm.value.warehouseStock
     }
 
     console.log('Datos enviados a la API:', apiData)
@@ -2615,6 +2824,7 @@ onMounted(async () => {
   loadUserPreferences()
   
   await loadCategories()
+  await loadWarehouses() // 🏢 Cargar bodegas disponibles
   
   // 🎓 Mostrar tour si es primera visita
   if (isFirstVisitProducts.value) {
