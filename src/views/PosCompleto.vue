@@ -361,8 +361,11 @@ const hasModulePermission = (module) => {
   
   // Mapeo de módulos especiales a permisos reales de la base de datos
   const modulePermissionMap = {
-    'returns-management': 'returns.view',  // Devoluciones → permiso de ver devoluciones
-    'cash-admin': 'settings.view'          // Panel Admin → permiso de configuración
+    'returns-management': 'returns.view',     // Devoluciones → permiso de ver devoluciones
+    'cash-admin': 'settings.view',            // Panel Admin → permiso de configuración
+    'accounts-receivable': 'customers.view',  // Cuentas por Cobrar → permiso de ver clientes
+    'warehouses': 'stock.view',               // Gestión de Sedes → permiso de ver stock
+    'stock-transfers': 'stock.transfer'       // Traslados → permiso de transferir stock
   }
   
   // Si el módulo tiene un mapeo especial, verificar ese permiso específico

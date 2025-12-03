@@ -11,6 +11,7 @@ class WarehouseController extends Controller
 {
     /**
      * Listar todas las bodegas/sedes
+     * Incluye información de límites según plan
      */
     public function index()
     {
@@ -22,7 +23,28 @@ class WarehouseController extends Controller
         ->orderBy('name')
         ->get();
 
-        return response()->json($warehouses);
+        // Obtener información del plan y límites
+        $tenantPlan = tenant('plan') ?? 'free_trial';
+        $warehouseCount = $warehouses->count();
+
+        $limits = [
+            'free_trial' => ['max' => 0, 'allowed' => false],
+            'basic' => ['max' => 0, 'allowed' => false],
+            'premium' => ['max' => 3, 'allowed' => true],
+            'enterprise' => ['max' => -1, 'allowed' => true] // -1 = ilimitado
+        ];
+
+        $planLimits = $limits[$tenantPlan] ?? ['max' => 0, 'allowed' => false];
+
+        return response()->json([
+            'warehouses' => $warehouses,
+            'plan_info' => [
+                'current_plan' => $tenantPlan,
+                'current_count' => $warehouseCount,
+                'max_allowed' => $planLimits['max'],
+                'can_create' => $planLimits['allowed'] && ($planLimits['max'] === -1 || $warehouseCount < $planLimits['max'])
+            ]
+        ]);
     }
 
     /**
@@ -42,9 +64,34 @@ class WarehouseController extends Controller
 
     /**
      * Crear una nueva bodega
+     * 🎯 Validación por plan: Premium (max 3), Enterprise (ilimitado)
      */
     public function store(Request $request)
     {
+        // Validar límite de tiendas según plan
+        $tenantPlan = tenant('plan') ?? 'free_trial';
+        $warehouseCount = Warehouse::count();
+
+        // Planes que NO pueden usar multi-tienda
+        if (in_array($tenantPlan, ['free_trial', 'basic'])) {
+            return response()->json([
+                'message' => '🔒 La funcionalidad Multi-tienda requiere plan Premium o Enterprise',
+                'error' => 'plan_restriction'
+            ], 403);
+        }
+
+        // Premium: máximo 3 tiendas
+        if ($tenantPlan === 'premium' && $warehouseCount >= 3) {
+            return response()->json([
+                'message' => '⚠️ Has alcanzado el límite de 3 tiendas para tu plan Premium. Actualiza a Enterprise para tiendas ilimitadas.',
+                'error' => 'warehouse_limit_reached',
+                'current_count' => $warehouseCount,
+                'max_allowed' => 3
+            ], 403);
+        }
+
+        // Enterprise: sin límite (no hay validación adicional)
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:255',

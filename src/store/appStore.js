@@ -23,6 +23,7 @@ export const appStore = reactive({
   customers: [],
   systemSettings: {},
   paymentMethods: [],
+  tenantPlan: 'free_trial', // Plan del tenant (free_trial, basic, premium, enterprise)
   
   // Estado de sesión de caja (para evitar verificaciones repetidas)
   cashSession: {
@@ -143,7 +144,10 @@ export const appStore = reactive({
       if (response.data.success) {
         // El backend devuelve un objeto directo, no un array de key-value
         this.systemSettings = response.data.data
+        // 🔒 Guardar el plan del tenant
+        this.tenantPlan = response.data.tenant_plan || 'free_trial'
         console.log('⚙️ System settings loaded/reloaded:', this.systemSettings)
+        console.log('🔒 Tenant plan:', this.tenantPlan)
       }
     } catch (error) {
   // console.error('❌ Error precargando configuración:', error)

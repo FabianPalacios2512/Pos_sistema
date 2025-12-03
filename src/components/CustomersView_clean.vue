@@ -304,6 +304,7 @@
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Contacto</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Compras</th>
                 <th v-if="isCreditiendaEnabled" class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Crédito</th>
+                <th v-if="isLoyaltyEnabled" class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Puntos</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Estado</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-600 uppercase tracking-wide">Acciones</th>
               </tr>
@@ -353,6 +354,21 @@
                        :class="parseFloat(customer.current_debt) > parseFloat(customer.credit_limit) ? 'text-rose-600 font-bold' : 'text-slate-600'">
                     <span class="text-xs text-slate-500">Deuda:</span> 
                     <span class="font-semibold">${{ formatCurrency(customer.current_debt) }}</span>
+                  </div>
+                </td>
+                
+                <!-- Puntos de Fidelidad -->
+                <td v-if="isLoyaltyEnabled" class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg flex items-center justify-center flex-shrink-0 border border-amber-100">
+                      <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <div class="text-base font-bold text-amber-700">{{ customer.loyalty_points || 0 }}</div>
+                      <div class="text-xs text-slate-500">puntos</div>
+                    </div>
                   </div>
                 </td>
                 
@@ -678,12 +694,18 @@ import { customersService } from '../services/customersService.js'
 import { useToast } from '../composables/useToast.js'
 import { useCreditienda } from '../composables/useCreditienda.js'
 import CustomerHistoryModal from './CustomerHistoryModal.vue'
+import { appStore } from '../store/appStore.js'
 
 // Sistema de toasts
 const { showSuccess, showError, showWarning, showInfo } = useToast()
 
 // Sistema de Creditienda
 const { isCreditiendaEnabled, showCreditiendaUpgradeModal } = useCreditienda()
+
+// Sistema de Fidelización (Loyalty Points)
+const isLoyaltyEnabled = computed(() => {
+  return appStore.systemSettings?.enable_loyalty_system || false
+})
 
 // Estado reactivo
 const loading = ref(false)

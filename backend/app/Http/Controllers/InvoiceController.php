@@ -171,47 +171,84 @@ class InvoiceController extends Controller
                     if ($product) {
                         $previousStock = $product->current_stock;
 
-                        // Obtener warehouse_id desde la sesión de caja si existe
+                        // 🏢 LÓGICA INTELIGENTE MULTI-BODEGA
                         $warehouseId = null;
+                        $preferredWarehouseId = null;
+
+                        // Obtener bodega preferida desde la sesión de caja
                         if (isset($data['cash_session_id']) && $data['cash_session_id']) {
                             $cashSession = \App\Models\CashSession::find($data['cash_session_id']);
                             if ($cashSession && $cashSession->warehouse_id) {
-                                $warehouseId = $cashSession->warehouse_id;
+                                $preferredWarehouseId = $cashSession->warehouse_id;
+                            }
+                        }
 
-                                // Descontar del product_warehouse específico
+                        // Intentar descontar de la bodega preferida SOLO si tiene stock suficiente
+                        if ($preferredWarehouseId) {
+                            $preferredStock = DB::table('product_warehouse')
+                                ->where('product_id', $item['product_id'])
+                                ->where('warehouse_id', $preferredWarehouseId)
+                                ->value('stock');
+
+                            if ($preferredStock && $preferredStock >= $item['quantity']) {
+                                // ✅ HAY STOCK en la bodega preferida, descontar de ahí
                                 DB::table('product_warehouse')
                                     ->where('product_id', $item['product_id'])
-                                    ->where('warehouse_id', $warehouseId)
+                                    ->where('warehouse_id', $preferredWarehouseId)
                                     ->decrement('stock', $item['quantity']);
 
-                                \Log::info('✅ Stock descontado de almacén (store)', [
+                                $warehouseId = $preferredWarehouseId;
+
+                                \Log::info('✅ Stock descontado de bodega preferida (store)', [
                                     'product_id' => $item['product_id'],
+                                    'product_name' => $product->name,
                                     'warehouse_id' => $warehouseId,
-                                    'quantity' => $item['quantity']
+                                    'stock_anterior' => $preferredStock,
+                                    'cantidad_vendida' => $item['quantity'],
+                                    'stock_restante' => $preferredStock - $item['quantity']
+                                ]);
+                            } else {
+                                // ⚠️ NO HAY STOCK suficiente en bodega preferida, buscar en otras bodegas
+                                \Log::warning('⚠️ Stock insuficiente en bodega preferida, buscando en otras (store)', [
+                                    'product_id' => $item['product_id'],
+                                    'product_name' => $product->name,
+                                    'preferred_warehouse_id' => $preferredWarehouseId,
+                                    'stock_disponible' => $preferredStock ?? 0,
+                                    'cantidad_requerida' => $item['quantity']
                                 ]);
                             }
                         }
 
-                        // Si no hay warehouse_id, descontar del primer almacén disponible
+                        // Si no se pudo descontar de la bodega preferida, buscar en cualquier bodega con stock
                         if (!$warehouseId) {
-                            $firstWarehouseStock = DB::table('product_warehouse')
+                            $availableWarehouse = DB::table('product_warehouse')
                                 ->where('product_id', $item['product_id'])
-                                ->where('stock', '>', 0)
-                                ->orderBy('stock', 'desc')
+                                ->where('stock', '>=', $item['quantity']) // Stock suficiente
+                                ->orderBy('stock', 'desc') // Priorizar bodega con más stock
                                 ->first();
 
-                            if ($firstWarehouseStock) {
+                            if ($availableWarehouse) {
                                 DB::table('product_warehouse')
                                     ->where('product_id', $item['product_id'])
-                                    ->where('warehouse_id', $firstWarehouseStock->warehouse_id)
+                                    ->where('warehouse_id', $availableWarehouse->warehouse_id)
                                     ->decrement('stock', $item['quantity']);
 
-                                $warehouseId = $firstWarehouseStock->warehouse_id;
+                                $warehouseId = $availableWarehouse->warehouse_id;
 
-                                \Log::warning('⚠️ Stock descontado del primer almacén disponible (store)', [
+                                \Log::info('✅ Stock descontado de bodega alternativa (store)', [
                                     'product_id' => $item['product_id'],
+                                    'product_name' => $product->name,
                                     'warehouse_id' => $warehouseId,
-                                    'quantity' => $item['quantity']
+                                    'stock_anterior' => $availableWarehouse->stock,
+                                    'cantidad_vendida' => $item['quantity'],
+                                    'stock_restante' => $availableWarehouse->stock - $item['quantity']
+                                ]);
+                            } else {
+                                // ❌ NO HAY STOCK en ninguna bodega (esto no debería pasar si el frontend valida correctamente)
+                                \Log::error('❌ ERROR: No hay stock disponible en ninguna bodega (store)', [
+                                    'product_id' => $item['product_id'],
+                                    'product_name' => $product->name,
+                                    'cantidad_requerida' => $item['quantity']
                                 ]);
                             }
                         }
@@ -832,49 +869,84 @@ class InvoiceController extends Controller
                     if ($product) {
                         $previousStock = $product->current_stock;
 
-                        // 🏭 MULTI-WAREHOUSE: Descontar del almacén correspondiente
+                        // 🏢 LÓGICA INTELIGENTE MULTI-BODEGA
                         $warehouseId = null;
+                        $preferredWarehouseId = null;
 
-                        // Obtener warehouse_id desde la sesión de caja si existe
+                        // Obtener bodega preferida desde la sesión de caja
                         if (isset($data['cash_session_id']) && $data['cash_session_id']) {
                             $cashSession = \App\Models\CashSession::find($data['cash_session_id']);
                             if ($cashSession && $cashSession->warehouse_id) {
-                                $warehouseId = $cashSession->warehouse_id;
+                                $preferredWarehouseId = $cashSession->warehouse_id;
+                            }
+                        }
 
-                                // Descontar del product_warehouse específico
+                        // Intentar descontar de la bodega preferida SOLO si tiene stock suficiente
+                        if ($preferredWarehouseId) {
+                            $preferredStock = DB::table('product_warehouse')
+                                ->where('product_id', $item['product_id'])
+                                ->where('warehouse_id', $preferredWarehouseId)
+                                ->value('stock');
+
+                            if ($preferredStock && $preferredStock >= $item['quantity']) {
+                                // ✅ HAY STOCK en la bodega preferida, descontar de ahí
                                 DB::table('product_warehouse')
                                     ->where('product_id', $item['product_id'])
-                                    ->where('warehouse_id', $warehouseId)
+                                    ->where('warehouse_id', $preferredWarehouseId)
                                     ->decrement('stock', $item['quantity']);
 
-                                \Log::info('✅ Stock descontado de almacén', [
+                                $warehouseId = $preferredWarehouseId;
+
+                                \Log::info('✅ Stock descontado de bodega preferida (createPosInvoice)', [
                                     'product_id' => $item['product_id'],
+                                    'product_name' => $product->name,
                                     'warehouse_id' => $warehouseId,
-                                    'quantity' => $item['quantity']
+                                    'stock_anterior' => $preferredStock,
+                                    'cantidad_vendida' => $item['quantity'],
+                                    'stock_restante' => $preferredStock - $item['quantity']
+                                ]);
+                            } else {
+                                // ⚠️ NO HAY STOCK suficiente en bodega preferida, buscar en otras bodegas
+                                \Log::warning('⚠️ Stock insuficiente en bodega preferida, buscando en otras (createPosInvoice)', [
+                                    'product_id' => $item['product_id'],
+                                    'product_name' => $product->name,
+                                    'preferred_warehouse_id' => $preferredWarehouseId,
+                                    'stock_disponible' => $preferredStock ?? 0,
+                                    'cantidad_requerida' => $item['quantity']
                                 ]);
                             }
                         }
 
-                        // Si no hay warehouse_id, descontar del primer almacén disponible
+                        // Si no se pudo descontar de la bodega preferida, buscar en cualquier bodega con stock
                         if (!$warehouseId) {
-                            $firstWarehouseStock = DB::table('product_warehouse')
+                            $availableWarehouse = DB::table('product_warehouse')
                                 ->where('product_id', $item['product_id'])
-                                ->where('stock', '>', 0)
-                                ->orderBy('stock', 'desc')
+                                ->where('stock', '>=', $item['quantity']) // Stock suficiente
+                                ->orderBy('stock', 'desc') // Priorizar bodega con más stock
                                 ->first();
 
-                            if ($firstWarehouseStock) {
+                            if ($availableWarehouse) {
                                 DB::table('product_warehouse')
                                     ->where('product_id', $item['product_id'])
-                                    ->where('warehouse_id', $firstWarehouseStock->warehouse_id)
+                                    ->where('warehouse_id', $availableWarehouse->warehouse_id)
                                     ->decrement('stock', $item['quantity']);
 
-                                $warehouseId = $firstWarehouseStock->warehouse_id;
+                                $warehouseId = $availableWarehouse->warehouse_id;
 
-                                \Log::warning('⚠️ Stock descontado del primer almacén disponible', [
+                                \Log::info('✅ Stock descontado de bodega alternativa (createPosInvoice)', [
                                     'product_id' => $item['product_id'],
+                                    'product_name' => $product->name,
                                     'warehouse_id' => $warehouseId,
-                                    'quantity' => $item['quantity']
+                                    'stock_anterior' => $availableWarehouse->stock,
+                                    'cantidad_vendida' => $item['quantity'],
+                                    'stock_restante' => $availableWarehouse->stock - $item['quantity']
+                                ]);
+                            } else {
+                                // ❌ NO HAY STOCK en ninguna bodega (esto no debería pasar si el frontend valida correctamente)
+                                \Log::error('❌ ERROR: No hay stock disponible en ninguna bodega (createPosInvoice)', [
+                                    'product_id' => $item['product_id'],
+                                    'product_name' => $product->name,
+                                    'cantidad_requerida' => $item['quantity']
                                 ]);
                             }
                         }

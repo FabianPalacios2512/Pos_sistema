@@ -66,10 +66,35 @@ class SystemSetting extends Model
 
     /**
      * Obtener la configuración del sistema (singleton)
+     * 🔒 Con validación automática de funciones premium según plan
      */
     public static function getSettings()
     {
-        return static::first() ?? static::create([]);
+        $settings = static::first() ?? static::create([]);
+
+        // 🔒 SEGURIDAD: Forzar desactivación de funciones premium según plan
+        try {
+            $tenantPlan = \DB::connection('mysql')
+                ->table('tenants')
+                ->where('id', tenant('id'))
+                ->value('plan');
+
+            // Creditienda: Solo premium y enterprise
+            if (!in_array($tenantPlan ?? 'free_trial', ['premium', 'enterprise'])) {
+                $settings->creditienda_enabled = false;
+            }
+
+            // Fidelización: Solo premium y enterprise
+            if (!in_array($tenantPlan ?? 'free_trial', ['premium', 'enterprise'])) {
+                $settings->enable_loyalty_system = false;
+            }
+        } catch (\Exception $e) {
+            // Si hay error consultando el plan, asumir free_trial por seguridad
+            $settings->creditienda_enabled = false;
+            $settings->enable_loyalty_system = false;
+        }
+
+        return $settings;
     }
 
     /**

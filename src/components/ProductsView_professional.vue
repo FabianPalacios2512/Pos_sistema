@@ -477,20 +477,32 @@
                 ${{ formatCurrency(product.sale_price) }}
               </div>
             </td>
-            <td class="px-6 py-4 text-center">
-              <div class="flex flex-col items-center relative">
-                <!-- Stock total con icono de bodega -->
-                <button 
-                  @mouseenter="showStockTooltip($event, product)"
-                  @mouseleave="hideStockTooltip"
-                  class="flex items-center space-x-1 hover:bg-gray-100 px-2 py-1 rounded transition-colors">
-                  <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            <td class="px-6 py-4">
+              <div class="flex flex-col space-y-1">
+                <!-- Stock por cada bodega -->
+                <div v-if="product.warehouses && product.warehouses.length > 0" class="space-y-1">
+                  <div v-for="warehouse in product.warehouses" :key="warehouse.id" 
+                       class="flex items-center justify-between bg-slate-50 px-2 py-1 rounded">
+                    <div class="flex items-center space-x-1.5">
+                      <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                      </svg>
+                      <span class="text-xs font-medium text-slate-600">{{ warehouse.name }}</span>
+                    </div>
+                    <!-- Acceder al stock desde pivot -->
+                    <span class="text-xs font-bold text-slate-900">{{ warehouse.pivot?.stock || warehouse.stock || 0 }}</span>
+                  </div>
+                </div>
+                <!-- Si no hay bodegas, mostrar stock global -->
+                <div v-else class="flex items-center justify-center space-x-1">
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                   </svg>
                   <span class="text-sm font-bold text-slate-700">{{ product.current_stock || 0 }}</span>
-                </button>
+                </div>
+                <!-- Alerta de stock bajo -->
                 <span v-if="(product.current_stock || 0) <= (product.min_stock || 0)" 
-                      class="text-[10px] font-bold text-rose-500 animate-pulse">
+                      class="text-[10px] font-bold text-rose-500 animate-pulse text-center">
                   ¡Stock Bajo!
                 </span>
               </div>
@@ -850,7 +862,8 @@
                     </div>
                   </div>
                   
-                  <div>
+                  <!-- Stock Inicial (Solo si hay 1 bodega) -->
+                  <div v-if="warehouses.length === 1">
                     <label class="block text-xs font-bold text-gray-700 mb-1">Stock Inicial</label>
                     <input v-model="productForm.stock" 
                            type="number" 
@@ -859,8 +872,8 @@
                            placeholder="0">
                   </div>
                   
-                  <!-- Stock por Tienda -->
-                  <div class="md:col-span-2">
+                  <!-- Stock por Tienda (Solo si hay 2+ bodegas) -->
+                  <div v-if="warehouses.length >= 2" class="md:col-span-2">
                     <div class="flex items-center justify-between mb-3">
                       <label class="block text-xs font-bold text-gray-700">
                         Stock por Tienda *
@@ -2164,8 +2177,17 @@ const loadWarehouses = async () => {
   try {
     loadingWarehouses.value = true
     const data = await warehouseService.getAll()
-    warehouses.value = Array.isArray(data) ? data : []
-    console.log('Bodegas cargadas:', warehouses.value.length)
+    
+    // La API ahora devuelve { warehouses: [], plan_info: {} }
+    if (data && data.warehouses) {
+      warehouses.value = Array.isArray(data.warehouses) ? data.warehouses : []
+    } else {
+      // Fallback por si la API cambia o devuelve array directo
+      warehouses.value = Array.isArray(data) ? data : []
+    }
+    
+    console.log('✅ Bodegas cargadas:', warehouses.value.length)
+    console.log('📦 Detalle de bodegas:', warehouses.value)
     
     // Seleccionar automáticamente la bodega predeterminada
     const defaultWarehouse = warehouses.value.find(w => w.is_default)
@@ -2233,6 +2255,9 @@ const openCreateModal = async () => {
   warehouses.value.forEach(warehouse => {
     warehouseStock[warehouse.id] = 0
   })
+  console.log('🏭 Inicializando formulario nuevo producto')
+  console.log('📦 Warehouses disponibles:', warehouses.value.length)
+  console.log('🔢 warehouseStock inicializado:', warehouseStock)
   
   productForm.value = {
     name: '',
@@ -2241,7 +2266,7 @@ const openCreateModal = async () => {
     description: '',
     price: '',
     cost: '',
-    stock: 0,
+    stock: 0, // Solo se usa si hay 1 bodega
     min_stock: 5,
     max_stock: 100,
     category_id: '',
@@ -2286,6 +2311,16 @@ const editProduct = async (product) => {
   }
   
   isEditing.value = true
+  
+  // 🏢 Si hay solo 1 bodega, obtener el stock de esa bodega para el campo "Stock Inicial"
+  let singleWarehouseStock = parseInt(product.current_stock || product.stock || 0)
+  if (warehouses.value.length === 1 && warehouses.value[0]) {
+    const warehouseId = warehouses.value[0].id
+    if (warehouseStock[warehouseId] !== undefined) {
+      singleWarehouseStock = warehouseStock[warehouseId]
+    }
+  }
+  
   // Mapear correctamente los campos del API a los campos del formulario
   productForm.value = {
     id: product.id,
@@ -2295,7 +2330,7 @@ const editProduct = async (product) => {
     description: product.description || '',
     price: parseFloat(product.sale_price || product.price || 0),
     cost: parseFloat(product.cost_price || product.cost || 0),
-    stock: parseInt(product.current_stock || product.stock || 0),
+    stock: singleWarehouseStock, // Usar el stock de la bodega única si aplica
     min_stock: parseInt(product.min_stock || 5),
     max_stock: parseInt(product.max_stock || 100),
     category_id: product.category_id,
@@ -2641,6 +2676,12 @@ const saveCategory = async () => {
 
 // Calcular stock total sumando todas las tiendas
 const calculateTotalStock = () => {
+  // Si hay solo 1 bodega, usar el campo stock directamente
+  if (warehouses.value.length === 1) {
+    return parseInt(productForm.value.stock) || 0
+  }
+  
+  // Si hay múltiples bodegas, sumar el stock de cada una
   if (!productForm.value.warehouseStock) return 0
   return Object.values(productForm.value.warehouseStock).reduce((sum, stock) => {
     return sum + (parseInt(stock) || 0)
@@ -2743,6 +2784,17 @@ watch(sortBy, (newValue, oldValue) => {
 // Watchers para resetear paginación cuando cambien los filtros
 watch([searchTerm, categoryFilter, statusFilter, sortBy], () => {
   currentPage.value = 1
+})
+
+// 🏢 Sincronizar stock con bodega única cuando hay solo 1 bodega
+watch(() => productForm.value.stock, (newStock) => {
+  if (warehouses.value.length === 1 && warehouses.value[0]) {
+    const warehouseId = warehouses.value[0].id
+    if (productForm.value.warehouseStock) {
+      productForm.value.warehouseStock[warehouseId] = parseInt(newStock) || 0
+      console.log('✅ Stock sincronizado con bodega única:', warehouseId, '=', newStock)
+    }
+  }
 })
 
 watch(statusFilter, async () => {

@@ -147,8 +147,8 @@
         </div>
       </div>
 
-      <!-- MULTISEDE -->
-      <div v-if="hasModuleAccess('warehouses')" class="mt-7 px-4">
+      <!-- MULTISEDE (Premium/Enterprise Only) -->
+      <div v-if="showMultisede" class="mt-7 px-4">
         <!-- Línea divisoria cuando está colapsado -->
         <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
         <h3 v-show="!sidebarCollapsed" class="section-title">MULTISEDE</h3>
@@ -198,7 +198,7 @@
         </div>
 
         <div
-          v-if="hasModuleAccess('customers') && isCreditiendaEnabled"
+          v-if="hasModuleAccess('customers') && isCreditiendaEnabled && ['premium', 'enterprise'].includes(appStore.tenantPlan)"
           @click="$emit('change-module', 'accounts-receivable')"
           class="menu-item"
           :class="[currentModule === 'accounts-receivable' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
@@ -302,9 +302,10 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, onMounted } from 'vue'
+import { defineProps, defineEmits, onMounted, computed } from 'vue'
 import { usePermissions } from '../composables/usePermissions.js'
 import { useCreditienda } from '../composables/useCreditienda.js'
+import { appStore } from '../store/appStore.js'
 
 // Props
 defineProps({
@@ -331,8 +332,16 @@ const { hasModuleAccess, currentUser, userPermissions } = usePermissions()
 // Creditienda
 const { isCreditiendaEnabled } = useCreditienda()
 
+// Computed para verificar si debería mostrar MULTISEDE (reactivo)
+const showMultisede = computed(() => {
+  const isPremiumOrEnterprise = ['premium', 'enterprise'].includes(appStore.tenantPlan)
+  console.log('🔍 [Sidebar] showMultisede:', isPremiumOrEnterprise, '(plan:', appStore.tenantPlan, ')')
+  return isPremiumOrEnterprise
+})
+
 onMounted(async () => {
   // Sidebar inicializado
+  console.log('🏢 [Sidebar] Tenant Plan en mount:', appStore.tenantPlan)
 })
 </script>
 

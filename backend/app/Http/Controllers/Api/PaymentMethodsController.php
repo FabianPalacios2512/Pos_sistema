@@ -286,10 +286,23 @@ class PaymentMethodsController extends Controller
     public function forPos()
     {
         try {
+            // 🔒 Obtener plan del tenant
+            $tenantPlan = \DB::connection('mysql')
+                ->table('tenants')
+                ->where('id', tenant('id'))
+                ->value('plan');
+
             $paymentMethods = PaymentMethod::where('active', true)
                 ->orderBy('sort_order')
                 ->orderBy('name')
                 ->get();
+
+            // 🔒 SEGURIDAD: Filtrar "Crédito en Tienda" si es plan gratuito
+            if (($tenantPlan ?? 'free_trial') === 'free_trial') {
+                $paymentMethods = $paymentMethods->filter(function($method) {
+                    return $method->code !== 'credito_tienda';
+                })->values();
+            }
 
             return response()->json([
                 'success' => true,

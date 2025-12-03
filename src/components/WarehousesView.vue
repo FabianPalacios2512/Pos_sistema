@@ -28,11 +28,17 @@
           
           <button 
             @click="openCreateModal"
-            class="px-5 py-2.5 bg-gradient-to-r from-lime-400 to-green-400 hover:from-lime-500 hover:to-green-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+            :disabled="!planInfo.can_create"
+            :class="[
+              'px-5 py-2.5 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300 flex items-center space-x-2',
+              planInfo.can_create 
+                ? 'bg-gradient-to-r from-lime-400 to-green-400 hover:from-lime-500 hover:to-green-500 transform hover:scale-105' 
+                : 'bg-gray-300 cursor-not-allowed opacity-60'
+            ]">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
-            <span>Nueva Sede</span>
+            <span>{{ planInfo.can_create ? 'Nueva Sede' : `Límite Alcanzado (${planInfo.current_count}/${planInfo.max_allowed === -1 ? '∞' : planInfo.max_allowed})` }}</span>
           </button>
         </div>
       </div>
@@ -110,6 +116,26 @@
               <p class="text-2xl font-bold text-gray-900 mb-1">{{ totalStock }}</p>
               <p class="text-sm text-gray-500">Unidades totales</p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerta de Límite de Plan (Solo Premium con límite alcanzado) -->
+      <div v-if="planInfo.current_plan === 'premium' && planInfo.current_count >= planInfo.max_allowed" 
+           class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4">
+        <div class="flex items-start space-x-3">
+          <div class="flex-shrink-0">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-sm font-bold text-amber-900">Límite de Tiendas Alcanzado</h3>
+            <p class="text-sm text-amber-700 mt-1">
+              Has alcanzado el límite de <strong>{{ planInfo.max_allowed }} tiendas</strong> de tu plan Premium.
+              <br>
+              <span class="text-amber-800 font-semibold">Actualiza a Enterprise para tiendas ilimitadas.</span>
+            </p>
           </div>
         </div>
       </div>
@@ -249,10 +275,20 @@
 import { ref, computed, onMounted } from 'vue';
 import { warehouseService } from '@/services/warehouseService';
 import WarehouseModal from '@/components/warehouses/WarehouseModal.vue';
+import { appStore } from '@/store/appStore';
+
 const warehouses = ref([]);
 const loading = ref(false);
 const showModal = ref(false);
 const selectedWarehouse = ref(null);
+
+// Información del plan y límites
+const planInfo = ref({
+  current_plan: 'free_trial',
+  current_count: 0,
+  max_allowed: 0,
+  can_create: false
+});
 
 const activeWarehouses = computed(() => {
   return warehouses.value.filter(w => w.active).length;
@@ -277,10 +313,19 @@ const fetchWarehouses = async () => {
   console.log('🔄 fetchWarehouses iniciado...');
   loading.value = true;
   try {
-    const data = await warehouseService.getAll();
-    // El servicio ya retorna el array directamente
-    warehouses.value = Array.isArray(data) ? data : [];
+    const response = await warehouseService.getAll();
+    
+    // El backend ahora retorna { warehouses: [], plan_info: {} }
+    if (response.warehouses && response.plan_info) {
+      warehouses.value = response.warehouses;
+      planInfo.value = response.plan_info;
+    } else {
+      // Fallback para respuestas antiguas (solo array)
+      warehouses.value = Array.isArray(response) ? response : [];
+    }
+    
     console.log('✅ Sedes cargadas:', warehouses.value.length, 'sedes');
+    console.log('📊 Plan info:', planInfo.value);
   } catch (error) {
     console.error('❌ Error al cargar sedes:', error);
     warehouses.value = [];
@@ -291,6 +336,19 @@ const fetchWarehouses = async () => {
 };
 
 const openCreateModal = () => {
+  // Validar si puede crear más tiendas según su plan
+  if (!planInfo.value.can_create) {
+    const plan = planInfo.value.current_plan;
+    const maxAllowed = planInfo.value.max_allowed;
+    
+    if (plan === 'premium' && maxAllowed === 3) {
+      alert(`⚠️ Has alcanzado el límite de ${maxAllowed} tiendas para tu plan Premium.\n\nActualiza a Enterprise para tiendas ilimitadas.`);
+    } else if (plan === 'free_trial' || plan === 'basic') {
+      alert('🔒 La funcionalidad Multi-tienda requiere plan Premium o Enterprise.\n\nActualiza tu plan para acceder a esta característica.');
+    }
+    return;
+  }
+  
   selectedWarehouse.value = null;
   showModal.value = true;
 };

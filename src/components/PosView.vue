@@ -310,26 +310,30 @@
           :class="[
             'group bg-white dark:bg-zinc-800/50 rounded-2xl p-3 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer relative flex flex-col overflow-hidden hover:-translate-y-0.5',
             product.is_remote 
-              ? 'border border-orange-200/40 dark:border-orange-400/30' 
+              ? 'border-2 border-orange-400 dark:border-orange-500 shadow-orange-100 dark:shadow-orange-900/30' 
               : 'border border-gray-100 dark:border-zinc-700/50 hover:border-gray-200 dark:hover:border-zinc-600'
           ]"
           @click="addToCart(product)"
         >
           
-          <div class="aspect-square rounded-xl overflow-hidden bg-gray-50 dark:bg-zinc-800/50 relative mb-3">
+          <!-- 🏪 Banner de Producto de Otra Tienda (MUY VISIBLE) -->
+          <div v-if="product.is_remote && product.alternative_warehouses && product.alternative_warehouses.length > 0" 
+               class="absolute top-0 left-0 right-0 z-20 bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-1.5 flex items-center justify-center space-x-1.5 shadow-lg">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span class="text-white text-xs font-black uppercase tracking-wide">
+              📍 {{ product.alternative_warehouses[0].name }}
+            </span>
+          </div>
+          
+          <div :class="['aspect-square rounded-xl overflow-hidden bg-gray-50 dark:bg-zinc-800/50 relative', product.is_remote ? 'mt-6 mb-3' : 'mb-3']">
              
-             <!-- Badge de Producto Remoto (MINIMALISTA - Esquina Superior Derecha) -->
-             <div v-if="product.is_remote && product.alternative_warehouses && product.alternative_warehouses.length > 0" 
-                  class="absolute top-2 right-2 z-10">
-              <div class="px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded border border-orange-200 dark:border-orange-800 flex items-center gap-1">
-                <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                </svg>
-                <span class="text-[9px] font-bold">
-                  {{ product.alternative_warehouses[0].name }}
-                </span>
-              </div>
-            </div>
+             <!-- Badge de cantidad en carrito (solo si tiene items) -->
+             <div v-if="getProductQuantityInCart(product.id) > 0" 
+                  class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-[10px] font-bold shadow-sm">
+               {{ getProductQuantityInCart(product.id) }} en carrito
+             </div>
              
              <!-- Badge de cantidad en carrito (solo si tiene items) -->
              <div v-if="getProductQuantityInCart(product.id) > 0" 
@@ -380,14 +384,14 @@
               {{ product.name }}
             </h3>
             
-            <!-- Stock con visibilidad clara -->
+            <!-- Stock con visibilidad clara (TOTAL de todas las bodegas) -->
             <div class="text-[11px] font-bold mt-0.5">
-              <span v-if="product.stock <= 5" class="text-rose-600 dark:text-rose-400 flex items-center gap-1">
+              <span v-if="getTotalStock(product) <= 5" class="text-rose-600 dark:text-rose-400 flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
-                ¡Solo {{ product.stock }}!
+                ¡Solo {{ getTotalStock(product) }}!
               </span>
               <span v-else class="text-slate-600 dark:text-zinc-300">
-                Stock: {{ product.stock }}
+                Stock: {{ getTotalStock(product) }}
               </span>
             </div>
           </div>
@@ -1767,8 +1771,15 @@ const handleImageError = (event, product) => {
 // 🔄 Función para refrescar datos después de una venta
 const refreshPosData = async () => {
   
-  // Refrescar productos para actualizar stock
-  await appStore.refresh('products')
+  // 🏢 Mantener el filtro Global/Local al refrescar
+  if (currentSession.value?.warehouse_id) {
+    const scope = globalSearch.value ? 'global' : 'local'
+    console.log(`🔄 Refrescando productos con scope: ${scope}`)
+    await appStore.loadProducts(currentSession.value.warehouse_id, scope)
+  } else {
+    // Si no hay sesión, refrescar normalmente
+    await appStore.refresh('products')
+  }
   
   // Opcional: refrescar todo si es necesario
   // await appStore.refresh('all')
@@ -2466,14 +2477,47 @@ const getProductQuantityInCart = (productId) => {
   return item ? item.quantity : 0
 }
 
+// 🏢 Función helper para calcular stock total de todas las bodegas
+const getTotalStock = (product) => {
+  let totalStock = product.stock || 0
+  
+  // Si el producto tiene información de bodegas, sumar todo el stock disponible
+  if (product.warehouses && Array.isArray(product.warehouses)) {
+    totalStock = product.warehouses.reduce((sum, w) => sum + (parseInt(w.stock) || 0), 0)
+  } else if (product.alternative_warehouses && Array.isArray(product.alternative_warehouses)) {
+    totalStock = product.alternative_warehouses.reduce((sum, w) => sum + (parseInt(w.stock) || 0), 0)
+  }
+  
+  return totalStock
+}
+
 // Métodos
 const addToCart = (product) => {
+  
+  // 🏢 Calcular stock total REAL sumando todas las bodegas
+  const totalStock = getTotalStock(product)
+  
+  console.log('🛒 Agregando al carrito:', {
+    producto: product.name,
+    stock_mostrado: product.stock,
+    stock_total_real: totalStock,
+    bodegas: product.warehouses || product.alternative_warehouses || []
+  })
+  
+  // Validar que haya stock disponible
+  if (totalStock <= 0) {
+    showWarning(`No hay stock disponible de ${product.name}`)
+    return
+  }
   
   const existingItem = cart.items.find(item => item.id === product.id)
   
   if (existingItem) {
-    if (existingItem.quantity < product.stock) {
+    if (existingItem.quantity < totalStock) {
       existingItem.quantity += 1
+      existingItem.max_stock = totalStock // Actualizar max_stock con el total real
+    } else {
+      showWarning(`No hay más stock disponible de ${product.name}`)
     }
   } else {
     cart.items.push({
@@ -2484,7 +2528,7 @@ const addToCart = (product) => {
       image: getProductImage(product),
       barcode: product.barcode,
       category: product.category,
-      max_stock: product.stock
+      max_stock: totalStock // Usar stock total de todas las bodegas
     })
   }
   

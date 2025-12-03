@@ -16,9 +16,24 @@ class SystemSettingsController extends Controller
         try {
             $settings = SystemSetting::getSettings();
 
+            // 🔒 Obtener plan del tenant desde la base de datos central
+            $tenantPlan = \DB::connection('mysql')
+                ->table('tenants')
+                ->where('id', tenant('id'))
+                ->value('plan');
+
+            // 🔒 SEGURIDAD: Forzar desactivación de funciones premium según plan
+            $allowedPlansForPremiumFeatures = ['premium', 'enterprise'];
+
+            if (!in_array($tenantPlan ?? 'free_trial', $allowedPlansForPremiumFeatures)) {
+                $settings->creditienda_enabled = false;
+                $settings->enable_loyalty_system = false;
+            }
+
             return response()->json([
                 'success' => true,
-                'data' => $settings
+                'data' => $settings,
+                'tenant_plan' => $tenantPlan ?? 'free_trial' // Default a free_trial si no existe
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -66,6 +81,39 @@ class SystemSettingsController extends Controller
                 'loyalty_points_per_currency' => 'numeric|min:0',
                 'loyalty_point_value' => 'numeric|min:0',
             ]);
+
+            // 🔒 SEGURIDAD: Validar plan del tenant antes de permitir funciones premium
+            $tenantPlan = \DB::connection('mysql')
+                ->table('tenants')
+                ->where('id', tenant('id'))
+                ->value('plan');
+
+            $allowedPlansForPremiumFeatures = ['premium', 'enterprise'];
+            $isPremiumPlan = in_array($tenantPlan ?? 'free_trial', $allowedPlansForPremiumFeatures);
+
+            // Bloquear activación de Creditienda si no es premium/enterprise
+            if (!$isPremiumPlan && isset($validated['creditienda_enabled']) && $validated['creditienda_enabled']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '🔒 Creditienda requiere plan Premium o Enterprise. Actualiza tu plan.',
+                    'error_code' => 'PREMIUM_FEATURE_REQUIRED'
+                ], 403);
+            }
+
+            // Bloquear activación de Fidelización si no es premium/enterprise
+            if (!$isPremiumPlan && isset($validated['enable_loyalty_system']) && $validated['enable_loyalty_system']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '🔒 Sistema de Fidelización requiere plan Premium o Enterprise. Actualiza tu plan.',
+                    'error_code' => 'PREMIUM_FEATURE_REQUIRED'
+                ], 403);
+            }
+
+            // Forzar desactivación si no es premium/enterprise (seguridad adicional)
+            if (!$isPremiumPlan) {
+                $validated['creditienda_enabled'] = false;
+                $validated['enable_loyalty_system'] = false;
+            }
 
             $settings->update($validated);
 

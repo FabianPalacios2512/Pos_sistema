@@ -553,8 +553,8 @@
       <!-- Configuración POS -->
       <div v-if="activeSection === 'pos'" class="space-y-6">
         
-        <!-- Configuración de Creditienda -->
-        <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
+        <!-- Configuración de Creditienda (Solo Premium y Enterprise) -->
+        <div v-if="['premium', 'enterprise'].includes(appStore.tenantPlan)" class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
           <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
             <div>
               <h2 class="text-base font-bold text-gray-900">Creditienda (Sistema de Créditos)</h2>
@@ -597,8 +597,8 @@
           </div>
         </div>
 
-        <!-- Configuración de Loyalty Points (Fidelización) -->
-        <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
+        <!-- Configuración de Loyalty Points (Fidelización - Solo Premium y Enterprise) -->
+        <div v-if="['premium', 'enterprise'].includes(appStore.tenantPlan)" class="bg-white rounded-2xl border border-gray-300 overflow-hidden">
           <div class="bg-gray-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
             <div>
               <h2 class="text-base font-bold text-gray-900">🎁 Sistema de Fidelización (Loyalty Points)</h2>

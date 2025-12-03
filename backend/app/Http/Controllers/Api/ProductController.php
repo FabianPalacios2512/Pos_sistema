@@ -13,7 +13,10 @@ class ProductController extends Controller
         $query = Product::with([
             'category',
             'supplier',
-            'warehouses:warehouses.id,warehouses.name' // 🏢 Incluir bodegas con stock
+            'warehouses' => function($q) {
+                $q->select('warehouses.id', 'warehouses.name')
+                  ->withPivot('stock'); // 🏢 Incluir stock de la tabla pivot
+            }
         ]);
 
         // Filtrar por estado (activo/inactivo/todos)
