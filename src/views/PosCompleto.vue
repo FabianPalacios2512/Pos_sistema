@@ -303,26 +303,18 @@ const getFirstAccessibleModule = () => {
 // Inicializar usuario autenticado
 const initializeUser = () => {
   const user = authService.getUser()
-  console.log('🔧 [initializeUser] Usuario desde authService:', user)
   
   if (user) {
     currentUser.value = {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role, // ✅ Guardar el objeto completo del rol, no solo el nombre
+      role: user.role,
       initials: user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
     }
     
-    console.log('✅ [initializeUser] currentUser actualizado:', currentUser.value)
-    console.log('🔑 [initializeUser] Permisos del rol:', currentUser.value.role?.permissions)
-    
     // Establecer módulo inicial basándose en los permisos del usuario
     currentModule.value = getFirstAccessibleModule()
-    
-    // Debug logs removed for production
-  } else {
-    console.log('❌ [initializeUser] No hay usuario en authService')
   }
 }
 
@@ -338,24 +330,15 @@ const getUserPermissions = (role) => {
 
 // Verificar si el usuario tiene permisos para un módulo
 const hasModulePermission = (module) => {
-  console.log('🔍 [hasModulePermission] =====================================')
-  console.log('🔍 [hasModulePermission] Verificando módulo:', module)
-  console.log('👤 [hasModulePermission] currentUser.value:', currentUser.value)
-  
   // Si no hay usuario o rol, denegar acceso
   if (!currentUser.value || !currentUser.value.role) {
-    console.log('❌ [hasModulePermission] No user or role for module:', module)
-    alert(`DEBUG: No hay usuario o rol\nUsuario: ${currentUser.value}\nRol: ${currentUser.value?.role}`)
     return false
   }
 
   const userPermissions = currentUser.value.role.permissions || []
   
-  console.log(`� [hasModulePermission] User permissions (${userPermissions.length}):`, userPermissions)
-  
   // Si tiene permiso ALL o admin, tiene acceso a todo
   if (userPermissions.includes('ALL') || userPermissions.includes('admin')) {
-    console.log(`✅ [hasModulePermission] User has ALL/admin permission`)
     return true
   }
   
@@ -371,18 +354,12 @@ const hasModulePermission = (module) => {
   // Si el módulo tiene un mapeo especial, verificar ese permiso específico
   if (modulePermissionMap[module]) {
     const requiredPermission = modulePermissionMap[module]
-    const hasAccess = userPermissions.includes(requiredPermission)
-    console.log(`${hasAccess ? '✅' : '❌'} [hasModulePermission] Module ${module} mapped to ${requiredPermission}: ${hasAccess}`)
-    return hasAccess
+    return userPermissions.includes(requiredPermission)
   }
   
   // Para módulos normales, verificar si tiene al menos un permiso que comience con el nombre del módulo
   // Por ejemplo: para 'pos', buscar 'pos.view', 'pos.create_sale', etc.
-  const hasAccess = userPermissions.some(permission => permission.startsWith(`${module}.`))
-  
-  console.log(`${hasAccess ? '✅' : '❌'} [hasModulePermission] Module ${module}: ${hasAccess}`)
-  
-  return hasAccess
+  return userPermissions.some(permission => permission.startsWith(`${module}.`))
 }
 
 // Verificar si un módulo debe mostrarse en el menú
@@ -1465,22 +1442,9 @@ const loadSettings = () => {
 
 // Watcher para sincronizar módulo actual con cambios en la ruta (navegación desde IA o otros componentes)
 watch(() => route.params.module, (newModule, oldModule) => {
-  console.log('🔍 [Route Watcher] ==============================================')
-  console.log('🔍 [Route Watcher] Triggered!')
-  console.log('🔍 [Route Watcher] Old module:', oldModule)
-  console.log('🔍 [Route Watcher] New module:', newModule)
-  console.log('🔍 [Route Watcher] Current module:', currentModule.value)
-  console.log('🔍 [Route Watcher] Full route params:', route.params)
-  
   if (newModule && newModule !== currentModule.value) {
-    console.log(`🚀 [Route Watcher] ✅ CAMBIO DETECTADO: ${currentModule.value} → ${newModule}`)
-    console.log(`🚀 [Route Watcher] Llamando a setCurrentModule('${newModule}')...`)
     setCurrentModule(newModule)
-    console.log(`🚀 [Route Watcher] Después de setCurrentModule, currentModule.value =`, currentModule.value)
-  } else {
-    console.log(`⏭️ [Route Watcher] Sin cambios (newModule=${newModule}, current=${currentModule.value})`)
   }
-  console.log('🔍 [Route Watcher] ==============================================')
 }, { immediate: true })
 
 // Watcher para ejecutar acciones pendientes cuando el componente PosView se monte

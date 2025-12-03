@@ -60,7 +60,7 @@ export const appStore = reactive({
           .map(product => ({
             ...product,
             stock: product.stock || 0,
-            warehouse_stock: product.warehouse_stock || [],
+            warehouses: product.warehouse_stock || [],  // ✅ Cambiar warehouse_stock a warehouses
             is_remote: product.is_remote || false,
             alternative_warehouses: product.alternative_warehouses || [],
             price: parseFloat(product.price || 0),

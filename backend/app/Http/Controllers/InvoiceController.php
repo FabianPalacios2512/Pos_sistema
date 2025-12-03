@@ -105,7 +105,7 @@ class InvoiceController extends Controller
                 'items.*.product_id' => 'required|integer',
                 'items.*.product_name' => 'required|string',
                 'items.*.product_sku' => 'nullable|string',
-                'items.*.quantity' => 'required|numeric|min:1',
+                'items.*.quantity' => 'required|numeric|min:0.01',
                 'items.*.unit_price' => 'required|numeric|min:0',
                 'items.*.cost_price' => 'nullable|numeric|min:0',
                 'items.*.discount_amount' => 'nullable|numeric|min:0',
@@ -586,7 +586,7 @@ class InvoiceController extends Controller
                 'items' => 'required|array',
                 'items.*.product_id' => 'required|integer',
                 'items.*.product_name' => 'required|string',
-                'items.*.quantity' => 'required|numeric|min:1',
+                'items.*.quantity' => 'required|numeric|min:0.01',
                 'items.*.unit_price' => 'required|numeric|min:0',
                 'subtotal' => 'required|numeric|min:0',
                 'tax_amount' => 'required|numeric|min:0',
@@ -1965,9 +1965,19 @@ startxref
 
         $customerName = $data['customer']['name'] ?? 'Cliente General';
 
-        // Formatear fecha como en el recibo: 05/11/2025, 11:07
-        $date = date('d/m/Y, H:i');
-        $dueDate = date('d/m/Y, H:i', strtotime('+30 days'));
+        // Formatear fecha de la factura (usar created_at si existe, sino date)
+        $invoiceDate = $data['created_at'] ?? $data['date'] ?? now();
+        $date = date('d \d\e F \d\e Y', strtotime($invoiceDate));
+        $dateTime = date('H:i', strtotime($invoiceDate));
+        
+        // Meses en español
+        $meses = [
+            'January' => 'enero', 'February' => 'febrero', 'March' => 'marzo',
+            'April' => 'abril', 'May' => 'mayo', 'June' => 'junio',
+            'July' => 'julio', 'August' => 'agosto', 'September' => 'septiembre',
+            'October' => 'octubre', 'November' => 'noviembre', 'December' => 'diciembre'
+        ];
+        $date = str_replace(array_keys($meses), array_values($meses), $date);
 
         // Datos del vendedor y sistema
         $cashier = 'Vendedor Demo';
@@ -1987,29 +1997,32 @@ startxref
         if (isset($data['items']) && is_array($data['items'])) {
             foreach ($data['items'] as $item) {
                 $itemName = $item['name'] ?? $item['product_name'] ?? 'Producto';
-                $quantity = $item['quantity'] ?? 1;
+                $quantityRaw = $item['quantity'] ?? 1;
+
+                // Formatear cantidad: si es decimal (0.5, 1.25), mostrar con 2 decimales, sino sin decimales
+                $quantity = (floor($quantityRaw) != $quantityRaw)
+                    ? number_format($quantityRaw, 2, ',', '.')
+                    : number_format($quantityRaw, 0, ',', '.');
+
                 $priceRaw = $item['price'] ?? $item['unit_price'] ?? 0;
                 $price = number_format($priceRaw, 0, '.', '.');
-                $itemTotalRaw = $quantity * $priceRaw;
+                $itemTotalRaw = $quantityRaw * $priceRaw;
                 $itemTotal = number_format($itemTotalRaw, 0, '.', '.');
 
-                $itemsText .= "0 -20 Td (" . $itemName . ") Tj ";
-                $itemsText .= "0 -15 Td (" . $quantity . " x \$" . $price . ") Tj ";
-                $itemsText .= "200 0 Td (\$" . $itemTotal . ") Tj -200 0 Td ";
+                // Limitar nombre a 20 caracteres para que quepa en la columna
+                $shortName = strlen($itemName) > 20 ? substr($itemName, 0, 17) . '...' : $itemName;
+                
+                $itemsText .= "0 -15 Td (" . $shortName . ") Tj ";
+                $itemsText .= "120 0 Td (" . $quantity . ") Tj ";
+                $itemsText .= "60 0 Td (\$" . $price . ") Tj ";
+                $itemsText .= "60 0 Td (\$" . $itemTotal . ") Tj ";
+                $itemsText .= "-240 0 Td ";
             }
         }
 
-        // Texto específico según el tipo de documento
-        $footerText = '';
-        if ($documentType === 'quotation') {
-            $footerText = "0 -30 Td (COTIZACION VALIDA POR 30 DIAS) Tj 0 -15 Td (Codigo: " . $documentNumber . ") Tj 0 -15 Td (Conserve este codigo para realizar) Tj 0 -15 Td (su compra posteriormente.) Tj";
-        } else {
-            $footerText = "0 -15 Td (Efectivo:) Tj 200 0 Td (\$" . $cashReceived . ") Tj -200 -15 Td (Cambio:) Tj 200 0 Td (\$" . $change . ") Tj -200 -30 Td (GRACIAS POR SU COMPRA) Tj 0 -15 Td (Conserve este comprobante) Tj 0 -15 Td (como garantia.) Tj";
-        }
-
-        $baseLength = 800;
-        $pdfLength = $baseLength + strlen($itemsText) + strlen($footerText);
-        $xrefPos = 650 + strlen($itemsText) + strlen($footerText);
+        $baseLength = 1200;
+        $pdfLength = $baseLength + strlen($itemsText);
+        $xrefPos = 800 + strlen($itemsText);
 
         $content = "%PDF-1.4
 1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
@@ -2017,20 +2030,26 @@ startxref
 3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R>>endobj
 4 0 obj<</Length " . $pdfLength . ">>stream
 BT
-/F1 16 Tf 306 750 Td (" . $companyName . ") Tj
-/F1 12 Tf -256 -40 Td (" . $documentTitle . ") Tj 200 0 Td (" . $documentNumber . ") Tj
--200 -20 Td (Fecha:) Tj 200 0 Td (" . $date . ") Tj
--200 -20 Td (Vence:) Tj 200 0 Td (" . $dueDate . ") Tj
--200 -20 Td (Vendedor:) Tj 200 0 Td (" . $cashier . ") Tj
--200 -20 Td (Cliente:) Tj 200 0 Td (" . $customerName . ") Tj
--200 -40 Td (PRODUCTOS) Tj
-0 -10 Td (...................................) Tj
-" . $itemsText . "
-0 -15 Td (...................................) Tj
-0 -20 Td (Subtotal:) Tj 200 0 Td (\$" . $subtotal . ") Tj
--200 -15 Td (IVA (" . $taxRate . "%):) Tj 200 0 Td (\$" . $tax . ") Tj
--200 -20 Td (TOTAL:) Tj 200 0 Td (\$" . $total . ") Tj
-" . $footerText . "
+/F1 18 Tf 150 750 Td (" . strtoupper($companyName) . ") Tj
+/F1 10 Tf 0 -25 Td (NIT: 900123456) Tj
+0 -12 Td (Calle 123 #45-67) Tj
+0 -12 Td (900123456 - 105@code.pos@gmail.com) Tj
+/F1 14 Tf 0 -35 Td (" . strtoupper($documentTitle) . " " . $documentNumber . ") Tj
+/F1 10 Tf 0 -30 Td (Fecha: " . $date . ") Tj
+0 -12 Td (Hora: " . $dateTime . " p. m.) Tj
+0 -12 Td (Atendido por: " . $cashier . ") Tj
+/F1 11 Tf 0 -25 Td (DATOS DEL CLIENTE) Tj
+/F1 10 Tf 0 -15 Td (Nombre: " . $customerName . ") Tj
+/F1 11 Tf 0 -30 Td (DESCRIPCION) Tj 120 0 Td (CANT.) Tj 60 0 Td (PRECIO) Tj 60 0 Td (TOTAL) Tj
+-240 -5 Td (_____________________________________________) Tj
+/F1 10 Tf " . $itemsText . "
+0 -5 Td (_____________________________________________) Tj
+/F1 10 Tf 0 -20 Td (Subtotal:) Tj 200 0 Td (\$" . $subtotal . ") Tj
+-200 -15 Td (IVA (19%):) Tj 200 0 Td (\$" . $tax . ") Tj
+/F1 14 Tf -200 -25 Td (TOTAL A PAGAR:) Tj 140 0 Td (\$" . $total . ") Tj
+/F1 10 Tf -140 -25 Td (FORMA DE PAGO) Tj
+0 -12 Td (- efectivo) Tj 200 0 Td (\$" . $total . ") Tj
+/F1 9 Tf -200 -30 Td (Gracias por su compra!) Tj
 ET
 endstream endobj
 xref
@@ -2074,7 +2093,7 @@ startxref
                     'id' => $item->id,
                     'product_id' => $item->product_id,
                     'product_name' => $item->product_name,
-                    'quantity' => (int) $item->quantity,
+                    'quantity' => (float) $item->quantity,
                     'price' => (float) $item->price,
                     'subtotal' => (float) $item->subtotal,
                     'image_url' => $item->image_url,
@@ -2103,7 +2122,7 @@ startxref
                     'id' => $item->id,
                     'product_id' => $item->product_id,
                     'product_name' => $item->product_name ?? 'Producto sin nombre',
-                    'quantity' => (int) $item->quantity,
+                    'quantity' => (float) $item->quantity,
                     'price' => (float) $item->unit_price,
                     'subtotal' => (float) $item->subtotal,
                     'image_url' => $imageUrl,
@@ -2131,7 +2150,7 @@ startxref
                         'id' => $item['id'] ?? null,
                         'product_id' => $item['product_id'] ?? null,
                         'product_name' => $item['product_name'] ?? '',
-                        'quantity' => (int) ($item['quantity'] ?? 0),
+                        'quantity' => (float) ($item['quantity'] ?? 0),
                         'price' => (float) ($item['unit_price'] ?? $item['price'] ?? 0),
                         'subtotal' => (float) ($item['subtotal'] ?? (($item['quantity'] ?? 0) * ($item['unit_price'] ?? $item['price'] ?? 0))),
                         'image_url' => $imageUrl,

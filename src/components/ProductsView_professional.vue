@@ -401,9 +401,25 @@
             <th class="px-6 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               Precio
             </th>
-            <th class="px-6 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-              Stock
-            </th>
+            
+            <!-- Columnas de Stock Dinámicas -->
+            <template v-if="showMultipleStockColumns">
+              <th v-for="warehouse in availableWarehouses" :key="warehouse.id"
+                  class="px-4 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                <div class="flex items-center justify-center space-x-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                  <span>{{ warehouse.name }}</span>
+                </div>
+              </th>
+            </template>
+            <template v-else>
+              <th class="px-6 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                Stock
+              </th>
+            </template>
+            
             <th class="px-6 py-3 text-center text-[10px] font-bold text-slate-500 uppercase tracking-wider">
               Estado
             </th>
@@ -415,7 +431,7 @@
         <tbody class="bg-white divide-y divide-slate-100">
           <!-- Loading State -->
           <tr v-if="loading">
-            <td colspan="6" class="px-4 py-12 text-center">
+            <td :colspan="5 + availableWarehouses.length" class="px-4 py-12 text-center">
               <div class="flex flex-col items-center space-y-3">
                 <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                 <p class="text-sm text-gray-600 font-medium">Cargando productos...</p>
@@ -425,7 +441,7 @@
 
           <!-- Empty State -->
           <tr v-else-if="!loading && !paginatedProducts.length">
-            <td colspan="6" class="px-4 py-12 text-center">
+            <td :colspan="5 + availableWarehouses.length" class="px-4 py-12 text-center">
               <div class="flex flex-col items-center space-y-3">
                 <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-2">
                   <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -477,36 +493,36 @@
                 ${{ formatCurrency(product.sale_price) }}
               </div>
             </td>
-            <td class="px-6 py-4">
-              <div class="flex flex-col space-y-1">
-                <!-- Stock por cada bodega -->
-                <div v-if="product.warehouses && product.warehouses.length > 0" class="space-y-1">
-                  <div v-for="warehouse in product.warehouses" :key="warehouse.id" 
-                       class="flex items-center justify-between bg-slate-50 px-2 py-1 rounded">
-                    <div class="flex items-center space-x-1.5">
-                      <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                      </svg>
-                      <span class="text-xs font-medium text-slate-600">{{ warehouse.name }}</span>
-                    </div>
-                    <!-- Acceder al stock desde pivot -->
-                    <span class="text-xs font-bold text-slate-900">{{ warehouse.pivot?.stock || warehouse.stock || 0 }}</span>
-                  </div>
+            <!-- Columnas de Stock Dinámicas -->
+            <template v-if="showMultipleStockColumns">
+              <td v-for="warehouse in availableWarehouses" :key="warehouse.id"
+                  class="px-4 py-4 text-center">
+                <div class="flex flex-col items-center">
+                  <span class="text-sm font-bold text-slate-900">
+                    {{ getWarehouseStock(product, warehouse.id) }}
+                  </span>
+                  <!-- Alerta de stock bajo para esta bodega -->
+                  <span v-if="getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0)" 
+                        class="text-[10px] font-bold text-rose-500 mt-0.5">
+                    Bajo
+                  </span>
                 </div>
-                <!-- Si no hay bodegas, mostrar stock global -->
-                <div v-else class="flex items-center justify-center space-x-1">
-                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                  </svg>
-                  <span class="text-sm font-bold text-slate-700">{{ product.current_stock || 0 }}</span>
+              </td>
+            </template>
+            <template v-else>
+              <td class="px-6 py-4 text-center">
+                <div class="flex flex-col items-center">
+                  <span class="text-sm font-bold text-slate-900">
+                    {{ getTotalStock(product) }}
+                  </span>
+                  <!-- Alerta de stock bajo -->
+                  <span v-if="getTotalStock(product) <= (product.min_stock || 0)" 
+                        class="text-[10px] font-bold text-rose-500 animate-pulse mt-0.5">
+                    ¡Bajo!
+                  </span>
                 </div>
-                <!-- Alerta de stock bajo -->
-                <span v-if="(product.current_stock || 0) <= (product.min_stock || 0)" 
-                      class="text-[10px] font-bold text-rose-500 animate-pulse text-center">
-                  ¡Stock Bajo!
-                </span>
-              </div>
-            </td>
+              </td>
+            </template>
             <td class="px-6 py-4 text-center">
               <span :class="getProductStatus(product) ? 
                 'bg-emerald-50 text-emerald-700 border-emerald-100' : 
@@ -713,14 +729,14 @@
     <div v-if="showProductModal" 
          class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
          @click.self="showProductModal = false">
-      <div class="bg-white rounded-lg w-full max-w-4xl shadow-xl max-h-[90vh] overflow-hidden">
+      <div class="bg-white rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden">
         
         <!-- Header -->
-        <div class="bg-white border-b border-gray-200 px-6 py-4">
+        <div class="bg-white border-b border-gray-200 px-8 py-5">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center border border-gray-200">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
               </div>
@@ -734,43 +750,45 @@
               </div>
             </div>
             <button @click="showProductModal = false" 
-                    class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="p-2 hover:bg-gray-100 rounded-lg transition-all">
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
           </div>
         </div>
 
-        <div class="flex h-[calc(90vh-120px)]">
+        <div class="flex h-[calc(95vh-160px)]">
           <!-- Formulario Principal -->
-          <div class="flex-1 p-6 overflow-y-auto">
-            <form @submit.prevent="saveProduct" class="space-y-4">
+          <div class="flex-1 p-8 overflow-y-auto bg-gray-50">
+            <form @submit.prevent="saveProduct" class="space-y-6">
               
               <!-- Información Básica -->
-              <div class="bg-gray-50 rounded-lg p-4">
+              <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
                 <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center">
-                  <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
+                  <div class="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center mr-2.5 border border-gray-200">
+                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
                   Información Básica
                 </h4>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Nombre del Producto *</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Nombre del Producto *</label>
                     <input v-model="productForm.name" 
                            type="text" 
                            required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                           placeholder="Nombre del producto">
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm transition-all"
+                           placeholder="Ej: iPhone 13 Pro Max">
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Categoría *</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Categoría *</label>
                     <select v-model="productForm.category_id" 
                             required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 text-sm bg-white transition-all">
                       <option value="">Seleccionar categoría</option>
                       <option v-for="category in categories" :key="category.id" :value="category.id">
                         {{ category.name }}
@@ -779,189 +797,400 @@
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">SKU</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">SKU (Código Único)</label>
                     <input v-model="productForm.sku" 
                            type="text" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                           placeholder="Código único del producto">
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm transition-all"
+                           placeholder="Ej: IP13-PRO-256">
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Código de Barras</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Código de Barras</label>
                     <div class="relative">
                       <input v-model="productForm.barcode" 
                              type="text" 
-                             class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                             placeholder="Código de barras">
+                             class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm transition-all"
+                             placeholder="Escanear o generar código">
                       <button type="button" 
                               @click="generateBarcode"
                               title="Generar código de barras"
-                              class="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                              class="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
                       </button>
                     </div>
                   </div>
-                </div>
-                
-                <div class="mt-4">
-                  <label class="block text-xs font-bold text-gray-700 mb-1">Descripción</label>
-                  <textarea v-model="productForm.description" 
-                            rows="3"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                            placeholder="Descripción detallada del producto">
-                  </textarea>
+                  
+                  <div class="col-span-2 mt-3">
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">Descripción <span class="text-gray-400 font-normal">(opcional)</span></label>
+                    <textarea v-model="productForm.description" 
+                              rows="2"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm transition-all resize-none"
+                              placeholder="Descripción breve del producto">
+                    </textarea>
+                  </div>
                 </div>
               </div>
 
-              <!-- Precios e Inventario -->
-              <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="text-sm font-bold text-gray-900 mb-3 flex items-center">
-                  <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                  </svg>
-                  Precios e Inventario
+              <!-- PASO 1: UNIDAD DE MEDIDA (LO PRIMERO) -->
+              <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <div class="flex items-center justify-between mb-5">
+                  <h4 class="text-base font-bold text-gray-900 flex items-center">
+                    <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mr-3 border border-gray-200">
+                      <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                      </svg>
+                    </div>
+                    PASO 1: ¿Cómo se vende este producto?
+                  </h4>
+                  <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-full">Requerido</span>
+                </div>
+                
+                <select
+                  v-model="productForm.measurement_unit"
+                  @change="updateAllowDecimal"
+                  class="w-full px-4 py-3 border border-gray-300 bg-white rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-gray-400 text-sm font-medium transition-all"
+                >
+                  <option value="unit">Unidades (und) - ej: celular, TV</option>
+                  <option value="kg">Kilogramos (kg) - ej: carne, papas</option>
+                  <option value="g">Gramos (g) - ej: especias, café</option>
+                  <option value="m">Metros (m) - ej: tela, cable</option>
+                  <option value="cm">Centímetros (cm) - ej: cinta, hilo</option>
+                  <option value="l">Litros (L) - ej: gasolina, leche</option>
+                  <option value="ml">Mililitros (ml) - ej: perfume, jarabe</option>
+                </select>
+                
+                <div class="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                      </svg>
+                      <span class="text-sm font-bold text-gray-900">Cantidades Decimales</span>
+                      <span class="px-2 py-0.5 bg-gray-200 text-gray-700 text-xs font-semibold rounded-full">Auto</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        v-model="productForm.allow_decimal"
+                        class="sr-only peer"
+                      />
+                      <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-slate-900 shadow-inner"></div>
+                      <span class="ml-3 text-sm font-semibold" :class="productForm.allow_decimal ? 'text-slate-900' : 'text-gray-600'">
+                        {{ productForm.allow_decimal ? 'Activado' : 'Desactivado' }}
+                      </span>
+                    </label>
+                  </div>
+                  <p class="text-xs text-gray-600 mt-3 flex items-start">
+                    <svg class="w-3.5 h-3.5 mr-1.5 mt-0.5 flex-shrink-0" :class="productForm.allow_decimal ? 'text-slate-900' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ productForm.allow_decimal ? 'Permite cantidades como 0.5, 1.25, 2.75, etc.' : 'Solo números enteros: 1, 2, 3, 4...' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- PASO 2: PRECIOS (DINÁMICO CON UNIDAD) -->
+              <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <h4 class="text-base font-bold text-gray-900 mb-5 flex items-center">
+                  <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mr-3 border border-gray-200">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                    </svg>
+                  </div>
+                  PASO 2: Precios por {{ getUnitAbbreviation(productForm.measurement_unit) }}
                 </h4>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Precio de Costo *</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                      Precio de Costo *
+                      <span class="text-gray-500 font-normal ml-1">(por {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                    </label>
                     <div class="relative">
-                      <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                      <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-bold">$</span>
                       <input v-model="productForm.cost" 
                              type="number" 
                              step="0.01"
                              min="0"
                              required
-                             class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                             class="w-full pl-9 pr-16 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm transition-all"
                              placeholder="0.00">
+                      <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sky-600 text-xs font-bold bg-sky-50 px-2 py-1 rounded">
+                        / {{ getUnitAbbreviation(productForm.measurement_unit) }}
+                      </span>
                     </div>
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Precio de Venta *</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                      Precio de Venta *
+                      <span class="text-gray-500 font-normal ml-1">(por {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                    </label>
                     <div class="relative">
-                      <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                      <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-bold">$</span>
                       <input v-model="productForm.price" 
                              type="number" 
                              step="0.01"
                              min="0"
                              required
-                             class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                             class="w-full pl-9 pr-16 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-transparent text-sm transition-all"
                              placeholder="0.00">
+                      <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sky-600 text-xs font-bold bg-sky-50 px-2 py-1 rounded">
+                        / {{ getUnitAbbreviation(productForm.measurement_unit) }}
+                      </span>
                     </div>
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Margen de Ganancia</label>
-                    <div class="px-3 py-2 bg-gray-100 rounded-lg text-sm font-medium text-gray-700">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Margen de Ganancia</label>
+                    <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 flex items-center justify-center">
                       {{ productForm.price && productForm.cost ? 
                         (((productForm.price - productForm.cost) / productForm.cost) * 100).toFixed(1) + '%' : 
                         '0%' }}
                     </div>
                   </div>
-                  
-                  <!-- Stock Inicial (Solo si hay 1 bodega) -->
-                  <div v-if="warehouses.length === 1">
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Stock Inicial</label>
-                    <input v-model="productForm.stock" 
-                           type="number" 
-                           min="0"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                           placeholder="0">
+                </div>
+
+                <!-- Información Visual de Precio con Unidad -->
+                <div v-if="productForm.price" class="mt-5 p-5 bg-gray-50 border border-gray-200 rounded-xl">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-xs font-semibold text-gray-700 uppercase tracking-wide">Vista Previa del POS</p>
+                        <p class="text-xs text-gray-600">Así se mostrará al vender</p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-2xl font-black text-gray-900">
+                        ${{ productForm.price.toLocaleString() }}
+                      </p>
+                      <p class="text-sm font-bold text-gray-600">
+                        por {{ getUnitAbbreviation(productForm.measurement_unit) }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PASO 3: INVENTARIO (DINÁMICO CON UNIDAD) -->
+              <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <h4 class="text-base font-bold text-gray-900 mb-5 flex items-center">
+                  <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mr-3 border border-gray-200">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                  </div>
+                  PASO 3: ¿Cuánto tienes en inventario?
+                  <span class="ml-3 text-sm font-normal text-gray-500">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                </h4>
+
+                <div class="grid grid-cols-1 gap-5">
+                  <!-- Stock Inicial (Solo si hay 1 bodega disponible según plan) -->
+                  <div v-if="availableWarehouses.length === 1" class="grid grid-cols-3 gap-5">
+                    <div>
+                      <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Stock Inicial
+                        <span class="text-gray-500 font-normal ml-1">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                      </label>
+                      <div class="relative">
+                        <input v-model="productForm.stock" 
+                               type="number" 
+                               :step="productForm.allow_decimal ? '0.01' : '1'"
+                               min="0"
+                               class="w-full px-4 pr-16 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm transition-all"
+                               :placeholder="productForm.allow_decimal ? '0.00' : '0'">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs font-medium bg-gray-100 px-2 py-1 rounded">
+                          {{ getUnitAbbreviation(productForm.measurement_unit) }}
+                        </span>
+                      </div>
+                      <p class="text-xs text-gray-500 mt-2">Cantidad actual que tienes</p>
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Stock Mínimo
+                        <span class="text-gray-500 font-normal ml-1">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                      </label>
+                      <div class="relative">
+                        <input v-model="productForm.min_stock" 
+                               type="number" 
+                               :step="productForm.allow_decimal ? '0.01' : '1'"
+                               min="0"
+                               class="w-full px-4 pr-16 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm transition-all"
+                               :placeholder="productForm.allow_decimal ? '5.00' : '5'">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs font-medium bg-gray-100 px-2 py-1 rounded">
+                          {{ getUnitAbbreviation(productForm.measurement_unit) }}
+                        </span>
+                      </div>
+                      <p class="text-xs text-gray-600 mt-2">Alerta cuando baje de este valor</p>
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Stock Máximo
+                        <span class="text-gray-500 font-normal ml-1">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                      </label>
+                      <div class="relative">
+                        <input v-model="productForm.max_stock" 
+                               type="number" 
+                               :step="productForm.allow_decimal ? '0.01' : '1'"
+                               min="0"
+                               class="w-full px-4 pr-16 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm transition-all"
+                               :placeholder="productForm.allow_decimal ? '100.00' : '100'">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs font-medium bg-gray-100 px-2 py-1 rounded">
+                          {{ getUnitAbbreviation(productForm.measurement_unit) }}
+                        </span>
+                      </div>
+                      <p class="text-xs text-gray-600 mt-2">Capacidad máxima de almacenamiento</p>
+                    </div>
                   </div>
                   
-                  <!-- Stock por Tienda (Solo si hay 2+ bodegas) -->
-                  <div v-if="warehouses.length >= 2" class="md:col-span-2">
-                    <div class="flex items-center justify-between mb-3">
-                      <label class="block text-xs font-bold text-gray-700">
+                  <!-- Stock por Tienda (Solo si hay 2+ bodegas disponibles según el plan) -->
+                  <div v-if="availableWarehouses.length >= 2" class="col-span-full">
+                    <div class="flex items-center justify-between mb-4">
+                      <label class="block text-sm font-bold text-gray-700 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
                         Stock por Tienda *
-                        <span class="text-xs font-normal text-gray-500 ml-1">(Asigna stock a cada sede)</span>
+                        <span class="ml-2 text-sm font-normal text-gray-500">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
                       </label>
                       <button type="button"
                               @click="showStockHelp = !showStockHelp"
-                              class="text-blue-600 hover:text-blue-700">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              class="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-xs font-semibold transition-all">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
+                        {{ showStockHelp ? 'Ocultar' : 'Ayuda' }}
                       </button>
                     </div>
                     
                     <!-- Ayuda -->
-                    <div v-if="showStockHelp" class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
-                      <p class="font-semibold mb-1">💡 ¿Cómo funciona?</p>
-                      <ul class="space-y-1 ml-4 list-disc">
-                        <li>Puedes poner <strong>diferente stock en cada tienda</strong></li>
-                        <li>Ejemplo: 20 unidades en Sede Principal, 5 en Margaritas</li>
-                        <li>Si dejas en 0, el producto NO estará disponible en esa tienda</li>
+                    <div v-if="showStockHelp" class="mb-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl">
+                      <p class="font-bold mb-2 text-blue-900 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                        ¿Cómo funciona el stock multi-tienda?
+                      </p>
+                      <ul class="space-y-2 text-sm text-blue-800">
+                        <li class="flex items-start">
+                          <svg class="w-5 h-5 mr-2 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          Asigna <strong>diferente stock a cada sede</strong> según tu inventario real
+                        </li>
+                        <li class="flex items-start">
+                          <svg class="w-5 h-5 mr-2 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          Ejemplo: <strong>20 {{ getUnitAbbreviation(productForm.measurement_unit) }}</strong> en Sede Principal, <strong>5 {{ getUnitAbbreviation(productForm.measurement_unit) }}</strong> en Sucursal Norte
+                        </li>
+                        <li class="flex items-start">
+                          <svg class="w-5 h-5 mr-2 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                          </svg>
+                          Si dejas <strong>0</strong>, el producto NO estará disponible en esa tienda
+                        </li>
                       </ul>
                     </div>
                     
                     <!-- Inputs por cada tienda -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div v-for="warehouse in warehouses" :key="warehouse.id"
-                           class="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <div class="flex items-center gap-2 mb-2">
-                          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                          </svg>
-                          <span class="text-xs font-bold text-gray-900">
-                            {{ warehouse.name }}
-                            <span v-if="warehouse.is_default" class="text-blue-600">(Principal)</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div v-for="warehouse in availableWarehouses" :key="warehouse.id"
+                           class="p-4 bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all">
+                        <div class="flex items-center gap-3 mb-3">
+                          <div class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 border border-gray-200">
+                            <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <span class="text-sm font-bold text-gray-900 block truncate">
+                              {{ warehouse.name }}
+                            </span>
+                            <span v-if="warehouse.is_default" class="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                              Principal
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div class="relative">
+                          <input 
+                            v-model.number="productForm.warehouseStock[warehouse.id]"
+                            type="number" 
+                            :step="productForm.allow_decimal ? '0.01' : '1'"
+                            min="0"
+                            :placeholder="productForm.allow_decimal ? '0.00' : '0'"
+                            class="w-full px-4 pr-14 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-gray-400 text-sm font-bold text-center bg-white transition-all"
+                          />
+                          <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs font-medium bg-gray-100 px-2 py-1 rounded">
+                            {{ getUnitAbbreviation(productForm.measurement_unit) }}
                           </span>
                         </div>
-                        <input 
-                          v-model.number="productForm.warehouseStock[warehouse.id]"
-                          type="number" 
-                          min="0"
-                          placeholder="0"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                        />
+                        
+                        <p class="text-xs text-gray-600 text-center mt-2 font-medium">
+                          Disponible en esta sede
+                        </p>
                       </div>
                     </div>
                     
                     <!-- Stock Total -->
-                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="mt-4 p-5 bg-gray-50 border border-gray-200 rounded-xl">
                       <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-blue-900">Stock Total:</span>
-                        <span class="text-base font-bold text-blue-600">
-                          {{ calculateTotalStock() }} unidades
-                        </span>
+                        <div class="flex items-center space-x-3">
+                          <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center border border-gray-200">
+                            <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                            </svg>
+                          </div>
+                          <div>
+                            <span class="text-sm font-bold text-gray-900 block">Stock Total del Producto</span>
+                            <span class="text-xs text-gray-600 font-medium">(suma de todas las sedes)</span>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <span class="text-4xl font-black text-gray-900 block">
+                            {{ calculateTotalStock() }}
+                          </span>
+                          <span class="text-sm font-bold text-gray-600">
+                            {{ getUnitAbbreviation(productForm.measurement_unit) }} totales
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Stock Mínimo</label>
-                    <input v-model="productForm.min_stock" 
-                           type="number" 
-                           min="0"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                           placeholder="5">
-                  </div>
-                  
-                  <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Stock Máximo</label>
-                    <input v-model="productForm.max_stock" 
-                           type="number" 
-                           min="0"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                           placeholder="100">
                   </div>
                 </div>
               </div>
 
               <!-- Estado Activo -->
-              <div class="bg-gray-50 rounded-lg p-4">
-                <div class="flex items-center space-x-3">
-                  <input v-model="productForm.active" 
-                         type="checkbox" 
-                         class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                  <div>
-                    <label class="text-sm font-bold text-gray-900">Producto Activo</label>
-                    <p class="text-xs text-gray-500">El producto estará disponible para la venta</p>
+              <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <div class="flex items-center space-x-4">
+                  <div class="flex-shrink-0">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input v-model="productForm.active" 
+                             type="checkbox" 
+                             class="sr-only peer">
+                      <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-green-500 peer-checked:to-emerald-600 shadow-inner"></div>
+                    </label>
+                  </div>
+                  <div class="flex-1">
+                    <label class="text-base font-bold text-gray-900 flex items-center">
+                      <svg class="w-5 h-5 mr-2" :class="productForm.active ? 'text-green-600' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      Producto {{ productForm.active ? 'Activo' : 'Inactivo' }}
+                    </label>
+                    <p class="text-sm text-gray-600 mt-1">
+                      {{ productForm.active ? 'El producto está disponible para la venta' : 'El producto NO aparecerá en el sistema de ventas' }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -970,33 +1199,46 @@
           
           <!-- Sidebar para Imagen -->
           <div class="w-80 bg-gray-50 border-l border-gray-200 p-6">
-            <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center">
-              <svg class="w-4 h-4 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-              Imagen del Producto
-            </h4>
+            <div class="mb-5">
+              <div class="flex items-center space-x-3 mb-2">
+                <div class="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="text-lg font-bold text-gray-900">Imagen del Producto</h4>
+                  <p class="text-xs text-gray-600">Añade una foto atractiva</p>
+                </div>
+              </div>
+            </div>
             
             <!-- Selector de método -->
-            <div class="flex bg-gray-100 rounded-lg p-1 mb-4">
+            <div class="flex bg-white rounded-lg p-1 mb-4 shadow-sm border border-gray-200">
               <button type="button"
                       @click="imageUploadMethod = 'url'"
                       :class="[
-                        'flex-1 px-3 py-2 rounded-md text-xs font-medium transition-all',
+                        'flex-1 px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center justify-center space-x-1.5',
                         imageUploadMethod === 'url' 
-                          ? 'bg-white text-blue-600 shadow-sm' 
-                          : 'text-gray-600 hover:text-gray-800'
+                          ? 'bg-slate-900 text-white' 
+                          : 'text-gray-600 hover:bg-gray-50'
                       ]">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
                 URL Web
               </button>
               <button type="button"
                       @click="imageUploadMethod = 'file'"
                       :class="[
-                        'flex-1 px-3 py-2 rounded-md text-xs font-medium transition-all',
+                        'flex-1 px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center justify-center space-x-1.5',
                         imageUploadMethod === 'file' 
-                          ? 'bg-white text-blue-600 shadow-sm' 
-                          : 'text-gray-600 hover:text-gray-800'
+                          ? 'bg-slate-900 text-white' 
+                          : 'text-gray-600 hover:bg-gray-50'
                       ]">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
                 Subir Archivo
               </button>
             </div>
@@ -1004,7 +1246,7 @@
             <!-- Subida de archivo -->
             <div v-if="imageUploadMethod === 'file'" class="space-y-3">
               <div @click="$refs.fileInput?.click()" 
-                   class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-purple-400 hover:bg-purple-50/30 transition-all">
+                   class="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center cursor-pointer hover:border-gray-400 hover:bg-gray-100 transition-all">
                 
                 <input type="file" 
                        ref="fileInput"
@@ -1013,16 +1255,16 @@
                        class="hidden">
                 
                 <div v-if="!previewImage">
-                  <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="w-11 h-11 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2 border border-gray-200">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                   </div>
-                  <h5 class="font-bold text-gray-900 mb-1">Subir Imagen</h5>
-                  <p class="text-gray-600 text-sm mb-1">
-                    <span class="font-semibold text-purple-600">Haz clic aquí</span> o arrastra una imagen
+                  <h5 class="font-semibold text-gray-900 mb-1 text-xs">Subir Imagen</h5>
+                  <p class="text-gray-600 text-xs mb-0.5">
+                    <span class="font-semibold text-gray-900">Haz clic aquí</span> o arrastra una imagen
                   </p>
-                  <p class="text-xs text-gray-500">PNG, JPG, GIF hasta 5MB</p>
+                  <p class="text-xs text-gray-500">PNG, JPG hasta 5MB</p>
                 </div>
                 
                 <!-- Preview de imagen -->
@@ -1043,7 +1285,7 @@
             <div v-if="imageUploadMethod === 'url'" class="space-y-3">
               <input v-model="productForm.image" 
                      type="url" 
-                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-400 focus:border-transparent text-sm"
                      placeholder="https://ejemplo.com/imagen.jpg">
               
               <!-- Preview de URL -->
@@ -1068,21 +1310,127 @@
             </div>
 
             <!-- Botones de acción -->
-            <div class="mt-6 space-y-3">
+            <div class="mt-6 space-y-2.5">
               <button type="button" 
                       @click="saveProduct"
                       :disabled="loading"
-                      class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                      class="w-full px-5 py-3 bg-slate-900 hover:bg-black text-white rounded-lg font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
                 {{ loading ? 'Guardando...' : (isEditing ? 'Actualizar Producto' : 'Crear Producto') }}
               </button>
               
               <button type="button" 
                       @click="showProductModal = false"
-                      class="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
+                      class="w-full px-5 py-3 bg-white hover:bg-gray-50 text-gray-700 rounded-lg font-semibold transition-colors border border-gray-300">
                 Cancelar
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⚠️ Modal de Confirmación: Producto sin Stock -->
+    <div v-if="showStockWarningModal" 
+         class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm flex items-center justify-center p-4 z-[60]"
+         @click.self="showStockWarningModal = false">
+      <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl transform transition-all">
+        
+        <!-- Header con icono de advertencia -->
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200 px-6 py-5">
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-xl font-bold text-gray-900">Datos Incompletos</h3>
+              <p class="text-sm text-gray-600 mt-0.5">Aún faltan datos importantes por llenar</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contenido -->
+        <div class="p-6">
+          <p class="text-sm text-gray-700 mb-4">
+            Detectamos que algunos campos importantes no han sido completados:
+          </p>
+          
+          <!-- Lista de campos faltantes -->
+          <div class="space-y-3 mb-5">
+            <div v-for="(item, index) in missingFields" :key="index"
+                 class="flex items-start space-x-3 p-3 rounded-lg"
+                 :class="{
+                   'bg-red-50 border border-red-200': item.severity === 'high',
+                   'bg-amber-50 border border-amber-200': item.severity === 'medium',
+                   'bg-gray-50 border border-gray-200': item.severity === 'low'
+                 }">
+              <div class="flex-shrink-0 mt-0.5">
+                <svg v-if="item.severity === 'high'" class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <svg v-else-if="item.severity === 'medium'" class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <svg v-else class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold"
+                   :class="{
+                     'text-red-900': item.severity === 'high',
+                     'text-amber-900': item.severity === 'medium',
+                     'text-gray-700': item.severity === 'low'
+                   }">
+                  {{ item.field }}
+                </p>
+                <p class="text-xs mt-0.5"
+                   :class="{
+                     'text-red-700': item.severity === 'high',
+                     'text-amber-700': item.severity === 'medium',
+                     'text-gray-600': item.severity === 'low'
+                   }">
+                  {{ item.message }}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-5">
+            <div class="flex items-start space-x-3">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+              </svg>
+              <div>
+                <p class="text-sm font-semibold text-blue-900">Recomendación</p>
+                <p class="text-xs text-blue-700 mt-1">
+                  Te sugerimos completar estos datos ahora para tener un control preciso de tu inventario desde el inicio.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-between space-x-3">
+          <button type="button" 
+                  @click="showStockWarningModal = false"
+                  class="flex-1 px-4 py-2.5 bg-white hover:bg-gray-100 text-gray-700 rounded-lg font-semibold transition-all border border-gray-300 shadow-sm">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
+            </svg>
+            Volver a Editar
+          </button>
+          
+          <button type="button" 
+                  @click="() => { showStockWarningModal = false; saveProduct(true) }"
+                  class="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-lg font-bold transition-all shadow-md">
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Continuar Así
+          </button>
         </div>
       </div>
     </div>
@@ -1501,6 +1849,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { warehouseService } from '../services/warehouseService.js'
+import { appStore } from '../store/appStore.js'
 import TablePaginator from './TablePaginator.vue'
 import ContextualTour from './ContextualTour.vue'
 
@@ -2014,7 +2363,9 @@ const productForm = ref({
   warehouse_id: null, // 🏢 Bodega donde se guardará el producto
   warehouseStock: {}, // 🏢 Stock por cada tienda { warehouse_id: cantidad }
   image: '',
-  active: true
+  active: true,
+  measurement_unit: 'unit', // 📏 Unidad de medida (unit, kg, g, m, cm, l, ml)
+  allow_decimal: false // 🔢 Permite cantidades decimales (0.5, 1.25, etc)
 })
 
 // 🏢 Lista de bodegas disponibles
@@ -2029,6 +2380,10 @@ const stockTooltip = ref({
   y: 0,
   warehouses: []
 })
+
+// ⚠️ Modal de confirmación para productos sin stock
+const showStockWarningModal = ref(false)
+const missingFields = ref([])
 
 // Computed properties
 const filteredProducts = computed(() => {
@@ -2172,6 +2527,57 @@ const loadCategories = async () => {
   }
 }
 
+// 🏢 Computed: Filtrar bodegas según plan del tenant
+const availableWarehouses = computed(() => {
+  const plan = appStore.tenantPlan
+  const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
+  
+  // Si es premium/enterprise, mostrar todas las bodegas activas
+  if (isPremiumOrEnterprise) {
+    return warehouses.value.filter(w => w.active)
+  }
+  
+  // Si es basic/free, mostrar solo la bodega actual de la sesión
+  const currentWarehouseId = appStore.cashSession.current?.warehouse_id
+  if (currentWarehouseId) {
+    return warehouses.value.filter(w => w.active && w.id === currentWarehouseId)
+  }
+  
+  // Si no hay sesión activa, mostrar la bodega por defecto
+  const defaultWarehouse = warehouses.value.find(w => w.is_default && w.active)
+  return defaultWarehouse ? [defaultWarehouse] : warehouses.value.filter(w => w.active).slice(0, 1)
+})
+
+// 🏢 Computed: Determinar si mostrar múltiples columnas de stock
+const showMultipleStockColumns = computed(() => {
+  return availableWarehouses.value.length > 1
+})
+
+// 🏢 Helper: Obtener stock de un producto en una bodega específica
+const getWarehouseStock = (product, warehouseId) => {
+  if (!product.warehouses || product.warehouses.length === 0) {
+    return 0
+  }
+  
+  const warehouse = product.warehouses.find(w => w.id === warehouseId || w.warehouse_id === warehouseId)
+  if (!warehouse) return 0
+  
+  // Intentar obtener desde pivot o directamente
+  return warehouse.pivot?.stock || warehouse.stock || 0
+}
+
+// 🏢 Helper: Obtener stock total de un producto
+const getTotalStock = (product) => {
+  if (!product.warehouses || product.warehouses.length === 0) {
+    return product.current_stock || 0
+  }
+  
+  return product.warehouses.reduce((total, warehouse) => {
+    const stock = warehouse.pivot?.stock || warehouse.stock || 0
+    return total + stock
+  }, 0)
+}
+
 // 🏢 Cargar bodegas disponibles
 const loadWarehouses = async () => {
   try {
@@ -2233,6 +2639,26 @@ const refreshProducts = async () => {
   await loadProducts()
 }
 
+// 📏 Helper: Obtener abreviación de unidad de medida
+const getUnitAbbreviation = (unit) => {
+  const units = {
+    unit: 'und',
+    kg: 'kg',
+    g: 'g',
+    m: 'm',
+    cm: 'cm',
+    l: 'L',
+    ml: 'ml'
+  }
+  return units[unit] || 'und'
+}
+
+// 🔢 Auto-actualizar allow_decimal según la unidad seleccionada
+const updateAllowDecimal = () => {
+  const decimalUnits = ['kg', 'g', 'm', 'cm', 'l', 'ml']
+  productForm.value.allow_decimal = decimalUnits.includes(productForm.value.measurement_unit)
+}
+
 const openCreateModal = async () => {
   // VALIDACIÓN: Verificar si existen categorías primero
   if (!categories.value || categories.value.length === 0) {
@@ -2250,13 +2676,14 @@ const openCreateModal = async () => {
   // Cargar bodegas antes de abrir el modal
   await loadWarehouses()
   
-  // Inicializar warehouseStock con todas las tiendas en 0
+  // Inicializar warehouseStock con todas las tiendas disponibles según el plan en 0
   const warehouseStock = {}
-  warehouses.value.forEach(warehouse => {
+  availableWarehouses.value.forEach(warehouse => {
     warehouseStock[warehouse.id] = 0
   })
   console.log('🏭 Inicializando formulario nuevo producto')
-  console.log('📦 Warehouses disponibles:', warehouses.value.length)
+  console.log('📦 Warehouses totales:', warehouses.value.length)
+  console.log('✅ Warehouses disponibles según plan:', availableWarehouses.value.length)
   console.log('🔢 warehouseStock inicializado:', warehouseStock)
   
   productForm.value = {
@@ -2273,7 +2700,16 @@ const openCreateModal = async () => {
     warehouse_id: warehouses.value.find(w => w.is_default)?.id || null,
     warehouseStock: warehouseStock,
     image: '',
-    active: true
+    active: true,
+    measurement_unit: 'unit', // 📏 Unidad de medida por defecto
+    allow_decimal: false // 🔢 No permite decimales por defecto
+  }
+  
+  // ✅ Si solo hay 1 bodega disponible, sincronizar stock inicial (0)
+  if (availableWarehouses.value.length === 1) {
+    const warehouseId = availableWarehouses.value[0].id
+    productForm.value.warehouseStock[warehouseId] = 0
+    console.log('✅ Sincronización inicial para bodega única:', warehouseId, '= 0')
   }
   
   // Limpiar estado de imágenes
@@ -2336,7 +2772,9 @@ const editProduct = async (product) => {
     category_id: product.category_id,
     warehouseStock: warehouseStock,
     image: product.image_url || product.image || '',
-    active: getProductStatus(product) !== false
+    active: getProductStatus(product) !== false,
+    measurement_unit: product.measurement_unit || 'unit', // 📏 Cargar unidad de medida
+    allow_decimal: product.allow_decimal || false // 🔢 Cargar si permite decimales
   }
   
   // Configurar estado de imágenes para edición
@@ -2677,7 +3115,7 @@ const saveCategory = async () => {
 // Calcular stock total sumando todas las tiendas
 const calculateTotalStock = () => {
   // Si hay solo 1 bodega, usar el campo stock directamente
-  if (warehouses.value.length === 1) {
+  if (availableWarehouses.value.length === 1) {
     return parseInt(productForm.value.stock) || 0
   }
   
@@ -2688,22 +3126,76 @@ const calculateTotalStock = () => {
   }, 0)
 }
 
-const saveProduct = async () => {
+// ⚠️ Validar si faltan datos importantes (especialmente stock)
+const checkMissingImportantFields = () => {
+  const missing = []
+  const totalStock = calculateTotalStock()
+  
+  // Validar stock (campo más importante)
+  if (totalStock === 0 || totalStock === null || totalStock === undefined) {
+    missing.push({
+      field: 'Stock Inicial',
+      message: 'No has especificado cuántas unidades tienes en inventario',
+      severity: 'high' // high = crítico, medium = importante, low = opcional
+    })
+  }
+  
+  // Validar stock mínimo (importante para alertas)
+  if (!productForm.value.min_stock || productForm.value.min_stock === 0) {
+    missing.push({
+      field: 'Stock Mínimo',
+      message: 'No recibirás alertas cuando el inventario esté bajo',
+      severity: 'medium'
+    })
+  }
+  
+  // Validar descripción (recomendado pero no crítico)
+  if (!productForm.value.description || productForm.value.description.trim() === '') {
+    missing.push({
+      field: 'Descripción',
+      message: 'El producto no tiene descripción',
+      severity: 'low'
+    })
+  }
+  
+  return missing
+}
+
+const saveProduct = async (skipValidation = false) => {
   try {
     loading.value = true
     
     // Validar campos requeridos
     if (!productForm.value.name?.trim()) {
+      loading.value = false
       throw new Error('El nombre del producto es requerido')
     }
     if (!productForm.value.category_id) {
+      loading.value = false
       throw new Error('La categoría es requerida')
     }
     if (!productForm.value.cost || productForm.value.cost <= 0) {
+      loading.value = false
       throw new Error('El precio de costo debe ser mayor a 0')
     }
     if (!productForm.value.price || productForm.value.price <= 0) {
+      loading.value = false
       throw new Error('El precio de venta debe ser mayor a 0')
+    }
+    
+    // ⚠️ Validar campos importantes y mostrar confirmación si faltan (solo en creación)
+    if (!skipValidation && !isEditing.value) {
+      const missing = checkMissingImportantFields()
+      
+      // Si hay campos críticos o importantes sin llenar, mostrar confirmación
+      const hasCriticalMissing = missing.some(m => m.severity === 'high' || m.severity === 'medium')
+      
+      if (hasCriticalMissing) {
+        missingFields.value = missing
+        showStockWarningModal.value = true
+        loading.value = false
+        return // Detener el guardado y esperar confirmación del usuario
+      }
     }
     
     // Calcular stock total
@@ -2711,6 +3203,12 @@ const saveProduct = async () => {
     if (totalStock === undefined || totalStock === null || totalStock < 0) {
       throw new Error('El stock total debe ser un número válido (0 o mayor)')
     }
+    
+    // Debug: Verificar estado del stock antes de enviar
+    console.log('📦 Stock en productForm.stock:', productForm.value.stock)
+    console.log('📦 Stock en warehouseStock:', productForm.value.warehouseStock)
+    console.log('📦 Total stock calculado:', totalStock)
+    console.log('✅ Bodegas disponibles:', availableWarehouses.value.map(w => ({ id: w.id, name: w.name })))
     
     // Transformar los datos para que coincidan con los campos esperados por la API
     const apiData = {
@@ -2733,10 +3231,14 @@ const saveProduct = async () => {
       image_url: productForm.value.image ? productForm.value.image.trim() : null,
       tags: null,
       // 🏢 Stock por cada tienda (nuevo sistema multi-tienda)
-      warehouse_stocks: productForm.value.warehouseStock
+      warehouse_stocks: productForm.value.warehouseStock || {},
+      // 📏 Unidades de Medida (NUEVO)
+      measurement_unit: productForm.value.measurement_unit || 'unit',
+      allow_decimal: productForm.value.allow_decimal || false
     }
 
-    console.log('Datos enviados a la API:', apiData)
+    console.log('📦 Datos enviados a la API:', apiData)
+    console.log('🏭 warehouse_stocks detallado:', JSON.stringify(apiData.warehouse_stocks, null, 2))
     
     if (isEditing.value) {
       await productsService.update(productForm.value.id, apiData)
@@ -2786,14 +3288,20 @@ watch([searchTerm, categoryFilter, statusFilter, sortBy], () => {
   currentPage.value = 1
 })
 
-// 🏢 Sincronizar stock con bodega única cuando hay solo 1 bodega
+// 🏢 Sincronizar stock con bodega única cuando hay solo 1 bodega disponible
 watch(() => productForm.value.stock, (newStock) => {
-  if (warehouses.value.length === 1 && warehouses.value[0]) {
-    const warehouseId = warehouses.value[0].id
-    if (productForm.value.warehouseStock) {
-      productForm.value.warehouseStock[warehouseId] = parseInt(newStock) || 0
-      console.log('✅ Stock sincronizado con bodega única:', warehouseId, '=', newStock)
+  // Usar availableWarehouses que ya filtra según el plan
+  if (availableWarehouses.value.length === 1 && availableWarehouses.value[0]) {
+    const warehouseId = availableWarehouses.value[0].id
+    
+    // Asegurar que warehouseStock existe
+    if (!productForm.value.warehouseStock) {
+      productForm.value.warehouseStock = {}
     }
+    
+    // Sincronizar el stock
+    productForm.value.warehouseStock[warehouseId] = parseInt(newStock) || 0
+    console.log('✅ Stock sincronizado con bodega única:', warehouseId, '=', newStock, 'Total bodegas disponibles:', availableWarehouses.value.length)
   }
 })
 

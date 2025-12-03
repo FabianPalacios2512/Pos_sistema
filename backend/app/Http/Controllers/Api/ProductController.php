@@ -51,7 +51,8 @@ class ProductController extends Controller
         $query = Product::select([
                 'id', 'name', 'sku', 'barcode', 'sale_price as price',
                 'current_stock as stock', 'category_id', 'image_url as image',
-                'active', 'manage_stock'
+                'active', 'manage_stock',
+                'measurement_unit', 'allow_decimal'  // 📏 Incluir unidades de medida
             ])
             ->with([
                 'category:id,name,color',
@@ -87,8 +88,14 @@ class ProductController extends Controller
                 $product->category_name = $product->category ? $product->category->name : 'Sin categoría';
                 $product->category_color = $product->category ? $product->category->color : '#6b7280';
 
-                // Información de stock por bodega
-                $product->warehouse_stock = $product->warehouses ? $product->warehouses->toArray() : [];
+                // Información de stock por bodega (transformar a formato correcto)
+                $product->warehouse_stock = $product->warehouses ? $product->warehouses->map(function($wh) {
+                    return [
+                        'warehouse_id' => $wh->id,
+                        'name' => $wh->name,
+                        'stock' => (int) $wh->pivot->stock
+                    ];
+                })->toArray() : [];
 
                 // Determinar stock local y bodegas alternativas
                 $localStock = 0;
@@ -118,6 +125,11 @@ class ProductController extends Controller
                 $product->stock = $localStock;
                 $product->is_remote = $searchScope === 'global' && $localStock === 0 && count($alternativeWarehouses) > 0;
                 $product->alternative_warehouses = $alternativeWarehouses;
+
+                // 📏 Agregar accessors de unidades de medida
+                $product->unit_abbreviation = $product->unit_abbreviation;
+                $product->unit_name = $product->unit_name;
+                $product->quantity_step = $product->quantity_step;
 
                 return $product;
             });

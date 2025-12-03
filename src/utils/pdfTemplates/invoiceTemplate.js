@@ -281,8 +281,8 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(style.fonts.header.size)
     pdf.text('DESCRIPCIÓN', leftMargin + 1, yPos + 2)
-    pdf.text('CANT', leftMargin + 42, yPos + 2, { align: 'center' })
-    pdf.text('PRECIO', leftMargin + 54, yPos + 2, { align: 'right' })
+    pdf.text('CANT.', leftMargin + 38, yPos + 2, { align: 'center' })
+    pdf.text('PRECIO', leftMargin + 53, yPos + 2, { align: 'right' })
     pdf.text('TOTAL', rightMargin - 1, yPos + 2, { align: 'right' })
 
     pdf.setTextColor(0, 0, 0) // Reset
@@ -309,15 +309,15 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       }
 
       // Nombre del producto (con wrapping si es muy largo)
-      const nameLines = pdf.splitTextToSize(itemName, 38)
+      const nameLines = pdf.splitTextToSize(itemName, 32)
       const firstLine = nameLines[0]
       pdf.text(firstLine, leftMargin + 1, yPos)
 
       // Cantidad (centrado)
-      pdf.text(quantity.toString(), leftMargin + 42, yPos, { align: 'center' })
+      pdf.text(quantity.toString(), leftMargin + 38, yPos, { align: 'center' })
 
       // Precio (alineado derecha)
-      pdf.text(`$${price.toLocaleString('es-CO')}`, leftMargin + 54, yPos, { align: 'right' })
+      pdf.text(`$${price.toLocaleString('es-CO')}`, leftMargin + 53, yPos, { align: 'right' })
 
       // Total (alineado derecha, en negrita si es múltiple)
       if (quantity > 1) {
@@ -366,10 +366,17 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       yPos += 4
     }
 
-    // IVA
+    // IVA - Calcular porcentaje real basado en los valores guardados
     const taxAmount = tax_amount || tax || 0
+    let actualTaxRate = taxRate // Default del sistema
+    
+    // Si hay IVA y subtotal, calcular el porcentaje real usado en la factura
+    if (taxAmount > 0 && subtotal > 0) {
+      actualTaxRate = Math.round((taxAmount / subtotal) * 100)
+    }
+    
     if (taxAmount > 0) {
-      pdf.text(`${taxLabel} (${taxRate}%):`, leftMargin + 35, yPos)
+      pdf.text(`${taxLabel} (${actualTaxRate}%):`, leftMargin + 35, yPos)
       pdf.text(`$${taxAmount.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
       yPos += 4
     }

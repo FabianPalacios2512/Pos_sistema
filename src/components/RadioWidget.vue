@@ -1,12 +1,12 @@
 <template>
-  <!-- Widget Flotante de Radio -->
+  <!-- Widget Flotante de Radio Enterprise -->
   <Teleport to="body">
-    <!-- Overlay de fondo (opcional, para cerrar al hacer click fuera) -->
+    <!-- Overlay de fondo -->
     <Transition name="fade">
       <div 
         v-if="isOpen" 
         @click="closeWidget"
-        class="fixed inset-0 bg-black/20 backdrop-blur-sm z-[60] transition-all duration-300"
+        class="fixed inset-0 bg-black/20 dark:bg-black/60 backdrop-blur-sm z-[60] transition-all duration-300"
       ></div>
     </Transition>
 
@@ -14,143 +14,156 @@
     <Transition name="slide-up">
       <div 
         v-show="isOpen"
-        class="fixed bottom-4 right-4 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-[70] overflow-hidden"
+        class="fixed bottom-4 right-4 w-96 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-800 z-[70] overflow-hidden flex flex-col max-h-[80vh]"
       >
-        <!-- Header con Glassmorphism -->
-        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 relative overflow-hidden">
-          <!-- Efecto de onda animada -->
-          <div class="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+        <!-- Header Enterprise -->
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-900 dark:to-teal-900 p-4 relative overflow-hidden flex-shrink-0">
+          <!-- Efecto de fondo -->
+          <div class="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+          <div class="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
           
           <div class="relative flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <!-- Icono de Radio -->
-              <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-md shadow-inner border border-white/10">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                 </svg>
               </div>
               <div>
-                <h3 class="text-white font-black text-sm tracking-wide">RADIO EN VIVO</h3>
-                <p class="text-emerald-50 text-xs font-medium">Emisoras de Colombia</p>
+                <h3 class="text-white font-bold text-sm tracking-wide">RADIO EN VIVO</h3>
+                <p class="text-emerald-100 text-xs font-medium">Emisoras de Colombia</p>
               </div>
             </div>
             
-            <!-- Botón Cerrar -->
-            <button 
-              @click="closeWidget"
-              class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition-all backdrop-blur-md"
-            >
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+            <!-- Controles Header -->
+            <div class="flex items-center gap-3">
+              <!-- Indicador "En Vivo" -->
+              <div v-if="isPlaying" class="flex items-center justify-center gap-1.5 bg-red-500/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-red-400/50 shadow-sm">
+                <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                <span class="text-white text-[10px] font-bold uppercase tracking-wider leading-none mt-[1px]">LIVE</span>
+              </div>
 
-          <!-- Indicador "En Vivo" animado -->
-          <div v-if="isPlaying" class="absolute top-2 right-14 flex items-center space-x-1.5 bg-red-500 px-2 py-1 rounded-full">
-            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-            <span class="text-white text-xs font-bold uppercase tracking-wider">En Vivo</span>
+              <!-- Botón Cerrar -->
+              <button 
+                @click="closeWidget"
+                class="w-8 h-8 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all backdrop-blur-md text-white/80 hover:text-white"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Lista de Emisoras (Scrollable) -->
-        <div class="max-h-96 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+        <div class="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar bg-gray-50 dark:bg-zinc-900/50">
           <div 
             v-for="radio in radios" 
             :key="radio.id"
             @click="selectRadio(radio)"
             :class="[
-              'flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200 border-2',
+              'flex items-center p-3 rounded-xl cursor-pointer transition-all duration-200 border group',
               currentRadio?.id === radio.id 
-                ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-300 shadow-md' 
-                : 'bg-slate-50 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/50'
+                ? 'bg-white dark:bg-zinc-800 border-emerald-500/50 dark:border-emerald-500/50 shadow-md ring-1 ring-emerald-500/20' 
+                : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-sm'
             ]"
           >
             <!-- Logo de la Emisora -->
-            <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm border border-slate-200 overflow-hidden">
+            <div class="w-10 h-10 bg-white dark:bg-zinc-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm border border-gray-100 dark:border-zinc-600 overflow-hidden p-1">
               <img 
                 :src="radio.logo" 
                 :alt="radio.name"
-                class="w-10 h-10 object-contain"
+                class="w-full h-full object-contain"
                 @error="handleImageError"
               >
             </div>
 
             <!-- Nombre de la Emisora -->
-            <div class="flex-1 ml-3">
+            <div class="flex-1 ml-3 min-w-0">
               <p :class="[
-                'font-bold text-sm',
-                currentRadio?.id === radio.id ? 'text-emerald-700' : 'text-slate-900'
+                'font-bold text-sm truncate transition-colors',
+                currentRadio?.id === radio.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white'
               ]">
                 {{ radio.name }}
               </p>
-              <p class="text-xs text-slate-500 font-medium">
-                {{ currentRadio?.id === radio.id && isPlaying ? 'Reproduciendo...' : 'Toca para escuchar' }}
+              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium truncate">
+                {{ currentRadio?.id === radio.id && isPlaying ? 'Reproduciendo ahora...' : 'Toca para escuchar' }}
               </p>
             </div>
 
-            <!-- Indicador de Reproducción -->
-            <div v-if="currentRadio?.id === radio.id && isPlaying" class="flex items-center space-x-1">
-              <div class="w-1 h-3 bg-emerald-500 rounded-full animate-sound-wave" style="animation-delay: 0s"></div>
-              <div class="w-1 h-4 bg-emerald-500 rounded-full animate-sound-wave" style="animation-delay: 0.1s"></div>
-              <div class="w-1 h-5 bg-emerald-500 rounded-full animate-sound-wave" style="animation-delay: 0.2s"></div>
-              <div class="w-1 h-4 bg-emerald-500 rounded-full animate-sound-wave" style="animation-delay: 0.3s"></div>
+            <!-- Indicador de Reproducción (Ecualizador) -->
+            <div v-if="currentRadio?.id === radio.id && isPlaying" class="flex items-end space-x-0.5 h-4 ml-2">
+              <div class="w-1 bg-emerald-500 rounded-t-sm animate-music-bar-1"></div>
+              <div class="w-1 bg-emerald-500 rounded-t-sm animate-music-bar-2"></div>
+              <div class="w-1 bg-emerald-500 rounded-t-sm animate-music-bar-3"></div>
             </div>
           </div>
         </div>
 
         <!-- Footer con Controles -->
-        <div class="bg-slate-50 border-t border-slate-200 p-4">
-          <!-- Emisora Actual -->
-          <div v-if="currentRadio" class="mb-3 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white dark:bg-zinc-800 border-t border-gray-200 dark:border-zinc-700 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+          <!-- Emisora Actual Info -->
+          <div v-if="currentRadio" class="mb-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3 min-w-0 flex-1 mr-4">
+              <div class="w-10 h-10 bg-gray-50 dark:bg-zinc-700 rounded-lg flex items-center justify-center shadow-sm border border-gray-200 dark:border-zinc-600 overflow-hidden p-1">
                 <img 
                   :src="currentRadio.logo" 
                   :alt="currentRadio.name"
-                  class="w-7 h-7 object-contain"
+                  class="w-full h-full object-contain"
                   @error="handleImageError"
                 >
               </div>
-              <div>
-                <p class="text-sm font-bold text-slate-900">{{ currentRadio.name }}</p>
-                <p class="text-xs text-slate-500">{{ isPlaying ? '🔊 Sonando' : '⏸️ Pausado' }}</p>
+              <div class="min-w-0">
+                <p class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ currentRadio.name }}</p>
+                <div class="flex items-center space-x-1.5">
+                  <span class="relative flex h-2 w-2">
+                    <span v-if="isPlaying" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span :class="isPlaying ? 'bg-emerald-500' : 'bg-gray-400'" class="relative inline-flex rounded-full h-2 w-2"></span>
+                  </span>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">{{ isPlaying ? 'En vivo' : 'Pausado' }}</p>
+                </div>
               </div>
             </div>
 
-            <!-- Control de Volumen -->
-            <div class="flex items-center space-x-2">
+            <!-- Control de Volumen Compacto -->
+            <div class="flex items-center space-x-2 group relative">
               <button 
                 @click="toggleMute"
-                class="w-8 h-8 bg-white hover:bg-slate-100 rounded-lg flex items-center justify-center transition-all shadow-sm"
+                class="w-8 h-8 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 rounded-lg flex items-center justify-center transition-all text-gray-600 dark:text-gray-300"
               >
-                <svg v-if="!isMuted" class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                <svg v-if="!isMuted && volume > 0" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                 </svg>
-                <svg v-else class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                <svg v-else class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                 </svg>
               </button>
-              <input 
-                v-model="volume"
-                @input="updateVolume"
-                type="range" 
-                min="0" 
-                max="100" 
-                class="w-24 h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-emerald-500"
-              >
+              
+              <!-- Slider de volumen (visible en hover o siempre) -->
+              <div class="w-20">
+                <input 
+                  v-model="volume"
+                  @input="updateVolume"
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  class="w-full h-1.5 appearance-none cursor-pointer"
+                >
+              </div>
             </div>
           </div>
 
-          <!-- Botones de Control -->
-          <div class="flex items-center justify-center space-x-3">
+          <!-- Botones de Control Principales -->
+          <div class="flex items-center justify-center space-x-6">
             <button 
               @click="previousRadio"
               :disabled="!currentRadio"
-              class="w-10 h-10 bg-white hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all shadow-sm border border-slate-200"
+              class="p-2 text-gray-400 hover:text-emerald-600 dark:text-gray-500 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors"
             >
-              <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 16V8a2 2 0 00-2-2h-1l-5-3v14l5-3h1a2 2 0 002-2zM3 12h8M3 12l3-3m-3 3l3 3" />
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
               </svg>
             </button>
 
@@ -158,45 +171,45 @@
             <button 
               @click="togglePlay"
               :disabled="!currentRadio"
-              class="w-14 h-14 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-full flex items-center justify-center transition-all shadow-lg active:scale-95"
+              class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-full flex items-center justify-center transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95"
             >
-              <svg v-if="!isPlaying" class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+              <svg v-if="!isPlaying" class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
               <svg v-else class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
               </svg>
             </button>
 
             <button 
               @click="nextRadio"
               :disabled="!currentRadio"
-              class="w-10 h-10 bg-white hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all shadow-sm border border-slate-200"
+              class="p-2 text-gray-400 hover:text-emerald-600 dark:text-gray-500 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors"
             >
-              <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8v8a2 2 0 002 2h1l5 3V5L6 8H5a2 2 0 00-2 2zm13 0l3-3m0 0l3 3m-3-3v8" />
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
               </svg>
             </button>
           </div>
 
           <!-- Mensaje de Estado -->
           <Transition name="fade">
-            <div v-if="statusMessage" class="mt-3 text-center">
-              <p :class="[
-                'text-xs font-semibold px-3 py-2 rounded-lg inline-block',
+            <div v-if="statusMessage" class="mt-3 text-center absolute bottom-20 left-0 right-0 pointer-events-none">
+              <span :class="[
+                'text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm inline-block backdrop-blur-md',
                 statusMessage.type === 'error' 
-                  ? 'bg-red-50 text-red-700 border border-red-200' 
-                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  ? 'bg-red-100/90 text-red-700 border border-red-200 dark:bg-red-900/90 dark:text-red-100 dark:border-red-800' 
+                  : 'bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/90 dark:text-emerald-100 dark:border-emerald-800'
               ]">
                 {{ statusMessage.text }}
-              </p>
+              </span>
             </div>
           </Transition>
         </div>
       </div>
     </Transition>
 
-    <!-- Elemento de Audio (Siempre vivo, aunque el widget esté cerrado) -->
+    <!-- Elemento de Audio -->
     <audio 
       ref="audioPlayer"
       @error="handleAudioError"
@@ -369,23 +382,19 @@ onUnmounted(() => {
 /* Animación de Slide-Up */
 .slide-up-enter-active,
 .slide-up-leave-active {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.slide-up-enter-from {
-  transform: translateY(100%);
-  opacity: 0;
-}
-
+.slide-up-enter-from,
 .slide-up-leave-to {
-  transform: translateY(100%);
+  transform: translateY(20px);
   opacity: 0;
 }
 
 /* Animación de Fade */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
 }
 
 .fade-enter-from,
@@ -395,12 +404,11 @@ onUnmounted(() => {
 
 /* Scrollbar Personalizado */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
+  background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -408,48 +416,100 @@ onUnmounted(() => {
   border-radius: 10px;
 }
 
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #52525b;
+}
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-/* Animación de Barras de Sonido */
-@keyframes sound-wave {
-  0%, 100% {
-    height: 0.75rem;
-  }
-  50% {
-    height: 1.25rem;
-  }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #71717a;
 }
 
-.animate-sound-wave {
-  animation: sound-wave 0.6s ease-in-out infinite;
+/* Animación de Barras de Música */
+@keyframes music-bar {
+  0%, 100% { height: 4px; }
+  50% { height: 12px; }
+}
+
+.animate-music-bar-1 {
+  animation: music-bar 0.5s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.animate-music-bar-2 {
+  animation: music-bar 0.5s ease-in-out infinite;
+  animation-delay: 0.15s;
+}
+
+.animate-music-bar-3 {
+  animation: music-bar 0.5s ease-in-out infinite;
+  animation-delay: 0.3s;
 }
 
 /* Estilo del Range Input */
 input[type="range"] {
   appearance: none;
   -webkit-appearance: none;
+  background: transparent;
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #10b981;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s;
+  margin-top: -3.5px; /* Ajuste fino de centrado */
 }
 
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  border-radius: 999px;
+  background: #e2e8f0; /* slate-200 */
+}
+
+.dark input[type="range"]::-webkit-slider-runnable-track {
+  background: #52525b; /* zinc-600 */
+}
+
+/* Firefox */
 input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
+  border: none;
   border-radius: 50%;
   background: #10b981;
   cursor: pointer;
-  border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.dark input[type="range"]::-moz-range-track {
+  background: #52525b;
 }
 </style>

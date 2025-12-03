@@ -1,23 +1,108 @@
 <template>
-  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="$emit('close')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in" @click.self="$emit('close')">
+    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden animate-scale-in">
       
-      <!-- Header -->
-      <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-            {{ product?.id ? 'Editar Producto' : 'Nuevo Producto' }}
-          </h3>
-          <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- Header Ejecutivo con Stepper -->
+      <div class="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+        <div class="px-6 py-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-zinc-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-zinc-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                {{ product?.id ? 'Editar Producto' : 'Crear Nuevo Producto' }}
+              </h3>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400">Complete la información en 3 pasos simples</p>
+            </div>
+          </div>
+          <button @click="$emit('close')" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
+        
+        <!-- Stepper Visual Profesional -->
+        <div class="px-6 pb-4">
+          <div class="flex items-center justify-between">
+            <!-- Paso 1 -->
+            <div class="flex items-center flex-1">
+              <div :class="[
+                'flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-all',
+                currentStep >= 1 
+                  ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900' 
+                  : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500'
+              ]">
+                <svg v-if="currentStep > 1" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span v-else>1</span>
+              </div>
+              <div class="ml-3 min-w-0">
+                <p :class="['text-xs font-semibold', currentStep >= 1 ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500']">
+                  Identidad
+                </p>
+                <p class="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">Nombre y categoría</p>
+              </div>
+            </div>
+            
+            <!-- Línea conectora 1 -->
+            <div class="flex-1 h-0.5 mx-2" :class="currentStep > 1 ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-200 dark:bg-zinc-700'"></div>
+            
+            <!-- Paso 2 -->
+            <div class="flex items-center flex-1">
+              <div :class="[
+                'flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-all',
+                currentStep >= 2 
+                  ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900' 
+                  : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500'
+              ]">
+                <svg v-if="currentStep > 2" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span v-else>2</span>
+              </div>
+              <div class="ml-3 min-w-0">
+                <p :class="['text-xs font-semibold', currentStep >= 2 ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500']">
+                  Precio y Medida
+                </p>
+                <p class="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">Cómo se vende</p>
+              </div>
+            </div>
+            
+            <!-- Línea conectora 2 -->
+            <div class="flex-1 h-0.5 mx-2" :class="currentStep > 2 ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-200 dark:bg-zinc-700'"></div>
+            
+            <!-- Paso 3 -->
+            <div class="flex items-center flex-1">
+              <div :class="[
+                'flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-all',
+                currentStep >= 3 
+                  ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900' 
+                  : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 dark:text-zinc-500'
+              ]">
+                3
+              </div>
+              <div class="ml-3 min-w-0">
+                <p :class="['text-xs font-semibold', currentStep >= 3 ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500']">
+                  Inventario
+                </p>
+                <p class="text-[10px] text-zinc-500 dark:text-zinc-400 truncate">Stock y tiendas</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="p-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <form @submit.prevent="handleSubmit" class="flex flex-col h-full">
+        <!-- Contenedor del Paso Actual (con scroll) -->
+        <div class="flex-1 overflow-y-auto p-6" style="max-height: calc(95vh - 240px);">
+          
+          <!-- ========================= PASO 1: IDENTIDAD DEL PRODUCTO ========================= -->
+          <div v-if="currentStep === 1" class="space-y-6 animate-fade-in">
           
           <!-- Columna Izquierda: Información Básica -->
           <div class="space-y-6">
@@ -225,6 +310,68 @@
                     ${{ (formData.price - formData.cost).toLocaleString() }}
                   </span>
                 </div>
+              </div>
+
+              <!-- 📏 UNIDAD DE MEDIDA (NUEVO) -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <!-- Unidad de Medida -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Unidad de Medida *
+                    <span class="text-xs text-gray-500 ml-1">(¿Cómo se vende?)</span>
+                  </label>
+                  <select
+                    v-model="formData.measurement_unit"
+                    @change="updateAllowDecimal"
+                    class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  >
+                    <option value="unit">🔢 Unidades (und) - iPhones, TVs, etc</option>
+                    <option value="kg">⚖️ Kilogramos (kg) - Papas, Carne, etc</option>
+                    <option value="g">⚖️ Gramos (g) - Especias, Café, etc</option>
+                    <option value="m">📏 Metros (m) - Tela, Cable, etc</option>
+                    <option value="cm">📏 Centímetros (cm) - Cinta, etc</option>
+                    <option value="l">🧴 Litros (L) - Gasolina, Leche, etc</option>
+                    <option value="ml">🧴 Mililitros (ml) - Perfumes, etc</option>
+                  </select>
+                  <p class="text-xs text-gray-500 mt-1">Seleccione cómo se vende este producto</p>
+                </div>
+
+                <!-- Permite Decimales -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Cantidad con Decimales
+                    <span class="text-xs text-gray-500 ml-1">(Auto-detectado)</span>
+                  </label>
+                  <div class="flex items-center h-10">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        v-model="formData.allow_decimal"
+                        class="sr-only peer"
+                      />
+                      <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                      <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                        {{ formData.allow_decimal ? 'Sí (ej: 1.5 kg)' : 'No (ej: 2 unidades)' }}
+                      </span>
+                    </label>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">
+                    {{ formData.allow_decimal ? 'Permite cantidades como 0.5, 1.25, etc' : 'Solo números enteros (1, 2, 3)' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Información Visual de Precio con Unidad -->
+              <div v-if="formData.price" class="mb-4 p-3 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-emerald-800 dark:text-emerald-200">Precio Final:</span>
+                  <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                    ${{ formData.price.toLocaleString() }} / {{ getUnitAbbreviation(formData.measurement_unit) }}
+                  </span>
+                </div>
+                <p class="text-xs text-emerald-700 dark:text-emerald-300 mt-1">
+                  Así se mostrará en el POS
+                </p>
               </div>
             </div>
 
@@ -458,6 +605,8 @@ const formData = ref({
   stock: 0,
   min_stock: 0,
   unit: 'unidad',
+  measurement_unit: 'unit',  // 📏 Nueva: Unidad de medida
+  allow_decimal: false,       // ✅ Nueva: Permite decimales
   image: '',
   active: true,
   warehouseStock: {} // { warehouse_id: stock_quantity }
@@ -510,6 +659,8 @@ const initializeForm = () => {
       stock: props.product.stock,
       min_stock: props.product.min_stock,
       unit: props.product.unit || 'unidad',
+      measurement_unit: props.product.measurement_unit || 'unit',  // 📏 Nueva
+      allow_decimal: props.product.allow_decimal || false,         // ✅ Nueva
       image: props.product.image || '',
       active: props.product.active,
       warehouseStock: { ...warehouseStock }
@@ -543,6 +694,8 @@ const initializeForm = () => {
       stock: 0, // Stock inicial puede ser 0
       min_stock: 0,
       unit: 'unidad',
+      measurement_unit: 'unit',  // 📏 Nueva: Por defecto unidades
+      allow_decimal: false,       // ✅ Nueva: Por defecto no permite decimales
       image: '',
       active: true,
       warehouseStock: { ...warehouseStock }
@@ -587,6 +740,26 @@ const handleImageUpload = (event) => {
     }
     reader.readAsDataURL(file)
   }
+}
+
+// 📏 Métodos para Unidades de Medida
+const getUnitAbbreviation = (unit) => {
+  const units = {
+    'unit': 'und',
+    'kg': 'kg',
+    'g': 'g',
+    'm': 'm',
+    'cm': 'cm',
+    'l': 'L',
+    'ml': 'ml'
+  }
+  return units[unit] || 'und'
+}
+
+const updateAllowDecimal = () => {
+  // Auto-detectar si debe permitir decimales según la unidad
+  const decimalUnits = ['kg', 'g', 'm', 'cm', 'l', 'ml']
+  formData.value.allow_decimal = decimalUnits.includes(formData.value.measurement_unit)
 }
 
 const handleSubmit = () => {

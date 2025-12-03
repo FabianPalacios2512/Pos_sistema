@@ -7,7 +7,7 @@
         
         <!-- Título Simple -->
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Facturas</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-zinc-200">Facturas</h1>
           <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestión y control de documentos fiscales</p>
         </div>
         
@@ -24,7 +24,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Facturas del Mes</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ monthlyInvoices }}</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">{{ monthlyInvoices }}</p>
               </div>
             </div>
           </div>
@@ -39,7 +39,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Total Facturado</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">${{ formatCurrency(totalInvoiced) }}</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">${{ formatCurrency(totalInvoiced) }}</p>
               </div>
             </div>
           </div>
@@ -54,7 +54,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Cotizaciones</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ quotations }}</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">{{ quotations }}</p>
               </div>
             </div>
           </div>
@@ -101,7 +101,7 @@
                 v-model="searchTerm"
                 type="text"
                 placeholder="Buscar facturas o clientes..."
-                class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300">
+                class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300">
             </div>
             
             <!-- Filtros compactos -->
@@ -126,7 +126,7 @@
           </div>
           
           <!-- Lista minimalista sin botones -->
-          <div class="flex-1 overflow-y-auto">
+          <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900">
             
             <div
               v-for="invoice in displayedInvoices"
@@ -145,7 +145,7 @@
               <div class="flex items-start gap-3">
                 <div class="flex-1 min-w-0">
                   <div class="flex justify-between items-start">
-                    <p class="text-sm font-bold text-gray-800 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <p class="text-sm font-bold text-gray-800 dark:text-zinc-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {{ invoice.invoiceNumber || invoice.number || `DOC-${String(invoice.id).padStart(4, '0')}` }}
                     </p>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border"
@@ -163,7 +163,7 @@
                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                        {{ formatDate(invoice.date) }}
                     </span>
-                    <span class="text-xs font-black text-gray-900 dark:text-white">
+                    <span class="text-xs font-black text-gray-900 dark:text-zinc-400">
                       ${{ formatCurrency(invoice.total) }}
                     </span>
                   </div>
@@ -216,7 +216,7 @@
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center gap-3 mb-3">
-                    <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
+                    <h2 class="text-3xl font-black text-gray-900 dark:text-zinc-200 tracking-tight">
                       {{ selectedInvoice.invoiceNumber || selectedInvoice.number || `DOC-${String(selectedInvoice.id).padStart(4, '0')}` }}
                     </h2>
                     <span
@@ -335,13 +335,13 @@
                   <div class="grid grid-cols-2 gap-6">
                     <div>
                       <h4 class="text-xs font-bold uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Información del Cliente</h4>
-                      <p class="text-sm font-bold text-gray-900 dark:text-white">{{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}</p>
+                      <p class="text-sm font-bold text-gray-900 dark:text-zinc-200">{{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}</p>
                       <p class="text-xs mt-1 text-gray-500 dark:text-zinc-400">ID Cliente: {{ selectedInvoice.customer_id || 'N/A' }}</p>
                     </div>
                     
                     <div class="text-right">
                       <h4 class="text-xs font-bold uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Información del Documento</h4>
-                      <p class="text-sm font-bold text-gray-900 dark:text-white">Documento: {{ selectedInvoice.invoiceNumber || selectedInvoice.number }}</p>
+                      <p class="text-sm font-bold text-gray-900 dark:text-zinc-200">Documento: {{ selectedInvoice.invoiceNumber || selectedInvoice.number }}</p>
                       <p class="text-xs mt-1 text-gray-500 dark:text-zinc-400">Fecha: {{ formatDate(selectedInvoice.date) }}</p>
                       <p class="text-xs text-gray-500 dark:text-zinc-400">Vencimiento: {{ formatDate(selectedInvoice.due_date) }}</p>
                       <p v-if="selectedInvoice.status === 'returned' && selectedInvoice.return_reference" 
@@ -354,7 +354,7 @@
 
                 <!-- Productos - Tabla limpia y espaciosa -->
                 <div class="mb-6">
-                  <h4 class="text-xs font-bold mb-4 uppercase text-gray-900 dark:text-white" style="letter-spacing: 0.05em;">Productos / Servicios</h4>
+                  <h4 class="text-xs font-bold mb-4 uppercase text-gray-900 dark:text-zinc-300" style="letter-spacing: 0.05em;">Productos / Servicios</h4>
                   
                   <div class="bg-white dark:bg-zinc-900/50 rounded-lg overflow-hidden">
                     <table class="min-w-full">
@@ -381,13 +381,13 @@
                           </td>
                           <td class="text-center px-6 py-4">
                             <span class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-md bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-zinc-300">
-                              {{ item.quantity }}
+                              {{ formatQuantity(item.quantity) }}
                             </span>
                           </td>
                           <td class="text-right px-6 py-4 text-sm font-medium text-gray-600 dark:text-zinc-300">
                             ${{ formatCurrency(item.price || item.unit_price) }}
                           </td>
-                          <td class="text-right px-6 py-4 text-sm font-bold text-gray-900 dark:text-white">
+                          <td class="text-right px-6 py-4 text-sm font-bold text-gray-900 dark:text-zinc-300">
                             ${{ formatCurrency(item.subtotal || (item.quantity * (item.price || item.unit_price))) }}
                           </td>
                         </tr>
@@ -400,15 +400,15 @@
                         <div class="w-72 space-y-2 text-sm">
                           <div class="flex justify-between">
                             <span class="text-gray-500 dark:text-zinc-400">Subtotal:</span>
-                            <span class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
+                            <span class="font-semibold text-gray-900 dark:text-zinc-300">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
                           </div>
                           <div class="flex justify-between">
                             <span class="text-gray-500 dark:text-zinc-400">IVA ({{ displayTaxRate }}%):</span>
-                            <span class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
+                            <span class="font-semibold text-gray-900 dark:text-zinc-300">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
                           </div>
                           <div class="pt-3 mt-2 border-t border-gray-300 dark:border-zinc-600">
                             <div class="flex justify-between items-center">
-                              <span class="text-base font-bold text-gray-900 dark:text-white">TOTAL:</span>
+                              <span class="text-base font-bold text-gray-900 dark:text-zinc-200">TOTAL:</span>
                               <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">${{ formatCurrency(selectedInvoice.total) }}</span>
                             </div>
                           </div>
@@ -422,7 +422,7 @@
                 <div class="grid grid-cols-2 gap-6 pt-5 border-t border-gray-200 dark:border-zinc-700">
                   <div>
                     <h4 class="text-xs font-bold uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Método de Pago</h4>
-                    <p class="text-sm text-gray-900 dark:text-white">{{ getPaymentMethodName(selectedInvoice.payment_method) }}</p>
+                    <p class="text-sm text-gray-900 dark:text-zinc-200">{{ getPaymentMethodName(selectedInvoice.payment_method) }}</p>
                   </div>
                   
                   <div>
@@ -726,6 +726,20 @@ const formatCurrency = (value) => {
   return parseFloat(value).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
+// Formatear cantidades: mostrar decimales solo si los tiene
+const formatQuantity = (quantity) => {
+  if (!quantity) return '0'
+  const num = parseFloat(quantity)
+  
+  // Si tiene decimales, mostrar hasta 2 decimales
+  if (num % 1 !== 0) {
+    return num.toLocaleString('es-CO', { minimumFractionDigits: 1, maximumFractionDigits: 2 })
+  }
+  
+  // Si es entero, no mostrar decimales
+  return num.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+}
+
 const getStatusLabel = (status) => {
   const labels = {
     'Pendiente': 'Pendiente',
@@ -847,12 +861,14 @@ const downloadPDF = async (invoice) => {
     const invoiceData = {
       invoice_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
       date: invoice.date || new Date(),
+      created_at: invoice.created_at || invoice.date || new Date(),
       customer_name: invoice.customer_name || invoice.customer || 'Cliente General',
       cashier: invoice.seller_name || 'Vendedor',
       items: items,
       subtotal: parseFloat(invoice.subtotal || 0),
       discount: parseFloat(invoice.discount_amount || 0),
-      tax: parseFloat(invoice.tax_amount || 0),
+      tax: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      tax_amount: parseFloat(invoice.tax || invoice.tax_amount || 0),
       total: parseFloat(invoice.total || 0),
       payments: invoice.payments || [{
         method: invoice.payment_method || 'efectivo',
@@ -1072,22 +1088,5 @@ onBeforeUnmount(() => {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Scrollbar personalizado */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+/* Scrollbar personalizado eliminado para usar estilos globales */
 </style>

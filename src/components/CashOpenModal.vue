@@ -52,7 +52,8 @@
 
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <!-- Selector de Tienda/Bodega -->
-          <div>
+          <!-- Selector de Tienda/Sede (solo si es Premium/Enterprise y tiene más de una bodega) -->
+          <div v-if="shouldShowWarehouseSelector">
             <label for="warehouse_id" class="block text-sm font-semibold text-gray-900 mb-2">
               Tienda / Sede <span class="text-red-600">*</span>
             </label>
@@ -188,6 +189,7 @@
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useToast } from '../composables/useToast'
 import { warehouseService } from '../services/warehouseService'
+import { appStore } from '../store/appStore'
 
 // Props
 const props = defineProps({
@@ -243,8 +245,26 @@ const currentTime = computed(() => {
   })
 })
 
+// Computed para determinar si debe mostrar el selector de tienda
+const shouldShowWarehouseSelector = computed(() => {
+  const plan = appStore.tenantPlan
+  const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
+  
+  // Si no es premium/enterprise, no mostrar
+  if (!isPremiumOrEnterprise) return false
+  
+  // Si es premium/enterprise, verificar si tiene más de una bodega
+  return warehouses.value.length > 1
+})
+
 const isFormValid = computed(() => {
-  return formData.value.warehouse_id &&
+  // Si el selector de bodega está oculto, no requerir validación de warehouse_id
+  // (se auto-selecciona automáticamente)
+  const warehouseValid = shouldShowWarehouseSelector.value 
+    ? formData.value.warehouse_id  // Si se muestra, debe estar seleccionada
+    : true  // Si está oculto, es válido (se auto-selecciona)
+  
+  return warehouseValid &&
          formData.value.opening_amount && 
          parseFloat(formData.value.opening_amount) >= 0 &&
          !Object.keys(errors.value).length
@@ -273,6 +293,13 @@ watch(() => formData.value.opening_notes, (newVal) => {
 
 // Métodos de validación
 const validateWarehouse = () => {
+  // Si el selector está oculto, no validar (se auto-selecciona)
+  if (!shouldShowWarehouseSelector.value) {
+    delete errors.value.warehouse_id
+    return true
+  }
+  
+  // Si el selector está visible, validar que esté seleccionado
   if (!formData.value.warehouse_id) {
     errors.value.warehouse_id = 'Debe seleccionar una tienda'
     return false
@@ -319,8 +346,26 @@ const validateForm = () => {
 
 // Manejo del formulario
 const handleSubmit = async () => {
+  // Asegurar que las bodegas estén cargadas
+  if (loadingWarehouses.value) {
+    showToast('Cargando información, espere un momento...', 'info')
+    return
+  }
+  
+  // Si no hay warehouse_id y no se debe mostrar el selector, auto-seleccionar
+  if (!formData.value.warehouse_id && !shouldShowWarehouseSelector.value) {
+    const defaultWarehouse = warehouses.value.find(w => w.is_default)
+    formData.value.warehouse_id = defaultWarehouse ? defaultWarehouse.id : warehouses.value[0]?.id
+  }
+  
   if (!validateForm()) {
     showToast('Por favor, corrija los errores en el formulario', 'error')
+    return
+  }
+  
+  // Verificar que warehouse_id esté presente
+  if (!formData.value.warehouse_id) {
+    showToast('Error: No se pudo determinar la tienda/bodega', 'error')
     return
   }
 
@@ -346,13 +391,39 @@ const handleSubmit = async () => {
 const loadWarehouses = async () => {
   try {
     loadingWarehouses.value = true
-    const data = await warehouseService.getAll()
+    const response = await warehouseService.getAll()
+    
+    // El backend devuelve { warehouses: [], plan_info: {} }
+    const data = response.warehouses || response.data?.warehouses || response
     warehouses.value = Array.isArray(data) ? data.filter(w => w.active) : []
     
-    // Auto-seleccionar la bodega predeterminada
-    const defaultWarehouse = warehouses.value.find(w => w.is_default)
-    if (defaultWarehouse) {
-      formData.value.warehouse_id = defaultWarehouse.id
+    console.log('🏪 Bodegas cargadas:', warehouses.value)
+    console.log('📊 Plan actual:', appStore.tenantPlan)
+    
+    // Si no hay bodegas, intentar crear una por defecto o mostrar error
+    if (warehouses.value.length === 0) {
+      console.error('⚠️ No hay bodegas disponibles')
+      showToast('No hay tiendas/bodegas configuradas', 'error')
+      return
+    }
+    
+    // Verificar si el usuario tiene acceso a multi-warehouse
+    const plan = appStore.tenantPlan
+    const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
+    
+    // Si NO es premium/enterprise O solo tiene una bodega, auto-seleccionar
+    if (!isPremiumOrEnterprise || warehouses.value.length === 1) {
+      // Seleccionar la primera bodega disponible (o la por defecto)
+      const defaultWarehouse = warehouses.value.find(w => w.is_default)
+      formData.value.warehouse_id = defaultWarehouse ? defaultWarehouse.id : warehouses.value[0]?.id
+      console.log('✅ Auto-seleccionada bodega:', formData.value.warehouse_id)
+    } else {
+      // Si es premium/enterprise y tiene múltiples bodegas, auto-seleccionar la por defecto si existe
+      const defaultWarehouse = warehouses.value.find(w => w.is_default)
+      if (defaultWarehouse) {
+        formData.value.warehouse_id = defaultWarehouse.id
+        console.log('✅ Auto-seleccionada bodega por defecto:', formData.value.warehouse_id)
+      }
     }
   } catch (error) {
     console.error('Error cargando tiendas:', error)

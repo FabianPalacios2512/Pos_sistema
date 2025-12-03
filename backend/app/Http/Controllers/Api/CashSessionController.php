@@ -195,7 +195,7 @@ class CashSessionController extends Controller
                 'closing_notes' => 'nullable|string|max:500'
             ]);
 
-            $userId = Auth::id(); // Requerir autenticación real
+            $userId = Auth::id();
 
             if (!$userId) {
                 return response()->json([

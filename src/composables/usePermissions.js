@@ -83,16 +83,9 @@ export function usePermissions() {
     }
     
     // Verificar si tiene al menos un permiso del módulo (ej: 'products.view')
-    const hasAccess = userPermissions.value.some(permission => 
+    return userPermissions.value.some(permission => 
       permission.startsWith(`${module}.`) || permission === module
     )
-    
-    // Log solo para módulos críticos
-    if (module === 'pos' || module === 'dashboard') {
-      console.log(`🔍 [hasModuleAccess] ${module}: ${hasAccess} (permisos: ${JSON.stringify(userPermissions.value)})`)
-    }
-    
-    return hasAccess
   }
   
   /**

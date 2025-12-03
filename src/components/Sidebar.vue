@@ -334,14 +334,11 @@ const { isCreditiendaEnabled } = useCreditienda()
 
 // Computed para verificar si debería mostrar MULTISEDE (reactivo)
 const showMultisede = computed(() => {
-  const isPremiumOrEnterprise = ['premium', 'enterprise'].includes(appStore.tenantPlan)
-  console.log('🔍 [Sidebar] showMultisede:', isPremiumOrEnterprise, '(plan:', appStore.tenantPlan, ')')
-  return isPremiumOrEnterprise
+  return ['premium', 'enterprise'].includes(appStore.tenantPlan)
 })
 
 onMounted(async () => {
   // Sidebar inicializado
-  console.log('🏢 [Sidebar] Tenant Plan en mount:', appStore.tenantPlan)
 })
 </script>
 

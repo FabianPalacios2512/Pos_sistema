@@ -59,7 +59,7 @@
             <div class="text-xs">
               <div class="font-medium text-gray-900 dark:text-white mb-1">{{ item.name }}</div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600 dark:text-gray-400">{{ item.quantity }} x ${{ item.price.toLocaleString() }}</span>
+                <span class="text-gray-600 dark:text-gray-400">{{ formatQuantity(item.quantity) }} x ${{ item.price.toLocaleString() }}</span>
                 <span class="font-bold text-gray-900 dark:text-white">${{ (item.quantity * item.price).toLocaleString() }}</span>
               </div>
             </div>
@@ -271,6 +271,20 @@ export default {
     // Formatear números
     const formatNumber = (number) => {
       return new Intl.NumberFormat('es-CO').format(number || 0)
+    }
+
+    // Formatear cantidades: mostrar decimales solo si los tiene
+    const formatQuantity = (quantity) => {
+      if (!quantity) return '0'
+      const num = parseFloat(quantity)
+      
+      // Si tiene decimales, mostrar hasta 2 decimales
+      if (num % 1 !== 0) {
+        return num.toLocaleString('es-CO', { minimumFractionDigits: 1, maximumFractionDigits: 2 })
+      }
+      
+      // Si es entero, no mostrar decimales
+      return num.toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
     }
 
     // Formatear fecha - Ahora usando formatters de Colombia

@@ -132,18 +132,21 @@
             </div>
           </div>
 
-          <!-- 🌍 Toggle Búsqueda Global (Estilo Filtro Profesional) -->
+          <!-- 🌍 Toggle Búsqueda Global/Local (Siempre visible con sesión) -->
           <button
-            v-if="hasOpenSession && currentSession?.warehouse"
+            v-if="shouldShowMultiWarehouseFeatures"
             @click="toggleGlobalSearch"
             class="flex items-center gap-2 px-3 h-10 rounded-lg border-2 transition-all duration-200 font-bold text-xs shadow-sm hover:shadow-md"
             :class="globalSearch 
               ? 'bg-blue-600 dark:bg-blue-700 border-blue-600 dark:border-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600' 
-              : 'bg-white dark:bg-zinc-800 border-slate-300 dark:border-zinc-600 text-slate-700 dark:text-zinc-300 hover:border-slate-400 dark:hover:border-zinc-500 hover:bg-slate-50 dark:hover:bg-zinc-700'"
-            :title="globalSearch ? 'Buscando en todas las tiendas' : 'Buscar solo en tienda actual'"
+              : 'bg-emerald-600 dark:bg-emerald-700 border-emerald-600 dark:border-emerald-700 text-white hover:bg-emerald-700 dark:hover:bg-emerald-600'"
+            :title="globalSearch ? '🌍 Buscando en TODAS las tiendas' : '🏪 Buscar SOLO en ' + (currentSession?.warehouse?.name || 'tienda actual')"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-if="globalSearch" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
             </svg>
             <span>{{ globalSearch ? 'Global' : 'Local' }}</span>
           </button>
@@ -316,18 +319,7 @@
           @click="addToCart(product)"
         >
           
-          <!-- 🏪 Banner de Producto de Otra Tienda (MUY VISIBLE) -->
-          <div v-if="product.is_remote && product.alternative_warehouses && product.alternative_warehouses.length > 0" 
-               class="absolute top-0 left-0 right-0 z-20 bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-1.5 flex items-center justify-center space-x-1.5 shadow-lg">
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
-            <span class="text-white text-xs font-black uppercase tracking-wide">
-              📍 {{ product.alternative_warehouses[0].name }}
-            </span>
-          </div>
-          
-          <div :class="['aspect-square rounded-xl overflow-hidden bg-gray-50 dark:bg-zinc-800/50 relative', product.is_remote ? 'mt-6 mb-3' : 'mb-3']">
+          <div class="aspect-square rounded-xl overflow-hidden bg-gray-50 dark:bg-zinc-800/50 relative mb-3">
              
              <!-- Badge de cantidad en carrito (solo si tiene items) -->
              <div v-if="getProductQuantityInCart(product.id) > 0" 
@@ -335,10 +327,13 @@
                {{ getProductQuantityInCart(product.id) }} en carrito
              </div>
              
-             <!-- Badge de cantidad en carrito (solo si tiene items) -->
-             <div v-if="getProductQuantityInCart(product.id) > 0" 
-                  class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white text-[10px] font-bold shadow-sm">
-               {{ getProductQuantityInCart(product.id) }} en carrito
+             <!-- Badge discreto de tienda (debajo del verde, solo para productos remotos) -->
+             <div v-if="product.is_remote && product.alternative_warehouses && product.alternative_warehouses.length > 0" 
+                  :class="[
+                    'absolute left-2 z-10 px-2 py-0.5 rounded bg-gray-900/75 dark:bg-gray-800/90 backdrop-blur-sm text-white text-[9px] font-medium shadow-sm',
+                    getProductQuantityInCart(product.id) > 0 ? 'top-9' : 'top-2'
+                  ]">
+               📍 {{ product.alternative_warehouses[0].name }}
              </div>
 
              <!-- Imagen o Placeholder Elegante -->
@@ -379,13 +374,13 @@
                </span>
             </div>
             
-            <!-- Nombre del producto (legible, 2 líneas máx) -->
-            <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300 leading-tight line-clamp-2 min-h-[2.5em]" :title="product.name">
+            <!-- Nombre del producto (compacto, 2 líneas máx) -->
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300 leading-tight line-clamp-2" :title="product.name">
               {{ product.name }}
             </h3>
             
-            <!-- Stock con visibilidad clara (TOTAL de todas las bodegas) -->
-            <div class="text-[11px] font-bold mt-0.5">
+            <!-- Stock con visibilidad clara y limpia -->
+            <div class="text-[11px] font-bold mt-1">
               <span v-if="getTotalStock(product) <= 5" class="text-rose-600 dark:text-rose-400 flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
                 ¡Solo {{ getTotalStock(product) }}!
@@ -493,7 +488,7 @@
           class="group relative flex gap-3 p-2.5 bg-white dark:bg-zinc-800/80 rounded-xl shadow-sm border border-transparent dark:border-zinc-700/50 hover:border-indigo-100 dark:hover:border-indigo-700 transition-all hover:shadow-md"
         >
           <div class="w-14 h-14 rounded-lg bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 overflow-hidden flex-shrink-0 relative">
-             <img v-if="item.image || item.image_url" :src="item.image || item.image_url" class="w-full h-full object-cover" @error="(e) => handleImageError(e, item)" />
+             <img v-if="item.image_url" :src="getFullImageUrl(item.image_url)" class="w-full h-full object-cover" @error="(e) => e.target.src = '/placeholder-product.png'" />
              <div v-else class="w-full h-full flex items-center justify-center">
                <svg class="w-6 h-6 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -512,14 +507,14 @@
             </div>
             
             <div class="flex items-center justify-between mt-2">
-              <p class="text-[10px] font-medium text-slate-400 dark:text-zinc-400">${{ item.price.toLocaleString() }} c/u</p>
+              <p class="text-[10px] font-medium text-slate-400 dark:text-zinc-400">${{ item.price.toLocaleString() }}/{{ getUnitText(item.measurement_unit || 'unit') }}</p>
               
               <div class="flex items-center bg-slate-50 dark:bg-zinc-700 border border-slate-200 dark:border-zinc-600 rounded-lg h-6 shadow-sm">
                 <button 
                   @click="updateQuantity(item.id, item.quantity - 1)" 
                   class="w-7 h-full flex items-center justify-center text-slate-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-l-lg transition-colors font-bold text-base leading-none pb-0.5"
                 >-</button>
-                <span class="w-6 text-center text-xs font-bold text-slate-900 dark:text-white select-none">{{ item.quantity }}</span>
+                <span class="w-8 text-center text-xs font-bold text-slate-900 dark:text-white select-none">{{ item.quantity % 1 === 0 ? item.quantity : item.quantity.toFixed(2) }}</span>
                 <button 
                   @click="updateQuantity(item.id, item.quantity + 1)" 
                   class="w-7 h-full flex items-center justify-center text-slate-400 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-r-lg transition-colors font-bold text-base leading-none pb-0.5"
@@ -597,97 +592,105 @@
             </div>
           </div>
 
-          <!-- 🎁 Usar Puntos de Lealtad -->
-          <div v-if="canUseLoyaltyPoints" class="mt-4 pt-3 border-t border-dashed border-slate-200">
-            <button
-              @click="usePoints = !usePoints"
-              class="text-[10px] font-bold flex items-center gap-1.5 transition-colors uppercase tracking-wide group w-full"
-              :class="usePoints ? 'text-amber-700 hover:text-amber-900' : 'text-slate-700 hover:text-slate-900'"
-            >
-              <div class="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
-                   :class="usePoints ? 'bg-amber-100 group-hover:bg-amber-200' : 'bg-slate-100 group-hover:bg-slate-200'">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+          <!-- Puntos y Cupón en una sola sección -->
+          <div class="mt-3 pt-3 border-t border-dashed border-slate-200 dark:border-zinc-700">
+            <!-- Botones horizontales -->
+            <div class="grid grid-cols-2 gap-2">
+              <!-- Botón Usar Puntos -->
+              <button
+                v-if="canUseLoyaltyPoints"
+                @click="usePoints = !usePoints"
+                class="text-[10px] font-bold flex items-center justify-center gap-1.5 transition-all uppercase tracking-wide px-2.5 py-2 rounded-lg border shadow-sm hover:shadow-md"
+                :class="usePoints ? 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-zinc-700 dark:to-zinc-600 border-slate-300 dark:border-zinc-500 text-slate-900 dark:text-white ring-2 ring-slate-200 dark:ring-zinc-600' : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-700'"
+              >
+                <svg class="w-3.5 h-3.5 flex-shrink-0" :class="usePoints ? 'text-yellow-600 dark:text-yellow-500' : 'text-slate-600 dark:text-zinc-400'" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                 </svg>
-              </div>
-              <span class="flex-1 text-left">{{ usePoints ? 'Usar Puntos' : 'Usar Puntos' }}</span>
-              <span class="text-[9px] font-black" :class="usePoints ? 'text-amber-600' : 'text-slate-500'">
-                {{ selectedCustomer.loyalty_points.toLocaleString() }} pts
-              </span>
-            </button>
-            
-            <!-- Input de Puntos (cuando está activado) -->
-            <div v-if="usePoints" class="mt-2 space-y-2 animate-fade-in">
-              <div class="flex gap-2">
-                <input 
-                  type="number" 
-                  v-model.number="pointsToRedeem"
-                  :max="maxPointsToUse"
-                  min="0"
-                  class="flex-1 px-3 py-2 border border-amber-300 rounded-lg text-xs font-bold text-amber-800 bg-white focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-                  placeholder="Puntos"
-                />
-                <button 
-                  @click="pointsToRedeem = maxPointsToUse"
-                  class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-bold rounded-lg transition-colors uppercase"
-                >
-                  Máx
-                </button>
-              </div>
-              
-              <!-- Mostrar descuento -->
-              <div v-if="pointsDiscount > 0" class="flex items-center justify-between text-xs bg-amber-50 text-amber-700 px-2 py-1.5 rounded-lg border border-amber-100">
-                <span class="font-semibold">Descuento puntos:</span>
-                <span class="font-black">-${{ pointsDiscount.toLocaleString() }}</span>
-              </div>
+                <span class="leading-tight">Puntos</span>
+              </button>
+
+              <!-- Botón Agregar Cupón -->
+              <button
+                id="tour-discount-btn"
+                @click="showPromoCodeInput = !showPromoCodeInput"
+                class="text-[10px] font-bold flex items-center justify-center gap-1.5 transition-all uppercase tracking-wide px-2.5 py-2 rounded-lg border shadow-sm hover:shadow-md"
+                :class="showPromoCodeInput ? 'bg-gradient-to-br from-slate-50 to-slate-100 dark:from-zinc-700 dark:to-zinc-600 border-slate-300 dark:border-zinc-500 text-slate-900 dark:text-white ring-2 ring-slate-200 dark:ring-zinc-600' : 'bg-slate-50 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-700'"
+              >
+                <svg class="w-3.5 h-3.5 flex-shrink-0" :class="showPromoCodeInput ? 'text-blue-600 dark:text-blue-500' : 'text-slate-600 dark:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <span class="leading-tight">Cupón</span>
+              </button>
             </div>
-          </div>
 
-          <!-- Cupón -->
-          <div class="mt-4 pt-3 border-t border-dashed border-slate-200">
-            <button
-              id="tour-discount-btn"
-              v-if="!showPromoCodeInput"
-              @click="showPromoCodeInput = true"
-              class="text-[10px] font-bold text-slate-700 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 flex items-center gap-1.5 transition-colors uppercase tracking-wide group"
-            >
-              <div class="w-7 h-7 bg-slate-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center group-hover:bg-slate-200 dark:group-hover:bg-zinc-700 transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-              </div>
-              <span>Agregar Cupón</span>
-            </button>
-
-            <div v-else class="animate-fade-in-down">
-              <div class="flex gap-2">
-                <input
-                  v-model="promoCode"
-                  type="text"
-                  placeholder="CÓDIGO"
-                  class="flex-1 px-3 py-2 text-xs font-bold border border-slate-300 dark:border-zinc-600 rounded-lg uppercase focus:ring-2 focus:ring-slate-500 dark:focus:ring-zinc-500 focus:border-slate-500 dark:focus:border-zinc-500 outline-none bg-white dark:bg-zinc-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500"
-                  @keyup.enter="applyPromoCode"
-                />
-                <button
-                  @click="applyPromoCode"
-                  :disabled="!promoCode.trim()"
-                  class="px-3 bg-slate-900 dark:bg-zinc-700 text-white text-[10px] font-bold rounded-lg hover:bg-black dark:hover:bg-zinc-600 disabled:opacity-50 transition-colors"
-                >
-                  APLICAR
+            <!-- Inputs que aparecen debajo -->
+            <div class="space-y-2 mt-2">
+              <!-- Input de Puntos -->
+              <div v-if="usePoints && canUseLoyaltyPoints" class="animate-fade-in">
+                <div class="flex gap-1.5">
+                  <input 
+                    type="number" 
+                    v-model.number="pointsToRedeem"
+                    :max="maxPointsToUse"
+                    min="0"
+                    class="flex-1 px-2.5 py-2 border rounded-lg text-xs font-bold transition-colors bg-white dark:bg-zinc-800 border-slate-300 dark:border-zinc-600 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-yellow-400 dark:focus:ring-yellow-600 focus:border-transparent"
+                    placeholder="Puntos a usar"
+                  />
+                  <button 
+                    @click="pointsToRedeem = maxPointsToUse"
+                    class="px-3 py-2 bg-gradient-to-br from-slate-600 to-slate-700 dark:from-zinc-600 dark:to-zinc-700 hover:from-slate-700 hover:to-slate-800 dark:hover:from-zinc-500 dark:hover:to-zinc-600 text-white text-[9px] font-bold rounded-lg transition-all shadow-sm hover:shadow-md uppercase"
+                  >
+                    Máx
                   </button>
-                <button 
-                  @click="showPromoCodeInput = false; promoCode = ''; promoError = ''" 
-                  class="text-slate-400 hover:text-rose-500 transition-colors p-1"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                  <button 
+                    @click="usePoints = false; pointsToRedeem = 0" 
+                    class="px-2 text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                </div>
+                <div v-if="pointsDiscount > 0" class="flex items-center justify-between text-[10px] bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/20 dark:to-green-950/20 text-emerald-700 dark:text-emerald-400 px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-900/30 mt-1.5">
+                  <span class="font-semibold flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                    Descuento:
+                  </span>
+                  <span class="font-black">-${{ pointsDiscount.toLocaleString() }}</span>
+                </div>
               </div>
-              <p v-if="promoError" class="text-[10px] text-rose-600 mt-1.5 font-bold flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                {{ promoError }}
-              </p>
-              <p v-if="discount > 0 && !promoError" class="text-[10px] text-emerald-600 mt-1.5 font-bold flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                Cupón aplicado correctamente
-              </p>
+
+              <!-- Input de Cupón -->
+              <div v-if="showPromoCodeInput" class="animate-fade-in">
+                <div class="flex gap-1.5">
+                  <input
+                    v-model="promoCode"
+                    type="text"
+                    placeholder="CÓDIGO"
+                    class="flex-1 px-2.5 py-2 text-xs font-bold border rounded-lg uppercase transition-colors bg-white dark:bg-zinc-800 border-slate-300 dark:border-zinc-600 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 focus:border-transparent outline-none"
+                    @keyup.enter="applyPromoCode"
+                  />
+                  <button
+                    @click="applyPromoCode"
+                    :disabled="!promoCode.trim()"
+                    class="px-3 py-2 bg-gradient-to-br from-slate-600 to-slate-700 dark:from-zinc-600 dark:to-zinc-700 hover:from-slate-700 hover:to-slate-800 dark:hover:from-zinc-500 dark:hover:to-zinc-600 disabled:from-slate-300 disabled:to-slate-300 dark:disabled:from-zinc-700 dark:disabled:to-zinc-700 disabled:cursor-not-allowed text-white text-[9px] font-bold rounded-lg transition-all shadow-sm hover:shadow-md uppercase"
+                  >
+                    OK
+                  </button>
+                  <button 
+                    @click="showPromoCodeInput = false; promoCode = ''; promoError = ''" 
+                    class="px-2 text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                </div>
+                <p v-if="promoError" class="text-[9px] text-rose-600 dark:text-rose-400 mt-1.5 font-bold flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  {{ promoError }}
+                </p>
+                <p v-if="discount > 0 && !promoError" class="text-[9px] text-emerald-600 dark:text-emerald-400 mt-1.5 font-bold flex items-center gap-1">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                  Cupón aplicado
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -814,6 +817,96 @@
       @view-history="handleCustomerHistory"
       @close="showCustomerSelector = false"
     />
+
+    <!-- Modal de Cantidad con Unidades de Medida -->
+    <div v-if="showQuantityModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl max-w-md w-full">
+        <!-- Header -->
+        <div class="bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Ingresa la Cantidad</h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">{{ selectedProductForQuantity?.name }}</p>
+            </div>
+            <button @click="showQuantityModal = false" 
+                    class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-lg transition-colors">
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-4">
+          <!-- Toggle de unidad (solo para kg/g y L/ml) -->
+          <div v-if="['kg', 'g', 'l', 'ml'].includes(selectedProductForQuantity?.measurement_unit)" 
+               class="flex items-center justify-between p-3 bg-gray-50 dark:bg-zinc-700 rounded-lg">
+            <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">
+              Ingresar en {{ getUnitText(getAlternativeUnit(selectedProductForQuantity?.measurement_unit)) }}
+            </span>
+            <button 
+              @click="useAlternativeUnit = !useAlternativeUnit"
+              :class="[
+                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+                useAlternativeUnit ? 'bg-blue-600' : 'bg-gray-300 dark:bg-zinc-600'
+              ]">
+              <span :class="[
+                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                useAlternativeUnit ? 'translate-x-6' : 'translate-x-1'
+              ]" />
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
+              Cantidad en {{ getUnitText(getInputUnit(selectedProductForQuantity?.measurement_unit)) }}
+            </label>
+            <div class="relative">
+              <input 
+                v-model="customQuantity" 
+                type="number" 
+                step="0.01"
+                min="0.01"
+                @keyup.enter="addToCartWithQuantity"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg font-semibold"
+                :placeholder="useAlternativeUnit && selectedProductForQuantity?.measurement_unit === 'kg' ? 'Ej: 450, 500, 1000' : 'Ej: 0.5, 1.25, 2.75'"
+                autofocus>
+              <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm font-semibold text-gray-500 dark:text-zinc-400">
+                {{ getUnitText(getInputUnit(selectedProductForQuantity?.measurement_unit)) }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-2">
+              Stock disponible: {{ getTotalStock(selectedProductForQuantity) }} {{ getUnitText(selectedProductForQuantity?.measurement_unit) }}
+            </p>
+          </div>
+
+          <!-- Botones rápidos (ajustados según la unidad) -->
+          <div class="grid grid-cols-4 gap-2">
+            <button 
+              v-for="quick in (useAlternativeUnit && ['kg', 'l'].includes(selectedProductForQuantity?.measurement_unit) ? [250, 500, 1000, 2000] : [0.25, 0.5, 1, 2])" 
+              :key="quick"
+              @click="customQuantity = quick"
+              class="px-3 py-2 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 text-gray-700 dark:text-zinc-300 rounded-lg text-sm font-semibold transition-colors">
+              {{ quick }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-700 px-6 py-4 flex gap-3">
+          <button @click="showQuantityModal = false" 
+                  class="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-600 text-gray-700 dark:text-zinc-300 rounded-lg font-semibold transition-colors border border-gray-300 dark:border-zinc-600">
+            Cancelar
+          </button>
+          <button @click="addToCartWithQuantity" 
+                  :disabled="!customQuantity || parseFloat(customQuantity) <= 0"
+                  class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+            Agregar al Carrito
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal de Historial de Cliente -->
     <CustomerHistoryModal
@@ -1993,6 +2086,78 @@ const promoError = ref('')
 // Flag para controlar si se intentó aplicar un código (solo mostrar errores tras intento)
 const promoApplyAttempted = ref(false)
 
+// Modal de cantidad con unidades de medida
+const showQuantityModal = ref(false)
+const selectedProductForQuantity = ref(null)
+const customQuantity = ref('')
+const useAlternativeUnit = ref(false) // Toggle para usar g en vez de kg, ml en vez de L, etc
+
+// Función para obtener la URL completa de la imagen
+const getFullImageUrl = (imageUrl) => {
+  if (!imageUrl) return null
+  // Si ya es una URL completa (http/https), devolverla tal cual
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl
+  }
+  // Si es una ruta relativa, agregar el base URL del backend
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+  return `${baseUrl}/storage/${imageUrl.replace(/^\/storage\//, '')}`
+}
+
+// Función para obtener el texto de la unidad
+const getUnitText = (unit) => {
+  const units = {
+    'unit': 'und',
+    'kg': 'kg',
+    'g': 'g',
+    'm': 'm',
+    'cm': 'cm',
+    'l': 'L',
+    'ml': 'ml'
+  }
+  return units[unit] || 'und'
+}
+
+// Función para verificar si una unidad permite decimales
+const allowsDecimals = (unit) => {
+  return unit !== 'unit' // Todas menos 'unit' permiten decimales
+}
+
+// Función para obtener la unidad alternativa (g<->kg, ml<->L)
+const getAlternativeUnit = (unit) => {
+  const alternatives = {
+    'kg': 'g',
+    'g': 'kg',
+    'l': 'ml',
+    'ml': 'l'
+  }
+  return alternatives[unit] || unit
+}
+
+// Función para convertir cantidad entre unidades
+const convertQuantity = (quantity, fromUnit, toUnit) => {
+  if (fromUnit === toUnit) return quantity
+  
+  // kg -> g: multiplicar por 1000
+  if (fromUnit === 'kg' && toUnit === 'g') return quantity * 1000
+  // g -> kg: dividir por 1000
+  if (fromUnit === 'g' && toUnit === 'kg') return quantity / 1000
+  // L -> ml: multiplicar por 1000
+  if (fromUnit === 'l' && toUnit === 'ml') return quantity * 1000
+  // ml -> L: dividir por 1000
+  if (fromUnit === 'ml' && toUnit === 'l') return quantity / 1000
+  
+  return quantity
+}
+
+// Obtener la unidad de entrada según el toggle
+const getInputUnit = (baseUnit) => {
+  if (useAlternativeUnit.value) {
+    return getAlternativeUnit(baseUnit)
+  }
+  return baseUnit
+}
+
 // Carrito de venta
 const cart = reactive({
   items: []
@@ -2131,6 +2296,19 @@ const mapPaymentIcon = (iconType, methodName) => {
 }
 
 // Computed properties
+
+// 🏢 Computed para saber si debe mostrar features de múltiples bodegas
+const shouldShowMultiWarehouseFeatures = computed(() => {
+  // ✅ Solo mostrar en planes premium/enterprise
+  const plan = appStore.tenantPlan
+  const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
+  
+  if (!isPremiumOrEnterprise) return false
+  
+  // Y solo cuando hay sesión abierta con bodega asignada
+  return hasOpenSession.value && currentSession.value?.warehouse_id
+})
+
 const paymentMethods = computed(() => {
   let methods = []
 
@@ -2479,43 +2657,79 @@ const getProductQuantityInCart = (productId) => {
 
 // 🏢 Función helper para calcular stock total de todas las bodegas
 const getTotalStock = (product) => {
-  let totalStock = product.stock || 0
-  
-  // Si el producto tiene información de bodegas, sumar todo el stock disponible
-  if (product.warehouses && Array.isArray(product.warehouses)) {
-    totalStock = product.warehouses.reduce((sum, w) => sum + (parseInt(w.stock) || 0), 0)
-  } else if (product.alternative_warehouses && Array.isArray(product.alternative_warehouses)) {
-    totalStock = product.alternative_warehouses.reduce((sum, w) => sum + (parseInt(w.stock) || 0), 0)
+  // 🔍 En modo LOCAL: Solo mostrar stock de la bodega actual
+  if (!globalSearch.value && currentSession.value?.warehouse_id) {
+    const currentWarehouseId = currentSession.value.warehouse_id
+    
+    // Buscar en warehouses
+    if (product.warehouses && Array.isArray(product.warehouses)) {
+      const currentWh = product.warehouses.find(w => w.warehouse_id === currentWarehouseId)
+      return currentWh ? (parseInt(currentWh.stock) || 0) : 0
+    }
+    
+    // Buscar en alternative_warehouses
+    if (product.alternative_warehouses && Array.isArray(product.alternative_warehouses)) {
+      const currentWh = product.alternative_warehouses.find(w => w.warehouse_id === currentWarehouseId)
+      return currentWh ? (parseInt(currentWh.stock) || 0) : 0
+    }
+    
+    // Si no hay info de bodegas, retornar 0 en modo local
+    return 0
   }
   
-  return totalStock
+  // 🌍 En modo GLOBAL: Sumar stock de TODAS las bodegas
+  if (product.warehouses && Array.isArray(product.warehouses)) {
+    return product.warehouses.reduce((sum, w) => sum + (parseInt(w.stock) || 0), 0)
+  }
+  
+  if (product.alternative_warehouses && Array.isArray(product.alternative_warehouses)) {
+    return product.alternative_warehouses.reduce((sum, w) => sum + (parseInt(w.stock) || 0), 0)
+  }
+  
+  // Fallback al stock general
+  return product.stock || 0
 }
 
 // Métodos
 const addToCart = (product) => {
   
-  // 🏢 Calcular stock total REAL sumando todas las bodegas
+  // 🏢 Calcular stock disponible (ya maneja modo LOCAL vs GLOBAL)
   const totalStock = getTotalStock(product)
   
   console.log('🛒 Agregando al carrito:', {
     producto: product.name,
-    stock_mostrado: product.stock,
-    stock_total_real: totalStock,
+    modo: globalSearch.value ? 'GLOBAL' : 'LOCAL',
+    stock_disponible: totalStock,
+    bodega_actual: currentSession.value?.warehouse?.name,
+    unidad: product.measurement_unit,
     bodegas: product.warehouses || product.alternative_warehouses || []
   })
   
   // Validar que haya stock disponible
   if (totalStock <= 0) {
-    showWarning(`No hay stock disponible de ${product.name}`)
+    if (!globalSearch.value) {
+      showWarning(`⚠️ No hay stock de "${product.name}" en ${currentSession.value?.warehouse?.name || 'esta tienda'}. Cambia a búsqueda GLOBAL para ver productos de otras tiendas.`)
+    } else {
+      showWarning(`No hay stock disponible de ${product.name} en ninguna tienda`)
+    }
     return
   }
   
+  // Si el producto usa unidades con decimales, abrir modal para ingresar cantidad
+  if (allowsDecimals(product.measurement_unit)) {
+    selectedProductForQuantity.value = product
+    customQuantity.value = ''
+    showQuantityModal.value = true
+    return
+  }
+  
+  // Para unidades enteras (unit), agregar normalmente
   const existingItem = cart.items.find(item => item.id === product.id)
   
   if (existingItem) {
     if (existingItem.quantity < totalStock) {
       existingItem.quantity += 1
-      existingItem.max_stock = totalStock // Actualizar max_stock con el total real
+      existingItem.max_stock = totalStock
     } else {
       showWarning(`No hay más stock disponible de ${product.name}`)
     }
@@ -2528,9 +2742,67 @@ const addToCart = (product) => {
       image: getProductImage(product),
       barcode: product.barcode,
       category: product.category,
-      max_stock: totalStock // Usar stock total de todas las bodegas
+      max_stock: totalStock,
+      measurement_unit: product.measurement_unit || 'unit'
     })
   }
+  
+  // Emitir cambio en el estado del carrito
+  emit('cart-status-changed', cart.items.length > 0)
+}
+
+// Agregar producto con cantidad personalizada
+const addToCartWithQuantity = () => {
+  if (!selectedProductForQuantity.value || !customQuantity.value) return
+  
+  let quantity = parseFloat(customQuantity.value)
+  const product = selectedProductForQuantity.value
+  const totalStock = getTotalStock(product)
+  const inputUnit = getInputUnit(product.measurement_unit)
+  
+  if (isNaN(quantity) || quantity <= 0) {
+    showWarning('Por favor ingresa una cantidad válida')
+    return
+  }
+  
+  // Convertir la cantidad ingresada a la unidad base del producto
+  const quantityInBaseUnit = convertQuantity(quantity, inputUnit, product.measurement_unit)
+  
+  if (quantityInBaseUnit > totalStock) {
+    showWarning(`Solo hay ${totalStock} ${getUnitText(product.measurement_unit)} disponibles`)
+    return
+  }
+  
+  const existingItem = cart.items.find(item => item.id === product.id)
+  
+  if (existingItem) {
+    const newQuantity = existingItem.quantity + quantityInBaseUnit
+    if (newQuantity <= totalStock) {
+      existingItem.quantity = newQuantity
+      existingItem.max_stock = totalStock
+    } else {
+      showWarning(`No puedes agregar más. Stock disponible: ${totalStock} ${getUnitText(product.measurement_unit)}`)
+      return
+    }
+  } else {
+    cart.items.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: quantityInBaseUnit,
+      image: getProductImage(product),
+      barcode: product.barcode,
+      category: product.category,
+      max_stock: totalStock,
+      measurement_unit: product.measurement_unit || 'unit'
+    })
+  }
+  
+  // Cerrar modal y limpiar
+  showQuantityModal.value = false
+  selectedProductForQuantity.value = null
+  customQuantity.value = ''
+  useAlternativeUnit.value = false
   
   // Emitir cambio en el estado del carrito
   emit('cart-status-changed', cart.items.length > 0)
@@ -2543,8 +2815,25 @@ const updateQuantity = (productId, newQuantity) => {
   }
   
   const item = cart.items.find(item => item.id === productId)
-  if (item && newQuantity <= item.max_stock) {
-    item.quantity = newQuantity
+  if (item) {
+    // Para unidades con decimales, incrementar/decrementar según un paso apropiado
+    const unit = item.measurement_unit || 'unit'
+    let step = 1
+    
+    // Definir pasos según la unidad
+    if (unit === 'kg' || unit === 'l') step = 0.5  // 500g o 500ml
+    else if (unit === 'g' || unit === 'ml') step = 100  // 100g o 100ml
+    else if (unit === 'm') step = 0.5  // 50cm
+    else if (unit === 'cm') step = 10  // 10cm
+    
+    // Redondear a 2 decimales
+    const roundedQuantity = Math.round(newQuantity * 100) / 100
+    
+    if (roundedQuantity <= item.max_stock) {
+      item.quantity = roundedQuantity
+    } else {
+      showWarning(`Stock máximo: ${item.max_stock} ${getUnitText(unit)}`)
+    }
   }
   
   // Emitir cambio en el estado del carrito
@@ -3101,7 +3390,7 @@ const handlePaymentConfirmed = async (paymentData) => {
         items: lastSale.value.items.map(item => ({
           product_id: item.id,
           product_name: item.name,
-          quantity: parseInt(item.quantity),
+          quantity: parseFloat(item.quantity), // Cambiar a parseFloat para soportar decimales
           unit_price: parseFloat(item.price)
         })),
         // Información del descuento aplicado
@@ -3144,12 +3433,16 @@ const handlePaymentConfirmed = async (paymentData) => {
     emit('sale-completed', finalInvoiceData)
     
   } catch (error) {
-    console.error('Error procesando venta en backend:', error)
-    // Si hay error, generar número temporal como fallback
-    if (lastSale.value.invoiceNumber === 'Generando...') {
-      lastSale.value.invoiceNumber = getNextInvoiceNumber()
-    }
-    emit('sale-completed', lastSale.value)
+    console.error('❌ Error procesando venta en backend:', error)
+    
+    // 🚨 MOSTRAR ERROR AL USUARIO Y NO CONTINUAR
+    showError(`No se pudo crear la factura: ${error.message || 'Error desconocido'}`)
+    
+    // Cerrar modal de confirmación de pago
+    showPaymentModal.value = false
+    
+    // NO limpiar el carrito, el usuario puede corregir e intentar de nuevo
+    return // IMPORTANTE: detener ejecución aquí
   }
   
   // DEBUG: Verificar cliente después del pago

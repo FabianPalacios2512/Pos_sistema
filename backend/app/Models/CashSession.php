@@ -259,6 +259,7 @@ class CashSession extends Model
         ];
 
         $this->closing_breakdown = $breakdown;
+        $this->save(); // ✅ Guardar los cambios antes de continuar
 
         return $this;
     }

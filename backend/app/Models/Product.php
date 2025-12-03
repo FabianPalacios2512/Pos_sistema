@@ -44,6 +44,8 @@ class Product extends Model
         'min_stock',
         'max_stock',
         'unit',
+        'measurement_unit',    // 📏 Nueva: Unidad de medida (unit, kg, g, m, cm, l, ml)
+        'allow_decimal',       // ✅ Nueva: Permite cantidades decimales
         'manage_stock',
         'active',
         'image_url',
@@ -62,6 +64,7 @@ class Product extends Model
         'max_stock' => 'integer',
         'manage_stock' => 'boolean',
         'active' => 'boolean',
+        'allow_decimal' => 'boolean',  // 📏 Cast para allow_decimal
         'is_public' => 'boolean',
         'tags' => 'array'
     ];
@@ -201,5 +204,137 @@ class Product extends Model
         ]);
 
         return $this;
+    }
+
+    // ==========================================
+    // 📏 MÉTODOS PARA UNIDADES DE MEDIDA (UOM)
+    // ==========================================
+
+    /**
+     * Obtiene la abreviatura de la unidad de medida para mostrar en UI
+     *
+     * @return string
+     */
+    public function getUnitAbbreviationAttribute(): string
+    {
+        return match($this->measurement_unit ?? 'unit') {
+            'unit' => 'und',
+            'kg' => 'kg',
+            'g' => 'g',
+            'm' => 'm',
+            'cm' => 'cm',
+            'l' => 'L',
+            'ml' => 'ml',
+            default => 'und'
+        };
+    }
+
+    /**
+     * Obtiene el nombre completo de la unidad de medida (para formularios)
+     *
+     * @return string
+     */
+    public function getUnitNameAttribute(): string
+    {
+        return match($this->measurement_unit ?? 'unit') {
+            'unit' => 'Unidades',
+            'kg' => 'Kilogramos',
+            'g' => 'Gramos',
+            'm' => 'Metros',
+            'cm' => 'Centímetros',
+            'l' => 'Litros',
+            'ml' => 'Mililitros',
+            default => 'Unidades'
+        };
+    }
+
+    /**
+     * Valida si una cantidad es válida para este producto
+     *
+     * @param float $quantity
+     * @return bool
+     */
+    public function isValidQuantity(float $quantity): bool
+    {
+        // Si no permite decimales, la cantidad debe ser un entero
+        if (!$this->allow_decimal) {
+            return $quantity == floor($quantity);
+        }
+
+        // Si permite decimales, cualquier número positivo es válido
+        return $quantity > 0;
+    }
+
+    /**
+     * Calcula el precio total para una cantidad dada
+     * Usa precisión de 2 decimales para evitar errores de redondeo
+     *
+     * @param float $quantity
+     * @return float
+     */
+    public function calculateTotal(float $quantity): float
+    {
+        // Convertir a centavos (enteros) para evitar errores de punto flotante
+        $priceInCents = (int) round($this->sale_price * 100);
+        $quantityInCents = (int) round($quantity * 100);
+
+        // Multiplicar en enteros
+        $totalInCents = ($priceInCents * $quantityInCents) / 100;
+
+        // Convertir de vuelta a decimales con 2 lugares
+        return round($totalInCents / 100, 2);
+    }
+
+    /**
+     * Formatea la cantidad con los decimales apropiados
+     *
+     * @param float $quantity
+     * @return string
+     */
+    public function formatQuantity(float $quantity): string
+    {
+        if (!$this->allow_decimal) {
+            return number_format($quantity, 0);
+        }
+
+        // Para productos a granel, mostrar hasta 3 decimales si es necesario
+        return rtrim(rtrim(number_format($quantity, 3, '.', ''), '0'), '.');
+    }
+
+    /**
+     * Obtiene el paso (step) para inputs numéricos en el frontend
+     *
+     * @return string
+     */
+    public function getQuantityStepAttribute(): string
+    {
+        return $this->allow_decimal ? '0.001' : '1';
+    }
+
+    /**
+     * Scope para filtrar productos por unidad de medida
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string|array $units
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeByMeasurementUnit($query, $units)
+    {
+        if (is_array($units)) {
+            return $query->whereIn('measurement_unit', $units);
+        }
+
+        return $query->where('measurement_unit', $units);
+    }
+
+    /**
+     * Scope para productos que permiten decimales
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAllowsDecimals($query)
+    {
+        return $query->where('allow_decimal', true);
     }
 }
