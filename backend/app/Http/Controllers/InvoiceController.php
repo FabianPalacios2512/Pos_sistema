@@ -1969,7 +1969,7 @@ startxref
         $invoiceDate = $data['created_at'] ?? $data['date'] ?? now();
         $date = date('d \d\e F \d\e Y', strtotime($invoiceDate));
         $dateTime = date('H:i', strtotime($invoiceDate));
-        
+
         // Meses en español
         $meses = [
             'January' => 'enero', 'February' => 'febrero', 'March' => 'marzo',
@@ -2011,7 +2011,7 @@ startxref
 
                 // Limitar nombre a 20 caracteres para que quepa en la columna
                 $shortName = strlen($itemName) > 20 ? substr($itemName, 0, 17) . '...' : $itemName;
-                
+
                 $itemsText .= "0 -15 Td (" . $shortName . ") Tj ";
                 $itemsText .= "120 0 Td (" . $quantity . ") Tj ";
                 $itemsText .= "60 0 Td (\$" . $price . ") Tj ";
