@@ -1,68 +1,22 @@
 <template>
-  <div class="min-h-screen font-sans bg-gray-100 dark:bg-black transition-colors duration-300">
-    <div class="p-4 lg:p-6 space-y-4 lg:space-y-5 animate-fade-in">
+  <div class="min-h-screen font-sans bg-gray-100 dark:bg-zinc-950 transition-colors duration-300">
+    <div class="animate-fade-in">
       
-      <!-- Header Profesional Limpio -->
-      <div class="flex items-center justify-between">
-        
-        <!-- Título Simple -->
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-zinc-200">Facturas</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestión y control de documentos fiscales</p>
-        </div>
-        
-        <!-- KPIs Modernos -->
-        <div class="flex-1 flex items-center justify-center gap-6">
+      <!-- CONTENEDOR DEL HEADER CON EFECTO SPOTLIGHT -->
+      <div class="bg-white dark:bg-gradient-to-b dark:from-zinc-900 dark:via-zinc-950 dark:to-black pb-8">
+        <div class="p-4 lg:p-6 space-y-6">
           
-          <!-- KPI: Facturas del Mes -->
-          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-blue-600 dark:bg-blue-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Facturas del Mes</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">{{ monthlyInvoices }}</p>
-              </div>
+          <!-- NIVEL 1: Header con Título y Botones de Acción -->
+          <div class="flex items-center justify-between">
+            
+            <!-- Título y Subtítulo -->
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Facturas</h1>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestión y control de documentos fiscales</p>
             </div>
-          </div>
-
-          <!-- KPI: Total Facturado -->
-          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-emerald-600 dark:bg-emerald-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Total Facturado</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">${{ formatCurrency(totalInvoiced) }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- KPI: Cotizaciones -->
-          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-slate-600 dark:bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                </svg>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Cotizaciones</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">{{ quotations }}</p>
-              </div>
-            </div>
-          </div>
-          
-        </div>
         
-        <!-- Botones de acción -->
-        <div class="flex items-center gap-3 flex-shrink-0">
+        <!-- Botones de Acción -->
+        <div class="flex items-center gap-3">
           <button
             @click="loadInvoices"
             class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 active:scale-95 flex items-center gap-2 group">
@@ -84,8 +38,61 @@
         
       </div>
 
+      <!-- NIVEL 2: KPIs Ejecutivos - Grid de 3 Columnas -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- KPI: Facturas del Mes (Efecto Cristal) -->
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/50">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Facturas del Mes</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ monthlyInvoices }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI: Total Facturado (Efecto Cristal) -->
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/50">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Facturado</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatCurrency(totalInvoiced) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI: Cotizaciones (Efecto Cristal) -->
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/50">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-purple-50 dark:bg-purple-950 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Cotizaciones</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ quotations }}</p>
+            </div>
+          </div>
+        </div>
+        
+        </div>
+      </div>
+      <!-- FIN CONTENEDOR DEL HEADER CON EFECTO SPOTLIGHT -->
+
       <!-- Master-Detail Layout Enterprise: 30/70 -->
-      <div class="grid grid-cols-1 lg:grid-cols-10 gap-6" style="height: calc(100vh - 180px); min-height: 650px;">
+      <div class="p-4 lg:p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-10 gap-6" style="height: calc(100vh - 240px); min-height: 650px;">
         
         <!-- PANEL IZQUIERDO: Lista Minimalista (30%) -->
         <div class="lg:col-span-3 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden flex flex-col border border-gray-300 dark:border-zinc-800 shadow-sm transition-colors duration-300">
@@ -442,8 +449,8 @@
           </div>
         </div>
 
+        </div>
       </div>
-
     </div>
   </div>
 
@@ -498,6 +505,7 @@
         Cerrar
       </button>
     </div>
+  </div>
   </div>
 </template>
 
@@ -799,11 +807,11 @@ const getColorForName = (name) => {
 
 const getStatusClasses = (status) => {
   const s = status?.toLowerCase() || ''
-  if (s === 'pagada' || s === 'paid') return 'bg-emerald-50 text-emerald-700 border-emerald-100'
-  if (s === 'pendiente' || s === 'pending') return 'bg-amber-50 text-amber-700 border-amber-100'
-  if (s === 'anulada' || s === 'cancelled') return 'bg-rose-50 text-rose-700 border-rose-100'
-  if (s === 'devuelta' || s === 'returned') return 'bg-purple-50 text-purple-700 border-purple-100'
-  return 'bg-slate-50 text-slate-600 border-slate-100'
+  if (s === 'pagada' || s === 'paid') return 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-900/50'
+  if (s === 'pendiente' || s === 'pending') return 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900/50'
+  if (s === 'anulada' || s === 'cancelled') return 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/50 dark:text-rose-400 dark:border-rose-900/50'
+  if (s === 'devuelta' || s === 'returned') return 'bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/50 dark:text-purple-400 dark:border-purple-900/50'
+  return 'bg-slate-50 text-slate-600 border-slate-100 dark:bg-zinc-800/50 dark:text-zinc-400 dark:border-zinc-700/50'
 }
 
 const isQuotation = (invoice) => {

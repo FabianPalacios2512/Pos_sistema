@@ -1,132 +1,119 @@
 <template>
-  <div class="min-h-screen font-sans bg-gray-100 dark:bg-black transition-colors duration-300">
-    <div class="p-4 lg:p-6 space-y-4 lg:space-y-5 animate-fade-in">
+  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-zinc-900 dark:via-zinc-950 dark:to-black transition-colors duration-300">
+    <div class="p-4 lg:p-6 space-y-6 animate-fade-in">
       
-      <!-- Header Profesional Limpio -->
+      <!-- NIVEL 1: Header con Título y Botones de Acción -->
       <div class="flex items-center justify-between">
-        
-        <!-- Título Simple -->
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-zinc-200">Devoluciones</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Control y seguimiento de devoluciones</p>
-        </div>
-        
-        <!-- KPIs Modernos -->
-        <div class="flex-1 flex items-center justify-center gap-6">
-          
-          <!-- KPI: Total Devuelto -->
-          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-red-600 dark:bg-red-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
-                </svg>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Total Devuelto</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">${{ formatCurrency(stats.totalRefunded) }}</p>
-              </div>
+            
+            <!-- Título y Subtítulo -->
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Devoluciones</h1>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Control y seguimiento de devoluciones</p>
             </div>
+            
+            <!-- Botones de Acción -->
+            <div class="flex items-center gap-3">
+              <button
+                @click="loadReturns"
+                class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 active:scale-95 flex items-center gap-2 group">
+                <svg class="w-4 h-4 text-slate-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Refrescar</span>
+              </button>
+              
+              <button
+                @click="navigateToNewReturn"
+                class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-slate-400/60 dark:hover:shadow-slate-900/70 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>Nueva Devolución</span>
+              </button>
+            </div>
+            
           </div>
 
-          <!-- KPI: Completadas -->
-          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-emerald-600 dark:bg-emerald-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Completadas</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">{{ stats.completedCount }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- KPI: Pendientes -->
-          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-amber-600 dark:bg-amber-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Pendientes</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">{{ stats.pendingCount }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- KPI: Productos -->
-          <div class="bg-white dark:bg-zinc-800/50 rounded-2xl p-5 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 transition-all duration-200 hover:shadow-lg min-w-[180px]">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-slate-600 dark:bg-slate-700 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                </svg>
-              </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">Productos</h3>
-                <p class="text-2xl font-bold text-gray-900 dark:text-zinc-300 mt-1">{{ stats.totalItemsReturned }}</p>
-              </div>
-            </div>
-          </div>
+          <!-- NIVEL 2: KPIs Ejecutivos - Grid de 3 Columnas -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           
+            <!-- KPI: Total Devuelto (Efecto Cristal) -->
+            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/50">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-red-50 dark:bg-red-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Devuelto</p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatCurrency(stats.totalRefunded) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI: Completadas (Efecto Cristal) -->
+            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/50">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Completadas</p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ stats.completedCount }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI: Pendientes (Efecto Cristal) -->
+            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/50">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Pendientes</p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ stats.pendingCount }}</p>
+                </div>
+              </div>
+            </div>
+            
         </div>
-        
-        <!-- Botones de acción -->
-        <div class="flex items-center gap-3 flex-shrink-0">
-          <button
-            @click="loadReturns"
-            class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 active:scale-95 flex items-center gap-2 group">
-            <svg class="w-4 h-4 text-slate-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            <span>Refrescar</span>
-          </button>
-          
-          <button
-            @click="navigateToNewReturn"
-            class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-slate-400/60 dark:hover:shadow-slate-900/70 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>Nueva Devolución</span>
-          </button>
-        </div>
-        
       </div>
 
       <!-- Master-Detail Layout Enterprise: 30/70 -->
-      <div class="grid grid-cols-1 lg:grid-cols-10 gap-4" style="height: calc(100vh - 140px); min-height: 650px;">
+      <div class="p-4 lg:p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-10 gap-6" style="height: calc(100vh - 240px); min-height: 650px;">
         
         <!-- PANEL IZQUIERDO: Lista Minimalista (30%) -->
-        <div class="lg:col-span-3 bg-white dark:bg-zinc-900 rounded-xl overflow-hidden flex flex-col border border-gray-200 dark:border-zinc-800">
+        <div class="lg:col-span-3 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden flex flex-col border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300">
           
           <!-- Header minimalista con búsqueda -->
-          <div class="p-3 border-b border-gray-200 dark:border-zinc-800">
+          <div class="p-4 border-b border-gray-200 dark:border-zinc-800">
             <!-- Búsqueda limpia -->
-            <div class="relative mb-3">
-              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="relative mb-4">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
               <input
                 v-model="searchTerm"
                 type="text"
-                placeholder="Buscar..."
-                class="w-full pl-9 pr-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500">
+                placeholder="Buscar devoluciones o clientes..."
+                class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300">
             </div>
             
             <!-- Filtro de estado -->
             <select
               v-model="statusFilter"
-              class="w-full px-2 py-1.5 text-xs rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-300 bg-white dark:bg-zinc-800">
-              <option value="">Todos los estados</option>
-              <option value="pending">Pendientes</option>
-              <option value="completed">Completadas</option>
-              <option value="cancelled">Canceladas</option>
+              class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
+              <option value="">Estado</option>
+              <option value="pending">⏳ Pendientes</option>
+              <option value="completed">✅ Completadas</option>
+              <option value="cancelled">❌ Canceladas</option>
             </select>
           </div>
           
@@ -137,8 +124,11 @@
               v-for="returnItem in filteredReturns"
               :key="returnItem.id"
               @click="selectReturn(returnItem)"
-              class="px-4 py-4 cursor-pointer transition-all border-b border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800 group relative"
-              :class="selectedReturn?.id === returnItem.id ? 'bg-indigo-50 dark:bg-indigo-950/30' : 'bg-white dark:bg-zinc-900'"
+              class="px-4 py-4 cursor-pointer transition-all border-b border-gray-100 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/50 group relative"
+              :class="[
+                selectedReturn?.id === returnItem.id ? 'bg-indigo-50 dark:bg-indigo-500/10' : 'bg-white dark:bg-zinc-900',
+                selectedReturn?.id === returnItem.id ? 'border-l-4 border-indigo-500 pl-3' : 'border-l-4 border-transparent'
+              ]"
             >
               <!-- Indicador de selección -->
               <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 transition-transform duration-200"
@@ -147,7 +137,7 @@
               <div class="flex items-start gap-3">
                 <div class="flex-1 min-w-0">
                   <div class="flex justify-between items-start">
-                    <p class="text-sm font-bold text-gray-900 dark:text-zinc-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <p class="text-sm font-bold text-gray-800 dark:text-zinc-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {{ returnItem.number }}
                     </p>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border"
@@ -185,24 +175,24 @@
         </div>
 
         <!-- PANEL DERECHO: Detalle Amplio (70%) -->
-        <div class="lg:col-span-7 bg-white dark:bg-zinc-900 rounded-xl overflow-hidden flex flex-col border border-gray-200 dark:border-zinc-800">
+        <div class="lg:col-span-7 bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden flex flex-col border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300">
           
           <!-- Estado: No seleccionado -->
-          <div v-if="!selectedReturn" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gray-50 dark:bg-zinc-900">
-            <div class="w-24 h-24 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center shadow-sm mb-6 border border-gray-200 dark:border-zinc-700">
+          <div v-if="!selectedReturn" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gray-50 dark:bg-zinc-900/50">
+            <div class="w-24 h-24 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center shadow-sm mb-6 border border-gray-100 dark:border-zinc-700">
                <svg class="w-10 h-10 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
                </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-zinc-200 mb-2">Selecciona una devolución</h3>
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Selecciona una devolución</h3>
             <p class="text-sm text-gray-500 dark:text-zinc-400 max-w-xs mx-auto">Haz clic en cualquier devolución de la lista izquierda para ver sus detalles completos.</p>
           </div>
 
           <!-- Estado: Devolución seleccionada -->
-          <div v-else class="flex-1 flex flex-col overflow-hidden">
+          <div v-else class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-300">
             
             <!-- Header del detalle con acciones contextuales -->
-            <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+            <div class="p-8 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <div class="flex items-center gap-3 mb-3">
@@ -257,10 +247,10 @@
             </div>
 
             <!-- Contenido scrollable - Documento digital limpio -->
-            <div class="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-zinc-900">
+            <div class="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-zinc-950/50">
               
               <!-- Sección: Información General (PRIMERO) -->
-              <div class="bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 p-4 mb-4">
+              <div class="bg-white dark:bg-zinc-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 p-6 mb-4">
                 <h4 class="text-sm font-bold mb-4 text-gray-900 dark:text-zinc-300">Información General</h4>
                 
                 <div class="grid grid-cols-2 gap-4">
@@ -297,7 +287,7 @@
               </div>
 
               <!-- Sección: Productos Devueltos -->
-              <div class="bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 mb-4">
+              <div class="bg-white dark:bg-zinc-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 mb-4">
                 <div class="border-b border-gray-200 dark:border-zinc-700 px-4 py-3 bg-gray-50 dark:bg-zinc-800/50">
                   <h4 class="text-sm font-bold text-gray-900 dark:text-zinc-300">Productos Devueltos</h4>
                 </div>
@@ -346,7 +336,7 @@
               </div>
 
               <!-- Sección: Razón de la Devolución -->
-              <div class="bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 border-l-4 border-l-amber-500 dark:border-l-amber-600 p-4">
+              <div class="bg-white dark:bg-zinc-800/50 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 border-l-4 border-l-amber-500 dark:border-l-amber-600 p-6">
                 <div class="flex items-start gap-3">
                   <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-100 dark:bg-amber-900/30">
                     <svg class="w-5 h-5 text-amber-600 dark:text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -364,10 +354,9 @@
           </div>
         </div>
 
+        </div>
       </div>
-
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -622,10 +611,10 @@ const getStatusLabel = (status) => {
 
 const getStatusClasses = (status) => {
   const s = status?.toLowerCase() || ''
-  if (s === 'completed' || s === 'completada') return 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
-  if (s === 'pending' || s === 'pendiente') return 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
-  if (s === 'cancelled' || s === 'cancelada') return 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800'
-  return 'bg-slate-50 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border-slate-200 dark:border-zinc-700'
+  if (s === 'completed' || s === 'completada') return 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-900/50'
+  if (s === 'pending' || s === 'pendiente') return 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900/50'
+  if (s === 'cancelled' || s === 'cancelada') return 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/50 dark:text-rose-400 dark:border-rose-900/50'
+  return 'bg-slate-50 text-slate-600 border-slate-100 dark:bg-zinc-800/50 dark:text-zinc-400 dark:border-zinc-700/50'
 }
 
 const getRefundMethodLabel = (method) => {

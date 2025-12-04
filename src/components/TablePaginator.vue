@@ -1,23 +1,23 @@
 <template>
   <!-- Paginador estándar reutilizable -->
-  <div class="bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between">
+  <div class="bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between">
     <!-- Información izquierda -->
     <div class="flex items-center space-x-3">
       <!-- Selector items por página -->
       <div class="flex items-center space-x-2">
-        <span class="text-xs font-medium text-gray-700">Mostrar:</span>
+        <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Mostrar:</span>
         <select :value="itemsPerPage" 
                 @change="$emit('update:itemsPerPage', parseInt($event.target.value))"
-                class="border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                class="border border-gray-300 dark:border-zinc-700 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white">
           <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
             {{ option }}
           </option>
         </select>
-        <span class="text-xs text-gray-700">por página</span>
+        <span class="text-xs text-gray-700 dark:text-zinc-300">por página</span>
       </div>
       
       <!-- Info de paginación -->
-      <div class="text-xs text-gray-700">
+      <div class="text-xs text-gray-700 dark:text-zinc-300">
         Mostrando {{ paginationInfo.start }} a {{ paginationInfo.end }} de {{ paginationInfo.total }} {{ label }}
       </div>
     </div>
@@ -27,7 +27,7 @@
       <!-- Primera página -->
       <button @click="$emit('update:currentPage', 1)" 
               :disabled="currentPage === 1"
-              class="p-1.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Primera página">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
@@ -37,7 +37,7 @@
       <!-- Anterior -->
       <button @click="$emit('update:currentPage', currentPage - 1)" 
               :disabled="currentPage === 1"
-              class="p-1.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Página anterior">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -53,18 +53,18 @@
                     'px-2.5 py-1 text-xs font-medium rounded-lg transition-colors',
                     page === currentPage 
                       ? 'bg-blue-600 text-white border border-blue-600' 
-                      : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+                      : 'text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'
                   ]">
             {{ page }}
           </button>
-          <span v-else-if="shouldShowEllipsis(page)" class="px-1 text-gray-400 text-xs">...</span>
+          <span v-else-if="shouldShowEllipsis(page)" class="px-1 text-gray-400 dark:text-zinc-500 text-xs">...</span>
         </template>
       </div>
       
       <!-- Siguiente -->
       <button @click="$emit('update:currentPage', currentPage + 1)" 
               :disabled="currentPage === totalPages"
-              class="p-1.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Página siguiente">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -74,7 +74,7 @@
       <!-- Última página -->
       <button @click="$emit('update:currentPage', totalPages)" 
               :disabled="currentPage === totalPages"
-              class="p-1.5 text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               title="Última página">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
