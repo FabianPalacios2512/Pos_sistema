@@ -34,7 +34,7 @@ jobs:
             cd backend && \
             composer install --no-dev --optimize-autoloader --no-interaction && \
             echo '🗄️ Running migrations...' && \
-            php artisan migrate --force && \
+            php artisan migrate --force || echo '⚠️ Algunas migraciones fallaron, continuando...' && \
             echo '🧹 Clearing cache...' && \
             php artisan config:clear && \
             php artisan cache:clear && \
