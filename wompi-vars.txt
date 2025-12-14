@@ -1,0 +1,8 @@
+
+# ==================== WOMPI CONFIGURATION (Colombia) ====================
+WOMPI_PUBLIC_KEY=pub_test_ZVH2hPZRCY7iVcPAyCCh53E5cS2SUFmW
+WOMPI_PRIVATE_KEY=prv_test_KCOpUn5CIvcopDAEkf79iKlim7B5LqcY
+WOMPI_EVENTS_SECRET=test_events_WTxoTpg6pfpYUAKKklCpI9GzuMcTSXnk
+WOMPI_INTEGRITY_SECRET=test_integrity_Zb8xdlPSUWmE9HmHjVCI10Y9vxaNuprK
+WOMPI_API_URL=https://sandbox.wompi.co/v1
+WOMPI_CURRENCY=COP

@@ -1,0 +1,161 @@
+🔄 Actualización incremental de 105 POS Pro
+============================================
+
+📡 [1/5] Verificando conexión SSH...
+✅ Conexión SSH OK
+
+💾 [2/5] Creando backup de seguridad...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-87-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sat Dec 13 15:54:24 UTC 2025
+
+  System load:  0.13               Processes:             137
+  Usage of /:   15.2% of 95.82GB   Users logged in:       0
+  Memory usage: 32%                IPv4 address for eth0: 72.61.73.245
+  Swap usage:   0%                 IPv6 address for eth0: 2a02:4780:2d:764f::1
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+22 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+6 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+1 updates could not be installed automatically. For more details,
+see /var/log/unattended-upgrades/unattended-upgrades.log
+
+*** System restart required ***
+✅ Backup creado: /root/backups/
+
+📤 [3/5] Sincronizando código frontend...
+sending incremental file list
+
+sent 7.718 bytes  received 31 bytes  5.166,00 bytes/sec
+total size is 4.625.924  speedup is 596,97
+sending incremental file list
+
+sent 150 bytes  received 12 bytes  108,00 bytes/sec
+total size is 9.429  speedup is 58,20
+✅ Frontend actualizado
+
+📤 [4/5] Sincronizando código backend...
+sending incremental file list
+whatsapp-multitenant.log
+          3.424   0%    0,00kB/s    0:00:00       11.740.542 100%    2,73GB/s    0:00:00 (xfr#1, to-chk=1380/1454)
+whatsapp_qrs/las-natura_qr.txt
+            237 100%   11,02kB/s    0:00:00              237 100%   11,02kB/s    0:00:00 (xfr#2, to-chk=946/1454)
+
+sent 45.688 bytes  received 20.717 bytes  26.562,00 bytes/sec
+total size is 16.385.298  speedup is 246,75
+✅ Backend actualizado
+
+🔨 [5/5] Rebuilding frontend y reiniciando servicios...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.8.0-87-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sat Dec 13 15:54:24 UTC 2025
+
+  System load:  0.13               Processes:             137
+  Usage of /:   15.2% of 95.82GB   Users logged in:       0
+  Memory usage: 32%                IPv4 address for eth0: 72.61.73.245
+  Swap usage:   0%                 IPv6 address for eth0: 2a02:4780:2d:764f::1
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+22 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+6 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+1 updates could not be installed automatically. For more details,
+see /var/log/unattended-upgrades/unattended-upgrades.log
+
+*** System restart required ***
+📦 Instalando dependencias nuevas (si hay)...
+🏗️ Construyendo frontend...
+
+> pos-tienda-demo@1.0.0 build
+> vite build
+
+▲ [WARNING] Duplicate key "devOptions" in object literal [duplicate-object-key]
+
+    vite.config.js:123:6:
+      123 │       devOptions: {
+          ╵       ~~~~~~~~~~
+
+  The original key "devOptions" is here:
+
+    vite.config.js:12:6:
+      12 │       devOptions: {
+         ╵       ~~~~~~~~~~
+
+vite v4.5.14 building for production...
+transforming...
+✓ 49 modules transformed.
+[vite-plugin-pwa:build] [vite]: Rollup failed to resolve import "/login.png" from "/var/www/105pos/frontend/src/views/SaasRegister.vue".
+This is most likely unintended because it can break your application at runtime.
+If you do want to externalize this module explicitly add it to
+`build.rollupOptions.external`
+error during build:
+Error: [vite]: Rollup failed to resolve import "/login.png" from "/var/www/105pos/frontend/src/views/SaasRegister.vue".
+This is most likely unintended because it can break your application at runtime.
+If you do want to externalize this module explicitly add it to
+`build.rollupOptions.external`
+    at viteWarn (file:///var/www/105pos/frontend/node_modules/vite/dist/node/chunks/dep-827b23df.js:48272:27)
+    at onRollupWarning (file:///var/www/105pos/frontend/node_modules/vite/dist/node/chunks/dep-827b23df.js:48304:9)
+    at onwarn (file:///var/www/105pos/frontend/node_modules/vite/dist/node/chunks/dep-827b23df.js:48032:13)
+    at file:///var/www/105pos/frontend/node_modules/rollup/dist/es/shared/node-entry.js:24276:13
+    at Object.logger [as onLog] (file:///var/www/105pos/frontend/node_modules/rollup/dist/es/shared/node-entry.js:25950:9)
+    at ModuleLoader.handleInvalidResolvedId (file:///var/www/105pos/frontend/node_modules/rollup/dist/es/shared/node-entry.js:24862:26)
+    at file:///var/www/105pos/frontend/node_modules/rollup/dist/es/shared/node-entry.js:24822:26
+📋 Copiando build a backend...
+cp: cannot stat 'dist/*': No such file or directory
+PHP Warning:  require(/var/www/105pos/backend/vendor/autoload.php): Failed to open stream: No such file or directory in /var/www/105pos/backend/artisan on line 10
+PHP Fatal error:  Uncaught Error: Failed opening required '/var/www/105pos/backend/vendor/autoload.php' (include_path='.:/usr/share/php') in /var/www/105pos/backend/artisan:10
+Stack trace:
+#0 {main}
+  thrown in /var/www/105pos/backend/artisan on line 10
+PHP Warning:  require(/var/www/105pos/backend/vendor/autoload.php): Failed to open stream: No such file or directory in /var/www/105pos/backend/artisan on line 10
+PHP Fatal error:  Uncaught Error: Failed opening required '/var/www/105pos/backend/vendor/autoload.php' (include_path='.:/usr/share/php') in /var/www/105pos/backend/artisan:10
+Stack trace:
+#0 {main}
+  thrown in /var/www/105pos/backend/artisan on line 10
+PHP Warning:  require(/var/www/105pos/backend/vendor/autoload.php): Failed to open stream: No such file or directory in /var/www/105pos/backend/artisan on line 10
+PHP Fatal error:  Uncaught Error: Failed opening required '/var/www/105pos/backend/vendor/autoload.php' (include_path='.:/usr/share/php') in /var/www/105pos/backend/artisan:10
+Stack trace:
+#0 {main}
+  thrown in /var/www/105pos/backend/artisan on line 10
+PHP Warning:  require(/var/www/105pos/backend/vendor/autoload.php): Failed to open stream: No such file or directory in /var/www/105pos/backend/artisan on line 10
+PHP Fatal error:  Uncaught Error: Failed opening required '/var/www/105pos/backend/vendor/autoload.php' (include_path='.:/usr/share/php') in /var/www/105pos/backend/artisan:10
+Stack trace:
+#0 {main}
+  thrown in /var/www/105pos/backend/artisan on line 10
+✅ Servicios actualizados
+
+✅ ACTUALIZACIÓN COMPLETADA!
+🌍 Sitio actualizado: http://72.61.73.245
+
+💡 Tip: Abre el navegador en modo incógnito para ver cambios sin cache

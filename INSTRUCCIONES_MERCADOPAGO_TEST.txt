@@ -1,0 +1,40 @@
+<!-- 
+  INSTRUCCIONES IMPORTANTES PARA PRUEBAS DE MERCADO PAGO
+  ======================================================
+  
+  ⚠️ ESTÁS USANDO CREDENCIALES DE PRUEBA ⚠️
+  
+  Para que funcione correctamente en modo TEST, debes usar TARJETAS DE PRUEBA:
+  
+  ✅ TARJETA QUE SIEMPRE APRUEBA:
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Número:  5031 7557 3453 0604
+  CVV:     123
+  Vence:   11/25
+  Nombre:  APRO
+  
+  
+  ❌ TARJETA QUE SIEMPRE RECHAZA:
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Número:  5031 7557 3453 0604
+  CVV:     123
+  Vence:   11/25
+  Nombre:  OTHE
+  
+  
+  📌 IMPORTANTE:
+  - NO uses tarjetas reales en modo TEST
+  - El nombre del titular DETERMINA el resultado (APRO = aprueba, OTHE = rechaza)
+  - El número de tarjeta es el mismo, cambia el NOMBRE
+  
+  
+  🔄 PARA USAR TARJETAS REALES:
+  - Ve a tu cuenta de Mercado Pago
+  - Obtén las credenciales de PRODUCCIÓN
+  - Reemplaza en backend/.env:
+    MERCADOPAGO_PUBLIC_KEY=TU_PUBLIC_KEY_PROD
+    MERCADOPAGO_ACCESS_TOKEN=TU_ACCESS_TOKEN_PROD
+  
+  
+  📚 Más info: Ver archivo TARJETAS_PRUEBA_MERCADOPAGO.md
+-->

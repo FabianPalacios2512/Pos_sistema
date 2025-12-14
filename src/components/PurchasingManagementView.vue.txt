@@ -1,0 +1,164 @@
+<template>
+  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
+    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between pb-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Compras</h1>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Control de proveedores y órdenes de compra</p>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <button @click="refreshCurrentTab" 
+                  :disabled="loading"
+                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200">
+            <svg class="w-4 h-4 inline mr-2" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Refrescar
+          </button>
+          
+          <button v-if="activeTab === 'suppliers'" 
+                  @click="viewMode = 'create-supplier'"
+                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300">
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nuevo Proveedor
+          </button>
+
+          <button v-if="activeTab === 'orders'" 
+                  @click="viewMode = 'create-order'"
+                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300">
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nueva Orden de Compra
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl border border-gray-300 dark:border-white/5 p-1 inline-flex">
+        <button 
+          @click="changeTab('suppliers')" 
+          :class="[
+            'px-6 py-2.5 text-sm font-bold rounded-lg transition-all duration-200',
+            activeTab === 'suppliers' 
+              ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-md' 
+              : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+          ]">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <span>Proveedores</span>
+          </div>
+        </button>
+        <button 
+          @click="changeTab('orders')" 
+          :class="[
+            'px-6 py-2.5 text-sm font-bold rounded-lg transition-all duration-200',
+            activeTab === 'orders' 
+              ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-md' 
+              : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+          ]">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span>Órdenes de Compra</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- TAB: PROVEEDORES -->
+      <div v-if="activeTab === 'suppliers'">
+        <SuppliersViewMasterDetail 
+          :key="'suppliers-' + supplierRefreshKey"
+          @supplier-selected="handleSupplierSelected"
+        />
+      </div>
+
+      <!-- TAB: ÓRDENES DE COMPRA -->
+      <div v-if="activeTab === 'orders'">
+        <PurchaseOrdersViewMasterDetail 
+          :key="'orders-' + ordersRefreshKey"
+          @order-selected="handleOrderSelected"
+        />
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<script>
+import SuppliersViewMasterDetail from './SuppliersView_MasterDetail.vue'
+import PurchaseOrdersViewMasterDetail from './PurchaseOrdersView_MasterDetail.vue'
+
+export default {
+  name: 'PurchasingManagementView',
+  components: {
+    SuppliersViewMasterDetail,
+    PurchaseOrdersViewMasterDetail
+  },
+  data() {
+    return {
+      activeTab: 'suppliers', // 'suppliers' | 'orders'
+      loading: false,
+      viewMode: 'list', // 'list' | 'create-supplier' | 'create-order'
+      supplierRefreshKey: 0,
+      ordersRefreshKey: 0
+    }
+  },
+  methods: {
+    changeTab(tab) {
+      this.activeTab = tab
+      this.viewMode = 'list'
+    },
+
+    refreshCurrentTab() {
+      this.loading = true
+      
+      if (this.activeTab === 'suppliers') {
+        this.supplierRefreshKey++
+      } else if (this.activeTab === 'orders') {
+        this.ordersRefreshKey++
+      }
+      
+      setTimeout(() => {
+        this.loading = false
+      }, 500)
+    },
+
+    handleSupplierSelected(supplier) {
+      console.log('Proveedor seleccionado:', supplier)
+    },
+
+    handleOrderSelected(order) {
+      console.log('Orden seleccionada:', order)
+    }
+  },
+  mounted() {
+    console.log('✅ PurchasingManagementView cargado')
+  }
+}
+</script>
+
+<style scoped>
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

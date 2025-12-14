@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        if (Schema::hasTable('customers')) {
+            Schema::table('customers', function (Blueprint $table) {
+if (!Schema::hasColumn('customers', 'loyalty_points')) {
+    $table->integer('loyalty_points')->default(0)->after('total_orders');
+}
+                        $table->index(['loyalty_points']);
+            
+                    });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('customers', function (Blueprint $table) {
+            $table->dropIndex(['loyalty_points']);
+            $table->dropColumn('loyalty_points');
+        });
+    }
+};

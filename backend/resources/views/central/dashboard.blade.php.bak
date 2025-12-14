@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - God Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="csrf-token" content="@{{ csrf_token() }}">
+</head>
+<body>
+    <div id="superAdminApp"></div>
+    
+    <script type="module">
+        import { createApp, ref, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+        import axios from 'https://cdn.skypack.dev/axios'
+        
+        const SuperAdminDashboard = {
+            setup() {
+                const loading = ref(false)
+                const lastUpdate = ref('--:--')
+                const kpis = ref({
+                    total_active_clients: 0,
+                    clients_created_today: 0,
+                    mrr: 0,
+                    ai_tokens_this_month: 0,
+                    ai_cost_this_month: 0,
+                })
+                const tenants = ref({ data: [], current_page: 1, last_page: 1, total: 0, from: 0, to: 0 })
+                const searchTenant = ref('')
+                const aiUsageData = ref([])
+                const aiUsageStats = ref({ total_tenants_using_ai: 0, avg_tokens_per_tenant: 0, total_cost_period: 0 })
+                const aiPeriod = ref('month')
+
+                const fetchKpis = async () => {
+                    try {
+                        const response = await axios.get('/admin/api/kpis')
+                        if (response.data.success) kpis.value = response.data.data
+                    } catch (error) {
+                        console.error('Error fetching KPIs:', error)
+                    }
+                }
+
+                const fetchTenants = async (page = 1, search = '') => {
+                    try {
+                        const response = await axios.get('/admin/api/tenants', {
+                            params: { page, search, per_page: 10 }
+                        })
+                        if (response.data.success) tenants.value = response.data.data
+                    } catch (error) {
+                        console.error('Error fetching tenants:', error)
+                    }
+                }
+
+                const fetchAiUsage = async () => {
+                    try {
+                        const response = await axios.get('/admin/api/ai-usage', {
+                            params: { period: aiPeriod.value }
+                        })
+                        if (response.data.success) {
+                            aiUsageData.value = response.data.data
+                            aiUsageStats.value = response.data.stats
+                        }
+                    } catch (error) {
+                        console.error('Error fetching AI usage:', error)
+                    }
+                }
+
+                const refreshData = async () => {
+                    loading.value = true
+                    await Promise.all([fetchKpis(), fetchTenants(), fetchAiUsage()])
+                    lastUpdate.value = new Date().toLocaleTimeString('es-ES')
+                    loading.value = false
+                }
+
+                const formatNumber = (num) => new Intl.NumberFormat('es-ES').format(num)
+                
+                const getCurrentDate = () => {
+                    return new Date().toLocaleDateString('es-ES', { month: 'long', day: 'numeric' })
+                }
+                
+                const loginToTenant = (tenant) => {
+                    window.open(`http://${tenant.primary_domain}/login`, '_blank')
+                }
+
+                onMounted(() => {
+                    refreshData()
+                    setInterval(refreshData, 30000)
+                })
+
+                return {
+                    loading, lastUpdate, kpis, tenants, searchTenant, aiUsageData, aiUsageStats, aiPeriod,
+                    refreshData, fetchAiUsage, formatNumber, loginToTenant, getCurrentDate
+                }
+            },
+            template: `
+                <div class="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800">
+                    <header class="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-red-500/30 shadow-lg">
+                        <div class="px-6 py-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-red-600 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+                                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h1 class="text-2xl font-bold text-white flex items-center space-x-2">
+                                            <span>GOD MODE</span>
+                                            <span class="px-2 py-0.5 bg-red-600 text-xs font-bold rounded-full animate-pulse">ADMIN</span>
+                                        </h1>
+                                        <p class="text-sm text-gray-400">Panel de Administración Central</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <button @click="refreshData" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg border border-gray-700 transition-all duration-200 flex items-center space-x-2">
+                                        <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        <span class="text-sm font-semibold">Actualizar</span>
+                                    </button>
+                                    <div class="px-3 py-2 bg-gray-800 rounded-lg border border-gray-700">
+                                        <span class="text-xs text-gray-400">Última actualización:</span>
+                                        <span class="text-xs text-white font-mono ml-2">@{{ lastUpdate }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main class="p-6 space-y-6">
+                        <section>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-5 border border-emerald-500/30 hover:border-emerald-500/60 transition-all duration-200 shadow-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                            </svg>
+                                        </div>
+                                        <span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-full">ACTIVO</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Clientes Activos</p>
+                                        <p class="text-3xl font-bold text-white mb-2">@{{ kpis.total_active_clients }}</p>
+                                        <div class="flex items-center space-x-2 text-xs">
+                                            <span class="text-emerald-400 font-semibold">+@{{ kpis.clients_created_today }}</span>
+                                            <span class="text-gray-500">hoy</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-5 border border-blue-500/30 hover:border-blue-500/60 transition-all duration-200 shadow-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                        </div>
+                                        <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full">MRR</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Ingresos Mensuales</p>
+                                        <p class="text-3xl font-bold text-white mb-2">\$@{{ formatNumber(kpis.mrr) }}</p>
+                                        <div class="flex items-center space-x-2 text-xs">
+                                            <span class="text-blue-400 font-semibold">USD/mes</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-5 border border-purple-500/30 hover:border-purple-500/60 transition-all duration-200 shadow-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                            </svg>
+                                        </div>
+                                        <span class="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs font-bold rounded-full">IA</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Tokens IA (Mes)</p>
+                                        <p class="text-3xl font-bold text-white mb-2">@{{ formatNumber(kpis.ai_tokens_this_month) }}</p>
+                                        <div class="flex items-center space-x-2 text-xs">
+                                            <span class="text-purple-400 font-semibold">\$@{{ kpis.ai_cost_this_month.toFixed(2) }}</span>
+                                            <span class="text-gray-500">costo</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-5 border border-orange-500/30 hover:border-orange-500/60 transition-all duration-200 shadow-lg">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                            </svg>
+                                        </div>
+                                        <span class="px-2 py-1 bg-orange-500/20 text-orange-400 text-xs font-bold rounded-full">HOY</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Tiendas Creadas Hoy</p>
+                                        <p class="text-3xl font-bold text-white mb-2">@@{{ kpis.clients_created_today }}</p>
+                                        <div class="flex items-center space-x-2 text-xs">
+                                            <span class="text-orange-400 font-semibold">@@{{ getCurrentDate() }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section>
+                            <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
+                                <div class="bg-gray-900 border-b border-gray-700 px-6 py-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+                                                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                                </svg>
+                                                <span>Gestión de Tenants</span>
+                                            </h2>
+                                            <p class="text-xs text-gray-400 mt-1">@{{ tenants.total }} inquilinos registrados</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-700">
+                                        <thead class="bg-gray-900">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Negocio</th>
+                                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Subdominio</th>
+                                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Plan</th>
+                                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Estado</th>
+                                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-gray-800 divide-y divide-gray-700">
+                                            <tr v-for="tenant in tenants.data" :key="tenant.id" class="hover:bg-gray-750 transition-colors">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center mr-3">
+                                                            <span class="text-white font-bold text-sm">@{{ tenant.business_name.charAt(0).toUpperCase() }}</span>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-semibold text-white">@{{ tenant.business_name }}</p>
+                                                            <p class="text-xs text-gray-400 font-mono">ID: @{{ tenant.id.substring(0, 8) }}...</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <a :href="'http://' + tenant.primary_domain" target="_blank" class="text-sm text-blue-400 hover:text-blue-300 font-mono flex items-center space-x-1 hover:underline">
+                                                        <span>@{{ tenant.primary_domain }}</span>
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                                        </svg>
+                                                    </a>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="px-2 py-1 text-xs font-bold rounded-full uppercase bg-gray-700 text-gray-300">@{{ tenant.plan }}</span>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="px-2 py-1 text-xs font-bold rounded-full flex items-center space-x-1 w-fit bg-emerald-500/20 text-emerald-400 border border-emerald-500/50">
+                                                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                                        <span>@{{ tenant.status === 'active' ? 'Activo' : 'Expirado' }}</span>
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <button @click="loginToTenant(tenant)" class="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-bold transition-all duration-200 flex items-center space-x-1 shadow-sm">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                                                        </svg>
+                                                        <span>Entrar</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="tenants.data.length === 0">
+                                                <td colspan="5" class="px-6 py-12 text-center">
+                                                    <div class="flex flex-col items-center space-y-3">
+                                                        <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center">
+                                                            <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-sm font-semibold text-gray-300">No hay tenants</p>
+                                                            <p class="text-xs text-gray-500 mt-1">Aún no se han registrado clientes</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            `
+        }
+
+        createApp(SuperAdminDashboard).mount('#superAdminApp')
+    </script>
+</body>
+</html>
