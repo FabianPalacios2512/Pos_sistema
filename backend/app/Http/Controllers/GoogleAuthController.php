@@ -308,19 +308,32 @@ class GoogleAuthController extends Controller
 
                 DB::commit();
 
-                // Preparar URL de redirección (al subdominio del tenant creado)
+                // 🔥 PRODUCCIÓN: No usar subdominios, redirigir a dominio principal con token de sesión
+                // Generar token temporal para el login
+                $loginToken = Str::random(64);
+                
+                // Guardar datos de sesión temporalmente
+                \Cache::put('google_login_' . $loginToken, [
+                    'tenant_id' => $tenantId,
+                    'user_id' => $newUser->id,
+                    'email' => $googleUser['email'],
+                    'tenant' => $tenant,
+                ], now()->addMinutes(5));
+
+                // Preparar URL de redirección
                 if (app()->environment('local')) {
-                    // En local: http://subdominio.localhost:3000/welcome
-                    $redirectUrl = 'http://' . $domainToCreate . ':3000/welcome';
+                    // En local: http://subdominio.localhost:3000/login con token
+                    $redirectUrl = 'http://' . $domainToCreate . ':3000/login?google_token=' . $loginToken;
                 } else {
-                    // En producción: https://subdominio.105pos.pro/welcome
-                    $redirectUrl = 'https://' . $domainToCreate . '/welcome';
+                    // En producción: https://105pos.pro/login con token (sin subdominio)
+                    $redirectUrl = 'https://105pos.pro/login?google_token=' . $loginToken;
                 }
 
                 \Log::info('✅ Tenant creado con Google OAuth - Redirigiendo', [
                     'tenant_id' => $tenantId,
                     'domain' => $domainToCreate,
-                    'redirect_url' => $redirectUrl
+                    'redirect_url' => $redirectUrl,
+                    'token' => $loginToken
                 ]);
 
                 return redirect()->away($redirectUrl);
