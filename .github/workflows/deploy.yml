@@ -52,7 +52,7 @@ jobs:
             npm install && \
             npm run build && \
             echo '🔄 Restarting PHP-FPM...' && \
-            sudo systemctl restart php8.2-fpm && \
+            sudo systemctl restart php8.3-fpm && \
             echo '✅ Deploy completed successfully!'"
 
       - name: ✅ Deployment Status
