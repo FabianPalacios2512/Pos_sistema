@@ -455,11 +455,17 @@
     </div>
 
       <!-- Modal Crear/Editar Cliente -->
-      <!-- 🎨 MODAL CREAR/EDITAR CLIENTE - Estilo Chunky Enterprise -->
+    </div>
+  </div>
+
+  <!-- 🎨 MODAL CREAR/EDITAR CLIENTE - Teleport al Body (evita conflictos z-index) -->
+  <Teleport to="body">
+    <Transition name="modal">
       <div v-if="showCustomerModal" 
-           class="fixed inset-0 bg-black/70 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
+           class="fixed inset-0 bg-black/70 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in"
            @click.self="closeCustomerModal">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/60 max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col border border-gray-200 dark:border-zinc-800/80">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/60 max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col border border-gray-200 dark:border-zinc-800/80"
+             @click.stop>
           
           <!-- 🎯 Header Profesional -->
           <div class="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-900/95 border-b border-gray-200 dark:border-zinc-800">
@@ -691,15 +697,15 @@
           </div>
         </div>
       </div>
+    </Transition>
+  </Teleport>
 
-      <!-- Modal Historial de Cliente -->
-      <CustomerHistoryModal
+  <!-- Modal Historial de Cliente -->
+  <CustomerHistoryModal
         v-if="showHistoryModal"
         :customer="selectedCustomer"
         @close="showHistoryModal = false"
       />
-    </div>
-  </div>
 </template>
 
 <script setup>
@@ -1223,5 +1229,21 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* 🎭 Transiciones Modal - Animación suave entrada/salida */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .bg-white,
+.modal-leave-to .bg-white {
+  transform: scale(0.95) translateY(20px);
 }
 </style>
