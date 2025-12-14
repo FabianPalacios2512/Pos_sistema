@@ -455,194 +455,239 @@
     </div>
 
       <!-- Modal Crear/Editar Cliente -->
+      <!-- 🎨 MODAL CREAR/EDITAR CLIENTE - Estilo Chunky Enterprise -->
       <div v-if="showCustomerModal" 
-           class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center p-4 z-50"
+           class="fixed inset-0 bg-black/70 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
            @click.self="closeCustomerModal">
-        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-xl dark:shadow-black/50 max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-300 dark:border-zinc-800">
-          <!-- Header del Modal -->
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center space-x-3">
-            <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-              </svg>
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/60 max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col border border-gray-200 dark:border-zinc-800/80">
+          
+          <!-- 🎯 Header Profesional -->
+          <div class="px-8 py-6 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-900/95 border-b border-gray-200 dark:border-zinc-800">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">
+                  {{ isEditing ? 'Editar Cliente' : 'Nuevo Cliente' }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">
+                  {{ isEditing ? 'Actualiza la información del cliente' : 'Completa los datos del nuevo cliente' }}
+                </p>
+              </div>
             </div>
-            <h3 class="text-base font-bold text-gray-900 dark:text-white">
-              {{ isEditing ? 'Editar Cliente' : 'Nuevo Cliente' }}
-            </h3>
           </div>
           
-          <!-- Contenido del Modal -->
-          <div class="flex-1 overflow-y-auto px-6 py-5">
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Información Personal -->
-            <div class="space-y-4">
-              <h4 class="font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-zinc-800 pb-2">Información Personal</h4>
+          <!-- 📋 Contenido con Grid Inteligente -->
+          <div class="flex-1 overflow-y-auto px-8 py-6 bg-gray-50/30 dark:bg-zinc-950/30">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
               
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Nombre Completo *</label>
-                <input v-model="customerForm.name" 
-                       type="text" 
-                       :class="[
-                         'w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2',
-                         formErrors.name 
-                           ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' 
-                           : 'border-gray-300 dark:border-zinc-700 focus:ring-blue-500 dark:focus:ring-blue-400'
-                       ]"
-                       placeholder="Ej: Juan Carlos Pérez">
-                <p v-if="formErrors.name" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ formErrors.name }}</p>
-              </div>
-              
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Tipo Documento</label>
-                  <select v-model="customerForm.document_type" 
-                          class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-                    <option value="CC">Cédula</option>
-                    <option value="TI">Tarjeta Identidad</option>
-                    <option value="CE">Cédula Extranjería</option>
-                    <option value="NIT">NIT</option>
-                    <option value="PP">Pasaporte</option>
-                  </select>
+              <!-- 🧑 COLUMNA 1: Información Personal -->
+              <div class="space-y-5">
+                <div class="pb-3 border-b-2 border-emerald-500/20 dark:border-emerald-400/20">
+                  <h4 class="text-base font-extrabold text-gray-800 dark:text-white uppercase tracking-wide">Información Personal</h4>
                 </div>
+                
+                <!-- Nombre Completo -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Número Documento *</label>
-                  <input v-model="customerForm.document_number" 
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Nombre Completo *</label>
+                  <input v-model="customerForm.name" 
                          type="text" 
                          :class="[
-                           'w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2',
-                           formErrors.document_number 
-                             ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' 
-                             : 'border-gray-300 dark:border-zinc-700 focus:ring-blue-500 dark:focus:ring-blue-400'
+                           'w-full h-12 px-4 border-2 rounded-xl font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 transition-all duration-200',
+                           formErrors.name 
+                             ? 'bg-red-50 dark:bg-red-950/30 border-red-400 dark:border-red-600 focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400' 
+                             : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20'
                          ]"
-                         placeholder="12345678">
-                  <p v-if="formErrors.document_number" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ formErrors.document_number }}</p>
+                         placeholder="Ej: Juan Carlos Pérez Gómez">
+                  <p v-if="formErrors.name" class="text-red-600 dark:text-red-400 text-xs font-semibold mt-2 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ formErrors.name }}
+                  </p>
+                </div>
+                
+                <!-- Tipo y Número de Documento -->
+                <div class="grid grid-cols-5 gap-3">
+                  <div class="col-span-2">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Tipo Doc.</label>
+                    <select v-model="customerForm.document_type" 
+                            class="w-full h-12 px-3 border-2 border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white font-medium focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 transition-all duration-200">
+                      <option value="CC">CC</option>
+                      <option value="TI">TI</option>
+                      <option value="CE">CE</option>
+                      <option value="NIT">NIT</option>
+                      <option value="PP">Pasaporte</option>
+                    </select>
+                  </div>
+                  <div class="col-span-3">
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Número *</label>
+                    <input v-model="customerForm.document_number" 
+                           type="text" 
+                           :class="[
+                             'w-full h-12 px-4 border-2 rounded-xl font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 transition-all duration-200',
+                             formErrors.document_number 
+                               ? 'bg-red-50 dark:bg-red-950/30 border-red-400 dark:border-red-600 focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400' 
+                               : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20'
+                           ]"
+                           placeholder="1234567890">
+                    <p v-if="formErrors.document_number" class="text-red-600 dark:text-red-400 text-xs font-semibold mt-2">{{ formErrors.document_number }}</p>
+                  </div>
+                </div>
+                
+                <!-- Fecha Nacimiento y Género -->
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Fecha Nacimiento</label>
+                    <input v-model="customerForm.birth_date" 
+                           type="date" 
+                           class="w-full h-12 px-4 border-2 border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white font-medium focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 transition-all duration-200">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Género</label>
+                    <select v-model="customerForm.gender" 
+                            class="w-full h-12 px-4 border-2 border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white font-medium focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 transition-all duration-200">
+                      <option value="">Seleccionar</option>
+                      <option value="M">Masculino</option>
+                      <option value="F">Femenino</option>
+                      <option value="O">Otro</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              
-              <div class="grid grid-cols-2 gap-3">
+
+              <!-- 📞 COLUMNA 2: Contacto y Financiero -->
+              <div class="space-y-5">
+                <div class="pb-3 border-b-2 border-blue-500/20 dark:border-blue-400/20">
+                  <h4 class="text-base font-extrabold text-gray-800 dark:text-white uppercase tracking-wide">Contacto</h4>
+                </div>
+                
+                <!-- Teléfono -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Fecha de Nacimiento</label>
-                  <input v-model="customerForm.birth_date" 
-                         type="date" 
-                         class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Teléfono *</label>
+                  <input v-model="customerForm.phone" 
+                         type="text" 
+                         :class="[
+                           'w-full h-12 px-4 border-2 rounded-xl font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 transition-all duration-200',
+                           formErrors.phone 
+                             ? 'bg-red-50 dark:bg-red-950/30 border-red-400 dark:border-red-600 focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400' 
+                             : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20'
+                         ]"
+                         placeholder="+57 300 123 4567">
+                  <p v-if="formErrors.phone" class="text-red-600 dark:text-red-400 text-xs font-semibold mt-2">{{ formErrors.phone }}</p>
                 </div>
+                
+                <!-- Email -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Género</label>
-                  <select v-model="customerForm.gender" 
-                          class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-                    <option value="">Seleccionar</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                    <option value="O">Otro</option>
-                  </select>
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Email *</label>
+                  <input v-model="customerForm.email" 
+                         type="email" 
+                         :class="[
+                           'w-full h-12 px-4 border-2 rounded-xl font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 transition-all duration-200',
+                           formErrors.email 
+                             ? 'bg-red-50 dark:bg-red-950/30 border-red-400 dark:border-red-600 focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400' 
+                             : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20'
+                         ]"
+                         placeholder="correo@ejemplo.com">
+                  <p v-if="formErrors.email" class="text-red-600 dark:text-red-400 text-xs font-semibold mt-2">{{ formErrors.email }}</p>
+                </div>
+                
+                <!-- Dirección -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Dirección</label>
+                  <input v-model="customerForm.address" 
+                         type="text" 
+                         class="w-full h-12 px-4 border-2 border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-zinc-500 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 transition-all duration-200"
+                         placeholder="Calle 123 #45-67">
+                </div>
+                
+                <!-- Ciudad -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Ciudad</label>
+                  <input v-model="customerForm.city" 
+                         type="text" 
+                         class="w-full h-12 px-4 border-2 border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white font-medium placeholder-gray-400 dark:placeholder-zinc-500 focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 transition-all duration-200"
+                         placeholder="Bogotá, Colombia">
+                </div>
+                
+                <!-- 💳 Crédito (si está habilitado) -->
+                <div v-if="isCreditiendaEnabled" class="pt-2 border-t border-gray-200 dark:border-zinc-800">
+                  <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Límite de Crédito</label>
+                  <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-zinc-400 font-bold">$</span>
+                    <input v-model="customerForm.credit_limit" 
+                           type="number" 
+                           min="0" 
+                           step="10000"
+                           :class="[
+                             'w-full h-12 pl-8 pr-4 border-2 rounded-xl font-bold text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 transition-all duration-200',
+                             formErrors.credit_limit 
+                               ? 'bg-red-50 dark:bg-red-950/30 border-red-400 dark:border-red-600 focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400' 
+                               : 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/50 focus:border-amber-500 dark:focus:border-amber-400 focus:ring-2 focus:ring-amber-500/20 dark:focus:ring-amber-400/20'
+                           ]"
+                           placeholder="500000">
+                  </div>
+                  <p v-if="formErrors.credit_limit" class="text-red-600 dark:text-red-400 text-xs font-semibold mt-2">{{ formErrors.credit_limit }}</p>
                 </div>
               </div>
             </div>
 
-            <!-- Información de Contacto y Financiera -->
-            <div class="space-y-4">
-              <h4 class="font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-zinc-800 pb-2">Contacto y Crédito</h4>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Teléfono *</label>
-                <input v-model="customerForm.phone" 
-                       type="text" 
-                       :class="[
-                         'w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2',
-                         formErrors.phone 
-                           ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' 
-                           : 'border-gray-300 dark:border-zinc-700 focus:ring-blue-500 dark:focus:ring-blue-400'
-                       ]"
-                       placeholder="+57 300 123 4567">
-                <p v-if="formErrors.phone" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ formErrors.phone }}</p>
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Email *</label>
-                <input v-model="customerForm.email" 
-                       type="email" 
-                       :class="[
-                         'w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2',
-                         formErrors.email 
-                           ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' 
-                           : 'border-gray-300 dark:border-zinc-700 focus:ring-blue-500 dark:focus:ring-blue-400'
-                       ]"
-                       placeholder="correo@ejemplo.com">
-                <p v-if="formErrors.email" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ formErrors.email }}</p>
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Dirección</label>
-                <input v-model="customerForm.address" 
-                       type="text" 
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                       placeholder="Calle 123 #45-67">
-              </div>
-              
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Ciudad</label>
-                <input v-model="customerForm.city" 
-                       type="text" 
-                       class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-                       placeholder="Bogotá">
-              </div>
-              
-              <div v-if="isCreditiendaEnabled">
-                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Límite de Crédito</label>
-                <input v-model="customerForm.credit_limit" 
-                       type="number" 
-                       min="0" 
-                       step="1000"
-                       :class="[
-                         'w-full px-3 py-2 border rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2',
-                         formErrors.credit_limit 
-                           ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' 
-                           : 'border-gray-300 dark:border-zinc-700 focus:ring-blue-500 dark:focus:ring-blue-400'
-                       ]"
-                       placeholder="500000">
-                <p v-if="formErrors.credit_limit" class="text-red-500 dark:text-red-400 text-sm mt-1">{{ formErrors.credit_limit }}</p>
-              </div>
-            </div>
-          </div>
+            <!-- ✅ Checkboxes de Estado -->
+            <div class="mt-8 pt-6 border-t-2 border-gray-200 dark:border-zinc-800 flex flex-wrap items-center gap-6">
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="relative">
+                  <input v-model="customerForm.active" 
+                         type="checkbox" 
+                         class="peer w-6 h-6 cursor-pointer appearance-none rounded-lg border-2 border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 checked:bg-emerald-600 dark:checked:bg-emerald-500 checked:border-emerald-600 dark:checked:border-emerald-500 transition-all duration-200">
+                  <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <span class="text-sm font-bold text-gray-700 dark:text-zinc-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Cliente Activo</span>
+              </label>
 
-          <!-- Estado Activo y Crédito -->
-          <div class="mt-6 flex items-center space-x-6">
-            <div class="flex items-center">
-              <input v-model="customerForm.active" 
-                     type="checkbox" 
-                     class="w-4 h-4 text-blue-600 dark:text-blue-500 bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 rounded focus:ring-blue-500 dark:focus:ring-blue-400">
-              <label class="ml-2 text-sm font-medium text-gray-700 dark:text-zinc-300">Cliente activo</label>
-            </div>
-
-            <div class="flex items-center">
-              <input v-model="customerForm.credit_active" 
-                     type="checkbox" 
-                     :disabled="!isCreditiendaEnabled"
-                     @click="handleCreditCheckboxClick"
-                     class="w-4 h-4 text-indigo-600 dark:text-indigo-500 bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 rounded focus:ring-indigo-500 dark:focus:ring-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed">
-              <label class="ml-2 text-sm font-medium text-gray-700 dark:text-zinc-300">
-                Habilitar Crédito
-                <span v-if="!isCreditiendaEnabled" class="ml-2 px-2 py-0.5 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800 text-xs font-semibold rounded-full">
-                  Premium
+              <label class="flex items-center gap-3 cursor-pointer group" :class="{'opacity-50 cursor-not-allowed': !isCreditiendaEnabled}">
+                <div class="relative">
+                  <input v-model="customerForm.credit_active" 
+                         type="checkbox" 
+                         :disabled="!isCreditiendaEnabled"
+                         @click="handleCreditCheckboxClick"
+                         class="peer w-6 h-6 cursor-pointer appearance-none rounded-lg border-2 border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 checked:bg-amber-600 dark:checked:bg-amber-500 checked:border-amber-600 dark:checked:border-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                  <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <span class="text-sm font-bold text-gray-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Habilitar Crédito
+                  <span v-if="!isCreditiendaEnabled" class="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 text-xs font-extrabold rounded-md uppercase tracking-wider">Premium</span>
                 </span>
               </label>
             </div>
           </div>
           
-          </div>
-          
-          <!-- Footer del Modal -->
-          <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3">
-            <button @click="closeCustomerModal" 
-                    class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200">
-              Cancelar
-            </button>
-            <button @click="saveCustomer" 
-                    :disabled="loading || !customerForm.name || !customerForm.document_number"
-                    class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300">
-              {{ loading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear') }} Cliente
-            </button>
+          <!-- 🎯 Footer con Botones Profesionales -->
+          <div class="px-8 py-5 bg-gray-50 dark:bg-zinc-950/50 border-t border-gray-200 dark:border-zinc-800 flex items-center justify-between">
+            <p class="text-xs text-gray-500 dark:text-zinc-500">
+              <span class="text-red-500">*</span> Campos requeridos
+            </p>
+            <div class="flex items-center gap-3">
+              <button @click="closeCustomerModal" 
+                      class="px-6 py-3 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white text-sm font-bold rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all duration-200">
+                Cancelar
+              </button>
+              <button @click="saveCustomer" 
+                      :disabled="loading || !customerForm.name || !customerForm.document_number"
+                      class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white text-sm font-extrabold rounded-xl shadow-lg shadow-emerald-500/30 dark:shadow-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 flex items-center gap-2">
+                <svg v-if="loading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>{{ loading ? 'Guardando...' : (isEditing ? 'Actualizar Cliente' : 'Crear Cliente') }}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
