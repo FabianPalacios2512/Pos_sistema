@@ -26,58 +26,34 @@ jobs:
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
       - name: 🚀 Deploy to Production
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
         run: |
-          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
-            set -e
-            
-            echo "🔄 Iniciando deploy en /var/www/105pos..."
-            cd ${{ secrets.PROJECT_PATH }}
-            
-            # 1. Actualizar código
-            echo "📥 Pulling latest changes..."
-            git pull origin main
-            
-            # 2. Backend: Composer
-            echo "📦 Installing Composer dependencies..."
-            cd backend
-            composer install --no-dev --optimize-autoloader --no-interaction
-            
-            # 3. Laravel: Migraciones y Cache
-            echo "🗄️ Running migrations..."
-            php artisan migrate --force
-            
-            echo "🧹 Clearing cache..."
-            php artisan config:clear
-            php artisan cache:clear
-            php artisan route:clear
-            php artisan view:clear
-            
-            echo "♻️ Optimizing..."
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            
-            # 4. Permisos
-            echo "🔐 Setting permissions..."
-            chmod -R 755 storage bootstrap/cache
-            chown -R www-data:www-data storage bootstrap/cache
-            
-            # 5. Frontend
-            echo "🎨 Building frontend..."
-            cd ..
-            npm install
-            npm run build
-            
-            # 6. Reiniciar servicios
-            echo "🔄 Restarting PHP-FPM..."
-            systemctl restart php8.2-fpm
-            
-            echo "✅ Deploy completed successfully!"
-          ENDSSH
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cd ${{ secrets.PROJECT_PATH }} && \
+            echo '🔄 Iniciando deploy...' && \
+            git pull origin main && \
+            echo '📦 Installing Composer dependencies...' && \
+            cd backend && \
+            composer install --no-dev --optimize-autoloader --no-interaction && \
+            echo '🗄️ Running migrations...' && \
+            php artisan migrate --force && \
+            echo '🧹 Clearing cache...' && \
+            php artisan config:clear && \
+            php artisan cache:clear && \
+            php artisan route:clear && \
+            php artisan view:clear && \
+            echo '♻️ Optimizing...' && \
+            php artisan config:cache && \
+            php artisan route:cache && \
+            php artisan view:cache && \
+            echo '🔐 Setting permissions...' && \
+            chmod -R 755 storage bootstrap/cache && \
+            chown -R www-data:www-data storage bootstrap/cache && \
+            echo '🎨 Building frontend...' && \
+            cd .. && \
+            npm install && \
+            npm run build && \
+            echo '🔄 Restarting PHP-FPM...' && \
+            sudo systemctl restart php8.2-fpm && \
+            echo '✅ Deploy completed successfully!'"
 
       - name: ✅ Deployment Status
         if: success()
