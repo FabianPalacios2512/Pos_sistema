@@ -270,7 +270,7 @@
   <div class="lg:col-span-6 h-full overflow-hidden">
     <div class="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/60 h-full flex flex-col overflow-hidden transition-all duration-300">
       
-      <div class="flex-1 p-3 overflow-y-auto bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+      <div class="flex-1 p-3 overflow-y-auto bg-slate-100/80 dark:bg-zinc-950/50 backdrop-blur-sm" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
         <!-- Loading skeleton -->
       <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -333,12 +333,12 @@
           @click="addToCart(product)"
         >
           
-          <!-- 🖼️ CONTENEDOR DE IMAGEN UNIFICADO - Fondo gris uniforme -->
-          <div class="aspect-square bg-gray-50 dark:bg-zinc-900 relative flex items-center justify-center p-3">
+          <!-- 🖼️ CONTENEDOR DE IMAGEN - Con placeholder elegante para productos sin imagen -->
+          <div class="aspect-square bg-gray-100 dark:bg-zinc-900 relative flex items-center justify-center p-2 border-b border-gray-100 dark:border-zinc-700">
              
-             <!-- Badge de cantidad en carrito (esquina superior DERECHA con ring blanco) -->
+             <!-- Badge de cantidad en carrito (gris oscuro profesional - menos ruido visual) -->
              <div v-if="getProductQuantityInCart(product.id) > 0" 
-                  class="absolute -top-0.5 -right-0.5 z-10 w-6 h-6 rounded-full bg-emerald-500 text-white text-[11px] font-bold shadow-md ring-2 ring-white dark:ring-zinc-800 flex items-center justify-center">
+                  class="absolute -top-0.5 -right-0.5 z-10 w-6 h-6 rounded-full bg-slate-800 dark:bg-zinc-200 text-white dark:text-zinc-900 text-[11px] font-bold shadow-md ring-2 ring-white dark:ring-zinc-800 flex items-center justify-center">
                {{ getProductQuantityInCart(product.id) }}
              </div>
              
@@ -348,14 +348,21 @@
                {{ product.alternative_warehouses[0].name }}
              </div>
 
-             <!-- Imagen centrada con object-contain para uniformidad -->
+             <!-- Imagen con fallback a placeholder elegante -->
              <img
+              v-if="product.image_url || product.image"
               :src="getProductImage(product)"
               :alt="product.name"
               class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
               @error="(e) => handleImageError(e, product)"
             />
+            <!-- Placeholder cuando NO hay imagen - Icono de caja elegante -->
+            <div v-else class="w-full h-full flex items-center justify-center">
+              <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+              </svg>
+            </div>
           </div>
 
           <!-- 📝 INFORMACIÓN - Altura fija para uniformidad -->
