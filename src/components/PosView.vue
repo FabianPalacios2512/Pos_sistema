@@ -467,15 +467,15 @@
         <p class="text-xs text-slate-500 dark:text-zinc-600 mt-1">Escanea productos para comenzar</p>
       </div>
 
-      <!-- 🛒 LISTA DE ITEMS REDISEÑADA - Táctil y Definida -->
+      <!-- 🛒 LISTA DE ITEMS REDISEÑADA - Compacta para Alto Tráfico -->
       <div v-else class="divide-y divide-gray-100 dark:divide-zinc-800">
         <div
           v-for="(item, index) in cart.items"
           :key="item.id"
-          class="group relative flex items-center gap-3 px-4 py-4 hover:bg-gray-50/50 dark:hover:bg-zinc-800/50 transition-colors"
+          class="group relative flex items-center gap-2.5 px-3 py-2 hover:bg-gray-50/50 dark:hover:bg-zinc-800/50 transition-colors"
         >
-          <!-- 🖼️ Miniatura con fondo uniforme -->
-          <div class="w-14 h-14 rounded-lg bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 overflow-hidden flex-shrink-0 flex items-center justify-center p-1.5">
+          <!-- 🖼️ Miniatura compacta -->
+          <div class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
              <img 
                :src="getCartItemImage(item)" 
                class="max-w-full max-h-full object-contain"
@@ -784,10 +784,10 @@
           class="w-full h-12 rounded-xl font-black text-base shadow-lg transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 group relative overflow-hidden"
           :class="[
             (!canShowPaymentModal || quotationMode)
-              ? 'bg-slate-300 dark:bg-zinc-600 text-slate-500 dark:text-zinc-400 cursor-not-allowed shadow-none'
+              ? 'bg-slate-300 dark:bg-zinc-700 text-slate-500 dark:text-zinc-400 cursor-not-allowed shadow-none'
             : (selectedPaymentMethod === 'efectivo' && (!cashReceived || cashReceived < total))
-              ? 'bg-rose-500 dark:bg-rose-600 text-white cursor-not-allowed shadow-rose-500/30'
-              : 'bg-emerald-600 dark:bg-emerald-600 text-white hover:bg-emerald-700 dark:hover:bg-emerald-500 shadow-emerald-600/30'
+              ? 'bg-slate-400 dark:bg-zinc-600 text-slate-600 dark:text-zinc-300 cursor-not-allowed shadow-none'
+              : 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-emerald-600/40 hover:shadow-emerald-600/60 cobrar-ready-pulse'
           ]"
         >
           <!-- Efecto de brillo animado cuando está listo -->
@@ -805,16 +805,19 @@
           </span>
 
           <span v-else-if="selectedPaymentMethod === 'efectivo' && (!cashReceived || cashReceived < total)" class="flex items-center gap-2">
-             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-             <span class="text-sm font-bold uppercase">Ingresa monto</span>
+             <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+             <span class="text-sm font-bold uppercase tracking-wide">Ingresa efectivo</span>
           </span>
 
           <span v-else class="flex items-center justify-between w-full px-4">
              <span class="flex items-center gap-2">
                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-               <span class="text-base font-black tracking-wide uppercase">Cobrar</span>
+               <span class="text-base font-black tracking-wide uppercase">Cobrar Ahora</span>
              </span>
-             <span class="text-lg font-black tabular-nums">${{ total.toLocaleString() }}</span>
+             <span class="flex items-center gap-1 text-lg font-black tabular-nums">
+               ${{ total.toLocaleString() }}
+               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+             </span>
           </span>
         </button>
     </div>
@@ -5998,6 +6001,20 @@ defineExpose({
 
 .animate-pulse-subtle {
   animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* 💚 Clase para botón COBRAR listo - Pulso suave profesional */
+.cobrar-ready-pulse {
+  animation: cobrar-glow 2s ease-in-out infinite;
+}
+
+@keyframes cobrar-glow {
+  0%, 100% {
+    box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.4), 0 0 0 0 rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 8px 30px -2px rgba(16, 185, 129, 0.6), 0 0 0 4px rgba(16, 185, 129, 0.1);
+  }
 }
 
 /* ✨ Efecto de brillo que recorre el botón */
