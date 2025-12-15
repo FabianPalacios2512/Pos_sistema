@@ -357,6 +357,21 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
 
 });
 
+// Rutas autenticadas SIN restricción de trial (para configuración)
+Route::middleware(['auth:sanctum'])->group(function () {
+    // ==================== WEB CATALOG CONFIGURATION ====================
+    Route::get('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getConfig']);
+    Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'saveConfig']);
+    // ==================== FIN WEB CATALOG CONFIGURATION ====================
+});
+
+// ==================== CATÁLOGO PÚBLICO (SIN AUTENTICACIÓN) ====================
+// Configuración pública del catálogo (para mostrar en el frontend público)
+Route::get('/public/catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getPublicConfig']);
+Route::get('/public/catalog/config/{subdomain}', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getPublicConfig']);
+// ==================== FIN CATÁLOGO PÚBLICO ====================
+
+
 // ==================== AI MONITORING (Sin Tenancy - Para Super Admin) ====================
 // Estas rutas funcionan tanto para tenants como para super admin
 Route::middleware(['auth:sanctum'])->group(function () {

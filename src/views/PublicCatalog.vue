@@ -249,6 +249,18 @@ const orderResult = ref({})
 const checkoutDrawer = ref(null)
 const isScrolled = ref(false)
 
+// Web Catalog Configuration
+const catalogConfig = ref({
+  store_active: true,
+  visible_categories: [],
+  hide_out_of_stock: false,
+  whatsapp_number: '+57',
+  custom_message: 'Hola, quiero hacer el siguiente pedido:',
+  primary_color: '#10B981',
+  delivery_cost: 0,
+  minimum_order: 0
+})
+
 // Scroll Listener
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20
@@ -258,7 +270,16 @@ const handleScroll = () => {
 const filteredProducts = computed(() => {
   let filtered = products.value
 
-  // Filtrar por categoría
+  // 1. Aplicar filtro de configuración (categorías visibles)
+  // Esto asegura que incluso en "Todas", solo salgan las permitidas
+  const visibleIds = catalogConfig.value.visible_categories || []
+  if (visibleIds.length > 0) {
+    filtered = filtered.filter(p => 
+      visibleIds.some(id => String(id) === String(p.category_id))
+    )
+  }
+
+  // 2. Filtrar por categoría seleccionada por el usuario
   if (selectedCategory.value !== null) {
     filtered = filtered.filter(p => p.category_id === selectedCategory.value)
   }
@@ -326,10 +347,61 @@ const loadCategories = async () => {
     const response = await axios.get('/api/public/catalog/categories')
     
     if (response.data.success) {
-      categories.value = response.data.categories
+      const allCategories = response.data.categories
+      
+      // Filter categories based on configuration
+      // If visible_categories is empty, show all
+      const visibleIds = catalogConfig.value.visible_categories || []
+      
+      console.log('🔍 Filtrando categorías:', {
+        visibleIds,
+        allCategoriesCount: allCategories.length,
+        firstCategory: allCategories[0]
+      })
+
+      if (visibleIds.length === 0) {
+        categories.value = allCategories
+      } else {
+        // Only show categories that are in the visible list
+        // Convert both to strings for safe comparison
+        categories.value = allCategories.filter(cat => 
+          visibleIds.some(id => String(id) === String(cat.id))
+        )
+      }
+      
+      console.log('✅ Categorías finales:', categories.value.length)
     }
   } catch (error) {
     console.error('Error cargando categorías:', error)
+  }
+}
+
+// Load web catalog configuration
+const loadCatalogConfig = async () => {
+  try {
+    const response = await axios.get('/api/public/catalog/config')
+    
+    if (response.data.success) {
+      const config = response.data.data
+      
+      catalogConfig.value = {
+        store_active: config.store_active ?? true,
+        visible_categories: config.visible_categories || [],
+        hide_out_of_stock: config.hide_out_of_stock ?? false,
+        whatsapp_number: config.whatsapp_number || '+57',
+        custom_message: config.custom_message || 'Hola, quiero hacer el siguiente pedido:',
+        primary_color: config.primary_color || '#10B981',
+        delivery_cost: parseFloat(config.delivery_cost || 0),
+        minimum_order: parseFloat(config.minimum_order || 0)
+      }
+      
+      // Update store name
+      storeName.value = config.store_name || 'Mi Tienda'
+      
+      console.log('✅ Configuración del catálogo cargada:', catalogConfig.value)
+    }
+  } catch (error) {
+    console.error('Error cargando configuración del catálogo:', error)
   }
 }
 
@@ -426,9 +498,16 @@ const closeSuccessModal = () => {
 }
 
 // Lifecycle
-onMounted(() => {
-  loadProducts()
-  loadCategories()
+onMounted(async () => {
+  // Load configuration first
+  await loadCatalogConfig()
+  
+  // Then load categories (will be filtered by config)
+  await loadCategories()
+  
+  // Finally load products
+  await loadProducts()
+  
   window.addEventListener('scroll', handleScroll)
 })
 

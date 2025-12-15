@@ -212,12 +212,19 @@ const UsersManagementView = defineAsyncComponent(() => import('../components/Use
 const ExpensesManager = defineAsyncComponent(() => import('./ExpensesManager.vue'))
 const AccountsReceivableView = defineAsyncComponent(() => import('../components/AccountsReceivableView.vue'))
 
+// Web Catalog
+const WebCatalogConfig = defineAsyncComponent(() => import('./WebCatalogConfig.vue'))
+const WebCatalogUpgrade = defineAsyncComponent(() => import('./WebCatalogUpgrade.vue'))
+
 // Multisede
 const WarehousesView = defineAsyncComponent(() => import('../components/WarehousesView_MasterDetail.vue'))
 const StockTransfersView = defineAsyncComponent(() => import('../components/StockTransfersView.vue'))
 
 // Componentes temporales para módulos no desarrollados aún
 const PlaceholderView = defineAsyncComponent(() => import('../components/PlaceholderView.vue'))
+
+// Importar appStore para acceso al plan del tenant
+import { appStore } from '../store/appStore.js'
 
 // ===== ESTADO REACTIVO GLOBAL =====
 
@@ -328,8 +335,9 @@ const getUserPermissions = (role) => {
 
 // Verificar si el usuario tiene permisos para un módulo
 const hasModulePermission = (module) => {
-  // Módulos que siempre están disponibles para todos los usuarios
-  const alwaysAvailableModules = ['expenses']
+  // Módulos que siempre están disponibles para todos los usuarios autenticados
+  // (tienen su propio control de acceso interno)
+  const alwaysAvailableModules = ['expenses', 'web-catalog-config']
   if (alwaysAvailableModules.includes(module)) {
     return true
   }
@@ -1091,6 +1099,13 @@ const lowStockProducts = computed(() => {
 
 // Componente dinámico basado en el módulo actual
 const currentModuleComponent = computed(() => {
+  // Handle Web Catalog module with plan-based access control
+  if (currentModule.value === 'web-catalog-config') {
+    const tenantPlan = appStore.tenantPlan || 'free_trial'
+    const hasAccess = ['premium', 'enterprise'].includes(tenantPlan)
+    return hasAccess ? WebCatalogConfig : WebCatalogUpgrade
+  }
+  
   const moduleComponents = {
     products: ProductsView,
     categories: CategoriesView,
@@ -1400,7 +1415,11 @@ const getModuleDescription = () => {
     users: 'Usuarios • Gestión de accesos y perfiles',
     roles: 'Roles y Permisos • Control de seguridad avanzado',
     reports: 'Reportes • Análisis inteligente de datos',
-    settings: 'Configuración • Personalización del sistema'
+    settings: 'Configuración • Personalización del sistema',
+    'web-catalog-config': 'Catálogo Web • Personaliza tu tienda online sin código',
+    'accounts-receivable': 'Cuentas por Cobrar • Gestión de créditos',
+    warehouses: 'Gestión de Sedes • Control multisede',
+    'cash-admin': 'Control de Cajas • Supervisión de turnos'
   }
   return descriptions[currentModule.value] || '✨ Sistema de gestión empresarial avanzado'
 }
