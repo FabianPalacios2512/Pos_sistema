@@ -131,8 +131,8 @@
               </svg>
             </div>
             <div class="flex-1">
-              <h4 class="text-sm font-bold text-blue-900 mb-1">Para acceder a esta vista necesitas:</h4>
-              <p class="text-sm text-blue-800">Abrir una caja para registrar ventas, o activar el modo cotización para crear presupuestos sin afectar el inventario.</p>
+              <h4 class="text-sm font-bold text-blue-900 mb-1">Importante</h4>
+              <p class="text-sm text-blue-800">Es importante abrir una caja para llevar el control de las ventas. El modal ahora solo se abre al iniciar una venta cuando no hay una caja abierta, por lo que ya no es necesario mostrar el mensaje anterior.</p>
             </div>
           </div>
           <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start space-x-2">

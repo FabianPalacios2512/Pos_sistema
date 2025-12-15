@@ -310,7 +310,7 @@ class GoogleAuthController extends Controller
 
                 // Generar token temporal para el login
                 $loginToken = Str::random(64);
-                
+
                 // Guardar datos de sesión temporalmente
                 \Cache::put('google_login_' . $loginToken, [
                     'tenant_id' => $tenantId,
