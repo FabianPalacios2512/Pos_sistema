@@ -157,6 +157,16 @@ const routes = [
       requiresAuth: false
     }
   },
+  // 🔍 TEMPORAL - DEBUG para detectar parámetros de Wompi
+  {
+    path: '/payment/debug',
+    name: 'PaymentDebug',
+    component: () => import('../views/PaymentDebug.vue'),
+    meta: {
+      title: 'Debug - Parámetros de Pago',
+      requiresAuth: false
+    }
+  },
   // Ruta raíz - Landing page SaaS (Registro)
   {
     path: '/',

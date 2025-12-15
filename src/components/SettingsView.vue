@@ -263,13 +263,13 @@
 
           <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 flex items-center justify-end gap-3">
             <button 
-              @click="$router.push('/upgrade')" 
+              @click="showUpgradeModal = false" 
               class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 rounded-lg text-sm font-medium hover:bg-white dark:hover:bg-zinc-800 transition-colors"
             >
               Renovar Ahora
             </button>
             <button 
-              @click="$router.push('/upgrade')" 
+              @click="showUpgradeModal = true" 
               class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-colors"
             >
               Mejorar Plan
@@ -277,22 +277,8 @@
           </div>
         </div>
         
-        <!-- Historial de Pagos -->
-        <div class="bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-200 dark:border-zinc-800">
-            <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">Historial de Pagos</h3>
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Últimos pagos realizados</p>
-          </div>
-          <div class="p-5">
-            <div class="text-center py-8 text-gray-500 dark:text-zinc-400">
-              <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-              <p class="text-sm font-medium">Sin historial de pagos</p>
-              <p class="text-xs mt-1">Los pagos aparecerán aquí una vez procesados</p>
-            </div>
-          </div>
-        </div>
+        <!-- Historial de Pagos - Componente Dinámico -->
+        <PaymentHistoryPanel />
       </div>
       
       <!-- Configuración General -->
@@ -1208,12 +1194,17 @@
       </div>
     </Transition>
   </Teleport>
+
+  <!-- Modal de Upgrade de Plan -->
+  <UpgradePlanModal :isOpen="showUpgradeModal" @close="showUpgradeModal = false" @success="handleUpgradeSuccess" />
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import axiosInstance from '../services/apiClient'
 import { appStore } from '../store/appStore.js'
+import UpgradePlanModal from './UpgradePlanModal.vue'
+import PaymentHistoryPanel from './PaymentHistoryPanel.vue'
 
 // Props para evitar warnings de Vue
 const props = defineProps({
@@ -1225,6 +1216,9 @@ const props = defineProps({
 
 // Emits para eventos
 const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos'])
+
+// Estado del modal de upgrade de plan
+const showUpgradeModal = ref(false)
 
 // Estados para modal de categorías de gastos
 const showCategoryModal = ref(false)
@@ -1802,6 +1796,24 @@ watch(activeSection, (newVal) => {
     loadExpenseCategories()
   }
 })
+
+// Manejo de upgrade exitoso
+const handleUpgradeSuccess = async (upgradeData) => {
+  // El plan fue actualizado exitosamente
+  // Recargar configuraciones y cerrar modal
+  showUpgradeModal.value = false
+  
+  // Recargar datos del tenant y system settings
+  await loadSystemSettings()
+  
+  // Mostrar mensaje de éxito
+  showNotification('✅ Plan actualizado exitosamente. Redirigiéndote al POS...', 'success')
+  
+  // Redirigir al POS después de 2 segundos
+  setTimeout(() => {
+    window.location.href = '/pos'
+  }, 2000)
+}
 
 // Inicialización
 onMounted(async () => {

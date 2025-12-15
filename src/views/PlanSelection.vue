@@ -1,4 +1,69 @@
 <template>
+  <!-- MODAL DE ÉXITO PARA TRIAL -->
+  <transition
+    enter-active-class="transition ease-out duration-300"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition ease-in duration-200"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div 
+      v-if="showTrialSuccessModal" 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+    >
+      <transition
+        enter-active-class="transition ease-out duration-300"
+        enter-from-class="scale-95 opacity-0"
+        enter-to-class="scale-100 opacity-100"
+        leave-active-class="transition ease-in duration-200"
+        leave-from-class="scale-100 opacity-100"
+        leave-to-class="scale-95 opacity-0"
+      >
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+          <!-- Header -->
+          <div class="bg-emerald-50 p-8 text-center border-b border-emerald-100">
+            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Trial Activado</h3>
+            <p class="text-gray-600">Tu prueba de 3 días comienza ahora</p>
+          </div>
+
+          <!-- Content -->
+          <div class="p-8">
+            <!-- Empresa -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Empresa</p>
+              <p class="text-lg font-bold text-gray-900">{{ companyName }}</p>
+            </div>
+
+            <!-- Información importante -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+              <p class="text-sm text-blue-900">
+                <strong>Acceso completo</strong> a todas las funciones durante 3 días. No se requiere tarjeta de crédito.
+              </p>
+            </div>
+
+            <!-- Botón -->
+            <button
+              @click="redirectToLogin"
+              class="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all duration-200"
+            >
+              Ir al Login
+            </button>
+
+            <p class="text-xs text-gray-500 text-center mt-4">
+              Se te redireccionará en <span class="font-bold">{{ countdownSeconds }}</span> segundos
+            </p>
+          </div>
+        </div>
+      </transition>
+    </div>
+  </transition>
+
   <!-- 🏦 FONDO TÉCNICO GRIS SUAVE (Estilo Stripe) -->
   <div class="min-h-screen bg-slate-50 py-16 px-4">
     <div class="max-w-7xl mx-auto">
@@ -525,6 +590,8 @@ const isProcessing = ref(false)
 const companyName = ref('')
 const tenantId = ref(null)
 const redirectUrl = ref('')
+const showTrialSuccessModal = ref(false)
+const countdownSeconds = ref(5)
 
 // Detectar ambiente de desarrollo
 const isDevelopment = ref(
@@ -718,48 +785,32 @@ const updateTenantPlan = async (plan) => {
       tenant_id: tenantId.value,
       plan: plan
     })
-    
-    console.log('✅ Plan activado:', response.data)
-    
+
+    console.log('Plan activado:', response.data)
+
     // Limpiar localStorage
     localStorage.removeItem('registration_data')
-    
-    // Si es trial, mostrar mensaje y redirigir al login
+
+    // Si es trial, mostrar modal de éxito
     if (plan === 'trial_express') {
-      // Guardar mensaje de éxito
+      showTrialSuccessModal.value = true
+      countdownSeconds.value = 5
+      
+      // Iniciar countdown
+      const countdownInterval = setInterval(() => {
+        countdownSeconds.value--
+        if (countdownSeconds.value <= 0) {
+          clearInterval(countdownInterval)
+          redirectToLogin()
+        }
+      }, 1000)
+      
+      // Guardar mensaje de éxito para después
       localStorage.setItem('registration_success', JSON.stringify({
-        message: '¡Trial activado! Inicia sesión para comenzar.',
+        message: 'Trial activado. Inicia sesión para comenzar.',
         companyName: companyName.value,
         subdomain: redirectUrl.value
       }))
-      
-      // Obtener subdomain desde URL params o localStorage
-      const urlParams = new URLSearchParams(window.location.search)
-      let subdomain = urlParams.get('subdomain')
-      
-      if (!subdomain) {
-        const registrationData = localStorage.getItem('registration_data')
-        if (registrationData) {
-          const data = JSON.parse(registrationData)
-          subdomain = data.subdomain
-        }
-      }
-      
-      // Redirigir al login con subdomain
-      setTimeout(() => {
-        if (subdomain) {
-          // Si estamos en localhost, usar subdominio
-          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            window.location.href = `http://${subdomain}.localhost:3000/login`
-          } else {
-            // En producción
-            window.location.href = `https://${subdomain}.105pos.pro/login`
-          }
-        } else {
-          // Fallback sin subdominio
-          window.location.href = '/login'
-        }
-      }, 800)
     } else {
       // Para planes de pago, redirigir al tenant directamente
       if (redirectUrl.value) {
@@ -773,6 +824,35 @@ const updateTenantPlan = async (plan) => {
     console.error('Error updating tenant plan:', error)
     console.error('Error details:', error.response?.data)
     throw error
+  }
+}
+
+// Función para redirigir al login
+const redirectToLogin = () => {
+  // Obtener subdomain desde URL params o localStorage
+  const urlParams = new URLSearchParams(window.location.search)
+  let subdomain = urlParams.get('subdomain')
+
+  if (!subdomain) {
+    const registrationData = localStorage.getItem('registration_data')
+    if (registrationData) {
+      const data = JSON.parse(registrationData)
+      subdomain = data.subdomain
+    }
+  }
+
+  // Redirigir al login con subdomain
+  if (subdomain) {
+    // Si estamos en localhost, usar subdominio
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      window.location.href = `http://${subdomain}.localhost:3000/login`
+    } else {
+      // En producción
+      window.location.href = `https://${subdomain}.105pos.pro/login`
+    }
+  } else {
+    // Fallback sin subdominio
+    window.location.href = '/login'
   }
 }
 </script>

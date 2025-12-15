@@ -222,7 +222,7 @@
                   <input 
                     v-model="config.address" 
                     type="text" 
-                    placeholder="Calle 123 #45-67, Bogotá"
+                    placeholder="Ej: Calle 123 #45-67, Bogotá"
                     class="w-full px-4 py-3 text-base border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all text-slate-900 font-semibold"
                   >
                 </div>
@@ -555,7 +555,7 @@ const dummyItems = [
 // Preview data reactivo para Step 2 - Datos que cambian en tiempo real
 const previewConfigData = computed(() => ({
   storeName: config.storeName || 'MI EMPRESA',
-  address: config.address || 'Calle 123 #45-67, Bogotá',
+  address: config.address || '',
   phone: config.phone || '+57 300 123 4567',
   email: config.email || '',
   nit: config.nit || '',

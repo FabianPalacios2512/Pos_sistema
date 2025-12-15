@@ -74,16 +74,7 @@
               </p>
             </div>
             
-            <button 
-              @click="hasOpenSession ? handleCloseCash() : handleOpenCash()"
-              :disabled="cashLoading"
-              class="w-full py-2 px-4 text-sm font-medium rounded-lg border transition-colors"
-              :class="hasOpenSession 
-                ? 'bg-white dark:bg-gray-800 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/30 hover:bg-rose-50 dark:hover:bg-rose-900/10' 
-                : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'"
-            >
-              {{ cashLoading ? 'Procesando...' : (hasOpenSession ? 'Cerrar Turno' : 'Abrir Caja') }}
-            </button>
+            
           </div>
         </div>
 

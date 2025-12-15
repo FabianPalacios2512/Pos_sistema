@@ -46,6 +46,28 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
+// 🔥 Crear instancia de axios con la URL base correcta del backend
+// Wompi redirige desde su servidor externo, no desde localhost
+// Por eso necesitamos especificar explícitamente dónde está el backend
+const backendAPI = axios.create({
+  baseURL: (() => {
+    // Determinar dónde está el backend según dónde estemos
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      // En localhost: el backend está en http://localhost:8000
+      return 'http://localhost:8000'
+    } else {
+      // En producción: el backend está en el mismo dominio (105pos.pro)
+      // pero sin subdominio
+      return `https://${window.location.hostname}`
+    }
+  })(),
+  timeout: 15000,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+})
+
 console.log('🚀 PaymentSuccess.vue - COMPONENTE CARGADO')
 
 const route = useRoute()
@@ -62,47 +84,106 @@ onMounted(async () => {
   const reference = route.query.reference || route.query.id || ''
   const tenantId = route.query.tenant_id || ''
   const plan = route.query.plan || ''
+  const isUpgrade = route.query.is_upgrade === 'true'  // Flag para detectar upgrades
   
-  console.log('🔍 PaymentSuccess - URL params:', { reference, tenantId, plan })
+  console.log('🔍 PaymentSuccess - URL params:', { reference, tenantId, plan, isUpgrade })
   
   paymentId.value = reference
   
   // 🔥 SI TENEMOS DATOS EN LA URL, ACTIVAR EL PLAN DIRECTAMENTE
   // (Wompi solo redirige a /success si el pago fue exitoso)
-  if (reference && tenantId && plan) {
-    console.log('✅ PaymentSuccess - Datos completos en URL, activando plan...')
+  if (reference && plan) {
+    console.log('✅ PaymentSuccess - Datos en URL, procesando pago...', { isUpgrade })
     
     try {
-      console.log('📤 PaymentSuccess - Enviando a /api/update-tenant-plan:', { tenant_id: tenantId, plan: plan })
-      
-      // Activar plan directamente (Wompi ya verificó el pago)
-      const updateResponse = await axios.post('/api/update-tenant-plan', {
-        tenant_id: tenantId,
-        plan: plan
-      })
-      
-      console.log('✅ PaymentSuccess - Respuesta de actualización de plan:', updateResponse.data)
-      
-      if (updateResponse.data.success) {
-        planName.value = plan === 'basic' ? 'Plan Basic' : 
-                       plan === 'premium' ? 'Plan Premium' : 
-                       plan === 'enterprise' ? 'Plan Enterprise' : 'Plan Seleccionado'
+      // 🔥 DETECTAR SI ES UPGRADE O PAGO INICIAL
+      if (isUpgrade) {
+        // ==================== FLUJO DE UPGRADE ====================
+        // Después de pago, Wompi redirige desde su servidor
+        // El usuario NO está autenticado, por eso usamos endpoint PÚBLICO
+        console.log('📤 PaymentSuccess - UPGRADE: Enviando a /api/process-upgrade (PÚBLICO)')
         
-        // Limpiar pago pendiente (por si existe)
-        localStorage.removeItem('pending_payment')
-        console.log('✅ PaymentSuccess - Plan activado correctamente')
+        if (!tenantId) {
+          throw new Error('No se encontró el ID del negocio en la URL')
+        }
+        
+        // Recuperar payment_frequency de localStorage
+        const pendingUpgrade = localStorage.getItem('pending_upgrade')
+        if (!pendingUpgrade) {
+          console.warn('⚠️ PaymentSuccess - No hay pending_upgrade en localStorage, usando defaults')
+        }
+        
+        const upgradeData = pendingUpgrade ? JSON.parse(pendingUpgrade) : {}
+        
+        console.log('📤 PaymentSuccess - Datos de upgrade:', { plan, tenantId, reference })
+        
+        // Llamar a endpoint PÚBLICO para procesar upgrade
+        const upgradeResponse = await backendAPI.post('/api/process-upgrade', {
+          tenant_id: tenantId,
+          plan: plan,
+          reference: reference,
+          is_upgrade: true
+        })
+        
+        console.log('✅ PaymentSuccess - Respuesta de upgrade:', upgradeResponse.data)
+        
+        if (upgradeResponse.data.success) {
+          planName.value = plan === 'basic' ? 'Plan Basic' : 
+                         plan === 'premium' ? 'Plan Premium' : 
+                         plan === 'enterprise' ? 'Plan Enterprise' : 'Plan Seleccionado'
+          
+          // Limpiar datos pendientes
+          localStorage.removeItem('pending_upgrade')
+          localStorage.removeItem('pending_payment')
+          
+          console.log('✅ PaymentSuccess - Plan actualizado correctamente (UPGRADE)')
+        } else {
+          throw new Error(upgradeResponse.data.message || 'Error al actualizar el plan')
+        }
+        
       } else {
-        console.error('❌ PaymentSuccess - Error al activar plan:', updateResponse.data)
-        alert('Error al activar el plan. Contacta a soporte con el ID: ' + reference)
+        // ==================== FLUJO DE PAGO INICIAL ====================
+        // Nuevo tenant, sin autenticación requerida
+        console.log('📤 PaymentSuccess - PAGO INICIAL: Enviando a /api/update-tenant-plan')
+        
+        if (!tenantId) {
+          throw new Error('No se encontró el ID del negocio')
+        }
+        
+        // Activar plan directamente (Wompi ya verificó el pago)
+        const updateResponse = await backendAPI.post('/api/update-tenant-plan', {
+          tenant_id: tenantId,
+          plan: plan
+        })
+        
+        console.log('✅ PaymentSuccess - Respuesta de activación de plan:', updateResponse.data)
+        
+        if (updateResponse.data.success) {
+          planName.value = plan === 'basic' ? 'Plan Basic' : 
+                         plan === 'premium' ? 'Plan Premium' : 
+                         plan === 'enterprise' ? 'Plan Enterprise' : 'Plan Seleccionado'
+          
+          // Limpiar pago pendiente (por si existe)
+          localStorage.removeItem('pending_payment')
+          
+          console.log('✅ PaymentSuccess - Plan activado correctamente (INICIAL)')
+        } else {
+          throw new Error(updateResponse.data.message || 'Error al activar el plan')
+        }
       }
       
     } catch (error) {
-      console.error('❌ PaymentSuccess - Error actualizando plan:', error)
+      console.error('❌ PaymentSuccess - Error procesando pago:', error)
       console.error('❌ PaymentSuccess - Error response:', error.response?.data)
-      alert('Error al activar el plan. Contacta a soporte con el ID: ' + reference)
+      console.error('❌ PaymentSuccess - Error message:', error.message)
+      console.error('❌ PaymentSuccess - Full error:', JSON.stringify(error, null, 2))
+      
+      // Mostrar error más específico
+      const errorMsg = error.response?.data?.message || error.message || 'Error desconocido'
+      alert('❌ Error al activar el plan\n\n' + errorMsg + '\n\nContacta a soporte con el ID: ' + reference)
     }
   } else {
-    console.warn('⚠️ PaymentSuccess - Faltan datos en URL:', { reference, tenantId, plan })
+    console.warn('⚠️ PaymentSuccess - Faltan datos en URL:', { reference, plan, isUpgrade })
   }
   
   // Obtener datos de localStorage

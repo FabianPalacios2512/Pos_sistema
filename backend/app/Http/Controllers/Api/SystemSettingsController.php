@@ -93,7 +93,7 @@ class SystemSettingsController extends Controller
                 'company_phone' => 'nullable|string|max:255',
                 'company_email' => 'nullable|email|max:255',
                 'company_address' => 'nullable|string',
-                'company_logo' => 'nullable|string',
+                'company_logo' => 'nullable|string', // ✅ Sin límite max: soporta base64 largo en LONGTEXT
                 'iva_enabled' => 'boolean',
                 'iva_percentage' => 'numeric|min:0|max:100',
                 'iva_display_name' => 'string|max:255',

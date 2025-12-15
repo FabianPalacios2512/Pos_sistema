@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CentralLoginController;
 use App\Http\Controllers\Api\TenantRegisterController;
+use App\Http\Controllers\Api\PlanUpgradeController;
+use App\Http\Controllers\Api\PaymentHistoryController;
 use App\Http\Controllers\WompiPaymentController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PasswordResetController;
@@ -19,6 +21,32 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/register-tenant', [TenantRegisterController::class, 'register']);
 Route::post('/update-tenant-plan', [\App\Http\Controllers\Api\TenantPlanController::class, 'updatePlan']);
+Route::post('/process-upgrade', [PlanUpgradeController::class, 'processUpgrade']);  // 🔥 Upgrade post-pago (público)
+Route::get('/process-upgrade', [PlanUpgradeController::class, 'processUpgrade']);   // 🔥 TAMBIÉN ACCEPT GET (Wompi podría usar GET)
+// 🔍 TEMPORAL - Endpoints de DEBUG para saber qué está pasando
+Route::get('/debug/ping', function () {
+    \Log::info('DEBUG: /api/debug/ping - Request received', [
+        'timestamp' => now()->toIso8601String(),
+        'ip' => request()->ip(),
+    ]);
+    return response()->json([
+        'success' => true,
+        'message' => 'API is reachable',
+        'timestamp' => now()->toIso8601String(),
+    ]);
+});
+Route::get('/debug/payment-success', function () {
+    \Log::info('DEBUG: /api/debug/payment-success - GET Request detected (Wompi)', [
+        'all_params' => request()->all(),
+        'query_string' => request()->getQueryString(),
+        'timestamp' => now()->toIso8601String(),
+    ]);
+    return response()->json([
+        'success' => true,
+        'message' => 'Payment success endpoint works',
+        'received_params' => request()->all(),
+    ]);
+});
 Route::post('/check-domain', [TenantRegisterController::class, 'checkDomain']);
 Route::post('/auth/validate-admin', [AuthController::class, 'validateAdmin']);
 
@@ -28,6 +56,15 @@ Route::get('/central/check-email', [CentralLoginController::class, 'checkEmailEx
 
 // ==================== PASSWORD RESET ROUTES ====================
 Route::post('/password/forgot', [PasswordResetController::class, 'forgotPassword']);
+
+// ==================== RUTAS AUTENTICADAS ====================
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Plan upgrades para tenants existentes (AUTENTICADO)
+    Route::post('/upgrade-plan', [PlanUpgradeController::class, 'upgrade']);
+
+    // Historial de pagos (AUTENTICADO)
+    Route::get('/payment-history/{tenantId}', [PaymentHistoryController::class, 'getPaymentHistory']);
+});
 Route::post('/password/validate-code', [PasswordResetController::class, 'validateCode']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 Route::get('/password/cleanup-tokens', [PasswordResetController::class, 'cleanupExpiredTokens']);

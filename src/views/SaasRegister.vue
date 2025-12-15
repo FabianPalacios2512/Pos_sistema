@@ -1,8 +1,8 @@
 <template>
-  <!-- 🎨 SPLIT SCREEN ENTERPRISE LAYOUT -->
+  <!-- SPLIT SCREEN ENTERPRISE LAYOUT -->
   <div class="h-screen flex font-sans bg-white selection:bg-emerald-500/30 overflow-hidden relative">
     
-    <!-- 🔔 TOAST NOTIFICATION: Google Success (Esquina Superior Derecha) -->
+    <!-- TOAST NOTIFICATION: Google Success (Esquina Superior Derecha) -->
     <transition
       enter-active-class="transition ease-out duration-300"
       enter-from-class="translate-x-full opacity-0"
@@ -25,7 +25,7 @@
           
           <!-- Contenido -->
           <div class="flex-1 min-w-0">
-            <h3 class="text-sm font-bold text-gray-900">✅ Cuenta de Google conectada</h3>
+            <h3 class="text-sm font-bold text-gray-900">Cuenta de Google conectada</h3>
             <p class="text-xs text-gray-600 mt-1">Completa los datos de tu negocio para finalizar</p>
           </div>
           
@@ -71,13 +71,13 @@
         >
           <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
             <!-- Header -->
-            <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-6 text-center">
-              <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white border-b border-gray-200 p-4 text-center">
+              <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
               </div>
-              <h3 class="text-2xl font-bold text-white">Email Ya Registrado</h3>
+              <h3 class="text-lg font-bold text-gray-900">Email Ya Registrado</h3>
             </div>
 
             <!-- Content -->
@@ -94,7 +94,7 @@
 
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p class="text-sm text-blue-900 text-center">
-                  💡 <strong>¿Olvidaste tu contraseña?</strong><br/>
+                  <strong>¿Olvidaste tu contraseña?</strong><br/>
                   Puedes recuperarla usando nuestra función de recuperación de contraseña.
                 </p>
               </div>
@@ -105,7 +105,7 @@
                   @click="goToRecovery"
                   class="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold rounded-xl shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
                 >
-                  🔐 Recuperar Contraseña
+                  Recuperar Contraseña
                 </button>
                 <button
                   @click="closeEmailModal"
@@ -174,14 +174,14 @@
       <div class="flex-1 overflow-y-auto py-6">
         <div class="w-full max-w-2xl mx-auto px-10 py-8">
           
-          <!-- 🎨 STEPPER: Barra horizontal moderna (solo step 0 y 1) -->
+          <!-- STEPPER: Barra horizontal moderna -->
           <div v-if="step === 0 || step === 1" class="mb-10">
-             <div class="flex items-center space-x-3">
+             <div class="flex items-center gap-6">
                 <!-- Step 0: Cuenta -->
-                <div class="flex-1 flex items-center space-x-2">
+                <div class="flex items-center gap-2 min-w-fit">
                    <div 
                      :class="[
-                       'w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-300',
+                       'w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0',
                        step >= 0 
                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/40' 
                          : 'bg-gray-100 text-gray-400'
@@ -192,22 +192,22 @@
                       </svg>
                       <span v-else>1</span>
                    </div>
-                   <span class="text-sm font-semibold" :class="step >= 0 ? 'text-gray-900' : 'text-gray-400'">Cuenta</span>
+                   <span class="text-sm font-semibold whitespace-nowrap" :class="step >= 0 ? 'text-gray-900' : 'text-gray-400'">Cuenta</span>
                 </div>
 
                 <!-- Línea conectora -->
                 <div 
                   :class="[
-                    'flex-1 h-1 rounded-full transition-all duration-500',
+                    'h-1 rounded-full transition-all duration-500 flex-1',
                     step >= 1 ? 'bg-emerald-600' : 'bg-gray-200'
                   ]"
                 ></div>
 
                 <!-- Step 1: Negocio -->
-                <div class="flex-1 flex items-center space-x-2">
+                <div class="flex items-center gap-2 min-w-fit">
                    <div 
                      :class="[
-                       'w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-300',
+                       'w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-300 flex-shrink-0',
                        step >= 1 
                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/40' 
                          : 'bg-gray-100 text-gray-400'
@@ -215,7 +215,7 @@
                    >
                       2
                    </div>
-                   <span class="text-sm font-semibold" :class="step >= 1 ? 'text-gray-900' : 'text-gray-400'">Negocio</span>
+                   <span class="text-sm font-semibold whitespace-nowrap" :class="step >= 1 ? 'text-gray-900' : 'text-gray-400'">Negocio</span>
                 </div>
              </div>
           </div>
@@ -336,12 +336,12 @@
                 </div>
               </div>
 
-              <!-- 🔥 Botón Crear Cuenta: Emerald Bold -->
+              <!-- Botón Crear Cuenta -->
               <button 
                 type="submit"
                 class="w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 hover:shadow-emerald-700/40 transition-all duration-200 text-base"
               >
-                Continuar →
+                Continuar
               </button>
             </form>
             
@@ -373,6 +373,7 @@
                     type="text" 
                     required
                     :readonly="!!googleUserData"
+                    @input="form.owner_name = form.owner_name.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\\s'-]/g, '')"
                     class="w-full h-14 px-4 rounded-xl border-2 transition-all outline-none font-medium placeholder-gray-400" 
                     :class="googleUserData ? 'bg-gray-100 text-gray-700 border-gray-200 cursor-not-allowed' : 'bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-gray-900'"
                     placeholder="Ej. Juan Pérez"
@@ -383,7 +384,7 @@
                 <div v-if="googleUserData">
                   <label class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                     Email
-                    <span class="text-xs font-normal text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">De Google</span>
+                    <span v-if="googleUserData" class="text-xs font-normal text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">De Google</span>
                   </label>
                   <input 
                     v-model="form.email" 
@@ -400,6 +401,8 @@
                     v-model="form.cedula" 
                     type="text" 
                     required 
+                    @input="form.cedula = form.cedula.replace(/[^0-9]/g, '')"
+                    maxlength="15"
                     class="w-full h-14 px-4 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none text-gray-900 font-medium placeholder-gray-400" 
                     placeholder="Ej. 123456789"
                   >
@@ -461,11 +464,11 @@
                       </p>
                       <p v-else-if="availabilityStatus === 'available'" class="text-xs text-emerald-600 flex items-center font-bold">
                          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                         ✓ Disponible: {{ form.subdomain }}.105pos.pro
+                         Disponible: {{ form.subdomain }}.105pos.pro
                       </p>
                       <p v-else-if="availabilityStatus === 'taken'" class="text-xs text-rose-600 flex items-center font-bold">
                          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                         ✗ No disponible - Prueba otro nombre
+                         No disponible - Prueba otro nombre
                       </p>
                       <p v-else-if="availabilityStatus === 'invalid'" class="text-xs text-amber-600 flex items-center font-bold">
                          <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -572,7 +575,7 @@
 
                 <!-- Título -->
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">
-                  ¡Cuenta Creada! 🎉
+                  ¡Cuenta Creada!
                 </h2>
 
                 <!-- Info de la Empresa -->
@@ -675,6 +678,14 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 import googleAuthService from '../services/googleAuthService'
 
+// Dominios de correo conocidos
+const KNOWN_EMAIL_DOMAINS = [
+  'gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'yahoo.es',
+  'aol.com', 'icloud.com', 'mail.com', 'protonmail.com', 'tutanota.com',
+  'fastmail.com', 'zoho.com', 'yandex.com', 'rediffmail.com', 'gmx.com',
+  'live.com', 'msn.com'
+]
+
 // State
 const step = ref(0)  // 0: Datos Iniciales | 1: Propietario | 2: Procesando | 3: Selección de Plan | 4: Éxito
 const isSubmitting = ref(false)
@@ -714,6 +725,27 @@ const form = reactive({
 })
 
 // Methods
+// Validadores de inputs
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) return false
+  
+  const domain = email.split('@')[1].toLowerCase()
+  return KNOWN_EMAIL_DOMAINS.includes(domain) || email.includes('.')
+}
+
+const validateOwnerName = (name) => {
+  // Solo permite letras, espacios y acentos
+  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/
+  return nameRegex.test(name) && name.trim().length >= 3
+}
+
+const validateCedula = (cedula) => {
+  // Solo validar que no esté vacío y que sea solo números
+  // El input ya bloquea caracteres no numéricos en tiempo real
+  return cedula.trim().length > 0
+}
+
 const generateSubdomain = () => {
   if (!form.company_name) return
   
@@ -884,8 +916,26 @@ const validateStep1 = async () => {
     return
   }
   
+  // Validar nombre del propietario
+  if (!validateOwnerName(form.owner_name)) {
+    alert('El nombre debe contener solo letras y espacios')
+    return
+  }
+  
   if (!form.email) {
     alert('Por favor ingresa tu correo electrónico')
+    return
+  }
+  
+  // Validar formato y dominio del correo
+  if (!validateEmail(form.email)) {
+    alert('Por favor ingresa un correo válido (gmail.com, hotmail.com, yahoo.com, etc.)')
+    return
+  }
+  
+  // Validar NIT/Cédula
+  if (!validateCedula(form.cedula)) {
+    alert('Por favor completa el NIT/Cédula')
     return
   }
   
