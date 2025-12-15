@@ -94,35 +94,10 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { appStore } from '../store/appStore'
-import axios from 'axios'
+import apiClient from '../services/apiClient'
 
 const payments = ref([])
 const loading = ref(true)
-
-// Crear instancia axios con baseURL correcta
-const backendAPI = axios.create({
-  baseURL: (() => {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      return 'http://localhost:8000'
-    } else {
-      return `https://${window.location.hostname}`
-    }
-  })(),
-  timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-})
-
-// Interceptor para agregar token
-backendAPI.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
 
 onMounted(async () => {
   try {
@@ -131,8 +106,8 @@ onMounted(async () => {
       return
     }
 
-    // Obtener historial de pagos del backend
-    const response = await backendAPI.get(`/api/payment-history/${appStore.tenant.id}`)
+    // Obtener historial de pagos del backend usando apiClient configurado
+    const response = await apiClient.get(`/payment-history/${appStore.tenant.id}`)
     
     if (response.data.success) {
       payments.value = response.data.data || []

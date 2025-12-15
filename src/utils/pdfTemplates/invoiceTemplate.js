@@ -80,11 +80,11 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     const messageHeight = 15 // Mensaje agradecimiento
     const qrHeight = 35 // QR + código
     const legalHeight = 18 // Info legal (4 líneas)
-    const footerHeight = 5 // Powered by
+    const footerHeight = 12 // Powered by + línea divisoria (aumentado de 5 a 12)
 
     const dynamicHeight = headerHeight + customerHeight + tableHeaderHeight +
       (itemCount * itemHeight) + totalsHeight + messageHeight +
-      qrHeight + legalHeight + footerHeight + 10 // 10mm padding extra
+      qrHeight + legalHeight + footerHeight + 15 // 15mm padding extra (aumentado de 10 a 15)
 
     // Crear PDF con formato ticket (80mm ancho, altura dinámica)
     const pdf = new jsPDF({
@@ -116,13 +116,17 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     if (companyLogo) {
       try {
         pdf.addImage(companyLogo, 'PNG', centerX - 8, yPos, 16, 10, '', 'FAST')
-        yPos += 12
+        yPos += 14  // Espaciado aumentado: 12 → 14 (2mm más de separación)
       } catch (err) {
         console.log('No se pudo cargar el logo')
       }
     }
 
-    // Nombre de la empresa
+    // Nombre de la empresa (con espacio adicional si hay logo)
+    if (companyLogo) {
+      yPos += 2  // Espacio adicional de 2mm cuando hay logo
+    }
+    
     pdf.setFont('helvetica', style.fonts.company.style)
     pdf.setFontSize(style.fonts.company.size)
     pdf.text(companyName.toUpperCase(), centerX, yPos, { align: 'center' })

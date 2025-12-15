@@ -13,33 +13,30 @@ class PaymentHistoryController extends Controller
      * Obtener historial de pagos de un tenant
      *
      * GET /api/payment-history/{tenantId}
-     * Requiere autenticación
+     * PÚBLICO - Valida usando tenantId directamente
      */
     public function getPaymentHistory(Request $request, $tenantId)
     {
         try {
-            // Validar que el usuario está autenticado
-            if (!$request->user()) {
+            // Validar que el tenantId es válido
+            if (!$tenantId || !is_string($tenantId)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No autorizado',
-                ], 401);
+                    'message' => 'ID de negocio inválido',
+                ], 400);
             }
 
-            // Validar que el usuario pertenece a este tenant
-            if ($request->user()->tenant_id !== $tenantId) {
-                Log::warning('PaymentHistoryController::getPaymentHistory - Usuario intenta acceder a otro tenant', [
-                    'user_id' => $request->user()->id,
-                    'user_tenant_id' => $request->user()->tenant_id,
-                    'requested_tenant_id' => $tenantId,
+            // Verificar que el tenant existe
+            $tenant = \App\Models\Tenant::find($tenantId);
+            if (!$tenant) {
+                Log::warning('PaymentHistoryController::getPaymentHistory - Tenant no encontrado', [
+                    'tenant_id' => $tenantId,
                 ]);
                 return response()->json([
                     'success' => false,
-                    'message' => 'No tienes acceso a este historial',
-                ], 403);
-            }
-
-            // Obtener pagos del tenant, ordenados por más recientes primero
+                    'message' => 'Negocio no encontrado',
+                ], 404);
+            }            // Obtener pagos del tenant, ordenados por más recientes primero
             $payments = PendingPayment::where('tenant_id', $tenantId)
                 ->orderBy('created_at', 'desc')
                 ->limit(50)  // Últimos 50 pagos

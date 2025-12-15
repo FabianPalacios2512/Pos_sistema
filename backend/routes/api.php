@@ -23,6 +23,8 @@ Route::post('/register-tenant', [TenantRegisterController::class, 'register']);
 Route::post('/update-tenant-plan', [\App\Http\Controllers\Api\TenantPlanController::class, 'updatePlan']);
 Route::post('/process-upgrade', [PlanUpgradeController::class, 'processUpgrade']);  // 🔥 Upgrade post-pago (público)
 Route::get('/process-upgrade', [PlanUpgradeController::class, 'processUpgrade']);   // 🔥 TAMBIÉN ACCEPT GET (Wompi podría usar GET)
+// Historial de pagos - PÚBLICO (información de lectura, sin datos sensibles)
+Route::get('/payment-history/{tenantId}', [PaymentHistoryController::class, 'getPaymentHistory']);
 // 🔍 TEMPORAL - Endpoints de DEBUG para saber qué está pasando
 Route::get('/debug/ping', function () {
     \Log::info('DEBUG: /api/debug/ping - Request received', [
@@ -61,10 +63,11 @@ Route::post('/password/forgot', [PasswordResetController::class, 'forgotPassword
 Route::middleware(['auth:sanctum'])->group(function () {
     // Plan upgrades para tenants existentes (AUTENTICADO)
     Route::post('/upgrade-plan', [PlanUpgradeController::class, 'upgrade']);
-
-    // Historial de pagos (AUTENTICADO)
-    Route::get('/payment-history/{tenantId}', [PaymentHistoryController::class, 'getPaymentHistory']);
 });
+
+// Historial de pagos (PUBLIC - validación por tenant_id)
+Route::get('/payment-history/{tenantId}', [PaymentHistoryController::class, 'getPaymentHistory']);
+
 Route::post('/password/validate-code', [PasswordResetController::class, 'validateCode']);
 Route::post('/password/reset', [PasswordResetController::class, 'resetPassword']);
 Route::get('/password/cleanup-tokens', [PasswordResetController::class, 'cleanupExpiredTokens']);
