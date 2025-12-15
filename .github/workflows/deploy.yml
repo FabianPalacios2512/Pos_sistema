@@ -29,7 +29,9 @@ jobs:
         run: |
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "cd /var/www/105pos && \
             echo '🔄 Iniciando deploy...' && \
-            git pull origin main && \
+            git fetch origin main && \
+            git reset --hard origin/main && \
+            git clean -fd && \
             echo '📦 Installing Composer dependencies...' && \
             cd backend && \
             composer install --no-dev --optimize-autoloader --no-interaction && \
