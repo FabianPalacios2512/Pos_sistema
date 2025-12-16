@@ -50,4 +50,35 @@ Route::middleware([
 
     // Ruta para buscar pedido por código (para el POS)
     Route::post('/orders/find-by-code', [App\Http\Controllers\PublicCatalogController::class, 'findByCode']);
+    
+    // 🔍 TEMPORAL - Debug endpoint para diagnosticar productos
+    Route::get('/debug/products', function () {
+        $data = [
+            'tenant_id' => tenant('id'),
+            'total_products' => \App\Models\Product::count(),
+            'active_products' => \App\Models\Product::where('active', true)->count(),
+            'public_products' => \App\Models\Product::where('is_public', true)->count(),
+            'products_with_stock' => \App\Models\Product::where('current_stock', '>', 0)->count(),
+            'available_online' => \App\Models\Product::where('is_public', true)
+                ->where('active', true)
+                ->where('current_stock', '>', 0)
+                ->count(),
+            'sample_products' => \App\Models\Product::select('id', 'name', 'active', 'is_public', 'current_stock', 'sale_price')
+                ->limit(10)
+                ->get()
+                ->map(function($p) {
+                    return [
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'active' => $p->active,
+                        'is_public' => $p->is_public,
+                        'stock' => $p->current_stock,
+                        'price' => $p->sale_price,
+                        'available_online' => $p->is_public && $p->active && $p->current_stock > 0
+                    ];
+                })
+        ];
+        
+        return response()->json($data);
+    });
 });
