@@ -38,14 +38,37 @@ const getWhatsAppClient = () => {
   
   // Si tenemos tenant_id: SIEMPRE usar modo directo (puerto 3002)
   if (tenantId) {
+    // Usar variable de entorno o construir URL basado en el entorno
+    const whatsappBaseURL = import.meta.env.VITE_WHATSAPP_URL || 
+                           (window.location.hostname === 'localhost' 
+                             ? 'http://localhost:3002' 
+                             : `${window.location.protocol}//${window.location.hostname}:3002`)
+    
+    const client = axios.create({
+      baseURL: whatsappBaseURL,
+      headers: {
+        'X-Tenant-Id': tenantId
+      },
+      // Agregar timeout para evitar que el error tarde mucho
+      timeout: 5000
+    })
+    
+    // Interceptor para silenciar errores de CORS en consola
+    client.interceptors.response.use(
+      response => response,
+      error => {
+        // Silenciar errores de red/CORS en la consola del navegador
+        if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+          // No loggear nada - servicio WhatsApp no disponible es esperado en producción
+          return Promise.reject({ silent: true, originalError: error })
+        }
+        return Promise.reject(error)
+      }
+    )
+    
     return {
       isDirect: true,
-      client: axios.create({
-        baseURL: 'http://localhost:3002',
-        headers: {
-          'X-Tenant-Id': tenantId
-        }
-      })
+      client: client
     }
   }
   
