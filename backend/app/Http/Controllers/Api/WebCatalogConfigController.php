@@ -24,7 +24,7 @@ class WebCatalogConfigController extends Controller
         try {
             // Usar el helper tenant() para obtener el ID del tenant actual
             $tenantId = tenant('id');
-            
+
             // Buscar configuración existente
             $config = DB::table('web_catalog_configs')
                 ->where('tenant_id', $tenantId)
@@ -40,6 +40,12 @@ class WebCatalogConfigController extends Controller
 
             // Decodificar JSONs
             $config->visible_categories = json_decode($config->visible_categories);
+
+            Log::info('Configuración cargada:', [
+                'logo_url_length' => $config->logo_url ? strlen($config->logo_url) : 0,
+                'logo_url_preview' => $config->logo_url ? substr($config->logo_url, 0, 50) . '...' : 'null',
+                'banner_url_length' => $config->banner_url ? strlen($config->banner_url) : 0
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -61,29 +67,39 @@ class WebCatalogConfigController extends Controller
     {
         Log::info('WebCatalogConfigController: saveConfig called', [
             'user_id' => Auth::id(),
-            'data' => $request->all()
+            'logo_length' => $request->input('brandIdentity.logo') ? strlen($request->input('brandIdentity.logo')) : 0,
+            'banner_length' => $request->input('brandIdentity.banner') ? strlen($request->input('brandIdentity.banner')) : 0
         ]);
 
         try {
             $tenantId = tenant('id');
 
+            $logoUrl = $request->input('brandIdentity.logo');
+            $bannerUrl = $request->input('brandIdentity.banner');
+
+            Log::info('Datos de imágenes recibidos:', [
+                'logo_is_base64' => $logoUrl ? (strpos($logoUrl, 'data:image') === 0) : false,
+                'logo_preview' => $logoUrl ? substr($logoUrl, 0, 50) . '...' : 'null',
+                'banner_is_base64' => $bannerUrl ? (strpos($bannerUrl, 'data:image') === 0) : false
+            ]);
+
             $data = [
                 'store_active' => $request->input('storeActive', true),
-                'logo_url' => $request->input('brandIdentity.logo'),
-                'banner_url' => $request->input('brandIdentity.banner'),
+                'logo_url' => $logoUrl,
+                'banner_url' => $bannerUrl,
                 'primary_color' => $request->input('brandIdentity.primaryColor', '#10B981'),
                 'template' => $request->input('brandIdentity.template', 'modern-grid'),
-                
+
                 'visible_categories' => json_encode($request->input('inventoryVisibility.visibleCategories', [])),
                 'hide_out_of_stock' => $request->input('inventoryVisibility.hideOutOfStock', false),
-                
+
                 'whatsapp_number' => $request->input('ordersConfig.whatsappNumber', '+57'),
                 'custom_message' => $request->input('ordersConfig.customMessage'),
-                
+
                 'delivery_cost' => $request->input('businessRules.deliveryCost', 0),
                 'minimum_order' => $request->input('businessRules.minimumOrder', 0),
                 'sync_with_cash_register' => $request->input('businessRules.syncWithCashRegister', false),
-                
+
                 'updated_at' => now()
             ];
 
@@ -113,7 +129,7 @@ class WebCatalogConfigController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Obtener la configuración pública del catálogo (sin autenticación)
      */
@@ -125,12 +141,12 @@ class WebCatalogConfigController extends Controller
         try {
             // Como estamos en una ruta de tenant (tenant_api.php), el tenant ya está inicializado
             $tenantId = tenant('id');
-            
+
             // Buscar configuración en la BD del tenant
             $config = DB::table('web_catalog_configs')
                 ->where('tenant_id', $tenantId)
                 ->first();
-            
+
             // Si no existe configuración, retornar valores por defecto
             if (!$config) {
                 $config = (object) [
@@ -148,11 +164,11 @@ class WebCatalogConfigController extends Controller
                     'sync_with_cash_register' => false
                 ];
             }
-            
+
             // Obtener nombre de la tienda del objeto tenant
             // Nota: Depende de las columnas que tenga tu tabla tenants o la metadata
             $storeName = tenant('business_name') ?? tenant('id');
-            
+
             // Parsear JSON y agregar información del tenant
             $publicConfig = [
                 'store_name' => $storeName,
@@ -169,12 +185,12 @@ class WebCatalogConfigController extends Controller
                 'minimum_order' => (float) $config->minimum_order,
                 'sync_with_cash_register' => (bool) $config->sync_with_cash_register
             ];
-            
+
             return response()->json([
                 'success' => true,
                 'data' => $publicConfig
             ]);
-            
+
         } catch (\Exception $e) {
             Log::error('Error en getPublicConfig: ' . $e->getMessage());
             return response()->json([

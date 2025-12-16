@@ -25,6 +25,7 @@ export const appStore = reactive({
   paymentMethods: [],
   tenantPlan: 'free_trial', // Plan del tenant (free_trial, basic, premium, enterprise)
   tenant: {}, // Información completa del tenant (plan, límites, fechas, etc.)
+  businessName: '', // Nombre del negocio
   
   // Estado de sesión de caja (para evitar verificaciones repetidas)
   cashSession: {
@@ -142,6 +143,9 @@ export const appStore = reactive({
         this.systemSettings = response.data.data
         // 🔒 Guardar el plan del tenant
         this.tenantPlan = response.data.tenant_plan || 'free_trial'
+        
+        // 🏪 Guardar nombre del negocio
+        this.businessName = response.data.data?.business_name || 'Mi Tienda'
         
         // 🆕 Guardar información completa del tenant (si viene del backend)
         if (response.data.tenant) {

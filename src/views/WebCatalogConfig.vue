@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[calc(100vh-64px)] overflow-hidden flex bg-white">
+  <div class="h-[calc(100vh-64px)] overflow-hidden flex bg-white relative" style="isolation: isolate;">
     
     <!-- ÁREA A: SIDEBAR DE NAVEGACIÓN (Izquierda - Fijo - w-64) -->
     <aside class="w-64 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col z-20">
@@ -18,7 +18,20 @@
             ? 'bg-emerald-50 text-emerald-700 border-l-4 border-emerald-500 shadow-sm' 
             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-4 border-transparent'"
         >
-          <span class="text-lg">{{ tab.icon }}</span>
+          <!-- Iconos SVG dinámicos -->
+          <svg v-if="tab.icon === 'palette'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+          </svg>
+          <svg v-else-if="tab.icon === 'box'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+          <svg v-else-if="tab.icon === 'message'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <svg v-else-if="tab.icon === 'settings'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
           <span>{{ tab.label }}</span>
         </button>
       </nav>
@@ -56,227 +69,406 @@
     </aside>
 
     <!-- ÁREA B: PANEL DE FORMULARIOS (Centro - Scrollable - Flex-1) -->
-    <main class="flex-1 bg-slate-50 overflow-y-auto relative">
-      <div class="max-w-3xl mx-auto p-8 pb-24">
+    <main class="flex-1 bg-white overflow-y-auto relative">
+      <div class="h-full">
         
-        <!-- Header de Sección -->
-        <div class="mb-6 border-b border-gray-200 pb-4">
-          <h2 class="text-xl font-bold text-gray-900">{{ currentTabLabel }}</h2>
-          <p class="text-sm text-gray-500">Personaliza esta sección.</p>
+        <!-- Header de Sección - Ejecutivo con Acciones -->
+        <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-8 py-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">{{ currentTabLabel }}</h2>
+              <p class="text-sm text-gray-500 mt-0.5">{{ currentTabDescription }}</p>
+            </div>
+            
+            <!-- Botones de Acción -->
+            <div class="flex items-center gap-3">
+              <!-- Copiar Link -->
+              <button 
+                @click="copyStoreLink"
+                class="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md border border-gray-200 transition-all duration-150 hover:border-gray-300"
+                title="Copiar enlace de la tienda"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                <span>Copiar enlace</span>
+              </button>
+              
+              <!-- Ver mi Página -->
+              <button 
+                @click="openCatalogInNewWindow"
+                class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition-all duration-150 shadow-sm"
+                title="Abrir catálogo en nueva ventana"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span>Ver mi página</span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <!-- CONTENIDO DINÁMICO -->
-        <div class="space-y-6">
+        <!-- CONTENIDO DINÁMICO - Full Width -->
+        <div class="px-8 py-6 space-y-8">
           
-          <!-- SECCIÓN: DISEÑO (COMPACTA) -->
-          <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
+          <!-- SECCIÓN: DISEÑO - Estilo Ejecutivo -->
+          <div v-if="activeTab === 'identity'" class="space-y-8 animate-fade-in pb-8">
             
-            <!-- Grid Superior: Logo + (Color/Template) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              <!-- Columna Izquierda: Logo (Cuadrado) -->
-              <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 h-full flex flex-col">
-                <label class="block text-xs font-bold uppercase text-gray-500 mb-3">Logo de la Tienda</label>
-                <div 
-                  @click="triggerFileUpload('logo')"
-                  class="flex-1 border-2 border-dashed border-gray-200 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer group relative flex flex-col items-center justify-center bg-gray-50 min-h-[140px]"
-                >
-                  <div v-if="config.brandIdentity.logo" class="absolute inset-0 p-4">
-                    <img :src="config.brandIdentity.logo" class="w-full h-full object-contain" />
-                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                      <span class="text-white text-xs font-medium px-3 py-1 bg-black/50 rounded backdrop-blur-sm">Cambiar</span>
-                    </div>
-                  </div>
-                  <div v-else class="text-gray-400 group-hover:text-emerald-600 transition-colors text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    <span class="text-xs font-medium">Subir Logo</span>
-                  </div>
-                  <input type="file" ref="logoInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'logo')" />
-                </div>
+            <!-- Subsección: Personalización de Marca -->
+            <section>
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-900">Personalización de Marca</h3>
+                <p class="text-xs text-gray-500 mt-1">Define los colores y logotipos que verán tus clientes en el catálogo.</p>
               </div>
-
-              <!-- Columna Derecha: Color y Template (Apilados) -->
-              <div class="space-y-4">
-                <!-- Color Picker -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                  <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Color de Marca</label>
-                  <div class="flex items-center gap-3">
-                    <div class="relative w-10 h-10 rounded-lg overflow-hidden shadow-sm ring-1 ring-gray-200 cursor-pointer hover:scale-105 transition-transform">
-                      <input 
-                        type="color" 
-                        v-model="config.brandIdentity.primaryColor"
-                        class="absolute -top-2 -left-2 w-14 h-14 cursor-pointer border-0 p-0"
-                      />
+              
+              <!-- Grid 2 Columnas: Logo + Color/Template -->
+              <div class="grid grid-cols-2 gap-6">
+                
+                <!-- Logo Upload -->
+                <div class="border border-gray-200 rounded-md bg-white p-4">
+                  <label class="block text-xs font-medium text-gray-700 mb-3">Logo de la Tienda</label>
+                  <div 
+                    @click="triggerFileUpload('logo')"
+                    class="border-2 border-dashed border-gray-200 rounded-md hover:border-emerald-400 hover:bg-emerald-50/50 transition-all cursor-pointer group relative flex flex-col items-center justify-center bg-gray-50 h-[160px]"
+                  >
+                    <div v-if="config.brandIdentity.logo" class="absolute inset-0 p-3">
+                      <img :src="config.brandIdentity.logo" class="w-full h-full object-contain" />
+                      <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
+                        <span class="text-white text-xs font-medium px-3 py-1.5 bg-black/60 rounded-md">Cambiar logo</span>
+                      </div>
                     </div>
-                    <div class="flex-1">
+                    <div v-else class="text-gray-400 group-hover:text-emerald-600 transition-colors text-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      <span class="text-xs font-medium">Subir logo</span>
+                      <span class="text-[10px] text-gray-400 block mt-1">PNG, JPG o SVG</span>
+                    </div>
+                    <input type="file" ref="logoInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'logo')" />
+                  </div>
+                </div>
+
+                <!-- Color + Template en columna -->
+                <div class="space-y-4">
+                  
+                  <!-- Color Picker Ejecutivo -->
+                  <div class="border border-gray-200 rounded-md bg-white p-4">
+                    <label class="block text-xs font-medium text-gray-700 mb-3">Color Primario</label>
+                    <div class="flex items-center gap-3">
+                      <div class="relative w-12 h-12 rounded-md overflow-hidden border border-gray-200 cursor-pointer hover:scale-105 transition-transform flex-shrink-0">
+                        <input 
+                          type="color" 
+                          v-model="config.brandIdentity.primaryColor"
+                          class="absolute inset-0 w-full h-full cursor-pointer border-0 p-0"
+                          style="transform: scale(1.5);"
+                        />
+                      </div>
                       <input 
                         type="text" 
                         v-model="config.brandIdentity.primaryColor"
-                        class="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm font-mono focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none uppercase"
+                        class="flex-1 h-10 px-3 rounded-md border border-gray-200 text-xs font-mono text-gray-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 uppercase"
+                        placeholder="#10B981"
                       />
                     </div>
                   </div>
-                </div>
-                
-                <!-- Plantilla Selector Compacto -->
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                  <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Diseño</label>
-                  <div class="flex gap-2">
-                    <div 
-                      @click="config.brandIdentity.template = 'modern-grid'"
-                      class="flex-1 p-2 rounded-lg border cursor-pointer transition-all text-center"
-                      :class="config.brandIdentity.template === 'modern-grid' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-gray-200 hover:bg-gray-50 text-gray-600'"
-                    >
-                      <div class="text-xs font-bold">Grid</div>
-                    </div>
-                    <div 
-                      @click="config.brandIdentity.template = 'simple-list'"
-                      class="flex-1 p-2 rounded-lg border cursor-pointer transition-all text-center"
-                      :class="config.brandIdentity.template === 'simple-list' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-gray-200 hover:bg-gray-50 text-gray-600'"
-                    >
-                      <div class="text-xs font-bold">Lista</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  
+                  <!-- Template Selector Compacto -->
+                  <div class="border border-gray-200 rounded-md bg-white p-4">
+                    <label class="block text-xs font-medium text-gray-700 mb-3">Plantilla de Diseño</label>
+                    <div class="space-y-2">
+                      
+                      <!-- Visual Story -->
+                      <button 
+                        @click="config.brandIdentity.template = 'visual-story'"
+                        class="w-full p-2.5 rounded-md border transition-all flex items-center gap-3 text-left group"
+                        :class="config.brandIdentity.template === 'visual-story' 
+                          ? 'border-emerald-500 bg-emerald-50' 
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
+                      >
+                        <div class="w-8 h-8 rounded-md bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center flex-shrink-0 border border-purple-200">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div class="flex-1">
+                          <div class="text-xs font-semibold" :class="config.brandIdentity.template === 'visual-story' ? 'text-emerald-700' : 'text-gray-900'">
+                            Historia Visual
+                          </div>
+                          <div class="text-[10px] text-gray-500">Boutique / Gourmet</div>
+                        </div>
+                        <div v-if="config.brandIdentity.template === 'visual-story'" class="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
+                      </button>
 
-            <!-- Banner (Full Width pero Slim) -->
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <label class="block text-xs font-bold uppercase text-gray-500 mb-3">Banner Principal</label>
-              <div 
-                @click="triggerFileUpload('banner')"
-                class="border-2 border-dashed border-gray-200 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer group relative h-24 flex flex-col items-center justify-center bg-gray-50"
-              >
-                <div v-if="config.brandIdentity.banner" class="absolute inset-0 p-1">
-                  <img :src="config.brandIdentity.banner" class="w-full h-full object-cover rounded-md" />
-                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
-                    <span class="text-white text-xs font-medium px-3 py-1 bg-black/50 rounded backdrop-blur-sm">Cambiar Banner</span>
+                      <!-- Speed Market -->
+                      <button 
+                        @click="config.brandIdentity.template = 'speed-market'"
+                        class="w-full p-2.5 rounded-md border transition-all flex items-center gap-3 text-left group"
+                        :class="config.brandIdentity.template === 'speed-market' 
+                          ? 'border-emerald-500 bg-emerald-50' 
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
+                      >
+                        <div class="w-8 h-8 rounded-md bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center flex-shrink-0 border border-blue-200">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                        </div>
+                        <div class="flex-1">
+                          <div class="text-xs font-semibold" :class="config.brandIdentity.template === 'speed-market' ? 'text-emerald-700' : 'text-gray-900'">
+                            Mercado Rápido
+                          </div>
+                          <div class="text-[10px] text-gray-500">Supermercado / Rápido</div>
+                        </div>
+                        <div v-if="config.brandIdentity.template === 'speed-market'" class="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
+                      </button>
+
+                      <!-- Modern Grid -->
+                      <button 
+                        @click="config.brandIdentity.template = 'modern-grid'"
+                        class="w-full p-2.5 rounded-md border transition-all flex items-center gap-3 text-left group"
+                        :class="config.brandIdentity.template === 'modern-grid' 
+                          ? 'border-emerald-500 bg-emerald-50' 
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
+                      >
+                        <div class="w-8 h-8 rounded-md bg-gradient-to-br from-gray-100 to-slate-100 flex items-center justify-center flex-shrink-0 border border-gray-300">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+                          </svg>
+                        </div>
+                        <div class="flex-1">
+                          <div class="text-xs font-semibold" :class="config.brandIdentity.template === 'modern-grid' ? 'text-emerald-700' : 'text-gray-900'">
+                            Cuadrícula Moderna
+                          </div>
+                          <div class="text-[10px] text-gray-500">Clásico / Versátil</div>
+                        </div>
+                        <div v-if="config.brandIdentity.template === 'modern-grid'" class="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
+                      </button>
+                      
+                    </div>
                   </div>
+                  
                 </div>
-                <div v-else class="text-gray-400 group-hover:text-emerald-600 transition-colors flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span class="text-xs font-medium">Subir Banner Promocional</span>
-                </div>
-                <input type="file" ref="bannerInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'banner')" />
               </div>
-            </div>
+            </section>
+
+            <!-- Subsección: Banner Promocional -->
+            <section>
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-900">Banner Promocional</h3>
+                <p class="text-xs text-gray-500 mt-1">Imagen destacada en la parte superior del catálogo.</p>
+              </div>
+              
+              <div class="border border-gray-200 rounded-md bg-white p-4">
+                <div 
+                  @click="triggerFileUpload('banner')"
+                  class="border-2 border-dashed border-gray-200 rounded-md hover:border-emerald-400 hover:bg-emerald-50/50 transition-all cursor-pointer group relative h-32 flex items-center justify-center bg-gray-50"
+                >
+                  <div v-if="config.brandIdentity.banner" class="absolute inset-0 p-1">
+                    <img :src="config.brandIdentity.banner" class="w-full h-full object-cover rounded" />
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
+                      <span class="text-white text-xs font-medium px-3 py-1.5 bg-black/60 rounded-md">Cambiar banner</span>
+                    </div>
+                  </div>
+                  <div v-else class="text-gray-400 group-hover:text-emerald-600 transition-colors flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <div>
+                      <span class="text-xs font-medium block">Subir banner promocional</span>
+                      <span class="text-[10px] text-gray-400">Recomendado: 1200x400px</span>
+                    </div>
+                  </div>
+                  <input type="file" ref="bannerInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'banner')" />
+                </div>
+              </div>
+            </section>
 
           </div>
 
-          <!-- SECCIÓN: PRODUCTOS -->
-          <div v-else-if="activeTab === 'catalog'" class="space-y-6 animate-fade-in">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <label class="block text-xs font-bold uppercase text-gray-500 mb-4">Categorías Visibles</label>
-              <div class="flex flex-wrap gap-2">
+          <!-- SECCIÓN: PRODUCTOS - Estilo Ejecutivo -->
+          <div v-else-if="activeTab === 'catalog'" class="space-y-8 animate-fade-in pb-8">
+            
+            <section>
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-900">Visibilidad del Catálogo</h3>
+                <p class="text-xs text-gray-500 mt-1">Controla qué categorías y productos se muestran en tu tienda online.</p>
+              </div>
+              
+              <div class="border border-gray-200 rounded-md bg-white p-5">
+                <label class="block text-xs font-medium text-gray-700 mb-3">Categorías Visibles</label>
+                <div class="flex flex-wrap gap-2">
+                  <button 
+                    v-for="category in availableCategories" 
+                    :key="category.id"
+                    @click="toggleCategory(category.id)"
+                    class="px-3 py-1.5 rounded-md text-xs font-medium border transition-all duration-150 flex items-center gap-2"
+                    :class="config.inventoryVisibility.visibleCategories.includes(category.id) 
+                      ? 'bg-emerald-50 border-emerald-500 text-emerald-700' 
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'"
+                  >
+                    <span>{{ category.name }}</span>
+                    <div v-if="config.inventoryVisibility.visibleCategories.includes(category.id)" class="bg-emerald-500 rounded-full p-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div class="border border-gray-200 rounded-md bg-white p-5 flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-900">Ocultar productos sin stock</h3>
+                  <p class="text-xs text-gray-500 mt-0.5">No mostrar productos agotados en el catálogo</p>
+                </div>
                 <button 
-                  v-for="category in availableCategories" 
-                  :key="category.id"
-                  @click="toggleCategory(category.id)"
-                  class="px-4 py-2 rounded-lg text-xs font-bold border transition-all duration-200 flex items-center gap-2"
-                  :class="config.inventoryVisibility.visibleCategories.includes(category.id) 
-                    ? 'bg-emerald-50 border-emerald-500 text-emerald-700' 
-                    : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'"
+                  @click="config.inventoryVisibility.hideOutOfStock = !config.inventoryVisibility.hideOutOfStock"
+                  class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+                  :class="config.inventoryVisibility.hideOutOfStock ? 'bg-emerald-500' : 'bg-gray-200'"
                 >
-                  <span>{{ category.name }}</span>
-                  <div v-if="config.inventoryVisibility.visibleCategories.includes(category.id)" class="bg-emerald-500 rounded-full p-0.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                  </div>
+                  <span
+                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                    :class="config.inventoryVisibility.hideOutOfStock ? 'translate-x-6' : 'translate-x-1'"
+                  />
                 </button>
               </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
-              <div>
-                <h3 class="text-sm font-bold text-gray-900">Ocultar sin Stock</h3>
-                <p class="text-xs text-gray-500">No mostrar productos agotados</p>
-              </div>
-              <button 
-                @click="config.inventoryVisibility.hideOutOfStock = !config.inventoryVisibility.hideOutOfStock"
-                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
-                :class="config.inventoryVisibility.hideOutOfStock ? 'bg-emerald-500' : 'bg-gray-200'"
-              >
-                <span
-                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
-                  :class="config.inventoryVisibility.hideOutOfStock ? 'translate-x-6' : 'translate-x-1'"
-                />
-              </button>
-            </div>
+            </section>
+            
           </div>
 
-          <!-- SECCIÓN: WHATSAPP -->
-          <div v-else-if="activeTab === 'orders'" class="space-y-6 animate-fade-in">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Número de WhatsApp</label>
-              <input 
-                type="text" 
-                v-model="config.ordersConfig.whatsappNumber"
-                placeholder="+57 300 123 4567"
-                class="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
-              />
-              <p class="text-xs text-gray-400 mt-2">Es el número donde recibirás los pedidos.</p>
-            </div>
+          <!-- SECCIÓN: WHATSAPP - Estilo Ejecutivo con Grid -->
+          <div v-else-if="activeTab === 'orders'" class="space-y-8 animate-fade-in pb-8">
+            
+            <section>
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-900">Configuración de Pedidos</h3>
+                <p class="text-xs text-gray-500 mt-1">Define cómo tus clientes realizarán pedidos a través de WhatsApp.</p>
+              </div>
+              
+              <!-- Grid 2 Columnas: Número + País/Horario (Placeholder) -->
+              <div class="grid grid-cols-2 gap-6">
+                
+                <div class="border border-gray-200 rounded-md bg-white p-4">
+                  <label class="block text-xs font-medium text-gray-700 mb-2">Número de WhatsApp</label>
+                  <input 
+                    type="text" 
+                    v-model="config.ordersConfig.whatsappNumber"
+                    placeholder="+57 300 123 4567"
+                    class="w-full h-10 px-3 rounded-md border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+                  <p class="text-[10px] text-gray-500 mt-2">Es el número donde recibirás los pedidos.</p>
+                </div>
 
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-              <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Mensaje Inicial</label>
-              <textarea 
-                v-model="config.ordersConfig.customMessage"
-                rows="3"
-                class="w-full p-4 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none transition-colors"
-              ></textarea>
-            </div>
+                <div class="border border-gray-200 rounded-md bg-white p-4">
+                  <label class="block text-xs font-medium text-gray-700 mb-2">Horario de Atención</label>
+                  <input 
+                    type="text" 
+                    placeholder="Lun-Vie: 9AM - 6PM"
+                    class="w-full h-10 px-3 rounded-md border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                    disabled
+                  />
+                  <p class="text-[10px] text-gray-500 mt-2">Muestra tu disponibilidad (próximamente).</p>
+                </div>
+                
+              </div>
+
+              <!-- Mensaje Inicial - Full Width -->
+              <div class="border border-gray-200 rounded-md bg-white p-4">
+                <label class="block text-xs font-medium text-gray-700 mb-2">Mensaje Inicial Personalizado</label>
+                <textarea 
+                  v-model="config.ordersConfig.customMessage"
+                  rows="3"
+                  placeholder="Hola, quiero hacer el siguiente pedido:"
+                  class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+                ></textarea>
+                <p class="text-[10px] text-gray-500 mt-2">Este mensaje aparecerá automáticamente al iniciar la conversación.</p>
+              </div>
+              
+            </section>
+            
           </div>
 
-          <!-- SECCIÓN: REGLAS -->
-          <div v-else-if="activeTab === 'rules'" class="space-y-6 animate-fade-in">
-            <div class="grid grid-cols-2 gap-6">
-              <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Costo Domicilio</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">$</span>
-                  <input 
-                    type="number" 
-                    v-model="config.businessRules.deliveryCost"
-                    class="w-full h-11 pl-7 pr-3 rounded-lg border border-gray-200 text-lg font-bold text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
-                  />
+          <!-- SECCIÓN: REGLAS - Grid 2x2 Ejecutivo -->
+          <div v-else-if="activeTab === 'rules'" class="space-y-8 animate-fade-in pb-8">
+            
+            <section>
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-900">Reglas de Negocio</h3>
+                <p class="text-xs text-gray-500 mt-1">Define los parámetros operativos de tu tienda online.</p>
+              </div>
+              
+              <!-- Grid 2 Columnas: Costo + Mínimo -->
+              <div class="grid grid-cols-2 gap-6">
+                
+                <div class="border border-gray-200 rounded-md bg-white p-4">
+                  <label class="block text-xs font-medium text-gray-700 mb-2">Costo de Domicilio</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">$</span>
+                    <input 
+                      type="number" 
+                      v-model="config.businessRules.deliveryCost"
+                      class="w-full h-10 pl-7 pr-3 rounded-md border border-gray-200 text-base font-semibold text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="0"
+                    />
+                  </div>
+                  <p class="text-[10px] text-gray-500 mt-2">Precio del envío a domicilio.</p>
                 </div>
-              </div>
 
-              <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
-                <label class="block text-xs font-bold uppercase text-gray-500 mb-2">Pedido Mínimo</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">$</span>
-                  <input 
-                    type="number" 
-                    v-model="config.businessRules.minimumOrder"
-                    class="w-full h-11 pl-7 pr-3 rounded-lg border border-gray-200 text-lg font-bold text-gray-900 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-colors"
-                  />
+                <div class="border border-gray-200 rounded-md bg-white p-4">
+                  <label class="block text-xs font-medium text-gray-700 mb-2">Pedido Mínimo</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">$</span>
+                    <input 
+                      type="number" 
+                      v-model="config.businessRules.minimumOrder"
+                      class="w-full h-10 pl-7 pr-3 rounded-md border border-gray-200 text-base font-semibold text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                      placeholder="0"
+                    />
+                  </div>
+                  <p class="text-[10px] text-gray-500 mt-2">Valor mínimo para aceptar pedidos.</p>
                 </div>
+                
               </div>
-            </div>
+            </section>
 
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
-              <div>
-                <h3 class="text-sm font-bold text-gray-900">Sincronizar con Caja</h3>
-                <p class="text-xs text-gray-500">Crear ventas en POS automáticamente</p>
+            <section>
+              <div class="mb-4">
+                <h3 class="text-sm font-semibold text-gray-900">Integraciones</h3>
+                <p class="text-xs text-gray-500 mt-1">Conecta tu tienda con otros sistemas.</p>
               </div>
-              <button 
-                @click="config.businessRules.syncWithCashRegister = !config.businessRules.syncWithCashRegister"
-                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
-                :class="config.businessRules.syncWithCashRegister ? 'bg-emerald-500' : 'bg-gray-200'"
-              >
-                <span
-                  class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm"
-                  :class="config.businessRules.syncWithCashRegister ? 'translate-x-6' : 'translate-x-1'"
-                />
-              </button>
-            </div>
+              
+              <div class="border border-gray-200 rounded-md bg-white p-5 flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-900">Sincronizar con Caja Registradora</h3>
+                  <p class="text-xs text-gray-500 mt-0.5">Registrar pedidos online automáticamente en el POS</p>
+                </div>
+                <button 
+                  @click="config.businessRules.syncWithCashRegister = !config.businessRules.syncWithCashRegister"
+                  class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+                  :class="config.businessRules.syncWithCashRegister ? 'bg-emerald-500' : 'bg-gray-200'"
+                >
+                  <span
+                    class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+                    :class="config.businessRules.syncWithCashRegister ? 'translate-x-6' : 'translate-x-1'"
+                  />
+                </button>
+              </div>
+            </section>
+            
           </div>
 
         </div>
@@ -296,25 +488,37 @@
         </h3>
         
         <!-- Toggle Mobile/Desktop -->
-        <div class="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+        <div class="flex items-center gap-2">
+          <div class="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+            <button 
+              @click="previewMode = 'mobile'"
+              class="p-1.5 rounded-md transition-all"
+              :class="previewMode === 'mobile' ? 'bg-gray-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
+              title="Vista Móvil"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </button>
+            <button 
+              @click="previewMode = 'desktop'"
+              class="p-1.5 rounded-md transition-all"
+              :class="previewMode === 'desktop' ? 'bg-gray-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
+              title="Vista Escritorio"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </button>
+          </div>
+
           <button 
-            @click="previewMode = 'mobile'"
-            class="p-1.5 rounded-md transition-all"
-            :class="previewMode === 'mobile' ? 'bg-gray-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-            title="Vista Móvil"
+            @click="openCatalogInNewWindow"
+            class="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+            title="Abrir en ventana nueva (Vista Real)"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-          </button>
-          <button 
-            @click="previewMode = 'desktop'"
-            class="p-1.5 rounded-md transition-all"
-            :class="previewMode === 'desktop' ? 'bg-gray-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-            title="Vista Escritorio"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </button>
         </div>
@@ -333,21 +537,24 @@
       <div class="flex-1 p-6 flex items-center justify-center overflow-hidden bg-slate-900 relative">
         <!-- Marco de Dispositivo -->
         <div 
-          class="relative bg-white transition-all duration-300 shadow-2xl overflow-hidden ring-1 ring-white/10"
+          class="relative bg-white transition-all duration-300 shadow-2xl overflow-hidden ring-1 ring-white/10 isolate"
           :class="previewMode === 'mobile' 
-            ? 'w-[340px] h-[680px] rounded-[3rem] border-[8px] border-gray-800' 
+            ? 'w-[375px] h-[740px] rounded-[3rem] border-[10px] border-gray-800' 
             : 'w-full h-[90%] rounded-lg border-[4px] border-gray-700 max-w-5xl'"
+          :style="previewMode === 'mobile' ? 'container-type: inline-size; width: 375px;' : ''"
         >
           <!-- Notch (Solo Mobile) -->
-          <div v-if="previewMode === 'mobile'" class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-800 rounded-b-xl z-20"></div>
+          <div v-if="previewMode === 'mobile'" class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-7 bg-gray-800 rounded-b-2xl z-50"></div>
           
-          <!-- Iframe -->
-          <iframe 
-            ref="previewIframe"
-            :src="catalogUrl"
-            class="w-full h-full bg-white"
-            frameborder="0"
-          ></iframe>
+          <!-- Live Preview Component - Aislado con nuevo contexto de apilamiento -->
+          <div class="w-full h-full overflow-auto bg-white relative" style="isolation: isolate; transform: translateZ(0);">
+            <CatalogTemplateSelector 
+              :template="config.brandIdentity.template"
+              :storeConfig="previewStoreConfig"
+              :isMobilePreview="previewMode === 'mobile'"
+              :key="`${previewKey}-${previewMode}`"
+            />
+          </div>
         </div>
       </div>
       
@@ -365,8 +572,8 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
       </svg>
       <div>
-        <h4 class="font-bold text-sm">¡Guardado!</h4>
-        <p class="text-xs opacity-90">Vista previa actualizada.</p>
+        <h4 class="font-bold text-sm">{{ toastMessage.title }}</h4>
+        <p class="text-xs opacity-90">{{ toastMessage.description }}</p>
       </div>
     </div>
   </div>
@@ -376,32 +583,75 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { appStore } from '../store/appStore.js'
 import apiClient from '../services/apiClient.js'
+import CatalogTemplateSelector from '../components/catalog/CatalogTemplateSelector.vue'
 
 // Refs
 const logoInput = ref(null)
 const bannerInput = ref(null)
-const previewIframe = ref(null)
+const previewKey = ref(0)
 
 // State
 const isSaving = ref(false)
 const showSuccessToast = ref(false)
+const toastMessage = reactive({
+  title: '¡Guardado!',
+  description: 'Vista previa actualizada.'
+})
 const isLoading = ref(true)
 const activeTab = ref('identity')
-const catalogUrl = ref('')
 const previewMode = ref('mobile') // 'mobile' | 'desktop'
+const realProducts = ref([]) // Productos reales de la base de datos
 
 // Tabs Configuration
 const tabs = [
-  { id: 'identity', label: 'Diseño', icon: '🎨' },
-  { id: 'catalog', label: 'Productos', icon: '📦' },
-  { id: 'orders', label: 'WhatsApp', icon: '💬' },
-  { id: 'rules', label: 'Reglas', icon: '⚙️' }
+  { 
+    id: 'identity', 
+    label: 'Diseño', 
+    icon: 'palette',
+    description: 'Define la identidad visual de tu catálogo online'
+  },
+  { 
+    id: 'catalog', 
+    label: 'Catálogo', 
+    icon: 'box',
+    description: 'Controla la visibilidad de categorías y productos'
+  },
+  { 
+    id: 'orders', 
+    label: 'Pedidos', 
+    icon: 'message',
+    description: 'Configura el sistema de pedidos por WhatsApp'
+  },
+  { 
+    id: 'rules', 
+    label: 'Reglas', 
+    icon: 'settings',
+    description: 'Establece las reglas de negocio y integraciones'
+  }
 ]
 
 const currentTabLabel = computed(() => {
   const tab = tabs.find(t => t.id === activeTab.value)
   return tab ? tab.label : ''
 })
+
+const currentTabDescription = computed(() => {
+  const tab = tabs.find(t => t.id === activeTab.value)
+  return tab ? tab.description : ''
+})
+
+// Preview Store Config - Se actualiza reactivamente con los cambios del config
+const previewStoreConfig = computed(() => ({
+  primary_color: config.brandIdentity.primaryColor,
+  logo_url: config.brandIdentity.logo || 'https://via.placeholder.com/150?text=Logo',
+  banner_url: config.brandIdentity.banner || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200',
+  whatsapp_number: config.ordersConfig.whatsappNumber,
+  currency_symbol: '$',
+  delivery_cost: config.businessRules.deliveryCost,
+  min_order_value: config.businessRules.minimumOrder,
+  store_name: appStore.businessName || 'Mi Tienda',
+  catalog_products: realProducts.value // Productos reales de la BD
+}))
 
 // Configuration Object (Reactive)
 const config = reactive({
@@ -410,7 +660,7 @@ const config = reactive({
     logo: '', 
     banner: '',
     primaryColor: '#10B981', 
-    template: 'modern-grid'
+    template: 'visual-story' // Plantilla por defecto
   },
   inventoryVisibility: {
     visibleCategories: [], 
@@ -432,11 +682,6 @@ const availableCategories = ref([])
 
 // Load categories from store
 onMounted(async () => {
-  // Determine Catalog URL
-  const currentHost = window.location.hostname
-  const port = window.location.port ? `:${window.location.port}` : ''
-  catalogUrl.value = `${window.location.protocol}//${currentHost}${port}/catalog`
-
   // Load categories
   if (appStore.categories && appStore.categories.length > 0) {
     availableCategories.value = appStore.categories
@@ -451,15 +696,80 @@ onMounted(async () => {
     ]
   }
 
+  // Cargar productos reales para la preview
+  try {
+    const response = await apiClient.get('/catalog')
+    if (response.data.success && response.data.products) {
+      realProducts.value = response.data.products.map(p => ({
+        id: p.id,
+        name: p.name,
+        description: p.description || '',
+        price: p.price,
+        image_url: p.image || p.image_url,
+        stock: p.stock || 0,
+        category: p.category || 'Sin categoría'
+      }))
+    }
+  } catch (error) {
+    console.error('Error cargando productos para preview:', error)
+  }
+
   // Load existing configuration from backend
   await loadConfiguration()
   isLoading.value = false
 })
 
-// Refresh Preview Iframe
+// Refresh Preview
 const refreshPreview = () => {
-  if (previewIframe.value) {
-    previewIframe.value.src = previewIframe.value.src
+  previewKey.value++
+}
+
+// Open catalog in new window (real mobile view)
+const openCatalogInNewWindow = () => {
+  const catalogUrl = `${window.location.origin}/catalog`
+  const windowFeatures = previewMode.value === 'mobile' 
+    ? 'width=414,height=896,left=100,top=100'
+    : 'width=1200,height=800,left=100,top=100'
+  window.open(catalogUrl, 'CatalogPreview', windowFeatures)
+}
+
+// Copy store link to clipboard
+const copyStoreLink = async () => {
+  const catalogUrl = `${window.location.origin}/catalog`
+  try {
+    await navigator.clipboard.writeText(catalogUrl)
+    
+    // Mostrar toast de éxito
+    toastMessage.title = '¡Enlace copiado!'
+    toastMessage.description = 'El enlace se copió al portapapeles.'
+    showSuccessToast.value = true
+    setTimeout(() => {
+      showSuccessToast.value = false
+    }, 3000)
+    
+    console.log('✅ Enlace copiado al portapapeles:', catalogUrl)
+  } catch (error) {
+    console.error('❌ Error al copiar enlace:', error)
+    // Fallback para navegadores antiguos
+    const textArea = document.createElement('textarea')
+    textArea.value = catalogUrl
+    textArea.style.position = 'fixed'
+    textArea.style.left = '-999999px'
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      toastMessage.title = '¡Enlace copiado!'
+      toastMessage.description = 'El enlace se copió al portapapeles.'
+      showSuccessToast.value = true
+      setTimeout(() => {
+        showSuccessToast.value = false
+      }, 3000)
+    } catch (err) {
+      console.error('❌ Error en fallback de copia:', err)
+      alert('No se pudo copiar el enlace. Por favor, cópialo manualmente.')
+    }
+    document.body.removeChild(textArea)
   }
 }
 
@@ -487,6 +797,12 @@ const handleFileUpload = (event, type) => {
   const file = event.target.files[0]
   if (!file) return
 
+  console.log('📁 Archivo seleccionado:', {
+    name: file.name,
+    size: file.size,
+    type: file.type
+  })
+
   if (file.size > 2 * 1024 * 1024) {
     alert('El archivo es muy grande. Máximo 2MB.')
     return
@@ -494,10 +810,19 @@ const handleFileUpload = (event, type) => {
 
   const reader = new FileReader()
   reader.onload = (e) => {
+    const base64String = e.target.result
+    console.log('✅ Archivo convertido a base64:', {
+      type,
+      length: base64String.length,
+      preview: base64String.substring(0, 50) + '...'
+    })
+    
     if (type === 'logo') {
-      config.brandIdentity.logo = e.target.result
+      config.brandIdentity.logo = base64String
+      console.log('🖼️ Logo asignado a config.brandIdentity.logo')
     } else if (type === 'banner') {
-      config.brandIdentity.banner = e.target.result
+      config.brandIdentity.banner = base64String
+      console.log('🖼️ Banner asignado a config.brandIdentity.banner')
     }
   }
   reader.readAsDataURL(file)
@@ -511,11 +836,17 @@ const loadConfiguration = async () => {
     if (response.data.success) {
       const data = response.data.data
       
+      console.log('📥 Configuración cargada desde BD:', {
+        logo_url: data.logo_url ? `${data.logo_url.substring(0, 50)}...` : 'null',
+        logo_length: data.logo_url ? data.logo_url.length : 0,
+        banner_url: data.banner_url ? `${data.banner_url.substring(0, 50)}...` : 'null'
+      })
+      
       config.storeActive = data.store_active ?? true
       config.brandIdentity.logo = data.logo_url || ''
       config.brandIdentity.banner = data.banner_url || ''
       config.brandIdentity.primaryColor = data.primary_color || '#10B981'
-      config.brandIdentity.template = data.template || 'modern-grid'
+      config.brandIdentity.template = data.template || 'visual-story'
       
       const visibleCats = Array.isArray(data.visible_categories) ? data.visible_categories : []
       
@@ -545,9 +876,19 @@ const saveConfiguration = async () => {
   isSaving.value = true
   
   try {
+    console.log('💾 Guardando configuración:', {
+      logo_length: config.brandIdentity.logo ? config.brandIdentity.logo.length : 0,
+      logo_preview: config.brandIdentity.logo ? config.brandIdentity.logo.substring(0, 50) + '...' : 'null',
+      banner_length: config.brandIdentity.banner ? config.brandIdentity.banner.length : 0
+    })
+    
     const response = await apiClient.post('/web-catalog/config', config)
     
+    console.log('📤 Respuesta del servidor:', response.data)
+    
     if (response.data.success) {
+      toastMessage.title = '¡Guardado!'
+      toastMessage.description = 'Configuración actualizada correctamente.'
       showSuccessToast.value = true
       setTimeout(() => {
         showSuccessToast.value = false
@@ -557,7 +898,7 @@ const saveConfiguration = async () => {
       refreshPreview()
     }
   } catch (error) {
-    console.error('Error saving configuration:', error)
+    console.error('❌ Error saving configuration:', error)
     alert('Error al guardar la configuración.')
   } finally {
     isSaving.value = false
@@ -580,5 +921,16 @@ const saveConfiguration = async () => {
 }
 .animate-slide-up {
   animation: slide-up 0.3s ease-out forwards;
+}
+
+/* Simular viewport móvil real */
+.mobile-preview-viewport {
+  width: 375px !important;
+  max-width: 375px !important;
+}
+
+/* Forzar estilos móviles en la preview */
+.mobile-preview-viewport * {
+  max-width: 100%;
 }
 </style>

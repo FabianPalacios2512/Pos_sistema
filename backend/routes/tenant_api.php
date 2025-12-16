@@ -369,6 +369,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 // Configuración pública del catálogo (para mostrar en el frontend público)
 Route::get('/public/catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getPublicConfig']);
 Route::get('/public/catalog/config/{subdomain}', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getPublicConfig']);
+
+// Productos del catálogo público
+Route::get('/catalog', [\App\Http\Controllers\PublicCatalogController::class, 'index']);
+Route::get('/catalog/categories', [\App\Http\Controllers\PublicCatalogController::class, 'categories']);
 // ==================== FIN CATÁLOGO PÚBLICO ====================
 
 
