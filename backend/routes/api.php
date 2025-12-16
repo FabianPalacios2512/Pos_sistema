@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CentralLoginController;
 use App\Http\Controllers\Api\TenantRegisterController;
 use App\Http\Controllers\Api\PlanUpgradeController;
 use App\Http\Controllers\Api\PaymentHistoryController;
+use App\Http\Controllers\Api\WebCatalogConfigController;
 use App\Http\Controllers\WompiPaymentController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PasswordResetController;
@@ -110,7 +111,7 @@ Route::get('/test', function () {
         'success' => true,
         'message' => 'API Central funcionando correctamente',
         'timestamp' => now(),
-        'version' => '1.0.0'
+        'version' => '1.1.0'
     ]);
 });
 
@@ -132,6 +133,26 @@ Route::get('/transaction-status/{transactionId}', [WompiPaymentController::class
 Route::get('/payment-methods', [WompiPaymentController::class, 'getAcceptedPaymentMethods']);
 // 🔧 DEV ONLY: Simular webhook para testing en localhost
 Route::post('/dev/simulate-payment-success/{tenantId}', [WompiPaymentController::class, 'simulatePaymentSuccess']);
+
+// ==================== WEB CATALOG CONFIGURATION ====================
+// 🔍 Endpoint de debug para verificar que las rutas están cargadas
+Route::get('/web-catalog/debug-test', function() {
+    return response()->json([
+        'success' => true,
+        'message' => 'Web Catalog routes loaded in api.php (Central)',
+        'tenant_id' => tenant('id') ?? 'no-tenant',
+        'controller_exists' => class_exists(\App\Http\Controllers\Api\WebCatalogConfigController::class),
+        'timestamp' => now()->toDateTimeString(),
+        'route_type' => 'central'
+    ]);
+});
+
+// ✅ Rutas de Web Catalog con autenticación (Central API)
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getConfig']);
+    Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'saveConfig']);
+});
+// ==================== FIN WEB CATALOG CONFIGURATION ====================
 
 // ==================== SUPER ADMIN - AI MONITORING ====================
 // Rutas para monitoreo global de IA (todos los tenants)
