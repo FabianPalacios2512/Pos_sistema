@@ -1099,13 +1099,6 @@ const lowStockProducts = computed(() => {
 
 // Componente dinámico basado en el módulo actual
 const currentModuleComponent = computed(() => {
-  // Handle Web Catalog module with plan-based access control
-  if (currentModule.value === 'web-catalog-config') {
-    const tenantPlan = appStore.tenantPlan || 'free_trial'
-    const hasAccess = ['premium', 'enterprise'].includes(tenantPlan)
-    return hasAccess ? WebCatalogConfig : WebCatalogUpgrade
-  }
-  
   const moduleComponents = {
     products: ProductsView,
     categories: CategoriesView,
@@ -1123,7 +1116,8 @@ const currentModuleComponent = computed(() => {
     'returns-management': ReturnsManagementView,
     expenses: ExpensesManager,
     warehouses: WarehousesView,
-    'stock-transfers': StockTransfersView
+    'stock-transfers': StockTransfersView,
+    'web-catalog-config': WebCatalogConfig
   }
   return moduleComponents[currentModule.value] || null
 })
