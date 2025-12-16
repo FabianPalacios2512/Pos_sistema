@@ -698,7 +698,7 @@ onMounted(async () => {
 
   // Cargar productos reales para la preview
   try {
-    const response = await apiClient.get('/catalog')
+    const response = await apiClient.get('/public/catalog')
     if (response.data.success && response.data.products) {
       realProducts.value = response.data.products.map(p => ({
         id: p.id,

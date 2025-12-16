@@ -98,6 +98,61 @@ class PublicCatalogController extends Controller
     }
 
     /**
+     * Obtiene la configuración pública del catálogo
+     */
+    public function getPublicConfig()
+    {
+        try {
+            $tenantId = tenant('id');
+            
+            $config = DB::table('web_catalog_configs')
+                ->where('tenant_id', $tenantId)
+                ->first();
+
+            if (!$config) {
+                // Retornar configuración por defecto
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'store_active' => true,
+                        'template' => 'visual-story',
+                        'primary_color' => '#10B981',
+                        'logo_url' => '',
+                        'banner_url' => '',
+                        'whatsapp_number' => '',
+                        'currency_symbol' => '$',
+                        'delivery_cost' => 0,
+                        'minimum_order' => 0,
+                        'store_name' => 'Mi Tienda'
+                    ]
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'store_active' => $config->store_active,
+                    'template' => $config->template,
+                    'primary_color' => $config->primary_color,
+                    'logo_url' => $config->logo_url,
+                    'banner_url' => $config->banner_url,
+                    'whatsapp_number' => $config->whatsapp_number,
+                    'currency_symbol' => '$',
+                    'delivery_cost' => $config->delivery_cost,
+                    'minimum_order' => $config->minimum_order,
+                    'store_name' => tenant('name') ?? 'Mi Tienda'
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error getting public catalog config: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cargar configuración'
+            ], 500);
+        }
+    }
+
+    /**
      * Crea un nuevo pedido desde el catálogo público
      */
     public function store(Request $request)

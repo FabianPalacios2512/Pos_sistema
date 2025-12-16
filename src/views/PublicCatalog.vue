@@ -76,7 +76,7 @@ const loadCatalogConfig = async () => {
 // Cargar productos del catálogo
 const loadProducts = async () => {
   try {
-    const response = await apiClient.get('/catalog')
+    const response = await apiClient.get('/public/catalog')
     
     if (response.data.success) {
       products.value = response.data.products.map(product => ({

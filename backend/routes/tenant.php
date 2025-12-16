@@ -45,6 +45,7 @@ Route::middleware([
 ])->prefix('api/public')->group(function () {
     Route::get('/catalog', [App\Http\Controllers\PublicCatalogController::class, 'index']);
     Route::get('/catalog/categories', [App\Http\Controllers\PublicCatalogController::class, 'categories']);
+    Route::get('/catalog/config', [App\Http\Controllers\PublicCatalogController::class, 'getPublicConfig']);
     Route::post('/orders', [App\Http\Controllers\PublicCatalogController::class, 'store']);
     Route::get('/orders/{uuid}', [App\Http\Controllers\PublicCatalogController::class, 'show']);
 
