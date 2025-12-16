@@ -147,6 +147,25 @@
         </div>
       </div>
 
+      <!-- TIENDA ONLINE -->
+      <div class="mt-7 px-4">
+        <!-- Línea divisoria cuando está colapsado -->
+        <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
+        <h3 v-show="!sidebarCollapsed" class="section-title">TIENDA ONLINE</h3>
+        
+        <div
+          @click="$emit('change-module', 'web-catalog')"
+          class="menu-item"
+          :class="[currentModule === 'web-catalog' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
+          :title="sidebarCollapsed ? 'Catálogo Web' : ''"
+        >
+          <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+          </svg>
+          <span v-show="!sidebarCollapsed" class="menu-text">Catálogo Web</span>
+        </div>
+      </div>
+
       <!-- MULTISEDE (Premium/Enterprise Only + Permiso) -->
       <div v-if="showMultisede" class="mt-7 px-4">
         <!-- Línea divisoria cuando está colapsado -->
