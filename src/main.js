@@ -7,20 +7,20 @@ import './style.css'
 import { registerSW } from 'virtual:pwa-register'
 
 const updateSW = registerSW({
-  immediate: true, // Forzar actualización inmediata
-  onNeedRefresh() {
-    // Auto-actualizar sin preguntar para forzar limpieza del SW viejo
-    updateSW(true)
-  },
-  onOfflineReady() {
-    console.log('✅ Aplicación lista para funcionar sin conexión')
-  },
-  onRegistered(r) {
-    // Forzar verificación de actualización cada 30 segundos
-    r && setInterval(() => {
-      r.update()
-    }, 30000)
-  }
+	immediate: true, // Forzar actualización inmediata
+	onNeedRefresh() {
+		// Auto-actualizar sin preguntar para forzar limpieza del SW viejo
+		updateSW(true)
+	},
+	onOfflineReady() {
+		console.log('✅ Aplicación lista para funcionar sin conexión')
+	},
+	onRegistered(r) {
+		// Forzar verificación de actualización cada 30 segundos
+		r && setInterval(() => {
+			r.update()
+		}, 30000)
+	}
 })
 
 // Configurar interceptor offline para Axios
@@ -31,7 +31,10 @@ setupOfflineInterceptor()
 import offlineTimeValidator from './utils/offlineTimeValidator.js'
 // El validador se inicializa automáticamente al importarse
 
+import { createPinia } from 'pinia'
+
 const app = createApp(App)
+const pinia = createPinia()
 
 	// Suppress verbose console.log/debug output application-wide unless explicitly enabled.
 	// This is a low-risk way to remove the large amount of debug spam the app produces
@@ -53,5 +56,6 @@ const app = createApp(App)
 		}
 	})()
 
+app.use(pinia)
 app.use(router)
 app.mount('#app')

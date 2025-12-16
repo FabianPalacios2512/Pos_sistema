@@ -152,8 +152,8 @@
       </div>
     </div>
 
-    <!-- Radio Widget Flotante (Global) -->
-    <RadioWidget 
+    <!-- Radio Player Modal (Global) -->
+    <RadioPlayerModal 
       :is-open="radioWidgetOpen"
       @close="radioWidgetOpen = false"
     />
@@ -178,8 +178,8 @@ import Sidebar from '../components/Sidebar.vue'
 // Importar componente AppHeader
 import AppHeader from '../components/AppHeader.vue'
 
-// Importar RadioWidget
-import RadioWidget from '../components/RadioWidget.vue'
+// Importar RadioPlayerModal
+import RadioPlayerModal from '../components/RadioPlayerModal.vue'
 
 // Router
 const router = useRouter()
