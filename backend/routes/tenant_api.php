@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\ExpenseCategoryController;
 use App\Http\Controllers\Api\ExcelImportController;
+use App\Http\Controllers\Api\WebCatalogConfigController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Tenant\AiUsageController;
 use Illuminate\Support\Facades\Route;
