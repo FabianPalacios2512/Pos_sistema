@@ -15,6 +15,19 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 🎨 Build Frontend
+        run: |
+          echo '🎨 Building frontend locally...'
+          npm ci
+          npm run build
+          echo '✅ Frontend build completed!'
+
       - name: 🔐 Setup SSH Key
         uses: webfactory/ssh-agent@v0.8.0
         with:
@@ -25,10 +38,16 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🚀 Deploy to Production
+      - name: 📤 Deploy Frontend to VPS
+        run: |
+          echo '📤 Uploading frontend build to VPS...'
+          rsync -avz --delete dist/ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/var/www/105pos/dist/
+          echo '✅ Frontend uploaded!'
+
+      - name: 🚀 Deploy Backend to Production
         run: |
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} "cd /var/www/105pos && \
-            echo '🔄 Iniciando deploy...' && \
+            echo '🔄 Iniciando backend deploy...' && \
             git config --global credential.helper store && \
             echo 'https://${{ secrets.GH_TOKEN }}@github.com' > ~/.git-credentials && \
             git fetch origin main && \
@@ -51,10 +70,6 @@ jobs:
             echo '🔐 Setting permissions...' && \
             chmod -R 755 storage bootstrap/cache || true && \
             chown -R www-data:www-data storage bootstrap/cache || true && \
-            echo '🎨 Building frontend...' && \
-            cd /var/www/105pos && \
-            npm install --production && \
-            npm run build && \
             echo '🔄 Restarting PHP-FPM...' && \
             sudo systemctl restart php8.3-fpm || sudo systemctl restart php-fpm || true && \
             rm ~/.git-credentials && \
