@@ -82,4 +82,24 @@ Route::middleware([
         
         return response()->json($data);
     });
+    
+    // 🔍 TEMPORAL - Debug endpoint para verificar que las rutas están cargadas
+    Route::get('/debug/routes', function () {
+        $routes = collect(\Route::getRoutes())->filter(function($route) {
+            return str_contains($route->uri(), 'web-catalog');
+        })->map(function($route) {
+            return [
+                'method' => implode('|', $route->methods()),
+                'uri' => $route->uri(),
+                'name' => $route->getName(),
+                'action' => $route->getActionName()
+            ];
+        })->values();
+        
+        return response()->json([
+            'tenant_id' => tenant('id'),
+            'web_catalog_routes_count' => $routes->count(),
+            'routes' => $routes
+        ]);
+    });
 });
