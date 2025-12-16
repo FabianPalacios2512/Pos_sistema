@@ -102,4 +102,26 @@ Route::middleware([
             'routes' => $routes
         ]);
     });
+    
+    // 🔍 TEMPORAL - Verificar si la tabla web_catalog_configs existe
+    Route::get('/debug/database', function () {
+        try {
+            $tableExists = \Schema::hasTable('web_catalog_configs');
+            $configCount = $tableExists ? DB::table('web_catalog_configs')->count() : 0;
+            $hasConfig = $tableExists ? DB::table('web_catalog_configs')->where('tenant_id', tenant('id'))->exists() : false;
+            
+            return response()->json([
+                'tenant_id' => tenant('id'),
+                'table_exists' => $tableExists,
+                'total_configs' => $configCount,
+                'tenant_has_config' => $hasConfig,
+                'migrations_ran' => DB::table('migrations')->count(),
+                'last_migration' => DB::table('migrations')->orderBy('id', 'desc')->first()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
 });
