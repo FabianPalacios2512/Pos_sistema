@@ -357,6 +357,17 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
 
 });
 
+// 🔍 TEMPORAL - Endpoint de debug ANTES de auth para verificar routing
+Route::get('/web-catalog/debug-test', function() {
+    return response()->json([
+        'success' => true,
+        'message' => 'Route works! tenant_api.php is loaded',
+        'tenant_id' => tenant('id'),
+        'controller_exists' => class_exists(\App\Http\Controllers\Api\WebCatalogConfigController::class),
+        'timestamp' => now()->toDateTimeString()
+    ]);
+});
+
 // Rutas autenticadas SIN restricción de trial (para configuración)
 Route::middleware(['auth:sanctum'])->group(function () {
     // ==================== WEB CATALOG CONFIGURATION ====================
