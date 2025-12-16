@@ -104,7 +104,7 @@ class PublicCatalogController extends Controller
     {
         try {
             $tenantId = tenant('id');
-            
+
             $config = DB::table('web_catalog_configs')
                 ->where('tenant_id', $tenantId)
                 ->first();

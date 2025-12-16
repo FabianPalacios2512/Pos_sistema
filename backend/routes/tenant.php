@@ -51,7 +51,7 @@ Route::middleware([
 
     // Ruta para buscar pedido por código (para el POS)
     Route::post('/orders/find-by-code', [App\Http\Controllers\PublicCatalogController::class, 'findByCode']);
-    
+
     // 🔍 TEMPORAL - Debug endpoint para diagnosticar productos
     Route::get('/debug/products', function () {
         $data = [
@@ -79,10 +79,10 @@ Route::middleware([
                     ];
                 })
         ];
-        
+
         return response()->json($data);
     });
-    
+
     // 🔍 TEMPORAL - Debug endpoint para verificar que las rutas están cargadas
     Route::get('/debug/routes', function () {
         $routes = collect(\Route::getRoutes())->filter(function($route) {
@@ -95,21 +95,21 @@ Route::middleware([
                 'action' => $route->getActionName()
             ];
         })->values();
-        
+
         return response()->json([
             'tenant_id' => tenant('id'),
             'web_catalog_routes_count' => $routes->count(),
             'routes' => $routes
         ]);
     });
-    
+
     // 🔍 TEMPORAL - Verificar si la tabla web_catalog_configs existe
     Route::get('/debug/database', function () {
         try {
             $tableExists = \Schema::hasTable('web_catalog_configs');
             $configCount = $tableExists ? DB::table('web_catalog_configs')->count() : 0;
             $hasConfig = $tableExists ? DB::table('web_catalog_configs')->where('tenant_id', tenant('id'))->exists() : false;
-            
+
             return response()->json([
                 'tenant_id' => tenant('id'),
                 'table_exists' => $tableExists,

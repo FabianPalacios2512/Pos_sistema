@@ -358,6 +358,7 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
 
 });
 
+// ==================== WEB CATALOG CONFIGURATION ====================
 // 🔍 TEMPORAL - Endpoint de debug ANTES de auth para verificar routing
 Route::get('/web-catalog/debug-test', function() {
     return response()->json([
@@ -369,13 +370,12 @@ Route::get('/web-catalog/debug-test', function() {
     ]);
 });
 
-// Rutas autenticadas SIN restricción de trial (para configuración)
+// ✅ Rutas de Web Catalog con autenticación
 Route::middleware(['auth:sanctum'])->group(function () {
-    // ==================== WEB CATALOG CONFIGURATION ====================
     Route::get('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getConfig']);
     Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'saveConfig']);
-    // ==================== FIN WEB CATALOG CONFIGURATION ====================
 });
+// ==================== FIN WEB CATALOG CONFIGURATION ====================
 
 // ==================== AI MONITORING (Sin Tenancy - Para Super Admin) ====================
 // Estas rutas funcionan tanto para tenants como para super admin
@@ -410,6 +410,6 @@ Route::get('/test', function () {
         'success' => true,
         'message' => 'API funcionando correctamente',
         'timestamp' => now(),
-        'version' => '1.0.0'
+        'version' => '1.1.0'
     ]);
 });
