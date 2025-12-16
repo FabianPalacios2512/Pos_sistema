@@ -365,17 +365,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // ==================== FIN WEB CATALOG CONFIGURATION ====================
 });
 
-// ==================== CATÁLOGO PÚBLICO (SIN AUTENTICACIÓN) ====================
-// Configuración pública del catálogo (para mostrar en el frontend público)
-Route::get('/public/catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getPublicConfig']);
-Route::get('/public/catalog/config/{subdomain}', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getPublicConfig']);
-
-// Productos del catálogo público
-Route::get('/catalog', [\App\Http\Controllers\PublicCatalogController::class, 'index']);
-Route::get('/catalog/categories', [\App\Http\Controllers\PublicCatalogController::class, 'categories']);
-// ==================== FIN CATÁLOGO PÚBLICO ====================
-
-
 // ==================== AI MONITORING (Sin Tenancy - Para Super Admin) ====================
 // Estas rutas funcionan tanto para tenants como para super admin
 Route::middleware(['auth:sanctum'])->group(function () {
