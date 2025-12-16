@@ -370,11 +370,15 @@ Route::get('/web-catalog/debug-test', function() {
     ]);
 });
 
-// ✅ Rutas de Web Catalog con autenticación
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getConfig']);
-    Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'saveConfig']);
-});
+// ✅ Rutas de Web Catalog SIN autenticación (temporal para debug)
+Route::get('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getConfig']);
+Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'saveConfig']);
+
+// 🔐 Rutas de Web Catalog con autenticación (comentadas temporalmente)
+// Route::middleware(['auth:sanctum'])->group(function () {
+//     Route::get('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getConfig']);
+//     Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'saveConfig']);
+// });
 // ==================== FIN WEB CATALOG CONFIGURATION ====================
 
 // ==================== AI MONITORING (Sin Tenancy - Para Super Admin) ====================

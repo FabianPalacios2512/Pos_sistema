@@ -16,8 +16,27 @@ class PublicCatalogController extends Controller
      */
     public function index(Request $request)
     {
+        // Obtener configuración para filtrar categorías visibles
+        $tenantId = tenant('id');
+        $config = DB::table('web_catalog_configs')
+            ->where('tenant_id', $tenantId)
+            ->first();
+
         $query = Product::with('category')
             ->availableForOnline();
+
+        // Filtrar por categorías visibles si está configurado
+        if ($config && $config->visible_categories) {
+            $visibleCategories = json_decode($config->visible_categories, true);
+            if (!empty($visibleCategories)) {
+                $query->whereIn('category_id', $visibleCategories);
+            }
+        }
+
+        // Ocultar productos sin stock si está configurado
+        if ($config && $config->hide_out_of_stock) {
+            $query->where('current_stock', '>', 0);
+        }
 
         // Búsqueda
         if ($request->has('search') && $request->search !== '') {
@@ -137,6 +156,9 @@ class PublicCatalogController extends Controller
                     'logo_url' => $config->logo_url,
                     'banner_url' => $config->banner_url,
                     'whatsapp_number' => $config->whatsapp_number,
+                    'visible_categories' => json_decode($config->visible_categories ?? '[]', true),
+                    'show_prices' => $config->show_prices,
+                    'hide_out_of_stock' => $config->hide_out_of_stock ?? false,
                     'currency_symbol' => '$',
                     'delivery_cost' => $config->delivery_cost,
                     'minimum_order' => $config->minimum_order,
