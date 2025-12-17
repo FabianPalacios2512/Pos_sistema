@@ -108,7 +108,7 @@
 
     <!-- Products Grid -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 md:pb-12 relative z-10">
-      <div class="grid grid-cols-2 gap-3 sm:gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         <TransitionGroup name="list">
           <div 
             v-for="product in filteredProducts"
@@ -306,6 +306,10 @@ const props = defineProps({
   storeConfig: {
     type: Object,
     required: true
+  },
+  categories: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -319,20 +323,11 @@ const loadingImages = ref({})
 const imageErrors = ref({})
 
 // Computed
-const categories = computed(() => {
-  const cats = new Set()
-  props.storeConfig.catalog_products?.forEach(p => {
-    if (p.category) cats.add(p.category)
-  })
-  return Array.from(cats).map((name, index) => ({ id: index + 1, name }))
-})
-
 const filteredProducts = computed(() => {
   let products = props.storeConfig.catalog_products || []
   
   if (selectedCategory.value !== null) {
-    const catName = categories.value.find(c => c.id === selectedCategory.value)?.name
-    products = products.filter(p => p.category === catName)
+    products = products.filter(p => p.category_id === selectedCategory.value)
   }
   
   if (searchQuery.value.trim()) {

@@ -1,17 +1,9 @@
 <template>
-  <!-- Loading State -->
-  <div v-if="isLoading" class="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div class="text-center">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-      <p class="text-gray-600 font-medium">Cargando tienda...</p>
-    </div>
-  </div>
-
   <!-- Dynamic Template Selector -->
   <CatalogTemplateSelector 
-    v-else
     :template="catalogConfig.template"
     :storeConfig="storeConfigForTemplate"
+    :categories="visibleCategories"
   />
 </template>
 
@@ -21,7 +13,6 @@ import CatalogTemplateSelector from '../components/catalog/CatalogTemplateSelect
 import apiClient from '../services/apiClient.js'
 
 // Estado
-const isLoading = ref(true)
 const catalogConfig = ref({
   template: 'visual-story',
   primary_color: '#10B981',
@@ -34,6 +25,7 @@ const catalogConfig = ref({
   store_name: 'Mi Tienda'
 })
 const products = ref([])
+const visibleCategories = ref([]) // Categorías visibles configuradas
 
 // Computed: Preparar configuración para las plantillas
 const storeConfigForTemplate = computed(() => ({
@@ -72,7 +64,6 @@ const loadCatalogConfig = async () => {
     // Usar valores por defecto
   }
 }
-
 // Cargar productos del catálogo
 const loadProducts = async () => {
   try {
@@ -86,7 +77,8 @@ const loadProducts = async () => {
         price: product.price,
         image_url: product.image || product.image_url || '',
         stock: product.stock || 0,
-        category: product.category || 'Sin categoría'
+        category: product.category || 'Sin categoría',
+        category_id: product.category_id
       }))
     }
   } catch (error) {
@@ -95,10 +87,23 @@ const loadProducts = async () => {
   }
 }
 
+// Cargar categorías visibles desde el backend
+const loadVisibleCategories = async () => {
+  try {
+    const response = await apiClient.get('/public/catalog/categories')
+    
+    if (response.data.success) {
+      visibleCategories.value = response.data.categories || []
+    }
+  } catch (error) {
+    console.error('Error loading categories:', error)
+    visibleCategories.value = []
+  }
+}
+
 // Lifecycle
 onMounted(async () => {
   await loadCatalogConfig()
-  await loadProducts()
-  isLoading.value = false
+  await Promise.all([loadProducts(), loadVisibleCategories()])
 })
 </script>

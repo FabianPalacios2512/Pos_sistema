@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class WebCatalogConfigController extends Controller
 {
@@ -68,7 +69,9 @@ class WebCatalogConfigController extends Controller
         Log::info('WebCatalogConfigController: saveConfig called', [
             'user_id' => Auth::id(),
             'logo_length' => $request->input('brandIdentity.logo') ? strlen($request->input('brandIdentity.logo')) : 0,
-            'banner_length' => $request->input('brandIdentity.banner') ? strlen($request->input('brandIdentity.banner')) : 0
+            'banner_length' => $request->input('brandIdentity.banner') ? strlen($request->input('brandIdentity.banner')) : 0,
+            'visible_categories_input' => $request->input('products.visibleCategories'),
+            'all_request_data' => $request->except(['brandIdentity.logo', 'brandIdentity.banner'])
         ]);
 
         try {
@@ -83,6 +86,13 @@ class WebCatalogConfigController extends Controller
                 'banner_is_base64' => $bannerUrl ? (strpos($bannerUrl, 'data:image') === 0) : false
             ]);
 
+            // BACKWARD COMPATIBILITY: Aceptar datos en formato NUEVO (products) o VIEJO (inventoryVisibility)
+            $visibleCategories = $request->input('products.visibleCategories')
+                ?? $request->input('inventoryVisibility.visibleCategories', []);
+
+            $hideOutOfStock = $request->input('products.hideOutOfStock')
+                ?? $request->input('inventoryVisibility.hideOutOfStock', false);
+
             $data = [
                 'store_active' => $request->input('storeActive', true),
                 'logo_url' => $logoUrl,
@@ -90,11 +100,13 @@ class WebCatalogConfigController extends Controller
                 'primary_color' => $request->input('brandIdentity.primaryColor', '#10B981'),
                 'template' => $request->input('brandIdentity.template', 'modern-grid'),
 
-                'visible_categories' => json_encode($request->input('inventoryVisibility.visibleCategories', [])),
-                'hide_out_of_stock' => $request->input('inventoryVisibility.hideOutOfStock', false),
+                'visible_categories' => json_encode($visibleCategories),
+                'show_prices' => $request->input('products.showPrices', true),
+                'hide_out_of_stock' => $hideOutOfStock,
 
-                'whatsapp_number' => $request->input('ordersConfig.whatsappNumber', '+57'),
-                'custom_message' => $request->input('ordersConfig.customMessage'),
+                'allow_orders' => $request->input('orders.allowOrders', true),
+                'whatsapp_number' => $request->input('orders.whatsappNumber', ''),
+                'custom_message' => $request->input('orders.customMessage', ''),
 
                 'delivery_cost' => $request->input('businessRules.deliveryCost', 0),
                 'minimum_order' => $request->input('businessRules.minimumOrder', 0),
@@ -116,13 +128,24 @@ class WebCatalogConfigController extends Controller
                     ->update($data);
             }
 
+            // Limpiar caché de configuración para que se recargue
+            Cache::forget("web_catalog_config_{$tenantId}");
+
+            Log::info('✅ Configuración guardada exitosamente', [
+                'tenant_id' => $tenantId,
+                'visible_categories' => $visibleCategories
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Configuración guardada exitosamente'
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error en saveConfig: ' . $e->getMessage());
+            Log::error('❌ Error en saveConfig', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Error al guardar la configuración: ' . $e->getMessage()

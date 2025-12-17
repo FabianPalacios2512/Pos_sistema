@@ -8,19 +8,30 @@ use App\Models\OnlineOrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class PublicCatalogController extends Controller
 {
+    /**
+     * Obtiene la configuración cacheada (1 hora)
+     */
+    private function getCachedConfig()
+    {
+        $tenantId = tenant('id');
+        return Cache::remember("web_catalog_config_{$tenantId}", 3600, function() use ($tenantId) {
+            return DB::table('web_catalog_configs')
+                ->where('tenant_id', $tenantId)
+                ->first();
+        });
+    }
+
     /**
      * Muestra el catálogo público de productos
      */
     public function index(Request $request)
     {
-        // Obtener configuración para filtrar categorías visibles
-        $tenantId = tenant('id');
-        $config = DB::table('web_catalog_configs')
-            ->where('tenant_id', $tenantId)
-            ->first();
+        // Obtener configuración cacheada
+        $config = $this->getCachedConfig();
 
         $query = Product::with('category')
             ->availableForOnline();
@@ -99,16 +110,23 @@ class PublicCatalogController extends Controller
      */
     public function categories()
     {
-        $categories = DB::table('categories')
-            ->join('products', 'categories.id', '=', 'products.category_id')
-            ->where('products.is_public', true)
-            ->where('products.active', true)
-            ->where('products.current_stock', '>', 0)
+        // Obtener configuración cacheada
+        $config = $this->getCachedConfig();
+
+        $query = DB::table('categories')
             ->where('categories.active', true)
             ->select('categories.id', 'categories.name')
-            ->distinct()
-            ->orderBy('categories.name')
-            ->get();
+            ->orderBy('categories.name');
+
+        // Si hay categorías visibles configuradas, filtrar solo esas
+        if ($config && $config->visible_categories) {
+            $visibleCategories = json_decode($config->visible_categories, true);
+            if (!empty($visibleCategories)) {
+                $query->whereIn('categories.id', $visibleCategories);
+            }
+        }
+
+        $categories = $query->get();
 
         return response()->json([
             'success' => true,
@@ -122,11 +140,8 @@ class PublicCatalogController extends Controller
     public function getPublicConfig()
     {
         try {
-            $tenantId = tenant('id');
-
-            $config = DB::table('web_catalog_configs')
-                ->where('tenant_id', $tenantId)
-                ->first();
+            // Obtener configuración cacheada
+            $config = $this->getCachedConfig();
 
             if (!$config) {
                 // Retornar configuración por defecto

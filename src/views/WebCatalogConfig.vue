@@ -1,149 +1,169 @@
 <template>
-  <div class="h-[calc(100vh-64px)] overflow-hidden flex bg-white relative" style="isolation: isolate;">
+  <!-- Layout de 3 Columnas: Menú Lateral + Contenido + Preview -->
+  <div class="flex overflow-hidden bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c]" style="height: calc(100vh - 64px);">
     
-    <!-- ÁREA A: SIDEBAR DE NAVEGACIÓN (Izquierda - Fijo - w-64) -->
-    <aside class="w-64 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col z-20">
-      <div class="p-6 border-b border-gray-100">
-        <h1 class="text-lg font-bold text-gray-900">Configuración</h1>
-        <p class="text-xs text-gray-500">Tienda Online</p>
+    <!-- SIDEBAR IZQUIERDO - Menú de Navegación -->
+    <aside class="w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col overflow-y-auto">
+      <!-- Header Sidebar - Compacto -->
+      <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-8 h-8 bg-slate-900 dark:bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-xs font-bold text-gray-900 dark:text-white">Configuración</h2>
+            <p class="text-[10px] text-gray-500 dark:text-zinc-500">Catálogo Web</p>
+          </div>
+        </div>
+        
+        <!-- Estado de la Tienda - Compacto -->
+        <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-zinc-800/50 rounded-lg">
+          <span class="text-[10px] font-semibold text-gray-700 dark:text-zinc-300">Estado:</span>
+          <div class="flex items-center gap-1.5">
+            <button 
+              @click="config.storeActive = !config.storeActive"
+              class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none"
+              :class="config.storeActive ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-600'"
+            >
+              <span
+                class="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow-sm"
+                :class="config.storeActive ? 'translate-x-5' : 'translate-x-0.5'"
+              />
+            </button>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md" 
+                  :class="config.storeActive 
+                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' 
+                    : 'bg-gray-200 dark:bg-zinc-700 text-gray-600 dark:text-zinc-400'">
+              {{ config.storeActive ? 'Activa' : 'Inactiva' }}
+            </span>
+          </div>
+        </div>
       </div>
-
-      <nav class="flex-1 overflow-y-auto py-4 space-y-1 px-3">
+      
+      <!-- Navegación - Compacta -->
+      <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
         <button 
           v-for="tab in tabs" 
           :key="tab.id"
           @click="activeTab = tab.id"
-          class="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 text-left group"
+          class="w-full text-left px-2.5 py-2 rounded-lg transition-all duration-150 flex items-center gap-2.5 group"
           :class="activeTab === tab.id 
-            ? 'bg-emerald-50 text-emerald-700 border-l-4 border-emerald-500 shadow-sm' 
-            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-4 border-transparent'"
+            ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400' 
+            : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50'"
         >
-          <!-- Iconos SVG dinámicos -->
-          <svg v-if="tab.icon === 'palette'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-          </svg>
-          <svg v-else-if="tab.icon === 'box'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-          <svg v-else-if="tab.icon === 'message'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-          <svg v-else-if="tab.icon === 'settings'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span>{{ tab.label }}</span>
+          <div class="w-4 h-4 flex items-center justify-center flex-shrink-0">
+            <svg v-if="tab.icon === 'palette'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" 
+                 :class="activeTab === tab.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-zinc-500'" 
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+            <svg v-else-if="tab.icon === 'box'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" 
+                 :class="activeTab === tab.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-zinc-500'" 
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <svg v-else-if="tab.icon === 'message'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" 
+                 :class="activeTab === tab.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-zinc-500'" 
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <svg v-else-if="tab.icon === 'settings'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" 
+                 :class="activeTab === tab.id ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-zinc-500'" 
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <span class="text-xs font-medium">{{ tab.label }}</span>
         </button>
       </nav>
-
-      <div class="p-4 border-t border-gray-100 bg-gray-50">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-xs font-bold uppercase text-gray-500">Estado</span>
-          <button 
-            @click="config.storeActive = !config.storeActive"
-            class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none"
-            :class="config.storeActive ? 'bg-emerald-500' : 'bg-gray-300'"
-          >
-            <span
-              class="inline-block h-3 w-3 transform rounded-full bg-white transition-transform"
-              :class="config.storeActive ? 'translate-x-5' : 'translate-x-1'"
-            />
-          </button>
-        </div>
-        
+      
+      <!-- Footer Sidebar con botones de acción - Compacto -->
+      <div class="px-3 pb-3 border-t border-gray-200 dark:border-zinc-800 pt-3 space-y-1.5 flex-shrink-0">
         <button 
           @click="saveConfiguration"
           :disabled="isSaving"
-          class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors text-sm font-bold shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+          class="w-full px-2.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
-          <svg v-if="!isSaving" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          <svg v-if="!isSaving" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
           </svg>
-          <svg v-else class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg v-else class="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+          {{ isSaving ? 'Guardando...' : 'Guardar Todo' }}
+        </button>
+        
+        <button 
+          @click="copyStoreLink"
+          class="w-full px-2.5 py-1.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 border border-gray-200 dark:border-zinc-700"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+          Copiar Enlace
+        </button>
+        
+        <button 
+          @click="openCatalogInNewWindow"
+          class="w-full px-2.5 py-1.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-xs font-semibold rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Ver Página
         </button>
       </div>
     </aside>
-
-    <!-- ÁREA B: PANEL DE FORMULARIOS (Centro - Scrollable - Flex-1) -->
-    <main class="flex-1 bg-white overflow-y-auto relative">
-      <div class="h-full">
-        
-        <!-- Header de Sección - Ejecutivo con Acciones -->
-        <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-8 py-5">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-lg font-semibold text-gray-900">{{ currentTabLabel }}</h2>
-              <p class="text-sm text-gray-500 mt-0.5">{{ currentTabDescription }}</p>
-            </div>
-            
-            <!-- Botones de Acción -->
-            <div class="flex items-center gap-3">
-              <!-- Copiar Link -->
-              <button 
-                @click="copyStoreLink"
-                class="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-md border border-gray-200 transition-all duration-150 hover:border-gray-300"
-                title="Copiar enlace de la tienda"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                </svg>
-                <span>Copiar enlace</span>
-              </button>
-              
-              <!-- Ver mi Página -->
-              <button 
-                @click="openCatalogInNewWindow"
-                class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-md transition-all duration-150 shadow-sm"
-                title="Abrir catálogo en nueva ventana"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                <span>Ver mi página</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- CONTENIDO DINÁMICO - Full Width -->
-        <div class="px-8 py-6 space-y-8">
+    
+    <!-- CONTENIDO CENTRAL -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-6 space-y-6">
           
-          <!-- SECCIÓN: DISEÑO - Estilo Ejecutivo -->
-          <div v-if="activeTab === 'identity'" class="space-y-8 animate-fade-in pb-8">
+          <!-- SECCIÓN: DISEÑO - Estilo SaaS Profesional -->
+          <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
             
-            <!-- Subsección: Personalización de Marca -->
-            <section>
-              <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-900">Personalización de Marca</h3>
-                <p class="text-xs text-gray-500 mt-1">Define los colores y logotipos que verán tus clientes en el catálogo.</p>
+            <!-- Personalización de Marca -->
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 p-6">
+              <div class="mb-5">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Personalización de Marca</h3>
+                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Define los colores y logotipos que verán tus clientes en el catálogo.</p>
               </div>
               
               <!-- Grid 2 Columnas: Logo + Color/Template -->
               <div class="grid grid-cols-2 gap-6">
                 
                 <!-- Logo Upload -->
-                <div class="border border-gray-200 rounded-md bg-white p-4">
-                  <label class="block text-xs font-medium text-gray-700 mb-3">Logo de la Tienda</label>
+                <div class="space-y-3">
+                  <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400">Logo de la Tienda</label>
                   <div 
                     @click="triggerFileUpload('logo')"
-                    class="border-2 border-dashed border-gray-200 rounded-md hover:border-emerald-400 hover:bg-emerald-50/50 transition-all cursor-pointer group relative flex flex-col items-center justify-center bg-gray-50 h-[160px]"
+                    class="border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-md hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition-all cursor-pointer group relative flex flex-col items-center justify-center bg-gray-50 dark:bg-zinc-800/50 h-[160px]"
                   >
                     <div v-if="config.brandIdentity.logo" class="absolute inset-0 p-3">
                       <img :src="config.brandIdentity.logo" class="w-full h-full object-contain" />
-                      <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
-                        <span class="text-white text-xs font-medium px-3 py-1.5 bg-black/60 rounded-md">Cambiar logo</span>
+                      <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-md">
+                        <button 
+                          @click.stop="config.brandIdentity.logo = ''"
+                          class="text-white text-xs font-medium px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-md transition-colors flex items-center gap-1"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Eliminar
+                        </button>
+                        <span class="text-white text-xs font-medium px-3 py-1.5 bg-black/60 rounded-md">Cambiar</span>
                       </div>
                     </div>
-                    <div v-else class="text-gray-400 group-hover:text-emerald-600 transition-colors text-center">
+                    <div v-else class="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-center">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                       </svg>
                       <span class="text-xs font-medium">Subir logo</span>
-                      <span class="text-[10px] text-gray-400 block mt-1">PNG, JPG o SVG</span>
+                      <span class="text-[10px] text-gray-400 dark:text-zinc-500 block mt-1">PNG, JPG o SVG</span>
                     </div>
                     <input type="file" ref="logoInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'logo')" />
                   </div>
@@ -152,9 +172,9 @@
                 <!-- Color + Template en columna -->
                 <div class="space-y-4">
                   
-                  <!-- Color Picker Ejecutivo -->
-                  <div class="border border-gray-200 rounded-md bg-white p-4">
-                    <label class="block text-xs font-medium text-gray-700 mb-3">Color Primario</label>
+                  <!-- Color Picker -->
+                  <div class="space-y-3">
+                    <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400">Color Primario</label>
                     <div class="flex items-center gap-3">
                       <div class="relative w-12 h-12 rounded-md overflow-hidden border border-gray-200 cursor-pointer hover:scale-105 transition-transform flex-shrink-0">
                         <input 
@@ -174,8 +194,8 @@
                   </div>
                   
                   <!-- Template Selector Compacto -->
-                  <div class="border border-gray-200 rounded-md bg-white p-4">
-                    <label class="block text-xs font-medium text-gray-700 mb-3">Plantilla de Diseño</label>
+                  <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                    <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-3">Plantilla de Diseño</label>
                     <div class="space-y-2">
                       
                       <!-- Visual Story -->
@@ -261,33 +281,42 @@
                   
                 </div>
               </div>
-            </section>
+            </div>
 
             <!-- Subsección: Banner Promocional -->
             <section>
               <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-900">Banner Promocional</h3>
-                <p class="text-xs text-gray-500 mt-1">Imagen destacada en la parte superior del catálogo.</p>
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Banner Promocional</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Imagen destacada en la parte superior del catálogo.</p>
               </div>
               
-              <div class="border border-gray-200 rounded-md bg-white p-4">
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
                 <div 
                   @click="triggerFileUpload('banner')"
-                  class="border-2 border-dashed border-gray-200 rounded-md hover:border-emerald-400 hover:bg-emerald-50/50 transition-all cursor-pointer group relative h-32 flex items-center justify-center bg-gray-50"
+                  class="border-2 border-dashed border-gray-200 rounded-md hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition-all cursor-pointer group relative h-32 flex items-center justify-center bg-gray-50 dark:bg-zinc-800/50"
                 >
                   <div v-if="config.brandIdentity.banner" class="absolute inset-0 p-1">
                     <img :src="config.brandIdentity.banner" class="w-full h-full object-cover rounded" />
-                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded">
-                      <span class="text-white text-xs font-medium px-3 py-1.5 bg-black/60 rounded-md">Cambiar banner</span>
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded">
+                      <button 
+                        @click.stop="config.brandIdentity.banner = ''"
+                        class="text-white text-xs font-medium px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-md transition-colors flex items-center gap-1"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Eliminar
+                      </button>
+                      <span class="text-white text-xs font-medium px-3 py-1.5 bg-black/60 rounded-md">Cambiar</span>
                     </div>
                   </div>
-                  <div v-else class="text-gray-400 group-hover:text-emerald-600 transition-colors flex items-center gap-3">
+                  <div v-else class="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <div>
                       <span class="text-xs font-medium block">Subir banner promocional</span>
-                      <span class="text-[10px] text-gray-400">Recomendado: 1200x400px</span>
+                      <span class="text-[10px] text-gray-400 dark:text-zinc-500">Recomendado: 1200x400px</span>
                     </div>
                   </div>
                   <input type="file" ref="bannerInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'banner')" />
@@ -302,12 +331,12 @@
             
             <section>
               <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-900">Visibilidad del Catálogo</h3>
-                <p class="text-xs text-gray-500 mt-1">Controla qué categorías y productos se muestran en tu tienda online.</p>
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Visibilidad del Catálogo</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Controla qué categorías y productos se muestran en tu tienda online.</p>
               </div>
               
-              <div class="border border-gray-200 rounded-md bg-white p-5">
-                <label class="block text-xs font-medium text-gray-700 mb-3">Categorías Visibles</label>
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-3">Categorías Visibles</label>
                 <div class="flex flex-wrap gap-2">
                   <button 
                     v-for="category in availableCategories" 
@@ -330,10 +359,10 @@
             </section>
 
             <section>
-              <div class="border border-gray-200 rounded-md bg-white p-5 flex items-center justify-between">
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 border border-gray-300 dark:border-zinc-800 shadow-sm flex items-center justify-between">
                 <div>
-                  <h3 class="text-sm font-semibold text-gray-900">Ocultar productos sin stock</h3>
-                  <p class="text-xs text-gray-500 mt-0.5">No mostrar productos agotados en el catálogo</p>
+                  <h3 class="text-sm font-bold text-gray-900 dark:text-white">Ocultar productos sin stock</h3>
+                  <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">No mostrar productos agotados en el catálogo</p>
                 </div>
                 <button 
                   @click="config.inventoryVisibility.hideOutOfStock = !config.inventoryVisibility.hideOutOfStock"
@@ -355,47 +384,47 @@
             
             <section>
               <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-900">Configuración de Pedidos</h3>
-                <p class="text-xs text-gray-500 mt-1">Define cómo tus clientes realizarán pedidos a través de WhatsApp.</p>
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Configuración de Pedidos</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Define cómo tus clientes realizarán pedidos a través de WhatsApp.</p>
               </div>
               
               <!-- Grid 2 Columnas: Número + País/Horario (Placeholder) -->
               <div class="grid grid-cols-2 gap-6">
                 
-                <div class="border border-gray-200 rounded-md bg-white p-4">
-                  <label class="block text-xs font-medium text-gray-700 mb-2">Número de WhatsApp</label>
+                <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                  <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Número de WhatsApp</label>
                   <input 
                     type="text" 
                     v-model="config.ordersConfig.whatsappNumber"
                     placeholder="+57 300 123 4567"
-                    class="w-full h-10 px-3 rounded-md border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                    class="w-full h-10 px-3 rounded-lg border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                   />
-                  <p class="text-[10px] text-gray-500 mt-2">Es el número donde recibirás los pedidos.</p>
+                  <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Es el número donde recibirás los pedidos.</p>
                 </div>
 
-                <div class="border border-gray-200 rounded-md bg-white p-4">
-                  <label class="block text-xs font-medium text-gray-700 mb-2">Horario de Atención</label>
+                <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm opacity-60">
+                  <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Horario de Atención</label>
                   <input 
                     type="text" 
                     placeholder="Lun-Vie: 9AM - 6PM"
-                    class="w-full h-10 px-3 rounded-md border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                    class="w-full h-10 px-3 rounded-lg border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500"
                     disabled
                   />
-                  <p class="text-[10px] text-gray-500 mt-2">Muestra tu disponibilidad (próximamente).</p>
+                  <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Muestra tu disponibilidad (próximamente).</p>
                 </div>
                 
               </div>
 
               <!-- Mensaje Inicial - Full Width -->
-              <div class="border border-gray-200 rounded-md bg-white p-4">
-                <label class="block text-xs font-medium text-gray-700 mb-2">Mensaje Inicial Personalizado</label>
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Mensaje Inicial Personalizado</label>
                 <textarea 
                   v-model="config.ordersConfig.customMessage"
                   rows="3"
                   placeholder="Hola, quiero hacer el siguiente pedido:"
-                  class="w-full px-3 py-2 rounded-md border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+                  class="w-full px-3 py-2.5 rounded-lg border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-sm text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent resize-none"
                 ></textarea>
-                <p class="text-[10px] text-gray-500 mt-2">Este mensaje aparecerá automáticamente al iniciar la conversación.</p>
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Este mensaje aparecerá automáticamente al iniciar la conversación.</p>
               </div>
               
             </section>
@@ -407,39 +436,39 @@
             
             <section>
               <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-900">Reglas de Negocio</h3>
-                <p class="text-xs text-gray-500 mt-1">Define los parámetros operativos de tu tienda online.</p>
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Reglas de Negocio</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Define los parámetros operativos de tu tienda online.</p>
               </div>
               
               <!-- Grid 2 Columnas: Costo + Mínimo -->
               <div class="grid grid-cols-2 gap-6">
                 
-                <div class="border border-gray-200 rounded-md bg-white p-4">
-                  <label class="block text-xs font-medium text-gray-700 mb-2">Costo de Domicilio</label>
+                <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                  <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Costo de Domicilio</label>
                   <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">$</span>
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-sm font-medium">$</span>
                     <input 
                       type="number" 
                       v-model="config.businessRules.deliveryCost"
-                      class="w-full h-10 pl-7 pr-3 rounded-md border border-gray-200 text-base font-semibold text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                      class="w-full h-10 pl-7 pr-3 rounded-lg border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-base font-semibold text-gray-900 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                       placeholder="0"
                     />
                   </div>
-                  <p class="text-[10px] text-gray-500 mt-2">Precio del envío a domicilio.</p>
+                  <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Precio del envío a domicilio.</p>
                 </div>
 
-                <div class="border border-gray-200 rounded-md bg-white p-4">
-                  <label class="block text-xs font-medium text-gray-700 mb-2">Pedido Mínimo</label>
+                <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                  <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Pedido Mínimo</label>
                   <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">$</span>
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-sm font-medium">$</span>
                     <input 
                       type="number" 
                       v-model="config.businessRules.minimumOrder"
-                      class="w-full h-10 pl-7 pr-3 rounded-md border border-gray-200 text-base font-semibold text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+                      class="w-full h-10 pl-7 pr-3 rounded-lg border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-base font-semibold text-gray-900 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
                       placeholder="0"
                     />
                   </div>
-                  <p class="text-[10px] text-gray-500 mt-2">Valor mínimo para aceptar pedidos.</p>
+                  <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Valor mínimo para aceptar pedidos.</p>
                 </div>
                 
               </div>
@@ -447,14 +476,14 @@
 
             <section>
               <div class="mb-4">
-                <h3 class="text-sm font-semibold text-gray-900">Integraciones</h3>
-                <p class="text-xs text-gray-500 mt-1">Conecta tu tienda con otros sistemas.</p>
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">Integraciones</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Conecta tu tienda con otros sistemas.</p>
               </div>
               
-              <div class="border border-gray-200 rounded-md bg-white p-5 flex items-center justify-between">
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 border border-gray-300 dark:border-zinc-800 shadow-sm flex items-center justify-between">
                 <div>
-                  <h3 class="text-sm font-semibold text-gray-900">Sincronizar con Caja Registradora</h3>
-                  <p class="text-xs text-gray-500 mt-0.5">Registrar pedidos online automáticamente en el POS</p>
+                  <h3 class="text-sm font-bold text-gray-900 dark:text-white">Sincronizar con Caja Registradora</h3>
+                  <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Registrar pedidos online automáticamente en el POS</p>
                 </div>
                 <button 
                   @click="config.businessRules.syncWithCashRegister = !config.businessRules.syncWithCashRegister"
@@ -470,113 +499,91 @@
             </section>
             
           </div>
-
-        </div>
-      </div>
+      
+      </div> <!-- Cierra p-6 pb-24 space-y-6 -->
     </main>
-
-    <!-- ÁREA C: LIVE PREVIEW REAL (Derecha - w-[500px] o 40%) -->
-    <aside 
-      class="flex-shrink-0 bg-slate-900 border-l border-gray-800 flex flex-col transition-all duration-300"
-      :class="previewMode === 'mobile' ? 'w-[450px]' : 'w-[800px]'"
-    >
+    
+    <!-- PREVIEW DERECHO - Solo Vista Móvil -->
+    <aside class="flex-shrink-0 w-[450px] bg-gradient-to-b from-gray-100 via-gray-50 to-white dark:from-[#1a1a1f] dark:via-[#16161a] dark:to-[#0f0f12] border-l border-gray-200 dark:border-zinc-800/50 flex flex-col overflow-y-auto">
       <!-- Preview Header -->
-      <div class="p-4 border-b border-gray-800 flex items-center justify-between">
-        <h3 class="text-white font-bold text-sm flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+      <div class="px-4 py-2 border-b border-gray-200 dark:border-zinc-800/50 flex items-center justify-between bg-white/50 dark:bg-black/20 backdrop-blur-sm">
+        <h3 class="text-gray-900 dark:text-white font-bold text-xs flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"></span>
           Vista Previa
         </h3>
         
-        <!-- Toggle Mobile/Desktop -->
-        <div class="flex items-center gap-2">
-          <div class="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
-            <button 
-              @click="previewMode = 'mobile'"
-              class="p-1.5 rounded-md transition-all"
-              :class="previewMode === 'mobile' ? 'bg-gray-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-              title="Vista Móvil"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-            </button>
-            <button 
-              @click="previewMode = 'desktop'"
-              class="p-1.5 rounded-md transition-all"
-              :class="previewMode === 'desktop' ? 'bg-gray-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
-              title="Vista Escritorio"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </button>
-          </div>
-
-          <button 
-            @click="openCatalogInNewWindow"
-            class="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
-            title="Abrir en ventana nueva (Vista Real)"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </button>
-        </div>
-
         <button 
           @click="refreshPreview"
-          class="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+          class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5"
           title="Recargar Vista"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </button>
       </div>
       
-      <div class="flex-1 p-6 flex items-center justify-center overflow-hidden bg-slate-900 relative">
-        <!-- Marco de Dispositivo -->
+      <div class="pt-6 pb-3 px-8 flex items-center justify-center">
+        <!-- Marco de Dispositivo Móvil Flotante -->
         <div 
-          class="relative bg-white transition-all duration-300 shadow-2xl overflow-hidden ring-1 ring-white/10 isolate"
-          :class="previewMode === 'mobile' 
-            ? 'w-[375px] h-[740px] rounded-[3rem] border-[10px] border-gray-800' 
-            : 'w-full h-[90%] rounded-lg border-[4px] border-gray-700 max-w-5xl'"
-          :style="previewMode === 'mobile' ? 'container-type: inline-size; width: 375px;' : ''"
+          class="relative bg-white transition-all duration-300 overflow-hidden isolate w-[375px] h-[740px] rounded-[3rem] shadow-2xl dark:shadow-black/80"
+          style="container-type: inline-size; width: 375px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);"
         >
-          <!-- Notch (Solo Mobile) -->
-          <div v-if="previewMode === 'mobile'" class="absolute top-0 left-1/2 -translate-x-1/2 w-36 h-7 bg-gray-800 rounded-b-2xl z-50"></div>
+          <!-- Borde exterior del teléfono (marco negro) -->
+          <div class="absolute inset-0 rounded-[3rem] border-[14px] border-black pointer-events-none z-50">
+            <!-- Notch -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl -mt-[14px]"></div>
+            
+            <!-- Botones laterales -->
+            <div class="absolute -left-[14px] top-24 w-1 h-12 bg-black rounded-l"></div>
+            <div class="absolute -left-[14px] top-40 w-1 h-16 bg-black rounded-l"></div>
+            <div class="absolute -right-[14px] top-32 w-1 h-20 bg-black rounded-r"></div>
+          </div>
           
-          <!-- Live Preview Component - Aislado con nuevo contexto de apilamiento -->
-          <div class="w-full h-full overflow-auto bg-white relative" style="isolation: isolate; transform: translateZ(0);">
+          <!-- Pantalla del teléfono -->
+          <div class="w-full h-full overflow-auto bg-white relative rounded-[2.2rem]" style="isolation: isolate; transform: translateZ(0);">
             <CatalogTemplateSelector 
               :template="config.brandIdentity.template"
               :storeConfig="previewStoreConfig"
-              :isMobilePreview="previewMode === 'mobile'"
-              :key="`${previewKey}-${previewMode}`"
+              :isMobilePreview="true"
+              :key="previewKey"
             />
           </div>
         </div>
       </div>
-      
-      <div class="p-3 text-center text-xs text-gray-500 border-t border-gray-800">
-        {{ previewMode === 'mobile' ? 'Vista Móvil (iPhone)' : 'Vista Escritorio (Laptop)' }}
-      </div>
     </aside>
 
-    <!-- Toast Notification -->
+  </div> <!-- Cierra flex min-h-screen -->
+  
+  <!-- Toast de Éxito -->
+  <Transition
+    enter-active-class="transition duration-300 ease-out"
+    enter-from-class="opacity-0 translate-y-4"
+    enter-to-class="opacity-100 translate-y-0"
+    leave-active-class="transition duration-200 ease-in"
+    leave-from-class="opacity-100 translate-y-0"
+    leave-to-class="opacity-0 translate-y-4"
+  >
     <div 
       v-if="showSuccessToast" 
-      class="fixed bottom-6 left-6 bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 animate-slide-up z-50"
+      class="fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 z-50 border border-emerald-500"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-      </svg>
+      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
       <div>
         <h4 class="font-bold text-sm">{{ toastMessage.title }}</h4>
-        <p class="text-xs opacity-90">{{ toastMessage.description }}</p>
+        <p class="text-xs opacity-90 mt-0.5">{{ toastMessage.description }}</p>
       </div>
+      <button @click="showSuccessToast = false" class="ml-2 text-white/70 hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
     </div>
-  </div>
+  </Transition>
 </template>
 
 <script setup>
@@ -599,7 +606,6 @@ const toastMessage = reactive({
 })
 const isLoading = ref(true)
 const activeTab = ref('identity')
-const previewMode = ref('mobile') // 'mobile' | 'desktop'
 const realProducts = ref([]) // Productos reales de la base de datos
 
 // Tabs Configuration
@@ -724,12 +730,10 @@ const refreshPreview = () => {
   previewKey.value++
 }
 
-// Open catalog in new window (real mobile view)
+// Open catalog in new window (always mobile view)
 const openCatalogInNewWindow = () => {
   const catalogUrl = `${window.location.origin}/catalog`
-  const windowFeatures = previewMode.value === 'mobile' 
-    ? 'width=414,height=896,left=100,top=100'
-    : 'width=1200,height=800,left=100,top=100'
+  const windowFeatures = 'width=414,height=896,left=100,top=100'
   window.open(catalogUrl, 'CatalogPreview', windowFeatures)
 }
 
@@ -850,11 +854,8 @@ const loadConfiguration = async () => {
       
       const visibleCats = Array.isArray(data.visible_categories) ? data.visible_categories : []
       
-      if (visibleCats.length === 0 && availableCategories.value.length > 0) {
-        config.inventoryVisibility.visibleCategories = availableCategories.value.map(c => c.id)
-      } else {
-        config.inventoryVisibility.visibleCategories = visibleCats
-      }
+      // Respetar la configuración guardada, incluso si está vacía
+      config.inventoryVisibility.visibleCategories = visibleCats
       
       config.inventoryVisibility.hideOutOfStock = data.hide_out_of_stock ?? false
       config.ordersConfig.whatsappNumber = data.whatsapp_number || '+57'
@@ -865,9 +866,8 @@ const loadConfiguration = async () => {
     }
   } catch (error) {
     console.error('Error loading configuration:', error)
-    if (config.inventoryVisibility.visibleCategories.length === 0 && availableCategories.value.length > 0) {
-      config.inventoryVisibility.visibleCategories = availableCategories.value.map(c => c.id)
-    }
+    // No forzar selección de todas las categorías en caso de error
+    // config.inventoryVisibility.visibleCategories permanecerá vacío
   }
 }
 
@@ -876,13 +876,39 @@ const saveConfiguration = async () => {
   isSaving.value = true
   
   try {
+    // Transformar estructura del frontend al formato que espera el backend
+    const payload = {
+      storeActive: config.storeActive,
+      brandIdentity: {
+        logo: config.brandIdentity.logo,
+        banner: config.brandIdentity.banner,
+        primaryColor: config.brandIdentity.primaryColor,
+        template: config.brandIdentity.template
+      },
+      products: {
+        visibleCategories: config.inventoryVisibility.visibleCategories, // ← MAPEO CORRECTO
+        showPrices: true, // Por ahora hardcodeado
+        hideOutOfStock: config.inventoryVisibility.hideOutOfStock
+      },
+      orders: {
+        allowOrders: true, // Por ahora hardcodeado
+        whatsappNumber: config.ordersConfig.whatsappNumber,
+        customMessage: config.ordersConfig.customMessage
+      },
+      businessRules: {
+        deliveryCost: config.businessRules.deliveryCost,
+        minimumOrder: config.businessRules.minimumOrder,
+        syncWithCashRegister: config.businessRules.syncWithCashRegister
+      }
+    }
+    
     console.log('💾 Guardando configuración:', {
-      logo_length: config.brandIdentity.logo ? config.brandIdentity.logo.length : 0,
-      logo_preview: config.brandIdentity.logo ? config.brandIdentity.logo.substring(0, 50) + '...' : 'null',
-      banner_length: config.brandIdentity.banner ? config.brandIdentity.banner.length : 0
+      visibleCategories: payload.products.visibleCategories,
+      logo_length: payload.brandIdentity.logo ? payload.brandIdentity.logo.length : 0,
+      banner_length: payload.brandIdentity.banner ? payload.brandIdentity.banner.length : 0
     })
     
-    const response = await apiClient.post('/web-catalog/config', config)
+    const response = await apiClient.post('/web-catalog/config', payload)
     
     console.log('📤 Respuesta del servidor:', response.data)
     

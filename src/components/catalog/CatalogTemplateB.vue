@@ -69,7 +69,7 @@
     <!-- LISTADO DE PRODUCTOS: Grid en Desktop, Lista en Móvil -->
     <main class="container mx-auto px-4 py-6 pb-32 md:pb-12 max-w-7xl">
       <!-- Grid de Cards para Desktop -->
-      <div class="hidden md:grid md:grid-cols-2 gap-4">
+      <div class="hidden md:grid md:grid-cols-3 lg:grid-cols-4 gap-4">
         <TransitionGroup name="list">
           <div 
             v-for="product in filteredProducts" 
@@ -362,6 +362,10 @@ const props = defineProps({
       min_order_value: 0,
       catalog_products: []
     })
+  },
+  categories: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -374,21 +378,13 @@ const loadingImages = ref({})
 const imageErrors = ref({})
 
 // Computed
-const categories = computed(() => {
-  const cats = new Set()
-  props.storeConfig.catalog_products?.forEach(p => {
-    if (p.category) cats.add(p.category)
-  })
-  return Array.from(cats).map((name, index) => ({ 
-    id: index + 1, 
-    name
-  }))
-})
-
 const filteredProducts = computed(() => {
   let products = props.storeConfig.catalog_products || []
   
-  // Filtrar por categoría
+  // Filtrar por categoría usando category_id
+  if (selectedCategory.value !== null) {
+    products = products.filter(p => p.category_id === selectedCategory.value)
+  }
   if (selectedCategory.value !== null) {
     const catName = categories.value.find(c => c.id === selectedCategory.value)?.name
     products = products.filter(p => p.category === catName)

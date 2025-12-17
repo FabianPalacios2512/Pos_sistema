@@ -3,6 +3,7 @@
     :is="currentTemplate" 
     :storeConfig="storeConfig"
     :isMobilePreview="isMobilePreview"
+    :categories="categories"
   />
 </template>
 
@@ -25,6 +26,10 @@ const props = defineProps({
   isMobilePreview: {
     type: Boolean,
     default: false
+  },
+  categories: {
+    type: Array,
+    default: () => []
   }
 })
 
