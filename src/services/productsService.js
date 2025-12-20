@@ -23,9 +23,10 @@ export const productsService = {
 
   // Crear nuevo producto
   async create(productData) {
+    const isFormData = productData instanceof FormData
     return await apiCall('/products', {
       method: 'POST',
-      body: JSON.stringify(productData)
+      body: isFormData ? productData : JSON.stringify(productData)
     })
   },
 

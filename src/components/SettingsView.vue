@@ -298,6 +298,16 @@
                        type="text" 
                        class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
               </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Tipo de Tienda</label>
+                <select v-model="systemSettings.store_type" 
+                        class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                  <option value="general">General (Mini Market, Ferretería, Papelería, etc.)</option>
+                  <option value="fashion">Moda (Ropa, Zapatos, Accesorios)</option>
+                </select>
+                <p class="text-[10px] text-gray-500 dark:text-zinc-400 mt-1">Define el diseño del POS y comportamiento predeterminado al crear productos.</p>
+              </div>
               
               <div>
                 <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">NIT/Documento</label>
@@ -1380,6 +1390,7 @@ const planLimits = computed(() => {
 // Configuraciones del sistema desde API
 const systemSettings = ref({
   company_name: 'Mi Empresa',
+  store_type: 'general', // 🏪 Default
   company_document: '',
   company_phone: '',
   company_email: '',

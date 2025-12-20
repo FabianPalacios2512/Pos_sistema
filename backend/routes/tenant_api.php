@@ -181,6 +181,7 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::get('/products-pos', [ProductController::class, 'forPos']); // Endpoint optimizado para POS
     Route::get('/products/low-stock', [ProductController::class, 'lowStock']);
     Route::post('/products/{product}/update-stock', [ProductController::class, 'updateStock']);
+    Route::put('/products/variants/bulk-update', [ProductController::class, 'bulkUpdateVariants']); // Actualización masiva de variantes
     Route::apiResource('products', ProductController::class);
 
     // NOTA: Las rutas de excel-import están fuera del middleware auth para funcionar en onboarding

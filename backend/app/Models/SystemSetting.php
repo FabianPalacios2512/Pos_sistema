@@ -11,6 +11,7 @@ class SystemSetting extends Model
 
     protected $fillable = [
         'company_name',
+        'store_type', // 🏪 Tipo de tienda (general, fashion, food, etc.)
         'company_document',
         'company_phone',
         'company_email',

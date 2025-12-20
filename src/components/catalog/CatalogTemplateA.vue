@@ -292,8 +292,8 @@
                   
                   <!-- Imagen del Producto -->
                   <img 
-                    v-if="product.image_url && product.image_url !== 'https://via.placeholder.com/400' && !imageErrors[product.id]"
-                    :src="product.image_url"
+                    v-if="(product.images && product.images.length > 0) || (product.image_url && product.image_url !== 'https://via.placeholder.com/400' && !imageErrors[product.id])"
+                    :src="product.images && product.images.length > 0 ? product.images[0] : product.image_url"
                     :alt="product.name"
                     @error="handleImageError(product.id)"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
@@ -377,17 +377,14 @@
               <!-- Main Image (Adjusted Height) -->
               <div class="relative h-[50vh] lg:h-[65vh] w-full overflow-hidden group">
                 <img 
-                  :src="selectedProduct.image_url" 
+                  :src="selectedProduct.images && selectedProduct.images.length > 0 ? selectedProduct.images[0] : selectedProduct.image_url" 
                   class="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-105"
                 />
               </div>
               <!-- Secondary Images (Smaller Height) -->
-              <div class="hidden lg:grid grid-cols-2 gap-1 h-[25vh] bg-white">
-                 <div class="relative overflow-hidden h-full">
-                    <img :src="selectedProduct.image_url" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-500" />
-                 </div>
-                 <div class="relative overflow-hidden h-full">
-                    <img :src="selectedProduct.image_url" class="w-full h-full object-cover object-center scale-150" />
+              <div v-if="selectedProduct.images && selectedProduct.images.length > 1" class="hidden lg:grid grid-cols-2 gap-1 h-[25vh] bg-white">
+                 <div v-for="(img, idx) in selectedProduct.images.slice(1, 3)" :key="idx" class="relative overflow-hidden h-full">
+                    <img :src="img" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-500" />
                  </div>
               </div>
             </div>
@@ -404,46 +401,30 @@
 
               <!-- Header -->
               <div class="space-y-4">
+                <p class="text-sm text-gray-500 uppercase tracking-widest font-bold">{{ selectedProduct.category }}</p>
                 <h2 class="text-3xl lg:text-4xl font-serif text-gray-900 leading-tight">
                   {{ selectedProduct.name }}
                 </h2>
                 <p class="text-2xl font-light text-gray-900">
-                  {{ storeConfig.currency_symbol }}{{ formatPrice(selectedProduct.price) }}
+                  {{ storeConfig.currency_symbol }}{{ formatPrice(currentPrice) }}
                 </p>
               </div>
 
-              <!-- Selectors -->
-              <div class="space-y-6 py-6 border-t border-gray-100">
-                <!-- Color -->
-                <div class="space-y-3">
-                  <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">Color: Navy Blue</span>
-                  <div class="flex gap-3">
+              <!-- Selectors (Dynamic) -->
+              <div class="space-y-6 py-6 border-t border-gray-100" v-if="selectedProduct.options && selectedProduct.options.length > 0">
+                <div v-for="option in selectedProduct.options" :key="option.id" class="space-y-3">
+                  <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">{{ option.name }}</span>
+                  <div class="flex flex-wrap gap-3">
                     <button 
-                      v-for="(color, idx) in productColors" 
-                      :key="idx"
-                      class="w-8 h-8 rounded-full ring-2 ring-offset-2 ring-transparent hover:ring-gray-300 transition-all"
-                      :class="[color.class, { '!ring-gray-900': idx === 0 }]"
-                    ></button>
-                  </div>
-                </div>
-
-                <!-- Size -->
-                <div class="space-y-3">
-                  <div class="flex justify-between items-center">
-                    <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">Talla</span>
-                    <button class="text-xs text-gray-500 underline hover:text-gray-900">Guía de tallas</button>
-                  </div>
-                  <div class="flex gap-3">
-                    <button 
-                      v-for="size in productSizes" 
-                      :key="size"
-                      @click="selectedSize = size"
-                      class="w-12 h-12 flex items-center justify-center border transition-all duration-200 text-sm font-medium"
-                      :class="selectedSize === size 
+                      v-for="val in option.values" 
+                      :key="val.id"
+                      @click="selectedOptions[option.id] = val.id"
+                      class="min-w-[3rem] h-10 px-3 flex items-center justify-center border transition-all duration-200 text-sm font-medium rounded-md"
+                      :class="selectedOptions[option.id] === val.id
                         ? 'bg-gray-900 text-white border-gray-900' 
                         : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900'"
                     >
-                      {{ size }}
+                      {{ val.value }}
                     </button>
                   </div>
                 </div>
@@ -452,10 +433,10 @@
               <!-- CTA -->
               <button 
                 @click="addToCartFromDetail"
-                :disabled="selectedProduct.stock === 0"
+                :disabled="currentStock === 0 || !isVariantSelected"
                 class="w-full bg-gray-900 text-white py-4 px-8 uppercase tracking-widest text-sm font-bold hover:bg-black transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                {{ selectedProduct.stock === 0 ? 'Agotado' : 'Agregar al Carrito' }}
+                {{ currentStock === 0 ? 'Agotado' : (isVariantSelected ? 'Agregar al Carrito' : 'Selecciona opciones') }}
               </button>
 
               <!-- Accordions -->
@@ -469,12 +450,13 @@
                     </span>
                   </button>
                   <div v-show="activeAccordion === 'description'" class="pb-4 text-sm text-gray-600 leading-relaxed animate-fade-in">
-                    <p>{{ selectedProduct.description || 'Una prenda esencial diseñada para el guardarropa moderno. Confeccionada con materiales de primera calidad que garantizan durabilidad y confort excepcional. El corte preciso y los acabados refinados reflejan nuestra dedicación a la excelencia artesanal.' }}</p>
+                    <p v-if="selectedProduct.description">{{ selectedProduct.description }}</p>
+                    <p v-else class="text-gray-400 italic">Sin descripción disponible.</p>
                   </div>
                 </div>
 
                 <!-- Composition -->
-                <div class="border-b border-gray-200">
+                <div class="border-b border-gray-200" v-if="false">
                   <button @click="toggleAccordion('composition')" class="w-full py-4 flex justify-between items-center text-left group">
                     <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">Composición y Cuidados</span>
                     <span class="text-xl font-light text-gray-400 group-hover:text-gray-900 transition-colors">
@@ -492,7 +474,7 @@
                 </div>
 
                 <!-- Shipping -->
-                <div class="border-b border-gray-200">
+                <div class="border-b border-gray-200" v-if="false">
                   <button @click="toggleAccordion('shipping')" class="w-full py-4 flex justify-between items-center text-left group">
                     <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">Envíos y Devoluciones</span>
                     <span class="text-xl font-light text-gray-400 group-hover:text-gray-900 transition-colors">
@@ -687,16 +669,40 @@ const stickyHeader = ref(null)
 const productsSection = ref(null)
 const currentSlide = ref(0)
 const selectedProduct = ref(null)
-const selectedSize = ref(null)
+const selectedOptions = ref({}) // { 'Color': 'Rojo', 'Talla': 'M' } (Stores Value IDs)
 const activeAccordion = ref(null)
 
-// Mock Data para Detalle
-const productSizes = ['S', 'M', 'L', 'XL']
-const productColors = [
-  { name: 'Navy Blue', class: 'bg-slate-900' },
-  { name: 'Matte Black', class: 'bg-gray-900' },
-  { name: 'Pure White', class: 'bg-white border border-gray-200' }
-]
+// Computed for Variants
+const currentVariant = computed(() => {
+  if (!selectedProduct.value || !selectedProduct.value.variants || selectedProduct.value.variants.length === 0) return null
+  
+  // Find variant that matches all selected options
+  return selectedProduct.value.variants.find(variant => {
+    // Check if every selected option matches the variant's option values
+    return Object.entries(selectedOptions.value).every(([optionId, valueId]) => {
+      // Find the option value in the variant's option_values list
+      return variant.option_values.some(ov => ov.option_id == optionId && ov.value_id == valueId)
+    })
+  })
+})
+
+const currentPrice = computed(() => {
+  if (currentVariant.value) return currentVariant.value.price
+  return selectedProduct.value ? selectedProduct.value.price : 0
+})
+
+const currentStock = computed(() => {
+  if (currentVariant.value) return currentVariant.value.stock
+  return selectedProduct.value ? selectedProduct.value.stock : 0
+})
+
+const isVariantSelected = computed(() => {
+  if (!selectedProduct.value || !selectedProduct.value.options || selectedProduct.value.options.length === 0) return true
+  // Check if all options have a selection
+  return selectedProduct.value.options.every(opt => selectedOptions.value[opt.id])
+})
+
+// Mock Data para Detalle (Legacy - Removed)
 
 // Imágenes del carrusel - usar banner y logo si están disponibles
 const carouselImages = computed(() => {
@@ -822,7 +828,7 @@ const scrollToProducts = () => {
 
 const openProductDetails = (product) => {
   selectedProduct.value = product
-  selectedSize.value = null
+  selectedOptions.value = {} // Reset options
   activeAccordion.value = 'description'
   document.body.style.overflow = 'hidden'
 }
@@ -838,7 +844,18 @@ const toggleAccordion = (section) => {
 
 const addToCartFromDetail = () => {
   if (selectedProduct.value) {
-    addToCart(selectedProduct.value)
+    // If it's a variable product but no variant selected (should be disabled by UI, but safety check)
+    if (!isVariantSelected.value) return
+
+    const productToAdd = {
+      ...selectedProduct.value,
+      price: currentPrice.value,
+      stock: currentStock.value,
+      variant_id: currentVariant.value ? currentVariant.value.id : null,
+      selected_options: { ...selectedOptions.value } // Store selected options for cart display
+    }
+    
+    addToCart(productToAdd)
     closeProductDetails()
     showCheckout.value = true
   }

@@ -14,7 +14,7 @@ return new class extends Migration
         // 1. Modificar tabla products
         Schema::table('products', function (Blueprint $table) {
             $table->enum('product_type', ['simple', 'variable'])->default('simple')->after('id');
-            
+
             // Hacer campos nullable para productos variables
             $table->string('sku')->nullable()->change();
             $table->string('barcode')->nullable()->change();
@@ -71,7 +71,7 @@ return new class extends Migration
         Schema::table('product_warehouse', function (Blueprint $table) {
             $table->foreignId('product_variant_id')->nullable()->after('product_id')->constrained('product_variants')->onDelete('cascade');
             // Índice compuesto para búsquedas rápidas
-            $table->index(['product_id', 'product_variant_id', 'warehouse_id']);
+            $table->index(['product_id', 'product_variant_id', 'warehouse_id'], 'pw_pid_pvid_wid_index');
         });
     }
 
@@ -97,7 +97,7 @@ return new class extends Migration
         // 3. Revertir cambios en products
         Schema::table('products', function (Blueprint $table) {
             $table->dropColumn('product_type');
-            // Nota: Revertir nullable a not null puede fallar si hay datos nulos, 
+            // Nota: Revertir nullable a not null puede fallar si hay datos nulos,
             // así que lo dejamos nullable o requeriría limpieza de datos.
             // Por seguridad en rollback, solo quitamos la columna nueva.
         });

@@ -31,6 +31,7 @@ class Product extends Model
     }
 
     protected $fillable = [
+        'product_type',        // 🆕 Tipo de producto: 'simple' o 'variable'
         'name',
         'description',
         'sku',
@@ -44,8 +45,8 @@ class Product extends Model
         'min_stock',
         'max_stock',
         'unit',
-        'measurement_unit',    // 📏 Nueva: Unidad de medida (unit, kg, g, m, cm, l, ml)
-        'allow_decimal',       // ✅ Nueva: Permite cantidades decimales
+        'measurement_unit',
+        'allow_decimal',
         'manage_stock',
         'active',
         'image_url',
@@ -64,12 +65,48 @@ class Product extends Model
         'max_stock' => 'integer',
         'manage_stock' => 'boolean',
         'active' => 'boolean',
-        'allow_decimal' => 'boolean',  // 📏 Cast para allow_decimal
+        'allow_decimal' => 'boolean',
         'is_public' => 'boolean',
         'tags' => 'array'
     ];
 
-    // Relaciones
+    // ==========================================
+    // 🆕 RELACIONES PARA VARIANTES Y GALERÍA
+    // ==========================================
+
+    /**
+     * Galería de imágenes del producto
+     */
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('order');
+    }
+
+    /**
+     * Variantes del producto (si es variable)
+     */
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    /**
+     * Opciones/Atributos del producto (ej: Talla, Color)
+     */
+    public function options()
+    {
+        return $this->hasMany(ProductOption::class);
+    }
+
+    /**
+     * Helper para saber si es producto variable
+     */
+    public function isVariable()
+    {
+        return $this->product_type === 'variable';
+    }
+
+    // Relaciones existentes
     public function category()
     {
         return $this->belongsTo(Category::class);

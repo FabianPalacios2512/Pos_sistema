@@ -149,6 +149,12 @@
           <!-- hasOpenSession: {{ hasOpenSession }} -->
           <!-- plan: {{ appStore.tenantPlan }} -->
 
+          <!-- 👗 Badge Modo Fashion (solo si es tienda de moda) -->
+          <div v-if="isFashionStore" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-black dark:bg-white text-white dark:text-black shadow-lg">
+            <span class="text-sm">👗</span>
+            <span class="text-xs font-bold uppercase tracking-wide">Fashion Mode</span>
+          </div>
+
           <!-- 🌍 Toggle Búsqueda Global/Local (Siempre visible con sesión) -->
           <button
             v-if="shouldShowMultiWarehouseFeatures"
@@ -266,8 +272,8 @@
     <!-- FIN BARRA DE HERRAMIENTAS EMPRESARIAL -->
     
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5" style="height: calc(100vh - 11rem - 54px); margin-bottom: 24px;">
-  <!-- Panel Izquierdo: Catálogo de Productos - 50% (6/12) -->
-  <div class="lg:col-span-6 h-full overflow-hidden">
+  <!-- Panel Izquierdo: Catálogo de Productos - 70% Fashion (8/12) | 50% General (6/12) -->
+  <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="h-full overflow-hidden transition-all duration-300">
     <div class="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/60 h-full flex flex-col overflow-hidden transition-all duration-300">
       
       <div class="flex-1 p-3 overflow-y-auto bg-slate-100/80 dark:bg-zinc-950/50 backdrop-blur-sm" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
@@ -324,7 +330,172 @@
         </button>
       </div>
       
-      <!-- Grid responsivo EXECUTIVE & UNIFORM -->
+      <!-- 👗 MODO FASHION - Diseño tipo Boutique/E-commerce Premium -->
+      <template v-if="isFashionStore">
+        <!-- Header de Colección Fashion -->
+        <div class="mb-6 pb-4 border-b border-gray-200 dark:border-zinc-800">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Colección</h2>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">{{ filteredProducts.length }} prendas disponibles</p>
+            </div>
+            <!-- Selector de vista -->
+            <div class="flex items-center gap-2 bg-gray-100 dark:bg-zinc-800 p-1 rounded-lg">
+              <button 
+                @click="fashionViewMode = 'grid'"
+                class="p-2 rounded-md transition-all"
+                :class="fashionViewMode === 'grid' ? 'bg-white dark:bg-zinc-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700'"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+              </button>
+              <button 
+                @click="fashionViewMode = 'list'"
+                class="p-2 rounded-md transition-all"
+                :class="fashionViewMode === 'list' ? 'bg-white dark:bg-zinc-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700'"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🎨 GRID FASHION - Estilo Lookbook (más columnas gracias al 70% de espacio) -->
+        <div v-if="fashionViewMode === 'grid'" class="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 pb-20 content-start">
+          <div
+            v-for="(product, index) in filteredProducts"
+            :key="product.id"
+            class="group cursor-pointer"
+            @click="addToCart(product)"
+          >
+            <!-- Card Minimalista Fashion -->
+            <div class="relative overflow-hidden rounded-xl bg-gray-100 dark:bg-zinc-900 mb-2">
+              
+              <!-- Aspect ratio para fotos de moda -->
+              <div class="aspect-[4/5] relative">
+                
+                <!-- Badge NUEVO (para productos recientes) -->
+                <div v-if="isNewProduct(product)" class="absolute top-2 left-2 z-20 px-2 py-0.5 bg-black dark:bg-white text-white dark:text-black text-[8px] font-bold uppercase tracking-wider rounded-full">
+                  Nuevo
+                </div>
+                
+                <!-- Badge cantidad en carrito - Estilo Fashion -->
+                <div v-if="getProductQuantityInCart(product.id) > 0" 
+                     class="absolute top-2 right-2 z-20 w-6 h-6 rounded-full bg-black dark:bg-white text-white dark:text-black text-xs font-bold flex items-center justify-center shadow-lg">
+                  {{ getProductQuantityInCart(product.id) }}
+                </div>
+                
+                <!-- Imagen principal -->
+                <img
+                  v-if="product.image_url || product.image"
+                  :src="getProductImage(product)"
+                  :alt="product.name"
+                  class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading="lazy"
+                  @error="(e) => handleImageError(e, product)"
+                />
+                
+                <!-- Placeholder elegante fashion -->
+                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900">
+                  <div class="text-center opacity-50">
+                    <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                  </div>
+                </div>
+                
+                <!-- Overlay con botón de agregar (aparece en hover) -->
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100">
+                  <button class="px-4 py-2 bg-white dark:bg-black text-black dark:text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-gray-100 dark:hover:bg-zinc-800">
+                    + Agregar
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Info del producto - Estilo minimalista -->
+            <div class="space-y-0.5 px-0.5">
+              <!-- Categoría -->
+              <p class="text-[8px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500 truncate">
+                {{ product.category_name || 'Sin categoría' }}
+              </p>
+              
+              <!-- Nombre -->
+              <h3 class="text-xs font-medium text-gray-900 dark:text-white leading-tight line-clamp-1">
+                {{ product.name }}
+              </h3>
+              
+              <!-- Precio y Stock -->
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-bold text-gray-900 dark:text-white">
+                  ${{ product.price.toLocaleString() }}
+                </span>
+                <span v-if="getTotalStock(product) <= 5" class="text-[8px] font-semibold text-rose-500 dark:text-rose-400">
+                  ¡{{ getTotalStock(product) }}!
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 📋 LISTA FASHION - Vista detallada -->
+        <div v-else class="space-y-3 pb-20">
+          <div
+            v-for="product in filteredProducts"
+            :key="product.id"
+            class="group flex gap-4 p-3 bg-white dark:bg-zinc-800/50 rounded-2xl border border-gray-200 dark:border-zinc-700/50 hover:border-gray-300 dark:hover:border-zinc-600 hover:shadow-lg transition-all duration-300 cursor-pointer"
+            @click="addToCart(product)"
+          >
+            <!-- Imagen -->
+            <div class="w-24 h-32 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-900">
+              <img
+                v-if="product.image_url || product.image"
+                :src="getProductImage(product)"
+                :alt="product.name"
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div v-else class="w-full h-full flex items-center justify-center">
+                <svg class="w-8 h-8 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+              </div>
+            </div>
+            
+            <!-- Info -->
+            <div class="flex-1 flex flex-col justify-between py-1">
+              <div>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500 mb-1">
+                  {{ product.category_name || 'Sin categoría' }}
+                </p>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white leading-snug">
+                  {{ product.name }}
+                </h3>
+              </div>
+              
+              <div class="flex items-center justify-between">
+                <span class="text-lg font-bold text-gray-900 dark:text-white">
+                  ${{ product.price.toLocaleString() }}
+                </span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-500 dark:text-zinc-400">
+                    Stock: {{ getTotalStock(product) }}
+                  </span>
+                  <!-- Badge si está en carrito -->
+                  <span v-if="getProductQuantityInCart(product.id) > 0" class="px-2 py-1 bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold rounded-full">
+                    {{ getProductQuantityInCart(product.id) }} en carrito
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      
+      <!-- 📦 GRID MODO GENERAL - Compacto y funcional (DISEÑO ACTUAL) -->
       <div v-else class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3 pb-20 min-h-[600px] content-start">
         <div
           v-for="product in filteredProducts"
@@ -391,9 +562,9 @@
 </div>
     
 
-<!-- bloque de ventas -->
+<!-- bloque de ventas - 30% Fashion (4/12) | Panel Central General (3/12) -->
 
-<div class="lg:col-span-3 h-full overflow-hidden">
+<div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="h-full overflow-hidden transition-all duration-300">
   <div class="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/60 h-full flex flex-col overflow-hidden transition-all duration-300">
     
     <div class="p-4 flex-shrink-0">
@@ -534,12 +705,141 @@
         </div>
       </div>
     </div>
+    
+    <!-- 👗 SECCIÓN DE PAGO INTEGRADA - Solo en modo Fashion -->
+    <div v-if="isFashionStore" class="flex-shrink-0 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50">
+      
+      <!-- Total compacto -->
+      <div class="px-2.5 py-2 border-b border-gray-100 dark:border-zinc-800">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[8px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total</p>
+            <h3 class="text-xl font-black text-slate-900 dark:text-white">${{ total.toLocaleString() }}</h3>
+            <p class="text-[9px] text-slate-400 dark:text-zinc-500">
+              Sub: ${{ subtotal.toLocaleString() }} • {{ systemSettings.iva_display_name || 'IVA' }}: ${{ tax.toLocaleString() }}
+            </p>
+          </div>
+          <div class="text-right">
+            <span class="text-2xl font-black text-slate-300 dark:text-zinc-600">{{ totalItems }}</span>
+            <p class="text-[8px] text-slate-400 dark:text-zinc-500 uppercase">items</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Métodos de pago compactos -->
+      <div class="px-2.5 py-2 space-y-1.5">
+        
+        <!-- Descuento Aplicado -->
+        <div v-if="discount > 0" class="bg-emerald-50 dark:bg-emerald-950/30 rounded-md px-2 py-1.5 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
+          <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            Descuento
+          </span>
+          <span class="text-xs font-black text-emerald-700 dark:text-emerald-400">-${{ discount.toLocaleString() }}</span>
+        </div>
+        
+        <!-- Métodos de Pago -->
+        <div class="grid grid-cols-3 gap-1">
+          <button 
+            v-for="method in paymentMethods.slice(0, 3)" 
+            :key="method.id"
+            @click="selectedPaymentMethod = method.id"
+            class="px-1.5 py-2 rounded-md text-[9px] font-bold uppercase transition-all flex flex-col items-center justify-center gap-0.5 border"
+            :class="selectedPaymentMethod === method.id 
+              ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white shadow-md' 
+              : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500'"
+          >
+            <svg v-if="method.id === 'efectivo'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg v-else-if="method.id === 'tarjeta' || method.id === 'card'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            <span class="leading-none">{{ method.name.split(' ')[0] }}</span>
+          </button>
+        </div>
+        
+        <!-- Cupón y Puntos -->
+        <div class="flex gap-1.5">
+          <button
+            v-if="canUseLoyaltyPoints"
+            @click="usePoints = !usePoints"
+            class="flex-1 text-[9px] font-bold flex items-center justify-center gap-1 px-2 py-1.5 rounded-md border transition-all"
+            :class="usePoints ? 'bg-amber-500 text-white border-amber-500' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400'"
+          >
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+            Puntos
+          </button>
+          
+          <button
+            @click="showPromoCodeInput = !showPromoCodeInput"
+            class="flex-1 text-[9px] font-bold flex items-center justify-center gap-1 px-2 py-1.5 rounded-md border transition-all"
+            :class="showPromoCodeInput ? 'bg-slate-700 text-white border-slate-700' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400'"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            Cupón
+          </button>
+        </div>
+        
+        <!-- Input de Cupón (colapsable) -->
+        <div v-if="showPromoCodeInput" class="flex gap-1.5">
+          <input
+            v-model="promoCode"
+            type="text"
+            placeholder="Código..."
+            class="flex-1 px-2 py-1.5 text-xs border border-gray-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent"
+            @keyup.enter="applyPromoCode"
+          />
+          <button
+            @click="applyPromoCode"
+            class="px-3 py-1.5 bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold rounded-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+          >
+            OK
+          </button>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="flex gap-1.5 pt-0.5">
+          <button 
+            @click="showConfirmClearCart" 
+            :disabled="cart.items.length === 0"
+            class="px-2 py-2 text-[9px] font-bold bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 rounded-md border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-40 transition-all"
+          >
+            Cancelar
+          </button>
+          
+          <button 
+            @click="printQuote" 
+            :disabled="!canCreateQuotation"
+            class="px-2 py-2 text-[9px] font-bold bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 rounded-md border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-40 transition-all flex items-center gap-0.5"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Cotizar
+          </button>
+          
+          <button
+            @click="handleCobrarClick"
+            :disabled="!canShowPaymentModal || quotationMode"
+            class="flex-1 py-2 rounded-md font-bold text-xs transition-all flex items-center justify-center gap-1.5"
+            :class="canShowPaymentModal && !quotationMode
+              ? 'bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 shadow-md'
+              : 'bg-gray-200 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500 cursor-not-allowed'"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Cobrar ${{ total.toLocaleString() }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    
   </div>
 </div>
 
 <!-- fin bloque de ventas -->  
 
-<div id="tour-pos-cart" class="lg:col-span-3 h-full overflow-hidden">
+<!-- Panel de Pagos - Solo visible en modo General (3/12) - Se oculta en Fashion -->
+<div v-if="!isFashionStore" id="tour-pos-cart" class="lg:col-span-3 h-full overflow-hidden">
   
   <div class="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-zinc-800/60 h-full flex flex-col justify-between shadow-lg dark:shadow-2xl dark:shadow-black/40 transition-all duration-300">
     
@@ -941,6 +1241,14 @@
       :customer="selectedCustomerForHistory"
       @add-to-cart="handleAddToCartFromHistory"
       @close="showCustomerHistory = false"
+    />
+
+    <!-- 👗 Modal de Selección de Variantes (Fashion) -->
+    <POSVariantSelector
+      :show="showVariantSelector"
+      :product="selectedProductForVariants"
+      @close="showVariantSelector = false"
+      @confirm="handleVariantConfirmed"
     />
 
     <!-- Modal de Confirmación de Pago -->
@@ -1493,6 +1801,7 @@ import QrScanner from 'qr-scanner'
 import ContextualTour from './ContextualTour.vue'
 import LoadWebOrderModal from './pos/LoadWebOrderModal.vue'
 import ConfirmCustomerModal from './pos/ConfirmCustomerModal.vue'
+import POSVariantSelector from './POSVariantSelector.vue'
 
 // Switch para tipo de método de pago
 const paymentType = ref('contado')
@@ -2096,6 +2405,18 @@ const originalQuotationProducts = ref([])
 // Variable para mostrar/ocultar input de código promocional
 const showPromoCodeInput = ref(false)
 
+// 👗 MODO FASHION - Variables para el diseño de tienda de ropa
+const fashionViewMode = ref('grid') // 'grid' | 'list'
+
+// Función para detectar si un producto es nuevo (menos de 7 días)
+const isNewProduct = (product) => {
+  if (!product.created_at) return false
+  const createdDate = new Date(product.created_at)
+  const now = new Date()
+  const diffDays = Math.floor((now - createdDate) / (1000 * 60 * 60 * 24))
+  return diffDays <= 7
+}
+
 // Número de factura real desde el backend
 const nextInvoiceNumber = ref('FACT-000001') // Valor inicial por defecto
 
@@ -2163,6 +2484,10 @@ const showQuantityModal = ref(false)
 const selectedProductForQuantity = ref(null)
 const customQuantity = ref('')
 const useAlternativeUnit = ref(false) // Toggle para usar g en vez de kg, ml en vez de L, etc
+
+// 👗 Modal de Selección de Variantes (Fashion/Moda)
+const showVariantSelector = ref(false)
+const selectedProductForVariants = ref(null)
 
 // Función para obtener la URL completa de la imagen
 const getFullImageUrl = (imageUrl) => {
@@ -2395,6 +2720,69 @@ const shouldShowMultiWarehouseFeatures = computed(() => {
   
   // Y solo cuando hay sesión abierta con bodega asignada
   return hasOpenSession.value && currentSession.value?.warehouse_id
+})
+
+// 👗 Computed para detectar si es una tienda de MODA (Fashion Store)
+const isFashionStore = computed(() => {
+  // 🛍️ Detección de tienda de moda
+  // PRIORIDAD 1: Configuración manual (anula todo lo demás)
+  
+  const storeType = systemSettings.value?.store_type
+  
+  // Si hay configuración explícita, respetarla siempre
+  if (storeType) {
+    const isFashion = storeType === 'fashion'
+    console.log(`${isFashion ? '🎨' : '🏪'} Modo ${isFashion ? 'Fashion' : 'General'}: Configurado manualmente como "${storeType}"`)
+    return isFashion
+  }
+  
+  // PRIORIDAD 2: Auto-detección (solo si NO hay configuración manual)
+  
+  const fashionKeywords = [
+    'boutique', 'moda', 'fashion', 'ropa', 'clothing', 'vestir',
+    'confecciones', 'textil', 'prendas', 'closet', 'wear',
+    'style', 'estilo', 'indumentaria', 'vestuario', 'apparel'
+  ]
+  
+  const fashionCategories = [
+    'camisas', 'camisas hombre', 'camisas mujer',
+    'pantalones', 'jeans', 'vestidos', 'faldas',
+    'chaquetas', 'abrigos', 'zapatos', 'calzado',
+    'accesorios moda', 'bolsos', 'ropa', 'moda',
+    'blusas', 'shorts', 'bermudas', 'camisetas', 't-shirts',
+    'sweaters', 'suéteres', 'medias', 'calcetines', 'ropa interior'
+  ]
+  
+  // Verificar nombre del negocio
+  const businessName = (systemSettings.value?.business_name || appStore.businessName || '').toLowerCase()
+  const hasBusinessNameMatch = fashionKeywords.some(kw => businessName.includes(kw))
+  
+  if (hasBusinessNameMatch) {
+    console.log('🎨 Fashion Mode: Auto-detectado por nombre del negocio:', businessName)
+    return true
+  }
+  
+  // Verificar categorías (solo necesita 2+ categorías de moda)
+  const cats = appStore.categories || []
+  if (!Array.isArray(cats) || cats.length === 0) {
+    console.log('🏪 General Mode: Sin categorías')
+    return false
+  }
+  
+  const matchedCategories = cats.filter(cat => {
+    const catName = (cat.name || '').toLowerCase()
+    return fashionCategories.some(f => catName.includes(f))
+  })
+  
+  const fashionCount = matchedCategories.length
+  
+  if (fashionCount >= 2) {
+    console.log('🎨 Fashion Mode: Auto-detectado por categorías:', matchedCategories.map(c => c.name).join(', '))
+    return true
+  }
+  
+  console.log('🏪 General Mode: Menos de 2 categorías de moda (' + fashionCount + '/' + cats.length + ')')
+  return false
 })
 
 const paymentMethods = computed(() => {
@@ -2786,6 +3174,16 @@ const getTotalStock = (product) => {
 
 // Métodos
 const addToCart = (product) => {
+  // 👗 INTERCEPTAR: Si el producto tiene variantes (Fashion/Moda), abrir modal de selección
+  if (product.variants && product.variants.length > 0) {
+    selectedProductForVariants.value = product
+    showVariantSelector.value = true
+    
+    // Notificación visual en el POS
+    showInfo(`Abriendo selector de variantes para: ${product.name}`)
+    
+    return
+  }
   
   // 🏢 Calcular stock disponible (ya maneja modo LOCAL vs GLOBAL)
   const totalStock = getTotalStock(product)
@@ -2837,6 +3235,56 @@ const addToCart = (product) => {
   
   // Emitir cambio en el estado del carrito
   emit('cart-status-changed', cart.items.length > 0)
+}
+
+// 👗 Manejar confirmación del modal de variantes
+const handleVariantConfirmed = ({ variant, selectedOptions }) => {
+  if (!variant || !selectedProductForVariants.value) return
+  
+  // Validar stock de la variante
+  if (variant.stock <= 0) {
+    showWarning(`No hay stock disponible para esta variante`)
+    return
+  }
+  
+  // Buscar si ya existe en el carrito (por variant_id único)
+  const existingItem = cart.items.find(item => item.variant_id === variant.id)
+  
+  if (existingItem) {
+    if (existingItem.quantity < variant.stock) {
+      existingItem.quantity += 1
+      existingItem.max_stock = variant.stock
+    } else {
+      showWarning(`No hay más stock disponible de esta variante`)
+    }
+  } else {
+    // Crear resumen de opciones para mostrar (ej: "Talla: M / Color: Rojo")
+    const optionsSummary = Object.entries(selectedOptions)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join(' / ')
+    
+    // Agregar nueva variante al carrito
+    cart.items.push({
+      id: selectedProductForVariants.value.id,
+      variant_id: variant.id, // 🔑 ID único de la variante
+      name: `${selectedProductForVariants.value.name} (${optionsSummary})`,
+      price: variant.price, // Precio específico de la variante
+      quantity: 1,
+      image_url: getProductImage(selectedProductForVariants.value),
+      barcode: variant.sku || selectedProductForVariants.value.barcode,
+      category: selectedProductForVariants.value.category,
+      max_stock: variant.stock,
+      measurement_unit: selectedProductForVariants.value.measurement_unit || 'unit',
+      variant_options: optionsSummary // Para mostrar en el ticket
+    })
+  }
+  
+  // Emitir cambio en el estado del carrito
+  emit('cart-status-changed', cart.items.length > 0)
+  
+  // Resetear
+  selectedProductForVariants.value = null
+  showVariantSelector.value = false
 }
 
 // Agregar producto con cantidad personalizada
@@ -3478,6 +3926,7 @@ const handlePaymentConfirmed = async (paymentData) => {
         notes: `Venta POS - ${lastSale.value.cashier}`,
         items: lastSale.value.items.map(item => ({
           product_id: item.id,
+          variant_id: item.variant_id || null, // 👗 ID de variante si es producto fashion
           product_name: item.name,
           quantity: parseFloat(item.quantity), // Cambiar a parseFloat para soportar decimales
           unit_price: parseFloat(item.price)
@@ -4158,6 +4607,7 @@ const confirmQuotation = async () => {
     // Preparar items mapeados con product_name requerido
     const mappedItems = cart.items.map(item => ({
       product_id: item.id,
+      variant_id: item.variant_id || null, // 👗 ID de variante si es producto fashion
       product_name: item.name, // Campo requerido por el backend
       quantity: item.quantity,
       unit_price: item.price,
@@ -4900,6 +5350,17 @@ onMounted(async () => {
     
     // 🎯 Cargar drafts existentes de la base de datos
     await loadSalesDrafts()
+    
+    // 🛍️ Debug: Verificar productos con variantes
+    // 👗 Debug variantes en consola
+    setTimeout(() => {
+      const productsWithVariants = products.value.filter(p => p.variants && p.variants.length > 0)
+      if (productsWithVariants.length > 0) {
+        console.log('✅ Productos con variantes cargados:', productsWithVariants.length)
+      } else {
+        console.log('⚠️ No hay productos con variantes en el catálogo')
+      }
+    }, 2000)
     
     // Emitir estado inicial del carrito
     emit('cart-status-changed', cart.items.length > 0)

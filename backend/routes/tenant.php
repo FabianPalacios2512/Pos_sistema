@@ -35,6 +35,24 @@ Route::middleware([
     Route::get('/', function () {
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
     });
+
+    // Servir archivos de storage del tenant
+    Route::get('/storage/{path}', function ($path) {
+        // storage_path() ya está modificado por tenancy para apuntar al directorio del tenant
+        $path = storage_path("app/public/{$path}");
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        $file = \Illuminate\Support\Facades\File::get($path);
+        $type = \Illuminate\Support\Facades\File::mimeType($path);
+
+        $response = \Illuminate\Support\Facades\Response::make($file, 200);
+        $response->header("Content-Type", $type);
+
+        return $response;
+    })->where('path', '.*');
 });
 
 // Rutas públicas del catálogo (sin autenticación)

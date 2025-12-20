@@ -80,8 +80,8 @@
             <div class="relative aspect-square bg-gray-50 overflow-hidden">
               <!-- Imagen del Producto -->
               <img 
-                v-if="product.image_url && product.image_url !== 'https://via.placeholder.com/400' && !imageErrors[product.id]"
-                :src="product.image_url"
+                v-if="(product.images && product.images.length > 0) || (product.image_url && product.image_url !== 'https://via.placeholder.com/400' && !imageErrors[product.id])"
+                :src="product.images && product.images.length > 0 ? product.images[0] : product.image_url"
                 :alt="product.name"
                 @error="handleImageError(product.id)"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -143,8 +143,8 @@
             <div class="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
               <!-- Imagen del Producto -->
               <img 
-                v-if="product.image_url && product.image_url !== 'https://via.placeholder.com/400' && !imageErrors[product.id]"
-                :src="product.image_url"
+                v-if="(product.images && product.images.length > 0) || (product.image_url && product.image_url !== 'https://via.placeholder.com/400' && !imageErrors[product.id])"
+                :src="product.images && product.images.length > 0 ? product.images[0] : product.image_url"
                 :alt="product.name"
                 @error="handleImageError(product.id)"
                 class="w-full h-full object-cover"

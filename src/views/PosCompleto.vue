@@ -194,7 +194,8 @@ const sessionTimeout = useSessionTimeout()
 // Importar componentes de módulos
 const DashboardView = defineAsyncComponent(() => import('../components/DashboardView_Executive.vue'))
 const PosView = defineAsyncComponent(() => import('../components/PosView.vue'))
-const ProductsView = defineAsyncComponent(() => import('../components/ProductsView_professional.vue'))
+const ProductsViewStandard = defineAsyncComponent(() => import('../components/ProductsView_professional.vue'))
+const FashionProductList = defineAsyncComponent(() => import('../components/FashionProductList.vue'))
 const CustomersView = defineAsyncComponent(() => import('../components/CustomersView_clean.vue'))
 const InventoryView = defineAsyncComponent(() => import('../components/InventoryView_professional.vue'))
 const IntelligentInventoryView = defineAsyncComponent(() => import('../components/IntelligentInventoryView_Simple.vue'))
@@ -1100,7 +1101,7 @@ const lowStockProducts = computed(() => {
 // Componente dinámico basado en el módulo actual
 const currentModuleComponent = computed(() => {
   const moduleComponents = {
-    products: ProductsView,
+    products: ProductsViewStandard,
     categories: CategoriesView,
     stock: InventoryView,
     intelligent_inventory: IntelligentInventoryView,

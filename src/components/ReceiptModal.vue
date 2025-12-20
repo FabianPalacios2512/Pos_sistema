@@ -61,7 +61,7 @@
             PRODUCTOS
           </div>
           
-          <div v-for="item in sale.items" :key="item.id" class="mb-3 bg-gray-50 dark:bg-gray-800 p-2 rounded">
+          <div v-for="item in normalizedSale.items" :key="item.id" class="mb-3 bg-gray-50 dark:bg-gray-800 p-2 rounded">
             <div class="text-xs">
               <div class="font-medium text-gray-900 dark:text-white mb-1">{{ item.name }}</div>
               <div class="flex justify-between items-center">
@@ -77,7 +77,7 @@
           <div class="text-xs font-bold text-gray-800 dark:text-gray-200 mb-2">DESCUENTO APLICADO</div>
           <div class="flex justify-between text-xs bg-green-50 dark:bg-green-900 p-2 rounded">
             <span class="text-gray-600 dark:text-gray-400">{{ sale.appliedDiscount.name }}</span>
-            <span class="text-green-600 dark:text-green-400 font-bold">-${{ sale.discount.toLocaleString() }}</span>
+            <span class="text-green-600 dark:text-green-400 font-bold">-${{ normalizedSale.discount.toLocaleString() }}</span>
           </div>
         </div>
 
@@ -86,15 +86,15 @@
           <div class="space-y-2 text-xs">
             <div class="flex justify-between">
               <span class="text-gray-600 dark:text-gray-400">Subtotal:</span>
-              <span class="text-gray-900 dark:text-white">${{ sale.subtotal.toLocaleString() }}</span>
+              <span class="text-gray-900 dark:text-white">${{ normalizedSale.subtotal.toLocaleString() }}</span>
             </div>
-            <div v-if="sale.discount > 0" class="flex justify-between">
+            <div v-if="normalizedSale.discount > 0" class="flex justify-between">
               <span class="text-gray-600 dark:text-gray-400">Descuento:</span>
-              <span class="text-red-600 dark:text-red-400">-${{ sale.discount.toLocaleString() }}</span>
+              <span class="text-red-600 dark:text-red-400">-${{ normalizedSale.discount.toLocaleString() }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600 dark:text-gray-400">IVA ({{ sale.taxRate }}%):</span>
-              <span class="text-gray-900 dark:text-white">${{ sale.tax.toLocaleString() }}</span>
+              <span class="text-gray-900 dark:text-white">${{ normalizedSale.tax.toLocaleString() }}</span>
             </div>
             <!-- Mostrar comisión si aplica -->
             <div v-if="hasPaymentFees" class="flex justify-between">
@@ -103,7 +103,7 @@
             </div>
             <div class="flex justify-between text-sm font-bold border-t-2 border-gray-400 dark:border-gray-600 pt-2 mt-3 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
               <span class="text-gray-900 dark:text-white">TOTAL:</span>
-              <span class="text-gray-900 dark:text-white">${{ (sale.totalWithFees || sale.total).toLocaleString() }}</span>
+              <span class="text-gray-900 dark:text-white">${{ (normalizedSale.totalWithFees || normalizedSale.total).toLocaleString() }}</span>
             </div>
           </div>
         </div>
@@ -111,13 +111,13 @@
         <!-- Información de Pago (Formato POS) -->
         <div class="border-t-2 border-dashed border-gray-400 dark:border-gray-600 pt-3 mb-4">
           <div class="text-xs font-bold text-gray-800 dark:text-gray-200 mb-2">MÉTODO DE PAGO</div>
-          <div v-for="payment in sale.payments" :key="payment.method" class="flex justify-between text-xs mb-2 bg-gray-50 dark:bg-gray-800 p-2 rounded">
+          <div v-for="payment in normalizedSale.payments" :key="payment.method" class="flex justify-between text-xs mb-2 bg-gray-50 dark:bg-gray-800 p-2 rounded">
             <span class="text-gray-600 dark:text-gray-400">{{ payment.methodName || getPaymentMethodName(payment.method) }}:</span>
             <span class="text-gray-900 dark:text-white font-medium">${{ payment.amount.toLocaleString() }}</span>
           </div>
-          <div v-if="sale.change > 0" class="flex justify-between text-xs font-bold border-t border-gray-300 dark:border-gray-600 pt-2 mt-2 bg-green-50 dark:bg-green-900 p-2 rounded">
+          <div v-if="normalizedSale.change > 0" class="flex justify-between text-xs font-bold border-t border-gray-300 dark:border-gray-600 pt-2 mt-2 bg-green-50 dark:bg-green-900 p-2 rounded">
             <span class="text-gray-900 dark:text-white">Cambio:</span>
-            <span class="text-green-600 dark:text-green-400">${{ sale.change.toLocaleString() }}</span>
+            <span class="text-green-600 dark:text-green-400">${{ normalizedSale.change.toLocaleString() }}</span>
           </div>
         </div>
 
@@ -172,7 +172,7 @@
             
             <div style="border-top: 1px dashed #000; padding-top: 2px; margin-bottom: 3px;">
               <div style="font-weight: bold;">PRODUCTOS</div>
-              <div v-for="item in sale.items" :key="item.id" style="margin-bottom: 2px;">
+              <div v-for="item in normalizedSale.items" :key="item.id" style="margin-bottom: 2px;">
                 <div>{{ item.name }}</div>
                 <div style="display: flex; justify-content: space-between;">
                   <span>{{ item.quantity }} x ${{ item.price.toFixed(2) }}</span>
@@ -185,26 +185,26 @@
               <div>Descuento: {{ sale.appliedDiscount.name }}</div>
               <div style="display: flex; justify-content: space-between;">
                 <span>{{ sale.appliedDiscount.name }}:</span>
-                <span>-${{ sale.discount.toFixed(2) }}</span>
+                <span>-${{ normalizedSale.discount.toFixed(2) }}</span>
               </div>
             </div>
             
             <div style="border-top: 1px dashed #000; padding-top: 2px; margin-bottom: 3px;">
-              <div style="display: flex; justify-content: space-between;"><span>Subtotal:</span><span>${{ sale.subtotal.toFixed(2) }}</span></div>
-              <div v-if="sale.discount > 0" style="display: flex; justify-content: space-between;"><span>Descuento:</span><span>-${{ sale.discount.toFixed(2) }}</span></div>
-              <div style="display: flex; justify-content: space-between;"><span>IVA:</span><span>${{ sale.tax.toFixed(2) }}</span></div>
+              <div style="display: flex; justify-content: space-between;"><span>Subtotal:</span><span>${{ normalizedSale.subtotal.toFixed(2) }}</span></div>
+              <div v-if="normalizedSale.discount > 0" style="display: flex; justify-content: space-between;"><span>Descuento:</span><span>-${{ normalizedSale.discount.toFixed(2) }}</span></div>
+              <div style="display: flex; justify-content: space-between;"><span>IVA:</span><span>${{ normalizedSale.tax.toFixed(2) }}</span></div>
               <div v-if="hasPaymentFees" style="display: flex; justify-content: space-between;"><span>Comision:</span><span>+${{ paymentFeesTotal.toFixed(2) }}</span></div>
               <div style="display: flex; justify-content: space-between; font-weight: bold; border-top: 1px solid #000; padding-top: 2px;">
-                <span>TOTAL:</span><span>${{ (sale.totalWithFees || sale.total).toFixed(2) }}</span>
+                <span>TOTAL:</span><span>${{ (normalizedSale.totalWithFees || normalizedSale.total).toFixed(2) }}</span>
               </div>
             </div>
             
             <div style="border-top: 1px dashed #000; padding-top: 2px; margin-bottom: 3px;">
-              <div v-for="payment in sale.payments" :key="payment.method" style="display: flex; justify-content: space-between;">
+              <div v-for="payment in normalizedSale.payments" :key="payment.method" style="display: flex; justify-content: space-between;">
                 <span>{{ payment.methodName || getPaymentMethodName(payment.method) }}:</span><span>${{ payment.amount.toFixed(2) }}</span>
               </div>
-              <div v-if="sale.change > 0" style="display: flex; justify-content: space-between; border-top: 1px solid #000; padding-top: 1px;">
-                <span>Cambio:</span><span>${{ sale.change.toFixed(2) }}</span>
+              <div v-if="normalizedSale.change > 0" style="display: flex; justify-content: space-between; border-top: 1px solid #000; padding-top: 1px;">
+                <span>Cambio:</span><span>${{ normalizedSale.change.toFixed(2) }}</span>
               </div>
             </div>
             
@@ -344,10 +344,33 @@ const companyInfo = computed(() => {
   }
 })
 
+// Computed - Normalizar items (convertir strings a números)
+const normalizedSale = computed(() => {
+  return {
+    ...props.sale,
+    items: (props.sale.items || []).map(item => ({
+      ...item,
+      price: parseFloat(item.price) || 0,
+      quantity: parseFloat(item.quantity) || 0
+    })),
+    payments: (props.sale.payments || []).map(payment => ({
+      ...payment,
+      amount: parseFloat(payment.amount) || 0,
+      fee: parseFloat(payment.fee) || 0
+    })),
+    subtotal: parseFloat(props.sale.subtotal) || 0,
+    discount: parseFloat(props.sale.discount) || 0,
+    tax: parseFloat(props.sale.tax) || 0,
+    total: parseFloat(props.sale.total) || 0,
+    totalWithFees: parseFloat(props.sale.totalWithFees) || 0,
+    change: parseFloat(props.sale.change) || 0
+  }
+})
+
 // Computed - Comisiones de métodos de pago
 const paymentFeesTotal = computed(() => {
-  return props.sale.payments?.reduce((total, payment) => {
-    return total + (payment.fee || 0)
+  return normalizedSale.value.payments?.reduce((total, payment) => {
+    return total + (parseFloat(payment.fee) || 0)
   }, 0) || 0
 })
 
@@ -496,7 +519,7 @@ const printReceipt = () => {
 const sendEmail = () => {
   const companyName = companyInfo.value.name
   const subject = `Factura ${props.sale.invoiceNumber} - ${companyName}`
-  const body = `Estimado cliente,\n\nAdjunto encontrará su factura de compra por un total de $${(props.sale.totalWithFees || props.sale.total).toLocaleString()}\n\nGracias por su preferencia.\n\n${companyName}`
+  const body = `Estimado cliente,\n\nAdjunto encontrará su factura de compra por un total de $${(normalizedSale.value.totalWithFees || normalizedSale.value.total).toLocaleString()}\n\nGracias por su preferencia.\n\n${companyName}`
   
   const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
   window.open(emailUrl)

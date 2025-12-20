@@ -113,6 +113,12 @@ export const apiCall = async (endpoint, options = {}) => {
   
   const headers = getAuthHeaders()
   const { silent, ...fetchOptions } = options // Extraer opción silent
+
+  // Si el body es FormData, eliminar Content-Type para que el navegador lo establezca con el boundary correcto
+  if (fetchOptions.body instanceof FormData) {
+    delete headers['Content-Type']
+  }
+
   const config = {
     headers,
     ...fetchOptions,

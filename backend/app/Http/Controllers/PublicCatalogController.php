@@ -33,7 +33,7 @@ class PublicCatalogController extends Controller
         // Obtener configuración cacheada
         $config = $this->getCachedConfig();
 
-        $query = Product::with('category')
+        $query = Product::with(['category', 'images', 'options.values', 'variants.optionValues'])
             ->availableForOnline();
 
         // Filtrar por categorías visibles si está configurado
@@ -85,17 +85,59 @@ class PublicCatalogController extends Controller
         }
 
         $products = $query->get()->map(function($product) {
+            $mainImage = $product->public_image ?? $product->image_url;
+            if ($mainImage && !str_starts_with($mainImage, 'http')) {
+                $mainImage = url($mainImage);
+            }
+
+            $images = $product->images->sortBy('order')->map(function($img) {
+                $url = $img->image_url;
+                if ($url && !str_starts_with($url, 'http')) {
+                    return url($url);
+                }
+                return $url;
+            })->values()->toArray();
+
             return [
                 'id' => $product->id,
                 'name' => $product->name,
                 'description' => $product->public_description ?? $product->description,
                 'price' => (float) $product->sale_price,
-                'image' => $product->public_image ?? $product->image_url,
+                'image' => $mainImage,
+                'images' => $images,
                 'stock' => $product->current_stock,
                 'category' => $product->category ? $product->category->name : null,
                 'category_id' => $product->category_id,
                 'sku' => $product->sku,
                 'unit' => $product->unit,
+                'type' => $product->product_type,
+                'options' => $product->options->map(function($opt) {
+                    return [
+                        'id' => $opt->id,
+                        'name' => $opt->name,
+                        'values' => $opt->values->map(function($val) {
+                            return [
+                                'id' => $val->id,
+                                'value' => $val->value
+                            ];
+                        })
+                    ];
+                }),
+                'variants' => $product->variants->map(function($var) {
+                    return [
+                        'id' => $var->id,
+                        'sku' => $var->sku,
+                        'price' => (float) $var->price,
+                        'stock' => $var->stock,
+                        'option_values' => $var->optionValues->map(function($ov) {
+                             return [
+                                 'option_id' => $ov->product_option_id,
+                                 'value_id' => $ov->id,
+                                 'value' => $ov->value
+                             ];
+                        })
+                    ];
+                }),
             ];
         });
 

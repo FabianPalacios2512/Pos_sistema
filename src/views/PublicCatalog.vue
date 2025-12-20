@@ -64,6 +64,14 @@ const loadCatalogConfig = async () => {
     // Usar valores por defecto
   }
 }
+// Helper para corregir URLs de imágenes
+const getImageUrl = (path) => {
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  // Asegurar que tenga slash inicial si es relativa
+  return path.startsWith('/') ? path : `/${path}`
+}
+
 // Cargar productos del catálogo
 const loadProducts = async () => {
   try {
@@ -75,10 +83,14 @@ const loadProducts = async () => {
         name: product.name,
         description: product.description,
         price: product.price,
-        image_url: product.image || product.image_url || '',
+        image_url: getImageUrl(product.image || product.image_url),
+        images: (product.images || []).map(getImageUrl),
         stock: product.stock || 0,
         category: product.category || 'Sin categoría',
-        category_id: product.category_id
+        category_id: product.category_id,
+        type: product.type || 'simple',
+        options: product.options || [],
+        variants: product.variants || []
       }))
     }
   } catch (error) {

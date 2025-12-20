@@ -525,6 +525,7 @@ let qrAutoRefreshInterval = null // Auto-refresh del QR cada 45 segundos
 
 const config = reactive({
   storeName: '',
+  store_type: 'general', // 🏪 Default
   nit: '',
   phone: '',
   email: '',
@@ -826,6 +827,7 @@ const saveConfig = async () => {
   try {
     const response = await apiClient.put('/tenant/system-settings', {
       company_name: config.storeName,
+      store_type: config.store_type, // 🏪 Guardar tipo de tienda
       company_document: config.nit,
       company_phone: config.phone,
       company_email: config.email,
@@ -853,6 +855,7 @@ const finishOnboarding = async () => {
     try {
       await apiClient.put('/tenant/system-settings', {
         company_name: config.storeName,
+        store_type: config.store_type, // 🏪 Guardar tipo de tienda
         company_document: config.nit,
         company_phone: config.phone,
         company_email: config.email,
@@ -884,6 +887,7 @@ const finishOnboarding = async () => {
         // Guardar en localStorage para aplicar después del login
         localStorage.setItem('pending_onboarding_config', JSON.stringify({
           company_name: config.storeName,
+          store_type: config.store_type, // 🏪 Guardar tipo de tienda
           company_document: config.nit,
           company_phone: config.phone,
           company_email: config.email,

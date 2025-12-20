@@ -57,19 +57,25 @@ export const appStore = reactive({
       const response = await productsService.getForPos(params)
       
       if (response.success) {
-        this.products = response.data
+        // 👗 Los productos ya vienen con sus variantes desde el backend
+        const productsFormatted = response.data
           .filter(product => product.active)
-          .map(product => ({
-            ...product,
-            stock: product.stock || 0,
-          warehouses: product.warehouse_stock || [],  // ✅ Cambiar warehouse_stock a warehouses
-          is_remote: product.is_remote || false,
-          alternative_warehouses: product.alternative_warehouses || [],
-          price: parseFloat(product.price || 0),
-          category_name: product.category_name || 'Sin categoría',
-          category_color: product.category_color || '#6b7280',
-          image_url: product.image || null  // ✅ Backend envía como 'image', no 'image_url'
-        }))
+          .map((product) => {
+            return {
+              ...product,
+              variants: product.variants || [],
+              stock: product.stock || 0,
+              warehouses: product.warehouse_stock || [],
+              is_remote: product.is_remote || false,
+              alternative_warehouses: product.alternative_warehouses || [],
+              price: parseFloat(product.price || 0),
+              category_name: product.category_name || 'Sin categoría',
+              category_color: product.category_color || '#6b7280',
+              image_url: product.image || null
+            }
+          })
+        
+        this.products = productsFormatted
       }
     } catch (error) {
       console.error('❌ Error precargando productos:', error)

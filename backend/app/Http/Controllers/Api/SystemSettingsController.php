@@ -89,6 +89,7 @@ class SystemSettingsController extends Controller
 
             $validated = $request->validate([
                 'company_name' => 'nullable|string|max:255',
+                'store_type' => 'nullable|string|in:general,fashion,food,electronics', // 🏪 Validación de tipo de tienda
                 'company_document' => 'nullable|string|max:255',
                 'company_phone' => 'nullable|string|max:255',
                 'company_email' => 'nullable|email|max:255',

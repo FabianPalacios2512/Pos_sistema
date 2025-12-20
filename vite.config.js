@@ -154,6 +154,11 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: false,
         secure: false,
+      },
+      '/storage': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: false,
+        secure: false,
       }
     },
     // Configurar para que las rutas de Vue Router funcionen al refrescar
