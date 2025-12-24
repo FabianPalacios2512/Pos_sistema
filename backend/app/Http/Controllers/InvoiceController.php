@@ -211,14 +211,20 @@ class InvoiceController extends Controller
                             $preferredStock = DB::table('product_warehouse')
                                 ->where('product_id', $item['product_id'])
                                 ->where('warehouse_id', $preferredWarehouseId)
+                                ->lockForUpdate() // 🔒 LOCK para evitar race condition
                                 ->value('stock');
 
                             if ($preferredStock && $preferredStock >= $item['quantity']) {
                                 // ✅ HAY STOCK en la bodega preferida, descontar de ahí
-                                DB::table('product_warehouse')
+                                $affected = DB::table('product_warehouse')
                                     ->where('product_id', $item['product_id'])
                                     ->where('warehouse_id', $preferredWarehouseId)
+                                    ->where('stock', '>=', $item['quantity']) // 🔒 Validación atómica
                                     ->decrement('stock', $item['quantity']);
+
+                                if ($affected === 0) {
+                                    throw new \Exception("Stock insuficiente en bodega {$preferredWarehouseId} (race condition detectada)");
+                                }
 
                                 $warehouseId = $preferredWarehouseId;
                                 $sourceWarehouseId = $preferredWarehouseId; // ✅ GUARDAR para invoice_item
@@ -248,14 +254,20 @@ class InvoiceController extends Controller
                             $availableWarehouse = DB::table('product_warehouse')
                                 ->where('product_id', $item['product_id'])
                                 ->where('stock', '>=', $item['quantity']) // Stock suficiente
+                                ->lockForUpdate() // 🔒 LOCK para evitar race condition
                                 ->orderBy('stock', 'desc') // Priorizar bodega con más stock
                                 ->first();
 
                             if ($availableWarehouse) {
-                                DB::table('product_warehouse')
+                                $affected = DB::table('product_warehouse')
                                     ->where('product_id', $item['product_id'])
                                     ->where('warehouse_id', $availableWarehouse->warehouse_id)
+                                    ->where('stock', '>=', $item['quantity']) // 🔒 Validación atómica
                                     ->decrement('stock', $item['quantity']);
+
+                                if ($affected === 0) {
+                                    throw new \Exception("Stock insuficiente en bodega alternativa (race condition detectada)");
+                                }
 
                                 $warehouseId = $availableWarehouse->warehouse_id;
                                 $sourceWarehouseId = $availableWarehouse->warehouse_id; // ✅ GUARDAR para invoice_item
@@ -481,13 +493,28 @@ class InvoiceController extends Controller
             ]);
 
             \DB::transaction(function () use ($invoice) {
-                // 1. Restaurar inventario de productos
+                // 1. Restaurar inventario en las bodegas ORIGINALES usando source_warehouse_id
                 foreach ($invoice->invoiceItems as $item) {
                     if ($item->product_id) {
                         $product = Product::find($item->product_id);
                         if ($product) {
-                            $product->increment('stock', $item->quantity);
-                            \Log::info("Stock restaurado: {$product->name} +{$item->quantity} = {$product->stock}");
+                            // 🔒 BUG-016 FIX: Usar source_warehouse_id para restaurar en bodega correcta
+                            $warehouseId = $item->source_warehouse_id ?? 1; // Fallback a bodega principal si no existe
+
+                            DB::table('product_warehouse')
+                                ->where('product_id', $item->product_id)
+                                ->where('warehouse_id', $warehouseId)
+                                ->increment('stock', $item->quantity);
+
+                            // Recalcular stock total del producto
+                            $totalStock = DB::table('product_warehouse')
+                                ->where('product_id', $item->product_id)
+                                ->sum('stock');
+
+                            $product->current_stock = $totalStock;
+                            $product->save();
+
+                            \Log::info("✅ Stock restaurado en bodega original: {$product->name} +{$item->quantity} bodega:{$warehouseId}");
                         }
                     }
                 }
@@ -709,8 +736,11 @@ class InvoiceController extends Controller
                     'surcharge_amount' => $data['surcharge_amount'] ?? 0
                 ]);
 
-                // 1. Obtener cliente
-                $customer = \App\Models\Customer::find($data['customer_id']);
+                // 1. Obtener cliente CON LOCK PESIMISTA 🔒 para evitar race condition BUG-002
+                $customer = \App\Models\Customer::where('id', $data['customer_id'])
+                    ->lockForUpdate()
+                    ->first();
+
                 if (!$customer) {
                     return response()->json([
                         'success' => false,
@@ -912,14 +942,20 @@ class InvoiceController extends Controller
                             $preferredStock = DB::table('product_warehouse')
                                 ->where('product_id', $item['product_id'])
                                 ->where('warehouse_id', $preferredWarehouseId)
+                                ->lockForUpdate() // 🔒 LOCK para evitar race condition
                                 ->value('stock');
 
                             if ($preferredStock && $preferredStock >= $item['quantity']) {
                                 // ✅ HAY STOCK en la bodega preferida, descontar de ahí
-                                DB::table('product_warehouse')
+                                $affected = DB::table('product_warehouse')
                                     ->where('product_id', $item['product_id'])
                                     ->where('warehouse_id', $preferredWarehouseId)
+                                    ->where('stock', '>=', $item['quantity']) // 🔒 Validación atómica
                                     ->decrement('stock', $item['quantity']);
+
+                                if ($affected === 0) {
+                                    throw new \Exception("Stock insuficiente en bodega {$preferredWarehouseId} (race condition detectada)");
+                                }
 
                                 $warehouseId = $preferredWarehouseId;
                                 $sourceWarehouseId = $preferredWarehouseId; // ✅ GUARDAR para invoice_item
@@ -949,14 +985,20 @@ class InvoiceController extends Controller
                             $availableWarehouse = DB::table('product_warehouse')
                                 ->where('product_id', $item['product_id'])
                                 ->where('stock', '>=', $item['quantity']) // Stock suficiente
+                                ->lockForUpdate() // 🔒 LOCK para evitar race condition
                                 ->orderBy('stock', 'desc') // Priorizar bodega con más stock
                                 ->first();
 
                             if ($availableWarehouse) {
-                                DB::table('product_warehouse')
+                                $affected = DB::table('product_warehouse')
                                     ->where('product_id', $item['product_id'])
                                     ->where('warehouse_id', $availableWarehouse->warehouse_id)
+                                    ->where('stock', '>=', $item['quantity']) // 🔒 Validación atómica
                                     ->decrement('stock', $item['quantity']);
+
+                                if ($affected === 0) {
+                                    throw new \Exception("Stock insuficiente en bodega alternativa (race condition detectada)");
+                                }
 
                                 $warehouseId = $availableWarehouse->warehouse_id;
                                 $sourceWarehouseId = $availableWarehouse->warehouse_id; // ✅ GUARDAR para invoice_item
