@@ -113,17 +113,25 @@
               v-model="searchTerm"
               type="text"
               placeholder="Buscar productos, SKU o escanear..."
-              class="block w-full h-10 pl-12 pr-24 text-sm font-semibold bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-zinc-400 rounded-xl shadow-md focus:border-slate-600 dark:focus:border-slate-500 focus:ring-4 focus:ring-slate-500/30 dark:focus:ring-slate-400/30 transition-all duration-200 hover:border-slate-500 dark:hover:border-zinc-600"
+              class="block w-full h-10 pl-12 pr-32 text-sm font-semibold bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-zinc-400 rounded-xl shadow-md focus:border-slate-600 dark:focus:border-slate-500 focus:ring-4 focus:ring-slate-500/30 dark:focus:ring-slate-400/30 transition-all duration-200 hover:border-slate-500 dark:hover:border-zinc-600"
               @keydown.escape="clearSearch"
               @keydown.enter.prevent="handleSearchEnter"
               @input="handleBarcodeInput"
             />
             
             <div class="absolute inset-y-0 right-0 flex items-center pr-2 space-x-1">
+              <!-- Badge "Listo para escanear" -->
+              <div class="hidden sm:flex items-center gap-1 px-2 py-1 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Escanear</span>
+              </div>
+              
               <button
                 @click="startQRScanner"
                 class="p-2 text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-xl transition-all duration-200"
-                title="Escanear código"
+                title="Escanear código QR"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
@@ -258,7 +266,7 @@
                     ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-800 dark:border-slate-700 shadow-lg shadow-slate-500/30' 
                     : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 shadow-sm'"
             >
-                {{ cat.name }}
+                {{ capitalizeText(cat.name) }}
             </button>
         </div>
     </div>
@@ -365,14 +373,14 @@
             class="group cursor-pointer"
             @click="addToCart(product)"
           >
-            <!-- Card Minimalista Fashion -->
-            <div class="relative overflow-hidden rounded-xl bg-gray-100 dark:bg-zinc-900 mb-2">
+            <!-- Card Minimalista Fashion - SIN fondo en contenedor principal -->
+            <div class="relative overflow-hidden rounded-xl mb-2">
               
-              <!-- Aspect ratio para fotos de moda -->
-              <div class="aspect-[4/5] relative">
+              <!-- Aspect ratio para fotos de moda - Fondo solo cuando NO hay imagen -->
+              <div class="aspect-[4/5] relative" :class="(product.image_url || product.image) ? '' : 'bg-gray-100 dark:bg-zinc-900'">
                 
                 <!-- Badge NUEVO (para productos recientes) -->
-                <div v-if="isNewProduct(product)" class="absolute top-2 left-2 z-20 px-2 py-0.5 bg-black dark:bg-white text-white dark:text-black text-[8px] font-bold uppercase tracking-wider rounded-full">
+                <div v-if="isNewProduct(product)" class="absolute top-2 left-2 z-20 px-2 py-0.5 bg-black dark:bg-white text-white dark:text-black text-[8px] font-bold uppercase tracking-wider rounded-full shadow-lg">
                   Nuevo
                 </div>
                 
@@ -382,20 +390,20 @@
                   {{ getProductQuantityInCart(product.id) }}
                 </div>
                 
-                <!-- Imagen principal -->
+                <!-- Imagen principal - LLENA TODO EL ESPACIO -->
                 <img
                   v-if="product.image_url || product.image"
                   :src="getProductImage(product)"
                   :alt="product.name"
-                  class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  class="w-full h-full object-cover rounded-xl transition-transform duration-700 ease-out group-hover:scale-105"
                   loading="lazy"
                   @error="(e) => handleImageError(e, product)"
                 />
                 
-                <!-- Placeholder elegante fashion -->
-                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900">
-                  <div class="text-center opacity-50">
-                    <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="0.5">
+                <!-- Placeholder FASHION MEJORADO - Icono de prenda más visible -->
+                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-50 to-white dark:from-zinc-800 dark:via-zinc-850 dark:to-zinc-900">
+                  <div class="text-center">
+                    <svg class="w-20 h-20 mx-auto text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
                   </div>
@@ -444,7 +452,7 @@
             @click="addToCart(product)"
           >
             <!-- Imagen -->
-            <div class="w-24 h-32 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-900">
+            <div class="w-24 h-32 flex-shrink-0 rounded-xl overflow-hidden" :class="(product.image_url || product.image) ? '' : 'bg-gradient-to-br from-gray-100 via-gray-50 to-white dark:from-zinc-800 dark:via-zinc-850 dark:to-zinc-900'">
               <img
                 v-if="product.image_url || product.image"
                 :src="getProductImage(product)"
@@ -453,8 +461,8 @@
                 loading="lazy"
               />
               <div v-else class="w-full h-full flex items-center justify-center">
-                <svg class="w-8 h-8 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                <svg class="w-10 h-10 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
               </div>
             </div>
@@ -498,8 +506,8 @@
           @click="addToCart(product)"
         >
           
-          <!-- 🖼️ CONTENEDOR DE IMAGEN - Con placeholder elegante para productos sin imagen -->
-          <div class="aspect-square bg-gray-100 dark:bg-zinc-900 relative flex items-center justify-center p-2 border-b border-gray-100 dark:border-zinc-700">
+          <!-- 🖼️ CONTENEDOR DE IMAGEN - OPTIMIZADO: Mayor área visual (p-2 → p-1) -->
+          <div class="aspect-square bg-gray-50 dark:bg-zinc-900/50 relative flex items-center justify-center p-1 border-b border-gray-100 dark:border-zinc-700">
              
              <!-- Badge de cantidad en carrito (gris oscuro profesional - menos ruido visual) -->
              <div v-if="getProductQuantityInCart(product.id) > 0" 
@@ -513,19 +521,20 @@
                {{ product.alternative_warehouses[0].name }}
              </div>
 
-             <!-- Imagen con fallback a placeholder elegante -->
+             <!-- Imagen AMPLIADA - Ocupa más espacio del card -->
              <img
               v-if="product.image_url || product.image"
               :src="getProductImage(product)"
               :alt="product.name"
-              class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
               @error="(e) => handleImageError(e, product)"
             />
-            <!-- Placeholder cuando NO hay imagen - Icono de caja elegante -->
-            <div v-else class="w-full h-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            <!-- Placeholder FASHION - Silueta de prenda en lugar de caja genérica -->
+            <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50 dark:from-zinc-800 dark:to-zinc-900">
+              <!-- Icono de prenda (camiseta/vestido) -->
+              <svg class="w-16 h-16 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
               </svg>
             </div>
           </div>
@@ -573,6 +582,7 @@
         </span>
       </div>
 
+      <!-- Botón Cliente (COMPLETO - Modo General) -->
       <button
         id="tour-customer-btn"
         @click="showCustomerSelector = true"
@@ -596,7 +606,7 @@
           </div>
 
           <div class="flex flex-col text-left overflow-hidden flex-1">
-             <span class="text-[10px] font-bold uppercase tracking-wider mb-0.5"
+             <span class="text-[10px] font-bold uppercase tracking-wider"
                    :class="selectedCustomer ? 'text-indigo-500 dark:text-indigo-400' : 'text-slate-500 dark:text-zinc-500'">
                {{ selectedCustomer ? 'Cliente Asignado' : 'Asignar Cliente' }}
              </span>
@@ -659,9 +669,24 @@
           <!-- 📝 Info del producto -->
           <div class="flex-1 min-w-0">
             <h3 class="text-sm font-semibold text-slate-800 dark:text-zinc-200 truncate leading-tight" :title="item.name">
-              {{ item.name }}
+              {{ item.name.split(' (')[0] }}
             </h3>
-            <p class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5 tabular-nums">
+            <!-- Variantes con círculos de color -->
+            <div v-if="item.variant_options" class="flex items-center gap-1.5 mt-0.5">
+              <template v-for="(option, idx) in parseVariantOptions(item.variant_options)" :key="idx">
+                <!-- Si es COLOR, mostrar círculo -->
+                <div v-if="option.type === 'COLOR'" 
+                     class="w-4 h-4 rounded-full border-2 border-white dark:border-zinc-700 shadow-sm ring-1 ring-gray-300 dark:ring-zinc-600" 
+                     :style="{ backgroundColor: option.value }"
+                     :title="option.label">
+                </div>
+                <!-- Si es TALLA u otro, mostrar texto -->
+                <span v-else class="text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700">
+                  {{ option.value }}
+                </span>
+              </template>
+            </div>
+            <p v-else class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5 tabular-nums">
               ${{ item.price.toLocaleString() }}/{{ getUnitText(item.measurement_unit || 'unit') }}
             </p>
           </div>
@@ -750,55 +775,26 @@
           </button>
         </div>
         
-        <!-- Cupón y Puntos -->
-        <div class="flex gap-1.5">
+        <!-- Puntos de Fidelización -->
+        <div v-if="canUseLoyaltyPoints" class="mb-1.5">
           <button
-            v-if="canUseLoyaltyPoints"
             @click="usePoints = !usePoints"
-            class="flex-1 text-[9px] font-bold flex items-center justify-center gap-1 px-2 py-1.5 rounded-md border transition-all"
-            :class="usePoints ? 'bg-amber-500 text-white border-amber-500' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400'"
+            class="w-full text-xs font-bold flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border transition-all"
+            :class="usePoints ? 'bg-amber-500 text-white border-amber-500 shadow-md' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400 hover:border-amber-400 dark:hover:border-amber-600'"
           >
-            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
             </svg>
-            Puntos
-          </button>
-          
-          <button
-            @click="showPromoCodeInput = !showPromoCodeInput"
-            class="flex-1 text-[9px] font-bold flex items-center justify-center gap-1 px-2 py-1.5 rounded-md border transition-all"
-            :class="showPromoCodeInput ? 'bg-slate-700 text-white border-slate-700' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400'"
-          >
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-            </svg>
-            Cupón
-          </button>
-        </div>
-        
-        <!-- Input de Cupón (colapsable) -->
-        <div v-if="showPromoCodeInput" class="flex gap-1.5">
-          <input
-            v-model="promoCode"
-            type="text"
-            placeholder="Código..."
-            class="flex-1 px-2 py-1.5 text-xs border border-gray-200 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent"
-            @keyup.enter="applyPromoCode"
-          />
-          <button
-            @click="applyPromoCode"
-            class="px-3 py-1.5 bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold rounded-md hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
-          >
-            OK
+            <span>Usar Puntos de Fidelización</span>
           </button>
         </div>
         
         <!-- Botones de acción -->
-        <div class="flex gap-1.5 pt-0.5">
+        <div class="flex gap-2 pt-0.5">
           <button 
             @click="showConfirmClearCart" 
             :disabled="cart.items.length === 0"
-            class="px-2 py-2 text-[9px] font-bold bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 rounded-md border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-40 transition-all"
+            class="px-4 py-2.5 text-sm font-bold bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 rounded-lg border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
           >
             Cancelar
           </button>
@@ -806,10 +802,10 @@
           <button 
             @click="printQuote" 
             :disabled="!canCreateQuotation"
-            class="px-2 py-2 text-[9px] font-bold bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 rounded-md border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-40 transition-all flex items-center gap-0.5"
+            class="px-4 py-2.5 text-sm font-bold bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 rounded-lg border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 shadow-sm"
           >
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            Cotizar
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Cotizar</span>
           </button>
           
           <button
@@ -2516,6 +2512,37 @@ const getCartItemImage = (item) => {
   }
   
   return generateAvatarSVG(item.name)
+}
+
+// Función para parsear las opciones de variantes y detectar colores
+const parseVariantOptions = (variantOptions) => {
+  if (!variantOptions) return []
+  
+  // Formato: "Talla: 40 / Color: #CB5A5A"
+  const options = variantOptions.split(' / ')
+  
+  return options.map(opt => {
+    const [label, value] = opt.split(': ').map(s => s.trim())
+    
+    // Detectar si es un color (empieza con #)
+    const isColor = value && value.startsWith('#')
+    
+    return {
+      label: label,
+      value: value,
+      type: isColor ? 'COLOR' : label.toUpperCase()
+    }
+  }).filter(opt => opt.value) // Filtrar vacíos
+}
+
+// Función para capitalizar texto - Capitaliza cada palabra (Pantalón, Camisa Hombres, etc.)
+const capitalizeText = (text) => {
+  if (!text) return ''
+  // Capitalizar primera letra de CADA palabra, mantener resto (para tildes como "Pantalón")
+  return text
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
 }
 
 // Función para obtener el texto de la unidad
@@ -5065,6 +5092,24 @@ const handleKeyboard = (event) => {
   // Si la calculadora está abierta, manejar eventos de teclado para la calculadora
   if (showCalculator.value) {
     handleCalculatorKeyboard(event)
+    return
+  }
+  
+  // 🔍 SIMULACIÓN DE LECTOR DE CÓDIGOS DE BARRAS
+  // Si el usuario NO está en un input/textarea y presiona una tecla alfanumérica,
+  // automáticamente enfocar el buscador y dejar que la tecla se escriba allí
+  const isTypingInInput = event.target.tagName === 'INPUT' || 
+                          event.target.tagName === 'TEXTAREA' || 
+                          event.target.isContentEditable
+  
+  const isAlphanumeric = /^[a-zA-Z0-9]$/.test(event.key)
+  
+  // Si está escribiendo fuera de un input Y es una tecla alfanumérica
+  if (!isTypingInInput && isAlphanumeric && searchInput.value) {
+    event.preventDefault()
+    searchInput.value.focus()
+    // Agregar la tecla al searchTerm manualmente
+    searchTerm.value += event.key
     return
   }
   
