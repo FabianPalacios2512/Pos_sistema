@@ -22,6 +22,7 @@ class ProductAnalyticsController extends Controller
                     'p.id',
                     'p.name',
                     'p.sku',
+                    'p.product_type',  // 🆕 Para detectar si es 'variable'
                     'p.cost_price',
                     'p.sale_price',
                     'p.current_stock',
@@ -50,12 +51,46 @@ class ProductAnalyticsController extends Controller
                 })
                 ->where('p.active', 1)
                 ->groupBy([
-                    'p.id', 'p.name', 'p.sku', 'p.cost_price', 'p.sale_price',
+                    'p.id', 'p.name', 'p.sku', 'p.product_type', 'p.cost_price', 'p.sale_price',
                     'p.current_stock', 'p.min_stock', 'p.unit', 'p.active', 'p.supplier_id',
                     'c.name', 's.name'
                 ])
                 ->orderBy('units_sold', 'desc')
-                ->get();
+                ->get()
+                ->map(function($product) {
+                    // 🆕 Para productos fashion, obtener costo desde variantes
+                    if ($product->product_type === 'variable') {
+                        $variantCosts = DB::table('product_variants')
+                            ->where('product_id', $product->id)
+                            ->whereNotNull('cost_price')
+                            ->where('cost_price', '>', 0)
+                            ->pluck('cost_price');
+
+                        if ($variantCosts->isNotEmpty()) {
+                            $minCost = $variantCosts->min();
+                            $maxCost = $variantCosts->max();
+                            $avgCost = $variantCosts->avg();
+
+                            // Usar costo promedio para cálculos
+                            $product->cost_price = $avgCost;
+                            $product->cost_price_display = $minCost == $maxCost
+                                ? '$' . number_format($minCost, 0, ',', '.')
+                                : '$' . number_format($minCost, 0, ',', '.') . ' - $' . number_format($maxCost, 0, ',', '.');
+
+                            // Recalcular margen con costo promedio
+                            if ($product->sale_price > 0) {
+                                $product->margin_percentage = round((($product->sale_price - $avgCost) / $product->sale_price) * 100, 1);
+                            }
+                        } else {
+                            $product->cost_price = 0;
+                            $product->cost_price_display = '$0';
+                        }
+                    } else {
+                        $product->cost_price_display = '$' . number_format($product->cost_price ?? 0, 0, ',', '.');
+                    }
+
+                    return $product;
+                });
 
             // Calcular estadísticas generales
             $totalProducts = $products->count();

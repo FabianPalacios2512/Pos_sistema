@@ -372,10 +372,8 @@
                     v-model="form.owner_name" 
                     type="text" 
                     required
-                    :readonly="!!googleUserData"
-                    @input="form.owner_name = form.owner_name.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\\s'-]/g, '')"
-                    class="w-full h-14 px-4 rounded-xl border-2 transition-all outline-none font-medium placeholder-gray-400" 
-                    :class="googleUserData ? 'bg-gray-100 text-gray-700 border-gray-200 cursor-not-allowed' : 'bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-gray-900'"
+                    @input="form.owner_name = form.owner_name.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s'-]/g, '')"
+                    class="w-full h-14 px-4 rounded-xl border-2 transition-all outline-none font-medium placeholder-gray-400 bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-gray-900"
                     placeholder="Ej. Juan Pérez"
                   >
                 </div>
@@ -735,8 +733,8 @@ const validateEmail = (email) => {
 }
 
 const validateOwnerName = (name) => {
-  // Solo permite letras, espacios y acentos
-  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/
+  // Permite letras, números, espacios, acentos y guiones
+  const nameRegex = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s'-]+$/
   return nameRegex.test(name) && name.trim().length >= 3
 }
 
@@ -918,7 +916,7 @@ const validateStep1 = async () => {
   
   // Validar nombre del propietario
   if (!validateOwnerName(form.owner_name)) {
-    alert('El nombre debe contener solo letras y espacios')
+    alert('El nombre debe contener al menos 3 caracteres (se permiten letras, números, espacios y guiones)')
     return
   }
   

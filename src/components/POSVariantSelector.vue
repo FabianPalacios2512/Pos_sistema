@@ -39,44 +39,37 @@
                 {{ optionGroup.name }}
               </h4>
               
-              <!-- Para COLORES: Círculos Reales -->
+              <!-- Para COLORES: Solo Círculos (sin texto) -->
               <div v-if="optionGroup.name.toLowerCase().includes('color')" class="flex items-center gap-3 flex-wrap">
                 <button v-for="value in optionGroup.values" 
                         :key="value"
                         @click="selectOption(optionGroup.name, value)"
                         :disabled="!isOptionAvailable(optionGroup.name, value)"
+                        :title="value"
                         :class="[
                           'relative transition-all duration-200 touch-manipulation group',
                           !isOptionAvailable(optionGroup.name, value) && 'opacity-40 cursor-not-allowed'
                         ]">
                   
-                  <!-- Swatch de Color -->
-                  <div class="relative">
-                    <!-- Ring de selección -->
-                    <div v-if="selectedOptions[optionGroup.name] === value"
-                         class="absolute -inset-1 rounded-full border-2 border-gray-900 dark:border-white"></div>
-                    
-                    <!-- Círculo de color -->
-                    <div :style="{ backgroundColor: getColorHex(value) || '#9CA3AF' }"
-                         :class="[
-                           'w-10 h-10 rounded-full transition-all',
-                           getColorHex(value) === '#F3F4F6' && 'border-2 border-gray-300 dark:border-zinc-700',
-                           !isOptionAvailable(optionGroup.name, value) && 'opacity-50'
-                         ]">
-                      <!-- X para sin stock -->
-                      <div v-if="!isOptionAvailable(optionGroup.name, value)"
-                           class="w-full h-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                      </div>
+                  <!-- Ring de selección -->
+                  <div v-if="selectedOptions[optionGroup.name] === value"
+                       class="absolute -inset-1.5 rounded-full border-3 border-slate-700 dark:border-slate-300 shadow-lg"></div>
+                  
+                  <!-- Círculo de color (detecta si es HEX o nombre y convierte) -->
+                  <div :style="{ backgroundColor: getColorDisplay(value) }"
+                       :class="[
+                         'w-12 h-12 rounded-full transition-all shadow-md hover:shadow-xl hover:scale-110',
+                         (value.toUpperCase() === '#FFFFFF' || getColorDisplay(value).toUpperCase() === '#FFFFFF') && 'border-2 border-gray-300 dark:border-zinc-600',
+                         !isOptionAvailable(optionGroup.name, value) && 'opacity-50'
+                       ]">
+                    <!-- X para sin stock -->
+                    <div v-if="!isOptionAvailable(optionGroup.name, value)"
+                         class="w-full h-full flex items-center justify-center">
+                      <svg class="w-6 h-6 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
                     </div>
                   </div>
-                  
-                  <!-- Nombre del color debajo -->
-                  <p class="text-xs text-center text-gray-600 dark:text-zinc-400 mt-1.5 font-medium">
-                    {{ value }}
-                  </p>
                 </button>
               </div>
               
@@ -312,20 +305,96 @@ const formatCurrency = (value) => {
   }).format(value || 0)
 }
 
+// Función helper: Detecta si es HEX o nombre de color y devuelve HEX
+const getColorDisplay = (value) => {
+  // Si ya es un código HEX, devolverlo directamente
+  if (value.startsWith('#')) {
+    return value
+  }
+  
+  // Si es un nombre de color, convertirlo usando el diccionario
+  return getColorHex(value) || value
+}
+
 const getColorHex = (colorName) => {
   const colorMap = {
+    // ROJOS
     'rojo': '#EF4444', 'red': '#EF4444',
+    'rojo oscuro': '#B91C1C', 'rojo claro': '#FCA5A5', 'rojo brillante': '#DC2626',
+    'carmesí': '#DC143C', 'carmesi': '#DC143C', 'crimson': '#DC143C',
+    'escarlata': '#FF2400', 'granate': '#800000', 'burdeos': '#7C0A02',
+    'vino': '#722F37', 'cereza': '#DE3163',
+    
+    // AZULES
     'azul': '#3B82F6', 'blue': '#3B82F6',
+    'azul oscuro': '#1E3A8A', 'azul claro': '#93C5FD', 'azul cielo': '#87CEEB',
+    'azul marino': '#000080', 'marino': '#000080', 'navy': '#000080',
+    'azul rey': '#4169E1', 'azul eléctrico': '#7DF9FF', 'azul turquesa': '#40E0D0',
+    'turquesa': '#40E0D0', 'cian': '#00FFFF', 'celeste': '#B0E0E6',
+    'azul pastel': '#AEC6CF', 'añil': '#4B0082', 'anil': '#4B0082',
+    
+    // VERDES
     'verde': '#10B981', 'green': '#10B981',
+    'verde oscuro': '#065F46', 'verde claro': '#86EFAC', 'verde limón': '#32CD32',
+    'verde marino': '#2E8B57', 'verde oliva': '#808000', 'oliva': '#808000',
+    'verde menta': '#98FF98', 'menta': '#98FF98', 'verde agua': '#7FFFD4',
+    'esmeralda': '#50C878', 'jade': '#00A86B', 'lima': '#00FF00',
+    'verde militar': '#4B5320', 'verde bosque': '#228B22', 'verde pino': '#01796F',
+    
+    // AMARILLOS
     'amarillo': '#F59E0B', 'yellow': '#F59E0B',
-    'negro': '#1F2937', 'black': '#1F2937',
-    'blanco': '#F3F4F6', 'white': '#F3F4F6',
-    'gris': '#6B7280', 'gray': '#6B7280',
-    'rosa': '#EC4899', 'pink': '#EC4899',
-    'morado': '#8B5CF6', 'purple': '#8B5CF6',
+    'amarillo claro': '#FDE68A', 'amarillo oscuro': '#D97706', 'amarillo brillante': '#FFFF00',
+    'oro': '#FFD700', 'dorado': '#FFD700', 'gold': '#FFD700',
+    'mostaza': '#FFDB58', 'canario': '#FFFF99',
+    
+    // NARANJAS
     'naranja': '#F97316', 'orange': '#F97316',
-    'café': '#92400E', 'brown': '#92400E',
-    'beige': '#D4A373', 'beige': '#D4A373'
+    'naranja claro': '#FDBA74', 'naranja oscuro': '#C2410C', 'naranja brillante': '#FF8C00',
+    'coral': '#FF7F50', 'durazno': '#FFDAB9', 'melocotón': '#FFE5B4', 'melocoton': '#FFE5B4',
+    'salmón': '#FA8072', 'salmon': '#FA8072',
+    
+    // ROSAS
+    'rosa': '#EC4899', 'pink': '#EC4899',
+    'rosa claro': '#FBB6CE', 'rosa oscuro': '#BE185D', 'rosa pastel': '#FFD1DC',
+    'rosa fuerte': '#FF1493', 'rosa chicle': '#FF69B4', 'magenta': '#FF00FF',
+    'fucsia': '#FF00FF', 'fuchsia': '#FF00FF',
+    
+    // MORADOS/PÚRPURAS
+    'morado': '#8B5CF6', 'purple': '#8B5CF6',
+    'morado claro': '#C4B5FD', 'morado oscuro': '#6B21A8', 'púrpura': '#A020F0', 'purpura': '#A020F0',
+    'violeta': '#8F00FF', 'lila': '#C8A2C8', 'lavanda': '#E6E6FA',
+    'ciruela': '#8E4585', 'berenjena': '#614051',
+    
+    // MARRONES/CAFÉS
+    'café': '#92400E', 'brown': '#92400E', 'marrón': '#A52A2A', 'marron': '#A52A2A',
+    'café claro': '#D2691E', 'café oscuro': '#654321', 'chocolate': '#D2691E',
+    'caramelo': '#C68E17', 'canela': '#D2691E', 'terracota': '#E2725B',
+    'cobre': '#B87333', 'bronce': '#CD7F32',
+    
+    // BEIGES/CREMAS
+    'beige': '#D4A373', 'crema': '#FFFDD0', 'marfil': '#FFFFF0',
+    'arena': '#C2B280', 'champán': '#F7E7CE', 'champan': '#F7E7CE',
+    'vainilla': '#F3E5AB', 'hueso': '#E3DAC9',
+    
+    // GRISES
+    'gris': '#6B7280', 'gray': '#6B7280', 'grey': '#6B7280',
+    'gris claro': '#D1D5DB', 'gris oscuro': '#374151', 'gris medio': '#9CA3AF',
+    'plata': '#C0C0C0', 'plateado': '#C0C0C0', 'silver': '#C0C0C0',
+    'ceniza': '#B2BEB5', 'pizarra': '#708090', 'carbón': '#36454F', 'carbon': '#36454F',
+    
+    // NEGROS
+    'negro': '#1F2937', 'black': '#1F2937',
+    'negro claro': '#374151', 'negro mate': '#28282B', 'negro brillante': '#000000',
+    'ébano': '#555D50', 'ebano': '#555D50', 'ónix': '#0F0F0F', 'onix': '#0F0F0F',
+    
+    // BLANCOS
+    'blanco': '#F3F4F6', 'white': '#F3F4F6',
+    'blanco roto': '#FAF9F6', 'blanco hueso': '#F5F5DC', 'blanco perla': '#FDEEF4',
+    'blanco nieve': '#FFFAFA', 'nieve': '#FFFAFA',
+    
+    // ESPECIALES
+    'transparente': 'transparent', 'neutro': '#E5E7EB',
+    'multicolor': 'linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #9400D3)'
   }
   
   return colorMap[colorName.toLowerCase()] || null

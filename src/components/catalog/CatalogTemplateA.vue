@@ -415,17 +415,50 @@
                 <div v-for="option in selectedProduct.options" :key="option.id" class="space-y-3">
                   <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">{{ option.name }}</span>
                   <div class="flex flex-wrap gap-3">
-                    <button 
-                      v-for="val in option.values" 
-                      :key="val.id"
-                      @click="selectedOptions[option.id] = val.id"
-                      class="min-w-[3rem] h-10 px-3 flex items-center justify-center border transition-all duration-200 text-sm font-medium rounded-md"
-                      :class="selectedOptions[option.id] === val.id
-                        ? 'bg-gray-900 text-white border-gray-900' 
-                        : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900'"
-                    >
-                      {{ val.value }}
-                    </button>
+                    <!-- Si es COLOR, mostrar bolitas de color -->
+                    <template v-if="option.name.toUpperCase() === 'COLOR'">
+                      <button 
+                        v-for="val in option.values" 
+                        :key="`color-${val.id}`"
+                        @click="selectedOptions[option.id] = val.id"
+                        class="w-10 h-10 flex items-center justify-center border-2 transition-all duration-200 rounded-full overflow-hidden group relative"
+                        :class="selectedOptions[option.id] === val.id
+                          ? 'border-gray-900 scale-110 shadow-lg' 
+                          : 'border-gray-300 hover:border-gray-600 hover:scale-105'"
+                      >
+                        <div 
+                          :style="{ backgroundColor: val.value }" 
+                          class="w-full h-full"
+                          :title="val.value"
+                        ></div>
+                        <!-- Checkmark cuando está seleccionado -->
+                        <svg 
+                          v-if="selectedOptions[option.id] === val.id" 
+                          class="absolute w-5 h-5 text-white drop-shadow-lg" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor" 
+                          stroke-width="3"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </button>
+                    </template>
+                    
+                    <!-- Para otras opciones (TALLA, etc) mostrar texto -->
+                    <template v-else>
+                      <button 
+                        v-for="val in option.values" 
+                        :key="`text-${val.id}`"
+                        @click="selectedOptions[option.id] = val.id"
+                        class="min-w-[3rem] h-10 px-3 flex items-center justify-center border transition-all duration-200 text-sm font-medium rounded-md"
+                        :class="selectedOptions[option.id] === val.id
+                          ? 'bg-gray-900 text-white border-gray-900' 
+                          : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900'"
+                      >
+                        {{ val.value }}
+                      </button>
+                    </template>
                   </div>
                 </div>
               </div>

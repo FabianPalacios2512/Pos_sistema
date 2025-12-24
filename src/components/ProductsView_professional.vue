@@ -817,10 +817,10 @@
     <div v-if="showProductModal" 
          class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50"
          @click.self="showProductModal = false">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden border border-gray-300 dark:border-zinc-800 mx-4">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden border border-gray-300 dark:border-zinc-800 mx-4 flex flex-col">
         
         <!-- Header -->
-        <div v-if="!isFashionMode" class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-8 py-5">
+        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-8 py-5 flex-shrink-0">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center border border-gray-200 dark:border-zinc-700">
@@ -846,50 +846,22 @@
           </div>
         </div>
 
-        <div class="flex h-[calc(95vh-160px)]">
+        <div class="flex flex-1 overflow-hidden">
           <!-- Formulario Principal -->
-          <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-zinc-950" :class="{'p-8': !isFashionMode, 'p-0': isFashionMode}">
+          <div class="flex-1 overflow-y-auto" :class="isFashionMode ? 'bg-white dark:bg-zinc-900 p-8' : 'bg-gray-50 dark:bg-zinc-950 p-8'">
             
-            <!-- 👗 Toggle Tipo de Producto -->
-            <div v-if="!isEditing" class="mb-6 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm" :class="{'mx-6 mt-6': isFashionMode}">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-lg flex items-center justify-center transition-colors"
-                       :class="isFashionMode ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'">
-                    <svg v-if="isFashionMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                    </svg>
-                    <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="font-bold text-gray-900 dark:text-white">
-                      {{ isFashionMode ? 'Producto con Variantes (Ropa/Tallas)' : 'Producto Simple' }}
-                    </h3>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400">
-                      {{ isFashionMode ? 'Crear múltiples variantes (Talla S/M/L, Colores) automáticamente' : 'Producto único con stock simple' }}
-                    </p>
-                  </div>
-                </div>
-                
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" v-model="isFashionMode" class="sr-only peer">
-                  <div class="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
-                </label>
-              </div>
+            <!-- 👗 Formulario Fashion (integrado sin header ni footer propio) -->
+            <div v-if="isFashionMode">
+              <FashionProductForm 
+                ref="fashionFormRef"
+                :categories="categories"
+                :suppliers="suppliers"
+                @save="handleFashionSave"
+                @cancel="showProductModal = false"
+                @create-category="showCategoryModal = true"
+                @create-supplier="showSupplierModal = true"
+              />
             </div>
-
-            <!-- 👗 Formulario Fashion -->
-            <FashionProductForm 
-              ref="fashionFormRef"
-              v-if="isFashionMode"
-              :categories="categories"
-              :suppliers="suppliers"
-              @save="handleFashionSave"
-              @cancel="showProductModal = false"
-              @create-category="showCategoryModal = true"
-            />
 
             <form v-else @submit.prevent="saveProduct" class="space-y-6">
               
@@ -1485,6 +1457,14 @@
             <!-- Botones de acción -->
             <div class="mt-6 space-y-2.5">
               <button type="button" 
+                      v-if="isFashionMode"
+                      @click="saveFashionProduct"
+                      :disabled="loading"
+                      class="w-full px-5 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-lg font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ loading ? 'Guardando...' : 'Crear Producto' }}
+              </button>
+              
+              <button v-else type="button" 
                       @click="saveProduct"
                       :disabled="loading"
                       class="w-full px-5 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-lg font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
@@ -1498,6 +1478,22 @@
               </button>
             </div>
           </div>
+        </div>
+        
+        <!-- Footer con botones (solo para fashion mode) -->
+        <div v-if="isFashionMode" class="flex-shrink-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-8 py-4 flex items-center justify-end gap-3">
+          <button type="button" 
+                  @click="showProductModal = false"
+                  class="px-6 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-lg font-semibold transition-colors border border-gray-300 dark:border-zinc-700">
+            Cancelar
+          </button>
+          
+          <button type="button" 
+                  @click="saveFashionProduct"
+                  :disabled="loading"
+                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-lg font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            {{ loading ? 'Guardando...' : 'Crear Producto' }}
+          </button>
         </div>
       </div>
     </div>
@@ -3697,6 +3693,31 @@ const saveInventoryChanges = async () => {
     // Recargar productos
     await loadProducts()
     
+    // Actualizar el producto seleccionado con los datos frescos
+    if (selectedProduct.value) {
+      const updatedProduct = products.value.find(p => p.id === selectedProduct.value.id)
+      if (updatedProduct) {
+        // Fetch detalles completos del producto actualizado
+        try {
+          const response = await productsService.getById(updatedProduct.id)
+          if (response.success) {
+            selectedProduct.value = response.data
+            
+            // Reinicializar campos editables
+            if (selectedProduct.value.variants) {
+              selectedProduct.value.variants.forEach(variant => {
+                variant.editableStock = variant.stock || 0
+                variant.editablePrice = variant.price || 0
+                variant.editableCost = variant.cost_price || 0
+              })
+            }
+          }
+        } catch (error) {
+          console.error('Error actualizando producto seleccionado:', error)
+        }
+      }
+    }
+    
   } catch (error) {
     console.error('Error saving inventory changes:', error)
     showNotification('Error', error.message || 'No se pudieron guardar los cambios', 'error')
@@ -4145,6 +4166,13 @@ const checkMissingImportantFields = () => {
 }
 
 // 👗 Guardar producto tipo Ropa/Variantes
+const saveFashionProduct = async () => {
+  // Llamar al método handleSubmit del componente hijo
+  if (fashionFormRef.value) {
+    fashionFormRef.value.handleSubmit()
+  }
+}
+
 const handleFashionSave = async (productData) => {
   try {
     loading.value = true
@@ -4156,9 +4184,15 @@ const handleFashionSave = async (productData) => {
     const formData = new FormData()
     formData.append('name', productData.name)
     formData.append('product_type', productData.type)
-    formData.append('category_id', productData.category_id)
+    // Solo agregar category_id si tiene valor válido
+    if (productData.category_id) {
+      formData.append('category_id', productData.category_id)
+    }
+    // Agregar supplier_id si existe
+    if (productData.supplier_id) {
+      formData.append('supplier_id', productData.supplier_id)
+    }
     formData.append('description', productData.description || '')
-    formData.append('cost_price', productData.cost_price || 0) // Agregar costo base
     formData.append('sku', productData.sku || `SKU-${Date.now()}`) // Agregar SKU (requerido)
     
     // Options
@@ -4177,14 +4211,8 @@ const handleFashionSave = async (productData) => {
     if (productData.variants) {
       productData.variants.forEach((variant, index) => {
         formData.append(`variants[${index}][sku]`, variant.sku)
-        formData.append(`variants[${index}][sale_price]`, variant.price) // Backend espera sale_price en variantes? Controller dice sale_price=0 en padre, pero variantes?
-        // Revisando controller: 
-        // foreach ($request->variants as $varData) { ... 'sale_price' => $varData['price'] ?? 0 ... }
-        // Espera 'price' o 'sale_price'?
-        // ProductController.php: 
-        // $variant = $product->variants()->create([ ... 'sale_price' => $varData['price'] ?? 0 ... ]);
-        // Entonces espera 'price' dentro del array de variantes.
         formData.append(`variants[${index}][price]`, variant.price)
+        formData.append(`variants[${index}][cost_price]`, variant.cost || 0)
         formData.append(`variants[${index}][stock]`, variant.stock)
         formData.append(`variants[${index}][active]`, variant.active ? 1 : 0)
         

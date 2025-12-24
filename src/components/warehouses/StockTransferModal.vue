@@ -113,7 +113,7 @@
                       v-for="p in availableProducts" 
                       :key="p.id" 
                       :value="p.id">
-                      {{ p.name }} (Stock: {{ getProductStock(p.id) }})
+                      {{ p.name }} (Stock: {{ getProductStock(p.id) }}) - {{ p.cost_price_display || '$0' }}
                     </option>
                   </select>
                 </div>

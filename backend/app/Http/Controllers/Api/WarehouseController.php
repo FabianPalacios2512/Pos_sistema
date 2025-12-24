@@ -56,6 +56,7 @@ class WarehouseController extends Controller
                     'p.sku',
                     'p.barcode',
                     'p.image_url',
+                    'p.product_type',  // 🆕 Necesitamos saber si es 'variable'
                     'p.cost_price',
                     'p.sale_price',
                     'p.min_stock',
@@ -66,7 +67,35 @@ class WarehouseController extends Controller
                     'pw.stock as stock'  // Ya no necesitamos COALESCE porque siempre habrá valor
                 )
                 ->orderBy('p.name', 'asc')
-                ->get();
+                ->get()
+                ->map(function($product) {
+                    // 🆕 Para productos fashion, calcular costo desde variantes
+                    if ($product->product_type === 'variable') {
+                        $variantCosts = \DB::table('product_variants')
+                            ->where('product_id', $product->id)
+                            ->whereNotNull('cost_price')
+                            ->where('cost_price', '>', 0)
+                            ->pluck('cost_price');
+
+                        if ($variantCosts->isNotEmpty()) {
+                            // Calcular rango de costos
+                            $minCost = $variantCosts->min();
+                            $maxCost = $variantCosts->max();
+
+                            $product->cost_price = $minCost; // Costo mínimo por defecto
+                            $product->cost_price_display = $minCost == $maxCost
+                                ? '$' . number_format($minCost, 0, ',', '.')
+                                : '$' . number_format($minCost, 0, ',', '.') . ' - $' . number_format($maxCost, 0, ',', '.');
+                        } else {
+                            $product->cost_price_display = '$0';
+                        }
+                    } else {
+                        // Producto simple: usar cost_price directo
+                        $product->cost_price_display = '$' . number_format($product->cost_price ?? 0, 0, ',', '.');
+                    }
+
+                    return $product;
+                });
 
             // Calcular resumen
             $totalStock = $products->sum('stock');

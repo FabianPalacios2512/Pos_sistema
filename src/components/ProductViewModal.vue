@@ -16,10 +16,10 @@
 -->
 <template>
   <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="$emit('close')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
       
-      <!-- Header -->
-      <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+      <!-- Header (fixed) -->
+      <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <div class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
@@ -61,8 +61,8 @@
         </div>
       </div>
 
-      <!-- Contenido -->
-      <div class="p-6">
+      <!-- Contenido (scrollable) -->
+      <div class="p-6 overflow-y-auto flex-1" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           <!-- Columna Principal: Información del Producto -->

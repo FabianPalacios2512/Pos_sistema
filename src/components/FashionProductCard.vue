@@ -58,24 +58,30 @@
       
       <!-- Visualizador de Variantes (Swatches) -->
       <div v-if="hasVariants" class="space-y-2">
-        <!-- Color Swatches (Círculos pequeños) -->
-        <div v-if="variantColors.length > 0" class="flex items-center gap-1.5">
-          <div v-for="(color, index) in variantColors.slice(0, 5)" 
-               :key="index"
-               class="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-zinc-700"
-               :style="{ backgroundColor: getColorHex(color) }"
-               :title="color"></div>
-          <span v-if="variantColors.length > 5" 
-                class="text-[10px] text-gray-400 dark:text-zinc-500">
-            +{{ variantColors.length - 5 }}
+        <!-- Colores disponibles (Solo círculos) -->
+        <div v-if="variantColors.length > 0" class="flex items-center gap-1.5 flex-wrap">
+          <span 
+            v-for="(color, index) in variantColors.slice(0, 8)" 
+            :key="index"
+            :style="{ backgroundColor: getColorDisplay(color) }"
+            :title="color"
+            :class="[
+              'w-5 h-5 rounded-full shadow-sm border',
+              (color.toUpperCase() === '#FFFFFF' || getColorDisplay(color).toUpperCase() === '#FFFFFF') ? 'border-gray-300 dark:border-zinc-600' : 'border-white/20'
+            ]">
+          </span>
+          <span v-if="variantColors.length > 8" 
+                class="text-[10px] text-gray-500 dark:text-zinc-400 font-medium ml-1">
+            +{{ variantColors.length - 8 }}
           </span>
         </div>
         
         <!-- Tallas disponibles -->
         <div v-if="variantSizes.length > 0" class="flex items-center gap-1 flex-wrap">
+          <span class="text-[10px] text-gray-500 dark:text-zinc-400 font-medium">Tallas:</span>
           <span v-for="(size, index) in variantSizes" 
                 :key="index"
-                class="text-[10px] text-gray-400 dark:text-zinc-500 font-light">
+                class="text-[10px] text-gray-600 dark:text-zinc-300 font-light">
             {{ size }}<span v-if="index !== variantSizes.length - 1"> ·</span>
           </span>
         </div>
@@ -147,37 +153,14 @@ const variantColors = computed(() => {
   const colors = []
   
   variants.forEach(variant => {
-    const optionValues = variant.option_values || []
-    optionValues.forEach(ov => {
-      const optionName = ov.option?.name?.toLowerCase() || ''
+    // Usar options_summary que ya viene formateado desde el backend
+    const optionsSummary = variant.options_summary || []
+    optionsSummary.forEach(option => {
+      const optionName = option.name?.toLowerCase() || ''
       if (optionName.includes('color') || optionName.includes('colour')) {
-        const colorValue = ov.value?.toLowerCase()
-        // Mapear nombres de colores a códigos hex
-        const colorMap = {
-          'rojo': '#EF4444',
-          'red': '#EF4444',
-          'azul': '#3B82F6',
-          'blue': '#3B82F6',
-          'verde': '#10B981',
-          'green': '#10B981',
-          'amarillo': '#F59E0B',
-          'yellow': '#F59E0B',
-          'negro': '#1F2937',
-          'black': '#1F2937',
-          'blanco': '#F9FAFB',
-          'white': '#F9FAFB',
-          'gris': '#6B7280',
-          'gray': '#6B7280',
-          'rosa': '#EC4899',
-          'pink': '#EC4899',
-          'morado': '#8B5CF6',
-          'purple': '#8B5CF6',
-          'naranja': '#F97316',
-          'orange': '#F97316'
-        }
-        
-        if (colorValue && !colors.includes(colorMap[colorValue])) {
-          colors.push(colorMap[colorValue] || '#6B7280')
+        const colorValue = option.value
+        if (colorValue && !colors.includes(colorValue)) {
+          colors.push(colorValue)
         }
       }
     })
@@ -192,11 +175,12 @@ const variantSizes = computed(() => {
   const sizes = []
   
   variants.forEach(variant => {
-    const optionValues = variant.option_values || []
-    optionValues.forEach(ov => {
-      const optionName = ov.option?.name?.toLowerCase() || ''
+    // Usar options_summary que ya viene formateado desde el backend
+    const optionsSummary = variant.options_summary || []
+    optionsSummary.forEach(option => {
+      const optionName = option.name?.toLowerCase() || ''
       if (optionName.includes('talla') || optionName.includes('size') || optionName.includes('tamaño')) {
-        const sizeValue = ov.value
+        const sizeValue = option.value
         if (sizeValue && !sizes.includes(sizeValue)) {
           sizes.push(sizeValue)
         }
@@ -230,22 +214,75 @@ const isNewProduct = computed(() => {
   return diffDays <= 7
 })
 
-// 🎨 Helper: Mapeo de nombres de colores a hex
+// 🎨 Helper: Detecta si es HEX o nombre de color y devuelve HEX
+const getColorDisplay = (value) => {
+  // Si ya es un código HEX, devolverlo directamente
+  if (value.startsWith('#')) {
+    return value
+  }
+  
+  // Si es un nombre de color, convertirlo usando el diccionario
+  return getColorHex(value) || value
+}
+
+// 🎨 Helper: Mapeo de nombres de colores a hex (expandido)
 const getColorHex = (colorName) => {
   const colorMap = {
+    // ROJOS
     'rojo': '#EF4444', 'red': '#EF4444',
+    'rojo oscuro': '#B91C1C', 'rojo claro': '#FCA5A5', 'rojo brillante': '#DC2626',
+    'carmesí': '#DC143C', 'carmesi': '#DC143C', 'crimson': '#DC143C',
+    'escarlata': '#FF2400', 'granate': '#800000', 'burdeos': '#7C0A02',
+    'vino': '#722F37', 'cereza': '#DE3163',
+    
+    // AZULES
     'azul': '#3B82F6', 'blue': '#3B82F6',
+    'azul oscuro': '#1E3A8A', 'azul claro': '#93C5FD', 'azul cielo': '#87CEEB',
+    'azul marino': '#000080', 'marino': '#000080', 'navy': '#000080',
+    'azul rey': '#4169E1', 'azul eléctrico': '#7DF9FF', 'azul turquesa': '#40E0D0',
+    'turquesa': '#40E0D0', 'cian': '#00FFFF', 'celeste': '#B0E0E6',
+    
+    // VERDES
     'verde': '#10B981', 'green': '#10B981',
+    'verde oscuro': '#065F46', 'verde claro': '#86EFAC', 'verde limón': '#32CD32',
+    'verde marino': '#2E8B57', 'verde oliva': '#808000', 'oliva': '#808000',
+    'verde menta': '#98FF98', 'menta': '#98FF98', 'esmeralda': '#50C878',
+    
+    // AMARILLOS
     'amarillo': '#F59E0B', 'yellow': '#F59E0B',
-    'negro': '#1F2937', 'black': '#1F2937',
-    'blanco': '#F9FAFB', 'white': '#F9FAFB',
-    'gris': '#6B7280', 'gray': '#6B7280', 'grey': '#6B7280',
-    'rosa': '#EC4899', 'pink': '#EC4899',
-    'morado': '#8B5CF6', 'purple': '#8B5CF6',
+    'amarillo claro': '#FDE68A', 'amarillo oscuro': '#D97706',
+    'oro': '#FFD700', 'dorado': '#FFD700', 'gold': '#FFD700',
+    
+    // NARANJAS
     'naranja': '#F97316', 'orange': '#F97316',
-    'café': '#92400E', 'brown': '#92400E',
-    'beige': '#D6C8B0', 'crema': '#FEF3C7', 'cream': '#FEF3C7'
+    'naranja claro': '#FDBA74', 'naranja oscuro': '#C2410C',
+    'coral': '#FF7F50', 'durazno': '#FFDAB9', 'salmón': '#FA8072', 'salmon': '#FA8072',
+    
+    // ROSAS
+    'rosa': '#EC4899', 'pink': '#EC4899',
+    'rosa claro': '#FBB6CE', 'rosa oscuro': '#BE185D',
+    'magenta': '#FF00FF', 'fucsia': '#FF00FF', 'fuchsia': '#FF00FF',
+    
+    // MORADOS
+    'morado': '#8B5CF6', 'purple': '#8B5CF6',
+    'morado claro': '#C4B5FD', 'morado oscuro': '#6B21A8',
+    'púrpura': '#A020F0', 'purpura': '#A020F0', 'violeta': '#8F00FF', 'lila': '#C8A2C8',
+    
+    // MARRONES
+    'café': '#92400E', 'brown': '#92400E', 'marrón': '#A52A2A', 'marron': '#A52A2A',
+    'café claro': '#D2691E', 'café oscuro': '#654321', 'chocolate': '#D2691E',
+    
+    // NEUTROS
+    'beige': '#D4A373', 'crema': '#FFFDD0', 'cream': '#FFFDD0',
+    'gris': '#6B7280', 'gray': '#6B7280', 'grey': '#6B7280',
+    'gris claro': '#D1D5DB', 'gris oscuro': '#374151',
+    'plata': '#C0C0C0', 'plateado': '#C0C0C0', 'silver': '#C0C0C0',
+    
+    // BLANCOS/NEGROS
+    'negro': '#1F2937', 'black': '#1F2937',
+    'blanco': '#F9FAFB', 'white': '#F9FAFB'
   }
+  
   return colorMap[colorName.toLowerCase()] || '#94A3B8'
 }
 

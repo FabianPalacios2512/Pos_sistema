@@ -289,8 +289,8 @@
             </div>
           </div>
 
-          <!-- Sección opcional: Importar Productos desde Excel -->
-          <div class="max-w-7xl mx-auto mt-6">
+          <!-- Sección opcional: Importar Productos desde Excel (solo para tiendas generales) -->
+          <div v-if="config.store_type !== 'fashion'" class="max-w-7xl mx-auto mt-6">
             <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-[24px] border border-indigo-100 shadow-sm p-6">
               <div class="flex items-start justify-between">
                 <div class="flex items-start space-x-4">
@@ -775,7 +775,14 @@ const nextStep = async () => {
 
 // Cargar configuración existente al montar el componente
 onMounted(async () => {
-  // 🎯 PRIMERO: Pre-llenar con datos del registro (localStorage)
+  // 🏪 PRIMERO: Leer tipo de tienda del Welcome si existe
+  const pendingStoreType = localStorage.getItem('pending_store_type')
+  if (pendingStoreType) {
+    config.store_type = pendingStoreType
+    console.log('✅ Tipo de tienda cargado desde Welcome:', pendingStoreType)
+  }
+
+  // 🎯 SEGUNDO: Pre-llenar con datos del registro (localStorage)
   const registrationData = JSON.parse(localStorage.getItem('registration_data') || '{}')
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   
@@ -790,7 +797,7 @@ onMounted(async () => {
     config.email = user.email || ''
   }
 
-  // SEGUNDO: Intentar cargar datos guardados del backend
+  // TERCERO: Intentar cargar datos guardados del backend
   try {
     const response = await apiClient.get('/tenant/system-settings')
     const settings = response.data.data || response.data
@@ -809,6 +816,11 @@ onMounted(async () => {
       // Cargar template seleccionado
       if (settings.invoice_template) {
         selectedTemplate.value = settings.invoice_template
+      }
+      
+      // 🏪 Solo sobrescribir store_type si NO viene de pending_store_type
+      if (!pendingStoreType && settings.store_type) {
+        config.store_type = settings.store_type
       }
     }
     
@@ -836,6 +848,11 @@ const saveConfig = async () => {
       invoice_footer_message: config.thankYouMessage,
       invoice_template: selectedTemplate.value
     })
+    
+    // 🧹 Limpiar pending_store_type después de guardarlo
+    localStorage.removeItem('pending_store_type')
+    console.log('✅ Tipo de tienda guardado en BD y limpiado de localStorage')
+    
     return response
   } catch (error) {
     // Si hay error 404 o 401, es porque aún no estamos autenticados en el tenant

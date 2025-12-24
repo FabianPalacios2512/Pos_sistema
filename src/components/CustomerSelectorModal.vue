@@ -245,6 +245,13 @@ import { useToast } from '../composables/useToast.js'
 // Emits
 const emit = defineEmits(['select', 'close', 'view-history'])
 
+const props = defineProps({
+  startCreating: {
+    type: Boolean,
+    default: false
+  }
+})
+
 // Sistema de toasts
 const { showSuccess, showError } = useToast()
 
@@ -357,6 +364,10 @@ const formatCurrency = (value) => {
 
 // Inicialización
 onMounted(() => {
+  if (props.startCreating) {
+    showCreateCustomer.value = true
+  }
+
   // Usar el loader del store global para evitar fetchs locales redundantes
   if (!appStore.customers || appStore.customers.length === 0) {
     appStore.loadCustomers()

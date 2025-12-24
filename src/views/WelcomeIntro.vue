@@ -4,9 +4,85 @@
     <!-- Contenedor centrado absoluto para evitar desplazamientos -->
     <div class="absolute inset-0 flex items-center justify-center p-4">
       
-      <!-- FASE 1: Animación de carga inicial (0s - 2s) -->
+      <!-- FASE 0: Selección del tipo de tienda (NUEVO) -->
       <Transition name="smooth-fade" mode="out-in">
-        <div v-if="loadingPhase === 1" key="loading" class="text-center space-y-6">
+        <div v-if="loadingPhase === 0" key="store-type" class="text-center space-y-8 max-w-4xl w-full">
+          <!-- Título -->
+          <div class="space-y-3">
+            <h1 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+              ¿Qué tipo de negocio tienes?
+            </h1>
+            <p class="text-base font-medium text-slate-600">
+              Selecciona el modelo que mejor describe tu tienda
+            </p>
+          </div>
+
+          <!-- Tarjetas de selección estilo Odoo -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            
+            <!-- Opción: Retail General -->
+            <button 
+              @click="selectStoreType('general')"
+              :disabled="savingStoreType"
+              class="group relative bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-slate-900 hover:shadow-2xl transition-all duration-300 text-left transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <div class="flex flex-col items-center space-y-4">
+                <!-- Icono -->
+                <div class="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                  <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                  </svg>
+                </div>
+                
+                <!-- Texto -->
+                <div class="text-center">
+                  <h3 class="text-xl font-bold text-slate-900 mb-2">Retail General</h3>
+                  <p class="text-sm text-slate-600 font-medium">
+                    Mini Market, Ferretería, Papelería, Farmacia, Supermercado, Abarrotes
+                  </p>
+                </div>
+
+                <!-- Badge "Recomendado" -->
+                <span class="absolute top-4 right-4 px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                  Más usado
+                </span>
+              </div>
+            </button>
+
+            <!-- Opción: Moda & Boutique -->
+            <button 
+              @click="selectStoreType('fashion')"
+              :disabled="savingStoreType"
+              class="group relative bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-slate-900 hover:shadow-2xl transition-all duration-300 text-left transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <div class="flex flex-col items-center space-y-4">
+                <!-- Icono -->
+                <div class="w-20 h-20 bg-purple-50 rounded-2xl flex items-center justify-center group-hover:bg-purple-100 transition-colors">
+                  <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                  </svg>
+                </div>
+                
+                <!-- Texto -->
+                <div class="text-center">
+                  <h3 class="text-xl font-bold text-slate-900 mb-2">Moda & Boutique</h3>
+                  <p class="text-sm text-slate-600 font-medium">
+                    Ropa, Calzado, Accesorios, Joyería, Perfumería
+                  </p>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Loader mientras guarda -->
+          <div v-if="savingStoreType" class="flex items-center justify-center gap-3 text-slate-600">
+            <div class="w-5 h-5 border-2 border-slate-300 border-t-slate-900 rounded-full animate-spin"></div>
+            <span class="text-sm font-semibold">Guardando configuración...</span>
+          </div>
+        </div>
+
+        <!-- FASE 1: Animación de carga inicial (0s - 2s) -->
+        <div v-else-if="loadingPhase === 1" key="loading" class="text-center space-y-6">
           <!-- Spinner elegante con tu estilo -->
           <div class="flex justify-center mb-8">
             <div class="relative">
@@ -120,18 +196,58 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { appStore } from '@/store/appStore'
+import axios from 'axios'
 
 const router = useRouter()
 const userName = ref('')
-const loadingPhase = ref(1)
+const loadingPhase = ref(1) // Empezar en 1 para mostrar animación primero
+const savingStoreType = ref(false)
 
 onMounted(() => {
   // Obtener nombre del usuario del localStorage o store
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   userName.value = user.name || user.username || ''
+  
+  // Iniciar la secuencia de animación automáticamente
+  startWelcomeSequence()
+})
 
-  // Secuencia de animación tipo instalación de Windows (MÁS TIEMPO)
+// Función para guardar el tipo de tienda seleccionado
+const selectStoreType = async (storeType) => {
+  try {
+    savingStoreType.value = true
+    console.log(`🏪 Guardando tipo de tienda en localStorage: ${storeType}`)
+    
+    // Guardar temporalmente en localStorage
+    localStorage.setItem('pending_store_type', storeType)
+    
+    // Actualizar el store local si existe
+    if (appStore.systemSettings) {
+      appStore.systemSettings.store_type = storeType
+    }
+    
+    console.log('✅ Tipo de tienda guardado en localStorage')
+    
+    // Esperar un momento para el feedback visual
+    setTimeout(() => {
+      savingStoreType.value = false
+      // Ir directamente al onboarding
+      router.push('/onboarding')
+    }, 800)
+    
+  } catch (error) {
+    console.error('❌ Error al guardar tipo de tienda:', error)
+    alert('No se pudo guardar la configuración. Por favor intenta nuevamente.')
+    savingStoreType.value = false
+  }
+}
+
+// Secuencia de animación de bienvenida
+const startWelcomeSequence = () => {
   // Fase 1: Loading inicial (2.5s)
+  loadingPhase.value = 1
+  
   setTimeout(() => {
     loadingPhase.value = 2 // Saludo
   }, 2500)
@@ -143,9 +259,9 @@ onMounted(() => {
 
   // Fase 3: Preparando (4s de duración)
   setTimeout(() => {
-    loadingPhase.value = 4 // Contenido final
+    loadingPhase.value = 0 // Mostrar selección de tipo de tienda
   }, 10000)
-})
+}
 
 const startOnboarding = () => {
   // Marcar que el usuario ya vio la pantalla de bienvenida

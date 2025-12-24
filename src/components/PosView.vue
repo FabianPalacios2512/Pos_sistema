@@ -149,12 +149,6 @@
           <!-- hasOpenSession: {{ hasOpenSession }} -->
           <!-- plan: {{ appStore.tenantPlan }} -->
 
-          <!-- 👗 Badge Modo Fashion (solo si es tienda de moda) -->
-          <div v-if="isFashionStore" class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-black dark:bg-white text-white dark:text-black shadow-lg">
-            <span class="text-sm">👗</span>
-            <span class="text-xs font-bold uppercase tracking-wide">Fashion Mode</span>
-          </div>
-
           <!-- 🌍 Toggle Búsqueda Global/Local (Siempre visible con sesión) -->
           <button
             v-if="shouldShowMultiWarehouseFeatures"
@@ -821,13 +815,13 @@
           <button
             @click="handleCobrarClick"
             :disabled="!canShowPaymentModal || quotationMode"
-            class="flex-1 py-2 rounded-md font-bold text-xs transition-all flex items-center justify-center gap-1.5"
+            class="flex-1 py-4 rounded-xl font-black text-lg transition-all flex items-center justify-center gap-2.5 shadow-lg"
             :class="canShowPaymentModal && !quotationMode
-              ? 'bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 shadow-md'
-              : 'bg-gray-200 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500 cursor-not-allowed'"
+              ? 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-emerald-600/40 hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]'
+              : 'bg-gray-200 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500 cursor-not-allowed shadow-none'"
           >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Cobrar ${{ total.toLocaleString() }}</span>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-black">Cobrar ${{ total.toLocaleString() }}</span>
           </button>
         </div>
       </div>
@@ -1084,17 +1078,17 @@
           </button>
        </div>
 
-       <!-- BOTÓN COBRAR - Verde SOLO cuando está listo -->
+       <!-- BOTÓN COBRAR - Verde SOLO cuando está listo (MÁS GRANDE Y DESTACADO) -->
        <button
           @click="handleCobrarClick"
           :disabled="!canShowPaymentModal || quotationMode || (selectedPaymentMethod === 'efectivo' && (!cashReceived || cashReceived < total))"
-          class="w-full h-12 rounded-xl font-black text-base shadow-lg transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 group relative overflow-hidden"
+          class="w-full h-16 rounded-2xl font-black text-lg shadow-2xl transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 group relative overflow-hidden"
           :class="[
             (!canShowPaymentModal || quotationMode)
               ? 'bg-slate-300 dark:bg-zinc-700 text-slate-500 dark:text-zinc-400 cursor-not-allowed shadow-none'
             : (selectedPaymentMethod === 'efectivo' && (!cashReceived || cashReceived < total))
               ? 'bg-slate-400 dark:bg-zinc-600 text-slate-600 dark:text-zinc-300 cursor-not-allowed shadow-none'
-              : 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-emerald-600/40 hover:shadow-emerald-600/60 cobrar-ready-pulse'
+              : 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-emerald-600/40 hover:shadow-emerald-600/60 hover:shadow-2xl cobrar-ready-pulse'
           ]"
         >
           <!-- Efecto de brillo animado cuando está listo -->
@@ -1117,13 +1111,13 @@
           </span>
 
           <span v-else class="flex items-center justify-between w-full px-4">
-             <span class="flex items-center gap-2">
-               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-               <span class="text-base font-black tracking-wide uppercase">Cobrar Ahora</span>
+             <span class="flex items-center gap-3">
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+               <span class="text-xl font-black tracking-wide uppercase">Cobrar Ahora</span>
              </span>
-             <span class="flex items-center gap-1 text-lg font-black tabular-nums">
+             <span class="flex items-center gap-2 text-2xl font-black tabular-nums">
                ${{ total.toLocaleString() }}
-               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
              </span>
           </span>
         </button>
@@ -1140,9 +1134,10 @@
     <CustomerSelectorModal
       v-if="showCustomerSelector"
       :customers="customers"
+      :start-creating="startCustomerCreation"
       @select="selectCustomer"
       @view-history="handleCustomerHistory"
-      @close="showCustomerSelector = false"
+      @close="showCustomerSelector = false; startCustomerCreation = false"
     />
 
     <!-- Modal de Cantidad con Unidades de Medida -->
@@ -1332,7 +1327,7 @@
                 Cancelar
               </button>
               <button 
-                @click="showRequireCustomerModal = false; showAddCustomerModal = true"
+                @click="showRequireCustomerModal = false; showCustomerSelector = true"
                 class="flex-1 px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2166,16 +2161,26 @@ const getProductImage = (product) => {
   if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim()) {
     const url = imageUrl.trim()
     
-    // Verificar que sea una URL HTTP válida o data URI REAL
+    // Si es una ruta relativa de Laravel Storage (/storage/...), convertir a URL absoluta
+    if (url.startsWith('/storage/')) {
+      const backendUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin
+      const fullUrl = `${backendUrl}${url}`
+      console.log('✅ Imagen convertida a URL completa:', fullUrl)
+      return fullUrl
+    }
+    
+    // Si ya es una URL HTTP completa
     if ((url.startsWith('http://') || url.startsWith('https://')) && url.length > 20) {
       // Verificar que no sea un placeholder genérico
       if (!url.includes('placeholder') && !url.includes('default') && !url.includes('no-image')) {
+        console.log('✅ Imagen HTTP válida para', product.name)
         return url
       }
     }
     
-    // Si ya es un data URI, devolverlo directamente
+    // Si es un data URI, devolverlo directamente
     if (url.startsWith('data:image')) {
+      console.log('✅ Data URI válido para', product.name)
       return url
     }
   }
@@ -2344,6 +2349,7 @@ const calculatorOperation = ref('') // Para mostrar la operación actual
 const whatsappStatus = ref(null)
 
 const showCustomerSelector = ref(false)
+const startCustomerCreation = ref(false)
 const showCustomerHistory = ref(false)
 const selectedCustomerForHistory = ref(null)
 const showPaymentModal = ref(false)
@@ -2849,6 +2855,7 @@ const filteredProducts = computed(() => {
   if (onlyStock.value) {
     filtered = filtered.filter(p => (p.stock ?? 0) > 0)
   }
+  
   return filtered
 })
 

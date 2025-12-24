@@ -324,10 +324,35 @@ class ProductController extends Controller
                         $totalStock += ($variantData['stock'] ?? 0);
 
                         // Vincular con Valores de Opción (Pivot)
-                        if (isset($variantData['options']) && is_array($variantData['options'])) {
-                            foreach ($variantData['options'] as $optName => $optVal) {
-                                if (isset($optionValueMap[$optName][$optVal])) {
-                                    $variant->optionValues()->attach($optionValueMap[$optName][$optVal]);
+                        if (isset($variantData['options'])) {
+                            $options = $variantData['options'];
+
+                            // 🔧 SOPORTE PARA AMBOS FORMATOS:
+                            // Array de objetos: [{"name": "Talla", "value": "M"}]
+                            // Objeto asociativo: {"Talla": "M", "Color": "Rojo"}
+
+                            if (is_string($options)) {
+                                $options = json_decode($options, true);
+                            }
+
+                            if (is_array($options)) {
+                                // Detectar formato: ¿tiene 'name' y 'value'? → Array de objetos
+                                if (isset($options[0]) && is_array($options[0]) && isset($options[0]['name'])) {
+                                    // Formato: [{"name": "Talla", "value": "M"}]
+                                    foreach ($options as $opt) {
+                                        $optName = $opt['name'];
+                                        $optVal = $opt['value'];
+                                        if (isset($optionValueMap[$optName][$optVal])) {
+                                            $variant->optionValues()->attach($optionValueMap[$optName][$optVal]);
+                                        }
+                                    }
+                                } else {
+                                    // Formato: {"Talla": "M", "Color": "Rojo"}
+                                    foreach ($options as $optName => $optVal) {
+                                        if (isset($optionValueMap[$optName][$optVal])) {
+                                            $variant->optionValues()->attach($optionValueMap[$optName][$optVal]);
+                                        }
+                                    }
                                 }
                             }
                         }
