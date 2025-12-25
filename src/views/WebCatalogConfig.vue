@@ -1,9 +1,9 @@
 <template>
   <!-- Layout de 3 Columnas: Menú Lateral + Contenido + Preview -->
-  <div class="flex overflow-hidden bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c]" style="height: calc(100vh - 64px);">
+  <div class="flex overflow-hidden bg-gray-50 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c]" style="height: calc(100vh - 64px);">
     
     <!-- SIDEBAR IZQUIERDO - Menú de Navegación -->
-    <aside class="w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col overflow-y-auto">
+    <aside class="w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col overflow-y-auto shadow-sm">
       <!-- Header Sidebar - Compacto -->
       <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
         <div class="flex items-center gap-2 mb-3">
@@ -120,209 +120,221 @@
     </aside>
     
     <!-- CONTENIDO CENTRAL -->
-    <main class="flex-1 overflow-y-auto">
-      <div class="p-6 space-y-6">
+    <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-transparent">
+      <div class="p-8 space-y-6 max-w-5xl mx-auto">
           
           <!-- SECCIÓN: DISEÑO - Estilo SaaS Profesional -->
           <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
             
-            <!-- Personalización de Marca -->
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 p-6">
-              <div class="mb-5">
-                <h3 class="text-base font-bold text-gray-900 dark:text-white">Personalización de Marca</h3>
-                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Define los colores y logotipos que verán tus clientes en el catálogo.</p>
+            <!-- 🎨 TARJETA 1: Logo y Color Primario -->
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Identidad Visual</h3>
+                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Logo y color principal de tu tienda</p>
               </div>
               
-              <!-- Grid 2 Columnas: Logo + Color/Template -->
-              <div class="grid grid-cols-2 gap-6">
-                
-                <!-- Logo Upload -->
-                <div class="space-y-3">
-                  <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400">Logo de la Tienda</label>
-                  <div 
-                    @click="triggerFileUpload('logo')"
-                    class="border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-md hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition-all cursor-pointer group relative flex flex-col items-center justify-center bg-gray-50 dark:bg-zinc-800/50 h-[160px]"
-                  >
-                    <div v-if="config.brandIdentity.logo" class="absolute inset-0 p-3">
-                      <img :src="config.brandIdentity.logo" class="w-full h-full object-contain" />
-                      <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-md">
-                        <button 
-                          @click.stop="config.brandIdentity.logo = ''"
-                          class="text-white text-xs font-medium px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-md transition-colors flex items-center gap-1"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                          Eliminar
-                        </button>
-                        <span class="text-white text-xs font-medium px-3 py-1.5 bg-black/60 rounded-md">Cambiar</span>
+              <div class="p-6">
+                <div class="grid grid-cols-2 gap-6">
+                  
+                  <!-- Logo Upload -->
+                  <div class="space-y-3">
+                    <label class="block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-zinc-300">Logo de la Tienda</label>
+                    <div 
+                      @click="triggerFileUpload('logo')"
+                      class="relative w-full h-32 border-2 border-dashed border-gray-300 dark:border-zinc-700 rounded-xl hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition-all cursor-pointer group bg-gray-50 dark:bg-zinc-800/50 flex items-center justify-center"
+                    >
+                      <div v-if="config.brandIdentity.logo" class="absolute inset-0 p-3 flex items-center justify-center">
+                        <img :src="config.brandIdentity.logo" class="max-w-full max-h-full object-contain" />
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded-xl">
+                          <button 
+                            @click.stop="config.brandIdentity.logo = ''"
+                            class="text-white text-xs font-semibold px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center gap-1.5"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Eliminar
+                          </button>
+                          <span class="text-white text-xs font-semibold px-3 py-2 bg-white/20 backdrop-blur-sm rounded-lg">Cambiar</span>
+                        </div>
                       </div>
+                      <div v-else class="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex flex-col items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <div class="text-center">
+                          <span class="text-xs font-semibold block">Subir logo</span>
+                          <span class="text-[10px] text-gray-400 dark:text-zinc-500">PNG, JPG o SVG</span>
+                        </div>
+                      </div>
+                      <input type="file" ref="logoInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'logo')" />
                     </div>
-                    <div v-else class="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                      </svg>
-                      <span class="text-xs font-medium">Subir logo</span>
-                      <span class="text-[10px] text-gray-400 dark:text-zinc-500 block mt-1">PNG, JPG o SVG</span>
-                    </div>
-                    <input type="file" ref="logoInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'logo')" />
                   </div>
-                </div>
-
-                <!-- Color + Template en columna -->
-                <div class="space-y-4">
                   
                   <!-- Color Picker -->
                   <div class="space-y-3">
-                    <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400">Color Primario</label>
-                    <div class="flex items-center gap-3">
-                      <div class="relative w-12 h-12 rounded-md overflow-hidden border border-gray-200 cursor-pointer hover:scale-105 transition-transform flex-shrink-0">
-                        <input 
-                          type="color" 
-                          v-model="config.brandIdentity.primaryColor"
-                          class="absolute inset-0 w-full h-full cursor-pointer border-0 p-0"
-                          style="transform: scale(1.5);"
-                        />
-                      </div>
+                    <label class="block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-zinc-300">Color Primario</label>
+                    <div class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800/50 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all">
                       <input 
-                        type="text" 
+                        type="color" 
                         v-model="config.brandIdentity.primaryColor"
-                        class="flex-1 h-10 px-3 rounded-md border border-gray-200 text-xs font-mono text-gray-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 uppercase"
-                        placeholder="#10B981"
+                        class="w-12 h-12 rounded-lg cursor-pointer border-2 border-gray-300 dark:border-zinc-600"
                       />
-                    </div>
-                  </div>
-                  
-                  <!-- Template Selector Compacto -->
-                  <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
-                    <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-3">Plantilla de Diseño</label>
-                    <div class="space-y-2">
-                      
-                      <!-- Visual Story -->
-                      <button 
-                        @click="config.brandIdentity.template = 'visual-story'"
-                        class="w-full p-2.5 rounded-md border transition-all flex items-center gap-3 text-left group"
-                        :class="config.brandIdentity.template === 'visual-story' 
-                          ? 'border-emerald-500 bg-emerald-50' 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
-                      >
-                        <div class="w-8 h-8 rounded-md bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center flex-shrink-0 border border-purple-200">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <div class="flex-1">
-                          <div class="text-xs font-semibold" :class="config.brandIdentity.template === 'visual-story' ? 'text-emerald-700' : 'text-gray-900'">
-                            Historia Visual
-                          </div>
-                          <div class="text-[10px] text-gray-500">Boutique / Gourmet</div>
-                        </div>
-                        <div v-if="config.brandIdentity.template === 'visual-story'" class="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                          </svg>
-                        </div>
-                      </button>
-
-                      <!-- Speed Market -->
-                      <button 
-                        @click="config.brandIdentity.template = 'speed-market'"
-                        class="w-full p-2.5 rounded-md border transition-all flex items-center gap-3 text-left group"
-                        :class="config.brandIdentity.template === 'speed-market' 
-                          ? 'border-emerald-500 bg-emerald-50' 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
-                      >
-                        <div class="w-8 h-8 rounded-md bg-gradient-to-br from-blue-100 to-cyan-100 flex items-center justify-center flex-shrink-0 border border-blue-200">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                          </svg>
-                        </div>
-                        <div class="flex-1">
-                          <div class="text-xs font-semibold" :class="config.brandIdentity.template === 'speed-market' ? 'text-emerald-700' : 'text-gray-900'">
-                            Mercado Rápido
-                          </div>
-                          <div class="text-[10px] text-gray-500">Supermercado / Rápido</div>
-                        </div>
-                        <div v-if="config.brandIdentity.template === 'speed-market'" class="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                          </svg>
-                        </div>
-                      </button>
-
-                      <!-- Modern Grid -->
-                      <button 
-                        @click="config.brandIdentity.template = 'modern-grid'"
-                        class="w-full p-2.5 rounded-md border transition-all flex items-center gap-3 text-left group"
-                        :class="config.brandIdentity.template === 'modern-grid' 
-                          ? 'border-emerald-500 bg-emerald-50' 
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
-                      >
-                        <div class="w-8 h-8 rounded-md bg-gradient-to-br from-gray-100 to-slate-100 flex items-center justify-center flex-shrink-0 border border-gray-300">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
-                          </svg>
-                        </div>
-                        <div class="flex-1">
-                          <div class="text-xs font-semibold" :class="config.brandIdentity.template === 'modern-grid' ? 'text-emerald-700' : 'text-gray-900'">
-                            Cuadrícula Moderna
-                          </div>
-                          <div class="text-[10px] text-gray-500">Clásico / Versátil</div>
-                        </div>
-                        <div v-if="config.brandIdentity.template === 'modern-grid'" class="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                          </svg>
-                        </div>
-                      </button>
-                      
+                      <div class="flex-1">
+                        <input 
+                          type="text"
+                          v-model="config.brandIdentity.primaryColor"
+                          class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 text-sm font-mono text-gray-900 dark:text-zinc-200 bg-gray-50 dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 uppercase"
+                          placeholder="#10B981"
+                        />
+                        <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1.5">Este color se aplicará en botones y acentos</p>
+                      </div>
                     </div>
                   </div>
                   
                 </div>
               </div>
             </div>
-
-            <!-- Subsección: Banner Promocional -->
-            <section>
-              <div class="mb-4">
-                <h3 class="text-base font-bold text-gray-900 dark:text-white">Banner Promocional</h3>
-                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Imagen destacada en la parte superior del catálogo.</p>
+            
+            <!-- 🎨 TARJETA 2: Selección de Plantilla -->
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Plantilla de Diseño</h3>
+                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Elige el estilo visual de tu catálogo web</p>
               </div>
               
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+              <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  
+                  <!-- Visual Story (Solo para Fashion) -->
+                  <button 
+                    v-if="isFashionStore"
+                    @click="config.brandIdentity.template = 'visual-story'"
+                    class="group relative p-5 rounded-xl border-2 transition-all text-left hover:shadow-md"
+                    :class="config.brandIdentity.template === 'visual-story' 
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 shadow-md' 
+                      : 'border-gray-200 dark:border-zinc-700 hover:border-emerald-300 dark:hover:border-emerald-700 bg-white dark:bg-zinc-800/50'"
+                  >
+                    <div class="flex flex-col items-center text-center space-y-3">
+                      <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/50 dark:to-pink-900/50 flex items-center justify-center border border-purple-200 dark:border-purple-800/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm font-bold" :class="config.brandIdentity.template === 'visual-story' ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-900 dark:text-white'">
+                          Historia Visual
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Boutique / Gourmet</div>
+                      </div>
+                      <div v-if="config.brandIdentity.template === 'visual-story'" class="absolute top-3 right-3 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+
+                  <!-- Speed Market -->
+                  <button 
+                    @click="config.brandIdentity.template = 'speed-market'"
+                    class="group relative p-5 rounded-xl border-2 transition-all text-left hover:shadow-md"
+                    :class="config.brandIdentity.template === 'speed-market' 
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 shadow-md' 
+                      : 'border-gray-200 dark:border-zinc-700 hover:border-emerald-300 dark:hover:border-emerald-700 bg-white dark:bg-zinc-800/50'"
+                  >
+                    <div class="flex flex-col items-center text-center space-y-3">
+                      <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/50 dark:to-cyan-900/50 flex items-center justify-center border border-blue-200 dark:border-blue-800/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm font-bold" :class="config.brandIdentity.template === 'speed-market' ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-900 dark:text-white'">
+                          Mercado Rápido
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Supermercado / Rápido</div>
+                      </div>
+                      <div v-if="config.brandIdentity.template === 'speed-market'" class="absolute top-3 right-3 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+
+                  <!-- Modern Grid -->
+                  <button 
+                    @click="config.brandIdentity.template = 'modern-grid'"
+                    class="group relative p-5 rounded-xl border-2 transition-all text-left hover:shadow-md"
+                    :class="config.brandIdentity.template === 'modern-grid' 
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 shadow-md' 
+                      : 'border-gray-200 dark:border-zinc-700 hover:border-emerald-300 dark:hover:border-emerald-700 bg-white dark:bg-zinc-800/50'"
+                  >
+                    <div class="flex flex-col items-center text-center space-y-3">
+                      <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-gray-100 to-slate-100 dark:from-gray-800/50 dark:to-slate-800/50 flex items-center justify-center border border-gray-300 dark:border-gray-700/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div class="text-sm font-bold" :class="config.brandIdentity.template === 'modern-grid' ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-900 dark:text-white'">
+                          Cuadrícula Moderna
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Clásico / Versátil</div>
+                      </div>
+                      <div v-if="config.brandIdentity.template === 'modern-grid'" class="absolute top-3 right-3 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+                  
+                </div>
+              </div>
+            </div>
+            
+            <!-- 🎨 TARJETA 3: Banner Promocional (Solo Fashion) -->
+            <div v-if="isFashionStore" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Banner Promocional</h3>
+                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Imagen destacada en la parte superior (exclusivo para tiendas de moda)</p>
+              </div>
+              
+              <div class="p-6">
                 <div 
                   @click="triggerFileUpload('banner')"
-                  class="border-2 border-dashed border-gray-200 rounded-md hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition-all cursor-pointer group relative h-32 flex items-center justify-center bg-gray-50 dark:bg-zinc-800/50"
+                  class="relative w-full h-48 border-2 border-dashed border-gray-300 dark:border-zinc-700 rounded-xl hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition-all cursor-pointer group bg-gray-50 dark:bg-zinc-800/50 flex items-center justify-center overflow-hidden"
                 >
-                  <div v-if="config.brandIdentity.banner" class="absolute inset-0 p-1">
-                    <img :src="config.brandIdentity.banner" class="w-full h-full object-cover rounded" />
-                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded">
+                  <div v-if="config.brandIdentity.banner" class="absolute inset-0 p-2">
+                    <img :src="config.brandIdentity.banner" class="w-full h-full object-cover rounded-lg" />
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 rounded-lg">
                       <button 
                         @click.stop="config.brandIdentity.banner = ''"
-                        class="text-white text-xs font-medium px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-md transition-colors flex items-center gap-1"
+                        class="text-white text-sm font-semibold px-4 py-2.5 bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center gap-2"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        Eliminar
+                        Eliminar Banner
                       </button>
-                      <span class="text-white text-xs font-medium px-3 py-1.5 bg-black/60 rounded-md">Cambiar</span>
+                      <span class="text-white text-sm font-semibold px-4 py-2.5 bg-white/20 backdrop-blur-sm rounded-lg">Cambiar Imagen</span>
                     </div>
                   </div>
-                  <div v-else class="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <div v-else class="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex flex-col items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <div>
-                      <span class="text-xs font-medium block">Subir banner promocional</span>
-                      <span class="text-[10px] text-gray-400 dark:text-zinc-500">Recomendado: 1200x400px</span>
+                    <div class="text-center">
+                      <span class="text-sm font-semibold block">Subir banner promocional</span>
+                      <span class="text-xs text-gray-400 dark:text-zinc-500 mt-1 block">Recomendado: 1200x400px</span>
                     </div>
                   </div>
                   <input type="file" ref="bannerInput" class="hidden" accept="image/*" @change="(e) => handleFileUpload(e, 'banner')" />
                 </div>
               </div>
-            </section>
+            </div>
 
           </div>
 
@@ -500,54 +512,59 @@
             
           </div>
       
-      </div> <!-- Cierra p-6 pb-24 space-y-6 -->
+      </div> <!-- Cierra p-8 space-y-6 max-w-5xl mx-auto -->
     </main>
     
-    <!-- PREVIEW DERECHO - Solo Vista Móvil -->
-    <aside class="flex-shrink-0 w-[450px] bg-gradient-to-b from-gray-100 via-gray-50 to-white dark:from-[#1a1a1f] dark:via-[#16161a] dark:to-[#0f0f12] border-l border-gray-200 dark:border-zinc-800/50 flex flex-col overflow-y-auto">
-      <!-- Preview Header -->
-      <div class="px-4 py-2 border-b border-gray-200 dark:border-zinc-800/50 flex items-center justify-between bg-white/50 dark:bg-black/20 backdrop-blur-sm">
-        <h3 class="text-gray-900 dark:text-white font-bold text-xs flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"></span>
-          Vista Previa
-        </h3>
-        
-        <button 
-          @click="refreshPreview"
-          class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5"
-          title="Recargar Vista"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </button>
-      </div>
-      
-      <div class="pt-6 pb-3 px-8 flex items-center justify-center">
-        <!-- Marco de Dispositivo Móvil Flotante -->
-        <div 
-          class="relative bg-white transition-all duration-300 overflow-hidden isolate w-[375px] h-[740px] rounded-[3rem] shadow-2xl dark:shadow-black/80"
-          style="container-type: inline-size; width: 375px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);"
-        >
-          <!-- Borde exterior del teléfono (marco negro) -->
-          <div class="absolute inset-0 rounded-[3rem] border-[14px] border-black pointer-events-none z-50">
-            <!-- Notch -->
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl -mt-[14px]"></div>
+    <!-- PREVIEW DERECHO - Solo Vista Móvil (Sticky) -->
+    <aside class="flex-shrink-0 w-[480px] bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden shadow-lg">
+      <div class="h-full overflow-y-auto py-8 px-8">
+        <div class="sticky top-0">
+          <!-- Preview Header -->
+          <div class="mb-6 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"></span>
+              <h3 class="text-gray-900 dark:text-white font-bold text-sm">Vista Previa</h3>
+            </div>
             
-            <!-- Botones laterales -->
-            <div class="absolute -left-[14px] top-24 w-1 h-12 bg-black rounded-l"></div>
-            <div class="absolute -left-[14px] top-40 w-1 h-16 bg-black rounded-l"></div>
-            <div class="absolute -right-[14px] top-32 w-1 h-20 bg-black rounded-r"></div>
+            <button 
+              @click="refreshPreview"
+              class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
+              title="Recargar Vista"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
           </div>
-          
-          <!-- Pantalla del teléfono -->
-          <div class="w-full h-full overflow-auto bg-white relative rounded-[2.2rem]" style="isolation: isolate; transform: translateZ(0);">
-            <CatalogTemplateSelector 
-              :template="config.brandIdentity.template"
-              :storeConfig="previewStoreConfig"
-              :isMobilePreview="true"
-              :key="previewKey"
-            />
+        
+          <!-- Marco de Dispositivo Móvil con Iframe Real -->
+          <div class="flex items-center justify-center">
+            <div 
+              class="relative bg-white transition-all duration-300 overflow-hidden isolate w-[375px] h-[740px] rounded-[3rem] shadow-2xl dark:shadow-black/80"
+              style="container-type: inline-size; width: 375px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.1);"
+            >
+              <!-- Borde exterior del teléfono (marco negro) -->
+              <div class="absolute inset-0 rounded-[3rem] border-[14px] border-black pointer-events-none z-50">
+                <!-- Notch -->
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl -mt-[14px]"></div>
+                
+                <!-- Botones laterales -->
+                <div class="absolute -left-[14px] top-24 w-1 h-12 bg-black rounded-l"></div>
+                <div class="absolute -left-[14px] top-40 w-1 h-16 bg-black rounded-l"></div>
+                <div class="absolute -right-[14px] top-32 w-1 h-20 bg-black rounded-r"></div>
+              </div>
+              
+              <!-- Pantalla del teléfono - Iframe Real del Catálogo -->
+              <div class="w-full h-full overflow-hidden bg-white relative rounded-[2.2rem]" style="isolation: isolate; transform: translateZ(0);">
+                <iframe 
+                  :src="catalogUrl"
+                  :key="previewKey"
+                  class="w-full h-full border-0"
+                  style="width: 375px; height: 740px;"
+                  title="Vista Previa del Catálogo"
+                ></iframe>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -590,12 +607,17 @@
 import { ref, reactive, onMounted, computed } from 'vue'
 import { appStore } from '../store/appStore.js'
 import apiClient from '../services/apiClient.js'
-import CatalogTemplateSelector from '../components/catalog/CatalogTemplateSelector.vue'
 
 // Refs
 const logoInput = ref(null)
 const bannerInput = ref(null)
 const previewKey = ref(0)
+
+// Catalog URL - Se construye dinámicamente según el entorno
+const catalogUrl = computed(() => {
+  // En desarrollo usa la ruta relativa /catalog
+  return `${window.location.origin}/catalog`
+})
 
 // State
 const isSaving = ref(false)
@@ -606,7 +628,6 @@ const toastMessage = reactive({
 })
 const isLoading = ref(true)
 const activeTab = ref('identity')
-const realProducts = ref([]) // Productos reales de la base de datos
 
 // Tabs Configuration
 const tabs = [
@@ -646,18 +667,17 @@ const currentTabDescription = computed(() => {
   return tab ? tab.description : ''
 })
 
-// Preview Store Config - Se actualiza reactivamente con los cambios del config
-const previewStoreConfig = computed(() => ({
-  primary_color: config.brandIdentity.primaryColor,
-  logo_url: config.brandIdentity.logo || 'https://via.placeholder.com/150?text=Logo',
-  banner_url: config.brandIdentity.banner || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200',
-  whatsapp_number: config.ordersConfig.whatsappNumber,
-  currency_symbol: '$',
-  delivery_cost: config.businessRules.deliveryCost,
-  min_order_value: config.businessRules.minimumOrder,
-  store_name: appStore.businessName || 'Mi Tienda',
-  catalog_products: realProducts.value // Productos reales de la BD
-}))
+// Detectar si la tienda es tipo Fashion (para mostrar/ocultar plantillas y banner)
+const isFashionStore = computed(() => {
+  // Primero intentar desde appStore.systemSettings
+  if (appStore.systemSettings?.store_type) {
+    return appStore.systemSettings.store_type === 'fashion'
+  }
+  
+  // Si no está en systemSettings, buscar en localStorage
+  const storedType = localStorage.getItem('pending_store_type')
+  return storedType === 'fashion'
+})
 
 // Configuration Object (Reactive)
 const config = reactive({
@@ -702,30 +722,19 @@ onMounted(async () => {
     ]
   }
 
-  // Cargar productos reales para la preview
-  try {
-    const response = await apiClient.get('/public/catalog')
-    if (response.data.success && response.data.products) {
-      realProducts.value = response.data.products.map(p => ({
-        id: p.id,
-        name: p.name,
-        description: p.description || '',
-        price: p.price,
-        image_url: p.image || p.image_url,
-        stock: p.stock || 0,
-        category: p.category || 'Sin categoría'
-      }))
-    }
-  } catch (error) {
-    console.error('Error cargando productos para preview:', error)
-  }
-
   // Load existing configuration from backend
   await loadConfiguration()
+  
+  // 🛡️ Si la plantilla es "visual-story" pero la tienda NO es fashion, cambiar a "speed-market"
+  if (config.brandIdentity.template === 'visual-story' && !isFashionStore.value) {
+    console.log('⚠️ Plantilla "visual-story" no disponible para tiendas no-fashion. Cambiando a "speed-market"')
+    config.brandIdentity.template = 'speed-market'
+  }
+  
   isLoading.value = false
 })
 
-// Refresh Preview
+// Refresh Preview - Recarga el iframe
 const refreshPreview = () => {
   previewKey.value++
 }
@@ -914,13 +923,13 @@ const saveConfiguration = async () => {
     
     if (response.data.success) {
       toastMessage.title = '¡Guardado!'
-      toastMessage.description = 'Configuración actualizada correctamente.'
+      toastMessage.description = 'Configuración actualizada. Vista previa recargada.'
       showSuccessToast.value = true
       setTimeout(() => {
         showSuccessToast.value = false
       }, 3000)
       
-      // Refresh preview after save
+      // Recargar iframe automáticamente después de guardar
       refreshPreview()
     }
   } catch (error) {

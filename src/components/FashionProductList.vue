@@ -259,8 +259,8 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
-import productsService from '@/services/productsService'
-import categoriesService from '@/services/categoriesService'
+import * as productsService from '@/services/productsService'
+import * as categoriesService from '@/services/categoriesService'
 import TablePaginator from '@/components/TablePaginator.vue'
 
 // Props

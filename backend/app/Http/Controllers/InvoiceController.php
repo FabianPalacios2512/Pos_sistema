@@ -394,6 +394,7 @@ class InvoiceController extends Controller
                 'date' => $invoice->date->format('Y-m-d'),
                 'due_date' => $invoice->due_date?->format('Y-m-d'),
                 'subtotal' => (float) $invoice->subtotal,
+                'discount_amount' => (float) ($invoice->discount_amount ?? 0),
                 'tax' => (float) $invoice->tax_amount,
                 'total' => (float) $invoice->total,
                 'status' => $invoice->status,
@@ -798,6 +799,14 @@ class InvoiceController extends Controller
                 }
 
                 \Log::info('✅ Validación de cupo exitosa, procesando venta a crédito');
+            }
+
+            // Agregar discount_amount si hay descuento aplicado
+            if (isset($request->applied_discount) && isset($request->applied_discount['amount'])) {
+                $data['discount_amount'] = $request->applied_discount['amount'];
+                \Log::info('💰 Descuento agregado a la factura', [
+                    'discount_amount' => $data['discount_amount']
+                ]);
             }
 
             // Crear la factura principal

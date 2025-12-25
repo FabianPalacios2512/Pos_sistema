@@ -402,6 +402,11 @@
                             <span class="text-gray-500 dark:text-zinc-400">Subtotal:</span>
                             <span class="font-semibold text-gray-900 dark:text-zinc-300">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
                           </div>
+                          <!-- Descuento aplicado -->
+                          <div v-if="selectedInvoice.discount_amount && selectedInvoice.discount_amount > 0" class="flex justify-between">
+                            <span class="text-rose-600 dark:text-rose-400 font-medium">Descuento:</span>
+                            <span class="font-semibold text-rose-600 dark:text-rose-400">-${{ formatCurrency(selectedInvoice.discount_amount) }}</span>
+                          </div>
                           <div class="flex justify-between">
                             <span class="text-gray-500 dark:text-zinc-400">IVA ({{ displayTaxRate }}%):</span>
                             <span class="font-semibold text-gray-900 dark:text-zinc-300">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>

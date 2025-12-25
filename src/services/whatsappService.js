@@ -36,13 +36,14 @@ const getWhatsAppClient = () => {
     }
   }
   
-  // Si tenemos tenant_id: SIEMPRE usar modo directo (puerto 3002)
+  // Si tenemos tenant_id: usar /api/whatsapp/ (proxy Nginx)
   if (tenantId) {
-    // Usar variable de entorno o construir URL basado en el entorno
+    // En producción usar /api/whatsapp/ (proxy Nginx)
+    // En desarrollo usar puerto 3002 directo
     const whatsappBaseURL = import.meta.env.VITE_WHATSAPP_URL || 
                            (window.location.hostname === 'localhost' 
                              ? 'http://localhost:3002' 
-                             : `${window.location.protocol}//${window.location.hostname}:3002`)
+                             : '/api/whatsapp')
     
     const client = axios.create({
       baseURL: whatsappBaseURL,
@@ -50,7 +51,7 @@ const getWhatsAppClient = () => {
         'X-Tenant-Id': tenantId
       },
       // Agregar timeout para evitar que el error tarde mucho
-      timeout: 5000
+      timeout: 10000
     })
     
     // Interceptor para silenciar errores de CORS en consola

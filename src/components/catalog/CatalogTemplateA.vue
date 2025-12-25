@@ -90,7 +90,7 @@
         <div class="flex items-center gap-4 md:gap-6">
            
            <!-- Desktop Search Bar -->
-           <div class="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2 w-64 transition-all focus-within:ring-2 focus-within:ring-emerald-500 focus-within:bg-white">
+           <div class="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2 w-64 transition-all focus-within:ring-2 focus-within:bg-white" :style="{ '--focus-ring-color': primaryColor }" style="--tw-ring-color: var(--focus-ring-color);">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
              </svg>
@@ -172,9 +172,11 @@
                         name="sort" 
                         value="" 
                         v-model="sortOrder"
-                        class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 checked:border-emerald-500 transition-all"
+                        class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all"
+                        :style="{ '--primary-color': primaryColor }"
+                        style="accent-color: var(--primary-color);"
                       />
-                      <span class="absolute bg-emerald-500 w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                      <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
                     </div>
                     <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Relevancia</span>
                   </label>
@@ -186,9 +188,9 @@
                         name="sort" 
                         value="price-asc" 
                         v-model="sortOrder"
-                        class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 checked:border-emerald-500 transition-all"
+                        class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all"
                       />
-                      <span class="absolute bg-emerald-500 w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                      <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
                     </div>
                     <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Menor precio</span>
                   </label>
@@ -200,9 +202,9 @@
                         name="sort" 
                         value="price-desc" 
                         v-model="sortOrder"
-                        class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 checked:border-emerald-500 transition-all"
+                        class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all"
                       />
-                      <span class="absolute bg-emerald-500 w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                      <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
                     </div>
                     <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Mayor precio</span>
                   </label>
@@ -214,9 +216,9 @@
                         name="sort" 
                         value="name-asc" 
                         v-model="sortOrder"
-                        class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 checked:border-emerald-500 transition-all"
+                        class="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 transition-all"
                       />
-                      <span class="absolute bg-emerald-500 w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></span>
+                      <span class="absolute w-2 h-2 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" :style="{ backgroundColor: primaryColor }"></span>
                     </div>
                     <span class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">Nombre (A-Z)</span>
                   </label>
@@ -231,7 +233,8 @@
                     <input 
                       type="checkbox" 
                       v-model="showOnlyAvailable"
-                      class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 checked:bg-emerald-500 checked:border-emerald-500 transition-all"
+                      class="peer h-5 w-5 cursor-pointer appearance-none rounded border border-gray-300 transition-all"
+                      :style="{ backgroundColor: showOnlyAvailable ? primaryColor : 'transparent', borderColor: showOnlyAvailable ? primaryColor : undefined }"
                     />
                     <svg class="absolute w-3.5 h-3.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -259,7 +262,7 @@
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
               <div class="text-sm text-gray-600 font-medium">
                 {{ filteredProducts.length }} productos
-                <span v-if="selectedCategory || showOnlyAvailable || sortOrder" class="text-emerald-600 font-semibold">
+                <span v-if="selectedCategory || showOnlyAvailable || sortOrder" class="font-semibold" :style="{ color: primaryColor }">
                   (filtrados)
                 </span>
               </div>
@@ -268,7 +271,9 @@
               <div class="lg:hidden">
                 <select 
                   v-model="sortOrder"
-                  class="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  class="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm text-gray-700 focus:outline-none focus:ring-2"
+                  :style="{ '--focus-ring-color': primaryColor }"
+                  style="--tw-ring-color: var(--focus-ring-color);"
                 >
                   <option value="">Ordenar</option>
                   <option value="price-asc">Menor precio</option>
@@ -309,11 +314,14 @@
                     </div>
                   </div>
                   
-                  <!-- Floating Add Button (Círculo verde flotante) -->
+                  <!-- Floating Add Button (Círculo con color primario flotante) -->
                   <button
                     @click.stop="addToCart(product)"
                     :disabled="product.stock === 0"
-                    class="absolute bottom-3 right-3 w-10 h-10 rounded-full shadow-lg flex items-center justify-center bg-emerald-500 text-white hover:bg-emerald-600 hover:scale-110 transition-all active:scale-95 z-10 disabled:bg-gray-300 disabled:cursor-not-allowed opacity-90 hover:opacity-100"
+                    :style="{ backgroundColor: product.stock > 0 ? primaryColor : undefined }"
+                    class="absolute bottom-3 right-3 w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-all active:scale-95 z-10 disabled:bg-gray-300 disabled:cursor-not-allowed opacity-90 hover:opacity-100"
+                    @mouseenter="(e) => e.target.style.filter = product.stock > 0 ? 'brightness(0.9)' : ''"
+                    @mouseleave="(e) => e.target.style.filter = ''"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -332,11 +340,11 @@
                 <!-- Product Info -->
                 <div class="p-4 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 class="text-sm font-medium text-gray-800 line-clamp-2 mb-2 leading-snug min-h-[2.5em] group-hover:text-emerald-700 transition-colors">
+                    <h3 class="text-sm font-medium text-gray-800 line-clamp-2 mb-2 leading-snug min-h-[2.5em] transition-colors">
                       {{ product.name }}
                     </h3>
                   </div>
-                  <p class="text-lg font-bold text-emerald-600">
+                  <p class="text-lg font-bold" :style="{ color: primaryColor }">
                     {{ storeConfig.currency_symbol }}{{ formatPrice(product.price) }}
                   </p>
                 </div>
@@ -586,7 +594,7 @@
             </div>
             <h4 class="text-lg font-bold text-gray-900">Tu carrito está vacío</h4>
             <p class="text-gray-500 text-sm mt-1 max-w-[200px]">Agrega productos para comenzar tu pedido</p>
-            <button @click="showCheckout = false" class="mt-6 text-emerald-600 font-bold text-sm hover:underline">
+            <button @click="showCheckout = false" class="mt-6 font-bold text-sm hover:underline" :style="{ color: primaryColor }">
               Seguir comprando
             </button>
           </div>
@@ -601,7 +609,7 @@
                 <p class="text-xs text-gray-500 mt-1">Unidad</p>
               </div>
               <div class="flex items-center justify-between mt-2">
-                <p class="text-emerald-600 font-black text-base">{{ storeConfig.currency_symbol }}{{ formatPrice(item.price) }}</p>
+                <p class="font-black text-base" :style="{ color: primaryColor }">{{ storeConfig.currency_symbol }}{{ formatPrice(item.price) }}</p>
                 <button @click="removeFromCart(item.id)" class="text-gray-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -626,7 +634,7 @@
             </div>
             <div class="flex justify-between text-xl pt-3 border-t border-gray-200/60">
               <span class="font-black text-gray-900">Total a Pagar</span>
-              <span class="font-black text-emerald-600">{{ storeConfig.currency_symbol }}{{ formatPrice(cartTotal + storeConfig.delivery_cost) }}</span>
+              <span class="font-black" :style="{ color: primaryColor }">{{ storeConfig.currency_symbol }}{{ formatPrice(cartTotal + storeConfig.delivery_cost) }}</span>
             </div>
           </div>
 
@@ -704,6 +712,9 @@ const currentSlide = ref(0)
 const selectedProduct = ref(null)
 const selectedOptions = ref({}) // { 'Color': 'Rojo', 'Talla': 'M' } (Stores Value IDs)
 const activeAccordion = ref(null)
+
+// Color primario dinámico del storeConfig
+const primaryColor = computed(() => props.storeConfig.primary_color || '#10B981')
 
 // Computed for Variants
 const currentVariant = computed(() => {

@@ -948,30 +948,30 @@
           </div>
 
           <div v-if="showPromoCodeInput" class="mt-1.5 animate-fade-in">
-            <div class="flex gap-1">
+            <div class="flex gap-1.5">
               <input
                 v-model="promoCode"
                 type="text"
-                placeholder="CÓDIGO"
-                class="flex-1 px-2 py-1 text-[10px] font-bold border rounded-lg uppercase bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-1 focus:ring-blue-400 outline-none"
+                placeholder="CÓDIGO PROMOCIONAL"
+                class="flex-1 px-3 py-2.5 text-sm font-bold border rounded-lg uppercase bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none tracking-wide"
                 @keyup.enter="applyPromoCode"
               />
               <button
                 @click="applyPromoCode"
                 :disabled="!promoCode.trim()"
-                class="px-2 py-1 bg-slate-700 dark:bg-zinc-700 hover:bg-slate-800 disabled:bg-slate-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-[9px] font-bold rounded-lg"
+                class="px-4 py-2.5 bg-slate-700 dark:bg-zinc-700 hover:bg-slate-800 disabled:bg-slate-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-xs font-bold rounded-lg transition-all"
               >
-                OK
+                Aplicar
               </button>
               <button 
                 @click="showPromoCodeInput = false; promoCode = ''; promoError = ''" 
-                class="px-1.5 text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-300 rounded-lg"
+                class="px-2 text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-300 rounded-lg transition-colors"
               >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
             </div>
-            <p v-if="promoError" class="text-[9px] text-rose-600 dark:text-rose-400 mt-1 font-bold">⚠️ {{ promoError }}</p>
-            <p v-if="discount > 0 && !promoError" class="text-[9px] text-emerald-600 dark:text-emerald-400 mt-1 font-bold">✓ Cupón aplicado</p>
+            <p v-if="promoError" class="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-semibold">⚠️ {{ promoError }}</p>
+            <p v-if="discount > 0 && !promoError" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 font-semibold">✓ Código aplicado: -${{ discount.toLocaleString() }}</p>
           </div>
         </div>
 
@@ -1077,19 +1077,19 @@
        <!-- BOTÓN COBRAR - Verde SOLO cuando está listo (MÁS GRANDE Y DESTACADO) -->
        <button
           @click="handleCobrarClick"
-          :disabled="!canShowPaymentModal || quotationMode || (selectedPaymentMethod === 'efectivo' && (!cashReceived || cashReceived < total))"
+          :disabled="!canShowPaymentModal || quotationMode || (selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))"
           class="w-full h-16 rounded-2xl font-black text-lg shadow-2xl transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 group relative overflow-hidden"
           :class="[
             (!canShowPaymentModal || quotationMode)
               ? 'bg-slate-300 dark:bg-zinc-700 text-slate-500 dark:text-zinc-400 cursor-not-allowed shadow-none'
-            : (selectedPaymentMethod === 'efectivo' && (!cashReceived || cashReceived < total))
+            : (selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))
               ? 'bg-slate-400 dark:bg-zinc-600 text-slate-600 dark:text-zinc-300 cursor-not-allowed shadow-none'
               : 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-emerald-600/40 hover:shadow-emerald-600/60 hover:shadow-2xl cobrar-ready-pulse'
           ]"
         >
           <!-- Efecto de brillo animado cuando está listo -->
           <div 
-            v-if="canShowPaymentModal && !quotationMode && !(selectedPaymentMethod === 'efectivo' && (!cashReceived || cashReceived < total))" 
+            v-if="canShowPaymentModal && !quotationMode && !(selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))" 
             class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shimmer"
           ></div>
 
@@ -3162,6 +3162,25 @@ const removeDiscount = () => {
 watch(() => cart.items.length, (newLength) => {
   if (newLength === 0) {
     removeDiscount()
+  }
+})
+
+// Watcher para recalcular descuento cuando cambia el subtotal (nuevos productos agregados)
+watch(() => subtotal.value, (newSubtotal) => {
+  if (appliedDiscount.value && newSubtotal > 0) {
+    // Recalcular descuento basado en el nuevo subtotal
+    if (appliedDiscount.value.type === 'percentage') {
+      const calculatedDiscount = Math.round(newSubtotal * (appliedDiscount.value.value / 100))
+      // Aplicar límite máximo de descuento si existe
+      if (appliedDiscount.value.maximum_discount) {
+        discount.value = Math.min(calculatedDiscount, appliedDiscount.value.maximum_discount)
+      } else {
+        discount.value = calculatedDiscount
+      }
+    } else if (appliedDiscount.value.type === 'fixed') {
+      // Descuento fijo no puede ser mayor al subtotal
+      discount.value = Math.min(appliedDiscount.value.value, newSubtotal)
+    }
   }
 })
 

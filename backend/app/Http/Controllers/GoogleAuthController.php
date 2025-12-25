@@ -20,8 +20,9 @@ class GoogleAuthController extends Controller
             'redirect_uri' => config('services.google.redirect_uri'),
             'response_type' => 'code',
             'scope' => 'openid email profile',
-            'access_type' => 'offline',
-            'prompt' => 'consent',
+            'access_type' => 'online', // Cambiar a 'online' para experiencia más fluida
+            // ⚠️ 'prompt' removido: Google decide automáticamente (mejor UX)
+            // Solo mostrará "Selecciona cuenta" si hay múltiples, sin pantalla extra de confirmación
             // Guardar datos de registro temporales en state (opcional)
             'state' => base64_encode(json_encode($request->all()))
         ];

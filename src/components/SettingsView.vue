@@ -1203,6 +1203,34 @@
         </div>
       </div>
     </Transition>
+
+    <!-- Toast de Error -->
+    <Transition name="slide-down">
+      <div v-if="showErrorToast" class="fixed top-4 right-4 z-[9999] max-w-md">
+        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-rose-200 dark:border-rose-900/50 overflow-hidden">
+          <div class="p-4 flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center border border-rose-100 dark:border-rose-900/50">
+              <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-1">Error</h4>
+              <p class="text-sm text-gray-600 dark:text-zinc-400">{{ errorMessage }}</p>
+            </div>
+            <button @click="showErrorToast = false" class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-zinc-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <!-- Barra de progreso -->
+          <div class="h-1 bg-rose-50 dark:bg-rose-950">
+            <div class="h-full bg-rose-500 dark:bg-rose-400 animate-shrink-width" style="animation-duration: 3s;"></div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </Teleport>
 
   <!-- Modal de Upgrade de Plan -->
@@ -1246,6 +1274,9 @@ const categoryForm = ref({
 })
 
 // Sistema de notificaciones simple sin Vuex
+const errorMessage = ref('')
+const showErrorToast = ref(false)
+
 const showNotification = (message, type = 'success') => {
   console.log(`[${type.toUpperCase()}] ${message}`)
   if (type === 'success') {
@@ -1256,7 +1287,12 @@ const showNotification = (message, type = 'success') => {
       showSuccessModal.value = false
     }, 2000)
   } else if (type === 'error') {
-    alert(`❌ ${message}`)
+    errorMessage.value = message
+    showErrorToast.value = true
+    // Auto-cerrar después de 3 segundos
+    setTimeout(() => {
+      showErrorToast.value = false
+    }, 3000)
   }
 }
 
@@ -1522,7 +1558,11 @@ const saveAllSettings = async () => {
       auto_apply_discounts: systemSettings.value.auto_apply_discounts ? 1 : 0,
     }
     
+    console.log('🏪 [Settings] Guardando configuraciones:', { store_type: settingsToSave.store_type })
+    
     const response = await axiosInstance.put('/system-settings', settingsToSave)
+    
+    console.log('✅ [Settings] Respuesta del servidor:', response.data)
     
     if (response.data.success) {
       showNotification('Configuraciones guardadas exitosamente', 'success')
@@ -1833,3 +1873,50 @@ onMounted(async () => {
   await loadPaymentMethods()
 })
 </script>
+
+<style scoped>
+/* Animaciones para modales */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* Animación para toast de error (slide down from top) */
+.slide-down-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-down-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.slide-down-enter-from {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.slide-down-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+/* Animación de barra de progreso */
+@keyframes shrink-width {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.animate-shrink-width {
+  animation: shrink-width linear;
+}
+</style>
