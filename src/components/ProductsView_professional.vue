@@ -4183,7 +4183,7 @@ const handleFashionSave = async (productData) => {
     // Convertir a FormData para soportar imágenes
     const formData = new FormData()
     formData.append('name', productData.name)
-    formData.append('product_type', productData.type)
+    formData.append('product_type', productData.type || 'variable') // Fallback a 'variable'
     // Solo agregar category_id si tiene valor válido
     if (productData.category_id) {
       formData.append('category_id', productData.category_id)
@@ -4315,6 +4315,7 @@ const saveProduct = async (skipValidation = false) => {
     const apiData = {
       name: productForm.value.name.trim(),
       description: productForm.value.description?.trim() || '',
+      product_type: 'simple', // 🆕 Campo requerido por el backend
       sku: productForm.value.sku?.trim() || `SKU-${Date.now()}`, // Generar SKU automático si está vacío
       barcode: productForm.value.barcode?.trim() || '',
       category_id: parseInt(productForm.value.category_id),

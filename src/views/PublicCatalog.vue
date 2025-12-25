@@ -22,6 +22,7 @@ const catalogConfig = ref({
   currency_symbol: '$',
   delivery_cost: 0,
   min_order_value: 0,
+  custom_message: 'Hola, quiero hacer el siguiente pedido:',
   store_name: 'Mi Tienda'
 })
 const products = ref([])
@@ -36,6 +37,7 @@ const storeConfigForTemplate = computed(() => ({
   currency_symbol: catalogConfig.value.currency_symbol,
   delivery_cost: catalogConfig.value.delivery_cost,
   min_order_value: catalogConfig.value.min_order_value,
+  custom_message: catalogConfig.value.custom_message,
   store_name: catalogConfig.value.store_name,
   catalog_products: products.value
 }))
@@ -56,6 +58,7 @@ const loadCatalogConfig = async () => {
         currency_symbol: '$',
         delivery_cost: parseFloat(data.delivery_cost || 0),
         min_order_value: parseFloat(data.minimum_order || 0),
+        custom_message: data.custom_message || 'Hola, quiero hacer el siguiente pedido:',
         store_name: data.store_name || 'Mi Tienda'
       }
     }
@@ -67,7 +70,8 @@ const loadCatalogConfig = async () => {
 // Helper para corregir URLs de imágenes
 const getImageUrl = (path) => {
   if (!path) return ''
-  if (path.startsWith('http')) return path
+  // No modificar base64 ni URLs absolutas
+  if (path.startsWith('http') || path.startsWith('data:')) return path
   // Asegurar que tenga slash inicial si es relativa
   return path.startsWith('/') ? path : `/${path}`
 }
@@ -88,6 +92,9 @@ const loadProducts = async () => {
         stock: product.stock || 0,
         category: product.category || 'Sin categoría',
         category_id: product.category_id,
+        unit: product.unit || 'unidad', // 🆕 Campo para peso/medida
+        measurement_unit: product.measurement_unit, // 🆕 Campo especial de medida (kg, g, etc.)
+        allow_decimal: product.allow_decimal || false, // 🆕 Si permite decimales
         type: product.type || 'simple',
         options: product.options || [],
         variants: product.variants || []

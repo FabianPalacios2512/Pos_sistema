@@ -87,20 +87,24 @@
         </div>
 
         <!-- Right: Search & Cart -->
-        <div class="flex items-center gap-4 md:gap-6">
+        <div class="flex items-center gap-2 md:gap-6 flex-1 justify-end">
            
-           <!-- Desktop Search Bar -->
-           <div class="hidden md:flex items-center bg-gray-100 rounded-full px-4 py-2 w-64 transition-all focus-within:ring-2 focus-within:bg-white" :style="{ '--focus-ring-color': primaryColor }" style="--tw-ring-color: var(--focus-ring-color);">
-             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-             </svg>
-             <input 
-               type="text" 
-               placeholder="Buscar productos..." 
-               class="bg-transparent border-none focus:ring-0 text-sm text-gray-700 w-full ml-2 placeholder-gray-400"
-             />
+           <!-- Search Bar (Desktop & Mobile) -->
+           <div class="flex-1 max-w-xs md:max-w-md">
+             <div class="relative">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+               </svg>
+               <input 
+                 v-model="searchQuery"
+                 type="text" 
+                 placeholder="Buscar..."
+                 class="w-full h-9 md:h-10 pl-9 md:pl-10 pr-3 md:pr-4 bg-gray-100 border border-gray-200 rounded-full text-sm text-gray-700 placeholder-gray-400 focus:bg-white focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none"
+               />
+             </div>
            </div>
 
+           <!-- Cart Button -->
            <button 
             @click="showCheckout = true"
             class="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-700"
@@ -574,17 +578,19 @@
         <!-- Header del Carrito -->
         <div class="flex-shrink-0 bg-white border-b border-gray-100 px-6 py-5 z-10 flex items-center justify-between" :class="{ 'rounded-t-3xl': isMobilePreview }">
           <div>
-            <h3 class="text-xl font-black text-gray-900">Tu Pedido</h3>
-            <p class="text-sm text-gray-500 mt-0.5">{{ cartItems.length }} productos seleccionados</p>
+            <h3 class="text-xl font-black text-gray-900">{{ showCheckoutForm ? 'Completar Pedido' : 'Tu Pedido' }}</h3>
+            <p class="text-sm text-gray-500 mt-0.5">{{ showCheckoutForm ? 'Ingresa tus datos' : `${cartItems.length} productos seleccionados` }}</p>
           </div>
-          <button @click="showCheckout = false" class="p-2 -mr-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+          <button @click="showCheckout = false; showCheckoutForm = false" class="p-2 -mr-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <!-- Lista de Productos (Scrollable) -->
+        <!-- VISTA DEL CARRITO (cuando showCheckoutForm === false) -->
+        <template v-if="!showCheckoutForm">
+          <!-- Lista de Productos (Scrollable) -->
         <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           <div v-if="cartItems.length === 0" class="h-full flex flex-col items-center justify-center text-center py-12">
             <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
@@ -601,7 +607,17 @@
 
           <div v-else v-for="item in cartItems" :key="item.id" class="flex gap-4 py-3 border-b border-gray-50 last:border-0 animate-fade-in">
             <div class="w-20 h-20 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
-              <img :src="item.image_url" class="w-full h-full object-cover" />
+              <img 
+                v-if="item.image_url" 
+                :src="item.image_url" 
+                class="w-full h-full object-cover"
+                @error="(e) => e.target.src = ''"
+              />
+              <div v-else class="w-full h-full flex items-center justify-center bg-gray-100">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
             </div>
             <div class="flex-1 min-w-0 flex flex-col justify-between py-1">
               <div>
@@ -628,14 +644,11 @@
               <span class="text-gray-600">Subtotal</span>
               <span class="font-bold text-gray-900">{{ storeConfig.currency_symbol }}{{ formatPrice(cartTotal) }}</span>
             </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Domicilio</span>
-              <span class="font-bold text-gray-900">{{ storeConfig.currency_symbol }}{{ formatPrice(storeConfig.delivery_cost) }}</span>
-            </div>
             <div class="flex justify-between text-xl pt-3 border-t border-gray-200/60">
-              <span class="font-black text-gray-900">Total a Pagar</span>
-              <span class="font-black" :style="{ color: primaryColor }">{{ storeConfig.currency_symbol }}{{ formatPrice(cartTotal + storeConfig.delivery_cost) }}</span>
+              <span class="font-black text-gray-900">Total</span>
+              <span class="font-black" :style="{ color: primaryColor }">{{ storeConfig.currency_symbol }}{{ formatPrice(cartTotal) }}</span>
             </div>
+            <p class="text-xs text-gray-500 text-center">El costo de envío se calculará en el siguiente paso</p>
           </div>
 
           <!-- Validación Pedido Mínimo -->
@@ -651,25 +664,206 @@
             </div>
           </div>
 
-          <!-- WhatsApp Button -->
+          <!-- Botón Completar Pedido -->
           <button 
-            @click="sendWhatsAppOrder"
+            @click="showCheckoutForm = true"
             :disabled="cartTotal < storeConfig.min_order_value"
             class="w-full bg-[#25D366] hover:bg-[#1ebe57] disabled:bg-gray-300 disabled:text-gray-500 text-white py-4 rounded-xl font-black text-lg flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Enviar Pedido por WhatsApp
+            Completar Pedido
           </button>
         </div>
+        </template>
+
+        <!-- VISTA DEL FORMULARIO (cuando showCheckoutForm === true) -->
+        <template v-else>
+          <!-- Botón Volver -->
+          <div class="px-6 pt-6 pb-4">
+            <button 
+              @click="showCheckoutForm = false" 
+              class="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold text-sm transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Volver al carrito
+            </button>
+          </div>
+
+          <!-- Formulario -->
+          <div class="flex-1 overflow-y-auto px-6 pb-6 space-y-4">
+            <div>
+              <h3 class="text-lg font-black text-gray-900 mb-1">Datos del Cliente</h3>
+              <p class="text-sm text-gray-500">Completa tu información para procesar el pedido</p>
+            </div>
+
+            <!-- Cédula -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Cédula / Documento <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <input 
+                  v-model="formData.customer_document"
+                  @blur="searchCustomerByDocument"
+                  type="text"
+                  required
+                  minlength="6"
+                  placeholder="1234567890"
+                  :disabled="searchingCustomer"
+                  class="w-full px-4 py-3 border-2 border-gray-200 bg-white text-gray-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 transition-all disabled:opacity-50"
+                />
+                <div v-if="searchingCustomer" class="absolute right-3 top-1/2 -translate-y-1/2">
+                  <svg class="animate-spin h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nombre -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Nombre Completo <span class="text-red-500">*</span></label>
+              <input 
+                v-model="formData.customer_name"
+                type="text"
+                required
+                placeholder="Juan Pérez"
+                class="w-full px-4 py-3 border-2 border-gray-200 bg-white text-gray-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+              />
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Teléfono <span class="text-red-500">*</span></label>
+              <input 
+                v-model="formData.customer_phone"
+                type="tel"
+                required
+                placeholder="3001234567"
+                class="w-full px-4 py-3 border-2 border-gray-200 bg-white text-gray-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+              />
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Correo Electrónico <span class="text-gray-400 text-xs">(Opcional)</span></label>
+              <input 
+                v-model="formData.customer_email"
+                type="email"
+                placeholder="correo@ejemplo.com"
+                class="w-full px-4 py-3 border-2 border-gray-200 bg-white text-gray-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+              />
+            </div>
+
+            <!-- Tipo de Entrega -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-3">Tipo de Entrega <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-2 gap-3">
+                <button 
+                  @click="formData.delivery_type = 'delivery'"
+                  type="button"
+                  class="px-4 py-4 rounded-xl border-2 font-bold text-sm flex flex-col items-center gap-2 transition-all"
+                  :class="formData.delivery_type === 'delivery' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" /></svg>
+                  Envío a Domicilio
+                </button>
+                <button 
+                  @click="formData.delivery_type = 'pickup'"
+                  type="button"
+                  class="px-4 py-4 rounded-xl border-2 font-bold text-sm flex flex-col items-center gap-2 transition-all"
+                  :class="formData.delivery_type === 'pickup' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'"
+                >
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                  Recoger en Tienda
+                </button>
+              </div>
+            </div>
+
+            <!-- Dirección (si es delivery) -->
+            <div v-if="formData.delivery_type === 'delivery'">
+              <label class="block text-sm font-bold text-gray-700 mb-2">Dirección de Entrega <span class="text-red-500">*</span></label>
+              <textarea 
+                v-model="formData.customer_address"
+                required
+                rows="3"
+                placeholder="Calle 123 #45-67"
+                class="w-full px-4 py-3 border-2 border-gray-200 bg-white text-gray-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 resize-none"
+              ></textarea>
+            </div>
+
+            <!-- Notas -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-2">Notas Especiales <span class="text-gray-400 text-xs">(Opcional)</span></label>
+              <textarea 
+                v-model="formData.note"
+                rows="2"
+                placeholder="Ej: Tocar el timbre"
+                class="w-full px-4 py-3 border-2 border-gray-200 bg-white text-gray-900 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 resize-none"
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Footer con botón -->
+          <div class="border-t border-gray-200 p-6 bg-gray-50 space-y-3">
+            <div class="p-4 rounded-xl bg-white border border-gray-200">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-semibold text-gray-600">Total a Pagar:</span>
+                <span class="text-2xl font-black text-gray-900">
+                  {{ storeConfig.currency_symbol }}{{ formatPrice(cartTotal + (formData.delivery_type === 'delivery' ? storeConfig.delivery_cost : 0)) }}
+                </span>
+              </div>
+              <p class="text-xs text-gray-500">
+                {{ cartItems.length }} producto{{ cartItems.length !== 1 ? 's' : '' }} • {{ formData.delivery_type === 'delivery' ? 'Envío a domicilio' : 'Recoger en tienda' }}
+              </p>
+            </div>
+
+            <button 
+              @click="handleCheckoutSubmit"
+              :disabled="submittingOrder || !formData.customer_name || !formData.customer_phone || !formData.customer_document || formData.customer_document.length < 6 || (formData.delivery_type === 'delivery' && !formData.customer_address)"
+              class="w-full bg-gradient-to-r from-[#25D366] to-[#1ebe57] hover:from-[#1ebe57] hover:to-[#128C7E] disabled:from-gray-300 disabled:to-gray-400 text-white py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 shadow-2xl hover:shadow-3xl transition-all disabled:cursor-not-allowed active:scale-[0.98]"
+            >
+              <svg v-if="!submittingOrder" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+              </svg>
+              <svg v-else class="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>{{ submittingOrder ? 'Procesando...' : 'Enviar Pedido' }}</span>
+            </button>
+          </div>
+        </template>
       </div>
     </Transition>
+
+    <!-- ⚖️ Modal de Cantidad (Productos por peso/medida) -->
+    <QuantityModal
+      :show="showQuantityModal"
+      :product="selectedProductForQuantity"
+      @close="showQuantityModal = false"
+      @confirm="handleQuantityConfirmed"
+    />
+
+    <!-- 👗 Modal de Selección de Variantes (Fashion) -->
+    <POSVariantSelector
+      :show="showVariantModal"
+      :product="selectedProductForVariants"
+      @close="showVariantModal = false"
+      @confirm="handleVariantConfirmed"
+    />
+
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import axios from 'axios'
+import QuantityModal from './QuantityModal.vue'
+import POSVariantSelector from '../POSVariantSelector.vue'
 
 const props = defineProps({
   storeConfig: {
@@ -702,16 +896,35 @@ const isLoadingBanner = ref(true)
 const loadingImages = ref({})
 const imageErrors = ref({})
 const selectedCategory = ref(null)
+const searchQuery = ref('')
 const sortOrder = ref('') // Filtro de ordenamiento
 const showOnlyAvailable = ref(false) // Filtro de disponibilidad
 const cartItems = ref([])
 const showCheckout = ref(false)
+const showCheckoutForm = ref(false)
+const submittingOrder = ref(false)
+const searchingCustomer = ref(false)
+const formData = ref({
+  customer_name: '',
+  customer_phone: '',
+  customer_document: '',
+  customer_email: '',
+  delivery_type: 'delivery',
+  customer_address: '',
+  note: ''
+})
 const stickyHeader = ref(null)
 const productsSection = ref(null)
 const currentSlide = ref(0)
 const selectedProduct = ref(null)
 const selectedOptions = ref({}) // { 'Color': 'Rojo', 'Talla': 'M' } (Stores Value IDs)
 const activeAccordion = ref(null)
+
+// 🆕 Estados para modales nuevos
+const showQuantityModal = ref(false)
+const selectedProductForQuantity = ref(null)
+const showVariantModal = ref(false)
+const selectedProductForVariants = ref(null)
 
 // Color primario dinámico del storeConfig
 const primaryColor = computed(() => props.storeConfig.primary_color || '#10B981')
@@ -769,6 +982,15 @@ const storeName = computed(() => props.storeConfig.store_name || 'Mi Tienda')
 
 const filteredProducts = computed(() => {
   let products = props.storeConfig.catalog_products || []
+  
+  // Filtro por búsqueda
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase()
+    products = products.filter(p => 
+      (p.name || '').toLowerCase().includes(query) ||
+      (p.description || '').toLowerCase().includes(query)
+    )
+  }
   
   // Filtro por categoría seleccionada
   if (selectedCategory.value !== null) {
@@ -833,10 +1055,88 @@ const handleImageError = (productId) => {
 
 const addToCart = (product) => {
   if (product.stock === 0) return
+  
+  console.log('🛒 Producto clickeado:', product.name)
+  console.log('⚖️ Measurement unit:', product.measurement_unit)
+  console.log('⚖️ Unit:', product.unit)
+  console.log('📦 Variantes:', product.variants)
+  
+  // 🚨 DETECCIÓN IGUAL QUE EL POS
+  // Si el producto usa measurement_unit diferente de 'unit', requiere modal de cantidad
+  const requiresQuantityInput = product.measurement_unit && product.measurement_unit !== 'unit'
+  
+  console.log('✅ Requiere input de cantidad:', requiresQuantityInput)
+  
+  if (requiresQuantityInput) {
+    console.log('✅ Abriendo modal de cantidad')
+    selectedProductForQuantity.value = product
+    showQuantityModal.value = true
+    return
+  }
+  
+  // 2️⃣ Verificar si tiene variantes (Fashion)
+  const hasVariants = product.variants && product.variants.length > 0
+  if (hasVariants) {
+    console.log('✅ Abriendo modal de variantes')
+    selectedProductForVariants.value = product
+    showVariantModal.value = true
+    return
+  }
+  
+  // 3️⃣ Producto simple: agregar directamente
+  console.log('⚠️ Agregando directamente')
   cartItems.value.push({ ...product })
   // Animación visual
   const event = new CustomEvent('cart-updated', { detail: { action: 'add' } })
   window.dispatchEvent(event)
+}
+
+// 🆕 Handler para modal de cantidad
+const handleQuantityConfirmed = ({ product, quantity }) => {
+  console.log(`⚖️ Agregando ${quantity} ${product.unit} de ${product.name}`)
+  
+  const productWithQuantity = {
+    ...product,
+    id: `${product.id}-${Date.now()}`,
+    quantity_value: quantity,
+    name: `${product.name} (${quantity} ${product.unit || 'kg'})`,
+    price: product.price * quantity,
+    original_price: product.price,
+    display_quantity: quantity
+  }
+  
+  cartItems.value.push(productWithQuantity)
+  selectedProductForQuantity.value = null
+  showQuantityModal.value = false
+}
+
+// 🆕 Handler para modal de variantes
+const handleVariantConfirmed = ({ variant, selectedOptions }) => {
+  if (!variant || !selectedProductForVariants.value) return
+  
+  if (variant.stock <= 0) {
+    console.warn('No hay stock disponible para esta variante')
+    return
+  }
+  
+  const optionsSummary = Object.entries(selectedOptions)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join(' / ')
+  
+  const productWithVariant = {
+    ...selectedProductForVariants.value,
+    id: `${selectedProductForVariants.value.id}-${variant.id}`,
+    variant_id: variant.id,
+    name: `${selectedProductForVariants.value.name} (${optionsSummary})`,
+    price: variant.price,
+    stock: variant.stock,
+    image_url: selectedProductForVariants.value.image_url || selectedProductForVariants.value.image,
+    variant_options: optionsSummary
+  }
+  
+  cartItems.value.push(productWithVariant)
+  selectedProductForVariants.value = null
+  showVariantModal.value = false
 }
 
 const removeFromCart = (productId) => {
@@ -844,22 +1144,114 @@ const removeFromCart = (productId) => {
   if (index > -1) cartItems.value.splice(index, 1)
 }
 
-const sendWhatsAppOrder = () => {
+// Buscar cliente por cédula (autocomplete inteligente)
+const searchCustomerByDocument = async () => {
+  if (!formData.value.customer_document || formData.value.customer_document.length < 6) {
+    return
+  }
+  
+  try {
+    searchingCustomer.value = true
+    
+    const response = await axios.post('/api/public/customers/find-by-document', {
+      document: formData.value.customer_document
+    })
+    
+    if (response.data.success && response.data.found) {
+      formData.value.customer_name = response.data.customer.name
+      formData.value.customer_phone = response.data.customer.phone
+      formData.value.customer_email = response.data.customer.email || ''
+      formData.value.customer_address = response.data.customer.address || ''
+      
+      console.log('✅ Cliente encontrado:', response.data.customer.name)
+    } else {
+      console.log('ℹ️ Cliente no encontrado, permitir llenado manual')
+    }
+  } catch (error) {
+    console.error('⚠️ Error buscando cliente:', error)
+  } finally {
+    searchingCustomer.value = false
+  }
+}
+
+const handleCheckoutSubmit = async () => {
   if (cartTotal.value < props.storeConfig.min_order_value) return
 
-  const total = cartTotal.value + props.storeConfig.delivery_cost
-  let message = `¡Hola! 👋 Quiero hacer un pedido:\n\n`
-  
-  cartItems.value.forEach((item, index) => {
-    message += `${index + 1}. ${item.name} - ${props.storeConfig.currency_symbol}${formatPrice(item.price)}\n`
-  })
-  
-  message += `\n📦 Subtotal: ${props.storeConfig.currency_symbol}${formatPrice(cartTotal.value)}`
-  message += `\n🚚 Domicilio: ${props.storeConfig.currency_symbol}${formatPrice(props.storeConfig.delivery_cost)}`
-  message += `\n💰 *Total: ${props.storeConfig.currency_symbol}${formatPrice(total)}*`
+  try {
+    submittingOrder.value = true
 
-  const whatsappUrl = `https://wa.me/${props.storeConfig.whatsapp_number}?text=${encodeURIComponent(message)}`
-  window.open(whatsappUrl, '_blank')
+    const items = cartItems.value.map(item => ({
+      product_id: item.id,
+      quantity: item.quantity || 1,
+      special_instructions: item.special_instructions || null
+    }))
+
+    const response = await axios.post('/api/public/orders', {
+      ...formData.value,
+      items
+    })
+
+    if (response.data.success) {
+      const order = response.data.order
+      
+      // Guardar datos ANTES de resetear
+      const customerData = { ...formData.value }
+      const orderItems = [...cartItems.value]
+      
+      // Cerrar modales
+      showCheckoutForm.value = false
+      showCheckout.value = false
+      
+      // Vaciar carrito
+      cartItems.value = []
+      
+      // Resetear formulario
+      formData.value = {
+        customer_name: '',
+        customer_phone: '',
+        customer_document: '',
+        customer_email: '',
+        delivery_type: 'delivery',
+        customer_address: '',
+        note: ''
+      }
+      
+      // Crear mensaje usando configuración personalizada
+      const greeting = props.storeConfig.custom_message || 'Hola, quiero hacer el siguiente pedido:'
+      let message = `${greeting}\n\n`
+      message += `📋 *Código: ${order.order_number}*\n\n`
+      message += `👤 ${customerData.customer_name}\n`
+      message += `📱 ${customerData.customer_phone}\n\n`
+      
+      if (customerData.delivery_type === 'delivery') {
+        message += `🚚 Envío a: ${customerData.customer_address}\n\n`
+      } else {
+        message += `🏪 Recoger en tienda\n\n`
+      }
+      
+      message += `📦 *Productos:*\n`
+      orderItems.forEach((item, index) => {
+        message += `${index + 1}. ${item.name} x${item.quantity || 1}\n`
+      })
+      
+      const deliveryCost = customerData.delivery_type === 'delivery' ? parseFloat(props.storeConfig.delivery_cost || 0) : 0
+      const finalTotal = parseFloat(order.total) + deliveryCost
+      
+      message += `\n💰 Total: ${props.storeConfig.currency_symbol}${formatPrice(finalTotal)}`
+
+      if (customerData.note) {
+        message += `\n\n📝 ${customerData.note}`
+      }
+
+      const whatsappUrl = `https://wa.me/${props.storeConfig.whatsapp_number}?text=${encodeURIComponent(message)}`
+      window.open(whatsappUrl, '_blank')
+    }
+  } catch (error) {
+    console.error('Error al crear pedido:', error)
+    alert('❌ Error al crear el pedido. Por favor intenta nuevamente.')
+  } finally {
+    submittingOrder.value = false
+  }
 }
 
 const handleScroll = () => {

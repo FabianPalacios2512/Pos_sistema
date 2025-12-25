@@ -86,13 +86,16 @@ class PublicCatalogController extends Controller
 
         $products = $query->get()->map(function($product) {
             $mainImage = $product->public_image ?? $product->image_url;
-            if ($mainImage && !str_starts_with($mainImage, 'http')) {
+
+            // Solo agregar URL base si NO es base64 ni URL absoluta
+            if ($mainImage && !str_starts_with($mainImage, 'http') && !str_starts_with($mainImage, 'data:')) {
                 $mainImage = url($mainImage);
             }
 
             $images = $product->images->sortBy('order')->map(function($img) {
                 $url = $img->image_url;
-                if ($url && !str_starts_with($url, 'http')) {
+                // Solo agregar URL base si NO es base64 ni URL absoluta
+                if ($url && !str_starts_with($url, 'http') && !str_starts_with($url, 'data:')) {
                     return url($url);
                 }
                 return $url;
@@ -110,6 +113,8 @@ class PublicCatalogController extends Controller
                 'category_id' => $product->category_id,
                 'sku' => $product->sku,
                 'unit' => $product->unit,
+                'measurement_unit' => $product->measurement_unit, // 📏 Para productos por peso
+                'allow_decimal' => $product->allow_decimal, // 📏 Para decimales
                 'type' => $product->product_type,
                 'options' => $product->options->map(function($opt) {
                     return [
@@ -123,12 +128,23 @@ class PublicCatalogController extends Controller
                         })
                     ];
                 }),
-                'variants' => $product->variants->map(function($var) {
+                'variants' => $product->variants->map(function($var) use ($product) {
+                    // Construir options_summary para el modal de variantes
+                    $optionsSummary = $var->optionValues->map(function($ov) use ($product) {
+                        // Buscar el nombre de la opción
+                        $option = $product->options->firstWhere('id', $ov->product_option_id);
+                        return [
+                            'name' => $option ? $option->name : 'Opción',
+                            'value' => $ov->value
+                        ];
+                    })->toArray();
+
                     return [
                         'id' => $var->id,
                         'sku' => $var->sku,
                         'price' => (float) $var->price,
                         'stock' => $var->stock,
+                        'options_summary' => $optionsSummary, // Para el modal de variantes
                         'option_values' => $var->optionValues->map(function($ov) {
                              return [
                                  'option_id' => $ov->product_option_id,
@@ -199,7 +215,10 @@ class PublicCatalogController extends Controller
                         'currency_symbol' => '$',
                         'delivery_cost' => 0,
                         'minimum_order' => 0,
-                        'store_name' => 'Mi Tienda'
+                        'store_name' => DB::table('system_settings')->value('company_name')
+                            ?? \Stancl\Tenancy\Facades\Tenancy::tenant()?->business_name
+                            ?? tenant('name')
+                            ?? 'Mi Tienda'
                     ]
                 ]);
             }
@@ -219,7 +238,11 @@ class PublicCatalogController extends Controller
                     'currency_symbol' => '$',
                     'delivery_cost' => $config->delivery_cost,
                     'minimum_order' => $config->minimum_order,
-                    'store_name' => tenant('name') ?? 'Mi Tienda'
+                    'custom_message' => $config->custom_message ?? 'Hola, quiero hacer el siguiente pedido:',
+                    'store_name' => DB::table('system_settings')->value('company_name')
+                        ?? \Stancl\Tenancy\Facades\Tenancy::tenant()?->business_name
+                        ?? tenant('name')
+                        ?? 'Mi Tienda'
                 ]
             ]);
         } catch (\Exception $e) {
@@ -240,6 +263,7 @@ class PublicCatalogController extends Controller
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:20',
             'customer_document' => 'required|string|min:6|max:20',
+            'customer_email' => 'nullable|email|max:255',
             'customer_address' => 'nullable|string',
             'delivery_type' => 'required|in:pickup,delivery',
             'note' => 'nullable|string|max:500',
@@ -294,6 +318,25 @@ class PublicCatalogController extends Controller
                     'message' => 'Algunos productos no tienen stock suficiente',
                     'errors' => $stockErrors,
                 ], 422);
+            }
+
+            // Actualizar datos del cliente si existe en la BD
+            $existingCustomer = DB::table('customers')
+                ->where('document_number', $request->customer_document)
+                ->where('active', true)
+                ->first();
+
+            if ($existingCustomer) {
+                // Actualizar datos del cliente existente
+                DB::table('customers')
+                    ->where('id', $existingCustomer->id)
+                    ->update([
+                        'name' => $request->customer_name,
+                        'phone' => $request->customer_phone,
+                        'email' => $request->customer_email ?: $existingCustomer->email,
+                        'address' => $request->customer_address ?: $existingCustomer->address,
+                        'updated_at' => now(),
+                    ]);
             }
 
             // Crear el pedido
@@ -479,6 +522,52 @@ class PublicCatalogController extends Controller
                 }),
             ],
             'stock_issues' => $stockIssues,
+        ]);
+    }
+
+    /**
+     * Busca un cliente por documento (optimizado con índice)
+     * Este endpoint es público para el catálogo web
+     */
+    public function findCustomerByDocument(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'document' => 'required|string|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Documento inválido',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Buscar cliente por documento_number (tiene índice en la BD)
+        // Solo devolver datos básicos necesarios para el formulario
+        $customer = DB::table('customers')
+            ->select('name', 'phone', 'email', 'address', 'document_number')
+            ->where('document_number', $request->document)
+            ->where('active', true)
+            ->first();
+
+        if (!$customer) {
+            return response()->json([
+                'success' => false,
+                'found' => false,
+                'message' => 'Cliente no encontrado'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'found' => true,
+            'customer' => [
+                'name' => $customer->name,
+                'phone' => $customer->phone,
+                'email' => $customer->email ?? '',
+                'address' => $customer->address ?? '',
+            ]
         ]);
     }
 

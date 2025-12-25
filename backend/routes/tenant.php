@@ -67,6 +67,9 @@ Route::middleware([
     Route::post('/orders', [App\Http\Controllers\PublicCatalogController::class, 'store']);
     Route::get('/orders/{uuid}', [App\Http\Controllers\PublicCatalogController::class, 'show']);
 
+    // Ruta para buscar cliente por documento (autocompletado)
+    Route::post('/customers/find-by-document', [App\Http\Controllers\PublicCatalogController::class, 'findCustomerByDocument']);
+
     // Ruta para buscar pedido por código (para el POS)
     Route::post('/orders/find-by-code', [App\Http\Controllers\PublicCatalogController::class, 'findByCode']);
 

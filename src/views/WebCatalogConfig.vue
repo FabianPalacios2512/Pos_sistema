@@ -734,9 +734,15 @@ onMounted(async () => {
   isLoading.value = false
 })
 
-// Refresh Preview - Recarga el iframe
+// Refresh Preview - Recarga el iframe completamente
 const refreshPreview = () => {
   previewKey.value++
+  // Forzar recarga completa del iframe con timestamp para evitar caché
+  const iframe = document.querySelector('iframe')
+  if (iframe) {
+    const currentSrc = iframe.src.split('?')[0] // Remover query params anteriores
+    iframe.src = `${currentSrc}?t=${Date.now()}` // Agregar timestamp único
+  }
 }
 
 // Open catalog in new window (always mobile view)
