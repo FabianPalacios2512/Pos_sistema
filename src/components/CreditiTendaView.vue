@@ -4,20 +4,32 @@
       <!-- Header -->
       <div class="flex items-center justify-between pb-4">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Cuentas por Cobrar</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestión de créditos y abonos de clientes</p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">CreditiTenda</h1>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestión completa de créditos y clientes</p>
         </div>
         
-        <div class="relative">
-          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-          <input 
-            v-model="searchTerm"
-            type="text" 
-            placeholder="Buscar cliente..."
-            class="pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
-          />
+        <div class="flex items-center gap-3">
+          <!-- Búsqueda -->
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input 
+              v-model="searchTerm"
+              type="text" 
+              placeholder="Buscar cliente..."
+              class="pl-10 pr-4 py-3 text-sm w-64 rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
+            />
+          </div>
+          
+          <!-- Botón Nuevo Crédito -->
+          <button @click="openCreateCreditModal" 
+                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Nuevo Crédito</span>
+          </button>
         </div>
       </div>
 
@@ -143,8 +155,9 @@
                   </p>
                 </td>
                 <td class="px-3 py-3">
-                  <p class="font-semibold text-emerald-600 dark:text-emerald-400">
-                    ${{ formatCurrency((customer.credit_limit || 0) - (customer.current_debt || 0)) }}
+                  <p class="font-semibold" 
+                     :class="getAvailableCredit(customer) > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-zinc-500'">
+                    ${{ formatCurrency(getAvailableCredit(customer)) }}
                   </p>
                 </td>
                 <td class="px-3 py-3">
@@ -264,13 +277,13 @@
                         </span>
                       </td>
                       <td class="px-3 py-3">
-                        <p class="text-sm font-semibold text-gray-900 dark:text-white">${{ formatCurrency(invoice.total - (invoice.surcharge_amount || 0)) }}</p>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">${{ formatCurrency(invoice.total) }}</p>
                       </td>
                       <td class="px-3 py-3">
                         <p class="text-sm font-semibold text-amber-600 dark:text-amber-400">${{ formatCurrency(invoice.surcharge_amount || 0) }}</p>
                       </td>
                       <td class="px-3 py-3">
-                        <p class="text-sm font-bold text-gray-900 dark:text-white">${{ formatCurrency(invoice.total) }}</p>
+                        <p class="text-sm font-bold text-gray-900 dark:text-white">${{ formatCurrency(invoice.total + (invoice.surcharge_amount || 0)) }}</p>
                       </td>
                     </tr>
                   </tbody>
@@ -356,7 +369,7 @@
                 </div>
                 <div>
                   <p class="text-xs text-gray-600 dark:text-zinc-400">Crédito Disponible</p>
-                  <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400">${{ formatCurrency((selectedCustomer?.credit_limit || 0) - (selectedCustomer?.current_debt || 0)) }}</p>
+                  <p class="text-lg font-bold" :class="getAvailableCredit(selectedCustomer) > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-zinc-500'">${{ formatCurrency(getAvailableCredit(selectedCustomer)) }}</p>
                 </div>
                 <div class="pt-2 border-t border-gray-200 dark:border-zinc-800">
                   <span :class="getStatusColor(selectedCustomer)" class="px-2 py-1 rounded-full text-xs font-semibold border w-full block text-center">
@@ -399,6 +412,166 @@
             class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200"
           >
             Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 Modal Crear Nuevo Crédito -->
+    <div v-if="showCreateCreditModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-50 p-4" @click.self="showCreateCreditModal = false">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 max-w-2xl w-full max-h-[90vh] overflow-auto">
+        
+        <!-- Header -->
+        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 sticky top-0 z-10">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ customerExists ? 'Actualizar Crédito' : 'Nuevo Crédito' }}</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ customerExists ? 'Cliente encontrado en el sistema' : 'Crear cliente con crédito habilitado' }}</p>
+              </div>
+            </div>
+            <button @click="showCreateCreditModal = false" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all">
+              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6 space-y-4">
+          <!-- Documento -->
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Tipo</label>
+              <select 
+                v-model="customerForm.document_type"
+                class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="CC">CC</option>
+                <option value="NIT">NIT</option>
+                <option value="CE">CE</option>
+                <option value="Pasaporte">Pasaporte</option>
+              </select>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Número de Documento *</label>
+              <div class="relative">
+                <input 
+                  v-model="customerForm.document_number"
+                  @blur="checkDocumentExists"
+                  type="text"
+                  placeholder="Ej: 1234567890"
+                  class="w-full px-3 py-2.5 pr-10 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <div v-if="checkingDocument" class="absolute right-3 top-1/2 -translate-y-1/2">
+                  <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información Personal -->
+          <div class="border-t border-gray-200 dark:border-zinc-800 pt-4">
+            <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Información Personal</h4>
+            
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Nombre Completo *</label>
+                <input 
+                  v-model="customerForm.name"
+                  type="text"
+                  placeholder="Ej: Juan Pérez"
+                  class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Teléfono</label>
+                  <input 
+                    v-model="customerForm.phone"
+                    type="tel"
+                    placeholder="3001234567"
+                    class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Email</label>
+                  <input 
+                    v-model="customerForm.email"
+                    type="email"
+                    placeholder="correo@ejemplo.com"
+                    class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Dirección</label>
+                <input 
+                  v-model="customerForm.address"
+                  type="text"
+                  placeholder="Calle 123 # 45-67"
+                  class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Ciudad</label>
+                <input 
+                  v-model="customerForm.city"
+                  type="text"
+                  placeholder="Bogotá"
+                  class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de Crédito -->
+          <div class="border-t border-gray-200 dark:border-zinc-800 pt-4">
+            <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Configuración de Crédito</h4>
+            
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Cupo de Crédito *</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-zinc-400 font-bold">$</span>
+                  <input 
+                    v-model.number="customerForm.credit_limit"
+                    type="number"
+                    min="0"
+                    step="1000"
+                    placeholder="0"
+                    class="w-full pl-8 pr-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Monto máximo que el cliente puede deber</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3">
+          <button 
+            @click="showCreateCreditModal = false"
+            class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200"
+          >
+            Cancelar
+          </button>
+          <button 
+            @click="saveCustomerCredit"
+            :disabled="!customerForm.document_number || !customerForm.name || !customerForm.credit_limit || processing"
+            class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300"
+          >
+            {{ processing ? 'Guardando...' : (customerExists ? 'Actualizar Cliente' : 'Crear Cliente') }}
           </button>
         </div>
       </div>
@@ -498,6 +671,23 @@ const sendingReminder = ref(false)
 const creditInvoices = ref([])
 const creditPayments = ref([])
 
+// 🎯 CreditiTenda: Modal de creación de cliente con crédito
+const showCreateCreditModal = ref(false)
+const checkingDocument = ref(false)
+const customerExists = ref(false)
+const customerForm = ref({
+  document_type: 'CC',
+  document_number: '',
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+  city: '',
+  credit_limit: 0,
+  credit_active: true,
+  active: true
+})
+
 // Computed
 const filteredCustomers = computed(() => {
   let filtered = customers.value.filter(c => c.credit_active)
@@ -548,23 +738,59 @@ const loadCustomers = async () => {
 const getStatusColor = (customer) => {
   const debt = customer.current_debt || 0
   const limit = customer.credit_limit || 0
-  const percentage = limit > 0 ? (debt / limit) * 100 : 0
   
+  // Sin deuda
   if (debt === 0) return 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'
-  if (percentage >= 90) return 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'
-  if (percentage >= 70) return 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800'
-  return 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800'
+  
+  // Deuda excede el límite = Crítico (siempre primero)
+  if (debt > limit) return 'bg-gray-900 dark:bg-gray-950 text-white dark:text-gray-100 border-gray-800 dark:border-gray-900'
+  
+  // Si tiene deuda pero no hay fecha registrada, calcular días desde now (caso legacy)
+  if (!customer.debt_since) {
+    return 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800'
+  }
+  
+  // Calcular días de mora
+  const debtDate = new Date(customer.debt_since)
+  const now = new Date()
+  const daysDiff = Math.floor((now - debtDate) / (1000 * 60 * 60 * 24))
+  
+  if (daysDiff >= 90) return 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800' // Mora
+  if (daysDiff >= 60) return 'bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 border-orange-100 dark:border-orange-800' // Vencido
+  if (daysDiff >= 30) return 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800' // Por Vencer
+  
+  return 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800' // Al día (con deuda reciente)
 }
 
 const getStatusText = (customer) => {
   const debt = customer.current_debt || 0
   const limit = customer.credit_limit || 0
-  const percentage = limit > 0 ? (debt / limit) * 100 : 0
   
-  if (debt === 0) return 'Al día'
-  if (percentage >= 90) return 'Crítico'
-  if (percentage >= 70) return 'Alto'
-  return 'Normal'
+  // Sin deuda
+  if (debt === 0) return 'Al Día'
+  
+  // Deuda excede el límite = Crítico
+  if (debt > limit) return 'Crítico'
+  
+  // Si no hay fecha de deuda (casos legacy)
+  if (!customer.debt_since) {
+    return 'Activo'
+  }
+  
+  // Calcular días de mora
+  const debtDate = new Date(customer.debt_since)
+  const now = new Date()
+  const daysDiff = Math.floor((now - debtDate) / (1000 * 60 * 60 * 24))
+  
+  if (daysDiff >= 90) return 'Mora'
+  if (daysDiff >= 60) return 'Vencido'
+  if (daysDiff >= 30) return 'Por Vencer'
+  
+  return 'Al Día'
+}
+
+const getAvailableCredit = (customer) => {
+  return Math.max(0, (customer.credit_limit || 0) - (customer.current_debt || 0))
 }
 
 const openPaymentModal = (customer) => {
@@ -701,6 +927,123 @@ const formatDate = (date) => {
 
 const formatCurrency = (value) => {
   return new Intl.NumberFormat('es-CO').format(parseFloat(value || 0))
+}
+
+// 🎯 CreditiTenda: Funciones para creación de cliente con validación de cédula
+const openCreateCreditModal = () => {
+  // Resetear formulario
+  customerForm.value = {
+    document_type: 'CC',
+    document_number: '',
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    credit_limit: 0,
+    credit_active: true,
+    active: true
+  }
+  customerExists.value = false
+  showCreateCreditModal.value = true
+}
+
+const checkDocumentExists = async () => {
+  if (!customerForm.value.document_number || customerForm.value.document_number.length < 5) {
+    return
+  }
+
+  checkingDocument.value = true
+  try {
+    const response = await axiosInstance.post('/customers/check-document', {
+      document_type: customerForm.value.document_type,
+      document_number: customerForm.value.document_number
+    })
+
+    if (response.data.exists) {
+      customerExists.value = true
+      // Autocompletar datos del cliente existente (SILENCIOSAMENTE - magia ✨)
+      const existingCustomer = response.data.data
+      customerForm.value = {
+        ...customerForm.value,
+        name: existingCustomer.name,
+        email: existingCustomer.email || '',
+        phone: existingCustomer.phone || '',
+        address: existingCustomer.address || '',
+        city: existingCustomer.city || '',
+        credit_limit: existingCustomer.credit_limit || 0,
+        credit_active: true, // Siempre true en CreditiTenda
+        active: existingCustomer.active ?? true
+      }
+      // Sin mensajes molestos - el autocompletado es la magia
+    } else {
+      customerExists.value = false
+      // Sin mensaje - el usuario simplemente sigue llenando el formulario
+    }
+  } catch (error) {
+    console.error('Error checking document:', error)
+    // Solo mostrar error si falla la conexión
+    showError('Error al validar el documento')
+  } finally {
+    checkingDocument.value = false
+  }
+}
+
+const saveCustomerCredit = async () => {
+  // Validaciones
+  if (!customerForm.value.document_number) {
+    showError('El número de documento es obligatorio')
+    return
+  }
+  if (!customerForm.value.name) {
+    showError('El nombre es obligatorio')
+    return
+  }
+  if (!customerForm.value.credit_limit || customerForm.value.credit_limit <= 0) {
+    showError('El cupo de crédito debe ser mayor a 0')
+    return
+  }
+
+  processing.value = true
+  try {
+    let response
+    if (customerExists.value) {
+      // Actualizar cliente existente
+      const existingId = customers.value.find(c => 
+        c.document_type === customerForm.value.document_type && 
+        c.document_number === customerForm.value.document_number
+      )?.id
+      
+      response = await axiosInstance.put(`/customers/${existingId}`, customerForm.value)
+    } else {
+      // Crear nuevo cliente
+      response = await axiosInstance.post('/customers', customerForm.value)
+    }
+
+    if (response.data.success) {
+      showSuccess(customerExists.value ? 'Crédito actualizado exitosamente' : 'Crédito creado exitosamente')
+      showCreateCreditModal.value = false
+      await loadCustomers()
+    }
+  } catch (error) {
+    console.error('Error saving customer:', error)
+    
+    // Mensajes de error amigables para duplicados
+    if (error.response?.data?.errors) {
+      const errors = error.response.data.errors
+      if (errors.document_number) {
+        showError('Este número de documento ya está registrado')
+      } else if (errors.email) {
+        showError('Este correo electrónico ya está registrado')
+      } else {
+        showError(error.response?.data?.message || 'Error al guardar el crédito')
+      }
+    } else {
+      showError(error.response?.data?.message || 'Error al guardar el crédito')
+    }
+  } finally {
+    processing.value = false
+  }
 }
 
 // Initialization

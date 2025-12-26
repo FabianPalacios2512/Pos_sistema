@@ -211,7 +211,7 @@ const CashAdminView = defineAsyncComponent(() => import('../components/CashAdmin
 const ReturnsManagementView = defineAsyncComponent(() => import('../components/ReturnsManagementView.vue'))
 const UsersManagementView = defineAsyncComponent(() => import('../components/UsersManagementView_Professional.vue'))
 const ExpensesManager = defineAsyncComponent(() => import('./ExpensesManager.vue'))
-const AccountsReceivableView = defineAsyncComponent(() => import('../components/AccountsReceivableView.vue'))
+const AccountsReceivableView = defineAsyncComponent(() => import('../components/CreditiTendaView.vue'))
 
 // Web Catalog
 const WebCatalogConfig = defineAsyncComponent(() => import('./WebCatalogConfig.vue'))
@@ -1412,7 +1412,7 @@ const getModuleDescription = () => {
     reports: 'Reportes • Análisis inteligente de datos',
     settings: 'Configuración • Personalización del sistema',
     'web-catalog-config': 'Catálogo Web • Personaliza tu tienda online sin código',
-    'accounts-receivable': 'Cuentas por Cobrar • Gestión de créditos',
+    'accounts-receivable': 'CreditiTenda • Gestión completa de créditos',
     warehouses: 'Gestión de Sedes • Control multisede',
     'cash-admin': 'Control de Cajas • Supervisión de turnos'
   }

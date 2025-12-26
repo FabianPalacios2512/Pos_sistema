@@ -24,7 +24,7 @@ class CustomerController extends Controller
             $selectFields = [
                 'id', 'name', 'email', 'phone', 'address', 'city',
                 'document_type', 'document_number', 'birth_date', 'gender',
-                'credit_limit', 'current_debt', 'credit_active', 'active',
+                'credit_limit', 'current_debt', 'debt_since', 'credit_active', 'active',
                 'total_purchases', 'total_orders', 'created_at', 'updated_at'
             ];
 
@@ -53,18 +53,19 @@ class CustomerController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * 🎯 CreditiTenda: Validación de unicidad en documento y email
      */
     public function store(Request $request): JsonResponse
     {
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'nullable|email|max:255',
+                'email' => 'nullable|email|max:255|unique:customers,email',
                 'phone' => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:500',
                 'city' => 'nullable|string|max:255',
                 'document_type' => 'nullable|string|max:50',
-                'document_number' => 'nullable|string|max:50',
+                'document_number' => 'nullable|string|max:50|unique:customers,document_number',
                 'birth_date' => 'nullable|date',
                 'credit_limit' => 'nullable|numeric|min:0',
                 'current_debt' => 'nullable|numeric|min:0',
@@ -133,6 +134,7 @@ class CustomerController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * 🎯 CreditiTenda: Validación de unicidad excluyendo el registro actual
      */
     public function update(Request $request, string $id): JsonResponse
     {
@@ -141,12 +143,12 @@ class CustomerController extends Controller
 
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'nullable|email|max:255',
+                'email' => 'nullable|email|max:255|unique:customers,email,' . $id,
                 'phone' => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:500',
                 'city' => 'nullable|string|max:255',
                 'document_type' => 'nullable|string|max:50',
-                'document_number' => 'nullable|string|max:50',
+                'document_number' => 'nullable|string|max:50|unique:customers,document_number,' . $id,
                 'birth_date' => 'nullable|date',
                 'credit_limit' => 'nullable|numeric|min:0',
                 'current_debt' => 'nullable|numeric|min:0',
@@ -195,4 +197,44 @@ class CustomerController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Validar si un documento ya existe en el sistema
+     * 🎯 CreditiTenda: Evita duplicados y autocompleta datos
+     */
+    public function checkDocument(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'document_type' => 'required|string',
+                'document_number' => 'required|string'
+            ]);
+
+            // Buscar cliente con ese documento en el tenant actual
+            $customer = Customer::where('document_type', $validated['document_type'])
+                ->where('document_number', $validated['document_number'])
+                ->first();
+
+            if ($customer) {
+                return response()->json([
+                    'success' => true,
+                    'exists' => true,
+                    'data' => $customer,
+                    'message' => 'Cliente encontrado en el sistema'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'exists' => false,
+                'message' => 'Cliente no encontrado. Puede crear uno nuevo.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al validar documento: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

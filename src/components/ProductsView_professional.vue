@@ -2446,54 +2446,31 @@ const getProductImage = (product) => {
   return generateDynamicAvatar(product?.name || 'Producto')
 }
 
-// Generar avatar dinámico SVG
+// Generar placeholder profesional SVG con icono de imagen
 const generateDynamicAvatar = (name) => {
-  const initials = name
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .substring(0, 2)
-    .toUpperCase() || 'P'
-    
-  // Colores pastel modernos para el fondo
-  const colors = [
-    '#F1F5F9', // Slate
-    '#EFF6FF', // Blue
-    '#ECFDF5', // Emerald
-    '#FEF3C7', // Amber
-    '#FEE2E2', // Red
-    '#F3E8FF', // Purple
-    '#E0E7FF', // Indigo
-    '#FAE8FF', // Fuchsia
-    '#ECFEFF'  // Cyan
-  ]
-  
-  // Colores de texto correspondientes (más oscuros)
-  const textColors = [
-    '#64748B', // Slate
-    '#3B82F6', // Blue
-    '#10B981', // Emerald
-    '#F59E0B', // Amber
-    '#EF4444', // Red
-    '#8B5CF6', // Purple
-    '#6366F1', // Indigo
-    '#D946EF', // Fuchsia
-    '#06B6D4'  // Cyan
-  ]
-  
-  // Hash simple para seleccionar color consistente
-  let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  const index = Math.abs(hash) % colors.length
-  const bgColor = colors[index]
-  const textColor = textColors[index]
+  // Placeholder neutro y profesional con icono de imagen
+  // Colores adaptados al modo claro/oscuro
+  const bgColor = '#F8FAFC' // Slate 50 (modo claro)
+  const iconColor = '#94A3B8' // Slate 400 (icono sutil)
+  const borderColor = '#E2E8F0' // Slate 200 (borde suave)
   
   return `data:image/svg+xml;base64,${btoa(`
     <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Fondo suave -->
       <rect width="200" height="200" fill="${bgColor}"/>
-      <text x="50%" y="50%" dy=".35em" fill="${textColor}" font-family="Inter, system-ui, sans-serif" font-size="80" font-weight="bold" text-anchor="middle">${initials}</text>
+      
+      <!-- Borde sutil -->
+      <rect x="0.5" y="0.5" width="199" height="199" stroke="${borderColor}" stroke-width="1" fill="none"/>
+      
+      <!-- Icono de imagen (shopping bag) centrado -->
+      <g transform="translate(100, 100)">
+        <path d="M -30 -20 L -30 30 L 30 30 L 30 -20 Z M -20 -30 L -20 -20 L 20 -20 L 20 -30 Q 20 -35 15 -35 Q 10 -40 0 -40 Q -10 -40 -15 -35 Q -20 -35 -20 -30 Z" 
+              fill="${iconColor}" 
+              opacity="0.4"/>
+      </g>
+      
+      <!-- Texto sutil debajo del icono -->
+      <text x="50%" y="140" fill="${iconColor}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="500" text-anchor="middle" opacity="0.5">Sin imagen</text>
     </svg>
   `)}`
 }

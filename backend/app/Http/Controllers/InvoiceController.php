@@ -761,14 +761,16 @@ class InvoiceController extends Controller
                     ], 400);
                 }
 
-                // 3. Calcular total con recargo
+                // 3. Calcular total con recargo (para registrar la deuda completa)
                 $totalWithSurcharge = $data['total'] + ($data['surcharge_amount'] ?? 0);
 
-                // 4. Validar cupo disponible
+                // 4. Validar cupo disponible (SOLO SOBRE EL SUBTOTAL, NO EL RECARGO)
+                // El recargo es ganancia adicional del negocio, no cuenta contra el cupo del cliente
+                $subtotal = $data['total']; // Subtotal SIN recargo
                 $currentDebt = floatval($customer->current_debt ?? 0);
                 $creditLimit = floatval($customer->credit_limit ?? 0);
                 $availableCredit = $creditLimit - $currentDebt;
-                $newDebt = $currentDebt + $totalWithSurcharge;
+                $newDebt = $currentDebt + $totalWithSurcharge; // La deuda SÍ incluye el recargo
 
                 \Log::info('🔍 Validación de cupo', [
                     'customer_id' => $customer->id,
@@ -776,16 +778,17 @@ class InvoiceController extends Controller
                     'credit_limit' => $creditLimit,
                     'current_debt' => $currentDebt,
                     'available_credit' => $availableCredit,
-                    'required_credit' => $totalWithSurcharge,
+                    'subtotal_to_validate' => $subtotal, // Solo valida el subtotal
+                    'total_with_surcharge' => $totalWithSurcharge, // Deuda total que se registrará
                     'new_debt_if_approved' => $newDebt
                 ]);
 
-                if ($totalWithSurcharge > $availableCredit) {
+                if ($subtotal > $availableCredit) {
                     \Log::error('❌ Crédito insuficiente', [
                         'customer_id' => $customer->id,
                         'available_credit' => $availableCredit,
-                        'required' => $totalWithSurcharge,
-                        'deficit' => $totalWithSurcharge - $availableCredit
+                        'required_subtotal' => $subtotal,
+                        'deficit' => $subtotal - $availableCredit
                     ]);
 
                     return response()->json([
@@ -793,7 +796,7 @@ class InvoiceController extends Controller
                         'message' => sprintf(
                             'Crédito insuficiente. Disponible: $%s - Requerido: $%s',
                             number_format($availableCredit, 0),
-                            number_format($totalWithSurcharge, 0)
+                            number_format($subtotal, 0) // Muestra el subtotal, no el total con recargo
                         )
                     ], 400);
                 }
@@ -884,8 +887,19 @@ class InvoiceController extends Controller
                 $customer = \App\Models\Customer::find($data['customer_id']);
                 if ($customer) {
                     $previousDebt = $customer->current_debt ?? 0;
+                    // Sumar total + recargo a la deuda (el cliente debe pagar ambos)
                     $totalWithSurcharge = $data['total'] + ($data['surcharge_amount'] ?? 0);
                     $customer->current_debt = $previousDebt + $totalWithSurcharge;
+
+                    // Si el cliente pasa de $0 deuda a tener deuda, registrar fecha inicial
+                    if ($previousDebt == 0 && $customer->current_debt > 0) {
+                        $customer->debt_since = now();
+                        \Log::info('📅 Registrando inicio de deuda para cliente', [
+                            'customer_id' => $customer->id,
+                            'debt_since' => $customer->debt_since
+                        ]);
+                    }
+
                     $customer->save();
 
                     \Log::info('✅ Deuda del cliente actualizada', [
@@ -1195,6 +1209,24 @@ class InvoiceController extends Controller
                 }
             } else {
                 \Log::info('ℹ️ No hay descuento promocional en esta factura');
+            }
+
+            // ✅ Actualizar estadísticas del cliente (total_purchases y total_orders)
+            if ($data['customer_id'] && $data['type'] !== 'quote' && $data['status'] === 'paid') {
+                $customer = \App\Models\Customer::find($data['customer_id']);
+                if ($customer) {
+                    // Sumar el total de la factura (sin recargo para estadísticas)
+                    $customer->total_purchases += $data['total'];
+                    $customer->total_orders += 1;
+                    $customer->last_purchase = now();
+                    $customer->save();
+
+                    \Log::info('✅ Estadísticas del cliente actualizadas', [
+                        'customer_id' => $customer->id,
+                        'total_purchases' => $customer->total_purchases,
+                        'total_orders' => $customer->total_orders
+                    ]);
+                }
             }
 
             DB::commit();

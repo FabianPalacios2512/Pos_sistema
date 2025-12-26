@@ -203,6 +203,7 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::apiResource('permissions', PermissionController::class);
 
     // Clientes
+    Route::post('/customers/check-document', [CustomerController::class, 'checkDocument']); // 🎯 CreditiTenda: Validar documento
     Route::apiResource('customers', CustomerController::class);
 
     // Proveedores

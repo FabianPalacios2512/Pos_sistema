@@ -99,6 +99,16 @@ class CreditPaymentController extends Controller
 
             // Update customer debt
             $customer->current_debt -= $request->amount;
+
+            // Si la deuda llega a $0, limpiar fecha de inicio de deuda
+            if ($customer->current_debt <= 0) {
+                $customer->current_debt = 0;
+                $customer->debt_since = null;
+                Log::info('✅ Cliente liquidó deuda completa, limpiando debt_since', [
+                    'customer_id' => $customer->id
+                ]);
+            }
+
             $customer->save();
 
             DB::commit();
@@ -132,7 +142,7 @@ class CreditPaymentController extends Controller
     }
 
     /**
-     * Send payment reminder to customer
+     * Send payment reminder to customer via WhatsApp and/or Email
      */
     public function sendReminder(Request $request)
     {
@@ -167,37 +177,147 @@ class CreditPaymentController extends Controller
                 ], 422);
             }
 
-            // TODO: Implement actual notification sending (WhatsApp/SMS/Email)
-            // For now, just log the reminder
-            $reminderMessage = sprintf(
-                "Recordatorio de Pago - %s: Tiene una deuda pendiente de $%s. Su cupo de crédito es de $%s.",
-                $customer->name,
-                number_format($customer->current_debt, 0, ',', '.'),
-                number_format($customer->credit_limit, 0, ',', '.')
-            );
+            $sentChannels = [];
+            $errors = [];
 
-            Log::info('Payment reminder sent', [
-                'customer_id' => $customer->id,
-                'customer_name' => $customer->name,
-                'debt' => $customer->current_debt,
-                'phone' => $customer->phone,
-                'email' => $customer->email,
-                'message' => $reminderMessage
-            ]);
+            // Preparar mensaje de recordatorio
+            $debtAmount = number_format($customer->current_debt, 0, ',', '.');
+            $creditLimit = number_format($customer->credit_limit, 0, ',', '.');
+            $availableCredit = number_format(max(0, $customer->credit_limit - $customer->current_debt), 0, ',', '.');
 
-            // Record reminder sent (optional: create a reminders table)
-            // For now, just return success
+            // Calcular días de mora
+            $daysPastDue = 0;
+            if ($customer->debt_since) {
+                $debtDate = new \DateTime($customer->debt_since);
+                $today = new \DateTime();
+                $daysPastDue = $today->diff($debtDate)->days;
+            }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Recordatorio enviado exitosamente',
-                'data' => [
-                    'customer_name' => $customer->name,
-                    'debt_amount' => $customer->current_debt,
-                    'sent_to' => $customer->phone ?? $customer->email,
-                    'sent_at' => now()
-                ]
-            ]);
+            // 📱 ENVIAR POR WHATSAPP
+            if ($customer->phone) {
+                try {
+                    $whatsappMessage = "🔔 *RECORDATORIO DE PAGO - CreditiTenda*\n\n";
+                    $whatsappMessage .= "Hola *{$customer->name}*,\n\n";
+                    $whatsappMessage .= "Le recordamos que tiene una deuda pendiente:\n\n";
+                    $whatsappMessage .= "💰 *Deuda Actual:* \${$debtAmount}\n";
+                    $whatsappMessage .= "📊 *Cupo de Crédito:* \${$creditLimit}\n";
+                    $whatsappMessage .= "✅ *Crédito Disponible:* \${$availableCredit}\n";
+
+                    if ($daysPastDue > 0) {
+                        $whatsappMessage .= "📅 *Días de Mora:* {$daysPastDue} días\n";
+                    }
+
+                    $whatsappMessage .= "\n_Por favor, realice su pago lo antes posible para mantener su cupo disponible._\n\n";
+                    $whatsappMessage .= "¡Gracias por su preferencia! 😊";
+
+                    // Formatear número al formato colombiano
+                    $phone = $customer->phone;
+                    if (!str_starts_with($phone, '+57')) {
+                        // Remover caracteres no numéricos
+                        $phone = preg_replace('/[^0-9]/', '', $phone);
+                        // Agregar prefijo +57
+                        if (strlen($phone) === 10) {
+                            $phone = '+57' . $phone;
+                        }
+                    }
+
+                    // Enviar vía WhatsApp usando el servicio del sistema
+                    $whatsappUrl = 'http://localhost:3001/send-message';
+                    $response = \Illuminate\Support\Facades\Http::timeout(10)->post($whatsappUrl, [
+                        'phone' => $phone,
+                        'message' => $whatsappMessage
+                    ]);
+
+                    if ($response->successful()) {
+                        $sentChannels[] = 'WhatsApp';
+                        Log::info('✅ Recordatorio WhatsApp enviado', [
+                            'customer_id' => $customer->id,
+                            'phone' => $phone
+                        ]);
+                    } else {
+                        $errors[] = 'WhatsApp: ' . ($response->json()['error'] ?? 'Error desconocido');
+                        Log::warning('⚠️ Error enviando WhatsApp', [
+                            'customer_id' => $customer->id,
+                            'phone' => $phone,
+                            'error' => $response->body()
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = 'WhatsApp: ' . $e->getMessage();
+                    Log::error('❌ Excepción enviando WhatsApp', [
+                        'customer_id' => $customer->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            // 📧 ENVIAR POR EMAIL
+            if ($customer->email) {
+                try {
+                    $emailSubject = "Recordatorio de Pago - CreditiTenda";
+                    $emailBody = "
+                        <h2>Recordatorio de Pago</h2>
+                        <p>Estimado/a <strong>{$customer->name}</strong>,</p>
+                        <p>Le recordamos que tiene una deuda pendiente en su cuenta de CreditiTenda:</p>
+                        <ul>
+                            <li><strong>Deuda Actual:</strong> \${$debtAmount}</li>
+                            <li><strong>Cupo de Crédito:</strong> \${$creditLimit}</li>
+                            <li><strong>Crédito Disponible:</strong> \${$availableCredit}</li>
+                    ";
+
+                    if ($daysPastDue > 0) {
+                        $emailBody .= "<li><strong>Días de Mora:</strong> {$daysPastDue} días</li>";
+                    }
+
+                    $emailBody .= "
+                        </ul>
+                        <p>Por favor, realice su pago lo antes posible para mantener su cupo de crédito disponible.</p>
+                        <p>¡Gracias por su preferencia!</p>
+                    ";
+
+                    \Illuminate\Support\Facades\Mail::html($emailBody, function($message) use ($customer, $emailSubject) {
+                        $message->to($customer->email)
+                                ->subject($emailSubject);
+                    });
+
+                    $sentChannels[] = 'Email';
+                    Log::info('✅ Recordatorio Email enviado', [
+                        'customer_id' => $customer->id,
+                        'email' => $customer->email
+                    ]);
+                } catch (\Exception $e) {
+                    $errors[] = 'Email: ' . $e->getMessage();
+                    Log::error('❌ Excepción enviando Email', [
+                        'customer_id' => $customer->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            // Preparar respuesta
+            if (count($sentChannels) > 0) {
+                $message = 'Recordatorio enviado por: ' . implode(' y ', $sentChannels);
+                if (count($errors) > 0) {
+                    $message .= '. Errores: ' . implode(', ', $errors);
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'data' => [
+                        'customer_name' => $customer->name,
+                        'debt_amount' => $customer->current_debt,
+                        'sent_channels' => $sentChannels,
+                        'errors' => $errors,
+                        'sent_at' => now()
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se pudo enviar el recordatorio. Errores: ' . implode(', ', $errors)
+                ], 500);
+            }
         } catch (\Exception $e) {
             Log::error('Error sending payment reminder: ' . $e->getMessage());
             return response()->json([

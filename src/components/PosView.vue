@@ -3813,13 +3813,14 @@ const handleCobrarClick = async () => {
     const surcharge = Math.round((total.value * surchargePercent) / 100)
     const estimatedTotal = total.value + surcharge
 
-    // 4. Validar cupo disponible
+    // 4. Validar cupo disponible (SOLO SOBRE EL SUBTOTAL, NO EL RECARGO)
+    // El recargo es ganancia adicional del negocio, no cuenta contra el cupo
     const currentDebt = parseFloat(selectedCustomer.value.current_debt || 0)
     const creditLimit = parseFloat(selectedCustomer.value.credit_limit || 0)
     const availableCredit = creditLimit - currentDebt
 
-    if (estimatedTotal > availableCredit) {
-      showError(`Crédito insuficiente. Disponible: $${availableCredit.toLocaleString()} - Requerido: $${estimatedTotal.toLocaleString()}`)
+    if (total.value > availableCredit) {
+      showError(`Crédito insuficiente. Disponible: $${availableCredit.toLocaleString()} - Requerido: $${total.value.toLocaleString()}`)
       return
     }
   }
