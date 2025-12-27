@@ -77,7 +77,7 @@ class EPaycoPaymentController extends Controller
     {
         try {
             $data = $request->all();
-            
+
             Log::info('ePayco Webhook recibido', $data);
 
             // Validar firma
@@ -89,12 +89,12 @@ class EPaycoPaymentController extends Controller
             $x_currency_code = $data['x_currency_code'] ?? null;
             $x_signature = $data['x_signature'] ?? null;
 
-            $signature = hash('sha256', 
-                $this->p_cust_id_cliente . '^' . 
-                $this->p_key . '^' . 
-                $x_ref_payco . '^' . 
-                $x_transaction_id . '^' . 
-                $x_amount . '^' . 
+            $signature = hash('sha256',
+                $this->p_cust_id_cliente . '^' .
+                $this->p_key . '^' .
+                $x_ref_payco . '^' .
+                $x_transaction_id . '^' .
+                $x_amount . '^' .
                 $x_currency_code
             );
 
@@ -125,11 +125,11 @@ class EPaycoPaymentController extends Controller
             if ($x_cod_response == 1) {
                 // Aceptada
                 $this->activateTenantPlan($pendingPayment, $data);
-                
+
                 $pendingPayment->status = 'completed';
                 $pendingPayment->payment_link_id = $x_ref_payco; // Guardamos ref de ePayco
                 $pendingPayment->save();
-                
+
                 Log::info('ePayco: Pago aprobado y procesado');
 
             } elseif ($x_cod_response == 2 || $x_cod_response == 4) {
