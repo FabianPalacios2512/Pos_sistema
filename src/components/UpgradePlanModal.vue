@@ -482,44 +482,54 @@ const handlePlanSelection = async (plan) => {
     const finalPrice = prices[plan]?.[paymentFrequency.value] || 0
     const reference = `upgrade_${tenantId}_${Date.now()}`
     
-    // 🔥 IMPORTANTE: Pasar tenant_id en la URL para que PaymentSuccess pueda procesarlo
-    // Wompi redirige desde su servidor, el navegador pierde el contexto de auth
-    const redirectUrl = getRedirectUrl(plan, reference, tenantId)
-    
-    // Create payment link with Wompi
-    const response = await axios.post('/api/create-payment-link', {
-      amount_in_cents: finalPrice * 100,
-      reference: reference,
-      customer_email: appStore.userEmail || 'cliente@105pos.pro',
-      description: `Plan upgrade a ${plan}`,
-      redirect_url: redirectUrl,
-      payment_frequency: paymentFrequency.value,
-      plan: plan,
-      tenant_id: tenantId,
-      is_upgrade: true
-    })
-    
-    if (response.data.success && response.data.payment_link_url) {
-      // Store upgrade data in localStorage - INCLUYENDO payment_frequency
-      const upgradeData = {
-        reference: reference,
-        plan: plan,
-        tenant_id: tenantId,
+    // 1. Initialize transaction in backend (save pending payment)
+    const initResponse = await axios.post('/api/epayco/init-transaction', {
         amount: finalPrice,
+        reference: reference,
+        customer_email: appStore.userEmail || 'cliente@105pos.pro',
         payment_frequency: paymentFrequency.value,
-        is_upgrade: true,  // Flag importante para diferenciar en PaymentSuccess
-        dianInvoicing: includeDianInvoicing.value
-      }
-      
-      localStorage.setItem('pending_upgrade', JSON.stringify(upgradeData))
-      
-      console.log('UpgradePlanModal - Upgrade pendiente guardado:', upgradeData)
-      
-      // Redirect to Wompi payment page
-      window.location.href = response.data.payment_link_url
-    } else {
-      throw new Error('No se pudo generar el link de pago')
+        plan: plan,
+        tenant_id: tenantId
+    })
+
+    if (!initResponse.data.success) {
+        throw new Error('Error inicializando transacción')
     }
+
+    // 2. Open ePayco Checkout
+    // Ensure ePayco is loaded
+    if (!window.ePayco) {
+        throw new Error('ePayco SDK no cargado. Por favor recarga la página.')
+    }
+
+    const handler = window.ePayco.checkout.configure({
+        key: import.meta.env.VITE_EPAYCO_PUBLIC_KEY || '2943652c673afffaa5b7b67829f00a0c', // Fallback to key used in PlanSelection
+        test: true // Should be env var too
+    })
+
+    const data = {
+        name: `Plan ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
+        description: `Suscripción ${paymentFrequency.value} - 105 POS`,
+        invoice: reference,
+        currency: 'cop',
+        amount: finalPrice,
+        tax_base: '0',
+        tax: '0',
+        country: 'co',
+        lang: 'es',
+        external: 'false',
+        extra1: tenantId,
+        extra2: plan,
+        extra3: paymentFrequency.value,
+        confirmation: `${window.location.origin}/api/epayco/webhook`, // Backend webhook
+        response: `${window.location.origin}/payment/success?plan=${plan}&reference=${reference}&is_upgrade=true&tenant_id=${tenantId}`, // Frontend return URL
+        
+        // Customer data (optional but good for UX)
+        email_billing: appStore.userEmail || 'cliente@105pos.pro',
+        name_billing: appStore.userName || 'Cliente 105 POS',
+    }
+
+    handler.open(data)
     
   } catch (error) {
     console.error('Error processing payment:', error)
@@ -528,33 +538,5 @@ const handlePlanSelection = async (plan) => {
   } finally {
     isProcessing.value = false
   }
-}
-
-// Get redirect URL based on environment
-const getRedirectUrl = (plan, reference, tenantId) => {
-  // 🔥 CRÍTICO: Detectar si estamos en localhost o en producción
-  // window.location.hostname puede ser: localhost, 127.0.0.1, sdsdsdsdf.localhost, 105pos.pro, subdomain.105pos.pro
-  const hostname = window.location.hostname
-  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.localhost')
-  
-  let baseUrl
-  if (isLocalhost) {
-    // En localhost: redirigir a http://localhost:3000
-    // (Sin subdominio, porque el backend está en un puerto diferente)
-    baseUrl = 'http://localhost:3000'
-  } else {
-    // En producción: redirigir a https://105pos.pro (sin subdominio)
-    baseUrl = 'https://105pos.pro'
-  }
-  
-  console.log('🔗 getRedirectUrl - Detecting environment:', {
-    hostname: hostname,
-    isLocalhost: isLocalhost,
-    baseUrl: baseUrl,
-  })
-  
-  // 🔥 IMPORTANTE: Incluir tenant_id en la URL para que PaymentSuccess pueda usarlo
-  // Wompi redirige desde su servidor, el navegador pierde contexto de auth
-  return `${baseUrl}/payment/success?plan=${plan}&reference=${reference}&is_upgrade=true&tenant_id=${tenantId}`
 }
 </script>

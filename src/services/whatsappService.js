@@ -41,9 +41,9 @@ const getWhatsAppClient = () => {
     // En producción usar /api/whatsapp/ (proxy Nginx)
     // En desarrollo usar puerto 3002 directo
     const whatsappBaseURL = import.meta.env.VITE_WHATSAPP_URL || 
-                           (window.location.hostname === 'localhost' 
+                           (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
                              ? 'http://localhost:3002' 
-                             : '/api/whatsapp')
+                             : `https://${tenantId}.105pos.pro/api/whatsapp`)
     
     const client = axios.create({
       baseURL: whatsappBaseURL,

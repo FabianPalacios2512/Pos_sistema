@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('system_settings', function (Blueprint $table) {
-            $table->string('store_type')->default('general')->after('company_name');
+            if (!Schema::hasColumn('system_settings', 'store_type')) {
+                $table->string('store_type')->default('general')->after('company_name');
+            }
         });
     }
 

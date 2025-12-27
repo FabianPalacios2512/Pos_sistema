@@ -10,7 +10,7 @@ npm run build
 
 echo ""
 echo "📤 Uploading frontend to VPS..."
-rsync -avz --progress --delete dist/ root@142.93.24.42:/var/www/105pos/dist/
+rsync -avz --progress --delete dist/ root@72.61.73.245:/var/www/105pos/dist/
 
 echo ""
 echo "🔄 Uploading backend files (sin node_modules ni vendor)..."
@@ -21,15 +21,15 @@ rsync -avz --progress \
   --exclude '.git' \
   --exclude 'storage' \
   --exclude '.env' \
-  backend/ root@142.93.24.42:/var/www/105pos/backend/
+  backend/ root@72.61.73.245:/var/www/105pos/backend/
 
 echo ""
 echo "🔄 Uploading src/ (Vue components)..."
-rsync -avz --progress src/ root@142.93.24.42:/var/www/105pos/src/
+rsync -avz --progress src/ root@72.61.73.245:/var/www/105pos/src/
 
 echo ""
 echo "🔄 Uploading public/ files..."
-rsync -avz --progress public/ root@142.93.24.42:/var/www/105pos/public/
+rsync -avz --progress public/ root@72.61.73.245:/var/www/105pos/public/
 
 echo ""
 echo "🔄 Uploading root config files..."
@@ -39,11 +39,11 @@ rsync -avz --progress \
   vite.config.js \
   tailwind.config.js \
   postcss.config.js \
-  root@142.93.24.42:/var/www/105pos/
+  root@72.61.73.245:/var/www/105pos/
 
 echo ""
 echo "⚙️  Running Laravel commands on VPS..."
-ssh root@142.93.24.42 "cd /var/www/105pos/backend && \
+ssh root@72.61.73.245 "cd /var/www/105pos/backend && \
   php artisan config:clear && \
   php artisan cache:clear && \
   php artisan route:clear && \

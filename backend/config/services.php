@@ -49,4 +49,13 @@ return [
         'redirect_uri' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'wompi' => [
+        'public_key' => env('WOMPI_PUBLIC_KEY'),
+        'private_key' => env('WOMPI_PRIVATE_KEY'),
+        'events_secret' => env('WOMPI_EVENTS_SECRET'),
+        'integrity_secret' => env('WOMPI_INTEGRITY_SECRET'),
+        'api_url' => env('WOMPI_API_URL'),
+        'currency' => env('WOMPI_CURRENCY', 'COP'),
+    ],
+
 ];

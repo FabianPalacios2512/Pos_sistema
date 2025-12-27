@@ -18,7 +18,11 @@ foreach ($tenants as $tenant) {
     try {
         // Intentar eliminar base de datos
         $databaseName = 'tenant' . $tenant->id;
-        DB::statement("DROP DATABASE IF EXISTS `{$databaseName}`");
+        try {
+            DB::statement("DROP DATABASE IF EXISTS `{$databaseName}`");
+        } catch (\Exception $e) {
+            echo "   ⚠️  Aviso DB: " . $e->getMessage() . "\n";
+        }
 
         // Eliminar registro del tenant
         $tenant->delete();
