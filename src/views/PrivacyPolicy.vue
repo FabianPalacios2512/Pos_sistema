@@ -100,7 +100,7 @@
           <div class="text-slate-700 leading-relaxed space-y-3">
             <p>Solo compartimos datos con:</p>
             <ul class="list-disc list-inside space-y-2 ml-4">
-              <li><strong>Wompi</strong>: Procesador de pagos (solo información necesaria para transacciones)</li>
+              <li><strong>ePayco</strong>: Procesador de pagos (solo información necesaria para transacciones)</li>
               <li><strong>DIAN</strong>: Para facturación electrónica (si activa esta opción)</li>
               <li><strong>Autoridades</strong>: Si es requerido por ley</li>
             </ul>

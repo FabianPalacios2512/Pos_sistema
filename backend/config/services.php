@@ -35,13 +35,12 @@ return [
         ],
     ],
 
-    'wompi' => [
-        'public_key' => env('WOMPI_PUBLIC_KEY'),
-        'private_key' => env('WOMPI_PRIVATE_KEY'),
-        'events_secret' => env('WOMPI_EVENTS_SECRET'),
-        'integrity_secret' => env('WOMPI_INTEGRITY_SECRET'),
-        'api_url' => env('WOMPI_API_URL', 'https://sandbox.wompi.co/v1'),
-        'currency' => env('WOMPI_CURRENCY', 'COP'),
+    'epayco' => [
+        'public_key' => env('EPAYCO_PUBLIC_KEY'),
+        'private_key' => env('EPAYCO_PRIVATE_KEY'),
+        'p_cust_id_cliente' => env('EPAYCO_P_CUST_ID_CLIENTE'),
+        'p_key' => env('EPAYCO_P_KEY'),
+        'test_mode' => env('EPAYCO_TEST_MODE', true),
     ],
 
     'google' => [

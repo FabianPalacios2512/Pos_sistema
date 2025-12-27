@@ -80,22 +80,47 @@ console.log('🔍 PaymentSuccess.vue - route.query:', route.query)
 
 onMounted(async () => {
   console.log('🎯 PaymentSuccess - onMounted EJECUTADO')
-  // Obtener información del pago de URL params
-  const reference = route.query.reference || route.query.id || ''
-  const tenantId = route.query.tenant_id || ''
-  const plan = route.query.plan || ''
-  const isUpgrade = route.query.is_upgrade === 'true'  // Flag para detectar upgrades
   
-  console.log('🔍 PaymentSuccess - URL params:', { reference, tenantId, plan, isUpgrade })
+  // 1. Intentar recuperar datos de localStorage (ePayco a veces limpia params)
+  const pendingPayment = localStorage.getItem('pending_payment')
+  let localData = {}
+  if (pendingPayment) {
+    try {
+      localData = JSON.parse(pendingPayment)
+      console.log('📦 Datos recuperados de localStorage:', localData)
+    } catch (e) {
+      console.error('Error parsing pending_payment:', e)
+    }
+  }
+
+  // 2. Obtener información del pago de URL params o localStorage
+  // ePayco envía ?ref_payco=...
+  const refPayco = route.query.ref_payco
   
-  paymentId.value = reference
+  const reference = route.query.reference || route.query.id || localData.reference || ''
+  const tenantId = route.query.tenant_id || localData.tenant_id || ''
+  const plan = route.query.plan || localData.plan || ''
+  const isUpgrade = route.query.is_upgrade === 'true' || localData.is_upgrade === true
   
-  // 🔥 SI TENEMOS DATOS EN LA URL, ACTIVAR EL PLAN DIRECTAMENTE
-  // (Wompi solo redirige a /success si el pago fue exitoso)
-  if (reference && plan) {
-    console.log('✅ PaymentSuccess - Datos en URL, procesando pago...', { isUpgrade })
+  console.log('🔍 PaymentSuccess - Params combinados:', { reference, tenantId, plan, isUpgrade, refPayco })
+  
+  paymentId.value = refPayco || reference
+  
+  // Si tenemos ref_payco pero no reference, usar ref_payco como ID visual
+  if (refPayco && !reference) {
+     // Si viene de ePayco Dashboard, es posible que solo tengamos ref_payco
+     // En este caso, confiamos en que el Webhook ya procesó el pago en el backend
+     // O usamos los datos de localStorage para mostrar la info
+  }
+  
+  // 🔥 SI TENEMOS DATOS (URL o LocalStorage), ACTIVAR O MOSTRAR ÉXITO
+  if ((reference || refPayco) && plan) {
+    console.log('✅ PaymentSuccess - Datos encontrados, procesando...', { isUpgrade })
     
     try {
+      // Limpiar localStorage para no reutilizar
+      localStorage.removeItem('pending_payment')
+
       // 🔥 DETECTAR SI ES UPGRADE O PAGO INICIAL
       if (isUpgrade) {
         // ==================== FLUJO DE UPGRADE ====================

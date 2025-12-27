@@ -101,7 +101,7 @@
               <li><strong>Enterprise</strong>: Solución corporativa ilimitada</li>
             </ul>
             <p class="mt-3">
-              <strong>Facturación:</strong> Los pagos se procesan de forma segura a través de <strong>Wompi</strong> (Colombia). 
+              <strong>Facturación:</strong> Los pagos se procesan de forma segura a través de <strong>ePayco</strong> (Colombia). 
               Las suscripciones se renuevan automáticamente según el período elegido (mensual, anual, 24 meses).
             </p>
             <p>

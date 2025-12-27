@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PlanUpgradeController;
 use App\Http\Controllers\Api\PaymentHistoryController;
 use App\Http\Controllers\Api\WebCatalogConfigController;
 use App\Http\Controllers\WompiPaymentController;
+use App\Http\Controllers\EPaycoPaymentController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PasswordResetController;
 use Illuminate\Support\Facades\Route;
@@ -124,7 +125,11 @@ Route::get('/ping', function () {
     ], 200);
 });
 
-// ==================== WOMPI - PAYMENT ROUTES ====================
+// ==================== EPAYCO - PAYMENT ROUTES ====================
+Route::post('/epayco/init-transaction', [EPaycoPaymentController::class, 'initTransaction']);
+Route::post('/epayco/webhook', [EPaycoPaymentController::class, 'webhook']);
+
+// ==================== WOMPI - PAYMENT ROUTES (DEPRECATED) ====================
 // Rutas de pago (públicas - no requieren auth)
 Route::post('/create-payment-transaction', [WompiPaymentController::class, 'createTransaction']);
 Route::post('/create-payment-link', [WompiPaymentController::class, 'createPaymentLink']);

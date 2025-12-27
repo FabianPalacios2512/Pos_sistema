@@ -673,7 +673,7 @@ const handlePlanSelection = async (plan) => {
     return
   }
   
-  // Para planes de pago, procesar pago con Wompi
+  // Para planes de pago, procesar pago con ePayco
   try {
     isProcessing.value = true
     
@@ -706,44 +706,63 @@ const handlePlanSelection = async (plan) => {
     }
     
     // 🔥 Determinar URL de redirección correcta basada en el entorno
-    // NOTA: Usamos el dominio principal (sin subdominio) porque el DNS wildcard no está configurado
     const getRedirectUrl = () => {
-      // Si estamos en localhost
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return `http://localhost:3000/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
       }
-      // En producción, usar el dominio principal (sin subdominio)
       return `https://105pos.pro/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
     }
-    
-    // Crear link de pago con Wompi
-    const response = await axios.post('/api/create-payment-link', {
-      amount_in_cents: finalPrice * 100, // Wompi usa centavos
+
+    // Inicializar transacción en backend (guardar pending payment)
+    await axios.post('/api/epayco/init-transaction', {
+      amount: finalPrice,
       reference: reference,
       customer_email: localStorage.getItem('user_email') || 'cliente@105pos.pro',
-      description: `Plan ${plan} - ${companyName.value}`,
-      redirect_url: getRedirectUrl(),
-      // 🔥 CRÍTICO: Enviar payment_frequency y plan para calcular subscription_ends_at correctamente
-      payment_frequency: paymentFrequency.value, // 'monthly', 'yearly', o '24months'
-      plan: plan, // 'basic', 'premium', o 'enterprise'
+      payment_frequency: paymentFrequency.value,
+      plan: plan,
       tenant_id: tenantId.value
     })
-    
-    if (response.data.success && response.data.payment_link_url) {
-      // Guardar referencia en localStorage para verificar después
-      localStorage.setItem('pending_payment', JSON.stringify({
-        reference: reference,
-        plan: plan,
-        tenant_id: tenantId.value,
-        amount: finalPrice
-      }))
-      
-      // Redirigir a página de pago de Wompi
-      window.location.href = response.data.payment_link_url
-    } else {
-      throw new Error('No se pudo generar el link de pago')
+
+    // Configurar ePayco
+    const handler = window.ePayco.checkout.configure({
+      key: '2943652c673afffaa5b7b67829f00a0c',
+      test: true
+    })
+
+    const data = {
+      name: `Plan ${plan} - ${companyName.value}`,
+      description: `Suscripción ${paymentFrequency.value} al plan ${plan}`,
+      invoice: reference,
+      currency: 'cop',
+      amount: finalPrice,
+      tax_base: '0',
+      tax: '0',
+      country: 'co',
+      lang: 'es',
+      external: 'true', // true = Standard Checkout (Redirección a la página de ePayco)
+      extra1: tenantId.value,
+      extra2: plan,
+      extra3: paymentFrequency.value,
+      confirmation: 'https://105pos.pro/api/epayco/webhook',
+      response: getRedirectUrl(),
+      name_billing: companyName.value || 'Cliente 105POS',
+      address_billing: 'Calle 123 # 45-67',
+      type_doc_billing: 'cc',
+      mobilephone_billing: '3000000000',
+      number_doc_billing: '1234567890',
+      email_billing: localStorage.getItem('user_email') || 'cliente@105pos.pro',
     }
+
+    handler.open(data)
     
+    // Guardar referencia en localStorage
+    localStorage.setItem('pending_payment', JSON.stringify({
+      reference: reference,
+      plan: plan,
+      tenant_id: tenantId.value,
+      amount: finalPrice
+    }))
+
   } catch (error) {
     console.error('Error processing payment:', error)
     
