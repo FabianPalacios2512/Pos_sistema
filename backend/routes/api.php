@@ -10,6 +10,7 @@ use App\Http\Controllers\WompiPaymentController;
 use App\Http\Controllers\EPaycoPaymentController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\RadioProxyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +54,9 @@ Route::get('/debug/payment-success', function () {
 });
 Route::post('/check-domain', [TenantRegisterController::class, 'checkDomain']);
 Route::post('/auth/validate-admin', [AuthController::class, 'validateAdmin']);
+
+// ==================== RADIO PROXY (Sin autenticación) ====================
+Route::get('/radio/search', [RadioProxyController::class, 'search']);
 
 // ==================== CENTRAL LOGIN (Smart Login) ====================
 Route::post('/central/login', [CentralLoginController::class, 'centralLogin']);

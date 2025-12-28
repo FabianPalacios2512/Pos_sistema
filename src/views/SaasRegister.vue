@@ -47,7 +47,7 @@
       </div>
     </transition>
 
-    <!-- 🚨 MODAL: Email Ya Registrado -->
+    <!-- 🚨 MODAL UNIFICADO: Email o NIT/CC Ya Registrado -->
     <transition
       enter-active-class="transition ease-out duration-300"
       enter-from-class="opacity-0"
@@ -57,9 +57,9 @@
       leave-to-class="opacity-0"
     >
       <div 
-        v-if="showEmailExistsModal" 
+        v-if="showDuplicateModal" 
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
-        @click.self="closeEmailModal"
+        @click.self="closeDuplicateModal"
       >
         <transition
           enter-active-class="transition ease-out duration-300"
@@ -70,48 +70,77 @@
           leave-to-class="scale-95 opacity-0"
         >
           <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            <!-- Header -->
+            <!-- Header Dinámico -->
             <div class="bg-white border-b border-gray-200 p-4 text-center">
-              <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div 
+                class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3"
+                :class="duplicateType === 'email' ? 'bg-amber-100' : 'bg-red-100'"
+              >
+                <svg class="w-6 h-6" :class="duplicateType === 'email' ? 'text-amber-600' : 'text-red-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
               </div>
-              <h3 class="text-lg font-bold text-gray-900">Email Ya Registrado</h3>
+              <h3 class="text-lg font-bold text-gray-900">
+                {{ duplicateType === 'email' ? 'Email Ya Registrado...' : 'NIT/Cédula Ya Registrado...' }}
+              </h3>
             </div>
 
-            <!-- Content -->
+            <!-- Content Dinámico -->
             <div class="p-6">
-              <p class="text-gray-700 text-center mb-2">
-                El correo electrónico
-              </p>
-              <p class="text-gray-900 font-bold text-center text-lg mb-4">
-                {{ duplicateEmail }}
-              </p>
-              <p class="text-gray-600 text-center mb-6">
-                ya está registrado en nuestro sistema.
-              </p>
-
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p class="text-sm text-blue-900 text-center">
-                  <strong>¿Olvidaste tu contraseña?</strong><br/>
-                  Puedes recuperarla usando nuestra función de recuperación de contraseña.
+              <!-- Contenido para Email -->
+              <template v-if="duplicateType === 'email'">
+                <p class="text-gray-700 text-center mb-2">
+                  El correo electrónico
                 </p>
-              </div>
+                <p class="text-gray-900 font-bold text-center text-lg mb-4">
+                  {{ duplicateValue }}
+                </p>
+                <p class="text-gray-600 text-center mb-6">
+                  ya está registrado en nuestro sistema.
+                </p>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <p class="text-sm text-blue-900 text-center">
+                    <strong>¿Olvidaste tu contraseña?</strong><br/>
+                    Puedes recuperarla usando nuestra función de recuperación de contraseña.
+                  </p>
+                </div>
+              </template>
+
+              <!-- Contenido para NIT/CC -->
+              <template v-else-if="duplicateType === 'document'">
+                <p class="text-gray-700 text-center mb-2">
+                  El NIT/Cédula
+                </p>
+                <p class="text-gray-900 font-bold text-center text-lg mb-4">
+                  {{ duplicateValue }}
+                </p>
+                <p class="text-gray-600 text-center mb-6">
+                  ya se encuentra registrado en nuestro sistema.
+                </p>
+
+                <!-- 🔒 SECURITY FIX: No mostrar lista de tiendas para evitar enumeración -->
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                  <p class="text-sm text-amber-900 text-center">
+                    <strong>¿Ya tienes una cuenta?</strong><br/>
+                    Puedes recuperar tu contraseña para acceder.
+                  </p>
+                </div>
+              </template>
 
               <!-- Botones -->
               <div class="flex flex-col gap-3">
-                <button
+                <button 
                   @click="goToRecovery"
-                  class="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold rounded-xl shadow-lg transition-all duration-200 transform hover:scale-[1.02]"
+                  class="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all duration-200"
                 >
                   Recuperar Contraseña
                 </button>
-                <button
-                  @click="closeEmailModal"
-                  class="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors"
+                <button 
+                  @click="closeDuplicateModal"
+                  class="w-full h-12 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all duration-200"
                 >
-                  Cancelar
+                  {{ duplicateType === 'email' ? 'Cerrar' : 'Usar otro NIT/Cédula' }}
                 </button>
               </div>
             </div>
@@ -122,39 +151,63 @@
     
     <!-- 📸 LEFT PANEL: Branding Visual (40%) -->
     <div class="hidden lg:flex lg:w-[40%] bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 relative overflow-hidden flex-col justify-between p-12 text-white">
-      <!-- Imagen de fondo real -->
+      <!-- Skeleton Loader mientras carga la imagen -->
+      <div 
+        v-if="!imageLoaded" 
+        class="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 animate-pulse"
+      >
+        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+      </div>
+      
+      <!-- Imagen de fondo con lazy loading optimizado -->
       <img 
         src="/login.png" 
         alt="105 POS Pro" 
-        class="absolute inset-0 w-full h-full object-cover opacity-20"
+        class="absolute inset-0 w-full h-full object-cover opacity-20 transition-opacity duration-700 ease-in-out"
+        :class="imageLoaded ? 'opacity-20' : 'opacity-0'"
+        @load="imageLoaded = true"
+        loading="eager"
+        decoding="async"
         style="object-position: center 70%;"
       />
       
       <!-- Overlay verde -->
       <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/60 via-emerald-800/50 to-black/60"></div>
 
-      <!-- Header con logo -->
-      <div class="relative z-10">
-        <h1 class="text-5xl font-bold mb-3">105 POS Pro</h1>
-        <p class="text-emerald-100 text-xl">Gestiona tu negocio al siguiente nivel</p>
-      </div>
+      <!-- Header con logo (con animación de entrada) -->
+      <transition
+        enter-active-class="transition ease-out duration-500"
+        enter-from-class="translate-y-4 opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+      >
+        <div v-if="imageLoaded" class="relative z-10">
+          <h1 class="text-5xl font-bold mb-3">105 POS Pro</h1>
+          <p class="text-emerald-100 text-xl">Gestiona tu negocio al siguiente nivel</p>
+        </div>
+      </transition>
 
-      <!-- Testimonial flotante -->
-      <div class="relative z-10 mt-auto">
-        <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
-          <div class="flex text-amber-400 mb-3">
-            <svg v-for="i in 5" :key="i" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          </div>
-          <p class="text-white text-lg italic mb-4">"Desde que uso 105 POS, mis ventas son 30% más rápidas."</p>
-          <div class="flex items-center">
-            <div class="w-12 h-12 rounded-full bg-emerald-500/30 flex items-center justify-center text-sm font-bold text-white mr-3 border-2 border-white/30">CR</div>
-            <div>
-              <p class="text-white font-semibold">Carlos R.</p>
-              <p class="text-emerald-100 text-sm">Dueño de Minimarket</p>
+      <!-- Testimonial flotante (con animación de entrada retrasada) -->
+      <transition
+        enter-active-class="transition ease-out duration-500 delay-200"
+        enter-from-class="translate-y-4 opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+      >
+        <div v-if="imageLoaded" class="relative z-10 mt-auto">
+          <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl">
+            <div class="flex text-amber-400 mb-3">
+              <svg v-for="i in 5" :key="i" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <p class="text-white text-lg italic mb-4">"Desde que uso 105 POS, mis ventas son 30% más rápidas."</p>
+            <div class="flex items-center">
+              <div class="w-12 h-12 rounded-full bg-emerald-500/30 flex items-center justify-center text-sm font-bold text-white mr-3 border-2 border-white/30">CR</div>
+              <div>
+                <p class="text-white font-semibold">Carlos R.</p>
+                <p class="text-emerald-100 text-sm">Dueño de Minimarket</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </transition>
     </div>
 
     <!-- 📝 RIGHT PANEL: Formulario Amplio (60%) -->
@@ -317,6 +370,7 @@
                     :type="showPassword ? 'text' : 'password'"
                     required 
                     minlength="8"
+                    autocomplete="new-password"
                     class="w-full h-14 pl-12 pr-14 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none text-gray-900 placeholder-gray-400 font-medium" 
                     placeholder="Mínimo 8 caracteres"
                   >
@@ -500,7 +554,7 @@
                     Acepto los 
                     <a 
                       href="/terminos-condiciones" 
-                      target="_blank"
+                      @click.prevent="openTermsInSameWindow"
                       class="text-emerald-600 hover:text-emerald-700 font-semibold underline"
                     >
                       Términos y Condiciones
@@ -508,7 +562,7 @@
                     y la 
                     <a 
                       href="/politica-privacidad" 
-                      target="_blank"
+                      @click.prevent="openPrivacyInSameWindow"
                       class="text-emerald-600 hover:text-emerald-700 font-semibold underline"
                     >
                       Política de Privacidad
@@ -697,8 +751,14 @@ const googleUserData = ref(null) // 🆕 Datos del usuario de Google
 const googleCode = ref(null) // 🆕 Código de autorización de Google
 const showGoogleToast = ref(false) // 🔔 Control de Toast de Google
 const acceptedTerms = ref(false) // ✅ Aceptación de Términos y Condiciones
-const showEmailExistsModal = ref(false) // 🔔 Modal de email duplicado
-const duplicateEmail = ref('') // Email duplicado encontrado
+const imageLoaded = ref(false) // 🖼️ Estado de carga de imagen de fondo
+
+// 🚨 Modal Unificado para Duplicados
+const showDuplicateModal = ref(false) // Control del modal unificado
+const duplicateType = ref('') // 'email' o 'document'
+const duplicateValue = ref('') // Valor duplicado (email o NIT/CC)
+const duplicateTenants = ref([]) // Array de tenants que usan el NIT/CC
+
 let toastTimeout = null // Timer para auto-cerrar toast
 
 const marketingMessages = [
@@ -865,15 +925,73 @@ const signInWithGoogle = async () => {
  * Verifica si el correo ya está registrado en el sistema
  * @returns {Promise<boolean>} true si el correo existe, false si está disponible
  */
-// 🔄 Cerrar modal y redirigir a recuperación
+
+// 🚨 Cerrar modal unificado de duplicados
+const closeDuplicateModal = () => {
+  showDuplicateModal.value = false
+  duplicateType.value = ''
+  duplicateValue.value = ''
+  duplicateTenants.value = []
+}
+
+// 🔄 Redirigir a recuperación de contraseña
 const goToRecovery = () => {
-  showEmailExistsModal.value = false
+  closeDuplicateModal()
   window.location.href = '/forgot-password'
 }
 
-// ❌ Cerrar modal sin hacer nada
-const closeEmailModal = () => {
-  showEmailExistsModal.value = false
+// 📝 Abrir términos en la misma ventana (guarda datos en sessionStorage)
+const openTermsInSameWindow = () => {
+  // Guardar datos del formulario antes de navegar
+  sessionStorage.setItem('register_form_data', JSON.stringify(form))
+  sessionStorage.setItem('register_return_url', window.location.pathname + window.location.search)
+  
+  // Navegar a términos
+  window.location.href = '/terminos-condiciones#from-register'
+}
+
+// 🔒 Abrir privacidad en la misma ventana (guarda datos en sessionStorage)
+const openPrivacyInSameWindow = () => {
+  // Guardar datos del formulario antes de navegar
+  sessionStorage.setItem('register_form_data', JSON.stringify(form))
+  sessionStorage.setItem('register_return_url', window.location.pathname + window.location.search)
+  
+  // Navegar a privacidad
+  window.location.href = '/politica-privacidad#from-register'
+}
+
+// 🆔 Verificar si un NIT/CC ya existe en el sistema
+const checkDocumentExists = async (cedula) => {
+  try {
+    const apiUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
+    
+    const response = await axios.get(`${apiUrl}/central/check-document`, {
+      params: { cedula }
+    })
+    
+    if (response.data.exists) {
+      // Mostrar modal unificado con info de los tenants existentes
+      duplicateType.value = 'document'
+      duplicateValue.value = cedula
+      duplicateTenants.value = response.data.tenants || []
+      showDuplicateModal.value = true
+      return true // NIT/CC exists
+    }
+    
+    return false // NIT/CC available
+    
+  } catch (error) {
+    console.error('❌ Error al verificar NIT/CC:', error)
+    
+    // Si hay error en la verificación, mostrar mensaje pero permitir continuar
+    const shouldContinue = confirm(
+      'No se pudo verificar si el NIT/Cédula está disponible. ' +
+      'Esto puede deberse a un problema temporal de conexión.\n\n' +
+      '¿Deseas continuar con el registro de todas formas?'
+    )
+    
+    return !shouldContinue // Si dice que SÍ quiere continuar, retornamos false (no existe)
+  }
 }
 
 const checkEmailExists = async () => {
@@ -885,9 +1003,11 @@ const checkEmailExists = async () => {
     })
     
     if (response.data.exists) {
-      // Mostrar modal profesional
-      duplicateEmail.value = form.email
-      showEmailExistsModal.value = true
+      // Mostrar modal unificado para email duplicado
+      duplicateType.value = 'email'
+      duplicateValue.value = form.email
+      duplicateTenants.value = [] // Email no necesita lista de tenants
+      showDuplicateModal.value = true
       return true // Email exists
     }
     
@@ -970,6 +1090,12 @@ const validateStep1 = async () => {
   // ✅ VALIDAR SI EL CORREO YA EXISTE
   const emailExists = await checkEmailExists()
   if (emailExists) {
+    return // La función ya muestra el mensaje de error
+  }
+  
+  // 🆔 VALIDAR SI EL NIT/CC YA EXISTE
+  const documentExists = await checkDocumentExists(form.cedula)
+  if (documentExists) {
     return // La función ya muestra el mensaje de error
   }
   
@@ -1066,12 +1192,47 @@ const registerTenant = async () => {
     }
 
   } catch (error) {
-    console.error('Registration error:', error)
+    console.log('🔥 ERROR REGISTRO:', error)
+    console.log('🔥 DATA:', error.response?.data)
     
     step.value = 1 // Go back to step 1 on error
     isSubmitting.value = false
     clearInterval(messageInterval)
     
+    const responseData = error.response?.data || {}
+    const errors = responseData.errors || {}
+    const message = responseData.message || ''
+    
+    // 🚨 Verificar si el error es de NIT/CC duplicado (Check robusto)
+    // Verificamos si existe el error en 'cedula' O si el mensaje contiene el texto específico
+    // Convertimos a minúsculas para evitar problemas de case-sensitivity
+    const isDuplicateDocument = 
+      errors.cedula || 
+      message.toLowerCase().includes('ya existe una tienda') || 
+      message.toLowerCase().includes('identificación') ||
+      message.toLowerCase().includes('nit/cédula');
+
+    if (isDuplicateDocument) {
+      console.log('✅ DETECTADO DUPLICADO DE CÉDULA - MOSTRANDO MODAL')
+      
+      // Mostrar modal unificado con info de NIT/CC duplicado
+      duplicateType.value = 'document'
+      duplicateValue.value = form.cedula
+      duplicateTenants.value = [] // 🔒 SECURITY FIX: No mostrar lista de tiendas
+      showDuplicateModal.value = true
+      return
+    }
+    
+    // 🚨 Verificar si el error es de email duplicado
+    if (errors.email) {
+      duplicateType.value = 'email'
+      duplicateValue.value = form.email
+      duplicateTenants.value = []
+      showDuplicateModal.value = true
+      return
+    }
+    
+    // Para otros errores, mostrar alert normal
     let errorMessage = 'Ocurrió un error al crear la cuenta.'
     if (error.response?.data?.message) {
       errorMessage = error.response.data.message
@@ -1079,12 +1240,46 @@ const registerTenant = async () => {
        errorMessage = Object.values(error.response.data.errors)[0][0]
     }
     
+    // 🛡️ ÚLTIMA DEFENSA: Si por alguna razón el check de arriba falló pero el mensaje es de duplicado
+    if (errorMessage.toLowerCase().includes('ya existe una tienda') || errorMessage.toLowerCase().includes('identificación')) {
+      console.log('✅ DETECTADO DUPLICADO EN FALLBACK - MOSTRANDO MODAL')
+      duplicateType.value = 'document'
+      duplicateValue.value = form.cedula
+      duplicateTenants.value = [] // 🔒 SECURITY FIX: No mostrar lista de tiendas
+      showDuplicateModal.value = true
+      return
+    }
+
     alert(errorMessage)
   }
 }
 
 // Detectar token de la URL al cargar
 onMounted(async () => {
+  // 📝 RESTAURAR datos del formulario si el usuario regresa de términos/privacidad
+  const savedFormData = sessionStorage.getItem('register_form_data')
+  if (savedFormData) {
+    try {
+      const parsedData = JSON.parse(savedFormData)
+      Object.assign(form, parsedData)
+      console.log('✅ Datos del formulario restaurados desde sessionStorage')
+      
+      // Limpiar sessionStorage
+      sessionStorage.removeItem('register_form_data')
+      sessionStorage.removeItem('register_return_url')
+      
+      // Ir al paso 1 (formulario completo)
+      step.value = 1
+      
+      // Re-verificar disponibilidad del subdominio
+      if (form.subdomain) {
+        checkAvailability()
+      }
+    } catch (error) {
+      console.error('❌ Error al restaurar datos del formulario:', error)
+    }
+  }
+
   // 🔒 PROTECCIÓN: Solo permitir registro en app central (sin subdominio)
   const hostname = window.location.hostname
   const parts = hostname.split('.')

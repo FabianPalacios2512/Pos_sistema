@@ -9,12 +9,7 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: {
-        enabled: true,
-        type: 'module',
-        // Silenciar logs de Workbox en desarrollo
-        suppressWarnings: true
-      },
+      injectRegister: 'auto',
       includeAssets: ['logo.png', 'logo2.png', 'robots.txt'],
       manifest: {
         name: '105 POS Pro - Sistema de Gestión Empresarial',
@@ -66,8 +61,19 @@ export default defineConfig({
         ]
       },
       workbox: {
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
+        // 🔇 Silenciar logs de Workbox en consola
+        disableDevLogs: true,
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB (para login.png)
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,woff,woff2}'],
+        // Inyectar código para silenciar logs
+        additionalManifestEntries: [],
+        // Configuración silenciosa
+        mode: 'production',
+        // Importar archivo de configuración personalizado
+        importScripts: ['sw-config.js'],
         // Excluir rutas de API del Service Worker navigation
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [
@@ -122,7 +128,8 @@ export default defineConfig({
       },
       devOptions: {
         enabled: true,
-        type: 'module'
+        type: 'module',
+        suppressWarnings: true  // 🔇 Suprimir warnings de Workbox
       }
     })
   ],

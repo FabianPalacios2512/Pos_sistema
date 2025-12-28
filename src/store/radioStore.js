@@ -50,7 +50,8 @@ export const useRadioStore = defineStore('radio', {
             this.isLoading = true
             try {
                 // 1. Top Colombia (Sorted by votes)
-                const topRes = await axios.get('https://de1.api.radio-browser.info/json/stations/search', {
+                // Usar nuestro proxy local en lugar de la API externa
+                const topRes = await axios.get('/api/radio/search', {
                     params: {
                         countrycode: 'CO',
                         limit: 10,
@@ -62,7 +63,8 @@ export const useRadioStore = defineStore('radio', {
                 this.topStations = this.processStations(topRes.data)
 
                 // 2. Noticias (Tag: news)
-                const newsRes = await axios.get('https://de1.api.radio-browser.info/json/stations/search', {
+                // Usar nuestro proxy local
+                const newsRes = await axios.get('/api/radio/search', {
                     params: {
                         countrycode: 'CO',
                         tag: 'news',
@@ -75,10 +77,11 @@ export const useRadioStore = defineStore('radio', {
                 this.newsStations = this.processStations(newsRes.data)
 
                 // 3. Música Popular/Vallenato
-                const musicRes = await axios.get('https://de1.api.radio-browser.info/json/stations/search', {
+                // Usar nuestro proxy local
+                const musicRes = await axios.get('/api/radio/search', {
                     params: {
                         countrycode: 'CO',
-                        tag: 'vallenato', // API uses single tag search usually, or comma separated depending on server implementation. 'vallenato' is safe.
+                        tag: 'vallenato',
                         limit: 10,
                         order: 'clickcount',
                         reverse: true,
@@ -95,18 +98,18 @@ export const useRadioStore = defineStore('radio', {
         },
 
         async searchStations(query) {
-            if (!query || query.length < 3) return
-
+            if (!query) return
             this.isLoading = true
             this.currentView = 'search'
 
             try {
-                const res = await axios.get('https://de1.api.radio-browser.info/json/stations/search', {
+                // Usar nuestro proxy local
+                const res = await axios.get('/api/radio/search', {
                     params: {
                         countrycode: 'CO',
                         name: query,
                         limit: 20,
-                        order: 'clickcount',
+                        order: 'votes',
                         reverse: true,
                         hidebroken: true
                     }
@@ -120,20 +123,26 @@ export const useRadioStore = defineStore('radio', {
         },
 
         async fetchByCity(city, stateFilter) {
+            this.isLoading = true
             this.currentView = 'city'
             this.currentCityTitle = city
-            this.isLoading = true
-
-            // Check cache first
-            const cityKey = city.toLowerCase()
-            if (this.cityStations[cityKey] && this.cityStations[cityKey].length > 0) {
-                this.activeCityStations = this.cityStations[cityKey]
-                this.isLoading = false
-                return
+            
+            // Map city names to state if needed
+            if (!stateFilter) {
+                // Default mapping if not provided
+                const cityMap = {
+                    'Bogotá': 'Bogota',
+                    'Medellín': 'Antioquia',
+                    'Cali': 'Valle del Cauca',
+                    'Barranquilla': 'Atlantico',
+                    'Cartagena': 'Bolivar'
+                }
+                stateFilter = cityMap[city] || ''
             }
 
             try {
-                const res = await axios.get('https://de1.api.radio-browser.info/json/stations/search', {
+                // Usar nuestro proxy local
+                const res = await axios.get('/api/radio/search', {
                     params: {
                         countrycode: 'CO',
                         state: stateFilter,
@@ -143,21 +152,15 @@ export const useRadioStore = defineStore('radio', {
                         hidebroken: true
                     }
                 })
-
-                const stations = this.processStations(res.data)
-                this.activeCityStations = stations
-
-                // Cache it
-                if (this.cityStations[cityKey] !== undefined) {
-                    this.cityStations[cityKey] = stations
-                }
-
+                this.activeCityStations = this.processStations(res.data)
             } catch (error) {
                 console.error(`Error fetching stations for ${city}:`, error)
             } finally {
                 this.isLoading = false
             }
         },
+
+
 
         processStations(data) {
             return data.map(station => ({

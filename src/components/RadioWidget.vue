@@ -256,10 +256,15 @@ const favorites = ref(new Set()) // Set of IDs
 
 // Data de Emisoras
 const radios = [
-  { id: 'oli_med', name: 'Olímpica Medellín', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Olimpica_Stereo_logo.png', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_MEDELLIN.mp3' },
-  { id: 'mix_med', name: 'Mix 89.9 FM', logo: 'https://mixradio.co/assets/img/logo-mix.png', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_MEDELLIN.mp3' },
-  { id: 'mega', name: 'La Mega', logo: 'https://www.lamega.com.co/themes/custom/lamega/logo.svg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/LA_MEGA.mp3' },
-  { id: 'w', name: 'W Radio', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/W_Radio_logo.svg/1200px-W_Radio_logo.svg.png', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/WRADIO.mp3' },
+  { id: 'oli_med', name: 'Olímpica Medellín', logo: '/img-radio/olimpica-stereo-medellin-1049-fm.e6a71dc8.png', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_MEDELLIN.mp3' },
+  { id: 'mix_med', name: 'Mix Medellín', logo: '/img-radio/mix-899-fm-medellin.9117dedc.jpg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_MEDELLIN.mp3' },
+  { id: 'mix_cali', name: 'Mix Cali', logo: '/img-radio/mix-899-fm-medellin.9117dedc.jpg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_CALI.mp3' },
+  { id: 'mix_bog', name: 'Mix Bogotá', logo: '/img-radio/mix-899-fm-medellin.9117dedc.jpg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_BOGOTA.mp3' },
+  { id: 'elsol_med', name: 'El Sol Medellín', logo: '/img-radio/el-sol-placeholder.svg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/ELSOL_MEDELLIN.mp3' },
+  { id: 'elsol_cali', name: 'El Sol Cali', logo: '/img-radio/el-sol-placeholder.svg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/ELSOL_CALI.mp3' },
+  { id: 'elsol_bog', name: 'El Sol Bogotá', logo: '/img-radio/el-sol-placeholder.svg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/ELSOL_BOGOTA.mp3' },
+  { id: 'mega', name: 'La Mega', logo: '/img-radio/la-mega-medellin.60573223.jpg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/LA_MEGA.mp3' },
+  { id: 'w', name: 'W Radio', logo: '/img-radio/la-w-radio.61065ed8.jpg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/WRADIO.mp3' },
   { id: 'caracol', name: 'Caracol Radio', logo: 'https://caracol.com.co/themes/custom/caracol/logo.svg', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/CARACOL_RADIO.mp3' },
   { id: 'blu', name: 'Blu Radio', logo: 'https://www.bluradio.com/themes/custom/bluradio/logo.svg', url: 'https://ice41.securenetsystems.net/BLURADIO?&playSessionID=5F967923-863D-4D39-9523-267957973059' },
   { id: 'tropi', name: 'Tropicana FM', logo: 'https://www.tropicanafm.com/wp-content/uploads/2020/07/Logo-Tropicana-2020.png', url: 'https://playerservices.streamtheworld.com/api/livestream-redirect/TROPICANA.mp3' },

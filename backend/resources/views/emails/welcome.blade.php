@@ -192,7 +192,7 @@
 
             <!-- Credenciales -->
             <div class="credentials-box">
-                <h3>📋 Tus Credenciales de Acceso</h3>
+                <h3>📋 Información de tu Cuenta</h3>
                 <div class="credential-item">
                     <span class="credential-label">Negocio:</span>
                     <span class="credential-value">{{ $business_name }}</span>
@@ -202,29 +202,8 @@
                     <span class="credential-value">{{ $email }}</span>
                 </div>
                 <div class="credential-item">
-                    <span class="credential-label">Subdominio:</span>
-                    <span class="credential-value">{{ $subdomain }}</span>
-                </div>
-                @if(isset($password))
-                <div class="credential-item">
-                    <span class="credential-label">Contraseña temporal:</span>
-                    <span class="credential-value">{{ $password }}</span>
-                </div>
-                @endif
-                <div class="credential-item">
-                    <span class="credential-label">Plan:</span>
-                    <span class="credential-value" style="text-transform: uppercase;">
-                        {{ $plan }}
-                        @if($plan === 'free')
-                            <span class="plan-badge" style="background: #3b82f6;">GRATIS</span>
-                        @elseif($plan === 'professional')
-                            <span class="plan-badge" style="background: #8b5cf6;">PRO</span>
-                        @elseif($plan === 'premium')
-                            <span class="plan-badge" style="background: #f59e0b;">PREMIUM</span>
-                        @elseif($plan === 'enterprise')
-                            <span class="plan-badge" style="background: #0f172a;">ENTERPRISE</span>
-                        @endif
-                    </span>
+                    <span class="credential-label">Tu Sitio:</span>
+                    <span class="credential-value">{{ $subdomain }}.105pos.pro</span>
                 </div>
             </div>
 

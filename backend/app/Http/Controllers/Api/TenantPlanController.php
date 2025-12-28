@@ -85,13 +85,31 @@ class TenantPlanController extends Controller
                     'ends_at' => $subscriptionEndsAt->toDateTimeString()
                 ]);
             } elseif (in_array($dbPlan, ['basic', 'premium', 'enterprise'])) {
-                // BUSCAR pending_payment para obtener payment_frequency correcto
+                // 🔥 BUSCAR pending_payment para obtener payment_frequency correcto
+                // Buscamos en 'pending' o 'completed' para manejar race conditions
                 $pendingPayment = \App\Models\PendingPayment::where('tenant_id', $request->tenant_id)
-                    ->where('status', 'pending')
+                    ->whereIn('status', ['pending', 'completed'])
                     ->latest()
                     ->first();
 
                 if ($pendingPayment) {
+                    // ✅ VALIDACIÓN IDEMPOTENTE: Si ya fue procesado, retornar éxito
+                    if ($pendingPayment->status === 'completed' && $tenant->plan === $dbPlan) {
+                        \Log::info('TenantPlanController - Plan ya fue activado previamente (IDEMPOTENTE)', [
+                            'tenant_id' => $request->tenant_id,
+                            'plan' => $dbPlan,
+                            'payment_reference' => $pendingPayment->reference,
+                        ]);
+
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Plan ya está activo',
+                            'plan' => $dbPlan,
+                            'subscription_ends_at' => $tenant->subscription_ends_at,
+                            'idempotent' => true,
+                        ]);
+                    }
+
                     // Calcular segun payment_frequency
                     $subscriptionEndsAt = match($pendingPayment->payment_frequency) {
                         'yearly' => now()->addYear(),
@@ -99,9 +117,22 @@ class TenantPlanController extends Controller
                         default => now()->addMonth(),
                     };
 
-                    // Marcar pago como completado
-                    $pendingPayment->status = 'completed';
-                    $pendingPayment->save();
+                    // 🔒 Marcar pago como completado usando updateOrFail para evitar race condition
+                    if ($pendingPayment->status === 'pending') {
+                        $affected = \App\Models\PendingPayment::where('id', $pendingPayment->id)
+                            ->where('status', 'pending')
+                            ->update([
+                                'status' => 'completed',
+                                'updated_at' => now(),
+                            ]);
+
+                        if ($affected === 0) {
+                            \Log::warning('TenantPlanController - PendingPayment ya fue procesado por otra request', [
+                                'tenant_id' => $request->tenant_id,
+                                'reference' => $pendingPayment->reference,
+                            ]);
+                        }
+                    }
 
                     \Log::info('TenantPlanController - Subscription activada desde pending_payment', [
                         'tenant_id' => $request->tenant_id,

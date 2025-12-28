@@ -4,19 +4,35 @@
     
     <!-- 📸 LADO IZQUIERDO: Imagen de Marca -->
     <div class="hidden lg:flex lg:w-1/2 xl:w-[45%] relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900">
+      <!-- Skeleton Loader -->
+      <div 
+        v-if="!imageLoaded" 
+        class="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 animate-pulse"
+      ></div>
+      
       <img 
         src="/login.png" 
         alt="105 POS - Nueva Contraseña" 
-        class="absolute inset-0 w-full h-full object-cover opacity-70"
+        class="absolute inset-0 w-full h-full object-cover opacity-70 transition-opacity duration-700 ease-in-out"
+        :class="imageLoaded ? 'opacity-70' : 'opacity-0'"
+        @load="imageLoaded = true"
+        loading="eager"
+        decoding="async"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
       
-      <div class="absolute bottom-8 left-8 right-8 z-10">
-        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-          <h3 class="text-2xl font-bold text-white mb-2">🔓 Nueva Contraseña</h3>
-          <p class="text-white/80 text-sm">Crea una contraseña segura y única para tu cuenta</p>
+      <transition
+        enter-active-class="transition ease-out duration-500 delay-300"
+        enter-from-class="translate-y-4 opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+      >
+        <div v-if="imageLoaded" class="absolute bottom-8 left-8 right-8 z-10">
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+            <h3 class="text-2xl font-bold text-white mb-2">🔓 Nueva Contraseña</h3>
+            <p class="text-white/80 text-sm">Crea una contraseña segura y única para tu cuenta</p>
+          </div>
         </div>
-      </div>
+      </transition>
     </div>
 
     <!-- 📝 LADO DERECHO: Formulario -->
@@ -184,6 +200,7 @@ const validating = ref(true)
 const tokenError = ref('')
 const success = ref(false)
 const loading = ref(false)
+const imageLoaded = ref(false) // 🖼️ Estado de carga de imagen
 
 const token = ref('')
 const email = ref('')

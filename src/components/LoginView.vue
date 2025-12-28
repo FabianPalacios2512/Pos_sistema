@@ -4,23 +4,41 @@
     
     <!-- 📸 LADO IZQUIERDO: Imagen de Marca (Oculto en móviles) -->
     <div class="hidden lg:flex lg:w-1/2 xl:w-[45%] relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900">
-      <!-- Imagen de Login -->
+      <!-- Skeleton Loader mientras carga la imagen -->
+      <div 
+        v-if="!imageLoaded" 
+        class="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 animate-pulse"
+      >
+        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+      </div>
+      
+      <!-- Imagen de Login con lazy loading optimizado -->
       <img 
         src="/login.png" 
         alt="105 POS Pro - Sistema de Punto de Venta" 
-        class="absolute inset-0 w-full h-full object-cover"
+        class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
+        :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
+        @load="imageLoaded = true"
+        loading="eager"
+        decoding="async"
       />
       
       <!-- Overlay oscuro sutil para mejorar contraste -->
       <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
       
-      <!-- Badge flotante con logo/texto (Opcional) -->
-      <div class="absolute bottom-8 left-8 right-8 z-10">
-        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-          <h3 class="text-2xl font-bold text-white mb-2">Sistema POS Empresarial</h3>
-          <p class="text-white/80 text-sm">Gestiona tu negocio de forma profesional con tecnología de última generación</p>
+      <!-- Badge flotante con logo/texto (Con animación de entrada) -->
+      <transition
+        enter-active-class="transition ease-out duration-500 delay-300"
+        enter-from-class="translate-y-4 opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+      >
+        <div v-if="imageLoaded" class="absolute bottom-8 left-8 right-8 z-10">
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+            <h3 class="text-2xl font-bold text-white mb-2">Sistema POS Empresarial</h3>
+            <p class="text-white/80 text-sm">Gestiona tu negocio de forma profesional con tecnología de última generación</p>
+          </div>
         </div>
-      </div>
+      </transition>
     </div>
 
     <!-- 📝 LADO DERECHO: Formulario de Login -->
@@ -190,6 +208,7 @@ const router = useRouter()
 const loading = ref(false)
 const showPassword = ref(false)
 const isGoogleLoading = ref(false)
+const imageLoaded = ref(false) // 🖼️ Estado de carga de imagen
 
 // Credenciales del formulario
 const credentials = reactive({

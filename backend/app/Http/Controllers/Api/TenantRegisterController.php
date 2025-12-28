@@ -34,6 +34,49 @@ class TenantRegisterController extends Controller
             'plan' => 'nullable|string|in:pending,trial_express,emprendedor,negocio_pro,premium,enterprise', // Plan seleccionado (puede ser 'pending')
         ]);
 
+        // 🆔 VALIDACIÓN: Verificar si el NIT/CC ya existe en otro tenant
+        $cedula = $request->cedula;
+        $foundTenants = [];
+
+        $allTenants = Tenant::all();
+        foreach ($allTenants as $existingTenant) {
+            try {
+                $existingTenant->run(function () use ($cedula, $existingTenant, &$foundTenants) {
+                    $exists = \DB::table('system_settings')
+                        ->where('company_document', $cedula)
+                        ->exists();
+
+                    if ($exists) {
+                        $domain = \DB::connection('mysql')
+                            ->table('domains')
+                            ->where('tenant_id', $existingTenant->id)
+                            ->first();
+
+                        if ($domain) {
+                            $foundTenants[] = $domain->domain;
+                        }
+                    }
+                });
+            } catch (\Exception $e) {
+                \Log::warning('⚠️ Error verificando NIT/CC en tenant', [
+                    'tenant_id' => $existingTenant->id,
+                    'error' => $e->getMessage()
+                ]);
+                continue;
+            }
+        }
+
+        if (!empty($foundTenants)) {
+            // 🔒 SECURITY FIX: No devolver lista de dominios para evitar enumeración de usuarios
+            return response()->json([
+                'message' => 'Ya existe una tienda registrada con este número de identificación.',
+                'errors' => ['cedula' => [
+                    'Este NIT/Cédula ya se encuentra registrado en nuestro sistema.'
+                ]],
+                // 'existing_domains' => $foundTenants // REMOVED FOR SECURITY
+            ], 422);
+        }
+
         // Detectar dominio base para crear subdominios de tenants
         // En local, usamos localhost. En producción, usamos CENTRAL_DOMAIN de config (ej: 105pos.pro)
         $baseDomain = app()->environment('local')
@@ -231,24 +274,12 @@ class TenantRegisterController extends Controller
                 'redirect_url' => $redirectUrl
             ]);
 
-            // 📧 ENVIAR EMAIL DE BIENVENIDA
-            try {
-                \App\Services\EmailService::sendWelcomeEmail([
-                    'email' => $request->email,
-                    'name' => $request->owner_name,
-                    'business_name' => $request->company_name,
-                    'subdomain' => $request->subdomain,
-                    'password' => $request->has('google_id') ? null : $request->password, // No enviar password si es OAuth
-                    'plan' => $plan
-                ]);
-                \Log::info('📧 Email de bienvenida enviado', ['email' => $request->email]);
-            } catch (\Exception $emailError) {
-                // No fallar el registro si el email falla
-                \Log::error('❌ Error enviando email de bienvenida', [
-                    'error' => $emailError->getMessage(),
-                    'email' => $request->email
-                ]);
-            }
+            // 📧 NO ENVIAR EMAIL AQUÍ - Se enviará después de seleccionar plan
+            // El email se enviará desde el frontend después de que el usuario seleccione su plan
+            \Log::info('⏳ Email de bienvenida pendiente - se enviará al seleccionar plan', [
+                'email' => $request->email,
+                'tenant_id' => $tenant->id
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -319,31 +350,92 @@ class TenantRegisterController extends Controller
 
     public function checkDomain(Request $request)
     {
-        $request->validate([
-            'subdomain' => 'required|string|alpha_dash|max:50',
-        ]);
+        try {
+            $request->validate([
+                'subdomain' => 'required|string|alpha_dash|max:50',
+            ]);
 
-        // Determinar el dominio base según el ambiente
-        $centralDomain = env('CENTRAL_DOMAIN', null);
+            // Determinar el dominio base usando config() en lugar de env()
+            $baseDomain = config('app.central_domain');
 
-        if ($centralDomain) {
-            // Si hay CENTRAL_DOMAIN configurado, usarlo (producción)
-            $baseDomain = $centralDomain;
-        } elseif (app()->environment('local') || in_array(request()->getHost(), ['127.0.0.1', 'localhost'])) {
-            // Ambiente local
-            $baseDomain = 'localhost';
-        } else {
-            // Fallback: usar el host actual
-            $baseDomain = request()->getHost();
+            if (!$baseDomain) {
+                // Fallback si no hay config
+                if (app()->environment('local') || in_array(request()->getHost(), ['127.0.0.1', 'localhost'])) {
+                    $baseDomain = 'localhost';
+                } else {
+                    $baseDomain = request()->getHost();
+                }
+            }
+
+            $domainToCheck = $request->subdomain . '.' . $baseDomain;
+
+            $exists = \Stancl\Tenancy\Database\Models\Domain::where('domain', $domainToCheck)->exists();
+
+            return response()->json([
+                'available' => !$exists,
+                'domain' => $domainToCheck
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('❌ Error checking domain availability', [
+                'subdomain' => $request->subdomain ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Error checking domain availability',
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
 
-        $domainToCheck = $request->subdomain . '.' . $baseDomain;
-
-        $exists = \Stancl\Tenancy\Database\Models\Domain::where('domain', $domainToCheck)->exists();
-
-        return response()->json([
-            'available' => !$exists,
-            'domain' => $domainToCheck
+    /**
+     * 📧 Enviar email de bienvenida después de seleccionar plan
+     *
+     * POST /api/send-welcome-email
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function sendWelcomeEmail(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'name' => 'required|string',
+            'business_name' => 'required|string',
+            'subdomain' => 'required|string',
+            'plan' => 'required|string'
         ]);
+
+        try {
+            \App\Services\EmailService::sendWelcomeEmail([
+                'email' => $validated['email'],
+                'name' => $validated['name'],
+                'business_name' => $validated['business_name'],
+                'subdomain' => $validated['subdomain'],
+                'plan' => $validated['plan']
+            ]);
+
+            \Log::info('📧 Email de bienvenida enviado después de seleccionar plan', [
+                'email' => $validated['email'],
+                'plan' => $validated['plan']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email de bienvenida enviado correctamente'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('❌ Error enviando email de bienvenida', [
+                'email' => $validated['email'],
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al enviar el email de bienvenida'
+            ], 500);
+        }
     }
 }

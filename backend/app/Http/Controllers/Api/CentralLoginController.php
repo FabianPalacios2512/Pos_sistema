@@ -238,4 +238,89 @@ class CentralLoginController extends Controller
             'domains' => array_column($tenants, 'domain')
         ]);
     }
+
+    /**
+     * 🆔 Verificar si un NIT/CC ya existe en el sistema
+     *
+     * GET /api/central/check-document?cedula=123456789
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function checkDocumentExists(Request $request)
+    {
+        $request->validate([
+            'cedula' => 'required|string'
+        ]);
+
+        try {
+            $cedula = $request->cedula;
+            $foundTenants = [];
+
+            // Buscar en todos los tenants si existe este NIT/CC en system_settings
+            $tenants = Tenant::all();
+
+            foreach ($tenants as $tenant) {
+                try {
+                    $tenant->run(function () use ($cedula, $tenant, &$foundTenants) {
+                        // Buscar en system_settings (donde se guarda el NIT/CC del negocio)
+                        $exists = DB::table('system_settings')
+                            ->where('company_document', $cedula)
+                            ->exists();
+
+                        if ($exists) {
+                            // Obtener el dominio del tenant
+                            $domain = DB::connection('mysql')
+                                ->table('domains')
+                                ->where('tenant_id', $tenant->id)
+                                ->first();
+
+                            if ($domain) {
+                                // Obtener info básica del tenant
+                                $systemSettings = DB::table('system_settings')->first();
+
+                                $foundTenants[] = [
+                                    'tenant_id' => $tenant->id,
+                                    'domain' => $domain->domain,
+                                    'company_name' => $systemSettings->company_name ?? 'Empresa',
+                                    'company_email' => $systemSettings->company_email ?? null
+                                ];
+                            }
+                        }
+                    });
+                } catch (\Exception $e) {
+                    \Log::warning('⚠️ Error buscando NIT/CC en tenant', [
+                        'tenant_id' => $tenant->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    continue;
+                }
+            }
+
+            if (!empty($foundTenants)) {
+                return response()->json([
+                    'exists' => true,
+                    'message' => 'Ya existe una tienda registrada con este número de identificación.',
+                    'tenants' => $foundTenants,
+                    'tenant_count' => count($foundTenants)
+                ]);
+            }
+
+            return response()->json([
+                'exists' => false,
+                'message' => 'NIT/CC disponible'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('❌ Error verificando NIT/CC', [
+                'cedula' => $request->cedula,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al verificar NIT/CC. Por favor intenta de nuevo.'
+            ], 500);
+        }
+    }
 }

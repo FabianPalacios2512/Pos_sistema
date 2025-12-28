@@ -329,13 +329,15 @@ const filterCity = (city, state) => {
 
 const handleImageError = (e) => {
   // Fallback icon (Microphone)
-  e.target.style.display = 'none'
-  e.target.parentElement.classList.add('flex', 'items-center', 'justify-center', 'bg-zinc-800')
-  e.target.parentElement.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-1/2 w-1/2 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-    </svg>
-  `
+  if (e.target && e.target.parentElement) {
+    e.target.style.display = 'none'
+    e.target.parentElement.classList.add('flex', 'items-center', 'justify-center', 'bg-zinc-800')
+    e.target.parentElement.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-1/2 w-1/2 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+      </svg>
+    `
+  }
 }
 
 onMounted(() => {

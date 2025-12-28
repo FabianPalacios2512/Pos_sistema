@@ -160,61 +160,8 @@
             <div class="lg:col-span-2">
               <div class="bg-white rounded-[24px] border border-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] p-6 space-y-5">
                 
-                <!-- Tipo de Negocio - NUEVO -->
-                <div>
-                  <label class="block text-sm font-bold text-slate-900 mb-3">
-                    Tipo de Negocio <span class="text-red-500">*</span>
-                  </label>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div @click="config.store_type = 'general'" 
-                         class="cursor-pointer p-3 rounded-xl border-2 transition-all flex items-center space-x-3"
-                         :class="config.store_type === 'general' ? 'border-slate-900 bg-slate-50' : 'border-slate-100 hover:border-slate-200'">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="config.store_type === 'general' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-400'">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m8-2a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 015.343 10S14.343 1 19 1m0 0a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                      </div>
-                      <div>
-                        <p class="text-sm font-bold text-slate-900">General</p>
-                        <p class="text-xs text-slate-500">Retail / Varios</p>
-                      </div>
-                    </div>
+                <!-- Tipo de Negocio - ELIMINADO (Ya se pide en el Welcome) -->
 
-                    <div @click="config.store_type = 'fashion'" 
-                         class="cursor-pointer p-3 rounded-xl border-2 transition-all flex items-center space-x-3"
-                         :class="config.store_type === 'fashion' ? 'border-slate-900 bg-slate-50' : 'border-slate-100 hover:border-slate-200'">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="config.store_type === 'fashion' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-400'">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                      </div>
-                      <div>
-                        <p class="text-sm font-bold text-slate-900">Moda</p>
-                        <p class="text-xs text-slate-500">Tallas y Colores</p>
-                      </div>
-                    </div>
-
-                    <div @click="config.store_type = 'restaurant'" 
-                         class="cursor-pointer p-3 rounded-xl border-2 transition-all flex items-center space-x-3"
-                         :class="config.store_type === 'restaurant' ? 'border-slate-900 bg-slate-50' : 'border-slate-100 hover:border-slate-200'">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="config.store_type === 'restaurant' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-400'">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                      </div>
-                      <div>
-                        <p class="text-sm font-bold text-slate-900">Restaurante</p>
-                        <p class="text-xs text-slate-500">Mesas / Comandas</p>
-                      </div>
-                    </div>
-
-                    <div @click="config.store_type = 'service'" 
-                         class="cursor-pointer p-3 rounded-xl border-2 transition-all flex items-center space-x-3"
-                         :class="config.store_type === 'service' ? 'border-slate-900 bg-slate-50' : 'border-slate-100 hover:border-slate-200'">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center" :class="config.store_type === 'service' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-400'">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                      </div>
-                      <div>
-                        <p class="text-sm font-bold text-slate-900">Servicios</p>
-                        <p class="text-xs text-slate-500">Citas / Horas</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 <!-- Logo Upload - PRIMERO (como en la factura) -->
                 <div>
