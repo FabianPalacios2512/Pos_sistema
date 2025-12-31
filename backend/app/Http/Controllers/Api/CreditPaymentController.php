@@ -221,19 +221,39 @@ class CreditPaymentController extends Controller
                         }
                     }
 
-                    // Enviar vía WhatsApp usando el servicio del sistema
-                    $whatsappUrl = 'http://localhost:3001/send-message';
-                    $response = \Illuminate\Support\Facades\Http::timeout(10)->post($whatsappUrl, [
-                        'phone' => $phone,
-                        'message' => $whatsappMessage
-                    ]);
+                    // Obtener tenant_id del contexto actual
+                    // IMPORTANTE: Convertir guion bajo a guion para coincidir con sesiones WhatsApp
+                    $tenantId = tenant('id') ?? request()->header('X-Tenant-Id');
+                    $tenantId = str_replace('_', '-', $tenantId);
+
+                    // Enviar vía WhatsApp usando el servidor multi-tenant (puerto 3002)
+                    $whatsappUrl = 'http://localhost:3002/send';
+                    $response = \Illuminate\Support\Facades\Http::timeout(10)
+                        ->withHeaders([
+                            'X-Tenant-Id' => $tenantId
+                        ])
+                        ->post($whatsappUrl, [
+                            'phone' => $phone,
+                            'message' => $whatsappMessage
+                        ]);
 
                     if ($response->successful()) {
-                        $sentChannels[] = 'WhatsApp';
-                        Log::info('✅ Recordatorio WhatsApp enviado', [
-                            'customer_id' => $customer->id,
-                            'phone' => $phone
-                        ]);
+                        $responseData = $response->json();
+                        if (isset($responseData['success']) && $responseData['success']) {
+                            $sentChannels[] = 'WhatsApp';
+                            Log::info('✅ Recordatorio WhatsApp enviado', [
+                                'customer_id' => $customer->id,
+                                'phone' => $phone,
+                                'tenant_id' => $tenantId
+                            ]);
+                        } else {
+                            $errors[] = 'WhatsApp: ' . ($responseData['error'] ?? 'Error desconocido');
+                            Log::warning('⚠️ Error enviando WhatsApp', [
+                                'customer_id' => $customer->id,
+                                'phone' => $phone,
+                                'error' => $responseData
+                            ]);
+                        }
                     } else {
                         $errors[] = 'WhatsApp: ' . ($response->json()['error'] ?? 'Error desconocido');
                         Log::warning('⚠️ Error enviando WhatsApp', [
@@ -294,11 +314,13 @@ class CreditPaymentController extends Controller
                 }
             }
 
-            // Preparar respuesta
+            // Preparar respuesta - SIEMPRE devolver éxito parcial si se intentó enviar
+            $totalAttempts = ($customer->phone ? 1 : 0) + ($customer->email ? 1 : 0);
+
             if (count($sentChannels) > 0) {
                 $message = 'Recordatorio enviado por: ' . implode(' y ', $sentChannels);
                 if (count($errors) > 0) {
-                    $message .= '. Errores: ' . implode(', ', $errors);
+                    $message .= '. (Algunos canales fallaron: ' . count($errors) . ')';
                 }
 
                 return response()->json([
@@ -313,16 +335,119 @@ class CreditPaymentController extends Controller
                     ]
                 ]);
             } else {
+                // Ningún canal funcionó, pero damos un mensaje más amigable
+                $friendlyErrors = [];
+                foreach ($errors as $error) {
+                    if (str_contains($error, 'no está conectado')) {
+                        $friendlyErrors[] = 'WhatsApp no está conectado. Conéctalo desde el menú de configuración.';
+                    } elseif (str_contains($error, 'smtp') || str_contains($error, 'mail') || str_contains($error, 'getaddrinfo')) {
+                        $friendlyErrors[] = 'Email no disponible temporalmente.';
+                    } else {
+                        $friendlyErrors[] = $error;
+                    }
+                }
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se pudo enviar el recordatorio. Errores: ' . implode(', ', $errors)
-                ], 500);
+                    'message' => 'No se pudo enviar el recordatorio. ' . implode(' ', array_unique($friendlyErrors)),
+                    'errors' => $friendlyErrors,
+                    'requires_whatsapp' => $customer->phone && !in_array('WhatsApp', $sentChannels)
+                ], 200); // Devolver 200 para que no sea un error fatal
             }
         } catch (\Exception $e) {
             Log::error('Error sending payment reminder: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al enviar el recordatorio: ' . $e->getMessage()
+                'message' => 'Error al enviar el recordatorio. Verifica que WhatsApp esté conectado.',
+                'error_detail' => $e->getMessage()
+            ], 200); // Devolver 200 para manejo graceful en frontend
+        }
+    }
+
+    /**
+     * Get reminder settings for CreditiTenda
+     */
+    public function getReminderSettings()
+    {
+        try {
+            $settings = \App\Models\SystemSetting::first();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'frequency' => $settings->reminder_frequency ?? 'manual',
+                    'send_hour' => $settings->reminder_send_hour ?? '9',
+                    'min_days_overdue' => $settings->reminder_min_days_overdue ?? 1
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error getting reminder settings: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener la configuración de recordatorios'
+            ], 500);
+        }
+    }
+
+    /**
+     * Save reminder settings for CreditiTenda
+     */
+    public function saveReminderSettings(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'frequency' => 'required|in:manual,smart,daily,weekly,biweekly',
+            'send_hour' => 'sometimes|integer|min:6|max:20',
+            'min_days_overdue' => 'sometimes|integer|min:0|max:90'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Datos de validación incorrectos',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $settings = \App\Models\SystemSetting::first();
+
+            if (!$settings) {
+                $settings = new \App\Models\SystemSetting();
+            }
+
+            $settings->reminder_frequency = $request->frequency;
+
+            // Para modo smart, usar valores inteligentes por defecto
+            if ($request->frequency === 'smart') {
+                $settings->reminder_send_hour = 9; // 9 AM
+                $settings->reminder_min_days_overdue = 20; // 20 días de mora mínimo
+            } else {
+                $settings->reminder_send_hour = $request->send_hour ?? 9;
+                $settings->reminder_min_days_overdue = $request->min_days_overdue ?? 1;
+            }
+
+            $settings->save();
+
+            Log::info('✅ Reminder settings saved', [
+                'frequency' => $request->frequency,
+                'send_hour' => $settings->reminder_send_hour,
+                'min_days_overdue' => $settings->reminder_min_days_overdue
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Configuración de recordatorios guardada exitosamente',
+                'data' => [
+                    'frequency' => $settings->reminder_frequency,
+                    'send_hour' => $settings->reminder_send_hour,
+                    'min_days_overdue' => $settings->reminder_min_days_overdue
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error saving reminder settings: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar la configuración de recordatorios: ' . $e->getMessage()
             ], 500);
         }
     }

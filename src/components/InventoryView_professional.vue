@@ -3,10 +3,9 @@
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Header Simple y Elegante -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Control de Inventario</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 font-medium mt-1">Gestiona el stock y movimientos de productos</p>
         </div>
         
         <div class="flex items-center space-x-3">
@@ -32,139 +31,144 @@
         </div>
       </div>
       
-      <!-- Métricas Principales -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <!-- Métricas Principales - Estilo Ghost/Glass -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <!-- Total Productos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Productos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ totalProducts }}</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Total Productos</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white">{{ totalProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Stock Bajo</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ lowStockProducts }}</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Stock Bajo</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white">{{ lowStockProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Valor Inventario -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Valor Total</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ totalInventoryValue.toLocaleString() }}</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Valor Total</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white">${{ totalInventoryValue.toLocaleString() }}</p>
             </div>
           </div>
         </div>
 
         <!-- Movimientos Hoy -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Movimientos Hoy</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ todayMovements }}</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Movimientos Hoy</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white">{{ todayMovements }}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 🏢 Filtro de Sede (Solo Premium/Enterprise con múltiples sedes) -->
-      <div v-if="showWarehouseFilter" class="mb-6">
-        <div class="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-xl p-4">
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-            </div>
-            <div class="flex-1">
-              <label class="text-sm font-bold text-blue-900 dark:text-blue-300 mb-2 block">
-                🏢 Sede / Bodega Activa
-              </label>
-              <select 
-                v-model="selectedWarehouse"
-                @change="refreshInventoryData"
-                class="w-full md:w-auto px-4 py-2.5 bg-white dark:bg-zinc-900 border border-blue-300 dark:border-blue-800 rounded-lg text-sm font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              >
-                <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">
-                  {{ warehouse.name }}
-                  <span v-if="warehouse.is_default"> (Principal)</span>
-                </option>
-              </select>
-            </div>
-            <div class="text-xs text-blue-700 dark:text-blue-400 flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span>Los ajustes se aplicarán a esta sede</span>
-            </div>
+      <!-- 🏢 Selector de Sede/Bodega - Diseño minimalista integrado -->
+      <div v-if="showWarehouseFilter" class="flex items-center justify-between py-3 px-4 bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-gray-100 dark:bg-zinc-700/50 rounded-lg flex items-center justify-center">
+            <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"></path>
+            </svg>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-500 dark:text-zinc-400">Bodega:</span>
+            <select 
+              v-model="selectedWarehouse"
+              @change="refreshInventoryData"
+              class="px-3 py-1.5 bg-transparent border-0 text-sm font-semibold text-gray-900 dark:text-white focus:ring-0 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded-lg transition-colors"
+            >
+              <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id" class="bg-white dark:bg-zinc-800">
+                {{ warehouse.name }}{{ warehouse.is_default ? ' (Principal)' : '' }}
+              </option>
+            </select>
           </div>
         </div>
+        <span class="text-xs text-gray-400 dark:text-zinc-500 hidden sm:flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"></path>
+          </svg>
+          Filtrando por esta sede
+        </span>
       </div>
       
       <!-- Contenedor Unificado: Pestañas + Contenido -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden mb-8">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+        <!-- Tabs estilo Proveedores -->
         <div class="border-b border-gray-200 dark:border-zinc-800">
-          <nav class="flex space-x-8 px-6 py-1">
+          <nav class="flex px-6" aria-label="Tabs">
             <button @click="activeTab = 'stock'" 
                     :class="[
-                      'py-4 px-1 border-b-2 font-semibold text-sm transition-colors',
+                      'group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors mr-8',
                       activeTab === 'stock' 
-                        ? 'border-slate-900 dark:border-white text-gray-900 dark:text-white' 
-                        : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300 dark:hover:border-zinc-700'
+                        ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' 
+                        : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-600'
                     ]">
+              <svg class="w-4 h-4" :class="activeTab === 'stock' ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500 group-hover:text-gray-500 dark:group-hover:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path>
+              </svg>
               Stock Actual
             </button>
             <button @click="activeTab = 'movements'" 
                     :class="[
-                      'py-4 px-1 border-b-2 font-semibold text-sm relative transition-colors',
+                      'group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm relative transition-colors mr-8',
                       activeTab === 'movements' 
-                        ? 'border-slate-900 dark:border-white text-gray-900 dark:text-white' 
-                        : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300 dark:hover:border-zinc-700'
+                        ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' 
+                        : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-600'
                     ]">
+              <svg class="w-4 h-4" :class="activeTab === 'movements' ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500 group-hover:text-gray-500 dark:group-hover:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
+              </svg>
               Movimientos
               <span v-if="unreadMovementsCount > 0" 
-                    class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-rose-500 rounded-full">
+                    class="ml-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-rose-500 rounded-full">
                 {{ unreadMovementsCount }}
               </span>
             </button>
             <button @click="activeTab = 'alerts'" 
                     :class="[
-                      'py-4 px-1 border-b-2 font-semibold text-sm relative transition-colors',
+                      'group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm relative transition-colors',
                       activeTab === 'alerts' 
-                        ? 'border-slate-900 dark:border-white text-gray-900 dark:text-white' 
-                        : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:border-gray-300 dark:hover:border-zinc-700'
+                        ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' 
+                        : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-600'
                     ]">
+              <svg class="w-4 h-4" :class="activeTab === 'alerts' ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500 group-hover:text-gray-500 dark:group-hover:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
+              </svg>
               Alertas
               <span v-if="unreadAlertsCount > 0" 
-                    class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-rose-500 rounded-full">
+                    class="ml-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-rose-500 rounded-full">
                 {{ unreadAlertsCount }}
               </span>
             </button>
@@ -340,162 +344,63 @@
         
         <!-- Contenido Alertas -->
         <div v-if="activeTab === 'alerts'" class="p-6 animate-fade-in">
-          <!-- Métricas de Resumen -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <!-- Total Alertas -->
-            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 shadow-md dark:shadow-lg dark:shadow-black/40 hover:shadow-lg dark:hover:shadow-black/50 transition-all duration-200">
-              <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-gray-50 dark:bg-gray-950 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                  </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Alertas</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ stockAlerts.length }}</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Stock Agotado -->
-            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 shadow-md dark:shadow-lg dark:shadow-black/40 hover:shadow-lg dark:hover:shadow-black/50 transition-all duration-200">
-              <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Agotado</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ stockAlerts.filter(a => a.stock === 0).length }}</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Stock Crítico -->
-            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 shadow-md dark:shadow-lg dark:shadow-black/40 hover:shadow-lg dark:hover:shadow-black/50 transition-all duration-200">
-              <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                  </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Crítico</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ stockAlerts.filter(a => a.stock > 0 && a.stock < a.min_stock / 2).length }}</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Stock Bajo -->
-            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 shadow-md dark:shadow-lg dark:shadow-black/40 hover:shadow-lg dark:hover:shadow-black/50 transition-all duration-200">
-              <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
-                  </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Bajo</p>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ stockAlerts.filter(a => a.stock >= a.min_stock / 2 && a.stock <= a.min_stock).length }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Lista de Alertas -->
+          <!-- Lista de Alertas - Sin KPIs redundantes -->
           <div class="space-y-3">
-            <div v-if="stockAlerts.length === 0" class="text-center py-12 bg-white dark:bg-zinc-900 rounded-xl border border-gray-300 dark:border-zinc-800 shadow-lg dark:shadow-lg dark:shadow-black/40">
-              <div class="w-16 h-16 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            <div v-if="stockAlerts.length === 0" class="text-center py-16">
+              <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Sin alertas pendientes</p>
-              <p class="text-sm text-gray-600 dark:text-zinc-400">Todos los productos tienen stock adecuado</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white mb-1">¡Todo en orden!</p>
+              <p class="text-sm text-gray-500 dark:text-zinc-400">Todos los productos tienen stock suficiente</p>
             </div>
 
             <div v-for="alert in stockAlerts" :key="alert.id" 
-                 class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl p-5 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 shadow-lg dark:shadow-lg dark:shadow-black/40 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
-              <div class="flex items-start justify-between">
-                <div class="flex items-start space-x-4 flex-1">
+                 class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl p-4 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
                   <!-- Imagen o Avatar del producto -->
-                  <div v-if="alert.image_url" class="w-14 h-14 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700 overflow-hidden flex-shrink-0">
+                  <div v-if="alert.image_url" class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ring-2 ring-white dark:ring-zinc-700">
                     <img :src="alert.image_url" 
                          :alt="alert.name"
                          class="w-full h-full object-cover"
                          @error="(e) => e.target.style.display='none'">
                   </div>
-                  <div v-else class="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm border border-gray-200 dark:border-zinc-700" :style="{backgroundColor: `hsl(${alert.id * 137.5 % 360}, 70%, 92%)`}">
-                    <span class="text-xl font-bold" :style="{color: `hsl(${alert.id * 137.5 % 360}, 80%, 35%)`}">
+                  <div v-else class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ring-2 ring-white dark:ring-zinc-700" :style="{backgroundColor: `hsl(${alert.id * 137.5 % 360}, 65%, 88%)`}">
+                    <span class="text-lg font-bold" :style="{color: `hsl(${alert.id * 137.5 % 360}, 70%, 35%)`}">
                       {{ alert.name.charAt(0).toUpperCase() }}
                     </span>
                   </div>
                   
                   <!-- Información del producto -->
                   <div class="flex-1 min-w-0">
-                    <div class="flex items-center space-x-3 mb-2">
-                      <h4 class="text-base font-semibold text-gray-900 dark:text-white">{{ alert.name }}</h4>
+                    <div class="flex items-center gap-2 mb-1">
+                      <h4 class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ alert.name }}</h4>
                       <span v-if="alert.stock === 0" 
-                            class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800">
+                            class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
                         Agotado
                       </span>
-                      <span v-else-if="alert.stock < alert.min_stock / 2" 
-                            class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800">
-                        Crítico
-                      </span>
                       <span v-else 
-                            class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
-                        Bajo
+                            class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400">
+                        Bajo Stock
                       </span>
                     </div>
-                    
-                    <div class="flex items-center space-x-6 text-sm">
-                      <div class="flex items-center space-x-2">
-                        <span class="text-gray-600 dark:text-zinc-400">Stock:</span>
-                        <span :class="[
-                          'font-semibold',
-                          alert.stock === 0 ? 'text-rose-600 dark:text-rose-400' : alert.stock < alert.min_stock / 2 ? 'text-amber-600 dark:text-amber-400' : 'text-blue-600 dark:text-blue-400'
-                        ]">{{ alert.stock }}</span>
-                        <span class="text-gray-400 dark:text-zinc-600">/</span>
-                        <span class="text-gray-700 dark:text-zinc-300">{{ alert.min_stock }}</span>
-                      </div>
-                      
-                      <div class="flex items-center space-x-2">
-                        <span class="text-gray-600 dark:text-zinc-400">Categoría:</span>
-                        <span class="text-gray-900 dark:text-zinc-200">{{ alert.category }}</span>
-                      </div>
-                      
-                      <div v-if="alert.stock > 0" class="flex items-center space-x-2">
-                        <span class="text-gray-600 dark:text-zinc-400">Falta:</span>
-                        <span class="font-medium text-gray-900 dark:text-zinc-200">{{ Math.max(0, alert.min_stock - alert.stock) }}</span>
-                      </div>
-                    </div>
-                    
-                    <!-- Barra de progreso -->
-                    <div class="mt-3 w-full bg-gray-200 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
-                      <div 
-                        :class="[
-                          'h-full transition-all duration-300',
-                          alert.stock === 0 ? 'bg-rose-500 dark:bg-rose-400' : alert.stock < alert.min_stock / 2 ? 'bg-amber-500 dark:bg-amber-400' : 'bg-blue-500 dark:bg-blue-400'
-                        ]"
-                        :style="{ width: `${Math.min(100, (alert.stock / alert.min_stock) * 100)}%` }"
-                      ></div>
+                    <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-zinc-400">
+                      <span>Stock: <strong class="text-gray-900 dark:text-white">{{ alert.stock }}</strong> / {{ alert.min_stock }}</span>
+                      <span>Categoría: <strong class="text-gray-700 dark:text-zinc-300">{{ alert.category }}</strong></span>
                     </div>
                   </div>
                 </div>
                 
                 <!-- Botón de acción -->
-                <div class="ml-4">
-                  <button @click="adjustStock(alert)" 
-                          class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center space-x-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    <span>Reponer</span>
-                  </button>
-                </div>
-
+                <button @click="adjustStock(alert)" 
+                        class="px-4 py-2 bg-gray-900 dark:bg-white/10 hover:bg-black dark:hover:bg-white/20 text-white text-xs font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 flex-shrink-0">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  Reponer
+                </button>
               </div>
             </div>
           </div>

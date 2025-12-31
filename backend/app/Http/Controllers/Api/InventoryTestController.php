@@ -532,7 +532,7 @@ class InventoryTestController extends Controller
                     'unit_price' => $unitPrice,
                     'total_value' => $totalValue,
                     'user_name' => $movement->user_name,
-                    'reference' => $movement->reference ?: 'N/A',
+                    'reference' => $this->formatReference($movement->reference),
                     'document_number' => $this->extractDocumentNumber($movement->reference),
                     'previous_stock' => $movement->previous_stock,
                     'new_stock' => $movement->new_stock,
@@ -613,6 +613,31 @@ class InventoryTestController extends Controller
             'transfer' => 'Transferencia'
         ];
         return $reasons[$type] ?? ucfirst($type);
+    }
+
+    /**
+     * Formatear referencia para mostrar de forma amigable
+     */
+    private function formatReference($reference)
+    {
+        if (!$reference) return 'N/A';
+
+        // Limpiar referencias de importación Excel con ID interno
+        if (preg_match('/^Importación Excel\s*-?\s*[a-zA-Z0-9]+$/', $reference)) {
+            return 'Importación Excel';
+        }
+
+        // Formatear referencias de ventas
+        if (preg_match('/Sale#(\d+)/', $reference, $matches)) {
+            return 'Factura FACT-' . str_pad($matches[1], 6, '0', STR_PAD_LEFT);
+        }
+
+        // Formatear referencias de facturas existentes
+        if (preg_match('/FACT-(\d+)/', $reference, $matches)) {
+            return 'Factura FACT-' . $matches[1];
+        }
+
+        return $reference;
     }
 
     private function extractDocumentNumber($reference)

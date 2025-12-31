@@ -28,7 +28,7 @@
         
         <div class="flex items-center space-x-3">
           <!-- Botón Importar Excel (NUEVO) -->
-          <button @click="showExcelImportModal = true"
+          <button id="tour-import-excel" @click="showExcelImportModal = true"
                   class="px-4 py-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 text-sm font-semibold rounded-xl border border-indigo-200 dark:border-indigo-800 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:border-indigo-300 dark:hover:border-indigo-700">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
@@ -37,7 +37,7 @@
           </button>
           
           <!-- Botón Neutro (Exportar) -->
-          <button @click="exportProducts"
+          <button id="tour-export-products" @click="exportProducts"
                   class="px-4 py-2.5 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-200 text-sm font-semibold rounded-xl border border-slate-200 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:border-slate-300 dark:hover:border-zinc-600">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -173,7 +173,7 @@
     <div class="bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl p-4 mb-6 border border-gray-200/40 dark:border-zinc-800/40 transition-colors duration-300">
       <div class="flex flex-wrap items-center gap-4">
         <!-- Búsqueda limpia (como Facturas) -->
-        <div class="flex-1 min-w-[200px] relative">
+        <div id="tour-search-products" class="flex-1 min-w-[200px] relative">
           <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
@@ -185,7 +185,7 @@
         </div>
         
         <!-- Categoría -->
-        <div class="min-w-[160px]">
+        <div id="tour-filter-category" class="min-w-[160px]">
           <select
             v-model="categoryFilter"
             class="w-full px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
@@ -195,7 +195,7 @@
         </div>
         
         <!-- Estado -->
-        <div class="min-w-[140px]">
+        <div id="tour-filter-status" class="min-w-[140px]">
           <select
             v-model="statusFilter"
             class="w-full px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
@@ -261,25 +261,87 @@
         </div>
       </div>
 
-      <!-- Empty State -->
-      <div v-else-if="!loading && !paginatedProducts.length" class="flex justify-center items-center py-32">
-        <div class="flex flex-col items-center space-y-4 max-w-md mx-auto">
-          <div class="w-20 h-20 bg-slate-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-            <svg class="w-10 h-10 text-slate-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+      <!-- Empty State - Ilustración Profesional -->
+      <div v-else-if="!loading && !paginatedProducts.length" class="flex justify-center items-center py-16">
+        <div class="flex flex-col items-center text-center max-w-md mx-auto">
+          
+          <!-- Ilustración SVG única de Inventario -->
+          <div class="mb-8 relative">
+            <!-- Efecto glow de fondo -->
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-200/40 via-transparent to-purple-200/40 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-3xl blur-3xl scale-150"></div>
+            
+            <svg class="w-52 h-52 relative z-10" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Estante/Rack de fondo -->
+              <rect x="30" y="60" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
+              <rect x="30" y="100" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
+              <rect x="30" y="140" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
+              <!-- Patas del estante -->
+              <rect x="35" y="60" width="6" height="95" rx="2" class="fill-gray-300 dark:fill-zinc-600"/>
+              <rect x="159" y="60" width="6" height="95" rx="2" class="fill-gray-300 dark:fill-zinc-600"/>
+              
+              <!-- Caja 1 (Grande - Principal) -->
+              <g transform="translate(55, 25)">
+                <rect x="0" y="15" width="50" height="40" rx="4" class="fill-indigo-100 dark:fill-indigo-900/40"/>
+                <rect x="0" y="15" width="50" height="40" rx="4" class="fill-none stroke-indigo-300 dark:stroke-indigo-700" stroke-width="1.5"/>
+                <rect x="5" y="0" width="40" height="15" rx="2" class="fill-indigo-200 dark:fill-indigo-800/60"/>
+                <rect x="18" y="28" width="14" height="14" rx="2" class="fill-indigo-400 dark:fill-indigo-500"/>
+                <path d="M22 35L24 37L28 33" class="stroke-white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              
+              <!-- Caja 2 (Mediana) -->
+              <g transform="translate(115, 35)">
+                <rect x="0" y="10" width="35" height="30" rx="3" class="fill-purple-100 dark:fill-purple-900/40"/>
+                <rect x="0" y="10" width="35" height="30" rx="3" class="fill-none stroke-purple-300 dark:stroke-purple-700" stroke-width="1.5"/>
+                <rect x="3" y="0" width="29" height="10" rx="2" class="fill-purple-200 dark:fill-purple-800/60"/>
+              </g>
+              
+              <!-- Caja 3 (Pequeña) -->
+              <g transform="translate(45, 75)">
+                <rect x="0" y="8" width="28" height="22" rx="2" class="fill-emerald-100 dark:fill-emerald-900/40"/>
+                <rect x="0" y="8" width="28" height="22" rx="2" class="fill-none stroke-emerald-300 dark:stroke-emerald-700" stroke-width="1.5"/>
+                <rect x="2" y="0" width="24" height="8" rx="1.5" class="fill-emerald-200 dark:fill-emerald-800/60"/>
+              </g>
+              
+              <!-- Caja 4 (En el estante inferior) -->
+              <g transform="translate(90, 115)">
+                <rect x="0" y="8" width="32" height="25" rx="3" class="fill-amber-100 dark:fill-amber-900/40"/>
+                <rect x="0" y="8" width="32" height="25" rx="3" class="fill-none stroke-amber-300 dark:stroke-amber-700" stroke-width="1.5"/>
+                <rect x="2" y="0" width="28" height="8" rx="1.5" class="fill-amber-200 dark:fill-amber-800/60"/>
+              </g>
+              
+              <!-- Líneas punteadas (vacío/placeholder) -->
+              <rect x="80" y="78" width="30" height="25" rx="3" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
+              <rect x="130" y="118" width="25" height="22" rx="2" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
+              <rect x="50" y="118" width="25" height="22" rx="2" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
+              
+              <!-- Icono de + flotante -->
+              <circle cx="160" cy="45" r="16" class="fill-slate-100 dark:fill-zinc-700"/>
+              <circle cx="160" cy="45" r="12" class="fill-slate-900 dark:fill-slate-600"/>
+              <path d="M160 40V50M155 45H165" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
+              
+              <!-- Sparkles decorativos -->
+              <circle cx="175" cy="80" r="3" class="fill-indigo-300 dark:fill-indigo-500/50"/>
+              <circle cx="25" cy="95" r="2" class="fill-purple-300 dark:fill-purple-500/50"/>
+              <circle cx="180" cy="130" r="2.5" class="fill-emerald-300 dark:fill-emerald-500/50"/>
             </svg>
           </div>
-          <div class="text-center">
-            <p class="text-lg font-bold text-gray-900 dark:text-white">No hay productos</p>
-            <p class="text-sm text-gray-600 dark:text-zinc-400 mt-2">{{ searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda' : 'Comienza agregando tu primer producto' }}</p>
+          
+          <!-- Texto -->
+          <div class="relative z-10">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Tu inventario está vacío</h3>
+            <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-1">
+              {{ searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda' : 'Comienza agregando productos para gestionar tu catálogo' }}
+            </p>
+            <p v-if="!searchTerm" class="text-xs text-gray-400 dark:text-zinc-500">Puedes agregar productos manualmente o importar desde Excel</p>
           </div>
+          
           <button v-if="!searchTerm" 
                   @click="openCreateModal" 
-                  class="mt-2 px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all inline-flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="mt-6 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 inline-flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
-            <span>Nuevo Producto</span>
+            <span>Agregar Primer Producto</span>
           </button>
         </div>
       </div>
@@ -457,26 +519,82 @@
             </td>
           </tr>
 
-          <!-- Empty State -->
+          <!-- Empty State - Ilustración Profesional -->
           <tr v-else-if="!loading && !paginatedProducts.length">
-            <td :colspan="5 + availableWarehouses.length" class="px-4 py-24">
-              <div class="flex flex-col items-center justify-center space-y-5 max-w-md mx-auto">
-                <div class="w-20 h-20 bg-slate-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-                  <svg class="w-10 h-10 text-slate-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            <td :colspan="5 + availableWarehouses.length" class="px-4 py-12">
+              <div class="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
+                
+                <!-- Ilustración SVG única de Inventario -->
+                <div class="mb-6 relative">
+                  <div class="absolute inset-0 bg-gradient-to-br from-indigo-200/40 via-transparent to-purple-200/40 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-3xl blur-3xl scale-150"></div>
+                  
+                  <svg class="w-44 h-44 relative z-10" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Estante/Rack de fondo -->
+                    <rect x="30" y="60" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
+                    <rect x="30" y="100" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
+                    <rect x="30" y="140" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
+                    <rect x="35" y="60" width="6" height="95" rx="2" class="fill-gray-300 dark:fill-zinc-600"/>
+                    <rect x="159" y="60" width="6" height="95" rx="2" class="fill-gray-300 dark:fill-zinc-600"/>
+                    
+                    <!-- Caja 1 (Grande) -->
+                    <g transform="translate(55, 25)">
+                      <rect x="0" y="15" width="50" height="40" rx="4" class="fill-indigo-100 dark:fill-indigo-900/40"/>
+                      <rect x="0" y="15" width="50" height="40" rx="4" class="fill-none stroke-indigo-300 dark:stroke-indigo-700" stroke-width="1.5"/>
+                      <rect x="5" y="0" width="40" height="15" rx="2" class="fill-indigo-200 dark:fill-indigo-800/60"/>
+                      <rect x="18" y="28" width="14" height="14" rx="2" class="fill-indigo-400 dark:fill-indigo-500"/>
+                      <path d="M22 35L24 37L28 33" class="stroke-white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                    
+                    <!-- Caja 2 -->
+                    <g transform="translate(115, 35)">
+                      <rect x="0" y="10" width="35" height="30" rx="3" class="fill-purple-100 dark:fill-purple-900/40"/>
+                      <rect x="0" y="10" width="35" height="30" rx="3" class="fill-none stroke-purple-300 dark:stroke-purple-700" stroke-width="1.5"/>
+                      <rect x="3" y="0" width="29" height="10" rx="2" class="fill-purple-200 dark:fill-purple-800/60"/>
+                    </g>
+                    
+                    <!-- Caja 3 -->
+                    <g transform="translate(45, 75)">
+                      <rect x="0" y="8" width="28" height="22" rx="2" class="fill-emerald-100 dark:fill-emerald-900/40"/>
+                      <rect x="0" y="8" width="28" height="22" rx="2" class="fill-none stroke-emerald-300 dark:stroke-emerald-700" stroke-width="1.5"/>
+                      <rect x="2" y="0" width="24" height="8" rx="1.5" class="fill-emerald-200 dark:fill-emerald-800/60"/>
+                    </g>
+                    
+                    <!-- Caja 4 -->
+                    <g transform="translate(90, 115)">
+                      <rect x="0" y="8" width="32" height="25" rx="3" class="fill-amber-100 dark:fill-amber-900/40"/>
+                      <rect x="0" y="8" width="32" height="25" rx="3" class="fill-none stroke-amber-300 dark:stroke-amber-700" stroke-width="1.5"/>
+                      <rect x="2" y="0" width="28" height="8" rx="1.5" class="fill-amber-200 dark:fill-amber-800/60"/>
+                    </g>
+                    
+                    <!-- Placeholders vacíos -->
+                    <rect x="80" y="78" width="30" height="25" rx="3" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
+                    <rect x="130" y="118" width="25" height="22" rx="2" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
+                    
+                    <!-- Icono + -->
+                    <circle cx="160" cy="45" r="16" class="fill-slate-100 dark:fill-zinc-700"/>
+                    <circle cx="160" cy="45" r="12" class="fill-slate-900 dark:fill-slate-600"/>
+                    <path d="M160 40V50M155 45H165" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
+                    
+                    <!-- Sparkles -->
+                    <circle cx="175" cy="80" r="3" class="fill-indigo-300 dark:fill-indigo-500/50"/>
+                    <circle cx="25" cy="95" r="2" class="fill-purple-300 dark:fill-purple-500/50"/>
                   </svg>
                 </div>
-                <div class="text-center">
-                  <p class="text-lg font-bold text-gray-900 dark:text-white">No hay productos</p>
-                  <p class="text-sm text-gray-600 dark:text-zinc-400 mt-2">{{ searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda' : 'Comienza agregando tu primer producto' }}</p>
+                
+                <div class="relative z-10">
+                  <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Tu inventario está vacío</h3>
+                  <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed">
+                    {{ searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda' : 'Comienza agregando productos para gestionar tu catálogo' }}
+                  </p>
                 </div>
+                
                 <button v-if="!searchTerm" 
                         @click="openCreateModal" 
-                        class="mt-1 px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all inline-flex items-center gap-2">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="mt-5 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 inline-flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                   </svg>
-                  <span>Nuevo Producto</span>
+                  <span>Agregar Primer Producto</span>
                 </button>
               </div>
             </td>
@@ -2178,64 +2296,83 @@
       <div v-if="showProductsWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-lg w-full overflow-hidden border border-gray-300 dark:border-zinc-800">
           <!-- Header con diseño profesional -->
-          <div class="bg-slate-900 dark:bg-zinc-800 px-8 py-6 text-center border-b border-slate-800 dark:border-zinc-700">
-            <div class="w-20 h-20 bg-emerald-500/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
-              <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+          <div class="bg-gradient-to-br from-slate-800 via-slate-900 to-black dark:from-zinc-800 dark:via-zinc-900 dark:to-black px-8 py-8 text-center border-b border-slate-700 dark:border-zinc-700">
+            <div class="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-5 border border-white/20 shadow-lg shadow-black/20">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
               </svg>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-2">¡Prueba Final!</h2>
-            <p class="text-slate-300 dark:text-zinc-400 text-sm">Última lección antes de empezar a vender</p>
+            <h2 class="text-2xl font-bold text-white mb-2">Gestión de Productos</h2>
+            <p class="text-slate-300 dark:text-zinc-400 text-sm">Tu inventario, tu control total</p>
           </div>
           
           <div class="px-8 py-6">
-            <p class="text-gray-700 dark:text-zinc-300 text-center mb-6 leading-relaxed">
-              Esta es tu última prueba. Te mostraremos cómo funciona el módulo de productos y las diferentes formas de visualizar tu inventario.
+            <p class="text-gray-600 dark:text-zinc-400 text-center mb-6 leading-relaxed">
+              Te mostraremos las herramientas clave para gestionar tu catálogo de forma eficiente y profesional.
             </p>
             
-            <!-- Card de lista con diseño profesional -->
-            <div class="bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl p-5 mb-6">
-              <p class="text-sm font-bold text-gray-900 dark:text-white mb-3">Con esto quedarás listo para:</p>
-              <ul class="space-y-2.5">
-                <li class="flex items-center space-x-3 text-sm text-gray-700 dark:text-zinc-300">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            <!-- Cards de características -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-4 border border-blue-100 dark:border-blue-900/50">
+                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center mb-2">
+                  <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                   </svg>
-                  <span>Gestionar tu inventario completo</span>
-                </li>
-                <li class="flex items-center space-x-3 text-sm text-gray-700 dark:text-zinc-300">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </div>
+                <p class="text-xs font-semibold text-blue-900 dark:text-blue-300">Búsqueda Inteligente</p>
+              </div>
+              
+              <div class="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-xl p-4 border border-emerald-100 dark:border-emerald-900/50">
+                <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center mb-2">
+                  <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                   </svg>
-                  <span>Crear y editar productos</span>
-                </li>
-                <li class="flex items-center space-x-3 text-sm text-gray-700 dark:text-zinc-300">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </div>
+                <p class="text-xs font-semibold text-emerald-900 dark:text-emerald-300">Importar Excel</p>
+              </div>
+              
+              <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl p-4 border border-amber-100 dark:border-amber-900/50">
+                <div class="w-8 h-8 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex items-center justify-center mb-2">
+                  <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                   </svg>
-                  <span>Cambiar entre vistas (Tarjetas/Tabla)</span>
-                </li>
-                <li class="flex items-center space-x-3 text-sm text-gray-700 dark:text-zinc-300">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </div>
+                <p class="text-xs font-semibold text-amber-900 dark:text-amber-300">Filtros Avanzados</p>
+              </div>
+              
+              <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 rounded-xl p-4 border border-purple-100 dark:border-purple-900/50">
+                <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center mb-2">
+                  <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                   </svg>
-                  <span>¡Empezar a vender!</span>
-                </li>
-              </ul>
+                </div>
+                <p class="text-xs font-semibold text-purple-900 dark:text-purple-300">Múltiples Vistas</p>
+              </div>
+            </div>
+            
+            <!-- Tiempo estimado -->
+            <div class="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-zinc-500 mb-6">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>Tour rápido: ~30 segundos</span>
             </div>
             
             <div class="flex gap-3">
               <button
-                @click="showProductsWelcomeModal = false"
-                class="flex-1 px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200"
+                @click="handleProductsWelcomeSkip"
+                class="flex-1 px-5 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 text-sm font-semibold rounded-xl border border-gray-200 dark:border-zinc-700 transition-all duration-200"
               >
                 Omitir
               </button>
               <button
                 @click="handleProductsWelcomeStart"
-                class="flex-1 px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300"
+                class="flex-1 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                ¡Vamos!
+                <span>Comenzar Tour</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                </svg>
               </button>
             </div>
           </div>
@@ -2256,64 +2393,70 @@
     >
       <div v-if="showFinalModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-md w-full overflow-hidden border border-gray-300 dark:border-zinc-800">
-          <!-- Header con diseño profesional -->
-          <div class="bg-slate-900 dark:bg-zinc-800 px-8 py-6 text-center border-b border-slate-800 dark:border-zinc-700">
-            <div class="w-20 h-20 bg-emerald-500/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
-              <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+          <!-- Header con diseño profesional y gradiente -->
+          <div class="bg-gradient-to-br from-slate-800 via-slate-900 to-black dark:from-zinc-800 dark:via-zinc-900 dark:to-black px-8 py-8 text-center border-b border-slate-700 dark:border-zinc-700 relative overflow-hidden">
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-pulse"></div>
+            
+            <div class="relative">
+              <div class="w-20 h-20 bg-emerald-500/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-5 border border-emerald-500/30 shadow-lg shadow-emerald-500/20">
+                <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-white mb-2">¡Excelente Trabajo!</h2>
+              <p class="text-slate-300 dark:text-zinc-400 text-sm">Has completado el tour de Productos</p>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-2">¡Felicitaciones!</h2>
-            <p class="text-slate-300 dark:text-zinc-400 text-sm">Entrenamiento completado exitosamente</p>
           </div>
           
           <div class="px-8 py-6">
-            <p class="text-gray-700 dark:text-zinc-300 text-center mb-6 leading-relaxed font-medium">
-              Ya dominas todas las funciones del sistema POS
+            <p class="text-gray-600 dark:text-zinc-400 text-center mb-6 leading-relaxed">
+              Ya conoces todas las herramientas para gestionar tu inventario de forma profesional.
             </p>
             
-            <!-- Card de lista con diseño profesional -->
-            <div class="bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl p-5 mb-5">
-              <p class="text-sm font-bold text-gray-900 dark:text-white mb-3">Ahora puedes:</p>
-              <ul class="space-y-2.5">
-                <li class="flex items-center space-x-3 text-sm text-gray-700 dark:text-zinc-300">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>Gestionar el control de caja</span>
-                </li>
-                <li class="flex items-center space-x-3 text-sm text-gray-700 dark:text-zinc-300">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>Realizar ventas y cotizaciones</span>
-                </li>
-                <li class="flex items-center space-x-3 text-sm text-gray-700 dark:text-zinc-300">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>Administrar clientes y descuentos</span>
-                </li>
-                <li class="flex items-center space-x-3 text-sm text-gray-700 dark:text-zinc-300">
-                  <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                  </svg>
-                  <span>Controlar tu inventario completo</span>
-                </li>
-              </ul>
-            </div>
-
-            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 rounded-xl p-4 mb-6 text-center">
-              <p class="text-sm text-emerald-700 dark:text-emerald-300 font-bold">
-                🚀 ¡A trabajar! Crea tus productos y empieza a vender
-              </p>
+            <!-- Próximos pasos -->
+            <div class="space-y-3 mb-6">
+              <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Próximos pasos:</p>
+              
+              <div class="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-900/50">
+                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span class="text-sm font-bold text-blue-600 dark:text-blue-400">1</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-blue-900 dark:text-blue-300">Agrega tu primer producto</p>
+                  <p class="text-xs text-blue-700/70 dark:text-blue-400/70">Haz clic en "Nuevo Producto" para empezar</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-3 p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl border border-emerald-100 dark:border-emerald-900/50">
+                <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">2</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-emerald-900 dark:text-emerald-300">O importa desde Excel</p>
+                  <p class="text-xs text-emerald-700/70 dark:text-emerald-400/70">Carga masiva con detección automática de IA</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-100 dark:border-purple-900/50">
+                <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span class="text-sm font-bold text-purple-600 dark:text-purple-400">3</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-purple-900 dark:text-purple-300">¡Empieza a vender!</p>
+                  <p class="text-xs text-purple-700/70 dark:text-purple-400/70">Dirígete al POS y realiza tu primera venta</p>
+                </div>
+              </div>
             </div>
             
             <button
               @click="closeFinalModal"
-              class="w-full px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300"
+              class="w-full px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all duration-300 flex items-center justify-center gap-2"
             >
-              Entendido
+              <span>Comenzar a Gestionar</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
             </button>
           </div>
         </div>
@@ -2602,28 +2745,129 @@ const displayProducts = computed(() => {
 
 const productsTourSteps = ref([
   {
-    selector: '#tour-view-toggle',
-    title: 'Vistas de Productos',
+    selector: '#tour-search-products',
+    title: 'Buscador Inteligente',
     content: `
-      <p class="text-sm text-gray-700 mb-2">
-        Cambia entre <strong>Tarjetas</strong> (visual) y <strong>Tabla</strong> (compacta).
-      </p>
-      <p class="text-xs text-gray-600 italic">
-        Observa el cambio automático en unos segundos...
-      </p>
+      <p>Encuentra productos al instante. Busca por:</p>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <span class="px-2.5 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700">Nombre</span>
+        <span class="px-2.5 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700">SKU</span>
+        <span class="px-2.5 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700">Código de barras</span>
+      </div>
+      <p class="mt-3 text-xs text-gray-500">Tip: Conecta un escáner de códigos para búsqueda instantánea.</p>
     `,
     position: 'bottom'
   },
   {
-    selector: '#tour-new-product',
-    title: 'Crear Productos',
+    selector: '#tour-filter-category',
+    title: 'Filtrar por Categoría',
     content: `
-      <p class="text-sm text-gray-700 mb-2">
-        Haz clic aquí para <strong>agregar nuevos productos</strong> a tu inventario.
-      </p>
-      <div class="bg-blue-50 rounded-lg p-2 mt-2">
-        <p class="text-xs text-blue-800">
-          <strong>Datos necesarios:</strong> Nombre, precio, stock, categoría y código de barras.
+      <p>Organiza tu catálogo filtrando por <strong>categorías</strong>. Ideal para tiendas con amplio inventario.</p>
+      <p class="mt-2 text-xs text-gray-500">Las categorías se crean automáticamente al agregar productos.</p>
+    `,
+    position: 'bottom'
+  },
+  {
+    selector: '#tour-filter-status',
+    title: 'Estados de Producto',
+    content: `
+      <p>Filtra productos por su estado actual:</p>
+      <div class="space-y-2 mt-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+          <span class="text-xs text-gray-600 dark:text-zinc-400"><strong>Activos:</strong> Disponibles para venta</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+          <span class="text-xs text-gray-600 dark:text-zinc-400"><strong>Inactivos:</strong> Ocultos del POS</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
+          <span class="text-xs text-gray-600 dark:text-zinc-400"><strong>Stock Bajo:</strong> Requieren reabastecimiento</span>
+        </div>
+      </div>
+    `,
+    position: 'bottom'
+  },
+  {
+    selector: '#tour-view-toggle',
+    title: 'Cambia tu Vista',
+    content: `
+      <p>Elige cómo visualizar tu catálogo:</p>
+      <div class="grid grid-cols-2 gap-3 mt-3">
+        <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-3 text-center border border-gray-200 dark:border-zinc-700">
+          <svg class="w-6 h-6 mx-auto mb-1 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/></svg>
+          <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Tarjetas</span>
+          <p class="text-[10px] text-gray-500 mt-0.5">Visual + Imágenes</p>
+        </div>
+        <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-3 text-center border border-gray-200 dark:border-zinc-700">
+          <svg class="w-6 h-6 mx-auto mb-1 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Tabla</span>
+          <p class="text-[10px] text-gray-500 mt-0.5">Datos compactos</p>
+        </div>
+      </div>
+      <p class="text-xs text-gray-500 mt-3 italic">Observa el cambio automático...</p>
+    `,
+    position: 'bottom'
+  },
+  {
+    selector: '#tour-import-excel',
+    title: 'Importación con IA',
+    content: `
+      <p><span class="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-xs font-semibold border border-indigo-200 dark:border-indigo-800">Powered by AI</span></p>
+      <p class="mt-2">Carga masiva de productos desde Excel. Nuestra <strong>IA detecta automáticamente</strong> las columnas y mapea los datos.</p>
+      <p class="mt-2 text-xs text-gray-500">Soporta formatos: .xlsx, .xls, .csv</p>
+    `,
+    position: 'left'
+  },
+  {
+    selector: '#tour-export-products',
+    title: 'Exportar Catálogo',
+    content: `
+      <p>Descarga tu inventario completo en formato Excel para:</p>
+      <ul class="mt-2 space-y-1 text-xs text-gray-600 dark:text-zinc-400">
+        <li class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          Respaldo de datos
+        </li>
+        <li class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          Análisis en hojas de cálculo
+        </li>
+        <li class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          Compartir con proveedores
+        </li>
+      </ul>
+    `,
+    position: 'left'
+  },
+  {
+    selector: '#tour-new-product',
+    title: 'Crear Nuevo Producto',
+    content: `
+      <p>Agrega productos a tu inventario con toda la información necesaria:</p>
+      <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
+        <div class="flex items-center gap-1.5 text-gray-600 dark:text-zinc-400">
+          <svg class="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          Nombre y descripción
+        </div>
+        <div class="flex items-center gap-1.5 text-gray-600 dark:text-zinc-400">
+          <svg class="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          Precios y costos
+        </div>
+        <div class="flex items-center gap-1.5 text-gray-600 dark:text-zinc-400">
+          <svg class="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          Stock inicial
+        </div>
+        <div class="flex items-center gap-1.5 text-gray-600 dark:text-zinc-400">
+          <svg class="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          Código de barras
+        </div>
+      </div>
+      <div class="mt-3 p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-100 dark:border-blue-900/50">
+        <p class="text-xs text-blue-700 dark:text-blue-400">
+          <strong>Pro tip:</strong> Puedes generar códigos de barras automáticamente.
         </p>
       </div>
     `,
@@ -2633,7 +2877,19 @@ const productsTourSteps = ref([
 
 // Variable para guardar la vista original del usuario
 const originalViewMode = ref('table')
+let viewChangeTimeout = null
 
+// 🚫 Usuario omite el tour
+const handleProductsWelcomeSkip = () => {
+  showProductsWelcomeModal.value = false
+  isTourActive.value = false
+  // Marcar como completado para no mostrar de nuevo
+  if (!DEV_MODE_PRODUCTS) {
+    localStorage.setItem('products_tour_completed', 'true')
+  }
+}
+
+// ▶️ Usuario inicia el tour
 const handleProductsWelcomeStart = () => {
   showProductsWelcomeModal.value = false
   isTourActive.value = true // Activar productos fantasma
@@ -2644,11 +2900,12 @@ const handleProductsWelcomeStart = () => {
   
   productsTourRef.value.startTourConfirmed()
   
-  // 🎬 Demo AUTOMÁTICA: cambiar vista después de 3 segundos
-  setTimeout(() => {
-    // Cambiar a la vista contraria
+  // 🎬 Demo AUTOMÁTICA: cambiar vista cuando llegue al paso de "Cambia tu Vista" (paso 4)
+  // El tour tardará aprox 12 segundos en llegar al paso 4 (3 pasos x 4 segundos cada uno)
+  viewChangeTimeout = setTimeout(() => {
+    // Cambiar a la vista contraria para demostrar
     viewMode.value = originalViewMode.value === 'table' ? 'grid' : 'table'
-  }, 3000)
+  }, 12000)
 }
 
 const showFinalModal = ref(false)
@@ -2707,6 +2964,12 @@ const triggerConfetti = () => {
 }
 
 const handleProductsTourComplete = () => {
+  // Limpiar timeout de cambio de vista si existe
+  if (viewChangeTimeout) {
+    clearTimeout(viewChangeTimeout)
+    viewChangeTimeout = null
+  }
+  
   // Mostrar modal de finalización
   showFinalModal.value = true
   isTourActive.value = false // Desactivar productos fantasma
@@ -2719,6 +2982,12 @@ const handleProductsTourComplete = () => {
 }
 
 const handleProductsTourSkip = () => {
+  // Limpiar timeout de cambio de vista si existe
+  if (viewChangeTimeout) {
+    clearTimeout(viewChangeTimeout)
+    viewChangeTimeout = null
+  }
+  
   isTourActive.value = false // Desactivar productos fantasma
   
   // Restaurar vista original del usuario

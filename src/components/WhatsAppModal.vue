@@ -42,13 +42,24 @@
           <p class="text-gray-600 dark:text-gray-400 mb-6">
             Ya puedes enviar facturas por WhatsApp a tus clientes
           </p>
-          <button 
-            @click="handleDisconnect"
-            :disabled="loading"
-            class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50"
-          >
-            {{ loading ? 'Desconectando...' : 'Desconectar WhatsApp' }}
-          </button>
+          
+          <!-- Botones de acción -->
+          <div class="space-y-3">
+            <button 
+              @click="$emit('close')"
+              class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors shadow-lg"
+            >
+              Continuar
+            </button>
+            
+            <button 
+              @click="handleDisconnect"
+              :disabled="loading"
+              class="w-full bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-red-600 dark:text-red-400 font-medium py-2.5 px-4 rounded-lg transition-colors disabled:opacity-50 border border-red-200 dark:border-red-800"
+            >
+              {{ loading ? 'Desconectando...' : 'Desconectar WhatsApp' }}
+            </button>
+          </div>
         </div>
 
         <!-- Estado No Conectado -->

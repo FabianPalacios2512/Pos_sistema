@@ -143,18 +143,64 @@
                       ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'
                       : message.isError
                         ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-                        : 'bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700'
+                        : message.isInfo
+                          ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800'
+                          : message.isWarning
+                            ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800'
+                            : 'bg-white dark:bg-zinc-800 border border-gray-100 dark:border-zinc-700'
                   ]"
                 >
-                  <!-- Mensaje de límite -->
-                  <div v-if="message.isLimit" class="space-y-2">
+                  <!-- Mensaje de límite alcanzado - Diseño bonito -->
+                  <div v-if="message.isLimit" class="space-y-3">
                     <div class="flex items-center gap-2 text-amber-700 dark:text-amber-400 font-medium">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                       </svg>
-                      Límite alcanzado
+                      Límite diario alcanzado
                     </div>
-                    <p class="text-gray-600 dark:text-zinc-300 whitespace-pre-line">{{ message.text }}</p>
+                    
+                    <p class="text-gray-600 dark:text-zinc-300">
+                      😊 Has usado tus {{ message.limitData?.used || 10 }} mensajes de hoy. ¡Gracias por probar 105 IA!
+                    </p>
+                    
+                    <div class="text-gray-600 dark:text-zinc-300 text-sm">
+                      Para continuar usando el asistente:
+                    </div>
+                    
+                    <!-- Botones de upgrade bonitos -->
+                    <div class="flex flex-col gap-2">
+                      <button 
+                        @click="$emit('navigate', 'upgrade')"
+                        class="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs font-bold rounded-xl hover:from-purple-600 hover:to-indigo-700 transition-all shadow-md"
+                      >
+                        <span class="text-sm">💎</span>
+                        <span>Premium</span>
+                        <span class="text-purple-200 font-normal">- Mensajes ilimitados</span>
+                      </button>
+                      <button 
+                        @click="$emit('navigate', 'upgrade')"
+                        class="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-bold rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-md"
+                      >
+                        <span class="text-sm">🚀</span>
+                        <span>Enterprise</span>
+                        <span class="text-emerald-200 font-normal">- Todo ilimitado</span>
+                      </button>
+                    </div>
+                    
+                    <p class="text-gray-500 dark:text-zinc-400 text-xs flex items-center gap-1">
+                      <span>⏰</span>
+                      {{ message.limitData?.renewalText || 'Mañana tendrás 10 mensajes nuevos.' }}
+                    </p>
+                  </div>
+                  
+                  <!-- Mensaje de info (quedan 3 mensajes) -->
+                  <div v-else-if="message.isInfo" class="space-y-1">
+                    <p class="text-blue-700 dark:text-blue-400 whitespace-pre-line font-medium">{{ message.text }}</p>
+                  </div>
+                  
+                  <!-- Mensaje de advertencia (último mensaje) -->
+                  <div v-else-if="message.isWarning" class="space-y-1">
+                    <p class="text-orange-700 dark:text-orange-400 whitespace-pre-line font-medium">{{ message.text }}</p>
                   </div>
                   
                   <!-- Mensaje normal -->
@@ -291,16 +337,16 @@
               </button>
             </div>
 
-            <!-- Uso de mensajes -->
+            <!-- Uso de mensajes - Diario para Basic -->
             <div v-if="messageLimit > 0" class="flex items-center gap-1.5 text-xs text-gray-400 dark:text-zinc-500">
               <div class="w-16 h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                 <div 
                   class="h-full bg-emerald-500 rounded-full transition-all duration-300"
-                  :style="{ width: `${Math.min((messagesUsedThisHour / messageLimit) * 100, 100)}%` }"
-                  :class="{ 'bg-amber-500': messagesUsedThisHour >= messageLimit * 0.8, 'bg-red-500': messagesUsedThisHour >= messageLimit }"
+                  :style="{ width: `${Math.min((messagesUsedToday / messageLimit) * 100, 100)}%` }"
+                  :class="{ 'bg-amber-500': messagesUsedToday >= messageLimit * 0.8, 'bg-red-500': messagesUsedToday >= messageLimit }"
                 ></div>
               </div>
-              <span>{{ messagesUsedThisHour }}/{{ messageLimit }}</span>
+              <span>{{ messagesUsedToday }}/{{ messageLimit }} hoy</span>
             </div>
           </div>
         </div>
@@ -342,9 +388,9 @@ export default {
     const selectedProvider = ref('gemini') // Cambiado a gemini por defecto
     const userPlan = ref('basic') // basic, premium, enterprise
     
-    // Sistema de límites
-    const messageLimit = ref(10) // Por defecto plan básico
-    const messagesUsedThisHour = ref(0)
+    // Sistema de límites - 10 mensajes por día para Basic (más generoso)
+    const messageLimit = ref(10) // Límite diario para plan Basic
+    const messagesUsedToday = ref(0)
     
     // Archivo seleccionado
     const selectedFile = ref(null)
@@ -372,34 +418,41 @@ export default {
     // Cargar estadísticas de uso y plan del usuario
     const loadUsageStats = async () => {
       try {
-        // Cargar estadísticas de uso
-        const usageResponse = await api.get('/ai/usage-stats')
-        if (usageResponse.success && usageResponse.data) {
-          const data = usageResponse.data
-          messagesUsedThisHour.value = data.usage?.last_hour?.requests || 0
-          
-          // Obtener límites según el plan
-          if (data.limits && !data.limits.unlimited) {
-            messageLimit.value = data.limits.limits?.requests_per_hour || 10
-          } else if (data.limits?.unlimited) {
-            messageLimit.value = 0 // 0 = ilimitado
-          }
-          
-          userPlan.value = data.plan || 'free_trial'
-        }
-
-        // Cargar configuración de proveedor según plan
+        // Cargar plan del usuario desde backend
         const providerResponse = await api.get('/ai/provider-config')
         if (providerResponse.success && providerResponse.data) {
           const config = providerResponse.data
           selectedProvider.value = config.default || 'groq'
-          userPlan.value = config.current_plan || userPlan.value
+          userPlan.value = config.current_plan || 'basic'
+        }
+        
+        // Cargar conteo de mensajes desde localStorage con validación de fecha
+        const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+        const storedData = JSON.parse(localStorage.getItem('ai_daily_usage') || '{}')
+        
+        // Si es un nuevo día, resetear contador
+        if (storedData.date !== today) {
+          messagesUsedToday.value = 0
+          localStorage.setItem('ai_daily_usage', JSON.stringify({
+            date: today,
+            count: 0
+          }))
+        } else {
+          messagesUsedToday.value = storedData.count || 0
+        }
+        
+        // Configurar límites según plan
+        if (userPlan.value === 'premium' || userPlan.value === 'enterprise') {
+          messageLimit.value = 0 // Ilimitado
+        } else {
+          messageLimit.value = 10 // Basic y Free Trial: 10 mensajes/día
         }
       } catch (error) {
         // Si falla, usar valores por defecto
         selectedProvider.value = 'groq'
+        userPlan.value = 'basic'
         messageLimit.value = 10
-        messagesUsedThisHour.value = 0
+        messagesUsedToday.value = 0
       }
     }
 
@@ -473,13 +526,17 @@ export default {
     const sendMessage = async () => {
       if ((!inputMessage.value.trim() && !selectedFile.value) || isTyping.value) return
 
-      // Verificar límite local antes de enviar
-      if (messageLimit.value > 0 && messagesUsedThisHour.value >= messageLimit.value) {
+      // Verificar límite diario antes de enviar (solo para Basic/Free Trial)
+      if (messageLimit.value > 0 && messagesUsedToday.value >= messageLimit.value) {
         messages.value.push({
           type: 'ai',
-          text: `Has alcanzado tu límite de ${messageLimit.value} mensajes por hora.\n\nActualiza tu plan para obtener más mensajes:\n• Premium: 50 mensajes/hora\n• Enterprise: Ilimitado`,
+          text: '',
           timestamp: getCurrentTime(),
-          isLimit: true
+          isLimit: true,
+          limitData: {
+            used: messageLimit.value,
+            renewalText: `Mañana tendrás ${messageLimit.value} mensajes nuevos disponibles.`
+          }
         })
         scrollToBottom()
         return
@@ -545,8 +602,13 @@ export default {
         // Guardar session_id
         if (response.session_id) sessionId.value = response.session_id
 
-        // Incrementar uso local
-        messagesUsedThisHour.value++
+        // Incrementar contador diario y guardar en localStorage
+        messagesUsedToday.value++
+        const today = new Date().toISOString().split('T')[0]
+        localStorage.setItem('ai_daily_usage', JSON.stringify({
+          date: today,
+          count: messagesUsedToday.value
+        }))
 
         // Parsear respuesta
         let aiReply = response.reply
@@ -574,6 +636,28 @@ export default {
           timestamp: getCurrentTime(),
           suggested_action: suggestedAction
         })
+
+        // 💡 Aviso amigable cuando quedan pocos mensajes (solo para planes limitados)
+        if (messageLimit.value > 0) {
+          const messagesRemaining = messageLimit.value - messagesUsedToday.value
+          
+          // Avisar cuando quedan 3 o menos mensajes
+          if (messagesRemaining === 3) {
+            messages.value.push({
+              type: 'ai',
+              text: `ℹ️ *Aviso amigable*: Te quedan 3 mensajes hoy. Mañana se renovarán tus ${messageLimit.value} mensajes diarios.`,
+              timestamp: getCurrentTime(),
+              isInfo: true
+            })
+          } else if (messagesRemaining === 1) {
+            messages.value.push({
+              type: 'ai',
+              text: `⚠️ Este es tu último mensaje de hoy. Mañana tendrás ${messageLimit.value} mensajes nuevos disponibles.`,
+              timestamp: getCurrentTime(),
+              isWarning: true
+            })
+          }
+        }
 
         // Ejecutar navegación si existe
         if (aiAction && aiAction.type === 'navigate' && aiAction.payload) {
@@ -663,7 +747,7 @@ export default {
       selectedProvider,
       userPlan,
       messageLimit,
-      messagesUsedThisHour,
+      messagesUsedToday,
       selectedFile,
       quickSuggestions,
       toggleChat,

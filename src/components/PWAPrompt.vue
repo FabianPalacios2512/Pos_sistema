@@ -98,11 +98,13 @@ const handleBeforeInstallPrompt = (e) => {
   // No mostrar si ya está instalado o si el usuario ya rechazó
   const dismissed = localStorage.getItem('pwa-install-dismissed')
   const alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
+  // Solo mostrar después de completar el tour del POS
+  const tourCompleted = localStorage.getItem('pos_tour_completed') === 'true'
   
-  if (!dismissed && !alreadyInstalled) {
+  if (!dismissed && !alreadyInstalled && tourCompleted) {
     setTimeout(() => {
       showInstallPrompt.value = true
-    }, 3000) // Mostrar después de 3 segundos
+    }, 5000) // Mostrar después de 5 segundos
   }
 }
 

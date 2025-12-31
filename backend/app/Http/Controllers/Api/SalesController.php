@@ -98,6 +98,7 @@ class SalesController extends Controller
             $data = $request->all();
             $surchargeAmount = 0;
             $paymentStatus = 'paid'; // Default for non-credit sales
+            $customer = null; // Inicializar para CRM
 
             // Lógica de Creditienda
             if ($request->payment_method === 'credit') {
@@ -175,6 +176,11 @@ class SalesController extends Controller
 
             // Agregar nombre del vendedor explícitamente
             $sale->seller_name = $sale->user ? $sale->user->name : 'Vendedor';
+
+            // 🎯 CRM: Enviar confirmación de compra a crédito por WhatsApp
+            if ($request->payment_method === 'credit' && $customer) {
+                $this->sendCreditPurchaseConfirmation($customer, $sale);
+            }
 
             return response()->json([
                 'success' => true,
@@ -520,6 +526,80 @@ class SalesController extends Controller
                 'success' => false,
                 'message' => 'Error al buscar cotización: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * 🎯 CRM: Enviar confirmación de compra a crédito por WhatsApp
+     * Se envía automáticamente después de cada compra a crédito
+     */
+    private function sendCreditPurchaseConfirmation($customer, $sale)
+    {
+        try {
+            if (!$customer->phone) {
+                \Log::info('CRM: Cliente sin teléfono, omitiendo confirmación WhatsApp', [
+                    'customer_id' => $customer->id
+                ]);
+                return;
+            }
+
+            // Formatear montos
+            $purchaseAmount = number_format($sale->total_amount, 0, ',', '.');
+            $newDebt = number_format($customer->current_debt, 0, ',', '.');
+            $creditLimit = number_format($customer->credit_limit, 0, ',', '.');
+            $availableCredit = number_format(max(0, $customer->credit_limit - $customer->current_debt), 0, ',', '.');
+
+            // Crear mensaje de confirmación CRM
+            $message = "✅ *COMPRA REGISTRADA - CreditiTenda*\n\n";
+            $message .= "Hola *{$customer->name}*,\n\n";
+            $message .= "Tu compra ha sido registrada exitosamente:\n\n";
+            $message .= "🛒 *Compra:* \${$purchaseAmount}\n";
+            $message .= "📋 *Factura:* {$sale->invoice_number}\n\n";
+            $message .= "💳 *Estado de tu crédito:*\n";
+            $message .= "• Deuda Actual: \${$newDebt}\n";
+            $message .= "• Cupo Total: \${$creditLimit}\n";
+            $message .= "• Disponible: \${$availableCredit}\n\n";
+            $message .= "¡Gracias por tu compra! 🙏";
+
+            // Formatear número al formato colombiano
+            $phone = $customer->phone;
+            if (!str_starts_with($phone, '+57')) {
+                $phone = preg_replace('/[^0-9]/', '', $phone);
+                if (strlen($phone) === 10) {
+                    $phone = '+57' . $phone;
+                }
+            }
+
+            // Obtener tenant_id
+            // IMPORTANTE: Convertir guion bajo a guion para coincidir con sesiones WhatsApp
+            $tenantId = tenant('id') ?? request()->header('X-Tenant-Id');
+            $tenantId = str_replace('_', '-', $tenantId);
+
+            // Enviar vía WhatsApp (silencioso, no bloquea la venta)
+            $whatsappUrl = 'http://localhost:3002/send';
+            $response = \Illuminate\Support\Facades\Http::timeout(5)
+                ->withHeaders(['X-Tenant-Id' => $tenantId])
+                ->post($whatsappUrl, [
+                    'phone' => $phone,
+                    'message' => $message
+                ]);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+                if (isset($responseData['success']) && $responseData['success']) {
+                    \Log::info('✅ CRM: Confirmación de compra enviada por WhatsApp', [
+                        'customer_id' => $customer->id,
+                        'sale_id' => $sale->id,
+                        'phone' => $phone
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            // No lanzar excepción - esto es opcional y no debe bloquear la venta
+            \Log::warning('⚠️ CRM: Error enviando confirmación WhatsApp (no crítico)', [
+                'customer_id' => $customer->id,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }

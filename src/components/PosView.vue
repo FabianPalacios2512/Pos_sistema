@@ -180,8 +180,9 @@
         
         <div class="flex items-center gap-3 w-full md:w-auto justify-end">
 
-          <!-- Botón Pedido Web -->
-          <button 
+          <!-- Botón Pedido Web: Solo para Premium y Enterprise -->
+          <button
+            v-if="canUseWebOrders"
             @click="showLoadWebOrderModal = true" 
             class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm"
             title="Cargar pedido web"
@@ -213,7 +214,8 @@
             </div>
           </button>
           
-          <WhatsAppStatus id="tour-pos-whatsapp" ref="whatsappStatus" class="hidden sm:block" />
+          <!-- WhatsApp: Solo para Premium y Enterprise -->
+          <WhatsAppStatus v-if="canUseWhatsApp" id="tour-pos-whatsapp" ref="whatsappStatus" class="hidden sm:block" />
           
           <button 
             id="tour-pos-cash-btn"
@@ -276,39 +278,85 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5" style="height: calc(100vh - 11rem - 54px); margin-bottom: 24px;">
   <!-- Panel Izquierdo: Catálogo de Productos - 70% Fashion (8/12) | 50% General (6/12) -->
   <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="h-full overflow-hidden transition-all duration-300">
-    <div class="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/60 h-full flex flex-col overflow-hidden transition-all duration-300">
+    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col overflow-hidden transition-all duration-300">
       
       <div class="flex-1 p-3 overflow-y-auto bg-slate-100/80 dark:bg-zinc-950/50 backdrop-blur-sm" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
-        <!-- Loading skeleton -->
+        <!-- Loading skeleton - Modo oscuro mejorado -->
       <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
-          <div v-for="n in 10" :key="n" class="bg-white rounded-2xl p-3 border border-slate-100 shadow-sm animate-pulse">
-            <div class="aspect-square bg-slate-100 rounded-xl mb-3"></div>
-            <div class="h-5 bg-slate-100 rounded-lg w-2/3 mb-2"></div>
-          <div class="h-4 bg-slate-100 rounded-lg w-1/3"></div>
+          <div v-for="n in 10" :key="n" class="bg-white dark:bg-zinc-800/50 rounded-2xl p-3 border border-gray-100 dark:border-zinc-700/50 shadow-sm">
+            <div class="aspect-square bg-gray-100 dark:bg-zinc-700/50 rounded-xl mb-3 animate-pulse"></div>
+            <div class="h-4 bg-gray-100 dark:bg-zinc-700/50 rounded-lg w-2/3 mb-2 animate-pulse"></div>
+            <div class="h-3 bg-gray-100 dark:bg-zinc-700/50 rounded-lg w-1/3 animate-pulse"></div>
         </div>
       </div>
       
-      <!-- Primera vez: NO hay productos en la base de datos -->
-      <div v-else-if="isFirstTimeNoProducts" class="h-full flex flex-col items-center justify-center text-center py-12 min-h-[600px]">
-        <!-- Icono de carrito vacío mejorado -->
-        <div class="w-28 h-28 bg-slate-100 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg dark:shadow-black/30">
-           <svg class="w-16 h-16 text-slate-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-           </svg>
+      <!-- Primera vez: NO hay productos en la base de datos - Ilustración Profesional -->
+      <div v-else-if="isFirstTimeNoProducts" class="h-full flex flex-col items-center justify-center text-center py-8 min-h-[500px] bg-gradient-to-b from-transparent via-slate-50/30 to-transparent dark:from-transparent dark:via-zinc-800/20 dark:to-transparent">
+        
+        <!-- Ilustración SVG única de Tienda/Carrito -->
+        <div class="mb-6 relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-blue-200/30 via-transparent to-emerald-200/30 dark:from-blue-500/10 dark:to-emerald-500/10 rounded-3xl blur-3xl scale-150"></div>
+          
+          <svg class="w-40 h-40 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Carrito de compras principal -->
+            <g transform="translate(35, 30)">
+              <!-- Cuerpo del carrito -->
+              <path d="M15 35 L25 35 L35 75 L95 75 L105 45 L30 45" class="fill-blue-100 dark:fill-blue-900/40"/>
+              <path d="M15 35 L25 35 L35 75 L95 75 L105 45 L30 45" class="fill-none stroke-blue-300 dark:stroke-blue-700" stroke-width="2"/>
+              
+              <!-- Manija del carrito -->
+              <path d="M5 30 L15 35" class="stroke-blue-400 dark:stroke-blue-500" stroke-width="3" stroke-linecap="round"/>
+              
+              <!-- Ruedas -->
+              <circle cx="45" cy="85" r="8" class="fill-gray-200 dark:fill-zinc-700"/>
+              <circle cx="45" cy="85" r="5" class="fill-gray-400 dark:fill-zinc-500"/>
+              <circle cx="85" cy="85" r="8" class="fill-gray-200 dark:fill-zinc-700"/>
+              <circle cx="85" cy="85" r="5" class="fill-gray-400 dark:fill-zinc-500"/>
+              
+              <!-- Producto dentro del carrito (caja) -->
+              <rect x="40" y="50" width="22" height="20" rx="3" class="fill-emerald-200 dark:fill-emerald-800/60"/>
+              <rect x="40" y="50" width="22" height="20" rx="3" class="fill-none stroke-emerald-400 dark:stroke-emerald-600" stroke-width="1.5"/>
+              <rect x="44" y="58" width="14" height="3" rx="1" class="fill-emerald-400 dark:fill-emerald-500"/>
+              
+              <!-- Segundo producto -->
+              <rect x="66" y="55" width="18" height="16" rx="2" class="fill-amber-200 dark:fill-amber-800/60"/>
+              <rect x="66" y="55" width="18" height="16" rx="2" class="fill-none stroke-amber-400 dark:stroke-amber-600" stroke-width="1.5"/>
+            </g>
+            
+            <!-- Signo de interrogación flotante -->
+            <g transform="translate(115, 25)">
+              <circle cx="20" cy="20" r="18" class="fill-slate-100 dark:fill-zinc-700"/>
+              <circle cx="20" cy="20" r="14" class="fill-slate-800 dark:fill-slate-600"/>
+              <text x="20" y="26" text-anchor="middle" class="fill-white font-bold" style="font-size: 18px; font-family: system-ui;">?</text>
+            </g>
+            
+            <!-- Estrellitas decorativas -->
+            <circle cx="25" cy="50" r="3" class="fill-blue-300 dark:fill-blue-500/50"/>
+            <circle cx="155" cy="80" r="2.5" class="fill-emerald-300 dark:fill-emerald-500/50"/>
+            <circle cx="140" cy="130" r="2" class="fill-amber-300 dark:fill-amber-500/50"/>
+            
+            <!-- Flecha hacia productos -->
+            <path d="M130 110 L145 125" class="stroke-gray-300 dark:stroke-zinc-600" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+            <circle cx="150" cy="130" r="6" class="fill-gray-200 dark:fill-zinc-700"/>
+            <path d="M147 130H153M150 127V133" class="stroke-gray-500 dark:stroke-zinc-400" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
         </div>
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">¿Quieres crear tu primer producto?</h3>
-        <p class="text-sm text-gray-600 dark:text-zinc-400 max-w-xs leading-relaxed mb-6">
-           Aún no tienes productos registrados. Crea tu primer producto para comenzar a vender.
+        
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">¿Listo para empezar a vender?</h3>
+        <p class="text-sm text-gray-500 dark:text-zinc-400 max-w-[280px] leading-relaxed mb-1">
+           Tu catálogo está vacío. Agrega productos para comenzar a realizar ventas.
         </p>
+        <p class="text-xs text-gray-400 dark:text-zinc-500 mb-5">Solo toma unos minutos configurar tu inventario</p>
+        
         <button
           @click="emit('change-module', 'products')"
-          class="px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-slate-400/60 dark:hover:shadow-slate-900/70 transition-all duration-300 transform active:scale-95 flex items-center gap-2"
+          class="px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 transform active:scale-95 flex items-center gap-2"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-          <span>Crear Primer Producto</span>
+          <span>Ir a Productos</span>
         </button>
       </div>
       
@@ -370,7 +418,8 @@
           <div
             v-for="(product, index) in filteredProducts"
             :key="product.id"
-            class="group cursor-pointer"
+            class="group cursor-pointer animate-fade-in-up"
+            :style="{ animationDelay: `${Math.min(index * 30, 300)}ms` }"
             @click="addToCart(product)"
           >
             <!-- Card Minimalista Fashion - SIN fondo en contenedor principal -->
@@ -395,15 +444,16 @@
                   v-if="product.image_url || product.image"
                   :src="getProductImage(product)"
                   :alt="product.name"
-                  class="w-full h-full object-cover rounded-xl transition-transform duration-700 ease-out group-hover:scale-105"
-                  loading="lazy"
+                  class="w-full h-full object-cover rounded-xl transition-all duration-700 ease-out group-hover:scale-105 opacity-0 animate-image-load"
+                  :loading="index < 15 ? 'eager' : 'lazy'"
+                  @load="(e) => e.target.classList.add('opacity-100')"
                   @error="(e) => handleImageError(e, product)"
                 />
                 
-                <!-- Placeholder FASHION MEJORADO - Icono de prenda más visible -->
-                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 via-gray-50 to-white dark:from-zinc-800 dark:via-zinc-850 dark:to-zinc-900">
+                <!-- Placeholder FASHION MEJORADO - Icono de prenda más sutil -->
+                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800/80 dark:to-zinc-900">
                   <div class="text-center">
-                    <svg class="w-20 h-20 mx-auto text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                    <svg class="w-12 h-12 mx-auto text-gray-200 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
                   </div>
@@ -502,12 +552,12 @@
         <div
           v-for="product in filteredProducts"
           :key="product.id"
-          class="group bg-white dark:bg-zinc-800 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] border border-gray-200 dark:border-zinc-700 hover:ring-2 hover:ring-emerald-500/70 dark:hover:ring-emerald-400/70 hover:border-transparent shadow-sm hover:shadow-lg dark:shadow-black/20"
+          class="group bg-white dark:bg-zinc-900/80 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] border border-gray-200 dark:border-zinc-800/40 hover:ring-2 hover:ring-emerald-500/70 dark:hover:ring-emerald-400/50 hover:border-transparent shadow-sm hover:shadow-lg dark:shadow-black/30"
           @click="addToCart(product)"
         >
           
           <!-- 🖼️ CONTENEDOR DE IMAGEN - OPTIMIZADO: Mayor área visual (p-2 → p-1) -->
-          <div class="aspect-square bg-gray-50 dark:bg-zinc-900/50 relative flex items-center justify-center p-1 border-b border-gray-100 dark:border-zinc-700">
+          <div class="aspect-square bg-gray-50 dark:bg-zinc-900/30 relative flex items-center justify-center p-1 border-b border-gray-100 dark:border-zinc-800/30">
              
              <!-- Badge de cantidad en carrito (gris oscuro profesional - menos ruido visual) -->
              <div v-if="getProductQuantityInCart(product.id) > 0" 
@@ -540,7 +590,7 @@
           </div>
 
           <!-- 📝 INFORMACIÓN - Altura fija para uniformidad -->
-          <div class="p-2.5 h-[72px] flex flex-col justify-between bg-white dark:bg-zinc-800">
+          <div class="p-2.5 h-[72px] flex flex-col justify-between bg-white dark:bg-zinc-900/50">
             
             <!-- PRECIO PROTAGONISTA -->
             <span class="text-lg font-bold text-slate-900 dark:text-white leading-none">
@@ -568,7 +618,7 @@
 <!-- bloque de ventas - 30% Fashion (4/12) | Panel Central General (3/12) -->
 
 <div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="h-full overflow-hidden transition-all duration-300">
-  <div class="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/60 h-full flex flex-col overflow-hidden transition-all duration-300">
+  <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col overflow-hidden transition-all duration-300">
     
     <div class="p-4 flex-shrink-0">
       <div class="flex items-center justify-between mb-3">
@@ -639,25 +689,44 @@
       </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 relative" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+    <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900/50 relative" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
       
-      <div v-if="cart.items.length === 0" class="absolute inset-0 flex flex-col items-center justify-center text-center opacity-50 pointer-events-none">
-        <div class="w-20 h-20 bg-gray-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-3 border border-gray-200 dark:border-zinc-700">
-          <svg class="w-8 h-8 text-slate-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+      <div v-if="cart.items.length === 0" class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+        
+        <!-- Ilustración SVG mini de bolsa vacía -->
+        <div class="mb-3 opacity-60">
+          <svg class="w-20 h-20" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Bolsa de compras -->
+            <path d="M18 28 L18 62 C18 65 20 67 23 67 L57 67 C60 67 62 65 62 62 L62 28 L18 28Z" class="fill-gray-100 dark:fill-zinc-800"/>
+            <path d="M18 28 L18 62 C18 65 20 67 23 67 L57 67 C60 67 62 65 62 62 L62 28 L18 28Z" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="2"/>
+            
+            <!-- Asas de la bolsa -->
+            <path d="M28 28 L28 20 C28 15 32 12 40 12 C48 12 52 15 52 20 L52 28" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="2.5" stroke-linecap="round"/>
+            
+            <!-- Líneas internas (vacío) -->
+            <path d="M28 40 L52 40" class="stroke-gray-200 dark:stroke-zinc-700" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+            <path d="M28 50 L45 50" class="stroke-gray-200 dark:stroke-zinc-700" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
+            
+            <!-- Mini círculo decorativo -->
+            <circle cx="58" cy="22" r="8" class="fill-gray-100 dark:fill-zinc-700"/>
+            <circle cx="58" cy="22" r="5" class="fill-slate-400 dark:fill-zinc-500"/>
+            <path d="M56 22H60M58 20V24" class="stroke-white" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
         </div>
-        <h3 class="text-sm font-bold text-slate-600 dark:text-zinc-500">Carrito Vacío</h3>
-        <p class="text-xs text-slate-500 dark:text-zinc-600 mt-1">Escanea productos para comenzar</p>
+        
+        <h3 class="text-sm font-semibold text-slate-500 dark:text-zinc-500">Carrito Vacío</h3>
+        <p class="text-xs text-slate-400 dark:text-zinc-600 mt-0.5">Selecciona productos para comenzar</p>
       </div>
 
       <!-- 🛒 LISTA DE ITEMS REDISEÑADA - Compacta para Alto Tráfico -->
-      <div v-else class="divide-y divide-gray-100 dark:divide-zinc-800">
+      <div v-else class="divide-y divide-gray-100 dark:divide-zinc-800/40">
         <div
           v-for="(item, index) in cart.items"
           :key="item.id"
           class="group relative flex items-center gap-2.5 px-3 py-2 hover:bg-gray-50/50 dark:hover:bg-zinc-800/50 transition-colors"
         >
           <!-- 🖼️ Miniatura compacta -->
-          <div class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
+          <div class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700/40 overflow-hidden flex-shrink-0 flex items-center justify-center p-1">
              <img 
                :src="getCartItemImage(item)" 
                class="max-w-full max-h-full object-contain"
@@ -681,7 +750,7 @@
                      :title="option.label">
                 </div>
                 <!-- Si es TALLA u otro, mostrar texto -->
-                <span v-else class="text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700">
+                <span v-else class="text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800/50 rounded border border-gray-200 dark:border-zinc-700/40">
                   {{ option.value }}
                 </span>
               </template>
@@ -699,12 +768,12 @@
           </div>
 
           <!-- 🎛️ STEPPER - Control de cantidad táctil -->
-          <div class="flex items-center border border-gray-200 dark:border-zinc-700 rounded-lg overflow-hidden bg-white dark:bg-zinc-800 shadow-sm flex-shrink-0">
+          <div class="flex items-center border border-gray-200 dark:border-zinc-700/40 rounded-lg overflow-hidden bg-white dark:bg-zinc-800/50 shadow-sm flex-shrink-0">
             <button 
               @click.stop="updateQuantity(item.id, item.quantity - 1)" 
-              class="w-8 h-8 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:text-rose-600 dark:hover:text-rose-400 transition-colors font-medium text-lg"
+              class="w-8 h-8 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700/50 hover:text-rose-600 dark:hover:text-rose-400 transition-colors font-medium text-lg"
             >−</button>
-            <span class="w-8 h-8 flex items-center justify-center text-sm font-bold text-slate-900 dark:text-white bg-gray-50 dark:bg-zinc-900 tabular-nums select-none border-x border-gray-200 dark:border-zinc-700">
+            <span class="w-8 h-8 flex items-center justify-center text-sm font-bold text-slate-900 dark:text-white bg-gray-50 dark:bg-zinc-900/50 tabular-nums select-none border-x border-gray-200 dark:border-zinc-700/40">
               {{ item.quantity % 1 === 0 ? item.quantity : item.quantity.toFixed(1) }}
             </span>
             <button 
@@ -716,7 +785,7 @@
           <!-- ❌ Botón eliminar (aparece en hover) -->
           <button
             @click.stop="removeFromCart(item.id)"
-            class="absolute top-2 right-2 w-5 h-5 bg-white dark:bg-zinc-700 border border-gray-200 dark:border-zinc-600 text-gray-400 dark:text-zinc-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:border-rose-500 hover:text-white z-10"
+            class="absolute top-2 right-2 w-5 h-5 bg-white dark:bg-zinc-700/80 border border-gray-200 dark:border-zinc-600/50 text-gray-400 dark:text-zinc-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:border-rose-500 hover:text-white z-10"
             title="Quitar"
           >
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -726,10 +795,10 @@
     </div>
     
     <!-- 👗 SECCIÓN DE PAGO INTEGRADA - Solo en modo Fashion -->
-    <div v-if="isFashionStore" class="flex-shrink-0 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50">
+    <div v-if="isFashionStore" class="flex-shrink-0 border-t border-gray-200 dark:border-zinc-800/40 bg-gray-50 dark:bg-zinc-900/30">
       
       <!-- Total compacto -->
-      <div class="px-2.5 py-2 border-b border-gray-100 dark:border-zinc-800">
+      <div class="px-2.5 py-2 border-b border-gray-100 dark:border-zinc-800/40">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-[8px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total</p>
@@ -831,10 +900,10 @@
 <!-- Panel de Pagos - Solo visible en modo General (3/12) - Se oculta en Fashion -->
 <div v-if="!isFashionStore" id="tour-pos-cart" class="lg:col-span-3 h-full overflow-hidden">
   
-  <div class="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-zinc-800/60 h-full flex flex-col justify-between shadow-lg dark:shadow-2xl dark:shadow-black/40 transition-all duration-300">
+  <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col justify-between shadow-lg dark:shadow-2xl dark:shadow-black/40 transition-all duration-300">
     
     <!-- 💰 HEADER COMPACTO: Total Protagonista -->
-    <div class="p-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800">
+    <div class="p-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800/40">
       <div class="flex items-end justify-between">
         <div>
           <p class="text-[9px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total a Pagar</p>
@@ -1850,6 +1919,21 @@ const currentUser = computed(() => {
 
 // Loading state para WhatsApp y Email
 const isLoading = ref(false)
+
+// 🎯 Validaciones de Plan del Tenant
+// WhatsApp solo para Premium y Enterprise
+const canUseWhatsApp = computed(() => {
+  const tenantPlan = appStore.tenantPlan || 'free_trial'
+  const allowedPlans = ['premium', 'enterprise']
+  return allowedPlans.includes(tenantPlan)
+})
+
+// Pedidos Web solo para Premium y Enterprise
+const canUseWebOrders = computed(() => {
+  const tenantPlan = appStore.tenantPlan || 'free_trial'
+  const allowedPlans = ['premium', 'enterprise']
+  return allowedPlans.includes(tenantPlan)
+})
 
 // 🎯 TOUR DEL POS - Control de bienvenida y primera visita
 const DEV_MODE = false // false = Tour solo primera vez | true = Tour siempre disponible
@@ -6646,5 +6730,36 @@ defineExpose({
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* 🎨 Animación de entrada para productos */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* 🖼️ Animación de carga de imagen */
+@keyframes image-load {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-image-load {
+  animation: image-load 0.3s ease-out forwards;
 }
 </style>

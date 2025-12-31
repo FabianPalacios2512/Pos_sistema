@@ -1,358 +1,460 @@
 <template>
   <!-- Modal Overlay -->
-  <transition
-    enter-active-class="transition ease-out duration-300"
-    enter-from-class="opacity-0"
-    enter-to-class="opacity-100"
-    leave-active-class="transition ease-in duration-200"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
-  >
-    <div 
-      v-if="isOpen" 
-      @click="closeModal"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 py-8 overflow-y-auto"
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
-      <transition
-        enter-active-class="transition ease-out duration-300"
-        enter-from-class="scale-95 opacity-0"
-        enter-to-class="scale-100 opacity-100"
-        leave-active-class="transition ease-in duration-200"
-        leave-from-class="scale-100 opacity-100"
-        leave-to-class="scale-95 opacity-0"
+      <div 
+        v-if="isOpen" 
+        @click="closeModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md px-4 py-6 overflow-y-auto"
       >
-        <div @click.stop class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-6xl my-auto max-h-[90vh] overflow-y-auto">
-          
-          <!-- Header -->
-          <div class="flex items-center justify-between px-8 py-6 border-b border-gray-200 dark:border-zinc-800 sticky top-0 bg-white dark:bg-zinc-900">
-            <div>
-              <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Actualiza tu Plan</h2>
-              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">
-                Desbloquea todas las funciones y lleva tu negocio al siguiente nivel
-              </p>
-            </div>
-            <button 
-              @click="closeModal"
-              class="p-2 text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Content -->
-          <div class="p-8 space-y-8">
+        <Transition
+          enter-active-class="transition ease-out duration-300"
+          enter-from-class="scale-95 opacity-0 translate-y-4"
+          enter-to-class="scale-100 opacity-100 translate-y-0"
+          leave-active-class="transition ease-in duration-200"
+          leave-from-class="scale-100 opacity-100 translate-y-0"
+          leave-to-class="scale-95 opacity-0 translate-y-4"
+        >
+          <div 
+            v-if="isOpen"
+            @click.stop 
+            class="bg-white dark:bg-[#0f0f12] rounded-3xl shadow-2xl w-full max-w-5xl my-auto overflow-hidden border border-gray-200/50 dark:border-zinc-800/50"
+          >
             
-            <!-- Current Plan Info -->
-            <div v-if="currentPlan" class="p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl">
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <div>
-                  <p class="text-sm font-semibold text-blue-900 dark:text-blue-100">Plan Actual: <span class="capitalize">{{ currentPlan }}</span></p>
-                  <p v-if="subscriptionEndsAt" class="text-xs text-blue-700 dark:text-blue-300 mt-1">
+            <!-- Header con gradiente sutil -->
+            <div class="relative px-8 py-6 border-b border-gray-100 dark:border-zinc-800/50">
+              <!-- Gradiente decorativo -->
+              <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-cyan-500/5 dark:from-emerald-500/10 dark:via-teal-500/5 dark:to-transparent"></div>
+              
+              <div class="relative flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <!-- Icono animado -->
+                  <div class="relative">
+                    <div class="absolute inset-0 bg-emerald-400/20 rounded-2xl blur-xl animate-pulse"></div>
+                    <div class="relative w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
+                      <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Potencia tu negocio</h2>
+                    <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">
+                      Elige el plan perfecto para tu crecimiento
+                    </p>
+                  </div>
+                </div>
+                
+                <button 
+                  @click="closeModal"
+                  class="p-2.5 text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-zinc-300 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all duration-200"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              
+              <!-- Plan Actual Badge -->
+              <div v-if="currentPlan" class="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-100 dark:border-blue-900/50 rounded-2xl">
+                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                    Plan actual: <span class="capitalize bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-lg">{{ currentPlan }}</span>
+                  </p>
+                  <p v-if="subscriptionEndsAt" class="text-xs text-blue-600 dark:text-blue-400 mt-0.5">
                     Vence: {{ formatDate(subscriptionEndsAt) }}
                   </p>
                 </div>
               </div>
-            </div>
 
-            <!-- Payment Frequency Selector -->
-            <div class="flex flex-col items-center gap-4">
-              <div class="relative">
-                <select 
-                  v-model="paymentFrequency"
-                  class="px-8 py-3.5 text-base font-semibold bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 rounded-xl appearance-none pr-14 cursor-pointer hover:border-slate-400 dark:hover:border-zinc-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 dark:text-zinc-200"
-                >
-                  <option value="monthly">Mensual</option>
-                  <option value="yearly">Anual (Ahorra 20%)</option>
-                  <option value="24months">24 Meses (2 meses gratis)</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                  <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- Plans Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
-              <!-- Basic Plan -->
-              <div 
-                @click="selectedPlan = 'basic'"
-                v-if="canUpgradeTo('basic')"
-                class="relative bg-white dark:bg-zinc-800 rounded-2xl border-2 shadow-sm transition-all duration-300 cursor-pointer p-6 hover:shadow-lg hover:-translate-y-1"
-                :class="selectedPlan === 'basic' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-zinc-700'"
-              >
-                <!-- Radio Button -->
-                <div class="absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
-                     :class="selectedPlan === 'basic' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300 dark:border-zinc-600'">
-                  <svg v-if="selectedPlan === 'basic'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                </div>
-
-                <div>
-                  <!-- Title -->
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Basic</h3>
-                  <p class="text-sm text-slate-600 dark:text-zinc-400 mb-4">Para negocios que inician y quieren orden.</p>
-
-                  <!-- Price -->
-                  <div class="mb-4">
-                    <div class="flex items-baseline gap-1 mb-1">
-                      <span class="text-4xl font-bold text-slate-900 dark:text-white">
-                        {{ paymentFrequency === '24months' ? '$20.000' : (paymentFrequency === 'yearly' ? '$20.000' : '$25.000') }}
-                      </span>
-                      <span class="text-sm text-slate-500 dark:text-zinc-400">/mes</span>
-                    </div>
-                    <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                      {{ paymentFrequency === '24months' ? 'Facturado $480.000 + 2 meses GRATIS' : (paymentFrequency === 'yearly' ? 'Facturado $240.000 (ahorra $60k)' : 'Facturado mensualmente') }}
-                    </p>
-                  </div>
-
-                  <!-- Button -->
+              <!-- Selector de Frecuencia - Estilo Toggle Moderno -->
+              <div class="flex justify-center">
+                <div class="inline-flex p-1.5 bg-gray-100 dark:bg-zinc-800/80 rounded-2xl gap-1">
                   <button
-                    @click.stop="selectedPlan = 'basic'"
-                    class="w-full h-11 px-4 text-sm font-semibold rounded-xl transition-all duration-200 mb-4 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                    @click="paymentFrequency = 'monthly'"
+                    :class="[
+                      'px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200',
+                      paymentFrequency === 'monthly' 
+                        ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
+                        : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200'
+                    ]"
                   >
-                    Seleccionar
+                    Mensual
                   </button>
-
-                  <!-- Features -->
-                  <div class="space-y-3 text-sm">
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>1 Usuario Administrador</span>
-                    </div>
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>POS Web + Inventario</span>
-                    </div>
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>Soporte por Email</span>
-                    </div>
-                  </div>
+                  <button
+                    @click="paymentFrequency = 'yearly'"
+                    :class="[
+                      'px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center gap-2',
+                      paymentFrequency === 'yearly' 
+                        ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
+                        : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200'
+                    ]"
+                  >
+                    Anual
+                    <span class="text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded-md">-20%</span>
+                  </button>
+                  <button
+                    @click="paymentFrequency = '24months'"
+                    :class="[
+                      'px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center gap-2',
+                      paymentFrequency === '24months' 
+                        ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
+                        : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200'
+                    ]"
+                  >
+                    24 Meses
+                    <span class="text-[10px] font-bold bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded-md">+2 GRATIS</span>
+                  </button>
                 </div>
               </div>
 
-              <!-- Premium Plan (Most Popular) -->
-              <div 
-                @click="selectedPlan = 'premium'"
-                v-if="canUpgradeTo('premium')"
-                class="relative bg-white dark:bg-zinc-800 rounded-2xl border-2 border-emerald-500 shadow-md transition-all duration-300 cursor-pointer p-6 hover:shadow-lg hover:-translate-y-1 ring-2 ring-emerald-500/20"
-              >
-                <!-- Badge -->
-                <div class="absolute -top-3 left-6">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-bold uppercase tracking-wide rounded-full border border-emerald-200 dark:border-emerald-800">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                    Más Vendido
-                  </span>
-                </div>
-
-                <!-- Radio Button -->
-                <div class="absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
-                     :class="selectedPlan === 'premium' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300 dark:border-zinc-600'">
-                  <svg v-if="selectedPlan === 'premium'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                </div>
-
-                <div class="pt-4">
-                  <!-- Title -->
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Premium</h3>
-                  <p class="text-sm text-slate-600 dark:text-zinc-400 mb-4">Automatización total + IA para crecer.</p>
-
-                  <!-- Price -->
-                  <div class="mb-4">
-                    <div class="flex items-baseline gap-1 mb-1">
-                      <span class="text-4xl font-bold text-slate-900 dark:text-white">
-                        {{ includeDianInvoicing 
-                          ? (paymentFrequency === '24months' ? '$80.000' : (paymentFrequency === 'yearly' ? '$80.000' : '$90.000'))
-                          : (paymentFrequency === '24months' ? '$50.000' : (paymentFrequency === 'yearly' ? '$50.000' : '$60.000')) 
-                        }}
-                      </span>
-                      <span class="text-sm text-slate-500 dark:text-zinc-400">/mes</span>
-                    </div>
-                    <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                      {{ paymentFrequency === '24months' 
-                        ? (includeDianInvoicing ? 'Facturado $1.920.000 + DIAN + 2 meses GRATIS' : 'Facturado $1.200.000 + 2 meses GRATIS')
-                        : (paymentFrequency === 'yearly' 
-                          ? (includeDianInvoicing ? 'Facturado $960.000 + DIAN (ahorra $120k)' : 'Facturado $600.000 (ahorra $120k)')
-                          : 'Facturado mensualmente'
-                        )
-                      }}
-                    </p>
-                  </div>
-
-                  <!-- DIAN Checkbox -->
-                  <div class="mb-4 p-3 bg-slate-50 dark:bg-zinc-700 border border-slate-200 dark:border-zinc-600 rounded-lg">
-                    <label class="flex items-start gap-2.5 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        v-model="includeDianInvoicing"
-                        class="w-4 h-4 text-emerald-600 border-slate-300 dark:border-zinc-600 rounded focus:ring-emerald-500 mt-0.5"
-                      >
-                      <div class="flex-1 text-sm">
-                        <span class="font-medium text-slate-900 dark:text-white">Incluir Facturación DIAN</span>
-                        <span class="text-emerald-600 dark:text-emerald-400 font-bold ml-1.5">+$30.000</span>
+              <!-- Plans Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Basic Plan -->
+                <div 
+                  v-if="canUpgradeTo('basic')"
+                  @click="selectedPlan = 'basic'"
+                  :class="[
+                    'relative rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden group',
+                    selectedPlan === 'basic' 
+                      ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 ring-4 ring-emerald-500/10' 
+                      : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:border-gray-300 dark:hover:border-zinc-700'
+                  ]"
+                >
+                  <!-- Selection indicator -->
+                  <div v-if="selectedPlan === 'basic'" class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                  
+                  <div class="p-5">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Basic</h3>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Para negocios que inician</p>
                       </div>
-                    </label>
+                      <!-- Radio -->
+                      <div :class="[
+                        'w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200',
+                        selectedPlan === 'basic' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300 dark:border-zinc-600'
+                      ]">
+                        <svg v-if="selectedPlan === 'basic'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                      </div>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="mb-4">
+                      <div class="flex items-baseline gap-1">
+                        <span class="text-3xl font-black text-gray-900 dark:text-white">
+                          {{ formatPrice(getPlanPrice('basic')) }}
+                        </span>
+                        <span class="text-sm text-gray-400 dark:text-zinc-500">/mes</span>
+                      </div>
+                      <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1">
+                        {{ getPaymentLabel('basic') }}
+                      </p>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="space-y-2.5 pt-4 border-t border-gray-100 dark:border-zinc-800">
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>1 Usuario Administrador</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>POS Web + Inventario</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Soporte por Email</span>
+                      </div>
+                    </div>
                   </div>
+                </div>
 
-                  <!-- Button -->
-                  <button
-                    @click.stop="selectedPlan = 'premium'"
-                    class="w-full h-11 px-4 text-sm font-semibold rounded-xl transition-all duration-200 mb-4 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                  >
-                    Seleccionar
-                  </button>
+                <!-- Premium Plan (Popular) -->
+                <div 
+                  v-if="canUpgradeTo('premium')"
+                  @click="selectedPlan = 'premium'"
+                  :class="[
+                    'relative rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden',
+                    selectedPlan === 'premium' 
+                      ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 ring-4 ring-emerald-500/10' 
+                      : 'border-emerald-200 dark:border-emerald-800/50 bg-gradient-to-b from-emerald-50/80 to-white dark:from-emerald-950/30 dark:to-zinc-900/50'
+                  ]"
+                >
+                  <!-- Popular Badge -->
+                  <div class="absolute -top-px left-1/2 -translate-x-1/2">
+                    <div class="px-4 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-b-xl shadow-lg shadow-emerald-500/25">
+                      ⭐ Más Popular
+                    </div>
+                  </div>
+                  
+                  <!-- Selection indicator -->
+                  <div v-if="selectedPlan === 'premium'" class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                  
+                  <div class="p-5 pt-8">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Premium</h3>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">IA + Automatización total</p>
+                      </div>
+                      <!-- Radio -->
+                      <div :class="[
+                        'w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200',
+                        selectedPlan === 'premium' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300 dark:border-zinc-600'
+                      ]">
+                        <svg v-if="selectedPlan === 'premium'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                      </div>
+                    </div>
 
-                  <!-- Features -->
-                  <div class="space-y-3 text-sm">
-                    <p class="font-bold text-slate-900 dark:text-white">Todo lo de Basic, más:</p>
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>3 Usuarios / 2 Bodegas</span>
+                    <!-- Price -->
+                    <div class="mb-4">
+                      <div class="flex items-baseline gap-1">
+                        <span class="text-3xl font-black text-gray-900 dark:text-white">
+                          {{ formatPrice(getPlanPrice('premium')) }}
+                        </span>
+                        <span class="text-sm text-gray-400 dark:text-zinc-500">/mes</span>
+                      </div>
+                      <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1">
+                        {{ getPaymentLabel('premium') }}
+                      </p>
                     </div>
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>Agente IA (Crea Promos)</span>
+
+                    <!-- DIAN Option -->
+                    <div class="mb-4 p-3 bg-white/60 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700 rounded-xl">
+                      <label class="flex items-center gap-3 cursor-pointer" @click.stop>
+                        <input 
+                          type="checkbox" 
+                          v-model="includeDianInvoicing"
+                          class="w-4 h-4 text-emerald-600 border-gray-300 dark:border-zinc-600 rounded focus:ring-emerald-500"
+                        >
+                        <div class="flex-1 flex items-center justify-between">
+                          <span class="text-sm font-medium text-gray-700 dark:text-zinc-200">Facturación DIAN</span>
+                          <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 rounded-lg">+$30k</span>
+                        </div>
+                      </label>
                     </div>
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>Sistema de Puntos (Fidelización)</span>
+
+                    <!-- Features -->
+                    <div class="space-y-2.5 pt-4 border-t border-gray-100 dark:border-zinc-800">
+                      <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Todo de Basic +</p>
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>3 Usuarios / 2 Bodegas</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Agente IA (Crea Promos)</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Sistema de Fidelización</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div 
+                  v-if="canUpgradeTo('enterprise')"
+                  @click="selectedPlan = 'enterprise'"
+                  :class="[
+                    'relative rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden',
+                    selectedPlan === 'enterprise' 
+                      ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 ring-4 ring-emerald-500/10' 
+                      : 'border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:border-gray-300 dark:hover:border-zinc-700'
+                  ]"
+                >
+                  <!-- Selection indicator -->
+                  <div v-if="selectedPlan === 'enterprise'" class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                  
+                  <div class="p-5">
+                    <!-- Header -->
+                    <div class="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Enterprise</h3>
+                        <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Solución empresarial</p>
+                      </div>
+                      <!-- Radio -->
+                      <div :class="[
+                        'w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200',
+                        selectedPlan === 'enterprise' ? 'border-emerald-500 bg-emerald-500' : 'border-gray-300 dark:border-zinc-600'
+                      ]">
+                        <svg v-if="selectedPlan === 'enterprise'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                      </div>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="mb-4">
+                      <div class="flex items-baseline gap-1">
+                        <span class="text-3xl font-black text-gray-900 dark:text-white">
+                          {{ formatPrice(getPlanPrice('enterprise')) }}
+                        </span>
+                        <span class="text-sm text-gray-400 dark:text-zinc-500">/mes</span>
+                      </div>
+                      <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1">
+                        {{ getPaymentLabel('enterprise') }}
+                      </p>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="space-y-2.5 pt-4 border-t border-gray-100 dark:border-zinc-800">
+                      <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Todo de Premium +</p>
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Usuarios ilimitados</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Multi-Sede / Multi-Caja</span>
+                      </div>
+                      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-zinc-300">
+                        <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>SLA 99.9% garantizado</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Enterprise Plan -->
-              <div 
-                @click="selectedPlan = 'enterprise'"
-                v-if="canUpgradeTo('enterprise')"
-                class="relative bg-white dark:bg-zinc-800 rounded-2xl border-2 shadow-sm transition-all duration-300 cursor-pointer p-6 hover:shadow-lg hover:-translate-y-1"
-                :class="selectedPlan === 'enterprise' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-zinc-700'"
-              >
-                <!-- Radio Button -->
-                <div class="absolute top-4 right-4 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
-                     :class="selectedPlan === 'enterprise' ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300 dark:border-zinc-600'">
-                  <svg v-if="selectedPlan === 'enterprise'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              <!-- No plans available message -->
+              <div v-if="!canUpgradeTo('basic') && !canUpgradeTo('premium') && !canUpgradeTo('enterprise')" class="text-center py-8">
+                <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                 </div>
-
-                <div>
-                  <!-- Title -->
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Enterprise</h3>
-                  <p class="text-sm text-slate-600 dark:text-zinc-400 mb-4">Solución empresarial completa.</p>
-
-                  <!-- Price -->
-                  <div class="mb-4">
-                    <div class="flex items-baseline gap-1 mb-1">
-                      <span class="text-4xl font-bold text-slate-900 dark:text-white">
-                        {{ paymentFrequency === '24months' ? '$120.000' : (paymentFrequency === 'yearly' ? '$120.000' : '$150.000') }}
-                      </span>
-                      <span class="text-sm text-slate-500 dark:text-zinc-400">/mes</span>
-                    </div>
-                    <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                      {{ paymentFrequency === '24months' ? 'Facturado $2.880.000 + 2 meses GRATIS' : (paymentFrequency === 'yearly' ? 'Facturado $1.440.000 (ahorra $360k)' : 'Facturado mensualmente') }}
-                    </p>
-                  </div>
-
-                  <!-- Button -->
-                  <button
-                    @click.stop="selectedPlan = 'enterprise'"
-                    class="w-full h-11 px-4 text-sm font-semibold rounded-xl transition-all duration-200 mb-4 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                  >
-                    Seleccionar
-                  </button>
-
-                  <!-- Features -->
-                  <div class="space-y-3 text-sm">
-                    <p class="font-bold text-slate-900 dark:text-white">Todo lo de Premium, más:</p>
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>Usuarios ilimitados</span>
-                    </div>
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>Multi-Sede / Multi-Caja</span>
-                    </div>
-                    <div class="flex items-start gap-2 text-slate-700 dark:text-zinc-300">
-                      <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                      </svg>
-                      <span>SLA garantizado 99.9%</span>
-                    </div>
-                  </div>
-                </div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">¡Ya tienes el mejor plan!</h3>
+                <p class="text-sm text-gray-500 dark:text-zinc-400">Estás disfrutando de todas las funcionalidades disponibles.</p>
               </div>
             </div>
 
-            <!-- Terms Checkbox -->
-            <div class="p-4 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg">
-              <label class="flex items-start gap-3 cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  v-model="agreedToTerms"
-                  class="w-4 h-4 text-emerald-600 border-slate-300 dark:border-zinc-600 rounded focus:ring-emerald-500 mt-1"
-                >
-                <div class="text-sm text-slate-700 dark:text-zinc-300">
-                  Autorizo el pago de <strong>${{ selectedPlanPrice }}</strong> ahora, seguidos de pagos mensuales de 
-                  <strong>${{ selectedPlanMonthlyPrice }}</strong>. Entiendo que puedo cancelar en cualquier momento.
-                </div>
-              </label>
-            </div>
+            <!-- Footer con resumen y botones -->
+            <div class="px-6 py-5 bg-gray-50 dark:bg-zinc-900/80 border-t border-gray-100 dark:border-zinc-800">
+              <!-- Terms -->
+              <div v-if="selectedPlan" class="mb-4 p-3 bg-white dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    v-model="agreedToTerms"
+                    class="w-4 h-4 text-emerald-600 border-gray-300 dark:border-zinc-600 rounded focus:ring-emerald-500 mt-0.5"
+                  >
+                  <span class="text-sm text-gray-600 dark:text-zinc-300 leading-relaxed">
+                    Autorizo el pago de <strong class="text-gray-900 dark:text-white">{{ selectedPlanTotalPrice }}</strong> ahora. 
+                    Entiendo que puedo cancelar en cualquier momento.
+                  </span>
+                </label>
+              </div>
 
-            <!-- Action Buttons -->
-            <div class="flex gap-4">
-              <button
-                @click="closeModal"
-                :disabled="isProcessing"
-                class="flex-1 h-12 px-6 text-sm font-semibold rounded-xl transition-all duration-200 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700 disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-              <button
-                @click="handlePlanSelection(selectedPlan)"
-                :disabled="!selectedPlan || !agreedToTerms || isProcessing"
-                class="flex-1 h-12 px-6 text-sm font-semibold rounded-xl transition-all duration-200 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm disabled:opacity-50"
-              >
-                {{ isProcessing ? 'Procesando...' : 'Procesar Pago' }}
-              </button>
+              <!-- Action Buttons -->
+              <div class="flex gap-3">
+                <button
+                  @click="closeModal"
+                  :disabled="isProcessing"
+                  class="flex-1 h-12 px-6 text-sm font-semibold rounded-xl transition-all duration-200 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  @click="processPayment"
+                  :disabled="!selectedPlan || !agreedToTerms || isProcessing"
+                  :class="[
+                    'flex-1 h-12 px-6 text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2',
+                    (!selectedPlan || !agreedToTerms || isProcessing)
+                      ? 'bg-gray-300 dark:bg-zinc-700 text-gray-500 dark:text-zinc-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98]'
+                  ]"
+                >
+                  <template v-if="isProcessing">
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Procesando...</span>
+                  </template>
+                  <template v-else>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    <span>Pagar con ePayco</span>
+                  </template>
+                </button>
+              </div>
+              
+              <!-- Payment Methods -->
+              <div class="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-zinc-800">
+                <span class="text-xs text-gray-400 dark:text-zinc-500">Pago seguro con</span>
+                <div class="flex items-center gap-3">
+                  <!-- Visa -->
+                  <div class="px-2 py-1 bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700">
+                    <span class="text-[10px] font-bold text-blue-600">VISA</span>
+                  </div>
+                  <!-- Mastercard -->
+                  <div class="px-2 py-1 bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700">
+                    <span class="text-[10px] font-bold text-orange-500">MC</span>
+                  </div>
+                  <!-- PSE -->
+                  <div class="px-2 py-1 bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700">
+                    <span class="text-[10px] font-bold text-green-600">PSE</span>
+                  </div>
+                  <!-- Nequi -->
+                  <div class="px-2 py-1 bg-white dark:bg-zinc-800 rounded border border-gray-200 dark:border-zinc-700">
+                    <span class="text-[10px] font-bold text-pink-500">Nequi</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </transition>
-    </div>
-  </transition>
+        </Transition>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { appStore } from '../store/appStore.js'
 import axios from 'axios'
 
@@ -391,44 +493,69 @@ const canUpgradeTo = (plan) => {
   return targetLevel > currentLevel
 }
 
-// Calculate selected plan price
-const selectedPlanPrice = computed(() => {
-  if (!selectedPlan.value) return '$0'
-  
-  const prices = {
-    basic: {
-      monthly: 25000,
-      yearly: 240000,
-      '24months': 480000
-    },
-    premium: {
-      monthly: includeDianInvoicing.value ? 90000 : 60000,
-      yearly: includeDianInvoicing.value ? 960000 : 600000,
-      '24months': includeDianInvoicing.value ? 1920000 : 1200000
-    },
-    enterprise: {
-      monthly: 150000,
-      yearly: 1440000,
-      '24months': 2880000
-    }
+// Prices configuration - Precios reales de producción
+const planPrices = {
+  basic: {
+    monthly: { display: 25000, total: 25000 },
+    yearly: { display: 20000, total: 240000 },
+    '24months': { display: 20000, total: 480000 }
+  },
+  premium: {
+    monthly: { display: 60000, total: 60000, withDian: 90000, totalWithDian: 90000 },
+    yearly: { display: 50000, total: 600000, withDian: 80000, totalWithDian: 960000 },
+    '24months': { display: 50000, total: 1200000, withDian: 80000, totalWithDian: 1920000 }
+  },
+  enterprise: {
+    monthly: { display: 150000, total: 150000 },
+    yearly: { display: 120000, total: 1440000 },
+    '24months': { display: 120000, total: 2880000 }
   }
-  
-  const price = prices[selectedPlan.value]?.[paymentFrequency.value] || 0
-  return `$${price.toLocaleString('es-CO').replace(/\./g, '.')}`
-})
+}
 
-// Calculate monthly price for terms
-const selectedPlanMonthlyPrice = computed(() => {
-  if (!selectedPlan.value) return '$0'
+// Get plan display price (monthly equivalent)
+const getPlanPrice = (plan) => {
+  const prices = planPrices[plan]?.[paymentFrequency.value]
+  if (!prices) return 0
   
-  const prices = {
-    basic: 25000,
-    premium: includeDianInvoicing.value ? 90000 : 60000,
-    enterprise: 150000
+  if (plan === 'premium' && includeDianInvoicing.value) {
+    return prices.withDian || prices.display
   }
+  return prices.display
+}
+
+// Get total price to pay
+const getTotalPrice = (plan) => {
+  const prices = planPrices[plan]?.[paymentFrequency.value]
+  if (!prices) return 0
   
-  const price = prices[selectedPlan.value] || 0
-  return `$${price.toLocaleString('es-CO').replace(/\./g, '.')}`
+  if (plan === 'premium' && includeDianInvoicing.value) {
+    return prices.totalWithDian || prices.total
+  }
+  return prices.total
+}
+
+// Format price with Colombian format
+const formatPrice = (price) => {
+  return '$' + price.toLocaleString('es-CO')
+}
+
+// Get payment label based on frequency
+const getPaymentLabel = (plan) => {
+  const total = getTotalPrice(plan)
+  
+  if (paymentFrequency.value === 'monthly') {
+    return 'Facturado mensualmente'
+  } else if (paymentFrequency.value === 'yearly') {
+    return `Pago único de ${formatPrice(total)} (ahorra 20%)`
+  } else {
+    return `Pago único de ${formatPrice(total)} + 2 meses gratis`
+  }
+}
+
+// Selected plan total price formatted
+const selectedPlanTotalPrice = computed(() => {
+  if (!selectedPlan.value) return '$0'
+  return formatPrice(getTotalPrice(selectedPlan.value))
 })
 
 // Format date
@@ -438,103 +565,139 @@ const formatDate = (dateStr) => {
   return date.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
+// Reset state when modal closes
+watch(() => props.isOpen, (newVal) => {
+  if (!newVal) {
+    selectedPlan.value = null
+    agreedToTerms.value = false
+    paymentFrequency.value = 'monthly'
+    includeDianInvoicing.value = false
+  }
+})
+
 // Close modal
 const closeModal = () => {
-  selectedPlan.value = null
-  agreedToTerms.value = false
-  paymentFrequency.value = 'monthly'
-  includeDianInvoicing.value = false
   emit('close')
 }
 
-// Handle plan selection and payment
-const handlePlanSelection = async (plan) => {
-  if (isProcessing.value || !plan || !agreedToTerms.value) return
+// Process payment with ePayco
+const processPayment = async () => {
+  if (isProcessing.value || !selectedPlan.value || !agreedToTerms.value) return
   
   try {
     isProcessing.value = true
     
-    // Get tenant ID from authenticated context
+    // Get tenant ID
     const tenantId = appStore.tenant?.id
     if (!tenantId) {
       throw new Error('No se pudo obtener el ID del negocio. Por favor, recarga la página.')
     }
     
-    // Calculate price
-    const prices = {
-      basic: {
-        monthly: 25000,
-        yearly: 240000,
-        '24months': 480000
-      },
-      premium: {
-        monthly: includeDianInvoicing.value ? 90000 : 60000,
-        yearly: includeDianInvoicing.value ? 960000 : 600000,
-        '24months': includeDianInvoicing.value ? 1920000 : 1200000
-      },
-      enterprise: {
-        monthly: 150000,
-        yearly: 1440000,
-        '24months': 2880000
-      }
-    }
-    
-    const finalPrice = prices[plan]?.[paymentFrequency.value] || 0
+    const finalPrice = getTotalPrice(selectedPlan.value)
     const reference = `upgrade_${tenantId}_${Date.now()}`
     
-    // 1. Initialize transaction in backend (save pending payment)
+    // 1. Initialize transaction in backend
     const initResponse = await axios.post('/api/epayco/init-transaction', {
-        amount: finalPrice,
-        reference: reference,
-        customer_email: appStore.userEmail || 'cliente@105pos.pro',
-        payment_frequency: paymentFrequency.value,
-        plan: plan,
-        tenant_id: tenantId
+      amount: finalPrice,
+      reference: reference,
+      customer_email: appStore.userEmail || 'cliente@105pos.pro',
+      payment_frequency: paymentFrequency.value,
+      plan: selectedPlan.value,
+      tenant_id: tenantId,
+      include_dian: includeDianInvoicing.value
     })
 
     if (!initResponse.data.success) {
-        throw new Error('Error inicializando transacción')
+      throw new Error(initResponse.data.error || 'Error inicializando transacción')
     }
 
     // 2. Open ePayco Checkout
-    // Ensure ePayco is loaded
     if (!window.ePayco) {
-        throw new Error('ePayco SDK no cargado. Por favor recarga la página.')
+      throw new Error('El sistema de pagos no está disponible. Por favor recarga la página.')
     }
 
     const handler = window.ePayco.checkout.configure({
-        key: import.meta.env.VITE_EPAYCO_PUBLIC_KEY || '2943652c673afffaa5b7b67829f00a0c', // Fallback to key used in PlanSelection
-        test: true // Should be env var too
+      key: import.meta.env.VITE_EPAYCO_PUBLIC_KEY || '2943652c673afffaa5b7b67829f00a0c',
+      test: import.meta.env.VITE_EPAYCO_TEST_MODE === 'true' || true
     })
 
-    const data = {
-        name: `Plan ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
-        description: `Suscripción ${paymentFrequency.value} - 105 POS`,
-        invoice: reference,
-        currency: 'cop',
-        amount: finalPrice,
-        tax_base: '0',
-        tax: '0',
-        country: 'co',
-        lang: 'es',
-        external: 'false',
-        extra1: tenantId,
-        extra2: plan,
-        extra3: paymentFrequency.value,
-        confirmation: `${window.location.origin}/api/epayco/webhook`, // Backend webhook
-        response: `${window.location.origin}/payment/success?plan=${plan}&reference=${reference}&is_upgrade=true&tenant_id=${tenantId}`, // Frontend return URL
-        
-        // Customer data (optional but good for UX)
-        email_billing: appStore.userEmail || 'cliente@105pos.pro',
-        name_billing: appStore.userName || 'Cliente 105 POS',
+    const planNames = {
+      basic: 'Basic',
+      premium: includeDianInvoicing.value ? 'Premium + DIAN' : 'Premium',
+      enterprise: 'Enterprise'
     }
+
+    const frequencyNames = {
+      monthly: 'Mensual',
+      yearly: 'Anual',
+      '24months': '24 Meses'
+    }
+
+    const data = {
+      name: `Plan ${planNames[selectedPlan.value]}`,
+      description: `Suscripción ${frequencyNames[paymentFrequency.value]} - 105 POS`,
+      invoice: reference,
+      currency: 'cop',
+      amount: finalPrice,
+      tax_base: '0',
+      tax: '0',
+      country: 'co',
+      lang: 'es',
+      external: 'false', // false = Modal dentro de la página (NO redirección)
+      extra1: tenantId,
+      extra2: selectedPlan.value,
+      extra3: paymentFrequency.value,
+      confirmation: `${window.location.origin}/api/epayco/webhook`,
+      response: `${window.location.origin}/#/dashboard`, // Volver al dashboard después del pago
+      email_billing: appStore.userEmail || 'cliente@105pos.pro',
+      name_billing: appStore.userName || 'Cliente 105 POS',
+      
+      // Callbacks para manejar respuesta sin redirigir
+      methodsDisable: [],
+    }
+
+    // Agregar listeners para capturar la respuesta del pago
+    const checkPaymentInterval = setInterval(async () => {
+      try {
+        // Consultar si el pago fue procesado
+        const statusResponse = await axios.get(`/api/epayco/check-payment-status/${reference}`)
+        
+        if (statusResponse.data.status === 'approved') {
+          clearInterval(checkPaymentInterval)
+          
+          // Actualizar datos del tenant en el store
+          await appStore.fetchTenantData()
+          
+          // Mostrar éxito
+          alert('✅ ¡Pago procesado con éxito!\n\nTu plan ha sido actualizado. Recarga la página para ver los cambios.')
+          
+          // Cerrar modal
+          closeModal()
+          emit('success')
+          
+          // Recargar página para aplicar cambios
+          setTimeout(() => {
+            window.location.reload()
+          }, 2000)
+        } else if (statusResponse.data.status === 'rejected' || statusResponse.data.status === 'failed') {
+          clearInterval(checkPaymentInterval)
+          alert('❌ El pago fue rechazado.\n\nPor favor, intenta nuevamente con otro método de pago.')
+        }
+      } catch (error) {
+        // Continuar esperando
+      }
+    }, 3000) // Consultar cada 3 segundos
+
+    // Detener consultas después de 5 minutos
+    setTimeout(() => {
+      clearInterval(checkPaymentInterval)
+    }, 300000)
 
     handler.open(data)
     
   } catch (error) {
     console.error('Error processing payment:', error)
-    const errorMessage = error.response?.data?.error || error.message || 'Por favor, intenta nuevamente.'
-    alert('❌ Error al procesar el pago\n\n' + errorMessage)
+    alert('❌ Error al procesar el pago\n\n' + (error.response?.data?.error || error.message || 'Por favor, intenta nuevamente.'))
   } finally {
     isProcessing.value = false
   }

@@ -1,117 +1,249 @@
 <template>
-  <!-- 🎨 SPLIT SCREEN LAYOUT - Diseño Corporativo SaaS -->
-  <div class="min-h-screen flex">
+  <!-- 🎨 PREMIUM SPLIT SCREEN - Diseño SaaS Empresarial 2025 -->
+  <div class="min-h-screen flex bg-slate-50">
     
-    <!-- 📸 LADO IZQUIERDO: Imagen de Marca (Oculto en móviles) -->
-    <div class="hidden lg:flex lg:w-1/2 xl:w-[45%] relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900">
-      <!-- Skeleton Loader mientras carga la imagen -->
-      <div 
-        v-if="!imageLoaded" 
-        class="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 animate-pulse"
-      >
-        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+    <!-- 📸 LADO IZQUIERDO: Panel de Marca Premium -->
+    <div class="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden">
+      <!-- Gradiente base oscuro elegante -->
+      <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
+      
+      <!-- Imagen con overlay profesional -->
+      <div class="absolute inset-0">
+        <img 
+          src="/login.png" 
+          alt="105 POS Pro - Sistema de Punto de Venta" 
+          class="w-full h-full object-cover transition-opacity duration-1000 ease-out"
+          :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
+          @load="imageLoaded = true"
+          loading="eager"
+          decoding="async"
+        />
+        <!-- Overlay con gradiente premium -->
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-slate-900/30"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-transparent to-transparent"></div>
       </div>
       
-      <!-- Imagen de Login con lazy loading optimizado -->
-      <img 
-        src="/login.png" 
-        alt="105 POS Pro - Sistema de Punto de Venta" 
-        class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out"
-        :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
-        @load="imageLoaded = true"
-        loading="eager"
-        decoding="async"
-      />
-      
-      <!-- Overlay oscuro sutil para mejorar contraste -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
-      
-      <!-- Badge flotante con logo/texto (Con animación de entrada) -->
-      <transition
-        enter-active-class="transition ease-out duration-500 delay-300"
-        enter-from-class="translate-y-4 opacity-0"
-        enter-to-class="translate-y-0 opacity-100"
+      <!-- Skeleton mientras carga -->
+      <div 
+        v-if="!imageLoaded" 
+        class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"
       >
-        <div v-if="imageLoaded" class="absolute bottom-8 left-8 right-8 z-10">
-          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-            <h3 class="text-2xl font-bold text-white mb-2">Sistema POS Empresarial</h3>
-            <p class="text-white/80 text-sm">Gestiona tu negocio de forma profesional con tecnología de última generación</p>
+        <div class="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-slate-700/20 to-transparent"></div>
+      </div>
+
+      <!-- Contenido superpuesto -->
+      <div class="relative z-10 flex flex-col justify-between w-full h-full p-10 xl:p-14">
+        
+        <!-- Logo y marca superior -->
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
+            <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
           </div>
+          <span class="text-white/90 font-bold text-xl tracking-tight">105 POS</span>
         </div>
-      </transition>
+
+        <!-- Contenido central con estadísticas -->
+        <div class="flex-1 flex flex-col justify-center max-w-lg">
+          <transition
+            enter-active-class="transition ease-out duration-700 delay-200"
+            enter-from-class="translate-y-8 opacity-0"
+            enter-to-class="translate-y-0 opacity-100"
+          >
+            <div v-if="imageLoaded" class="space-y-8">
+              <div>
+                <h2 class="text-4xl xl:text-5xl font-bold text-white leading-tight">
+                  Potencia tu negocio con
+                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+                    tecnología inteligente
+                  </span>
+                </h2>
+                <p class="mt-4 text-lg text-slate-300 leading-relaxed">
+                  El sistema POS más completo para empresas que buscan crecer. 
+                  Controla ventas, inventario y clientes desde cualquier lugar.
+                </p>
+              </div>
+
+              <!-- Stats Grid -->
+              <div class="grid grid-cols-3 gap-4">
+                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                  <div class="text-3xl font-bold text-white">99.9%</div>
+                  <div class="text-sm text-slate-400 mt-1">Uptime garantizado</div>
+                </div>
+                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                  <div class="text-3xl font-bold text-white">+2K</div>
+                  <div class="text-sm text-slate-400 mt-1">Negocios activos</div>
+                </div>
+                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                  <div class="text-3xl font-bold text-white">24/7</div>
+                  <div class="text-sm text-slate-400 mt-1">Soporte técnico</div>
+                </div>
+              </div>
+            </div>
+          </transition>
+        </div>
+
+        <!-- Testimonial Card inferior -->
+        <transition
+          enter-active-class="transition ease-out duration-700 delay-500"
+          enter-from-class="translate-y-6 opacity-0"
+          enter-to-class="translate-y-0 opacity-100"
+        >
+          <div v-if="imageLoaded" class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
+                <span class="text-white font-bold text-lg">CP</span>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="flex gap-0.5">
+                    <svg v-for="i in 5" :key="i" class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  </div>
+                </div>
+                <p class="text-white/90 text-sm leading-relaxed italic">
+                  "Desde que implementamos 105 POS, nuestras ventas aumentaron un 40% y el control de inventario es impecable."
+                </p>
+                <p class="text-slate-400 text-sm mt-3 font-medium">Carlos Pérez — CEO, Supermercados del Valle</p>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
     </div>
 
-    <!-- 📝 LADO DERECHO: Formulario de Login -->
-    <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-white">
-      <div class="w-full max-w-md space-y-8">
+    <!-- 📝 LADO DERECHO: Formulario de Login Premium -->
+    <div class="flex-1 flex items-center justify-center px-6 sm:px-8 lg:px-12 xl:px-16 bg-white relative">
+      <!-- Patrón de fondo sutil -->
+      <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50"></div>
+      
+      <div class="w-full max-w-[420px] relative z-10">
         
-        <!-- Logo -->
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">105 POS Pro</h1>
+        <!-- Badge versión móvil -->
+        <div class="lg:hidden flex items-center gap-2.5 mb-10">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg shadow-slate-900/20">
+            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span class="text-slate-900 font-bold text-xl tracking-tight">105 POS Pro</span>
         </div>
 
-        <!-- Título y Subtítulo -->
-        <div class="mt-6">
-          <h2 class="text-3xl font-bold text-gray-900">
-            ¡Bienvenido de nuevo!
-          </h2>
-          <p class="mt-2 text-base text-gray-600">
-            Ingresa a tu punto de venta.
+        <!-- Header del formulario -->
+        <div class="mb-8">
+          <div class="hidden lg:block">
+            <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-4 border border-emerald-100">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Plataforma activa
+            </span>
+          </div>
+          <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
+            Bienvenido de nuevo
+          </h1>
+          <p class="mt-2 text-slate-500">
+            Ingresa tus credenciales para acceder al sistema
           </p>
         </div>
 
-        <!-- Mensajes de Error/Éxito -->
-        <div v-if="message.text" 
-             :class="message.type === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'"
-             class="mt-6 border px-4 py-3 rounded-lg text-sm">
-          {{ message.text }}
-        </div>
+        <!-- Mensajes de Error/Éxito mejorados -->
+        <transition
+          enter-active-class="transition ease-out duration-300"
+          enter-from-class="-translate-y-2 opacity-0"
+          enter-to-class="translate-y-0 opacity-100"
+          leave-active-class="transition ease-in duration-200"
+          leave-from-class="translate-y-0 opacity-100"
+          leave-to-class="-translate-y-2 opacity-0"
+        >
+          <div v-if="message.text" 
+               :class="[
+                 'mb-6 px-4 py-3.5 rounded-xl text-sm font-medium flex items-center gap-3',
+                 message.type === 'error' 
+                   ? 'bg-red-50 text-red-700 border border-red-100' 
+                   : message.type === 'info'
+                     ? 'bg-blue-50 text-blue-700 border border-blue-100'
+                     : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+               ]">
+            <svg v-if="message.type === 'error'" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <svg v-else-if="message.type === 'info'" class="w-5 h-5 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <svg v-else class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>{{ message.text }}</span>
+          </div>
+        </transition>
 
-        <form @submit.prevent="handleLogin" class="mt-8 space-y-6">
+        <form @submit.prevent="handleLogin" class="space-y-5">
           
           <!-- Campo Email -->
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-semibold text-slate-700">
               Correo Electrónico
             </label>
-            <input
-              id="email"
-              v-model="credentials.email"
-              type="email"
-              autocomplete="email"
-              required
-              placeholder="tucorreo@ejemplo.com"
-              class="block w-full px-4 py-3 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-              :class="{ 'border-red-300 focus:ring-red-500': errors.email }"
-            />
-            <p v-if="errors.email" class="mt-2 text-sm text-red-600">{{ errors.email }}</p>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <input
+                id="email"
+                v-model="credentials.email"
+                type="email"
+                autocomplete="email"
+                required
+                placeholder="tu@email.com"
+                class="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200"
+                :class="{ 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/10': errors.email }"
+              />
+            </div>
+            <p v-if="errors.email" class="text-sm text-red-600 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              {{ errors.email }}
+            </p>
           </div>
 
           <!-- Campo Contraseña -->
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <label for="password" class="block text-sm font-medium text-gray-700">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label for="password" class="block text-sm font-semibold text-slate-700">
                 Contraseña
               </label>
-              <router-link to="/forgot-password" class="text-xs font-medium text-emerald-600 hover:text-emerald-500 transition-colors">
+              <router-link 
+                to="/forgot-password" 
+                class="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
+              >
                 ¿Olvidaste tu contraseña?
               </router-link>
             </div>
             <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </div>
               <input
                 id="password"
                 v-model="credentials.password"
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="current-password"
                 required
-                placeholder="Ingresa tu contraseña"
-                class="block w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                :class="{ 'border-red-300 focus:ring-red-500': errors.password }"
+                placeholder="••••••••"
+                class="block w-full pl-12 pr-12 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200"
+                :class="{ 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/10': errors.password }"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
               >
                 <svg v-if="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -122,72 +254,93 @@
                 </svg>
               </button>
             </div>
-            <p v-if="errors.password" class="mt-2 text-sm text-red-600">{{ errors.password }}</p>
+            <p v-if="errors.password" class="text-sm text-red-600 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              {{ errors.password }}
+            </p>
           </div>
 
-          <!-- Botón Principal - Verde Esmeralda -->
+          <!-- Botón Principal Premium -->
           <div class="pt-2">
             <button
               type="submit"
               :disabled="loading"
-              class="w-full flex items-center justify-center py-3.5 px-6 text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-lg shadow-emerald-600/20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]"
+              class="group w-full flex items-center justify-center gap-2 py-4 px-6 text-base font-semibold text-white bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black rounded-xl shadow-lg shadow-slate-900/25 focus:outline-none focus:ring-4 focus:ring-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
             >
-              <svg v-if="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+              <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {{ loading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+              <span>{{ loading ? 'Verificando...' : 'Iniciar Sesión' }}</span>
+              <svg v-if="!loading" class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
             </button>
           </div>
         </form>
 
-        <!-- Separador -->
-        <div class="mt-6">
-          <div class="relative">
-            <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-gray-300"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-              <span class="px-2 bg-white text-gray-500">O continúa con</span>
-            </div>
+        <!-- Separador Premium -->
+        <div class="relative my-8">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-slate-200"></div>
+          </div>
+          <div class="relative flex justify-center">
+            <span class="px-4 text-sm text-slate-400 bg-white">o continúa con</span>
           </div>
         </div>
 
-        <!-- Botón Google (Secundario) -->
-        <div class="mt-6">
-          <button
-            type="button"
-            @click="loginWithGoogle"
-            :disabled="isGoogleLoading"
-            class="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg v-if="!isGoogleLoading" class="w-5 h-5" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            <svg v-else class="w-5 h-5 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>{{ isGoogleLoading ? 'Conectando...' : 'Continuar con Google' }}</span>
-          </button>
-        </div>
+        <!-- Botón Google Premium -->
+        <button
+          type="button"
+          @click="loginWithGoogle"
+          :disabled="isGoogleLoading"
+          class="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-white border-2 border-slate-200 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg v-if="!isGoogleLoading" class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <svg v-else class="w-5 h-5 animate-spin text-slate-400" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>{{ isGoogleLoading ? 'Conectando...' : 'Continuar con Google' }}</span>
+        </button>
 
-        <!-- Link de Registro -->
-        <div class="mt-6 text-center">
-          <p class="text-sm text-gray-600">
-            ¿No tienes cuenta? 
-            <a href="https://105pos.pro/register" class="font-semibold text-emerald-600 hover:text-emerald-500 transition-colors">
-              Regístrate aquí
+        <!-- Link de Registro Premium -->
+        <div class="mt-8 text-center">
+          <p class="text-sm text-slate-500">
+            ¿Nuevo en 105 POS? 
+            <a 
+              href="https://105pos.pro/register" 
+              class="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors hover:underline underline-offset-2"
+            >
+              Crea tu cuenta gratis
             </a>
           </p>
         </div>
 
-        <!-- Footer Copyright -->
-        <div class="mt-10 pt-6 border-t border-gray-100">
-          <p class="text-xs text-center text-gray-400">© 2025 105 POS Pro. Todos los derechos reservados.</p>
+        <!-- Footer con features -->
+        <div class="mt-10 pt-8 border-t border-slate-100">
+          <div class="flex items-center justify-center gap-6 text-xs text-slate-400">
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span>Conexión segura</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+              </svg>
+              <span>Datos encriptados</span>
+            </div>
+          </div>
+          <p class="text-center text-xs text-slate-400 mt-4">© 2025 105 POS Pro. Todos los derechos reservados.</p>
         </div>
       </div>
     </div>
@@ -612,7 +765,7 @@ if (authService.isAuthenticated()) {
 </script>
 
 <style scoped>
-/* 🎨 SPLIT SCREEN DESIGN - Estilos Personalizados */
+/* 🎨 PREMIUM LOGIN DESIGN - Estilos Personalizados 2025 */
 
 /* Animación de spinner */
 .animate-spin {
@@ -624,30 +777,43 @@ if (authService.isAuthenticated()) {
   to { transform: rotate(360deg); }
 }
 
-/* Focus ring verde esmeralda (Marca) */
-input:focus {
-  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
-  border-color: #059669;
+/* Animación pulse para indicador de estado */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Smooth transitions */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Focus ring premium para inputs */
+input:focus {
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+}
+
+/* Smooth transitions globales */
 input,
 button,
 a {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Efecto hover en botón principal */
+/* Efecto hover premium en botón principal */
 button[type="submit"]:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3);
 }
 
-/* Animación de entrada suave */
+button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Animación de entrada del formulario */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -655,8 +821,80 @@ button[type="submit"]:hover:not(:disabled) {
   }
 }
 
-/* Aplicar animación al contenedor del formulario */
-.space-y-8 {
-  animation: fadeInUp 0.6s ease-out;
+/* Contenedor principal con animación */
+.max-w-\[420px\] {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Efecto shimmer para skeleton loader */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Transición suave para imagen de fondo */
+img {
+  transition: opacity 1s ease-out, transform 0.3s ease;
+}
+
+/* Glassmorphism mejorado para cards */
+.backdrop-blur-xl {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Hover sutil en stats */
+.bg-white\/5:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Grid pattern sutil */
+.bg-\[radial-gradient\(\#e5e7eb_1px\,transparent_1px\)\] {
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+}
+
+/* Underline offset para links */
+.underline-offset-2 {
+  text-underline-offset: 2px;
+}
+
+/* Scroll suave */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selección de texto con color de marca */
+::selection {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: inherit;
+}
+
+/* Media query para pantallas pequeñas */
+@media (max-width: 1024px) {
+  .max-w-\[420px\] {
+    max-width: 100%;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Efecto de focus visible mejorado */
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
 }
 </style>

@@ -63,10 +63,10 @@ class GeminiAgentService
         };
 
         return <<<EOT
-Eres "105 IA", el asistente virtual inteligente del sistema POS 105. Eres amigable, profesional y muy útil.
+Eres "105 IA", el asistente virtual inteligente del sistema POS 105. Eres amigable, profesional, eficiente y MUY útil.
 
 🏢 CONTEXTO DEL NEGOCIO:
-- Plan Actual: **{$tenantPlan}** ({$planInfo})
+- Plan Actual: {$tenantPlan} ({$planInfo})
 - Fecha actual: {$currentDate}
 - Hora actual: {$currentTime}
 
@@ -81,40 +81,39 @@ Eres "105 IA", el asistente virtual inteligente del sistema POS 105. Eres amigab
 • consultarFacturas - Ver facturas y detalles de ventas
 • consultarCategorias - Ver categorías de productos
 • obtenerReporteVentas - Obtener resumen de ventas con métricas
+• obtenerProductosMenosVendidos - Ver productos con menos rotación/ventas
+• obtenerMejoresClientes - Ver clientes que más compran
 • consultarDeudasClientes - (PREMIUM) Ver clientes con deudas/créditos activos
 • consultarSedes - (PREMIUM) Ver listado de sedes/bodegas
-• crearSede - (PREMIUM) Crear nuevas sedes/bodegas (según límites del plan)
+• crearSede - (PREMIUM) Crear nuevas sedes/bodegas
 
-🧠 MEMORIA CONVERSACIONAL:
-- TIENES acceso al historial de la conversación actual
-- Si el usuario dice "sí", "ese", "el último", "hazlo", entiende que se refiere a lo último que mencionaste
-- Mantén el contexto y recuerda de qué estaban hablando
+⚡ REGLAS CRÍTICAS DE COMPORTAMIENTO:
 
-⚠️ FORMATO DE RESPUESTA:
-- NUNCA devuelvas JSON crudo al usuario.
-- Siempre responde en texto natural, amigable y profesional.
-- Si una herramienta devuelve datos, interprétalos y explícalos.
+1. **NUNCA PREGUNTES PARA CONFIRMAR** - Si el usuario pide algo, HAZLO INMEDIATAMENTE.
+   - Si dice "sí", "ok", "por favor", "hazlo", "mira", "dale" → EJECUTA la acción sin preguntar.
+   - Si dice "¿cuál fue el cliente que más compró?" → USA la herramienta y RESPONDE con datos.
+   - Si dice "¿cuál es el producto menos vendido?" → USA obtenerProductosMenosVendidos y RESPONDE.
 
-📋 REGLAS DE NEGOCIO Y PLANES:
-1. **ADAPTACIÓN AL PLAN**:
-   - Si el usuario pide algo de **SEDES** (sucursales) o **CRÉDITOS** (deudas, fiado) y su plan es 'free_trial' o 'basic':
-     - PUEDES responder la consulta si la herramienta lo permite, PERO SIEMPRE añade una nota de venta.
-     - Ejemplo: "Veo que tienes 2 clientes con deuda. 💡 Para gestionar créditos y cobros automáticamente, te recomiendo actualizar al Plan Premium."
-     - Si intentan crear una sede y el sistema lo rechaza por plan, explícales amablemente los beneficios del plan Premium.
-     - Si preguntan CÓMO hacerlo manualmente: "Ve al menú lateral > Gestión de Sedes > Botón 'Nueva Sede'."
+2. **MEMORIA Y CONTEXTO**:
+   - RECUERDA toda la conversación. Si el usuario preguntó algo antes, ÚSALO.
+   - Si dice "sí" o "ese", se refiere a lo ÚLTIMO que mencionaste.
+   - NUNCA digas "¿Te refieres a...?" si ya sabes de qué hablan.
 
-2. **VENTAS INTELIGENTES (UPSELLING)**:
-   - Si detectas que el usuario pregunta mucho por inventario avanzado o múltiples cajas, sugiere sutilmente el plan Enterprise.
-   - Si pregunta por "fiado" o "crédito", destaca el módulo Creditienda del plan Premium.
+3. **SÉ DIRECTO Y ÚTIL**:
+   - Da respuestas COMPLETAS con datos reales.
+   - Si una herramienta devuelve datos, INTERPRÉTALOS y explícalos claramente.
+   - NUNCA digas "no tengo herramienta para eso" si SÍ la tienes.
 
-3. **RESPUESTAS REALES**:
-   - Siempre usa las herramientas. No inventes datos.
-   - Si preguntan "¿tenemos clientes con deudas?", USA `consultarDeudasClientes`.
+4. **FORMATO**:
+   - Responde en español natural, amigable y profesional.
+   - NUNCA devuelvas JSON crudo.
+   - Usa emojis moderadamente para hacer las respuestas más amigables.
 
-4. **PREGUNTAS DE SEGUIMIENTO**:
-   - Si preguntan "¿quiénes son?" después de un reporte, usa los datos que ya tienes o busca detalles específicos.
+5. **PROMOCIÓN SUTIL DE PLANES**:
+   - Solo sugiere upgrades si el usuario pregunta por funciones Premium que no tiene.
+   - Sé útil PRIMERO, vende DESPUÉS.
 
-¡Ayuda al usuario a gestionar su negocio y crecer con POS 105!
+¡Tu misión es hacer que el usuario sienta que tiene un asistente INTELIGENTE y EFICIENTE!
 EOT;
     }
 
@@ -456,6 +455,36 @@ EOT;
                             'required' => ['periodo']
                         ]
                     ],
+                    [
+                        'name' => 'obtenerProductosMenosVendidos',
+                        'description' => 'Obtiene los productos con menor cantidad de ventas/rotación en un período. Útil para identificar productos estancados o sin movimiento.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'periodo' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Período: semana, mes, trimestre, año',
+                                    'enum' => ['semana', 'mes', 'trimestre', 'año']
+                                ],
+                                'limite' => ['type' => 'NUMBER', 'description' => 'Cantidad de productos a mostrar (default 10)']
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'obtenerMejoresClientes',
+                        'description' => 'Obtiene los clientes que más han comprado (mayor monto total) en un período.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'periodo' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Período: hoy, semana, mes, año',
+                                    'enum' => ['hoy', 'semana', 'mes', 'año']
+                                ],
+                                'limite' => ['type' => 'NUMBER', 'description' => 'Cantidad de clientes a mostrar (default 10)']
+                            ]
+                        ]
+                    ],
 
                     // === CLIENTES ===
                     [
@@ -676,6 +705,12 @@ EOT;
                 return $this->consultarVentasDB($args);
             case 'obtenerReporteVentas':
                 return $this->obtenerReporteVentasDB($args);
+
+            case 'obtenerProductosMenosVendidos':
+                return $this->obtenerProductosMenosVendidosDB($args);
+
+            case 'obtenerMejoresClientes':
+                return $this->obtenerMejoresClientesDB($args);
 
             // Clientes
             case 'consultarClientes':
@@ -1050,6 +1085,133 @@ EOT;
         } catch (\Exception $e) {
             Log::error("❌ Error obtenerReporteVentas: " . $e->getMessage());
             return ['status' => 'error', 'message' => 'Error al generar reporte.'];
+        }
+    }
+
+    private function obtenerProductosMenosVendidosDB($args)
+    {
+        try {
+            $periodo = $args['periodo'] ?? 'mes';
+            $limite = intval($args['limite'] ?? 10);
+
+            $dateFilter = match($periodo) {
+                'semana' => Carbon::now()->subWeek(),
+                'mes' => Carbon::now()->subMonth(),
+                'trimestre' => Carbon::now()->subMonths(3),
+                'año' => Carbon::now()->subYear(),
+                default => Carbon::now()->subMonth()
+            };
+
+            // Obtener todos los productos activos
+            $productosActivos = Product::where('active', true)
+                ->select('id', 'name', 'sku', 'sale_price', 'stock')
+                ->get();
+
+            // Obtener ventas por producto en el período
+            $ventasPorProducto = InvoiceItem::whereHas('invoice', function($q) use ($dateFilter) {
+                    $q->where('type', 'invoice')
+                      ->where('status', '!=', 'cancelled')
+                      ->where('date', '>=', $dateFilter);
+                })
+                ->selectRaw('product_id, SUM(quantity) as cantidad_vendida')
+                ->groupBy('product_id')
+                ->pluck('cantidad_vendida', 'product_id')
+                ->toArray();
+
+            // Combinar productos con sus ventas (o 0 si no vendieron)
+            $productosConVentas = $productosActivos->map(function($producto) use ($ventasPorProducto) {
+                return [
+                    'id' => $producto->id,
+                    'nombre' => $producto->name,
+                    'sku' => $producto->sku,
+                    'precio' => $producto->sale_price,
+                    'stock_actual' => $producto->stock,
+                    'cantidad_vendida' => $ventasPorProducto[$producto->id] ?? 0
+                ];
+            });
+
+            // Ordenar por menor cantidad vendida y tomar el límite
+            $menosVendidos = $productosConVentas
+                ->sortBy('cantidad_vendida')
+                ->take($limite)
+                ->values()
+                ->toArray();
+
+            $sinVentas = collect($menosVendidos)->where('cantidad_vendida', 0)->count();
+
+            return [
+                'periodo' => $periodo,
+                'productos_menos_vendidos' => $menosVendidos,
+                'total_productos_analizados' => $productosActivos->count(),
+                'productos_sin_ventas' => $sinVentas,
+                'mensaje' => "Los {$limite} productos con menor rotación en el último {$periodo}. {$sinVentas} productos no han tenido ninguna venta."
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error obtenerProductosMenosVendidos: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Error al obtener productos menos vendidos.'];
+        }
+    }
+
+    private function obtenerMejoresClientesDB($args)
+    {
+        try {
+            $periodo = $args['periodo'] ?? 'mes';
+            $limite = intval($args['limite'] ?? 10);
+
+            $dateFilter = match($periodo) {
+                'hoy' => Carbon::today(),
+                'semana' => Carbon::now()->subWeek(),
+                'mes' => Carbon::now()->subMonth(),
+                'año' => Carbon::now()->subYear(),
+                default => Carbon::now()->subMonth()
+            };
+
+            $isExactDate = $periodo === 'hoy';
+
+            // Obtener compras por cliente
+            $queryBase = Invoice::where('type', 'invoice')
+                ->where('status', '!=', 'cancelled')
+                ->whereNotNull('customer_id');
+
+            if ($isExactDate) {
+                $queryBase->whereDate('date', $dateFilter);
+            } else {
+                $queryBase->where('date', '>=', $dateFilter);
+            }
+
+            $mejoresClientes = $queryBase
+                ->selectRaw('customer_id, COUNT(*) as total_compras, SUM(total) as monto_total')
+                ->groupBy('customer_id')
+                ->orderByDesc('monto_total')
+                ->limit($limite)
+                ->with('customer:id,name,email,phone')
+                ->get()
+                ->map(function($registro) {
+                    return [
+                        'cliente_id' => $registro->customer_id,
+                        'nombre' => $registro->customer?->name ?? 'Cliente eliminado',
+                        'email' => $registro->customer?->email ?? '-',
+                        'telefono' => $registro->customer?->phone ?? '-',
+                        'total_compras' => $registro->total_compras,
+                        'monto_total' => round($registro->monto_total, 2)
+                    ];
+                })
+                ->toArray();
+
+            $montoTotal = collect($mejoresClientes)->sum('monto_total');
+
+            return [
+                'periodo' => $periodo,
+                'mejores_clientes' => $mejoresClientes,
+                'total_clientes_encontrados' => count($mejoresClientes),
+                'monto_total_combinado' => $montoTotal,
+                'mensaje' => "Los {$limite} mejores clientes del último {$periodo}. En total representan $" . number_format($montoTotal, 0, ',', '.') . " en compras."
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error obtenerMejoresClientes: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Error al obtener mejores clientes.'];
         }
     }
 

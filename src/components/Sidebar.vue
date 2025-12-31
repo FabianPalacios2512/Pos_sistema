@@ -251,8 +251,9 @@
         <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
         <h3 v-show="!sidebarCollapsed" class="section-title">SISTEMA</h3>
         
+        <!-- Usuarios: Solo visible en Premium y Enterprise (Basic y Free Trial tienen un solo usuario) -->
         <div
-          v-if="hasModuleAccess('users')"
+          v-if="hasModuleAccess('users') && canAccessUsersModule"
           @click="$emit('change-module', 'users')"
           class="menu-item"
           :class="[currentModule === 'users' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
@@ -374,6 +375,14 @@ const showWebCatalog = computed(() => {
   const allowedPlans = ['premium', 'enterprise']
   
   // Verificar si el plan actual permite catálogo web
+  return allowedPlans.includes(tenantPlan)
+})
+
+// Computed para validar acceso al módulo Usuarios
+// Basic y Free Trial solo permiten un usuario, por lo tanto no necesitan el módulo
+const canAccessUsersModule = computed(() => {
+  const tenantPlan = appStore.tenantPlan || 'free_trial'
+  const allowedPlans = ['premium', 'enterprise']
   return allowedPlans.includes(tenantPlan)
 })
 

@@ -169,222 +169,192 @@
             <span class="text-sm font-medium text-gray-600 dark:text-zinc-400">{{ currentWarehouse.name }}</span>
           </div>
           
-          <!-- Perfil de Usuario - Avatar con Badge Premium -->
+          <!-- Perfil de Usuario - Avatar Profesional estilo Google -->
           <div class="relative" id="user-dropdown-container">
             <button
               id="user-profile-button"
               @click="toggleUserDropdown"
-              class="p-1 rounded-full hover:ring-2 hover:ring-gray-200 dark:hover:ring-zinc-700 transition-all duration-200"
+              class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all duration-200"
               :title="`${currentUser.name} - ${currentUser.role?.name || 'User'}`"
             >
-              <!-- Avatar Circular Profesional -->
-              <div class="relative w-9 h-9 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center shadow-sm">
+              <!-- Avatar Circular - Diseño Google -->
+              <div class="relative w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-sm ring-2 ring-transparent hover:ring-emerald-200 dark:hover:ring-emerald-800 transition-all">
                 <span class="text-white font-bold text-sm">{{ currentUser.initials }}</span>
                 
-                <!-- 🎯 Badge Premium/Enterprise - Diseño Profesional SaaS B2B -->
+                <!-- 🎯 Indicador de Plan - Sutil punto de color -->
                 <div 
                   v-if="isPremiumOrEnterprise"
-                  class="absolute -bottom-0.5 -right-0.5 flex items-center justify-center"
+                  class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white dark:border-[#1a1a1f] shadow-sm"
+                  :class="isEnterprisePlan ? 'bg-violet-500' : 'bg-emerald-500'"
                   :title="planBadgeText"
-                >
-                  <div 
-                    class="w-4 h-4 rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-[#25252d] transition-colors duration-300"
-                    :class="planBadgeClass"
-                  >
-                    <!-- Corona dorada para Enterprise (icono premium) -->
-                    <svg 
-                      v-if="isEnterprisePlan" 
-                      class="w-2.5 h-2.5 text-white" 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20"
-                    >
-                      <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" clip-rule="evenodd"/>
-                    </svg>
-                    <!-- Estrella dorada para Premium -->
-                    <svg 
-                      v-else 
-                      class="w-2.5 h-2.5 text-white" 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                  </div>
-                </div>
+                ></div>
               </div>
             </button>
             
-            <!-- Dropdown Mejorado con Temas -->
+            <!-- Dropdown Mejorado - Estilo Google/Gemini -->
             <Transition
               enter-active-class="transition ease-out duration-200"
-              enter-from-class="opacity-0 scale-95"
-              enter-to-class="opacity-100 scale-100"
+              enter-from-class="opacity-0 scale-95 translate-y-1"
+              enter-to-class="opacity-100 scale-100 translate-y-0"
               leave-active-class="transition ease-in duration-150"
-              leave-from-class="opacity-100 scale-100"
-              leave-to-class="opacity-0 scale-95"
+              leave-from-class="opacity-100 scale-100 translate-y-0"
+              leave-to-class="opacity-0 scale-95 translate-y-1"
             >
               <div 
                 v-if="userDropdownOpen"
                 id="user-dropdown-menu"
-                class="absolute right-0 mt-3 w-72 bg-white dark:bg-[#2d2d38] rounded-xl shadow-xl border border-gray-100 dark:border-zinc-700/60 overflow-hidden z-50"
-                style="box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);"
+                class="absolute right-0 mt-2 w-80 bg-white dark:bg-[#2d2d38] rounded-2xl shadow-2xl border border-gray-200/80 dark:border-zinc-700/60 overflow-hidden z-50"
+                style="box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);"
                 @click.stop
               >
-                <!-- Header del Usuario -->
-                <div class="px-4 py-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-zinc-800 dark:to-zinc-900 border-b border-gray-100 dark:border-zinc-700/60">
-                  <div class="flex items-center space-x-3">
-                    <div class="relative w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center shadow-lg">
-                      <span class="text-white font-bold text-base">{{ currentUser.initials }}</span>
-                      
-                      <!-- Badge en avatar del dropdown -->
+                <!-- Header del Usuario - Estilo Google Account -->
+                <div class="p-5 bg-white dark:bg-[#2d2d38]">
+                  <div class="flex items-start gap-4">
+                    <!-- Avatar Grande -->
+                    <div class="relative flex-shrink-0">
+                      <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
+                        <span class="text-white font-bold text-xl">{{ currentUser.initials }}</span>
+                      </div>
+                      <!-- Indicador de plan sutil -->
                       <div 
                         v-if="isPremiumOrEnterprise"
-                        class="absolute -top-1 -right-1 flex items-center justify-center"
+                        class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-3 border-white dark:border-[#2d2d38] flex items-center justify-center"
+                        :class="isEnterprisePlan ? 'bg-violet-500' : 'bg-emerald-500'"
                       >
-                        <div 
-                          class="relative flex h-5 w-5 rounded-full items-center justify-center shadow-lg"
-                          :class="planBadgeClass"
-                        >
-                          <span 
-                            v-if="isEnterprisePlan"
-                            class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-purple-400"
-                          ></span>
-                          <svg 
-                            class="relative w-3 h-3 text-white z-10" 
-                            fill="currentColor" 
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        </div>
+                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
                       </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2">
-                        <div class="font-semibold text-sm text-gray-900 dark:text-white truncate">{{ currentUser.name }}</div>
-                        <!-- Badge de plan -->
-                        <span 
-                          v-if="isPremiumOrEnterprise"
-                          class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide flex items-center gap-1"
-                          :class="isEnterprisePlan 
-                            ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300' 
-                            : 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300'"
-                        >
-                          <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          {{ isEnterprisePlan ? 'Enterprise' : 'Premium' }}
-                        </span>
+                    
+                    <!-- Info del Usuario -->
+                    <div class="flex-1 min-w-0 pt-1">
+                      <h3 class="text-base font-semibold text-gray-900 dark:text-white truncate">{{ currentUser.name }}</h3>
+                      <p class="text-sm text-gray-500 dark:text-zinc-400 truncate">{{ currentUser.email }}</p>
+                      
+                      <!-- Badge de Plan Elegante -->
+                      <div 
+                        v-if="isPremiumOrEnterprise"
+                        class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                        :class="isEnterprisePlan 
+                          ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300' 
+                          : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300'"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ isEnterprisePlan ? 'Enterprise' : 'Pro' }}
                       </div>
-                      <div class="text-xs text-gray-600 dark:text-zinc-300 font-medium">{{ currentUser.role?.name || 'User' }}</div>
-                      <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5 truncate">{{ currentUser.email }}</div>
                     </div>
                   </div>
                 </div>
+                
+                <!-- Separador sutil -->
+                <div class="h-px bg-gray-100 dark:bg-zinc-700/60"></div>
                 
                 <!-- Opciones del Menu -->
                 <div class="py-2">
                   <!-- Mi Perfil -->
                   <button
                     @click="handleProfileClick"
-                    class="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-200 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors font-medium group"
+                    class="w-full flex items-center px-5 py-3 text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group"
                   >
-                    <div class="w-8 h-8 mr-3 bg-blue-100 dark:bg-blue-950 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-900 transition-colors">
-                      <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    <div class="w-9 h-9 mr-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-950 transition-colors">
+                      <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                       </svg>
                     </div>
-                    <span>Mi Perfil</span>
+                    <span class="font-medium">Mi Perfil</span>
                   </button>
                   
                   <!-- Configuración -->
                   <button
                     v-if="shouldShowSettings"
                     @click="handleSettingsClick"
-                    class="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors font-medium group"
+                    class="w-full flex items-center px-5 py-3 text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group"
                   >
-                    <div class="w-8 h-8 mr-3 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors">
-                      <svg class="w-4 h-4 text-gray-600 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <div class="w-9 h-9 mr-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors">
+                      <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                       </svg>
                     </div>
-                    <span>Configuración</span>
+                    <span class="font-medium">Configuración</span>
                   </button>
-                  
-                  <!-- Separador -->
-                  <div class="border-t border-gray-100 dark:border-zinc-700 my-2"></div>
-                  
-                  <!-- Selector de Tema -->
-                  <div class="px-4 py-2">
-                    <div class="flex items-center justify-between mb-2">
-                      <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Apariencia</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                      <!-- Modo Claro -->
-                      <button
-                        @click="setTheme('light')"
-                        :class="[
-                          'flex flex-col items-center justify-center p-2 rounded-lg border-2 transition-all duration-200',
-                          currentTheme === 'light' 
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-500' 
-                            : 'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:border-gray-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700'
-                        ]"
-                      >
-                        <svg class="w-5 h-5 mb-1" :class="currentTheme === 'light' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-300'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>
-                        <span class="text-xs font-medium" :class="currentTheme === 'light' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-300'">Claro</span>
-                      </button>
-                      
-                      <!-- Modo Oscuro -->
-                      <button
-                        @click="setTheme('dark')"
-                        :class="[
-                          'flex flex-col items-center justify-center p-2 rounded-lg border-2 transition-all duration-200',
-                          currentTheme === 'dark' 
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-500' 
-                            : 'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:border-gray-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700'
-                        ]"
-                      >
-                        <svg class="w-5 h-5 mb-1" :class="currentTheme === 'dark' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-300'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                        </svg>
-                        <span class="text-xs font-medium" :class="currentTheme === 'dark' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-300'">Oscuro</span>
-                      </button>
-                      
-                      <!-- Modo Sistema -->
-                      <button
-                        @click="setTheme('system')"
-                        :class="[
-                          'flex flex-col items-center justify-center p-2 rounded-lg border-2 transition-all duration-200',
-                          currentTheme === 'system' 
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-500' 
-                            : 'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:border-gray-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700'
-                        ]"
-                      >
-                        <svg class="w-5 h-5 mb-1" :class="currentTheme === 'system' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-300'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                        <span class="text-xs font-medium" :class="currentTheme === 'system' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-300'">Sistema</span>
-                      </button>
-                    </div>
+                </div>
+                
+                <!-- Separador -->
+                <div class="h-px bg-gray-100 dark:bg-zinc-700/60"></div>
+                
+                <!-- Selector de Tema - Diseño Limpio -->
+                <div class="p-4">
+                  <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3 px-1">Apariencia</p>
+                  <div class="grid grid-cols-3 gap-2">
+                    <!-- Modo Claro -->
+                    <button
+                      @click="setTheme('light')"
+                      :class="[
+                        'flex flex-col items-center justify-center py-3 px-2 rounded-xl border transition-all duration-200',
+                        currentTheme === 'light' 
+                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50' 
+                          : 'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700'
+                      ]"
+                    >
+                      <svg class="w-5 h-5 mb-1.5" :class="currentTheme === 'light' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                      </svg>
+                      <span class="text-xs font-medium" :class="currentTheme === 'light' ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-zinc-400'">Claro</span>
+                    </button>
+                    
+                    <!-- Modo Oscuro -->
+                    <button
+                      @click="setTheme('dark')"
+                      :class="[
+                        'flex flex-col items-center justify-center py-3 px-2 rounded-xl border transition-all duration-200',
+                        currentTheme === 'dark' 
+                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50' 
+                          : 'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700'
+                      ]"
+                    >
+                      <svg class="w-5 h-5 mb-1.5" :class="currentTheme === 'dark' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                      </svg>
+                      <span class="text-xs font-medium" :class="currentTheme === 'dark' ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-zinc-400'">Oscuro</span>
+                    </button>
+                    
+                    <!-- Modo Sistema -->
+                    <button
+                      @click="setTheme('system')"
+                      :class="[
+                        'flex flex-col items-center justify-center py-3 px-2 rounded-xl border transition-all duration-200',
+                        currentTheme === 'system' 
+                          ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50' 
+                          : 'border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700'
+                      ]"
+                    >
+                      <svg class="w-5 h-5 mb-1.5" :class="currentTheme === 'system' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                      </svg>
+                      <span class="text-xs font-medium" :class="currentTheme === 'system' ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-600 dark:text-zinc-400'">Sistema</span>
+                    </button>
                   </div>
-                  
-                  <!-- Separador -->
-                  <div class="border-t border-gray-100 dark:border-zinc-700 my-2"></div>
-                  
-                  <!-- Cerrar Sesión -->
+                </div>
+                
+                <!-- Separador -->
+                <div class="h-px bg-gray-100 dark:bg-zinc-700/60"></div>
+                
+                <!-- Cerrar Sesión -->
+                <div class="p-2">
                   <button
                     @click="handleLogout"
-                    class="w-full flex items-center px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-semibold group"
+                    class="w-full flex items-center px-4 py-3 text-sm text-gray-700 dark:text-zinc-300 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors group"
                   >
-                    <div class="w-8 h-8 mr-3 bg-red-100 dark:bg-red-950/30 rounded-lg flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/30 transition-colors">
-                      <svg class="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    <div class="w-9 h-9 mr-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center group-hover:bg-red-100 dark:group-hover:bg-red-950/50 transition-colors">
+                      <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                       </svg>
                     </div>
-                    <span>Cerrar Sesión</span>
+                    <span class="font-medium group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Cerrar Sesión</span>
                   </button>
                 </div>
               </div>
@@ -779,12 +749,8 @@ const loadThemePreference = () => {
 
 // 👤 Manejar clic en Mi Perfil
 const handleProfileClick = () => {
-  console.log('👤 Abrir perfil de usuario')
   userDropdownOpen.value = false
-  // Aquí puedes emitir un evento o navegar a la vista de perfil
-  // emit('navigate-to-profile')
-  // O si tienes un módulo de perfil:
-  router.push('/profile') // Descomenta cuando tengas la ruta
+  emit('navigate-to-profile')
 }
 
 // ⚙️ Manejar clic en Configuración

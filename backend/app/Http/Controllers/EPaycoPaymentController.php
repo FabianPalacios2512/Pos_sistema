@@ -36,6 +36,7 @@ class EPaycoPaymentController extends Controller
                 'payment_frequency' => 'required|in:monthly,yearly,24months',
                 'plan' => 'required|in:basic,premium,enterprise',
                 'tenant_id' => 'required|string',
+                'include_dian' => 'sometimes|boolean',
             ]);
 
             // Guardar datos del pago pendiente
@@ -126,7 +127,7 @@ class EPaycoPaymentController extends Controller
                 // Aceptada
                 $this->activateTenantPlan($pendingPayment, $data);
 
-                $pendingPayment->status = 'completed';
+                $pendingPayment->status = 'approved';
                 $pendingPayment->payment_link_id = $x_ref_payco; // Guardamos ref de ePayco
                 $pendingPayment->save();
 
@@ -134,7 +135,7 @@ class EPaycoPaymentController extends Controller
 
             } elseif ($x_cod_response == 2 || $x_cod_response == 4) {
                 // Rechazada o Fallida
-                $pendingPayment->status = 'failed';
+                $pendingPayment->status = 'rejected';
                 $pendingPayment->save();
                 Log::info('ePayco: Pago rechazado o fallido');
             } else {
@@ -147,6 +148,130 @@ class EPaycoPaymentController extends Controller
         } catch (\Exception $e) {
             Log::error('Error procesando webhook ePayco: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Verificar estado de un pago por referencia
+     * Consulta tanto la BD como la API de ePayco
+     */
+    public function checkPaymentStatus($reference)
+    {
+        try {
+            $pendingPayment = PendingPayment::where('reference', $reference)->first();
+
+            if (!$pendingPayment) {
+                return response()->json([
+                    'status' => 'not_found',
+                    'message' => 'Pago no encontrado'
+                ], 404);
+            }
+
+            // Si ya está completado o rechazado, devolver ese estado
+            if (in_array($pendingPayment->status, ['completed', 'approved', 'failed', 'rejected'])) {
+                return response()->json([
+                    'status' => $pendingPayment->status,
+                    'plan' => $pendingPayment->plan,
+                    'payment_frequency' => $pendingPayment->payment_frequency,
+                    'amount' => $pendingPayment->amount_in_cents / 100,
+                    'reference' => $pendingPayment->reference
+                ]);
+            }
+
+            // Si está pendiente, consultar a ePayco API
+            if ($pendingPayment->status === 'pending') {
+                $this->syncPaymentWithEpayco($pendingPayment);
+
+                // Refrescar el pago desde BD después de sincronizar
+                $pendingPayment->refresh();
+            }
+
+            return response()->json([
+                'status' => $pendingPayment->status,
+                'plan' => $pendingPayment->plan,
+                'payment_frequency' => $pendingPayment->payment_frequency,
+                'amount' => $pendingPayment->amount_in_cents / 100,
+                'reference' => $pendingPayment->reference
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error verificando estado de pago: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Sincronizar estado del pago consultando API de ePayco
+     */
+    private function syncPaymentWithEpayco($pendingPayment)
+    {
+        try {
+            // API de ePayco para consultar transacción
+            $url = "https://secure.epayco.co/validation/v1/reference/{$pendingPayment->reference}";
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Accept: application/json'
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+
+                Log::info('ePayco API Response for reference: ' . $pendingPayment->reference, $data);
+
+                // Estructura puede ser: { success: true, data: { ... } } o directamente los datos
+                $transactionData = $data['data'] ?? $data;
+
+                if (!empty($transactionData)) {
+                    // Puede venir como array de transacciones, tomamos la última
+                    if (isset($transactionData[0]) && is_array($transactionData[0])) {
+                        $transaction = end($transactionData);
+                    } else {
+                        $transaction = $transactionData;
+                    }
+
+                    // Estados: Aceptada, Rechazada, Pendiente, Fallida
+                    $estado = strtolower($transaction['x_response'] ?? $transaction['estado'] ?? '');
+                    $cod_response = $transaction['x_cod_response'] ?? $transaction['cod_response'] ?? null;
+
+                    Log::info('ePayco Transaction Status', [
+                        'estado' => $estado,
+                        'cod_response' => $cod_response,
+                        'reference' => $pendingPayment->reference
+                    ]);
+
+                    if ($cod_response == 1 || $estado === 'aceptada' || $estado === 'aprobada') {
+                        // Pago aprobado
+                        $this->activateTenantPlan($pendingPayment, $transaction);
+
+                        $pendingPayment->status = 'approved';
+                        $pendingPayment->payment_link_id = $transaction['x_ref_payco'] ?? $transaction['ref_payco'] ?? null;
+                        $pendingPayment->save();
+
+                        Log::info('✅ ePayco: Pago aprobado (sincronizado vía API)');
+                    } elseif ($cod_response == 2 || $cod_response == 4 || $estado === 'rechazada' || $estado === 'fallida') {
+                        // Pago rechazado
+                        $pendingPayment->status = 'rejected';
+                        $pendingPayment->save();
+
+                        Log::info('❌ ePayco: Pago rechazado (sincronizado vía API)');
+                    }
+                }
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error sincronizando con ePayco API: ' . $e->getMessage());
         }
     }
 
@@ -185,6 +310,61 @@ class EPaycoPaymentController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error activando plan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 🔧 DEV ONLY: Aprobar manualmente un pago pendiente
+     * Útil cuando el webhook no llega en localhost
+     */
+    public function manualApprove($reference)
+    {
+        try {
+            $pendingPayment = PendingPayment::where('reference', $reference)->first();
+
+            if (!$pendingPayment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pago no encontrado'
+                ], 404);
+            }
+
+            if ($pendingPayment->status !== 'pending') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El pago ya fue procesado',
+                    'current_status' => $pendingPayment->status
+                ]);
+            }
+
+            // Activar plan
+            $this->activateTenantPlan($pendingPayment, []);
+
+            // Actualizar estado
+            $pendingPayment->status = 'approved';
+            $pendingPayment->save();
+
+            Log::info('✅ Pago aprobado manualmente', [
+                'reference' => $reference,
+                'plan' => $pendingPayment->plan
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pago aprobado manualmente',
+                'payment' => [
+                    'reference' => $pendingPayment->reference,
+                    'plan' => $pendingPayment->plan,
+                    'status' => $pendingPayment->status
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error aprobando pago manualmente: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }

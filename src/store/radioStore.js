@@ -15,6 +15,7 @@ export const useRadioStore = defineStore('radio', {
         newsStations: [],
         musicStations: [],
         searchResults: [],
+        favorites: [], // 🎯 Lista de favoritos
 
         // Cache for city filters
         cityStations: {
@@ -24,7 +25,7 @@ export const useRadioStore = defineStore('radio', {
             costa: []
         },
 
-        currentView: 'home', // 'home', 'search', 'city'
+        currentView: 'home', // 'home', 'search', 'city', 'favorites'
         currentCityTitle: '',
         activeCityStations: []
     }),
@@ -44,6 +45,104 @@ export const useRadioStore = defineStore('radio', {
                 })
                 this.audio.addEventListener('ended', () => { this.isPlaying = false })
             }
+            
+            // Cargar favoritos desde localStorage
+            this.loadFavorites()
+        },
+
+        // 🎯 Sistema de Favoritos
+        loadFavorites() {
+            try {
+                const saved = localStorage.getItem('radio-favorites')
+                if (saved) {
+                    this.favorites = JSON.parse(saved)
+                }
+            } catch (e) {
+                this.favorites = []
+            }
+        },
+
+        saveFavorites() {
+            try {
+                localStorage.setItem('radio-favorites', JSON.stringify(this.favorites))
+            } catch (e) {
+                console.error('Error saving favorites:', e)
+            }
+        },
+
+        toggleFavorite(station) {
+            const index = this.favorites.findIndex(f => f.id === station.id)
+            if (index >= 0) {
+                this.favorites.splice(index, 1)
+            } else {
+                this.favorites.push({
+                    id: station.id,
+                    name: station.name,
+                    url: station.url,
+                    logo: station.logo,
+                    state: station.state,
+                    country: station.country
+                })
+            }
+            this.saveFavorites()
+        },
+
+        isFavorite(stationId) {
+            return this.favorites.some(f => f.id === stationId)
+        },
+
+        // 🎯 Navegación entre emisoras
+        getAllStations() {
+            // Combinar todas las emisoras disponibles según la vista actual
+            let stations = []
+            
+            if (this.currentView === 'favorites') {
+                stations = [...this.favorites]
+            } else if (this.currentView === 'search') {
+                stations = [...this.searchResults]
+            } else if (this.currentView === 'city') {
+                stations = [...this.activeCityStations]
+            } else {
+                // Home: combinar todas
+                stations = [...this.topStations, ...this.newsStations, ...this.musicStations]
+            }
+            
+            // Eliminar duplicados por id
+            const uniqueStations = []
+            const seenIds = new Set()
+            for (const station of stations) {
+                if (!seenIds.has(station.id)) {
+                    seenIds.add(station.id)
+                    uniqueStations.push(station)
+                }
+            }
+            return uniqueStations
+        },
+
+        playNext() {
+            const stations = this.getAllStations()
+            if (stations.length === 0) return
+            
+            const currentIndex = stations.findIndex(s => s.id === this.currentStation?.id)
+            const nextIndex = (currentIndex + 1) % stations.length
+            this.playStation(stations[nextIndex])
+        },
+
+        playPrevious() {
+            const stations = this.getAllStations()
+            if (stations.length === 0) return
+            
+            const currentIndex = stations.findIndex(s => s.id === this.currentStation?.id)
+            const prevIndex = currentIndex <= 0 ? stations.length - 1 : currentIndex - 1
+            this.playStation(stations[prevIndex])
+        },
+
+        playRandom() {
+            const stations = this.getAllStations()
+            if (stations.length === 0) return
+            
+            const randomIndex = Math.floor(Math.random() * stations.length)
+            this.playStation(stations[randomIndex])
         },
 
         async fetchHomeData() {

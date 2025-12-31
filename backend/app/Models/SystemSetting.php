@@ -44,6 +44,10 @@ class SystemSetting extends Model
         'loyalty_points_per_currency',
         'loyalty_point_value',
         'onboarding_completed', // ✅ Validación de onboarding
+        // 🔔 Configuración de recordatorios automáticos
+        'reminder_frequency',      // manual, daily, weekly, biweekly
+        'reminder_send_hour',      // Hora de envío (8-18)
+        'reminder_min_days_overdue', // Días mínimos de mora para enviar
     ];
 
     protected $casts = [

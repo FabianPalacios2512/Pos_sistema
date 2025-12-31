@@ -5,176 +5,161 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * 🎯 Optimizado: Solo carga loyalty_points si el sistema está habilitado
      */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
         try {
-            // Verificar si el sistema de fidelización está habilitado
-            $loyaltyEnabled = \App\Models\SystemSetting::getSettings()->enable_loyalty_system ?? false;
+            $query = Customer::query();
 
-            // Seleccionar campos dinámicamente para evitar cargas innecesarias
-            $selectFields = [
-                'id', 'name', 'email', 'phone', 'address', 'city',
-                'document_type', 'document_number', 'birth_date', 'gender',
-                'credit_limit', 'current_debt', 'debt_since', 'credit_active', 'credit_photo', 'active',
-                'total_purchases', 'total_orders', 'created_at', 'updated_at'
-            ];
-
-            // Solo agregar loyalty_points si el sistema está habilitado
-            if ($loyaltyEnabled) {
-                $selectFields[] = 'loyalty_points';
+            // Filtro por búsqueda
+            if ($request->has('search') && $request->search) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('document', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                });
             }
 
-            $customers = Customer::select($selectFields)
-                ->orderBy('name', 'asc')
-                ->get();
+            // Filtro por estado
+            if ($request->has('active')) {
+                $query->where('active', $request->active);
+            }
+
+            // Ordenar
+            $sortBy = $request->get('sort_by', 'name');
+            $sortOrder = $request->get('sort_order', 'asc');
+            $query->orderBy($sortBy, $sortOrder);
+
+            $customers = $query->get();
 
             return response()->json([
                 'success' => true,
-                'data' => $customers,
-                'loyalty_enabled' => $loyaltyEnabled, // Indicar al frontend si está habilitado
-                'message' => 'Clientes obtenidos exitosamente'
+                'data' => $customers
             ]);
         } catch (\Exception $e) {
+            Log::error('Error getting customers: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener clientes: ' . $e->getMessage()
+                'message' => 'Error al obtener clientes',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
      * Store a newly created resource in storage.
-     * 🎯 CreditiTenda: Validación de unicidad en documento y email
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         try {
-            $validated = $request->validate([
+            $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'email' => 'nullable|email|max:255|unique:customers,email',
-                'phone' => 'nullable|string|max:20',
+                'document' => 'nullable|string|max:50|unique:customers,document',
+                'email' => 'nullable|email|max:255',
+                'phone' => 'nullable|string|max:50',
                 'address' => 'nullable|string|max:500',
-                'city' => 'nullable|string|max:255',
-                'document_type' => 'nullable|string|max:50',
-                'document_number' => 'nullable|string|max:50|unique:customers,document_number',
-                'birth_date' => 'nullable|date',
                 'credit_limit' => 'nullable|numeric|min:0',
-                'current_debt' => 'nullable|numeric|min:0',
-                'credit_active' => 'boolean',
-                'credit_photo' => 'nullable|string',
+                'credit_days' => 'nullable|integer|min:0',
                 'active' => 'boolean'
             ]);
 
-            $customer = Customer::create($validated);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error de validación',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $customer = Customer::create($request->all());
 
             return response()->json([
                 'success' => true,
-                'data' => $customer,
-                'message' => 'Cliente creado exitosamente'
+                'message' => 'Cliente creado exitosamente',
+                'data' => $customer
             ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de validación',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
+            Log::error('Error creating customer: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear cliente: ' . $e->getMessage()
+                'message' => 'Error al crear cliente',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
      * Display the specified resource.
-     * 🎯 Optimizado: Solo carga loyalty_points si el sistema está habilitado
      */
-    public function show(string $id): JsonResponse
+    public function show($id)
     {
         try {
-            // Verificar si el sistema de fidelización está habilitado
-            $loyaltyEnabled = \App\Models\SystemSetting::getSettings()->enable_loyalty_system ?? false;
-
-            // Seleccionar campos dinámicamente
-            $selectFields = [
-                'id', 'name', 'email', 'phone', 'address', 'city',
-                'document_type', 'document_number', 'birth_date', 'gender',
-                'credit_limit', 'current_debt', 'credit_active', 'credit_photo', 'active',
-                'total_purchases', 'total_orders', 'created_at', 'updated_at'
-            ];
-
-            if ($loyaltyEnabled) {
-                $selectFields[] = 'loyalty_points';
-            }
-
-            $customer = Customer::select($selectFields)->findOrFail($id);
+            $customer = Customer::findOrFail($id);
 
             return response()->json([
                 'success' => true,
-                'data' => $customer,
-                'loyalty_enabled' => $loyaltyEnabled,
-                'message' => 'Cliente obtenido exitosamente'
+                'data' => $customer
             ]);
         } catch (\Exception $e) {
+            Log::error('Error getting customer: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Cliente no encontrado'
+                'message' => 'Cliente no encontrado',
+                'error' => $e->getMessage()
             ], 404);
         }
     }
 
     /**
      * Update the specified resource in storage.
-     * 🎯 CreditiTenda: Validación de unicidad excluyendo el registro actual
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(Request $request, $id)
     {
         try {
             $customer = Customer::findOrFail($id);
 
-            $validated = $request->validate([
+            $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'email' => 'nullable|email|max:255|unique:customers,email,' . $id,
-                'phone' => 'nullable|string|max:20',
+                'document' => 'nullable|string|max:50|unique:customers,document,' . $id,
+                'email' => 'nullable|email|max:255',
+                'phone' => 'nullable|string|max:50',
                 'address' => 'nullable|string|max:500',
-                'city' => 'nullable|string|max:255',
-                'document_type' => 'nullable|string|max:50',
-                'document_number' => 'nullable|string|max:50|unique:customers,document_number,' . $id,
-                'birth_date' => 'nullable|date',
                 'credit_limit' => 'nullable|numeric|min:0',
-                'current_debt' => 'nullable|numeric|min:0',
-                'credit_active' => 'boolean',
-                'credit_photo' => 'nullable|string',
+                'credit_days' => 'nullable|integer|min:0',
                 'active' => 'boolean'
             ]);
 
-            $customer->update($validated);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error de validación',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $customer->update($request->all());
 
             return response()->json([
                 'success' => true,
-                'data' => $customer,
-                'message' => 'Cliente actualizado exitosamente'
+                'message' => 'Cliente actualizado exitosamente',
+                'data' => $customer
             ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error de validación',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
+            Log::error('Error updating customer: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al actualizar cliente: ' . $e->getMessage()
+                'message' => 'Error al actualizar cliente',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -182,7 +167,7 @@ class CustomerController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy($id)
     {
         try {
             $customer = Customer::findOrFail($id);
@@ -193,50 +178,52 @@ class CustomerController extends Controller
                 'message' => 'Cliente eliminado exitosamente'
             ]);
         } catch (\Exception $e) {
+            Log::error('Error deleting customer: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar cliente: ' . $e->getMessage()
+                'message' => 'Error al eliminar cliente',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Validar si un documento ya existe en el sistema
-     * 🎯 CreditiTenda: Evita duplicados y autocompleta datos
+     * Check if document exists
      */
-    public function checkDocument(Request $request): JsonResponse
+    public function checkDocument(Request $request)
     {
         try {
-            $validated = $request->validate([
-                'document_type' => 'required|string',
-                'document_number' => 'required|string'
+            $validator = Validator::make($request->all(), [
+                'document' => 'required|string',
+                'exclude_id' => 'nullable|integer'
             ]);
 
-            // Buscar cliente con ese documento en el tenant actual
-            $customer = Customer::where('document_type', $validated['document_type'])
-                ->where('document_number', $validated['document_number'])
-                ->first();
-
-            if ($customer) {
+            if ($validator->fails()) {
                 return response()->json([
-                    'success' => true,
-                    'exists' => true,
-                    'data' => $customer,
-                    'message' => 'Cliente encontrado en el sistema'
-                ]);
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
             }
+
+            $query = Customer::where('document', $request->document);
+
+            if ($request->has('exclude_id')) {
+                $query->where('id', '!=', $request->exclude_id);
+            }
+
+            $exists = $query->exists();
 
             return response()->json([
                 'success' => true,
-                'exists' => false,
-                'message' => 'Cliente no encontrado. Puede crear uno nuevo.'
+                'exists' => $exists
             ]);
         } catch (\Exception $e) {
+            Log::error('Error checking document: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al validar documento: ' . $e->getMessage()
+                'message' => 'Error al verificar documento',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
 }
-

@@ -1,37 +1,36 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
+  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
-      <!-- Header sin icono, limpio -->
-      <div class="flex items-center justify-between pb-4">
+      <!-- Header con Navegación Integrada -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Inventario Inteligente</h1>
           <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Sistema de análisis predictivo y gestión avanzada</p>
         </div>
         
-        <div class="flex items-center space-x-3">
-          <!-- Navegación de Secciones -->
-          <div class="flex items-center space-x-1 bg-gray-50 dark:bg-zinc-800 rounded-xl p-1 border border-gray-200 dark:border-zinc-700">
+        <div class="flex items-center gap-3">
+          <!-- Navegación de Secciones - Estilo Tabs Profesional -->
+          <nav class="flex items-center bg-white/60 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl p-1">
             <button
               v-for="section in sections"
               :key="section.id"
               @click="switchToSection(section.id)"
               :class="[
-                'px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-200 flex items-center space-x-2',
+                'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
                 activeSection === section.id
                   ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-zinc-800/50'
               ]"
             >
-              <i :class="section.icon"></i>
-              <span>{{ section.name }}</span>
+              {{ section.name }}
             </button>
-          </div>
+          </nav>
 
           <!-- Botón Actualizar -->
           <button 
             @click="refreshCurrentSection"
-            class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
+            class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
           >
             <svg class="w-4 h-4" :class="{ 'animate-spin': connectionStatus === 'Cargando...' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -55,50 +54,46 @@
           </div>
         </div>
         
-        <!-- Filtros de Período (Compactos) -->
-        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-xl dark:shadow-black/50 p-3 border border-gray-300 dark:border-zinc-800">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <span class="text-xs font-semibold text-gray-700">Período:</span>
-            <div class="flex items-center gap-2 flex-wrap">
-              <select 
-                v-model="selectedPeriod"
-                @change="handlePeriodChange"
-                class="bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs text-gray-900 dark:text-zinc-200 focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent min-w-[140px]"
+        <!-- Filtros de Período (Compactos) - Sin bordes, integrado -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white/60 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-4 py-3">
+          <span class="text-sm font-medium text-gray-600 dark:text-zinc-400">Período:</span>
+          <div class="flex items-center gap-2 flex-wrap">
+            <select 
+              v-model="selectedPeriod"
+              @change="handlePeriodChange"
+              class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-zinc-200 focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent min-w-[140px]"
+            >
+              <option value="day">Hoy</option>
+              <option value="week">Esta Semana</option>
+              <option value="month" selected>Este Mes</option>
+              <option value="year">Este Año</option>
+              <option value="custom">Personalizado</option>
+            </select>
+            
+            <template v-if="selectedPeriod === 'custom'">
+              <input
+                type="date"
+                v-model="customDateRange.start"
+                @change="loadDashboardData"
+                :max="new Date().toISOString().split('T')[0]"
+                class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-zinc-200 focus:ring-2 focus:ring-slate-500 min-w-[150px]"
               >
-                <option value="day">Hoy</option>
-                <option value="week">Esta Semana</option>
-                <option value="month" selected>Este Mes</option>
-                <option value="year">Este Año</option>
-                <option value="custom">Personalizado</option>
-              </select>
-              
-              <template v-if="selectedPeriod === 'custom'">
-                <div class="relative">
-                  <input
-                    type="date"
-                    v-model="customDateRange.start"
-                    @change="loadDashboardData"
-                    :max="new Date().toISOString().split('T')[0]"
-                    class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-blue-500 min-w-[150px]"
-                  >
-                </div>
-              </template>
-            </div>
+            </template>
           </div>
         </div>
 
-        <!-- Dashboard Principal - KPIs con Glassmorphism -->
+        <!-- Dashboard Principal - KPIs con Glassmorphism SIN BORDES -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- PRODUCTOS ACTIVOS -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 bg-blue-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Productos Activos</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Productos Activos</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ metrics.activeProducts || 0 }}</p>
                 <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">de {{ metrics.totalProducts || 0 }} totales</p>
               </div>
@@ -106,128 +101,128 @@
           </div>
 
           <!-- VALOR INVERTIDO -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 bg-emerald-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Valor Invertido</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Valor Invertido</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ formatCurrency(metrics.totalInventoryValue) }}</p>
-                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">costo × stock</p>
+                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">costo × stock</p>
               </div>
             </div>
           </div>
 
           <!-- VALOR POTENCIAL -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 bg-indigo-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Valor Potencial</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Valor Potencial</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ formatCurrency(metrics.totalSaleValue || 0) }}</p>
-                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">precio × stock</p>
+                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">precio × stock</p>
               </div>
             </div>
           </div>
 
           <!-- GANANCIA ESTIMADA -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:hover:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 bg-purple-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Ganancia Est.</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Ganancia Est.</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ formatCurrency((metrics.totalSaleValue || 0) - (metrics.totalInventoryValue || 0)) }}</p>
-                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">venta - costo</p>
+                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">venta - costo</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Métricas Secundarias Compactas (Una línea) -->
-        <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-6 py-4 border border-gray-300 dark:border-zinc-800">
+        <!-- Métricas Secundarias Compactas (Una línea) - Sin bordes -->
+        <div class="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-6 py-5">
           <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
             <!-- Ventas -->
             <div>
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ventas</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics.monthlySales || 0) }}</p>
-              <p class="text-xs text-gray-600 dark:text-zinc-400">{{ monthlyTransactions || 0 }} transacciones</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ventas</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics.monthlySales || 0) }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500">{{ monthlyTransactions || 0 }} transacciones</p>
             </div>
 
             <!-- Alertas Stock -->
             <div>
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Alertas Stock</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Alertas Stock</p>
               <div class="flex items-baseline gap-1">
-                <span class="text-lg font-bold text-gray-900 dark:text-white">{{ metrics.lowStockProducts || 0 }}</span>
-                <span class="text-xs text-gray-600 dark:text-zinc-400">/</span>
-                <span class="text-lg font-bold text-gray-900 dark:text-white">{{ metrics.outOfStockProducts || 0 }}</span>
+                <span class="text-xl font-bold text-amber-600 dark:text-amber-400">{{ metrics.lowStockProducts || 0 }}</span>
+                <span class="text-xs text-gray-400 dark:text-zinc-500">/</span>
+                <span class="text-xl font-bold text-rose-600 dark:text-rose-400">{{ metrics.outOfStockProducts || 0 }}</span>
               </div>
-              <p class="text-xs text-gray-600 dark:text-zinc-400">bajo / sin stock</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500">bajo / sin stock</p>
             </div>
 
             <!-- Ganancias -->
             <div>
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ganancias</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics.monthlySales || 0) }}</p>
-              <p class="text-xs text-gray-600 dark:text-zinc-400">{{ getPeriodLabel() }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ganancias</p>
+              <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">{{ formatCurrency(metrics.monthlySales || 0) }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500">{{ getPeriodLabel() }}</p>
             </div>
 
             <!-- Gastos -->
             <div>
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Gastos</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics.totalExpenses || 0) }}</p>
-              <p class="text-xs text-gray-600 dark:text-zinc-400">{{ getPeriodLabel() }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Gastos</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics.totalExpenses || 0) }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500">{{ getPeriodLabel() }}</p>
             </div>
 
             <!-- Ganancia Neta -->
             <div>
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ganancia Neta</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics.netProfit || 0) }}</p>
-              <p class="text-xs text-gray-600 dark:text-zinc-400">ventas - gastos</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ganancia Neta</p>
+              <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">{{ formatCurrency(metrics.netProfit || 0) }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500">ventas - gastos</p>
             </div>
           </div>
         </div>
 
-        <!-- Sección de Productos y Movimientos con Glassmorphism -->
+        <!-- Sección de Productos y Movimientos - Cards sin bordes pesados -->
         <div v-if="overviewData" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           <!-- Top Productos -->
-          <div v-if="overviewData.data.topSellingProducts?.length > 0" class="bg-white dark:bg-zinc-900 rounded-xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-            <div class="bg-gray-50 dark:bg-transparent border-b border-gray-200 dark:border-zinc-800/50 px-5 py-3">
+          <div v-if="overviewData.data.topSellingProducts?.length > 0" class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+            <div class="px-5 py-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-slate-50 dark:bg-slate-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                   </svg>
                 </div>
                 <div>
                   <h3 class="text-base font-bold text-gray-900 dark:text-white">Top Productos</h3>
-                  <p class="text-xs text-gray-500 dark:text-zinc-400">Más vendidos del período</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-500">Más vendidos del período</p>
                 </div>
               </div>
             </div>
-            <div class="p-5">
+            <div class="px-5 pb-5 space-y-2">
               <div v-for="(product, index) in overviewData.data.topSellingProducts.slice(0, 5)" 
                    :key="product.id" 
-                   class="flex items-center gap-3 p-3 bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-all duration-200 border-b border-gray-100 dark:border-zinc-800/50 last:border-b-0">
+                   class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-zinc-800/30 hover:bg-gray-100/50 dark:hover:bg-zinc-800/50 rounded-xl transition-all duration-200">
                 <!-- Ranking Badge -->
-                <div class="w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold text-sm flex-shrink-0">
+                <div class="w-8 h-8 bg-white dark:bg-zinc-800 rounded-lg flex items-center justify-center text-gray-700 dark:text-zinc-300 font-bold text-sm flex-shrink-0 shadow-sm">
                   {{ index + 1 }}
                 </div>
                 
                 <!-- Imagen del producto -->
-                <div class="w-12 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-zinc-700">
+                <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
                   <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover" />
-                  <svg v-else class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-else class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                   </svg>
                 </div>
@@ -235,69 +230,67 @@
                 <!-- Info del producto -->
                 <div class="flex-1 min-w-0">
                   <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ product.name }}</p>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">
-                    <span class="font-medium">{{ product.total_quantity_sold }}</span> unidades vendidas
+                  <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
+                    {{ product.total_quantity_sold }} unidades vendidas
                   </p>
                 </div>
                 
                 <!-- Revenue -->
                 <div class="text-right flex-shrink-0">
                   <p class="font-bold text-emerald-600 dark:text-emerald-400 text-sm">{{ formatCurrency(product.total_revenue) }}</p>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">ingresos</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-500">ingresos</p>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Stock Bajo -->
-          <div v-if="overviewData.data.lowStockProductsList?.length > 0" class="bg-white dark:bg-zinc-900 rounded-xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-              <div class="bg-gray-50 dark:bg-transparent border-b border-gray-200 dark:border-zinc-800/50 px-5 py-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white">Stock Bajo</h3>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400">Productos que necesitan reposición</p>
-                  </div>
+          <div v-if="overviewData.data.lowStockProductsList?.length > 0" class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+            <div class="px-5 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-rose-50 dark:bg-rose-950/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                  </svg>
                 </div>
-              </div>
-              <div class="p-5">
                 <div>
-                  <div v-for="product in overviewData.data.lowStockProductsList.slice(0, 5)" 
-                       :key="product.id" 
-                       class="flex items-center gap-3 p-3 bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-all duration-200 border-b border-gray-100 dark:border-zinc-800/50 last:border-b-0">
-                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900 flex items-center justify-center flex-shrink-0 border" :class="product.current_stock === 0 ? 'border-rose-200 dark:border-rose-900/30' : 'border-slate-200 dark:border-slate-700'">
-                      <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover" />
-                      <svg v-else class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                      </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ product.name }}</p>
-                      <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ product.category?.name || 'Sin categoría' }}</p>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                      <div class="flex items-center gap-1.5">
-                        <div class="w-1.5 h-1.5 rounded-full animate-pulse" :class="product.current_stock === 0 ? 'bg-rose-400 dark:bg-rose-500' : 'bg-slate-400 dark:bg-slate-500'"></div>
-                        <p class="font-bold text-sm" :class="product.current_stock === 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-slate-400'">
-                          {{ product.current_stock }}<span class="text-gray-400 dark:text-zinc-500">/</span>{{ product.min_stock }}
-                        </p>
-                      </div>
-                      <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ product.current_stock === 0 ? 'Agotado' : 'Reponer' }}</p>
-                    </div>
-                  </div>
+                  <h3 class="text-base font-bold text-gray-900 dark:text-white">Stock Bajo</h3>
+                  <p class="text-xs text-gray-500 dark:text-zinc-500">Productos que necesitan reposición</p>
                 </div>
               </div>
+            </div>
+            <div class="px-5 pb-5 space-y-2">
+              <div v-for="product in overviewData.data.lowStockProductsList.slice(0, 5)" 
+                   :key="product.id" 
+                   class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-zinc-800/30 hover:bg-gray-100/50 dark:hover:bg-zinc-800/50 rounded-xl transition-all duration-200">
+                <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                  <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover" />
+                  <svg v-else class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ product.name }}</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">{{ product.category?.name || 'Sin categoría' }}</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <div class="flex items-center gap-1.5">
+                    <div class="w-1.5 h-1.5 rounded-full animate-pulse" :class="product.current_stock === 0 ? 'bg-rose-500' : 'bg-amber-500'"></div>
+                    <p class="font-bold text-sm" :class="product.current_stock === 0 ? 'text-rose-600 dark:text-rose-400' : 'text-amber-600 dark:text-amber-400'">
+                      {{ product.current_stock }}<span class="text-gray-400 dark:text-zinc-600">/</span>{{ product.min_stock }}
+                    </p>
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-zinc-500">{{ product.current_stock === 0 ? 'Agotado' : 'Reponer' }}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Movimientos Recientes -->
-          <div v-if="overviewData.data.recentMovements?.length > 0" class="bg-white dark:bg-zinc-900 rounded-xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-              <div class="bg-gray-50 dark:bg-transparent border-b border-gray-200 dark:border-zinc-800/50 px-5 py-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div v-if="overviewData.data.recentMovements?.length > 0" class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+              <div class="px-5 py-4">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
                     </svg>
@@ -307,17 +300,15 @@
                     <p class="text-xs text-gray-500 dark:text-zinc-400">Actividad reciente</p>
                   </div>
                 </div>
-              </div>
-              <div class="p-5">
-                <div>
+                <div class="space-y-2">
                   <div v-for="movement in overviewData.data.recentMovements.slice(0, 5)" 
                        :key="movement.id" 
-                       class="flex items-center gap-3 p-3 bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-all duration-200 border-b border-gray-200 dark:border-zinc-800 last:border-b-0">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="movement.quantity > 0 ? 'bg-slate-100 dark:bg-slate-800' : 'bg-slate-100 dark:bg-slate-800'">
-                      <svg v-if="movement.quantity > 0" class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-zinc-800/30 hover:bg-gray-100/50 dark:hover:bg-zinc-800/50 transition-all duration-200 rounded-xl">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="movement.quantity > 0 ? 'bg-emerald-100 dark:bg-emerald-950/50' : 'bg-rose-100 dark:bg-rose-950/50'">
+                      <svg v-if="movement.quantity > 0" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
-                      <svg v-else class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg v-else class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                       </svg>
                     </div>
@@ -326,7 +317,7 @@
                       <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ formatMovementType(movement.type) }}</p>
                     </div>
                     <div class="text-right flex-shrink-0">
-                      <p class="font-bold text-sm" :class="movement.quantity > 0 ? 'text-slate-600 dark:text-slate-300' : 'text-slate-600 dark:text-slate-300'">
+                      <p class="font-bold text-sm" :class="movement.quantity > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
                         {{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}
                       </p>
                       <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">unidades</p>
@@ -342,7 +333,7 @@
       <div v-if="activeSection === 'products'" class="space-y-4">
         
         <!-- Filtros Compactos -->
-        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-xl dark:shadow-black/50 p-4 border border-gray-300 dark:border-zinc-800">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-4">
           <div class="flex flex-wrap items-center gap-3">
             <!-- Búsqueda -->
             <div class="flex-1 min-w-48 relative">
@@ -424,9 +415,9 @@
         <!-- KPIs de Productos con Glassmorphism -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- TOTAL PRODUCTOS -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
-              <div class="bg-indigo-50 dark:bg-zinc-800/50 border border-indigo-100 dark:border-white/5 rounded-xl p-3">
+              <div class="bg-indigo-50 dark:bg-indigo-950/50 rounded-xl p-3">
                 <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
@@ -444,9 +435,9 @@
           </div>
 
           <!-- ACTIVOS -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
-              <div class="bg-emerald-50 dark:bg-zinc-800/50 border border-emerald-100 dark:border-white/5 rounded-xl p-3">
+              <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-xl p-3">
                 <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
@@ -454,7 +445,7 @@
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between mb-2">
                   <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">ACTIVOS</h3>
-                  <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 border border-emerald-100 dark:border-emerald-800 px-2 py-1 rounded-full">
+                  <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-1 rounded-full">
                     disponibles
                   </span>
                 </div>
@@ -464,9 +455,9 @@
           </div>
 
           <!-- SIN STOCK -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
-              <div class="bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-xl p-3">
+              <div class="bg-gray-100 dark:bg-zinc-800/50 rounded-xl p-3">
                 <svg class="w-6 h-6 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                 </svg>
@@ -484,9 +475,9 @@
           </div>
 
           <!-- VALOR TOTAL -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
-              <div class="bg-purple-50 dark:bg-zinc-800/50 border border-purple-100 dark:border-white/5 rounded-xl p-3">
+              <div class="bg-purple-50 dark:bg-purple-950/50 rounded-xl p-3">
                 <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
@@ -506,8 +497,8 @@
         </div>
 
         <!-- Tabla de Productos -->
-        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-white dark:bg-zinc-900 rounded-xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800/50 bg-gray-50 dark:bg-transparent">
+        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-4 bg-transparent">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="text-base font-bold text-gray-900 dark:text-white">Lista de Productos</h3>
@@ -517,8 +508,8 @@
           </div>
           
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-              <thead class="bg-gray-50/50 dark:bg-transparent border-b border-gray-200 dark:border-zinc-800">
+            <table class="min-w-full">
+              <thead class="bg-gray-50/80 dark:bg-zinc-800/50">
                 <tr>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Producto</th>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Categoría</th>
@@ -528,15 +519,15 @@
                   <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Rentabilidad</th>
                 </tr>
               </thead>
-              <tbody class="bg-transparent divide-y divide-gray-200 dark:divide-zinc-800/50">
+              <tbody class="bg-transparent">
                 <tr v-for="product in productsData.products" :key="product.id"
-                    class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors border-b border-gray-200 dark:border-zinc-800/50 last:border-b-0">
+                    class="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors border-b border-gray-100 dark:border-zinc-800/30 last:border-b-0">
                   <td class="px-4 py-3">
                     <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ product.name }}</div>
                     <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">SKU: {{ product.sku || 'N/A' }}</div>
                   </td>
                   <td class="px-4 py-3">
-                    <span class="inline-flex items-center bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 rounded-md px-2.5 py-0.5 text-xs font-medium">
+                    <span class="inline-flex items-center bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 rounded-md px-2.5 py-0.5 text-xs font-medium">
                       {{ product.category_name || product.category || 'Sin categoría' }}
                     </span>
                   </td>
@@ -613,31 +604,31 @@
         </div>
         
         <!-- Estado Vacío -->
-        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-12">
+        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
           <div class="text-center">
-            <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-zinc-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
             </svg>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">No hay productos</h3>
-            <p class="text-sm text-gray-500">No se encontraron productos con los filtros seleccionados.</p>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No hay productos</h3>
+            <p class="text-sm text-gray-500 dark:text-zinc-400">No se encontraron productos con los filtros seleccionados.</p>
           </div>
         </div>
         
         <!-- Cargando -->
-        <div v-else class="bg-white rounded-2xl shadow-sm border border-gray-200 p-12">
+        <div v-else class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
           <div class="text-center">
-            <svg class="w-16 h-16 mx-auto text-blue-500 animate-spin mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-16 h-16 mx-auto text-blue-500 dark:text-blue-400 animate-spin mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">Cargando productos...</h3>
-            <p class="text-sm text-gray-500">Por favor espera un momento.</p>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Cargando productos...</h3>
+            <p class="text-sm text-gray-500 dark:text-zinc-400">Por favor espera un momento.</p>
           </div>
         </div>
       </div>
 
       <div v-if="activeSection === 'movements'" class="space-y-6 animate-fade-in">
         <!-- Header y Filtros -->
-        <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-5 border border-gray-300 dark:border-zinc-800 shadow-sm dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Movimientos de Inventario</h2>
@@ -697,9 +688,9 @@
         <!-- Tarjetas de Resumen - Diseño Limpio -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <!-- Total Movimientos -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="bg-indigo-50 dark:bg-zinc-800/50 border border-indigo-100 dark:border-white/5 rounded-xl p-3">
+                <div class="bg-indigo-50 dark:bg-indigo-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                     </svg>
@@ -712,9 +703,9 @@
           </div>
 
           <!-- Entradas -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="bg-emerald-50 dark:bg-zinc-800/50 border border-emerald-100 dark:border-white/5 rounded-xl p-3">
+                <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                     </svg>
@@ -727,9 +718,9 @@
           </div>
 
           <!-- Salidas -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="bg-rose-50 dark:bg-zinc-800/50 border border-rose-100 dark:border-white/5 rounded-xl p-3">
+                <div class="bg-rose-50 dark:bg-rose-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
                     </svg>
@@ -742,9 +733,9 @@
           </div>
 
           <!-- Valor Entradas -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="bg-teal-50 dark:bg-zinc-800/50 border border-teal-100 dark:border-white/5 rounded-xl p-3">
+                <div class="bg-teal-50 dark:bg-teal-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -757,9 +748,9 @@
           </div>
 
           <!-- Valor Salidas -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="bg-orange-50 dark:bg-zinc-800/50 border border-orange-100 dark:border-white/5 rounded-xl p-3">
+                <div class="bg-orange-50 dark:bg-orange-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -772,9 +763,9 @@
           </div>
 
           <!-- Movimiento Neto -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="bg-purple-50 dark:bg-zinc-800/50 border border-purple-100 dark:border-white/5 rounded-xl p-3">
+                <div class="bg-purple-50 dark:bg-purple-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                     </svg>
@@ -790,21 +781,21 @@
         </div>
 
         <!-- Tabla de Movimientos -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800/50 bg-gray-50 dark:bg-transparent flex items-center justify-between">
+        <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-4 bg-transparent flex items-center justify-between">
             <div>
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Historial de Movimientos</h3>
                 <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Registro cronológico de operaciones</p>
             </div>
             <div class="flex items-center space-x-2">
-                <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-semibold rounded-xl border border-indigo-200 dark:border-indigo-500/20">
+                <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-semibold rounded-xl">
                     {{ movementsData?.movements?.length || 0 }} registros
                 </span>
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-              <thead class="bg-gray-50 dark:bg-transparent border-b border-gray-200 dark:border-zinc-800">
+            <table class="min-w-full">
+              <thead class="bg-gray-50/80 dark:bg-zinc-800/50">
                 <tr>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Fecha</th>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Flujo</th>
@@ -816,10 +807,10 @@
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Fuente</th>
                 </tr>
               </thead>
-              <tbody class="bg-transparent divide-y divide-gray-200 dark:divide-zinc-800/50">
+              <tbody class="bg-transparent">
                 <!-- Movimientos con iconografía de flujo -->
                 <tr v-for="movement in movementsData?.movements || []" :key="movement.movement_id" 
-                    class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors duration-150 border-b border-gray-200 dark:border-zinc-800/50 last:border-b-0"
+                    class="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors duration-150 border-b border-gray-100 dark:border-zinc-800/30 last:border-b-0"
                     :class="movement.movement_type === 'entry' ? 'border-l-4 border-l-emerald-500 dark:border-l-emerald-400' : 'border-l-4 border-l-rose-500 dark:border-l-rose-400'">
                   
                   <!-- Fecha -->
@@ -1005,7 +996,7 @@
       <!-- Vista por Cliente -->
       <div v-if="activeSection === 'customers'" class="space-y-6 animate-fade-in">
         <!-- Header y Filtros -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Análisis por Cliente</h2>
@@ -1065,9 +1056,9 @@
         <!-- Tarjetas de Resumen -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4" v-if="customersData">
           <!-- Total Clientes -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
@@ -1080,9 +1071,9 @@
           </div>
 
           <!-- Ingresos Totales -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -1095,9 +1086,9 @@
           </div>
 
           <!-- Ganancia Total -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-teal-50 dark:bg-teal-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 bg-teal-50 dark:bg-teal-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                     </svg>
@@ -1110,9 +1101,9 @@
           </div>
 
           <!-- Valor Promedio -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                     </svg>
@@ -1125,9 +1116,9 @@
           </div>
 
           <!-- Descuento Prom. -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-orange-50 dark:bg-zinc-800/50 border border-orange-100 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 bg-orange-50 dark:bg-orange-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-percentage text-orange-600 dark:text-orange-400"></i>
                 </div>
                 <div class="flex-1 min-w-0">
@@ -1138,9 +1129,9 @@
           </div>
 
           <!-- Cliente Top -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                     </svg>
@@ -1157,14 +1148,14 @@
         </div>
 
         <!-- Tabla de Clientes -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-transparent flex items-center justify-between">
+        <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-4 bg-transparent flex items-center justify-between">
             <div>
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Análisis de Clientes</h3>
                 <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Ranking y comportamiento de compra</p>
             </div>
             <div class="flex items-center space-x-2">
-                <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-semibold rounded-xl border border-indigo-100 dark:border-indigo-500/20">
+                <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-semibold rounded-xl">
                     {{ customersData?.customers?.length || 0 }} clientes
                 </span>
             </div>
@@ -1186,11 +1177,11 @@
                 </tr>
               </thead>
               <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800" v-if="customersData && customersData.customers">
-                <tr v-for="customer in customersData.customers" :key="customer.customer_id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 border-b border-gray-200 dark:border-zinc-800 transition-colors">
+                <tr v-for="customer in customersData.customers" :key="customer.customer_id" class="hover:bg-gray-50/80 dark:hover:bg-zinc-800/30 border-b border-gray-100 dark:border-zinc-800/50 transition-colors">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <!-- AVATAR CON INICIALES (Visual Polish - Clientes) -->
-                      <div class="w-9 h-9 rounded-full flex items-center justify-center shadow-sm border border-gray-200 dark:border-zinc-700 bg-slate-100 dark:bg-slate-800">
+                      <div class="w-9 h-9 rounded-full flex items-center justify-center shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800">
                         <span class="text-xs font-bold text-slate-600 dark:text-slate-300">
                           {{ getInitials(customer.customer_name) }}
                         </span>
@@ -1344,9 +1335,9 @@
         <!-- Tarjetas de Resumen -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Total Proveedores -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-5 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-slate-50 dark:bg-zinc-800/50 border border-slate-100 dark:border-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 bg-slate-50 dark:bg-slate-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -1362,9 +1353,9 @@
           </div>
 
           <!-- Cuentas por Pagar -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-5 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-rose-50 dark:bg-zinc-800/50 border border-rose-100 dark:border-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
@@ -1380,9 +1371,9 @@
           </div>
 
           <!-- Mejor Proveedor -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-5 border border-gray-300 dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-amber-50 dark:bg-zinc-800/50 border border-amber-100 dark:border-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 bg-amber-50 dark:bg-amber-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
@@ -1401,8 +1392,8 @@
         </div>
 
         <!-- Tabla de Proveedores -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-          <div class="bg-gray-50 dark:bg-transparent border-b border-gray-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between">
+        <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="bg-transparent px-4 py-3 flex items-center justify-between">
             <div>
               <h2 class="text-base font-bold text-gray-900 dark:text-white">Lista de Proveedores</h2>
               <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ suppliersData?.suppliers?.length || 0 }} proveedores registrados</p>
@@ -1419,7 +1410,7 @@
           </div>
 
           <div v-else-if="suppliersData?.suppliers?.length === 0" class="text-center py-12">
-            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg class="w-8 h-8 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
@@ -1555,7 +1546,7 @@
       <div v-if="activeSection === 'alerts'" class="space-y-6 animate-fade-in">
         
         <!-- Header con Filtros -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-300 dark:border-zinc-800 shadow-sm dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h2 class="text-lg font-bold text-gray-900 dark:text-white">Centro de Alertas</h2>
@@ -1588,9 +1579,9 @@
         <!-- 4 Tarjetas de Resumen Horizontales -->
         <div v-if="alertsData" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Críticas (Rojo - Alerta) -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-11 h-11 bg-rose-50 dark:bg-rose-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
@@ -1603,9 +1594,9 @@
           </div>
 
           <!-- Advertencias -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
@@ -1618,9 +1609,9 @@
           </div>
 
           <!-- Información -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-sky-50 dark:bg-sky-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-11 h-11 bg-sky-50 dark:bg-sky-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -1633,9 +1624,9 @@
           </div>
 
           <!-- Total -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200 hover:shadow-lg dark:shadow-black/50">
+          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-slate-50 dark:bg-slate-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div class="w-11 h-11 bg-slate-50 dark:bg-slate-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                     </svg>
@@ -1649,8 +1640,8 @@
         </div>
 
         <!-- Alertas del Sistema - DISEÑO TECHNICAL LIST -->
-        <div v-if="alertsData && alertsData.alerts?.length > 0" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-          <div class="px-6 py-3.5 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
+        <div v-if="alertsData && alertsData.alerts?.length > 0" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-3.5 flex items-center justify-between">
             <div>
               <h3 class="text-base font-bold text-gray-900 dark:text-white">Centro de Alertas</h3>
               <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ alertsData.alerts.length }} notificaciones agrupadas</p>
@@ -1666,12 +1657,12 @@
           </div>
           
           <!-- Lista de Alertas Agrupadas - Technical List -->
-          <div class="divide-y divide-gray-100 dark:divide-zinc-800">
+          <div class="divide-y divide-gray-100 dark:divide-zinc-800/30">
             <div v-for="group in groupedAlerts" :key="group.category + group.severity" 
                  class="transition-colors duration-150">
               
               <!-- Header del Grupo (Acordeón Limpio) -->
-              <div class="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors duration-150">
+              <div class="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors duration-150">
                 <div 
                   @click="toggleAlertGroup(group.category, group.severity)"
                   class="flex items-center space-x-3 flex-1 cursor-pointer"
@@ -1814,7 +1805,7 @@
 
         <!-- Sin alertas -->
         <div v-else-if="alertsData && alertsData.alerts?.length === 0" 
-             class="bg-white dark:bg-zinc-900 rounded-lg shadow-sm dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 p-12 text-center">
+             class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-lg shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12 text-center">
           <div class="w-16 h-16 bg-green-100 dark:bg-green-950 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -1829,7 +1820,7 @@
       <div v-if="activeSection === 'predictions'" class="space-y-4">
         
         <!-- Filtros Ejecutivos de Predicciones -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/50 p-4 border border-gray-300 dark:border-zinc-800">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-4">
           <div class="flex flex-wrap items-center gap-3 justify-between">
             <div class="flex items-center gap-3">
               <div class="flex items-center gap-2">
@@ -1881,8 +1872,8 @@
         </div>
 
         <!-- Análisis de Tendencias - Ejecutivo Minimalista -->
-        <div v-if="predictionsData" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-gradient-to-r from-slate-50 to-blue-50/30 dark:from-zinc-800/50 dark:to-blue-950/30">
+        <div v-if="predictionsData" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-4 bg-gradient-to-r from-slate-50/80 to-blue-50/30 dark:from-zinc-800/50 dark:to-blue-950/30">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 rounded-xl flex items-center justify-center shadow-sm">
@@ -2040,8 +2031,8 @@
 
         <!-- Predicción de Agotamiento de Stock con IA - DISEÑO ENTERPRISE CLEAN -->
         <div v-if="predictionsData && predictionsData.stock_depletion?.length > 0" 
-             class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-transparent">
+             class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-4 bg-transparent">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 dark:from-slate-500 dark:to-slate-600 rounded-xl flex items-center justify-center shadow-sm">
@@ -2326,8 +2317,8 @@
 
         <!-- Pronóstico de Ventas con Machine Learning - Ejecutivo -->
         <div v-if="predictionsData && predictionsData.sales_forecast?.length > 0" 
-             class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 bg-gradient-to-r from-emerald-50 to-green-50/50 dark:from-emerald-950/30 dark:to-green-950/30">
+             class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-4 bg-gradient-to-r from-emerald-50/80 to-green-50/50 dark:from-emerald-950/30 dark:to-green-950/30">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
                 <div class="p-2.5 bg-white/60 dark:bg-emerald-900/50 backdrop-blur-sm rounded-xl shadow-sm">
@@ -2340,13 +2331,13 @@
                   <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Proyección para los próximos {{ predictionsFilters.forecastDays }} días</p>
                 </div>
               </div>
-              <span class="px-2.5 py-1 bg-emerald-100/70 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-xs font-semibold rounded-xl border border-emerald-200 dark:border-emerald-900">
+              <span class="px-2.5 py-1 bg-emerald-100/70 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-xs font-semibold rounded-xl">
                 {{ predictionsFilters.forecastDays }} días
               </span>
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
+            <table class="min-w-full divide-y divide-gray-200/50 dark:divide-zinc-800/50">
               <thead class="bg-gray-50/50 dark:bg-transparent">
                 <tr>
                   <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Producto</th>

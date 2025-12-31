@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
-    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
+  <div class="font-sans transition-colors duration-300">
+    <div class="space-y-6 pb-8 animate-fade-in">
       
       <!-- Header profesional sin brillo excesivo -->
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4">
@@ -79,88 +79,88 @@
     <div v-else class="space-y-6">
       
       <!-- 📊 KPIs PRINCIPALES CON GLASSMORPHISM -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         
         <!-- Total Sales -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/50 dark:to-emerald-900/30 transition-transform group-hover:scale-105">
+              <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-0.5">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Ventas Totales</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800">
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Ventas Totales</p>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400">
                   +15%
                 </span>
               </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ (totalSales || 0).toLocaleString() }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">vs período anterior</p>
+              <p class="text-2xl font-black text-gray-900 dark:text-white">${{ (totalSales || 0).toLocaleString() }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">vs período anterior</p>
             </div>
           </div>
         </div>
 
         <!-- Total Transactions -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 transition-transform group-hover:scale-105">
+              <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m3 0h2a2 2 0 002-2V7a2 2 0 00-2-2h-2m-3 0V3m0 0l3 3m-3-3l-3 3"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-0.5">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Transacciones</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Transacciones</p>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-400">
                   +8%
                 </span>
               </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ (totalTransactions || 0).toLocaleString() }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">vs período anterior</p>
+              <p class="text-2xl font-black text-gray-900 dark:text-white">{{ (totalTransactions || 0).toLocaleString() }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">vs período anterior</p>
             </div>
           </div>
         </div>
 
         <!-- Average Ticket -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/50 dark:to-amber-900/30 transition-transform group-hover:scale-105">
+              <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-0.5">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Ticket Promedio</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800">
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Ticket Promedio</p>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400">
                   +5%
                 </span>
               </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ (averageTicket || 0).toLocaleString() }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">vs período anterior</p>
+              <p class="text-2xl font-black text-gray-900 dark:text-white">${{ (averageTicket || 0).toLocaleString() }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">vs período anterior</p>
             </div>
           </div>
         </div>
 
         <!-- Gross Margin -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30 transition-transform group-hover:scale-105">
+              <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-0.5">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Margen Bruto</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800">
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Margen Bruto</p>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-400">
                   +2.1%
                 </span>
               </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ grossMargin }}%</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">vs período anterior</p>
+              <p class="text-2xl font-black text-gray-900 dark:text-white">{{ grossMargin }}%</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">vs período anterior</p>
             </div>
           </div>
         </div>
@@ -170,13 +170,13 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <!-- Sales Trend Chart -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden">
-          <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-5 py-4 flex items-center justify-between">
+        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
             <div>
-              <h2 class="text-base font-bold text-gray-900 dark:text-white">Tendencia de Ventas</h2>
-              <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Rendimiento para {{ getPeriodLabel() }}</p>
+              <h2 class="text-lg font-bold text-gray-900 dark:text-white">Tendencia de Ventas</h2>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Rendimiento para {{ getPeriodLabel() }}</p>
             </div>
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
               </svg>
@@ -186,13 +186,13 @@
             <div class="relative" style="height: 320px;">
               <Line :data="lineChartData" :options="lineChartOptions" />
             </div>
-            <div class="mt-6 grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-zinc-800">
-              <div class="text-center p-3 bg-emerald-50 dark:bg-emerald-950 rounded-xl border border-emerald-100 dark:border-emerald-800">
-                <p class="text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wide mb-1">Crecimiento</p>
+            <div class="mt-6 grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-zinc-800/50">
+              <div class="text-center p-3.5 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/50 dark:to-emerald-900/20 rounded-xl">
+                <p class="text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">Crecimiento</p>
                 <p class="text-xl font-black text-emerald-700 dark:text-emerald-400">+{{ dailySales && dailySales.length > 0 ? Math.round((dailySales.reduce((a, b) => a + b, 0) / dailySales.length) * 0.0015) : 15 }}%</p>
               </div>
-              <div class="text-center p-3 bg-blue-50 dark:bg-blue-950 rounded-xl border border-blue-100 dark:border-blue-800">
-                <p class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wide mb-1">Pico Máximo</p>
+              <div class="text-center p-3.5 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/50 dark:to-blue-900/20 rounded-xl">
+                <p class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-1">Pico Máximo</p>
                 <p class="text-xl font-black text-blue-700 dark:text-blue-400">${{ dailySales && dailySales.length > 0 ? Math.max(...dailySales).toLocaleString() : '2,800' }}</p>
               </div>
             </div>
@@ -200,19 +200,19 @@
         </div>
 
         <!-- Top Products Chart -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden transition-colors duration-300">
-          <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-5 py-4 flex items-center justify-between transition-colors duration-300">
+        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden transition-all duration-300">
+          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
             <div>
-              <h2 class="text-base font-bold text-gray-900 dark:text-white transition-colors duration-300">Top Productos</h2>
-              <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5 transition-colors duration-300">Productos más vendidos por ingresos</p>
+              <h2 class="text-lg font-bold text-gray-900 dark:text-white">Top Productos</h2>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Productos más vendidos por ingresos</p>
             </div>
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 transition-colors duration-300">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/50 dark:to-emerald-900/30">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
             </div>
           </div>
-          <div class="p-6 transition-colors duration-300">
+          <div class="p-6">
             <div style="height: 320px;">
               <Bar :data="barChartData" :options="barChartOptions" />
             </div>
@@ -220,13 +220,13 @@
         </div>
 
         <!-- Category Sales Chart -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden">
-          <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-5 py-4 flex items-center justify-between">
+        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
             <div>
-              <h2 class="text-base font-bold text-gray-900 dark:text-white">Ventas por Categoría</h2>
-              <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Distribución de ventas por categorías</p>
+              <h2 class="text-lg font-bold text-gray-900 dark:text-white">Ventas por Categoría</h2>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Distribución de ventas por categorías</p>
             </div>
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30">
               <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
               </svg>
@@ -240,21 +240,33 @@
         </div>
 
         <!-- Critical Stock Chart -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden">
-          <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-5 py-4 flex items-center justify-between">
+        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
             <div>
-              <h2 class="text-base font-bold text-gray-900 dark:text-white">Stock Crítico</h2>
-              <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Productos con inventario bajo</p>
+              <h2 class="text-lg font-bold text-gray-900 dark:text-white">Stock Crítico</h2>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Productos con inventario bajo</p>
             </div>
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-950/50 dark:to-rose-900/30">
               <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
               </svg>
             </div>
           </div>
           <div class="p-6">
-            <div style="height: 280px;" class="flex justify-center items-center">
-              <PolarArea :data="polarChartData" :options="polarChartOptions" style="max-height: 240px; max-width: 240px;"/>
+            <div style="height: 320px;" class="flex justify-center items-center">
+              <PolarArea 
+                v-if="lowStockProducts && lowStockProducts.length > 0"
+                :data="polarChartData" 
+                :options="polarChartOptions" 
+                class="w-full h-full"
+              />
+              <div v-else class="text-center text-gray-500 dark:text-zinc-400">
+                <svg class="w-16 h-16 mx-auto mb-3 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="font-medium">Sin productos críticos</p>
+                <p class="text-sm">Todo el inventario está en niveles óptimos</p>
+              </div>
             </div>
           </div>
         </div>
@@ -407,11 +419,12 @@ const loadReportsData = async () => {
     
     if (lowStockData.success) {
       // Convertir para el gráfico polar con colores
-      const colors = ['#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#8b5cf6', '#f97316', '#06b6d4', '#84cc16', '#ec4899', '#6366f1']
+      const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#f97316', '#06b6d4', '#84cc16', '#ec4899', '#6366f1']
       lowStockProducts.value = lowStockData.data.map((product, index) => ({
         ...product,
         color: colors[index % colors.length]
       }))
+      console.log('📦 Low Stock Products cargados:', lowStockProducts.value.length, 'productos:', lowStockProducts.value.map(p => p.name))
     }
     
     if (customerData.success) {
@@ -503,11 +516,12 @@ const loadHourlyReportsData = async () => {
     }
     
     if (lowStockData.success) {
-      const colors = ['#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#8b5cf6']
+      const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#f97316', '#06b6d4', '#84cc16', '#ec4899', '#6366f1']
       lowStockProducts.value = lowStockData.data.map((product, index) => ({
         ...product,
         color: colors[index % colors.length]
       }))
+      console.log('📦 [Hourly] Low Stock Products cargados:', lowStockProducts.value.length, 'productos:', lowStockProducts.value.map(p => p.name))
     }
     
     if (customerData.success) {
@@ -1055,29 +1069,76 @@ const radarChartOptions = {
 };
 
 // 6. GRÁFICO POLAR (Stock Bajo)
-const polarChartData = computed(() => ({
-    labels: lowStockProducts.value.map(p => p.name),
-    datasets: [
-        {
-            data: lowStockProducts.value.map(p => p.units),
-            backgroundColor: lowStockProducts.value.map(p => p.color),
+const polarChartData = computed(() => {
+    // Si no hay datos, mostrar placeholder
+    if (!lowStockProducts.value || lowStockProducts.value.length === 0) {
+        return {
+            labels: ['Sin productos críticos'],
+            datasets: [{
+                data: [1],
+                backgroundColor: ['#d1d5db'],
+                borderColor: '#fff',
+                borderWidth: 2,
+            }]
+        }
+    }
+    
+    // Colores para cada producto
+    const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6', '#f97316', '#06b6d4', '#84cc16', '#ec4899', '#6366f1']
+    
+    // Mostrar TODOS los productos con stock bajo
+    // Para el gráfico polar, usamos el stock actual (units) pero mínimo 1 para que sea visible
+    const chartData = lowStockProducts.value.map((p, index) => ({
+        name: p.name || 'Producto sin nombre',
+        value: Math.max(p.units || p.quantity || 0, 1), // Mínimo 1 para visualización
+        actualValue: p.units || p.quantity || 0, // Valor real para tooltip
+        color: p.color || colors[index % colors.length]
+    }))
+    
+    return {
+        labels: chartData.map(p => p.name),
+        datasets: [{
+            data: chartData.map(p => p.value),
+            backgroundColor: chartData.map(p => p.color),
             borderColor: '#fff',
             borderWidth: 2,
-        }
-    ]
-}));
+        }]
+    }
+});
 
 const polarChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-        legend: { display: true, position: 'right' }, // La leyenda es necesaria aquí
-        tooltip: getProChartOptions().plugins.tooltip,
+        legend: { 
+            display: true, 
+            position: 'right',
+            labels: {
+                padding: 15,
+                usePointStyle: true,
+                pointStyle: 'circle',
+                font: {
+                    size: 12,
+                    weight: '500'
+                }
+            }
+        },
+        tooltip: {
+            ...getProChartOptions().plugins.tooltip,
+            callbacks: {
+                label: function(context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    return `${label}: ${value} unidades`;
+                }
+            }
+        },
     },
     scales: {
         r: {
-            grid: { color: '#e5e7eb' },
-            ticks: { display: false, beginAtZero: true }
+            grid: { color: '#e5e7eb', circular: true },
+            ticks: { display: true, beginAtZero: true, stepSize: 5 },
+            pointLabels: { display: false }
         }
     }
 };

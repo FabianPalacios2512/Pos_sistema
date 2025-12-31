@@ -4,9 +4,9 @@
   <div class="flex overflow-hidden bg-gray-50 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c]" style="height: calc(100vh - 64px);">
     
     <!-- SIDEBAR IZQUIERDO - Menú de Navegación -->
-    <aside class="w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col overflow-y-auto shadow-sm">
+    <aside class="w-64 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-r border-gray-200/80 dark:border-zinc-800/50 flex flex-col overflow-y-auto shadow-lg shadow-gray-200/50 dark:shadow-black/30">
       <!-- Header Sidebar - Compacto -->
-      <div class="px-4 py-3 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
+      <div class="px-4 py-3 border-b border-gray-100/80 dark:border-zinc-800/50 flex-shrink-0">
         <div class="flex items-center gap-2 mb-3">
           <div class="w-8 h-8 bg-slate-900 dark:bg-slate-700 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -82,7 +82,7 @@
       </nav>
       
       <!-- Footer Sidebar con botones de acción - Compacto -->
-      <div class="px-3 pb-3 border-t border-gray-200 dark:border-zinc-800 pt-3 space-y-1.5 flex-shrink-0">
+      <div class="px-3 pb-3 border-t border-gray-100/80 dark:border-zinc-800/50 pt-3 space-y-1.5 flex-shrink-0 bg-gray-50/50 dark:bg-zinc-800/30">
         <button 
           @click="saveConfiguration"
           :disabled="isSaving"
@@ -100,8 +100,7 @@
         
         <button 
           @click="copyStoreLink"
-          class="w-full px-2.5 py-1.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 border border-gray-200 dark:border-zinc-700"
-        >
+          class="w-full px-2.5 py-1.5 bg-white/80 dark:bg-zinc-800/80 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-xs font-medium rounded-lg transition-all duration-150 flex items-center justify-center gap-1.5 shadow-sm hover:shadow">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
           </svg>
@@ -128,8 +127,8 @@
           <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
             
             <!-- 🎨 TARJETA 1: Logo y Color Primario -->
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
+            <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+              <div class="px-6 py-5 border-b border-gray-100/80 dark:border-zinc-800/50">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Identidad Visual</h3>
                 <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Logo y color principal de tu tienda</p>
               </div>
@@ -198,8 +197,8 @@
             </div>
             
             <!-- 🎨 TARJETA 2: Selección de Plantilla -->
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
+            <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+              <div class="px-6 py-5 border-b border-gray-100/80 dark:border-zinc-800/50">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Plantilla de Diseño</h3>
                 <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Elige el estilo visual de tu catálogo web</p>
               </div>
@@ -297,8 +296,8 @@
             </div>
             
             <!-- 🎨 TARJETA 3: Banner Promocional (Solo Fashion) -->
-            <div v-if="isFashionStore" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
+            <div v-if="isFashionStore" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+              <div class="px-6 py-5 border-b border-gray-100/80 dark:border-zinc-800/50">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Banner Promocional</h3>
                 <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Imagen destacada en la parte superior (exclusivo para tiendas de moda)</p>
               </div>
@@ -348,17 +347,17 @@
                 <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Controla qué categorías y productos se muestran en tu tienda online.</p>
               </div>
               
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 border border-gray-300 dark:border-zinc-800 shadow-sm">
+              <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
                 <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-3">Categorías Visibles</label>
                 <div class="flex flex-wrap gap-2">
                   <button 
                     v-for="category in availableCategories" 
                     :key="category.id"
                     @click="toggleCategory(category.id)"
-                    class="px-3 py-1.5 rounded-md text-xs font-medium border transition-all duration-150 flex items-center gap-2"
+                    class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-2 shadow-sm"
                     :class="config.inventoryVisibility.visibleCategories.includes(category.id) 
-                      ? 'bg-emerald-50 border-emerald-500 text-emerald-700' 
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'"
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 ring-2 ring-emerald-500/50' 
+                      : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700'"
                   >
                     <span>{{ category.name }}</span>
                     <div v-if="config.inventoryVisibility.visibleCategories.includes(category.id)" class="bg-emerald-500 rounded-full p-0.5">
@@ -372,7 +371,7 @@
             </section>
 
             <section>
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 border border-gray-300 dark:border-zinc-800 shadow-sm flex items-center justify-between">
+              <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-bold text-gray-900 dark:text-white">Ocultar productos sin stock</h3>
                   <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">No mostrar productos agotados en el catálogo</p>
@@ -404,7 +403,7 @@
               <!-- Grid 2 Columnas: Número + País/Horario (Placeholder) -->
               <div class="grid grid-cols-2 gap-6">
                 
-                <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
                   <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Número de WhatsApp</label>
                   <input 
                     type="text" 
@@ -415,7 +414,7 @@
                   <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Es el número donde recibirás los pedidos.</p>
                 </div>
 
-                <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm opacity-60">
+                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 opacity-60">
                   <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Horario de Atención</label>
                   <input 
                     type="text" 
@@ -429,7 +428,7 @@
               </div>
 
               <!-- Mensaje Inicial - Full Width -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+              <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 mt-6">
                 <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Mensaje Inicial Personalizado</label>
                 <textarea 
                   v-model="config.ordersConfig.customMessage"
@@ -456,7 +455,7 @@
               <!-- Grid 2 Columnas: Costo + Mínimo -->
               <div class="grid grid-cols-2 gap-6">
                 
-                <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
                   <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Costo de Domicilio</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-sm font-medium">$</span>
@@ -470,7 +469,7 @@
                   <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Precio del envío a domicilio.</p>
                 </div>
 
-                <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-300 dark:border-zinc-800 shadow-sm">
+                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
                   <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Pedido Mínimo</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-sm font-medium">$</span>
@@ -493,7 +492,7 @@
                 <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Conecta tu tienda con otros sistemas.</p>
               </div>
               
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 border border-gray-300 dark:border-zinc-800 shadow-sm flex items-center justify-between">
+              <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-bold text-gray-900 dark:text-white">Sincronizar con Caja Registradora</h3>
                   <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Registrar pedidos online automáticamente en el POS</p>
@@ -702,7 +701,7 @@ const config = reactive({
     logo: '', 
     banner: '',
     primaryColor: '#10B981', 
-    template: 'visual-story' // Plantilla por defecto
+    template: 'speed-market' // Plantilla por defecto (segura para todas las tiendas)
   },
   inventoryVisibility: {
     visibleCategories: [], 
@@ -881,7 +880,17 @@ const loadConfiguration = async () => {
       config.brandIdentity.logo = data.logo_url || ''
       config.brandIdentity.banner = data.banner_url || ''
       config.brandIdentity.primaryColor = data.primary_color || '#10B981'
-      config.brandIdentity.template = data.template || 'visual-story'
+      // 🛡️ Validar plantilla: si viene visual-story pero NO es fashion, usar speed-market
+      const loadedTemplate = data.template || 'speed-market'
+      const storeType = appStore.systemSettings?.store_type || localStorage.getItem('pending_store_type')
+      const isFashion = storeType === 'fashion'
+      
+      if (loadedTemplate === 'visual-story' && !isFashion) {
+        config.brandIdentity.template = 'speed-market'
+        console.log('⚠️ Plantilla visual-story no disponible para tiendas no-fashion. Usando speed-market')
+      } else {
+        config.brandIdentity.template = loadedTemplate
+      }
       
       const visibleCats = Array.isArray(data.visible_categories) ? data.visible_categories : []
       

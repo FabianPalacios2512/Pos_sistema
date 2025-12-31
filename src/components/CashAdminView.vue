@@ -209,7 +209,7 @@
                 <td class="px-4 py-3 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="relative">
-                      <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                      <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
                         {{ getUserInitials(session.user?.name || 'Usuario') }}
                       </div>
                       <div v-if="session.status === 'open'" class="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#1e1e24]"></div>
@@ -274,7 +274,7 @@
                     </button>
                     <button
                       @click="viewSessionAudit(session)"
-                      class="p-2 text-slate-400 dark:text-zinc-500 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl border border-transparent hover:border-purple-100 dark:hover:border-purple-900/30 transition-all duration-200"
+                      class="p-2 text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/20 rounded-xl border border-transparent hover:border-slate-100 dark:hover:border-slate-900/30 transition-all duration-200"
                       title="Ver auditoría completa"
                     >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -518,14 +518,14 @@
               </div>
             </div>
             
-            <div class="bg-purple-50 dark:bg-purple-950 p-4 rounded-xl border border-purple-200 dark:border-purple-800">
+            <div class="bg-teal-50 dark:bg-teal-950 p-4 rounded-xl border border-teal-200 dark:border-teal-800">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-xs font-medium text-purple-700 dark:text-purple-400">Efectivo</p>
-                  <p class="text-xl font-bold text-purple-900 dark:text-purple-300">${{ parseFloat(selectedSession.cash_sales || 0).toLocaleString() }}</p>
+                  <p class="text-xs font-medium text-teal-700 dark:text-teal-400">Efectivo</p>
+                  <p class="text-xl font-bold text-teal-900 dark:text-teal-300">${{ parseFloat(selectedSession.cash_sales || 0).toLocaleString() }}</p>
                 </div>
-                <div class="w-10 h-10 bg-purple-100 dark:bg-purple-950 rounded-lg flex items-center justify-center">
-                  <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-teal-100 dark:bg-teal-950 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 002 2z"/>
                   </svg>
                 </div>
@@ -611,13 +611,13 @@
               <label class="text-xs font-medium text-amber-700 dark:text-amber-400">Efectivo</label>
               <p class="text-base font-bold text-amber-900 dark:text-amber-300">${{ parseFloat(sessionToClose?.cash_sales || 0).toLocaleString() }}</p>
             </div>
-            <div class="bg-purple-50 dark:bg-purple-950 p-3 rounded-xl border border-purple-100 dark:border-purple-800">
-              <label class="text-xs font-medium text-purple-700 dark:text-purple-400">Tarjetas</label>
-              <p class="text-base font-bold text-purple-900 dark:text-purple-300">${{ parseFloat(sessionToClose?.card_sales || 0).toLocaleString() }}</p>
+            <div class="bg-sky-50 dark:bg-sky-950 p-3 rounded-xl border border-sky-100 dark:border-sky-800">
+              <label class="text-xs font-medium text-sky-700 dark:text-sky-400">Tarjetas</label>
+              <p class="text-base font-bold text-sky-900 dark:text-sky-300">${{ parseFloat(sessionToClose?.card_sales || 0).toLocaleString() }}</p>
             </div>
-            <div class="bg-indigo-50 dark:bg-indigo-950 p-3 rounded-xl border border-indigo-100 dark:border-indigo-800">
-              <label class="text-xs font-medium text-indigo-700 dark:text-indigo-400">Transferencias</label>
-              <p class="text-base font-bold text-indigo-900 dark:text-indigo-300">${{ parseFloat(sessionToClose?.transfer_sales || 0).toLocaleString() }}</p>
+            <div class="bg-teal-50 dark:bg-teal-950 p-3 rounded-xl border border-teal-100 dark:border-teal-800">
+              <label class="text-xs font-medium text-teal-700 dark:text-teal-400">Transferencias</label>
+              <p class="text-base font-bold text-teal-900 dark:text-teal-300">${{ parseFloat(sessionToClose?.transfer_sales || 0).toLocaleString() }}</p>
             </div>
           </div>
 
@@ -724,9 +724,9 @@
               <p class="text-xl font-bold text-emerald-900 dark:text-emerald-300">${{ parseFloat(auditData.statistics.average_sale || 0).toLocaleString() }}</p>
               <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Venta Promedio</p>
             </div>
-            <div class="bg-purple-50 dark:bg-purple-950 p-3 rounded-xl border border-purple-200 dark:border-purple-800 text-center">
-              <p class="text-xl font-bold text-purple-900 dark:text-purple-300">${{ parseFloat(auditData.statistics.largest_sale || 0).toLocaleString() }}</p>
-              <p class="text-xs font-medium text-purple-700 dark:text-purple-400">Venta Mayor</p>
+            <div class="bg-cyan-50 dark:bg-cyan-950 p-3 rounded-xl border border-cyan-200 dark:border-cyan-800 text-center">
+              <p class="text-xl font-bold text-cyan-900 dark:text-cyan-300">${{ parseFloat(auditData.statistics.largest_sale || 0).toLocaleString() }}</p>
+              <p class="text-xs font-medium text-cyan-700 dark:text-cyan-400">Venta Mayor</p>
             </div>
             <div class="bg-orange-50 dark:bg-orange-950 p-3 rounded-xl border border-orange-200 dark:border-orange-800 text-center">
               <p class="text-xl font-bold text-orange-900 dark:text-orange-300">{{ Math.floor(auditData.statistics.session_duration / 60) }}h</p>
@@ -783,6 +783,48 @@
       </div>
     </div>
   </div>
+
+  <!-- 🎯 Modal de Confirmación Profesional (reemplaza confirm() nativo) -->
+  <div v-if="showConfirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200]" @click.self="showConfirmModal = false">
+    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-gray-200 dark:border-zinc-800 animate-fade-in">
+      <!-- Header con icono -->
+      <div class="p-6 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-950 flex items-center justify-center">
+          <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Confirmar Cierre de Caja</h3>
+        <p class="text-gray-600 dark:text-zinc-400 mb-4">
+          ¿Estás seguro que deseas cerrar la caja de <span class="font-bold text-gray-900 dark:text-white">{{ sessionToClose?.user?.name }}</span>?
+        </p>
+        
+        <!-- Resumen del monto -->
+        <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600 dark:text-zinc-400">Monto a cerrar:</span>
+            <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">${{ parseFloat(closeForm.actual_amount || 0).toLocaleString() }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botones -->
+      <div class="flex border-t border-gray-200 dark:border-zinc-800">
+        <button 
+          @click="showConfirmModal = false"
+          class="flex-1 px-6 py-4 text-gray-700 dark:text-zinc-300 font-bold hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors duration-200"
+        >
+          Cancelar
+        </button>
+        <button 
+          @click="confirmCloseSessionFinal"
+          class="flex-1 px-6 py-4 bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition-colors duration-200"
+        >
+          Confirmar Cierre
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -807,6 +849,7 @@ const showNewSessionModal = ref(false)
 // Nuevos estados para modales
 const showCloseSessionModal = ref(false)
 const showAuditModal = ref(false)
+const showConfirmModal = ref(false) // Modal de confirmación bonito
 const sessionToClose = ref(null)
 const closingSession = ref(false)
 const auditData = ref(null)
@@ -914,7 +957,7 @@ const clearFilters = () => {
 
 const exportData = () => {
   // TODO: Implementar exportación real
-  alert('Función de exportación en desarrollo')
+  showInfo('📥 Exportación en desarrollo - Esta función estará disponible pronto')
 }
 
 // Pagination methods
@@ -1046,10 +1089,15 @@ const confirmCloseSession = async () => {
     return
   }
 
-  // Confirmación antes de cerrar
-  const confirmed = confirm(`¿Estás seguro que deseas cerrar la caja de ${sessionToClose.value?.user?.name}?\n\nMonto: $${actualAmount.toLocaleString()}`)
-  if (!confirmed) return
+  // Mostrar modal de confirmación en lugar de confirm()
+  showConfirmModal.value = true
+}
 
+// 🎯 Función que hace el cierre real después de confirmar en el modal bonito
+const confirmCloseSessionFinal = async () => {
+  showConfirmModal.value = false
+  const actualAmount = parseFloat(closeForm.value.actual_amount)
+  
   closingSession.value = true
   
   try {
@@ -1065,6 +1113,7 @@ const confirmCloseSession = async () => {
     })
     
     if (data.success) {
+      showSuccess('✅ Caja cerrada correctamente')
       showCloseSessionModal.value = false
       sessionToClose.value = null
       refreshSessions()
@@ -1204,7 +1253,7 @@ const generateReport = (session) => {
 // Lifecycle
 onMounted(() => {
   refreshSessions()
-  showSuccess('🚀 Panel cargado - Sistema administrativo iniciado correctamente')
+  // Sin mensaje inicial - la vista carga silenciosamente
 })
 </script>
 

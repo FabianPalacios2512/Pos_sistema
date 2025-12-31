@@ -132,6 +132,10 @@ Route::get('/ping', function () {
 // ==================== EPAYCO - PAYMENT ROUTES ====================
 Route::post('/epayco/init-transaction', [EPaycoPaymentController::class, 'initTransaction']);
 Route::post('/epayco/webhook', [EPaycoPaymentController::class, 'webhook']);
+Route::get('/epayco/check-payment-status/{reference}', [EPaycoPaymentController::class, 'checkPaymentStatus']);
+
+// 🔧 DEV ONLY: Aprobar pago manualmente (cuando webhook no llega en localhost)
+Route::post('/epayco/manual-approve/{reference}', [EPaycoPaymentController::class, 'manualApprove']);
 
 // ==================== WOMPI - PAYMENT ROUTES (DEPRECATED) ====================
 // Rutas de pago (públicas - no requieren auth)

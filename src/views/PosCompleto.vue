@@ -33,6 +33,7 @@
         @toggleAutoHide="autoHideEnabled = !autoHideEnabled"
         @toggleSidebarCollapsed="sidebarCollapsed = !sidebarCollapsed"
         @navigate-to-settings="setCurrentModule('settings')"
+        @navigate-to-profile="setCurrentModule('my-profile')"
         @toggle-radio="radioWidgetOpen = !radioWidgetOpen"
         @logout="handleLogout"
       />
@@ -90,68 +91,74 @@
     ></div>
 
     <!-- Modal de Confirmación - Salir del POS con productos en carrito -->
-    <div v-if="showCartWarningModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden border border-gray-200 dark:border-zinc-800 animate-scale-in">
-        
-        <!-- Header Profesional con colores del sistema -->
-        <div class="bg-gradient-to-r from-slate-700 to-slate-800 dark:from-slate-800 dark:to-slate-900 px-6 py-5 border-b border-slate-600 dark:border-zinc-700">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 border border-white/10">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-            </div>
-            <div class="flex-1">
-              <h3 class="text-xl font-black text-white tracking-tight">¡Productos Pendientes!</h3>
-              <p class="text-slate-200 text-xs mt-0.5">Tienes productos en el carrito</p>
-            </div>
-          </div>
-        </div>
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition ease-out duration-300"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-200"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showCartWarningModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <Transition
+            enter-active-class="transition ease-out duration-300"
+            enter-from-class="opacity-0 scale-95 translate-y-4"
+            enter-to-class="opacity-100 scale-100 translate-y-0"
+            leave-active-class="transition ease-in duration-200"
+            leave-from-class="opacity-100 scale-100 translate-y-0"
+            leave-to-class="opacity-0 scale-95 translate-y-4"
+          >
+            <div v-if="showCartWarningModal" class="bg-white dark:bg-[#1e1e24] rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-gray-100 dark:border-zinc-800">
+              
+              <!-- Contenido Principal -->
+              <div class="p-8 text-center">
+                <!-- Icono animado -->
+                <div class="relative w-20 h-20 mx-auto mb-6">
+                  <div class="absolute inset-0 bg-amber-100 dark:bg-amber-900/30 rounded-full animate-ping opacity-30"></div>
+                  <div class="relative w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                </div>
+                
+                <!-- Texto -->
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  ¡Espera un momento!
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed max-w-xs mx-auto">
+                  Tienes productos en el carrito. Si cambias de módulo perderás la venta actual.
+                </p>
+              </div>
 
-        <!-- Contenido -->
-        <div class="p-6 space-y-5">
-          <div class="text-center space-y-3">
-            <div class="w-16 h-16 bg-amber-50 dark:bg-amber-950/30 rounded-2xl flex items-center justify-center mx-auto border border-amber-100 dark:border-amber-800">
-              <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+              <!-- Botones -->
+              <div class="px-6 pb-6 space-y-3">
+                <button 
+                  @click="cancelModuleChange"
+                  class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold py-3.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  Seguir vendiendo
+                </button>
+                
+                <button 
+                  @click="confirmModuleChange"
+                  class="w-full bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium py-3.5 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                  Salir y perder carrito
+                </button>
+              </div>
             </div>
-            
-            <div>
-              <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                Tienes productos pendientes
-              </h4>
-              <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
-                Si sales ahora, perderás todos los productos del carrito actual. ¿Qué deseas hacer?
-              </p>
-            </div>
-          </div>
-
-          <!-- Botones con estilo del sistema -->
-          <div class="flex flex-col gap-2.5">
-            <button 
-              @click="cancelModuleChange"
-              class="w-full bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 transform active:scale-[0.98] shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 flex items-center justify-center gap-2"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              <span>Continuar Vendiendo</span>
-            </button>
-            
-            <button 
-              @click="confirmModuleChange"
-              class="w-full bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 font-bold py-3 px-6 rounded-xl border border-gray-200 dark:border-zinc-700 transition-all duration-200 transform active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-              <span>Ir a {{ getModuleName(pendingModule) }}</span>
-            </button>
-          </div>
+          </Transition>
         </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
 
     <!-- Radio Player Modal (Global) -->
     <RadioPlayerModal 
@@ -226,6 +233,9 @@ const WebCatalogUpgrade = defineAsyncComponent(() => import('./WebCatalogUpgrade
 // Multisede
 const WarehousesView = defineAsyncComponent(() => import('../components/WarehousesView_MasterDetail.vue'))
 const StockTransfersView = defineAsyncComponent(() => import('../components/StockTransfersView.vue'))
+
+// Mi Perfil
+const MyProfileView = defineAsyncComponent(() => import('../components/MyProfileView.vue'))
 
 // Componentes temporales para módulos no desarrollados aún
 const PlaceholderView = defineAsyncComponent(() => import('../components/PlaceholderView.vue'))
@@ -1129,7 +1139,8 @@ const currentModuleComponent = computed(() => {
     expenses: ExpensesManager,
     warehouses: WarehousesView,
     'stock-transfers': StockTransfersView,
-    'web-catalog-config': WebCatalogConfig
+    'web-catalog-config': WebCatalogConfig,
+    'my-profile': MyProfileView
   }
   return moduleComponents[currentModule.value] || null
 })
@@ -1149,9 +1160,13 @@ const toggleSidebar = () => {
 
 // Cambiar módulo actual
 const setCurrentModule = (module, options = {}) => {
+  // Módulos especiales accesibles para todos los usuarios (sin verificación de permisos)
+  const publicModules = ['my-profile', 'dashboard', 'pos']
+  
   // Verificar permisos antes de cambiar módulo
   // SOLO si el usuario ya está cargado (evitar check durante inicialización)
-  if (currentUser.value && currentUser.value.name !== 'Cargando...' && !hasModulePermission(module)) {
+  // Y si NO es un módulo público
+  if (currentUser.value && currentUser.value.name !== 'Cargando...' && !publicModules.includes(module) && !hasModulePermission(module)) {
     alert('No tienes permisos para acceder a este módulo')
     return
   }
@@ -1429,7 +1444,8 @@ const getModuleDescription = () => {
     'web-catalog-config': 'Catálogo Web • Personaliza tu tienda online sin código',
     'accounts-receivable': 'CreditiTenda • Gestión completa de créditos',
     warehouses: 'Gestión de Sedes • Control multisede',
-    'cash-admin': 'Control de Cajas • Supervisión de turnos'
+    'cash-admin': 'Control de Cajas • Supervisión de turnos',
+    'my-profile': 'Mi Perfil • Información personal y seguridad'
   }
   return descriptions[currentModule.value] || '✨ Sistema de gestión empresarial avanzado'
 }

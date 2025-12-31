@@ -13,6 +13,27 @@
         </div>
         
         <div class="flex items-center gap-3">
+          <!-- Indicador de Límite de Usuarios (solo en tab usuarios) -->
+          <div v-if="activeTab === 'users' && maxUsersAllowed !== null" 
+               class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium"
+               :class="canCreateMoreUsers 
+                 ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' 
+                 : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            <span>{{ currentUsersCount }}/{{ maxUsersAllowed }} usuarios</span>
+          </div>
+          
+          <!-- Badge Plan Enterprise -->
+          <div v-if="activeTab === 'users' && maxUsersAllowed === null" 
+               class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+            </svg>
+            <span>Usuarios ilimitados</span>
+          </div>
+          
           <!-- Botón Secundario -->
           <button @click="refreshData"
                   :disabled="loading"
@@ -25,7 +46,8 @@
           
           <!-- Botón Principal -->
           <button @click="activeTab === 'users' ? openCreateUserModal() : openCreateRoleModal()"
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+                  :disabled="activeTab === 'users' && !canCreateMoreUsers"
+                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -247,6 +269,7 @@
 import { ref, computed, onMounted } from 'vue'
 import usersService from '../services/usersService.js'
 import rolesService from '../services/rolesService.js'
+import { appStore } from '../store/appStore.js'
 import UsersTable from './UsersTable.vue'
 import RolesTable from './RolesTable.vue'
 import UserModal from './UserModal.vue'
@@ -269,6 +292,29 @@ const selectedRole = ref(null)
 
 // Contraseña
 const showPasswordModal = ref(false)
+
+// ===== VALIDACIÓN DE PLAN =====
+// Límites de usuarios según el plan
+const planUserLimits = {
+  'free_trial': 2,
+  'basic': 4,
+  'pro': 4,       // premium en el frontend se llama 'pro'
+  'premium': 4,   // alias por si acaso
+  'enterprise': null // null = ilimitado
+}
+
+const currentPlan = computed(() => appStore.tenantPlan || 'free_trial')
+const maxUsersAllowed = computed(() => planUserLimits[currentPlan.value] ?? 2)
+const currentUsersCount = computed(() => users.value.length)
+const canCreateMoreUsers = computed(() => {
+  // Si es enterprise (null), siempre puede crear
+  if (maxUsersAllowed.value === null) return true
+  return currentUsersCount.value < maxUsersAllowed.value
+})
+const remainingUserSlots = computed(() => {
+  if (maxUsersAllowed.value === null) return '∞'
+  return Math.max(0, maxUsersAllowed.value - currentUsersCount.value)
+})
 
 // ===== COMPUTED PROPERTIES =====
 const activeUsersCount = computed(() => users.value.filter(u => u.active).length)
@@ -440,6 +486,16 @@ const loadRoles = async () => {
 
 // Usuarios
 const openCreateUserModal = () => {
+  // 🔒 VALIDACIÓN DE PLAN: Verificar si puede crear más usuarios
+  if (!canCreateMoreUsers.value) {
+    const planName = currentPlan.value === 'free_trial' ? 'Prueba Gratuita' : 
+                     currentPlan.value === 'basic' ? 'Básico' :
+                     currentPlan.value === 'pro' || currentPlan.value === 'premium' ? 'Premium' : 
+                     'Enterprise'
+    alert(`⚠️ Has alcanzado el límite de ${maxUsersAllowed.value} usuarios para el plan ${planName}.\n\n💎 Actualiza tu plan para agregar más usuarios.`)
+    return
+  }
+  
   selectedUser.value = null
   showUserModal.value = true
 }

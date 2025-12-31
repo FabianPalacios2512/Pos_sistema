@@ -831,15 +831,213 @@
       </Transition>
     </Teleport>
 
-    <!-- Botón FAB Flotante - Nuevo Crédito -->
-    <button 
-      @click="openCreateCreditModal"
-      class="fixed bottom-6 right-6 w-14 h-14 bg-black dark:bg-zinc-800 hover:bg-gray-900 dark:hover:bg-zinc-700 text-white rounded-full shadow-2xl dark:shadow-black/70 hover:shadow-black/40 transition-all duration-300 transform hover:scale-110 active:scale-95 z-50 flex items-center justify-center group">
-      <svg class="w-7 h-7 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-      </svg>
-      <span class="sr-only">Nuevo Crédito</span>
-    </button>
+    <!-- Botones FAB Flotantes -->
+    <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+      <!-- Botón Configuración de Recordatorios -->
+      <button 
+        @click="showReminderSettingsModal = true"
+        class="w-12 h-12 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 rounded-full shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-700 transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center group"
+        title="Configuración de recordatorios automáticos">
+        <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+      </button>
+      
+      <!-- Botón Nuevo Crédito -->
+      <button 
+        @click="openCreateCreditModal"
+        class="w-14 h-14 bg-black dark:bg-zinc-800 hover:bg-gray-900 dark:hover:bg-zinc-700 text-white rounded-full shadow-2xl dark:shadow-black/70 hover:shadow-black/40 transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center group">
+        <svg class="w-7 h-7 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span class="sr-only">Nuevo Crédito</span>
+      </button>
+    </div>
+
+    <!-- MODAL: Configuración de Recordatorios Automáticos -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showReminderSettingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <!-- Overlay -->
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showReminderSettingsModal = false"></div>
+          
+          <!-- Modal Content -->
+          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 animate-modal-enter">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-zinc-700">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-gray-900 dark:text-white">CRM Inteligente</h3>
+                  <p class="text-xs text-gray-500 dark:text-zinc-400">Gestión automática de clientes</p>
+                </div>
+              </div>
+              <button @click="showReminderSettingsModal = false" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-5 space-y-5">
+              <!-- Estado WhatsApp -->
+              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-green-100 dark:bg-green-500/10 rounded-lg flex items-center justify-center">
+                      <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.515"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">WhatsApp</p>
+                      <p class="text-xs" :class="whatsappConnected ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'">
+                        {{ whatsappConnected ? '● Conectado' : '○ Desconectado' }}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    v-if="!whatsappConnected"
+                    @click="openWhatsAppConfig"
+                    class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-colors">
+                    Conectar
+                  </button>
+                </div>
+              </div>
+
+              <!-- Funciones CRM automáticas -->
+              <div class="space-y-3">
+                <h4 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Funciones automáticas activas:</h4>
+                
+                <!-- Confirmación post-compra -->
+                <div class="flex items-start gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+                  <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-800/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-emerald-800 dark:text-emerald-300">Confirmación de compra</p>
+                    <p class="text-xs text-emerald-600 dark:text-emerald-400">Después de cada compra a crédito, el cliente recibe un mensaje con el resumen y su saldo disponible.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Modo de recordatorios -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3">
+                  Modo de recordatorios
+                </label>
+                <div class="grid grid-cols-1 gap-2">
+                  <!-- Modo Manual -->
+                  <label 
+                    class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-200"
+                    :class="reminderSettings.frequency === 'manual' 
+                      ? 'bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-600' 
+                      : 'bg-white dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600'"
+                  >
+                    <input 
+                      type="radio" 
+                      name="frequency" 
+                      value="manual" 
+                      v-model="reminderSettings.frequency"
+                      class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">Manual</p>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400">Envío manual desde el botón "Recordatorio"</p>
+                    </div>
+                  </label>
+                  
+                  <!-- Modo Inteligente -->
+                  <label 
+                    class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-200"
+                    :class="reminderSettings.frequency === 'smart' 
+                      ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30' 
+                      : 'bg-white dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600'"
+                  >
+                    <input 
+                      type="radio" 
+                      name="frequency" 
+                      value="smart" 
+                      v-model="reminderSettings.frequency"
+                      class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">Modo Inteligente</p>
+                        <span class="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 text-[10px] font-bold rounded">RECOMENDADO</span>
+                      </div>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400">
+                        Envía recordatorios automáticamente después de 20 días de mora, cada 3 días para no saturar al cliente
+                      </p>
+                    </div>
+                    <div class="w-8 h-8 bg-blue-100 dark:bg-blue-800/50 rounded-lg flex items-center justify-center">
+                      <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                      </svg>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Info del modo inteligente -->
+              <div v-if="reminderSettings.frequency === 'smart'" class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/30">
+                <h4 class="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Cómo funciona el modo inteligente
+                </h4>
+                <ul class="text-xs text-blue-700 dark:text-blue-400 space-y-1.5">
+                  <li class="flex items-start gap-2">
+                    <span class="text-blue-500 mt-0.5">•</span>
+                    <span>Espera 20 días después de la compra antes del primer recordatorio</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-blue-500 mt-0.5">•</span>
+                    <span>Envía recordatorios cada 3 días (máximo 5 por mes)</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-blue-500 mt-0.5">•</span>
+                    <span>Los mensajes son amigables y no agresivos</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-blue-500 mt-0.5">•</span>
+                    <span>Se detiene automáticamente cuando el cliente paga</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="flex gap-3 p-5 border-t border-gray-200 dark:border-zinc-700">
+              <button
+                @click="showReminderSettingsModal = false"
+                class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-xl transition-colors">
+                Cancelar
+              </button>
+              <button
+                @click="saveReminderSettings"
+                :disabled="savingSettings"
+                class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2">
+                <svg v-if="savingSettings" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ savingSettings ? 'Guardando...' : 'Guardar' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- Modal de Edición de Cliente -->
     <Teleport to="body">
@@ -1128,6 +1326,25 @@ const showEditCustomerModal = ref(false)
 const editForm = ref({})
 const editPhotoPreview = ref(null)
 const uploadingEditPhoto = ref(false)
+
+// 🔔 Modal de configuración de recordatorios
+const showReminderSettingsModal = ref(false)
+const savingSettings = ref(false)
+const showWhatsAppModal = ref(false)
+const whatsappConnected = ref(false)
+const reminderSettings = ref({
+  frequency: 'smart', // Por defecto modo inteligente
+  sendHour: '9',
+  minDaysOverdue: 20 // 20 días por defecto para modo inteligente
+})
+
+// Función para abrir WhatsApp desde CRM
+const openWhatsAppConfig = () => {
+  showReminderSettingsModal.value = false
+  // Emitir evento para abrir modal de WhatsApp global
+  window.dispatchEvent(new CustomEvent('open-whatsapp-modal'))
+}
+
 const processingEdit = ref(false)
 
 // 🎯 Modal de preview de foto
@@ -1414,6 +1631,11 @@ const sendReminder = async (customer) => {
     return
   }
 
+  if (!customer.phone) {
+    showError('El cliente no tiene número de teléfono registrado')
+    return
+  }
+
   sendingReminder.value = true
   try {
     const response = await axiosInstance.post('/credit-reminders', {
@@ -1421,11 +1643,25 @@ const sendReminder = async (customer) => {
     })
 
     if (response.data.success) {
-      showSuccess('Recordatorio enviado exitosamente')
+      const channels = response.data.data?.sent_channels || []
+      if (channels.length > 0) {
+        showSuccess(`Recordatorio enviado por ${channels.join(' y ')}`)
+      } else {
+        showSuccess('Recordatorio enviado')
+      }
+    } else {
+      // Mensaje de error amigable
+      const message = response.data.message || 'No se pudo enviar el recordatorio'
+      if (response.data.requires_whatsapp) {
+        showError('WhatsApp no está conectado. Conéctalo desde el botón de configuración ⚙️')
+      } else {
+        showError(message)
+      }
     }
   } catch (error) {
     console.error('Error sending reminder:', error)
-    showError(error.response?.data?.message || 'Error al enviar el recordatorio')
+    // Mensaje amigable sin detalles técnicos
+    showError('No se pudo enviar el recordatorio. Verifica que WhatsApp esté conectado.')
   } finally {
     sendingReminder.value = false
   }
@@ -1690,9 +1926,61 @@ const saveCustomerCredit = async () => {
   }
 }
 
+// 🔔 Funciones de configuración de recordatorios
+const loadReminderSettings = async () => {
+  try {
+    const response = await axiosInstance.get('/credit-reminder-settings')
+    if (response.data.success && response.data.data) {
+      reminderSettings.value = {
+        frequency: response.data.data.frequency || 'manual',
+        sendHour: response.data.data.send_hour || '9',
+        minDaysOverdue: response.data.data.min_days_overdue || 1
+      }
+    }
+  } catch (error) {
+    // Si no existe configuración, usar valores por defecto
+    console.warn('No se encontró configuración de recordatorios, usando valores por defecto')
+  }
+}
+
+const saveReminderSettings = async () => {
+  savingSettings.value = true
+  try {
+    const response = await axiosInstance.post('/credit-reminder-settings', {
+      frequency: reminderSettings.value.frequency,
+      send_hour: reminderSettings.value.sendHour,
+      min_days_overdue: reminderSettings.value.minDaysOverdue
+    })
+    
+    if (response.data.success) {
+      showSuccess('Configuración guardada exitosamente')
+      showReminderSettingsModal.value = false
+    } else {
+      showError(response.data.message || 'Error al guardar la configuración')
+    }
+  } catch (error) {
+    console.error('Error saving reminder settings:', error)
+    showError(error.response?.data?.message || 'Error al guardar la configuración')
+  } finally {
+    savingSettings.value = false
+  }
+}
+
+const checkWhatsAppStatus = async () => {
+  try {
+    const { whatsappService } = await import('../services/whatsappService.js')
+    const result = await whatsappService.getStatus()
+    whatsappConnected.value = result?.status?.connected || false
+  } catch (error) {
+    whatsappConnected.value = false
+  }
+}
+
 // Initialization
 onMounted(() => {
   loadCustomers()
+  loadReminderSettings()
+  checkWhatsAppStatus()
   window.addEventListener('keydown', handleEscape)
 })
 

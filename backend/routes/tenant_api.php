@@ -332,6 +332,8 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::get('/credit-payments', [\App\Http\Controllers\Api\CreditPaymentController::class, 'index']);
     Route::post('/credit-payments', [\App\Http\Controllers\Api\CreditPaymentController::class, 'store']);
     Route::post('/credit-reminders', [\App\Http\Controllers\Api\CreditPaymentController::class, 'sendReminder']);
+    Route::get('/credit-reminder-settings', [\App\Http\Controllers\Api\CreditPaymentController::class, 'getReminderSettings']);
+    Route::post('/credit-reminder-settings', [\App\Http\Controllers\Api\CreditPaymentController::class, 'saveReminderSettings']);
     // ==================== FIN CRÉDITOS ====================
 
     // ==================== LOYALTY POINTS (PUNTOS DE FIDELIZACIÓN) ====================

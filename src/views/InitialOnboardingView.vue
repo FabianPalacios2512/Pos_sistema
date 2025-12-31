@@ -18,7 +18,7 @@
                 Configuración de {{ config.storeName || 'Tu Tienda' }}
               </h1>
               <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mt-1">
-                Personaliza tu sistema en 3 pasos sencillos
+                Personaliza tu sistema en {{ totalSteps }} pasos sencillos
               </p>
             </div>
           </div>
@@ -38,20 +38,24 @@
             <div class="flex items-center">
               <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300"
                    :class="currentStep >= 2 ? 'bg-slate-900 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-400'">
-                <span v-if="currentStep > 2">✓</span>
+                <span v-if="currentStep > 2 || (!isPremiumPlan && currentStep === 2)">✓</span>
                 <span v-else>2</span>
               </div>
               <span class="ml-2 text-xs font-bold uppercase tracking-wide" :class="currentStep >= 2 ? 'text-slate-900' : 'text-slate-400'">Datos</span>
             </div>
-            <div class="w-12 h-0.5 rounded-full transition-all duration-300" :class="currentStep >= 3 ? 'bg-slate-900' : 'bg-slate-200'"></div>
+            
+            <!-- Paso 3 solo para Premium/Enterprise -->
+            <template v-if="isPremiumPlan">
+              <div class="w-12 h-0.5 rounded-full transition-all duration-300" :class="currentStep >= 3 ? 'bg-slate-900' : 'bg-slate-200'"></div>
 
-            <div class="flex items-center">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300"
-                   :class="currentStep >= 3 ? 'bg-slate-900 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-400'">
-                3
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300"
+                     :class="currentStep >= 3 ? 'bg-slate-900 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-400'">
+                  3
+                </div>
+                <span class="ml-2 text-xs font-bold uppercase tracking-wide" :class="currentStep >= 3 ? 'text-slate-900' : 'text-slate-400'">WhatsApp</span>
               </div>
-              <span class="ml-2 text-xs font-bold uppercase tracking-wide" :class="currentStep >= 3 ? 'text-slate-900' : 'text-slate-400'">WhatsApp</span>
-            </div>
+            </template>
           </div>
         </div>
       </div>
@@ -292,8 +296,9 @@
             </div>
           </div>
 
-          <!-- Sección opcional: Importar Productos desde Excel (solo para tiendas generales) -->
-          <div v-if="config.store_type !== 'fashion'" class="max-w-7xl mx-auto mt-6">
+          <!-- Sección opcional: Importar Productos desde Excel (NO para tiendas de MODA) -->
+          <!-- Las tiendas de moda usan variantes (talla, color), no importación simple de Excel -->
+          <div v-if="!isFashionStore" class="max-w-7xl mx-auto mt-6">
             <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-[24px] border border-indigo-100 shadow-sm p-6">
               <div class="flex items-start justify-between">
                 <div class="flex items-start space-x-4">
@@ -340,7 +345,22 @@
               </svg>
               <span>Atrás</span>
             </button>
+            
+            <!-- Si es plan básico/free, mostrar "Finalizar" en paso 2 -->
             <button 
+              v-if="!isPremiumPlan"
+              @click="finishOnboarding" 
+              :disabled="!config.storeName || !config.phone"
+              class="px-10 py-3 bg-slate-900 hover:bg-black disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>Finalizar y Empezar</span>
+            </button>
+            
+            <!-- Si es plan premium, continuar al paso 3 -->
+            <button 
+              v-else
               @click="nextStep" 
               :disabled="!config.storeName || !config.phone"
               class="px-10 py-3 bg-slate-900 hover:bg-black disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center space-x-2">
@@ -352,7 +372,8 @@
           </div>
         </div>
 
-        <div v-else-if="currentStep === 3" key="step3" class="space-y-6">
+        <!-- STEP 3: WHATSAPP - Solo para planes Premium/Enterprise -->
+        <div v-else-if="currentStep === 3 && isPremiumPlan" key="step3" class="space-y-6">
           <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-6 mb-6">
             <h2 class="text-xl font-black text-slate-900 tracking-tight mb-2">Conecta WhatsApp Business</h2>
             <p class="text-sm font-semibold text-slate-600">
@@ -496,6 +517,7 @@ import { useRouter } from 'vue-router'
 import apiClient from '@/services/apiClient.js'
 import QRCode from 'qrcode'
 import { whatsappService } from '@/services/whatsappService.js'
+import { appStore } from '@/store/appStore.js'
 // ✅ IMPORTAR LOS TICKETS TÉRMICOS REALES (los que genera invoiceTemplate.js)
 import ThermalClassicPreview from '@/components/invoiceTemplates/ThermalClassicPreview.vue'
 import ThermalModernPreview from '@/components/invoiceTemplates/ThermalModernPreview.vue'
@@ -507,6 +529,20 @@ const router = useRouter()
 const currentStep = ref(1)
 const selectedTemplate = ref('modern')
 const isLoading = ref(true)
+
+// 🔐 Verificar si el plan permite WhatsApp (solo premium y enterprise)
+const isPremiumPlan = computed(() => {
+  const plan = appStore.tenantPlan || 'free_trial'
+  return ['premium', 'enterprise'].includes(plan)
+})
+
+// 👗 Verificar si es tienda de moda (no permite importar Excel porque usa variantes)
+const isFashionStore = computed(() => {
+  return config.store_type === 'fashion'
+})
+
+// Número total de pasos según el plan
+const totalSteps = computed(() => isPremiumPlan.value ? 3 : 2)
 
 // Excel Import
 const showExcelImportModal = ref(false)
@@ -526,9 +562,12 @@ const refreshingQR = ref(false)
 let whatsappCheckInterval = null
 let qrAutoRefreshInterval = null // Auto-refresh del QR cada 45 segundos
 
+// 🏪 Leer tipo de tienda INMEDIATAMENTE del localStorage (antes del primer render)
+const pendingStoreTypeInitial = localStorage.getItem('pending_store_type')
+
 const config = reactive({
   storeName: '',
-  store_type: 'general', // 🏪 Default
+  store_type: pendingStoreTypeInitial || 'general', // 🏪 Cargar inmediatamente si existe
   nit: '',
   phone: '',
   email: '',

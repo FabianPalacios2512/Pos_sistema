@@ -16,7 +16,7 @@ import CatalogTemplateC from './CatalogTemplateC.vue'
 const props = defineProps({
   template: {
     type: String,
-    default: 'visual-story',
+    default: 'speed-market', // Default seguro para todas las tiendas
     validator: (value) => ['visual-story', 'speed-market', 'modern-grid'].includes(value)
   },
   storeConfig: {
@@ -42,7 +42,7 @@ const currentTemplate = computed(() => {
     case 'modern-grid':
       return CatalogTemplateC
     default:
-      return CatalogTemplateA
+      return CatalogTemplateB // Default seguro (speed-market) para todas las tiendas
   }
 })
 </script>

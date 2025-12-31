@@ -273,7 +273,7 @@ class ExcelImportController extends Controller
                             'quantity' => $stockToAdd,
                             'previous_stock' => 0,
                             'new_stock' => $stockToAdd,
-                            'reference' => 'Importación Excel - ' . $importId,
+                            'reference' => 'Importación Excel',
                             'user_id' => auth()->id() ?? 1,
                             'movement_date' => now()
                         ]);
