@@ -1,4 +1,5 @@
 <template>
+  <div>
   <!-- Layout de 3 Columnas: Menú Lateral + Contenido + Preview -->
   <div class="flex overflow-hidden bg-gray-50 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c]" style="height: calc(100vh - 64px);">
     
@@ -601,12 +602,27 @@
       </button>
     </div>
   </Transition>
+  </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { appStore } from '../store/appStore.js'
 import apiClient from '../services/apiClient.js'
+
+// Props & Emits
+const props = defineProps({
+  moduleName: {
+    type: String,
+    default: ''
+  },
+  queryParams: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'refresh'])
 
 // Refs
 const logoInput = ref(null)

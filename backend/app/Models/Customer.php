@@ -26,6 +26,7 @@ class Customer extends Model
         'total_orders',
         'active',
         'credit_active',
+        'credit_photo',
         'last_purchase',
         'loyalty_points'
     ];

@@ -27,11 +27,43 @@ class AIController extends Controller
         // Aumentar tiempo de ejecución para cadenas de pensamiento largas
         set_time_limit(120);
 
+        // 🔍 LOG DE DEBUG: Ver qué llega
+        Log::info('🤖 [AI Chat] Request recibido', [
+            'message' => $request->input('message'),
+            'provider' => $request->input('provider', 'groq'),
+            'has_auth' => auth()->check(),
+            'user_id' => auth()->id(),
+            'ip' => $request->ip()
+        ]);
+
         $request->validate([
             'message' => 'required|string',
         ]);
 
         $userMessage = trim($request->input('message'));
+
+        // 🧠 SELECTOR DE CEREBROS (AI Provider)
+        $provider = $request->input('provider', 'groq');
+
+        Log::info('🔄 [AI Chat] Proveedor seleccionado', ['provider' => $provider]);
+
+        if ($provider === 'gemini') {
+            try {
+                Log::info('🚀 [Gemini] Iniciando agente Gemini', ['message' => $userMessage]);
+                $geminiService = new \App\Services\GeminiAgentService();
+                $response = $geminiService->runAgent($userMessage);
+                Log::info('✅ [Gemini] Respuesta generada', ['reply_length' => strlen(json_encode($response))]);
+                return response()->json($response);
+            } catch (\Exception $e) {
+                Log::error("❌ [Gemini] Error: " . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString()
+                ]);
+                return response()->json([
+                    'reply' => 'Error con el Agente Gemini: ' . $e->getMessage(),
+                    'status' => 'error'
+                ], 500);
+            }
+        }
 
         try {
             // 🔧 CÓDIGOS DE DESARROLLO (sin consumir tokens)
@@ -236,13 +268,16 @@ class AIController extends Controller
             }
             Cache::put($lockKey, true, 60); // Bloqueo por 60 segundos
 
-            // 1. Build lightweight system prompt (NO CONTEXT STUFFING!)
+            // 1. Limpiar historial viejo al iniciar (solo de este tenant)
+            $this->cleanOldHistory($sessionId);
+
+            // 2. Build lightweight system prompt (NO CONTEXT STUFFING!)
             $systemPrompt = $this->buildSystemPrompt();
 
-            // 2. Recuperar historial de conversación (reducido para evitar confusión)
+            // 3. Recuperar historial de conversación (reducido para evitar confusión)
             $conversationHistory = ConversationHistory::getRecentMessages($sessionId, 3);
 
-            // 3. Guardar mensaje del usuario
+            // 4. Guardar mensaje del usuario
             ConversationHistory::create([
                 'user_id' => auth()->id(),
                 'session_id' => $sessionId,
@@ -250,10 +285,10 @@ class AIController extends Controller
                 'content' => $userMessage,
             ]);
 
-            // 4. Call AI with agent loop (handles tools automatically)
+            // 5. Call AI with agent loop (handles tools automatically)
             $response = $this->callGroqAPI($systemPrompt, $userMessage, $conversationHistory);
 
-            // 5. Guardar respuesta del asistente
+            // 6. Guardar respuesta del asistente
             $aiResponse = json_decode($response, true);
             $assistantReply = $aiResponse['reply'] ?? 'Sin respuesta';
             ConversationHistory::create([
@@ -295,6 +330,337 @@ class AIController extends Controller
     }
 
     /**
+     * Handle chat with file upload (Excel or Image)
+     */
+    public function chatWithFile(Request $request)
+    {
+        Log::info("📂 [AI] Iniciando carga de archivo", [
+            'has_file' => $request->hasFile('file'),
+            'message' => $request->input('message')
+        ]);
+
+        set_time_limit(180); // Más tiempo para procesar archivos grandes
+
+        $request->validate([
+            'message' => 'nullable|string',
+            'file' => 'required|file|max:10240', // Max 10MB
+        ]);
+
+        $userMessage = trim($request->input('message', ''));
+        $provider = $request->input('provider', 'groq');
+        $file = $request->file('file');
+
+        try {
+            $extension = strtolower($file->getClientOriginalExtension());
+            $mimeType = $file->getMimeType();
+
+            // Determinar tipo de archivo
+            if (in_array($extension, ['xlsx', 'xls', 'csv'])) {
+                // Procesar Excel/CSV
+                return $this->processExcelFile($file, $userMessage, $provider);
+            } elseif (str_starts_with($mimeType, 'image/')) {
+                // Procesar imagen
+                return $this->processImageFile($file, $userMessage, $provider);
+            } else {
+                return response()->json([
+                    'reply' => 'Tipo de archivo no soportado. Solo acepto archivos Excel (.xlsx, .xls, .csv) o imágenes.',
+                    'status' => 'error'
+                ], 400);
+            }
+        } catch (\Throwable $e) {
+            Log::error('AI Chat With File Error: ' . $e->getMessage());
+            return response()->json([
+                'reply' => 'Error al procesar el archivo: ' . $e->getMessage(),
+                'status' => 'error'
+            ], 500);
+        }
+    }
+
+    /**
+     * Process Excel file and create products in bulk
+     */
+    private function processExcelFile($file, $userMessage, $provider)
+    {
+        Log::info("📂 [processExcelFile] Iniciando procesamiento", [
+            'provider' => $provider,
+            'extension' => $file->getClientOriginalExtension(),
+            'size' => $file->getSize(),
+            'message' => $userMessage
+        ]);
+
+        // ✅ SI EL PROVIDER ES GEMINI, USAR GEMINI AGENT
+        if ($provider === 'gemini') {
+            Log::info("🤖 [processExcelFile] Usando Gemini Agent para procesar archivo");
+            return $this->processExcelFileWithGemini($file, $userMessage);
+        }
+
+        // ❌ SI NO, USAR PROCESAMIENTO DIRECTO (ANTIGUO)
+        Log::info("📊 [processExcelFile] Usando procesamiento directo (sin IA)");
+
+        // Usar PhpSpreadsheet si está disponible, sino SimpleXLSX
+        $extension = strtolower($file->getClientOriginalExtension());
+        $products = [];
+
+        try {
+            if ($extension === 'csv') {
+                // Procesar CSV
+                $handle = fopen($file->getPathname(), 'r');
+                $headers = fgetcsv($handle);
+
+                if ($headers === false) {
+                    fclose($handle);
+                    return response()->json([
+                        'reply' => 'El archivo CSV está vacío o no se pudo leer.',
+                        'status' => 'error'
+                    ]);
+                }
+
+                // Limpiar BOM si existe
+                $bom = pack('H*','EFBBBF');
+                $headers[0] = preg_replace("/^$bom/", '', $headers[0]);
+
+                $headers = array_map('strtolower', array_map('trim', $headers));
+                $headerCount = count($headers);
+
+                while (($row = fgetcsv($handle)) !== false) {
+                    // Saltar filas vacías
+                    if (empty($row) || (count($row) === 1 && empty($row[0]))) {
+                        continue;
+                    }
+
+                    $rowCount = count($row);
+
+                    if ($rowCount > $headerCount) {
+                        $row = array_slice($row, 0, $headerCount);
+                    } elseif ($rowCount < $headerCount) {
+                        $row = array_pad($row, $headerCount, '');
+                    }
+
+                    $combined = @array_combine($headers, $row);
+                    if ($combined !== false) {
+                        $products[] = $combined;
+                    }
+                }
+                fclose($handle);
+            } else {
+                // Intentar usar PhpSpreadsheet
+                if (!class_exists('\PhpOffice\PhpSpreadsheet\IOFactory')) {
+                    return response()->json([
+                        'reply' => "Para procesar archivos Excel (.xlsx/.xls), necesito la librería PhpSpreadsheet.\n\nPuedes:\n1. Exportar tu archivo como CSV\n2. O instalar: composer require phpoffice/phpspreadsheet",
+                        'status' => 'error'
+                    ]);
+                }
+
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+                $worksheet = $spreadsheet->getActiveSheet();
+                $rows = $worksheet->toArray();
+
+                if (count($rows) < 2) {
+                    return response()->json([
+                        'reply' => 'El archivo Excel está vacío o solo tiene encabezados.',
+                        'status' => 'error'
+                    ]);
+                }
+
+                $headers = array_map('strtolower', array_map('trim', $rows[0]));
+                for ($i = 1; $i < count($rows); $i++) {
+                    if (count($rows[$i]) >= count($headers)) {
+                        $products[] = array_combine($headers, $rows[$i]);
+                    }
+                }
+            }
+
+            if (empty($products)) {
+                return response()->json([
+                    'reply' => 'No encontré productos válidos en el archivo. Asegúrate de que tenga columnas como: nombre, precio, costo, stock, categoria.',
+                    'status' => 'error'
+                ]);
+            }
+
+            // Procesar y crear productos
+            $created = 0;
+            $errors = [];
+            $createdProducts = [];
+
+            foreach ($products as $index => $productData) {
+                try {
+                    // Mapear columnas comunes
+                    $name = $productData['nombre'] ?? $productData['name'] ?? $productData['producto'] ?? null;
+                    $price = $productData['precio'] ?? $productData['price'] ?? $productData['precio_venta'] ?? $productData['sale_price'] ?? 0;
+                    $cost = $productData['costo'] ?? $productData['cost'] ?? $productData['precio_costo'] ?? $productData['cost_price'] ?? 0;
+                    $stock = $productData['stock'] ?? $productData['cantidad'] ?? $productData['quantity'] ?? 0;
+                    $sku = $productData['sku'] ?? $productData['codigo'] ?? $productData['code'] ?? null;
+                    $categoryName = $productData['categoria'] ?? $productData['category'] ?? null;
+
+                    if (empty($name)) {
+                        $errors[] = "Fila " . ($index + 2) . ": Sin nombre de producto";
+                        continue;
+                    }
+
+                    // Buscar o crear categoría
+                    $categoryName = $categoryName ?: 'General';
+                    $category = \App\Models\Category::where('name', 'LIKE', $categoryName)->first();
+
+                    if (!$category) {
+                        $category = \App\Models\Category::create([
+                            'name' => $categoryName,
+                            'active' => true
+                        ]);
+                    }
+                    $categoryId = $category->id;
+
+                    // Crear producto
+                    $product = Product::create([
+                        'name' => $name,
+                        'sku' => $sku ?? strtoupper(substr(md5($name . time()), 0, 8)),
+                        'sale_price' => floatval($price),
+                        'cost_price' => floatval($cost),
+                        'current_stock' => intval($stock),
+                        'min_stock' => 5,
+                        'category_id' => $categoryId,
+                        'active' => true,
+                        'manage_stock' => true,
+                    ]);
+
+                    $created++;
+                    $createdProducts[] = $product->name;
+
+                } catch (\Throwable $e) {
+                    $errors[] = "Fila " . ($index + 2) . ": " . $e->getMessage();
+                }
+            }
+
+            // Eliminar archivo después de procesar
+            @unlink($file->getPathname());
+
+            // Preparar respuesta
+            $reply = "✅ **Importación completada**\n\n";
+            $reply .= "📦 Productos creados: **{$created}** de " . count($products) . "\n";
+
+            if ($created > 0) {
+                $reply .= "\n**Productos creados:**\n";
+                foreach (array_slice($createdProducts, 0, 10) as $name) {
+                    $reply .= "• {$name}\n";
+                }
+                if ($created > 10) {
+                    $reply .= "• ... y " . ($created - 10) . " más\n";
+                }
+            }
+
+            if (!empty($errors)) {
+                $reply .= "\n⚠️ **Errores:**\n";
+                foreach (array_slice($errors, 0, 5) as $error) {
+                    $reply .= "• {$error}\n";
+                }
+                if (count($errors) > 5) {
+                    $reply .= "• ... y " . (count($errors) - 5) . " errores más\n";
+                }
+            }
+
+            return response()->json([
+                'reply' => $reply,
+                'status' => 'success',
+                'data' => [
+                    'created' => $created,
+                    'total' => count($products),
+                    'errors' => count($errors)
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            @unlink($file->getPathname());
+            throw $e;
+        }
+    }
+
+    /**
+     * Process image file and create product with it
+     */
+    private function processImageFile($file, $userMessage, $provider)
+    {
+        try {
+            // Guardar imagen en storage
+            $fileName = 'product_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('products', $fileName, 'public');
+            $imageUrl = asset('storage/' . $path);
+
+            // Extraer nombre del mensaje o del archivo
+            $productName = $this->extractProductNameFromMessage($userMessage);
+            if (empty($productName)) {
+                // Usar nombre del archivo sin extensión
+                $productName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $productName = str_replace(['_', '-'], ' ', $productName);
+                $productName = ucwords($productName);
+            }
+
+            // Crear producto con imagen
+            $product = Product::create([
+                'name' => $productName,
+                'sku' => strtoupper(substr(md5($productName . time()), 0, 8)),
+                'sale_price' => 0,
+                'cost_price' => 0,
+                'current_stock' => 0,
+                'min_stock' => 5,
+                'image_url' => $imageUrl,
+                'active' => true,
+                'manage_stock' => true,
+            ]);
+
+            $reply = "✅ **Producto creado con imagen**\n\n";
+            $reply .= "📦 **{$product->name}**\n";
+            $reply .= "🖼️ Imagen: Guardada correctamente\n";
+            $reply .= "💰 Precio: $0 (pendiente)\n";
+            $reply .= "📊 Stock: 0 unidades\n\n";
+            $reply .= "⚠️ Recuerda configurar el precio y stock del producto.";
+
+            return response()->json([
+                'reply' => json_encode([
+                    'reply' => $reply,
+                    'action' => null,
+                    'suggested_action' => [
+                        'type' => 'navigate',
+                        'label' => '✏️ Editar Producto',
+                        'payload' => [
+                            'name' => 'POSModule',
+                            'params' => ['module' => 'products'],
+                            'query' => ['action' => 'edit', 'id' => $product->id]
+                        ]
+                    ]
+                ]),
+                'status' => 'success',
+                'data' => [
+                    'product_id' => $product->id,
+                    'image_url' => $imageUrl
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Extract product name from user message
+     */
+    private function extractProductNameFromMessage($message)
+    {
+        // Patrones comunes para extraer nombres de productos
+        $patterns = [
+            '/(?:crea(?:r)?|crear un|nuevo) producto (?:llamado |con nombre |de )?"?([^"]+)"?/i',
+            '/producto[:\s]+([^\n,]+)/i',
+            '/nombre[:\s]+([^\n,]+)/i',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $message, $matches)) {
+                return trim($matches[1]);
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Build lightweight system prompt (NO CONTEXT STUFFING!)
      */
     private function buildSystemPrompt()
@@ -332,17 +698,46 @@ Tienes herramientas para consultar datos en tiempo real:
    Usuario: "muestra productos" → Llama search_products() → {"reply": "datos formateados", "action": null}
    Usuario: "ventas de hoy" → Llama get_sales_report('today') → {"reply": "estadísticas", "action": null}
 
-   **FACTURAS - CONSULTAS INTELIGENTES**:
-   • "¿cuántas facturas hay?" → search_invoices(date='all', limit=1000) → Contar resultados
-   • "facturas de hoy" → search_invoices(date='today')
-   • "facturas de ayer" → search_invoices(date='yesterday')
-   • "facturas de la semana" → search_invoices(date='week')
-   • "muestra la factura 5" o "detalles de la factura 5" → get_invoice_details(invoice_id=5)
-   • "información de esa venta" (si ya mencionaste una factura) → get_invoice_details(invoice_id=ID_PREVIO)
+   **FACTURAS - REGLAS CRÍTICAS** ⚠️⚠️⚠️:
 
-   ⚠️ IMPORTANTE: Si el usuario pregunta por "información", "detalles" o "qué tiene" una factura, USA get_invoice_details(), NO search_invoices()
+   **CUANDO EL USUARIO PIDE "INFORMACIÓN", "DETALLES", "VENDEDOR" O "PRODUCTOS" DE UNA FACTURA:**
+   1. Si menciona un número como "FACT-000012":
+      - Paso 1: search_invoices(invoice_number='FACT-000012') → Obtener ID
+      - Paso 2: **OBLIGATORIO** get_invoice_details(invoice_id=ID) → Obtener TODO
 
-4. **CREAR PRODUCTOS** - SÉ PROACTIVO:
+   2. Si el usuario pregunta "qué productos" o "qué vendió" después de consultar una factura:
+      - Usa get_invoice_details(invoice_id=ID_DEL_CONTEXTO)
+      - NO digas "necesito consultar ventas de hoy"
+      - La factura YA fue consultada, usa su ID del historial
+
+   3. **NUNCA** respondas solo con search_invoices si el usuario quiere:
+      - Vendedor
+      - Productos
+      - Detalles completos
+      - "información de"
+
+   **search_invoices** → Solo para LISTAR/CONTAR facturas
+   **get_invoice_details** → Para VER DETALLES (vendedor, productos, precios)
+
+   Ejemplos correctos:
+   • "dame información de FACT-000012" → search_invoices + get_invoice_details
+   • "qué productos tiene esa factura" → get_invoice_details(ID_del_historial)
+   • "quién fue el vendedor" → get_invoice_details(ID_del_historial)
+   • "cuántas facturas hay" → search_invoices solamente
+
+4. **MEMORIA DE CONTEXTO** 🧠:
+   Tienes acceso al historial de los últimos 3 mensajes. Úsalo inteligentemente:
+
+   - Si en turno 1 consultaste la factura FACT-000012 (ID=12)
+   - Y en turno 2 el usuario pregunta "qué productos tiene" o "quién fue el vendedor"
+   - **USA EL ID DEL TURNO 1**: get_invoice_details(invoice_id=12)
+   - NO digas "necesito consultar ventas" - YA TIENES EL CONTEXTO
+
+   Si no encuentras el ID en el historial reciente:
+   - Pregunta: "¿Te refieres a la factura FACT-000012 que consultamos antes?"
+   - O pide el número de factura nuevamente
+
+5. **CREAR PRODUCTOS** - SÉ PROACTIVO:
    Usuario: "crea producto X con categoría Y"
 
    SI FALTA INFO (especialmente CATEGORÍA) → Pídela específicamente:
@@ -358,54 +753,70 @@ Tienes herramientas para consultar datos en tiempo real:
    - Paso 4: RESPONDE con éxito Y ACCIÓN DE NAVEGACIÓN para editar:
      {"reply": "¡Producto creado! Te abro el editor por si quieres ajustar algo.", "action": {"type": "navigate", "payload": {"name": "POSModule", "params": {"module": "products"}, "query": {"action": "edit", "id": ID_DEL_PRODUCTO}}}}
 
-5. **ACCIONES MULTI-PASO**:
+6. **ACCIONES MULTI-PASO**:
    Ejemplo: "crea descuento para Maria"
    - Paso 1: search_customers(query='Maria') → obtiene ID
    - Paso 2: execute_action('create_discount', params con customer_id)
    - Paso 3: RESPONDE con resultado (NO más herramientas)
 
-6. **SALUDOS**: "hola", "hi", "buenos días" → Responde directamente sin herramientas
+7. **SALUDOS**: "hola", "hi", "buenos días" → Responde directamente sin herramientas
 
-7. **DETENTE** cuando hayas obtenido lo que el usuario pidió
+8. **DETENTE** cuando hayas obtenido lo que el usuario pidió
 
-8. **ERRORES** - SÉ CLARO Y ÚTIL:
+9. **ERRORES** - SÉ CLARO Y ÚTIL:
    Si algo falla → Explica QUÉ falló y QUÉ se necesita
    Ejemplo: "No puedo crear el producto porque la categoría 'Hogar' no existe en el sistema. ¿Quieres que la cree primero o usar otra categoría existente?"
 
-9. **WhatsApp**: target debe ser "all", "active" o "specific" (con customer_ids)
+10. **WhatsApp**: target debe ser "all", "active" o "specific" (con customer_ids)
 
-10. **EDICIÓN DE PRODUCTOS**:
+11. **EDICIÓN DE PRODUCTOS**:
    - Si el usuario dice "abreme el editor", "editarlo", "modificarlo" justo después de crear o mencionar un producto:
      - Usa la acción `navigate` con `query: { "action": "edit", "id": [ID_DEL_PRODUCTO] }`.
      - El ID del producto recién creado estará en el historial de conversación o en tu memoria inmediata.
-     - Ejemplo:
-       Usuario: "abreme el editor"
-       Respuesta: {
-         "reply": "¡Claro! Abriendo el editor para 'Carne Molida' 📝",
-         "action": {"type": "navigate", "payload": {"name": "POSModule", "params": {"module": "products"}, "query": {"action": "edit", "id": 39}}}
-       }
 
-11. **CREACIÓN PROACTIVA Y EDICIÓN OPCIONAL**:
+12. **CREACIÓN PROACTIVA Y EDICIÓN OPCIONAL**:
    - Si el usuario pregunta "¿podemos crear X?" o "¿puedes crear X?", ASUME QUE ES UNA ORDEN.
    - NO preguntes "¿quieres que lo cree?". HAZLO.
    - Si faltan datos, créalo con valores por defecto (precio 0, stock 0) y avisa al usuario que puede editarlo después.
    - **IMPORTANTE**: Después de crear un producto, **NO** navegues automáticamente al editor.
    - En su lugar, usa `suggested_action` para mostrar un botón que diga "✏️ Editar Producto".
-   - Así el usuario puede decidir si quiere editarlo o seguir conversando.
-   - Ejemplo:
-     Usuario: "podemos crear una categoria llamada empanadas"
-     Respuesta: {
-       "reply": "¡Listo! Categoría 'empanadas' creada ✅. ¿Quieres agregar productos a ella?",
-       "execute_action": { "type": "create_category", "params": { "name": "empanadas" } }
-     }
 
-12. **FORMATO RESPUESTA**:
+13. **SEDES / BODEGAS (IMPORTANTE)**:
+    - Si el usuario pide "crear sede", "nueva bodega", "sucursal":
+      - Verifica el plan del usuario (si tienes acceso) o intenta ejecutar la acción `create_warehouse`.
+      - Si la acción falla por límite de plan (Basic/Free), EXPLICA: "Tu plan actual no permite crear más sedes."
+      - **LÍMITES DE PLAN**: Free/Basic: 1 sede, Premium: 3 sedes, Enterprise: Ilimitado
+
+14. **FORMATO RESPUESTA**:
    SIEMPRE JSON: {"reply": "texto amigable y útil", "action": null o objeto_navegación, "suggested_action": { "type": "navigate", "label": "Texto del Botón", "payload": { ... } } o null}
+
+15. **ERRORES PREVIOS**:
+   - Si ves en el historial que tuviste un problema o error en el turno anterior, NO intentes reintentar la acción automáticamente a menos que el usuario lo pida de nuevo.
+   - Prioriza SIEMPRE el último mensaje del usuario.
 
 13. **ERRORES PREVIOS**:
    - Si ves en el historial que tuviste un problema o error en el turno anterior, NO intentes reintentar la acción automáticamente a menos que el usuario lo pida de nuevo.
    - Prioriza SIEMPRE el último mensaje del usuario.
    - Si el usuario pregunta algo nuevo (ej: "¿cuántos productos hay?"), responde a ESO, no a la orden fallida anterior.
+
+14. **EJEMPLOS DE CONSULTAS DE FACTURAS**:
+   Ejemplo 1:
+   Usuario: "dame información de la factura FACT-000012"
+   Paso 1: search_invoices(invoice_number='FACT-000012') → Obtiene [{ id: 12, number: 'FACT-000012', customer_name: 'MARIA JOSE', date: '2025-12-26', total: 1800, status: 'Pagada', payment_method: 'Efectivo' }]
+   Paso 2: get_invoice_details(invoice_id=12) → Obtiene productos completos y vendedor
+   Respuesta: "La factura **FACT-000012** del 26 de diciembre de 2025 a nombre de **MARIA JOSE** fue realizada por el vendedor **[Nombre del Vendedor]** y pagada con **efectivo** por un total de **$1.800**. Productos vendidos: [lista productos con cantidades y precios]"
+
+   Ejemplo 2:
+   Usuario: "facturas de hoy"
+   Paso 1: search_invoices(date='today') → Lista facturas
+   Respuesta: "Hoy tienes X facturas por un total de $XXX. Las principales son: [lista con números, clientes y montos]"
+
+   Ejemplo 3:
+   Usuario: "muestra los productos de esa factura" (después de haber mencionado FACT-000012)
+   Paso 1: get_invoice_details(invoice_id=12) [usar el ID del contexto]
+   Respuesta: "Productos de la factura FACT-000012:\n• [Producto 1]: X unidades x $Y = $Z\n• [Producto 2]: X unidades x $Y = $Z\n**Total: $1.800**\n**Vendedor: [Nombre]**"
+
+   ⚠️ IMPORTANTE: SIEMPRE incluye el vendedor (seller_name) en las respuestas sobre facturas cuando esté disponible.
 
 ¡Sé inteligente, proactivo y ayuda al usuario a completar sus tareas!
 
@@ -520,7 +931,7 @@ EOT;
                 'type' => 'function',
                 'function' => [
                     'name' => 'search_invoices',
-                    'description' => 'Buscar facturas por cliente, fecha, número de factura o ID. Usa esto para listar facturas o encontrar una específica.',
+                    'description' => 'Buscar facturas por cliente, fecha, número de factura o ID. IMPORTANTE: Si el usuario menciona un número de factura como "FACT-000012", usa el parámetro invoice_number. Esta herramienta retorna una lista con información básica (id, number, customer, date, total, status). Para obtener los DETALLES COMPLETOS (productos, cantidades, precios), usa después get_invoice_details con el ID encontrado.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -535,11 +946,11 @@ EOT;
                             ],
                             'invoice_id' => [
                                 'type' => 'integer',
-                                'description' => 'ID específico de la factura'
+                                'description' => 'ID específico de la factura (ej: 12)'
                             ],
                             'invoice_number' => [
                                 'type' => 'string',
-                                'description' => 'Número de factura (ej: FACT-0001)'
+                                'description' => 'Número de factura completo o parcial (ej: "FACT-000012" o "000012"). Usa esto cuando el usuario mencione el código de la factura.'
                             ],
                             'limit' => [
                                 'type' => 'integer',
@@ -555,7 +966,7 @@ EOT;
                 'type' => 'function',
                 'function' => [
                     'name' => 'get_invoice_details',
-                    'description' => 'Obtener información COMPLETA de una factura específica incluyendo productos, cantidades, precios, cliente, fecha, etc. Usa esto cuando el usuario pida "información", "detalles", "qué tiene" o "mostrar" una factura.',
+                    'description' => 'Obtener información COMPLETA de una factura específica incluyendo: productos con cantidades y precios, cliente, vendedor/cajero, fecha, método de pago, estado, etc. Usa esto cuando el usuario pida "información", "detalles", "qué tiene", "mostrar" una factura, o pregunte por el vendedor.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
@@ -578,12 +989,12 @@ EOT;
                         'properties' => [
                             'action_type' => [
                                 'type' => 'string',
-                                'enum' => ['create_discount', 'send_whatsapp', 'create_campaign', 'create_product', 'create_category'],
+                                'enum' => ['create_discount', 'send_whatsapp', 'create_campaign', 'create_product', 'create_category', 'create_warehouse'],
                                 'description' => 'Tipo de acción a ejecutar'
                             ],
                             'params' => [
                                 'type' => 'object',
-                                'description' => 'Parámetros específicos. create_product: {name, category_id, sale_price, cost_price, current_stock}. create_discount: {name, code, type, value, duration_days}. send_whatsapp: {message, target, customer_ids}.'
+                                'description' => 'Parámetros específicos. create_product: {name, category_id, sale_price, cost_price, current_stock}. create_warehouse: {name, address, phone}. create_discount: {name, code, type, value, duration_days}. send_whatsapp: {message, target, customer_ids}.'
                             ]
                         ],
                         'required' => ['action_type', 'params']
@@ -1192,6 +1603,7 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 'customer_name' => $invoice->customer?->name ?? 'Cliente Final',
                 'customer_phone' => $invoice->customer?->phone,
                 'customer_email' => $invoice->customer?->email,
+                'seller_name' => $invoice->seller_name ?? 'No especificado',
                 'date' => $invoice->date,
                 'subtotal' => $invoice->subtotal,
                 'tax' => $invoice->tax,
@@ -1258,6 +1670,9 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
 
                 case 'create_category':
                     return $this->createCategoryAction($actionData['params'] ?? []);
+
+                case 'create_warehouse':
+                    return $this->createWarehouseAction($actionData['params'] ?? []);
 
                 default:
                     return [
@@ -1339,6 +1754,72 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
     }
 
     /**
+     * Create warehouse action
+     */
+    private function createWarehouseAction($params)
+    {
+        // Validar límite de tiendas según plan
+        $tenantPlan = tenant('plan') ?? 'free_trial';
+        $warehouseCount = \App\Models\Warehouse::count();
+
+        // Planes que NO pueden usar multi-tienda
+        if (in_array($tenantPlan, ['free_trial', 'basic'])) {
+            return [
+                'success' => false,
+                'message' => "Tu plan actual ({$tenantPlan}) no permite crear múltiples sedes. Necesitas el plan Premium o Enterprise."
+            ];
+        }
+
+        // Premium: máximo 3 tiendas
+        if ($tenantPlan === 'premium' && $warehouseCount >= 3) {
+            return [
+                'success' => false,
+                'message' => "Has alcanzado el límite de 3 sedes para tu plan Premium. Actualiza a Enterprise para crear más."
+            ];
+        }
+
+        try {
+            $warehouse = \App\Models\Warehouse::create([
+                'name' => $params['name'] ?? 'Nueva Sede',
+                'address' => $params['address'] ?? null,
+                'phone' => $params['phone'] ?? null,
+                'active' => true,
+                'is_default' => false
+            ]);
+
+            return [
+                'success' => true,
+                'message' => "Sede '{$warehouse->name}' creada exitosamente.",
+                'data' => $warehouse
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => "Error al crear la sede: " . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Clean old conversation history (only current tenant)
+     * Deletes messages from the provided session
+     */
+    private function cleanOldHistory($sessionId)
+    {
+        try {
+            // Eliminar TODO el historial de esta sesión (del tenant actual)
+            $deleted = ConversationHistory::where('session_id', $sessionId)->delete();
+
+            if ($deleted > 0) {
+                Log::info("🧹 [AI] Historial limpiado: {$deleted} mensajes eliminados (session: {$sessionId})");
+            }
+
+        } catch (\Exception $e) {
+            Log::error('❌ [AI] Error limpiando historial: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Clear conversation history
      */
     public function clearHistory(Request $request)
@@ -1369,4 +1850,219 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             ], 500);
         }
     }
+
+    /**
+     * Get AI usage statistics for the current tenant
+     * Returns usage limits, current usage, and warnings
+     */
+    public function getUsageStats()
+    {
+        try {
+            $tenantId = tenant('id');
+
+            if (!$tenantId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tenant no identificado'
+                ], 400);
+            }
+
+            $aiUsageService = new AiUsageService();
+            $stats = $aiUsageService->getUsageStats($tenantId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $stats
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo estadísticas de uso IA: ' . $e->getMessage());
+
+            // Return default stats if service fails
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'plan' => 'free_trial',
+                    'limits' => [
+                        'unlimited' => false,
+                        'limits' => [
+                            'requests_per_hour' => 10,
+                            'requests_per_day' => 50,
+                            'tokens_per_request' => 4000,
+                            'tokens_per_day' => 100000
+                        ]
+                    ],
+                    'usage' => [
+                        'last_hour' => [
+                            'requests' => 0,
+                            'tokens' => 0,
+                            'remaining_requests' => 10
+                        ],
+                        'today' => [
+                            'requests' => 0,
+                            'tokens' => 0,
+                            'remaining_requests' => 50
+                        ]
+                    ],
+                    'warnings' => []
+                ]
+            ]);
+        }
+    }
+
+    /**
+     * Get AI provider configuration based on tenant plan
+     * Returns recommended provider and availability
+     */
+    public function getProviderConfig()
+    {
+        try {
+            $tenantId = tenant('id');
+            $tenant = \Stancl\Tenancy\Database\Models\Tenant::find($tenantId);
+            $planName = $tenant->plan ?? 'free_trial';
+
+            // Provider availability based on plan
+            $providerConfig = [
+                'free_trial' => [
+                    'default' => 'groq',
+                    'available' => ['groq'],
+                    'gemini_enabled' => false,
+                    'reason' => 'Plan gratuito - solo Groq disponible'
+                ],
+                'basic' => [
+                    'default' => 'groq',
+                    'available' => ['groq'],
+                    'gemini_enabled' => false,
+                    'reason' => 'Plan Básico - solo Groq disponible'
+                ],
+                'premium' => [
+                    'default' => 'gemini',
+                    'available' => ['groq', 'gemini'],
+                    'gemini_enabled' => true,
+                    'reason' => 'Plan Premium - Gemini recomendado'
+                ],
+                'enterprise' => [
+                    'default' => 'gemini',
+                    'available' => ['groq', 'gemini'],
+                    'gemini_enabled' => true,
+                    'reason' => 'Plan Enterprise - acceso completo'
+                ]
+            ];
+
+            $config = $providerConfig[$planName] ?? $providerConfig['free_trial'];
+            $config['current_plan'] = $planName;
+
+            return response()->json([
+                'success' => true,
+                'data' => $config
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo config de proveedores IA: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'current_plan' => 'free_trial',
+                    'default' => 'groq',
+                    'available' => ['groq'],
+                    'gemini_enabled' => false,
+                    'reason' => 'Configuración por defecto'
+                ]
+            ]);
+        }
+    }
+
+    /**
+     * Process Excel file with Gemini AI
+     */
+    private function processExcelFileWithGemini($file, $userMessage)
+    {
+        Log::info("🤖 [Gemini Excel] Iniciando análisis con Gemini");
+
+        $fullPath = null;
+        try {
+            // 1. Guardar archivo temporalmente
+            $filePath = $file->store('temp_excel', 'local');
+            $fullPath = storage_path('app/' . $filePath);
+
+            Log::info("📁 [Gemini Excel] Archivo guardado en: {$fullPath}");
+
+            // 2. Parsear el archivo CSV/Excel INMEDIATAMENTE
+            $excelService = app(\App\Services\ExcelParserService::class);
+            $parseResult = $excelService->parseFile($fullPath);
+
+            $headers = $parseResult['headers'] ?? [];
+            $rows = $parseResult['data'] ?? [];
+
+            // ✅ ELIMINAR ARCHIVO INMEDIATAMENTE DESPUÉS DE PARSEAR
+            // No esperar a que Gemini responda
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+                Log::info("🗑️ [Gemini Excel] Archivo temporal eliminado inmediatamente");
+            }
+
+            if (empty($headers) || empty($rows)) {
+                return response()->json([
+                    'reply' => '❌ Error: El archivo está vacío o no tiene el formato correcto.',
+                    'status' => 'error'
+                ], 400);
+            }
+
+            Log::info("📊 [Gemini Excel] Archivo parseado", [
+                'headers' => $headers,
+                'total_rows' => count($rows)
+            ]);
+
+            // 3. Preparar datos para Gemini (SIN la ruta del archivo)
+            $geminiService = app(\App\Services\GeminiAgentService::class);
+
+            $prompt = $userMessage ?: "Importa estos productos a la base de datos.";
+            $prompt .= "\n\n🚀 **INSTRUCCIÓN IMPORTANTE:** Usa la función `importarProductosMasivo` para crear todos estos productos en la base de datos de una sola vez.\n\n";
+            $prompt .= "**Datos del archivo:**\n";
+            $prompt .= "- Columnas: " . implode(', ', $headers) . "\n";
+            $prompt .= "- Total de productos: " . count($rows) . "\n\n";
+            $prompt .= "**Primeras 5 filas (vista previa):**\n```json\n";
+
+            foreach (array_slice($rows, 0, 5) as $index => $row) {
+                $prompt .= json_encode(array_combine($headers, $row), JSON_UNESCAPED_UNICODE) . "\n";
+            }
+            $prompt .= "```\n\n";
+            $prompt .= "📋 **Datos completos listos para importar:**\n```json\n";
+            $prompt .= json_encode(['headers' => $headers, 'rows' => $rows], JSON_UNESCAPED_UNICODE);
+            $prompt .= "\n```\n\n";
+            $prompt .= "✅ **Ahora llama a la función `importarProductosMasivo` con este JSON para importar los " . count($rows) . " productos.**";
+
+            Log::info("📤 [Gemini Excel] Enviando a Gemini", [
+                'total_products' => count($rows),
+                'headers' => $headers
+            ]);
+
+            // 4. Ejecutar con Gemini Agent
+            $response = $geminiService->runAgent($prompt);
+
+            Log::info("✅ [Gemini Excel] Respuesta recibida de Gemini");
+
+            // 6. Retornar respuesta de Gemini
+            return response()->json([
+                'reply' => $response,
+                'status' => 'success'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('❌ [Gemini Excel] Error: ' . $e->getMessage());
+
+            // Limpiar archivo si aún existe
+            if ($fullPath && file_exists($fullPath)) {
+                @unlink($fullPath);
+                Log::info("🗑️ [Gemini Excel] Archivo temporal eliminado (error)");
+            }
+
+            return response()->json([
+                'reply' => '❌ Error al procesar con Gemini: ' . $e->getMessage(),
+                'status' => 'error'
+            ], 500);
+        }
+    }
 }
+

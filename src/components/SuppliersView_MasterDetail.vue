@@ -1,13 +1,13 @@
 <template>
-  <!-- Master-Detail Layout para Proveedores -->
-  <div class="grid grid-cols-12 gap-6">
+  <!-- Master-Detail Layout Enterprise: 30/70 - Unificado como WhatsApp -->
+  <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="height: calc(100vh - 200px); min-height: 550px;">
+    <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
     
-    <!-- MASTER: Lista de Proveedores (Izquierda) -->
-    <div class="col-span-12 lg:col-span-4">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden flex flex-col" style="height: calc(100vh - 200px);">
+    <!-- PANEL IZQUIERDO: Lista de Proveedores (30%) -->
+    <div class="lg:col-span-3 overflow-hidden flex flex-col border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
         
         <!-- Filtros / Búsqueda -->
-        <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50 flex-shrink-0">
+        <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900 flex-shrink-0">
           <div class="relative">
             <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -129,30 +129,88 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- DETAIL: Detalles del Proveedor (Derecha) -->
-    <div class="col-span-12 lg:col-span-8">
-      <!-- Estado vacío -->
-      <div v-if="!selectedSupplier" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 p-12 text-center" style="height: calc(100vh - 200px); display: flex; align-items: center; justify-content: center;">
-        <div>
-          <div class="w-24 h-24 bg-gray-100 dark:bg-zinc-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <svg class="w-12 h-12 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+    <!-- PANEL DERECHO: Detalles del Proveedor (70%) -->
+    <div class="lg:col-span-7 overflow-hidden flex flex-col bg-gray-50/30 dark:bg-zinc-950/30 transition-colors duration-300">
+      <!-- Estado vacío - Empty State Profesional estilo WhatsApp -->
+      <div v-if="!selectedSupplier" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-zinc-900/50 dark:via-zinc-900/30 dark:to-zinc-900/50 relative">
+            
+          <!-- Ilustración SVG profesional y limpia -->
+          <div class="mb-8 relative">
+            <!-- Efecto glow suave de fondo -->
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-200/30 via-transparent to-emerald-200/30 dark:from-blue-500/10 dark:to-emerald-500/10 rounded-3xl blur-3xl scale-150"></div>
+            
+            <!-- Ilustración principal de proveedores -->
+            <svg class="w-48 h-48 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Sombra del edificio -->
+              <rect x="48" y="38" width="88" height="110" rx="6" class="fill-gray-200/50 dark:fill-zinc-700/30"/>
+              
+              <!-- Edificio proveedor -->
+              <rect x="44" y="32" width="88" height="110" rx="6" class="fill-white dark:fill-zinc-800" stroke-width="0"/>
+              <rect x="44" y="32" width="88" height="110" rx="6" class="fill-none stroke-gray-200 dark:stroke-zinc-700" stroke-width="1.5"/>
+              
+              <!-- Cartel de empresa -->
+              <rect x="54" y="44" width="68" height="18" rx="3" class="fill-blue-100 dark:fill-blue-500/20"/>
+              <rect x="60" y="50" width="30" height="6" rx="3" class="fill-blue-500 dark:fill-blue-400"/>
+              <rect x="94" y="50" width="22" height="6" rx="3" class="fill-blue-300 dark:fill-blue-400/50"/>
+              
+              <!-- Ventanas/oficinas -->
+              <rect x="54" y="70" width="28" height="18" rx="2" class="fill-gray-100 dark:fill-zinc-700"/>
+              <rect x="86" y="70" width="28" height="18" rx="2" class="fill-emerald-100 dark:fill-emerald-500/20 stroke-emerald-200 dark:stroke-emerald-500/30" stroke-width="1"/>
+              
+              <!-- Puerta/entrada -->
+              <rect x="74" y="102" width="28" height="40" rx="3" class="fill-blue-500 dark:fill-blue-400"/>
+              <circle cx="94" cy="122" r="2" class="fill-white dark:fill-zinc-200"/>
+              
+              <!-- Camión de entregas -->
+              <rect x="134" y="115" width="32" height="22" rx="3" class="fill-emerald-100 dark:fill-emerald-500/20"/>
+              <rect x="138" y="119" width="20" height="14" rx="2" class="fill-emerald-500 dark:fill-emerald-400"/>
+              <rect x="158" y="123" width="8" height="8" rx="1" class="fill-emerald-400 dark:fill-emerald-500"/>
+              <circle cx="144" cy="137" r="4" class="fill-gray-600 dark:fill-zinc-500"/>
+              <circle cx="158" cy="137" r="4" class="fill-gray-600 dark:fill-zinc-500"/>
+              
+              <!-- Cajas de productos -->
+              <rect x="10" y="110" width="24" height="20" rx="3" class="fill-amber-100 dark:fill-amber-500/20"/>
+              <rect x="13" y="113" width="18" height="14" rx="2" class="fill-amber-400 dark:fill-amber-500"/>
+              <path d="M17 120H27" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
+              
+              <rect x="18" y="132" width="20" height="16" rx="2" class="fill-purple-100 dark:fill-purple-500/20"/>
+              <rect x="21" y="135" width="14" height="10" rx="1" class="fill-purple-400 dark:fill-purple-500"/>
+              
+              <!-- Icono de contacto -->
+              <circle cx="150" cy="55" r="16" class="fill-blue-100 dark:fill-blue-500/15"/>
+              <path d="M150 47C146.69 47 144 49.69 144 53C144 56.31 146.69 59 150 59C153.31 59 156 56.31 156 53C156 49.69 153.31 47 150 47ZM150 51C151.1 51 152 51.9 152 53C152 54.1 151.1 55 150 55C148.9 55 148 54.1 148 53C148 51.9 148.9 51 150 51Z" class="fill-blue-500 dark:fill-blue-400"/>
+              <path d="M150 61C146 61 142 63 142 65V67H158V65C158 63 154 61 150 61Z" class="fill-blue-500 dark:fill-blue-400"/>
             </svg>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Selecciona un proveedor</h3>
-          <p class="text-sm text-gray-600 dark:text-zinc-400">
-            Haz clic en un proveedor de la lista para ver sus detalles completos,<br>historial de compras y gestionar la información
-          </p>
-        </div>
+          
+          <!-- Texto de bienvenida profesional -->
+          <div class="relative z-10 max-w-md">
+            <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+              Selecciona un proveedor
+            </h3>
+            <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
+              Haz clic en un proveedor de la lista para ver sus detalles completos, historial de compras y gestionar la información.
+            </p>
+            <p class="text-xs text-gray-400 dark:text-zinc-500">
+              Administra tus proveedores de forma rápida y segura.
+            </p>
+          </div>
+          
+          <!-- Footer de confianza estilo WhatsApp -->
+          <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <span>Datos de proveedores sincronizados en tiempo real</span>
+          </div>
       </div>
 
-      <!-- Detalles del proveedor seleccionado -->
-      <div v-else-if="viewMode === 'create'" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden" style="height: calc(100vh - 200px); display: flex; flex-direction: column;">
+      <!-- Formulario de crear proveedor -->
+      <div v-else-if="viewMode === 'create'" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900/50">
         
         <!-- Header -->
-        <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-gradient-to-r from-blue-50 to-white dark:from-blue-950/20 dark:to-zinc-900 flex-shrink-0">
+        <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex-shrink-0">
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-xl font-bold text-gray-900 dark:text-white">Nuevo Proveedor</h2>
@@ -288,10 +346,10 @@
       </div>
 
       <!-- Formulario de Edición COMPACTO -->
-      <div v-else-if="viewMode === 'edit' && editingSupplier" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden" style="height: calc(100vh - 200px); display: flex; flex-direction: column;">
+      <div v-else-if="viewMode === 'edit' && editingSupplier" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900/50">
         
         <!-- Header Compacto -->
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-gradient-to-r from-amber-50 to-white dark:from-amber-950/20 dark:to-zinc-900 flex items-center justify-between flex-shrink-0">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between flex-shrink-0">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-amber-100 dark:bg-amber-950 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,10 +439,10 @@
       </div>
       
       <!-- Detalles del proveedor seleccionado -->
-      <div v-else-if="viewMode === 'detail' && selectedSupplier" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden" style="height: calc(100vh - 200px); display: flex; flex-direction: column;">
+      <div v-else-if="viewMode === 'detail' && selectedSupplier" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900/50">
         
         <!-- Header del proveedor -->
-        <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-900 flex-shrink-0">
+        <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex-shrink-0">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
@@ -616,7 +674,7 @@
         </div>
       </div>
     </div>
-
+  </div>
   </div>
 
   <!-- 🎭 MODAL: Crear Proveedor -->
@@ -834,8 +892,18 @@ export default {
   },
   mounted() {
     this.loadSuppliers()
+    // Handler para tecla ESC - deseleccionar proveedor
+    document.addEventListener('keydown', this.handleKeyDown)
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown)
   },
   methods: {
+    handleKeyDown(event) {
+      if (event.key === 'Escape' && this.selectedSupplier && this.viewMode === 'list') {
+        this.selectedSupplier = null
+      }
+    },
     async loadSuppliers() {
       try {
         this.loading = true

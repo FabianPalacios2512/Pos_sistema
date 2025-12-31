@@ -1057,7 +1057,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch, onActivated } from 'vue'
 import api from '../services/api.js'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
@@ -1067,6 +1067,7 @@ import { inventoryStore } from '../store/inventory.js'
 import { notificationStore } from '../store/notifications.js'
 import { useToast } from '../composables/useToast.js'
 import { appStore } from '../store/appStore.js' // NUEVO: para obtener el plan
+import { useAutoRefresh } from '../composables/useRouteState.js'
 import MovementsSection from './inventory/sections/MovementsSection.vue'
 import TablePaginator from './TablePaginator.vue'
 
@@ -2073,6 +2074,18 @@ onMounted(async () => {
     console.error('Error en mounted:', error)
   } finally {
     loading.value = false
+  }
+})
+
+// 🔄 AUTO-REFRESH al reactivar el componente
+onActivated(async () => {
+  console.log('🔄 [InventoryView] Component activated - Refreshing data...')
+  // Recarga silenciosa de datos críticos
+  try {
+    await loadProducts()
+    await loadMovementsData()
+  } catch (error) {
+    console.error('Error en auto-refresh de inventario:', error)
   }
 })
 

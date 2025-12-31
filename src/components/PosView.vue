@@ -1761,7 +1761,7 @@
 
 <script setup>
 import { apiCall } from '../services/api.js'
-import { ref, reactive, computed, onMounted, onBeforeUnmount, onUnmounted, watch, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, onUnmounted, watch, nextTick, onActivated } from 'vue'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { customersService } from '../services/customersService.js'
@@ -1770,6 +1770,7 @@ import { warehouseService } from '../services/warehouseService.js'
 import { generateInvoicePDF as generateInvoicePDFTemplate, generateQuotationPDF as generateQuotationPDFTemplate, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
 import { useCashSession } from '../services/cashSessionService.js'
 import { appStore } from '../store/appStore.js' // Importar store global
+import { useAutoRefresh } from '../composables/useRouteState.js'
 import axiosInstance from '../services/apiClient.js'
 import { useToast } from '../composables/useToast.js'
 import { useLoyaltyPoints } from '../composables/useLoyaltyPoints.js'
@@ -1810,9 +1811,13 @@ const {
 
 // Obtener nombre del vendedor actual
 const getCurrentSeller = () => {
-  if (user.value && user.value.name) {
-    return user.value.name
-  }
+  const u = currentUser.value
+  if (!u) return 'Vendedor'
+  
+  if (u.name) return u.name
+  if (u.user && u.user.name) return u.user.name
+  if (u.data && u.data.name) return u.data.name
+  
   return 'Vendedor'
 }
 
@@ -1835,8 +1840,13 @@ const hasOpenSession = ref(false)
 const warehouses = ref([]) // 🏢 Lista de todas las warehouses/sedes
 
 // Current user info
-// Current user info
-const currentUser = computed(() => user.value || { name: 'Compañero' })
+const currentUser = computed(() => {
+  // 🔍 DEBUG: Verificar qué usuario tenemos
+  const userData = user.value || authService.getUser()
+  // console.log('🔍 [PosView] currentUser computed:', userData)
+  
+  return userData || {}
+})
 
 // Loading state para WhatsApp y Email
 const isLoading = ref(false)
@@ -4011,6 +4021,11 @@ const handlePaymentConfirmed = async (paymentData) => {
         lastSale.value.id = result.data.id
         lastSale.value.invoiceNumber = result.data.number || `FV-${result.data.id}`
         
+        // ✅ Actualizar vendedor con el que retornó el backend (fuente de verdad)
+        if (result.data.seller_name) {
+          lastSale.value.cashier = result.data.seller_name
+        }
+        
         // Obtener el próximo número de factura para la siguiente venta
         await fetchNextInvoiceNumber()
         
@@ -4363,11 +4378,20 @@ const generateInvoicePDF = async () => {
     }
 
     // Preparar datos de la factura para la plantilla
+    // 🔍 DEBUG: Verificar qué datos de vendedor tenemos
+    console.log('🔍 [generateInvoicePDF] Datos de vendedor:', {
+      lastSale_cashier: lastSale.value.cashier,
+      lastSale_seller_name: lastSale.value.seller_name,
+      currentUser_name: currentUser.value?.name,
+      currentUser_full: currentUser.value
+    })
+
     const invoiceData = {
       invoice_number: lastSale.value.invoiceNumber || lastSale.value.invoice_number || 'SIN-NUMERO',
       created_at: lastSale.value.date || lastSale.value.created_at || new Date(),
       customer_name: lastSale.value.customer || lastSale.value.customer_name || 'Cliente Final',
-      cashier: lastSale.value.cashier || currentUser?.name || 'Vendedor',
+      // 🛡️ FIX: Usar el nombre del usuario autenticado si no viene en la venta
+      cashier: lastSale.value.cashier || lastSale.value.seller_name || currentUser.value?.name || 'Vendedor',
       items: lastSale.value.items || [],
       subtotal: parseFloat(lastSale.value.subtotal || 0),
       discount: parseFloat(lastSale.value.discount || 0),
@@ -5125,7 +5149,8 @@ const handleKeyboard = (event) => {
   const isAlphanumeric = /^[a-zA-Z0-9]$/.test(event.key)
   
   // Si está escribiendo fuera de un input Y es una tecla alfanumérica
-  if (!isTypingInInput && isAlphanumeric && searchInput.value) {
+  // 🛡️ FIX: Ignorar si se presionan teclas modificadoras (Ctrl, Alt, Meta) para evitar capturar atajos como Ctrl+C, Ctrl+V
+  if (!isTypingInInput && isAlphanumeric && searchInput.value && !event.ctrlKey && !event.altKey && !event.metaKey) {
     event.preventDefault()
     searchInput.value.focus()
     // Agregar la tecla al searchTerm manualmente
@@ -5380,6 +5405,13 @@ const showLoadedQuotationDetails = () => {
 // Lifecycle hooks
 onMounted(async () => {
   try {
+    // 🔄 AUTO-REFRESH: Recargar productos si es necesario
+    // Si el store ya tiene productos, esto será rápido (o podemos forzar recarga)
+    if (currentSession.value?.warehouse_id) {
+      console.log('🔄 [PosView] Auto-refreshing products...')
+      await appStore.loadProducts(currentSession.value.warehouse_id)
+    }
+
     // Configurar interfaz inmediatamente
     setTimeout(() => {
       if (searchInput.value) {
@@ -5439,6 +5471,15 @@ onMounted(async () => {
     
   } catch (error) {
     console.error('Error en inicialización de PosView:', error)
+  }
+})
+
+// 🔄 AUTO-REFRESH al reactivar el componente (si se usa KeepAlive)
+onActivated(async () => {
+  if (currentSession.value?.warehouse_id) {
+    console.log('🔄 [PosView] Component activated - Refreshing products...')
+    // Forzar recarga silenciosa para asegurar datos frescos
+    await appStore.loadProducts(currentSession.value.warehouse_id)
   }
 })
 

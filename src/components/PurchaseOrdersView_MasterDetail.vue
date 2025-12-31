@@ -40,13 +40,13 @@
       </div>
 
       <!-- Tabs Navigation -->
-      <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-1 inline-flex border border-gray-200 dark:border-zinc-700 h-[46px]">
+      <div class="flex items-center gap-2 border-b border-gray-300 dark:border-zinc-700">
         <button 
           @click="changeTab('suppliers')" 
           :class="[
-            'px-6 py-2.5 text-sm font-bold rounded-lg transition-all duration-200',
+            'px-6 py-3 text-sm font-bold rounded-t-xl transition-all duration-200',
             activeTab === 'suppliers' 
-              ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-md' 
+              ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white border-t-2 border-x-2 border-gray-300 dark:border-zinc-700 border-b-0 -mb-px' 
               : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
           ]">
           <div class="flex items-center gap-2">
@@ -59,9 +59,9 @@
         <button 
           @click="changeTab('orders')" 
           :class="[
-            'px-6 py-2.5 text-sm font-bold rounded-lg transition-all duration-200',
+            'px-6 py-3 text-sm font-bold rounded-t-xl transition-all duration-200',
             activeTab === 'orders' 
-              ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-md' 
+              ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white border-t-2 border-x-2 border-gray-300 dark:border-zinc-700 border-b-0 -mb-px' 
               : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
           ]">
           <div class="flex items-center gap-2">
@@ -229,17 +229,15 @@
       <!-- TAB: ÓRDENES DE COMPRA -->
       <div v-if="activeTab === 'orders'">
 
-      <!-- Master-Detail Layout -->
-      <div v-if="viewMode === 'list'" class="grid grid-cols-12 gap-6">
+      <!-- Master-Detail Layout Enterprise: 30/70 - Unificado como WhatsApp -->
+      <div v-if="viewMode === 'list'" class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="height: calc(100vh - 200px); min-height: 550px;">
+        <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
-        <!-- CÓDIGO DE MASTER-DETAIL EXISTENTE -->
-        
-        <!-- MASTER: Lista de Órdenes (Izquierda) -->
-        <div class="col-span-12 lg:col-span-4">
-          <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden flex flex-col" style="height: calc(100vh - 200px);">
+        <!-- PANEL IZQUIERDO: Lista de Órdenes (30%) -->
+        <div class="lg:col-span-3 overflow-hidden flex flex-col border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
             
             <!-- Filtros -->
-            <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex-shrink-0">
+            <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900 flex-shrink-0">
               <div class="flex items-center gap-2 flex-wrap">
                 <button v-for="status in statusFilters" :key="status.value"
                         @click="filterStatus = status.value"
@@ -255,7 +253,7 @@
             </div>
 
             <!-- Lista de órdenes -->
-            <div class="flex-1 overflow-y-auto">
+            <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 px-2">
               <!-- Loading -->
               <div v-if="loading" class="p-8 text-center">
                 <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -312,26 +310,91 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- DETAIL: Detalles de la Orden (Derecha) -->
-        <div class="col-span-12 lg:col-span-8">
-          <!-- Empty State -->
-          <div v-if="!selectedOrder" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 flex flex-col items-center justify-center" style="height: calc(100vh - 200px);">
-            <div class="w-24 h-24 bg-gray-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mb-6">
-              <svg class="w-12 h-12 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Selecciona una orden</h3>
-            <p class="text-sm text-gray-600 dark:text-zinc-400 max-w-sm text-center">Haz clic en una orden de la lista para ver sus detalles completos y gestionar la recepción de mercancía</p>
+        <!-- PANEL DERECHO: Detalles de la Orden (70%) -->
+        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-gray-50/30 dark:bg-zinc-950/30 transition-colors duration-300">
+          <!-- Empty State Profesional estilo WhatsApp -->
+          <div v-if="!selectedOrder" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-zinc-900/50 dark:via-zinc-900/30 dark:to-zinc-900/50 relative">
+              
+              <!-- Ilustración SVG profesional y limpia -->
+              <div class="mb-8 relative">
+                <!-- Efecto glow suave de fondo -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-200/30 via-transparent to-purple-200/30 dark:from-blue-500/10 dark:to-purple-500/10 rounded-3xl blur-3xl scale-150"></div>
+                
+                <!-- Ilustración principal de órdenes de compra -->
+                <svg class="w-48 h-48 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Sombra del documento -->
+                  <rect x="48" y="38" width="88" height="110" rx="6" class="fill-gray-200/50 dark:fill-zinc-700/30"/>
+                  
+                  <!-- Documento principal -->
+                  <rect x="44" y="32" width="88" height="110" rx="6" class="fill-white dark:fill-zinc-800" stroke-width="0"/>
+                  <rect x="44" y="32" width="88" height="110" rx="6" class="fill-none stroke-gray-200 dark:stroke-zinc-700" stroke-width="1.5"/>
+                  
+                  <!-- Encabezado del documento -->
+                  <rect x="54" y="44" width="40" height="5" rx="2.5" class="fill-blue-400 dark:fill-blue-500"/>
+                  <rect x="54" y="54" width="68" height="3" rx="1.5" class="fill-gray-100 dark:fill-zinc-700"/>
+                  <rect x="54" y="62" width="55" height="3" rx="1.5" class="fill-gray-100 dark:fill-zinc-700"/>
+                  
+                  <!-- Lista de productos -->
+                  <rect x="54" y="74" width="68" height="16" rx="2" class="fill-gray-50 dark:fill-zinc-700/50"/>
+                  <circle cx="62" cy="82" r="4" class="fill-emerald-400 dark:fill-emerald-500"/>
+                  <rect x="70" y="79" width="40" height="3" rx="1.5" class="fill-gray-300 dark:fill-zinc-600"/>
+                  <rect x="115" y="79" width="12" height="6" rx="1" class="fill-emerald-100 dark:fill-emerald-500/20"/>
+                  
+                  <rect x="54" y="94" width="68" height="16" rx="2" class="fill-gray-50 dark:fill-zinc-700/50"/>
+                  <circle cx="62" cy="102" r="4" class="fill-blue-400 dark:fill-blue-500"/>
+                  <rect x="70" y="99" width="35" height="3" rx="1.5" class="fill-gray-300 dark:fill-zinc-600"/>
+                  <rect x="115" y="99" width="12" height="6" rx="1" class="fill-blue-100 dark:fill-blue-500/20"/>
+                  
+                  <!-- Total -->
+                  <rect x="94" y="118" width="28" height="8" rx="4" class="fill-emerald-500 dark:fill-emerald-400"/>
+                  
+                  <!-- Sello de orden -->
+                  <circle cx="145" cy="55" r="18" class="fill-blue-100 dark:fill-blue-500/20"/>
+                  <circle cx="145" cy="55" r="14" class="fill-blue-500 dark:fill-blue-400"/>
+                  <path d="M140 55L143 58L151 50" class="stroke-white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  
+                  <!-- Caja de productos -->
+                  <rect x="140" y="100" width="28" height="24" rx="4" class="fill-purple-100 dark:fill-purple-500/20"/>
+                  <rect x="144" y="104" width="20" height="16" rx="2" class="fill-purple-400 dark:fill-purple-500"/>
+                  <path d="M149 112H159M154 107V117" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
+                  
+                  <!-- Icono de camión -->
+                  <rect x="12" y="115" width="32" height="20" rx="3" class="fill-amber-100 dark:fill-amber-500/20"/>
+                  <rect x="16" y="119" width="18" height="12" rx="2" class="fill-amber-500 dark:fill-amber-400"/>
+                  <rect x="34" y="123" width="8" height="8" rx="1" class="fill-amber-400 dark:fill-amber-500"/>
+                  <circle cx="22" cy="135" r="3" class="fill-gray-600 dark:fill-zinc-500"/>
+                  <circle cx="36" cy="135" r="3" class="fill-gray-600 dark:fill-zinc-500"/>
+                </svg>
+              </div>
+              
+              <!-- Texto de bienvenida profesional -->
+              <div class="relative z-10 max-w-md">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+                  Selecciona una orden
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
+                  Haz clic en una orden de la lista para ver sus detalles completos y gestionar la recepción de mercancía.
+                </p>
+                <p class="text-xs text-gray-400 dark:text-zinc-500">
+                  Controla tus órdenes de compra de forma rápida y segura.
+                </p>
+              </div>
+              
+              <!-- Footer de confianza estilo WhatsApp -->
+              <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <span>Datos de compras sincronizados en tiempo real</span>
+              </div>
           </div>
 
           <!-- Order Details -->
-          <div v-else class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden flex flex-col" style="height: calc(100vh - 200px);">
+          <div v-else class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900/50">
             
             <!-- Header con estado -->
-            <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex-shrink-0">
+            <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex-shrink-0">
               <div class="flex items-start justify-between mb-4">
                 <div class="flex-1 min-w-0 mr-4">
                   <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ selectedOrder.order_number }}</h2>
@@ -350,20 +413,20 @@
 
               <!-- Info Grid -->
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
+                <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
                   <p class="text-xs text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1">Fecha Orden</p>
                   <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ formatDate(selectedOrder.order_date) }}</p>
                 </div>
-                <div class="bg-white dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
+                <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
                   <p class="text-xs text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1">Total</p>
                   <p class="text-sm font-mono font-bold text-gray-900 dark:text-white">${{ formatCurrency(selectedOrder.total) }}</p>
                 </div>
                 <!-- Mostrar bodega solo si hay múltiples bodegas -->
-                <div v-if="hasMultipleWarehouses && selectedOrder.warehouse" class="bg-white dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
+                <div v-if="hasMultipleWarehouses && selectedOrder.warehouse" class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
                   <p class="text-xs text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1">Bodega Destino</p>
                   <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ selectedOrder.warehouse.name }}</p>
                 </div>
-                <div v-if="selectedOrder.expected_date" class="bg-white dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
+                <div v-if="selectedOrder.expected_date" class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
                   <p class="text-xs text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1">Fecha Esperada</p>
                   <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ formatDate(selectedOrder.expected_date) }}</p>
                 </div>
@@ -519,6 +582,7 @@
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
 
@@ -968,11 +1032,19 @@ export default {
 
     // Escuchar evento de actualización de productos
     window.addEventListener('products-updated', this.handleProductsUpdate)
+    // Handler para tecla ESC - deseleccionar orden
+    document.addEventListener('keydown', this.handleKeyDown)
   },
   beforeUnmount() {
     window.removeEventListener('products-updated', this.handleProductsUpdate)
+    document.removeEventListener('keydown', this.handleKeyDown)
   },
   methods: {
+    handleKeyDown(event) {
+      if (event.key === 'Escape' && this.selectedOrder && this.viewMode === 'list') {
+        this.selectedOrder = null
+      }
+    },
     changeTab(tab) {
       this.activeTab = tab
       this.viewMode = 'list'

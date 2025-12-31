@@ -186,12 +186,27 @@ class InventoryController extends Controller
 
             // 🏢 Si hay filtro de warehouse, ajustar el stock mostrado al del warehouse específico
             if ($request->filled('warehouse_id')) {
-                $products->getCollection()->transform(function($product) {
-                    if ($product->warehouses && $product->warehouses->isNotEmpty()) {
-                        $warehouseStock = $product->warehouses->first()->pivot->stock;
-                        $product->current_stock = $warehouseStock;
-                        $product->stock = $warehouseStock;
+                $warehouseId = $request->warehouse_id;
+
+                $products->getCollection()->transform(function($product) use ($warehouseId) {
+                    // 🛠️ FIX: Para productos variables, sumar stock de TODAS sus variantes en el warehouse
+                    if ($product->product_type === 'variable') {
+                        $totalVariantStock = DB::table('product_warehouse')
+                            ->where('warehouse_id', $warehouseId)
+                            ->where('product_id', $product->id)
+                            ->sum('stock');
+
+                        $product->current_stock = (int)$totalVariantStock;
+                        $product->stock = (int)$totalVariantStock;
+                    } else {
+                        // Para productos simples, usar el stock directo del warehouse
+                        if ($product->warehouses && $product->warehouses->isNotEmpty()) {
+                            $warehouseStock = $product->warehouses->first()->pivot->stock;
+                            $product->current_stock = (int)$warehouseStock;
+                            $product->stock = (int)$warehouseStock;
+                        }
                     }
+
                     return $product;
                 });
             }

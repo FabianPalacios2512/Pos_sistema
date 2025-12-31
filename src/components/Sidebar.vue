@@ -35,8 +35,9 @@
           :class="[currentModule === 'dashboard' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Dashboard' : ''"
         >
+          <!-- Dashboard: Cuadrícula de métricas/paneles -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Dashboard</span>
         </div>
@@ -55,8 +56,9 @@
           :class="[currentModule === 'pos' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Punto de Venta' : ''"
         >
+          <!-- Punto de Venta: Terminal/Caja registradora moderna -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Punto de Venta</span>
         </div>
@@ -68,8 +70,9 @@
           :class="[currentModule === 'invoices' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Facturas' : ''"
         >
+          <!-- Facturas: Recibo con check -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l2 2 4-4m0-9H7a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V5a2 2 0 00-2-2h-2"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Facturas</span>
         </div>
@@ -81,8 +84,9 @@
           :class="[currentModule === 'returns-management' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Devoluciones' : ''"
         >
+          <!-- Devoluciones: Paquete con flecha de retorno -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Devoluciones</span>
         </div>
@@ -127,8 +131,9 @@
           :class="[currentModule === 'stock' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Gestión de Stock' : ''"
         >
+          <!-- Gestión de Stock: Cajas apiladas/almacén -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Gestión de Stock</span>
         </div>
@@ -140,15 +145,17 @@
           :class="[currentModule === 'intelligent_inventory' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Inventario Inteligente' : ''"
         >
+          <!-- Inventario IA: Chip/cerebro con circuito -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 9l2 2 4-4"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Inventario IA</span>
         </div>
       </div>
 
       <!-- TIENDA ONLINE -->
-      <div class="mt-7 px-4">
+      <div v-if="showWebCatalog" class="mt-7 px-4">
         <!-- Línea divisoria cuando está colapsado -->
         <div v-if="sidebarCollapsed" class="border-t border-gray-200 dark:border-white/10 mb-4"></div>
         <h3 v-show="!sidebarCollapsed" class="section-title">TIENDA ONLINE</h3>
@@ -159,8 +166,9 @@
           :class="[currentModule === 'web-catalog-config' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Catálogo Web' : ''"
         >
+          <!-- Catálogo Web: Tienda online con carrito -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Catálogo Web</span>
         </div>
@@ -178,8 +186,10 @@
           :class="[currentModule === 'warehouses' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Gestión de Sedes' : ''"
         >
+          <!-- Gestión de Sedes: Múltiples ubicaciones/mapa -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Gestión de Sedes</span>
         </div>
@@ -210,12 +220,13 @@
           @click="$emit('change-module', 'accounts-receivable')"
           class="menu-item"
           :class="[currentModule === 'accounts-receivable' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
-          :title="sidebarCollapsed ? 'CreditiTenda' : ''"
+          :title="sidebarCollapsed ? 'CrediTienda' : ''"
         >
+          <!-- CrediTienda: Tarjeta de crédito -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
           </svg>
-          <span v-show="!sidebarCollapsed" class="menu-text">CreditiTenda</span>
+          <span v-show="!sidebarCollapsed" class="menu-text">CrediTienda</span>
         </div>
 
         <div
@@ -225,8 +236,9 @@
           :class="[currentModule === 'purchase-orders' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Proveedores' : ''"
         >
+          <!-- Proveedores: Camión de entrega -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 17h1m6 0h1M3 11l2-6h10l2 6M3 11v6h2m0 0a2 2 0 104 0m-4 0h4m8 0h2v-6m-2 6a2 2 0 104 0m-4 0h4m-6-6V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v6"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Proveedores</span>
         </div>
@@ -246,8 +258,9 @@
           :class="[currentModule === 'users' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Usuarios' : ''"
         >
+          <!-- Usuarios: Persona con escudo/seguridad -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Usuarios</span>
         </div>
@@ -259,8 +272,9 @@
           :class="[currentModule === 'cash-admin' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Control de Cajas' : ''"
         >
+          <!-- Control de Cajas: Caja registradora/cajón -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Control de Cajas</span>
         </div>
@@ -271,8 +285,9 @@
           :class="[currentModule === 'expenses' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Gastos Operativos' : ''"
         >
+          <!-- Gastos Operativos: Flecha hacia abajo con moneda (egresos) -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Gastos Operativos</span>
         </div>
@@ -284,8 +299,9 @@
           :class="[currentModule === 'reports' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
           :title="sidebarCollapsed ? 'Reportes' : ''"
         >
+          <!-- Reportes: Gráfico de barras -->
           <svg style="width: 18px; height: 18px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
           </svg>
           <span v-show="!sidebarCollapsed" class="menu-text">Reportes</span>
         </div>
@@ -348,6 +364,16 @@ const showMultisede = computed(() => {
   const allowedPlans = ['premium', 'enterprise']
   
   // Verificar si el plan actual permite multi-sede
+  return allowedPlans.includes(tenantPlan)
+})
+
+// Computed para verificar si debería mostrar Catálogo Web (reactivo)
+// Solo mostrar para planes Premium y Enterprise
+const showWebCatalog = computed(() => {
+  const tenantPlan = appStore.tenantPlan || 'free_trial'
+  const allowedPlans = ['premium', 'enterprise']
+  
+  // Verificar si el plan actual permite catálogo web
   return allowedPlans.includes(tenantPlan)
 })
 

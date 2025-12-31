@@ -75,6 +75,7 @@
             v-bind="getModuleProps()"
             @change-module="setCurrentModule"
             @open-quotation-in-pos="handleOpenQuotationInPos"
+            @refresh="loadInvoices"
           />
         </div>
         
@@ -171,6 +172,8 @@ import { inventoryService } from '../services/inventoryService.js'
 import { hasPermission, PERMISSIONS } from '../middleware/auth.js'
 import { useSessionTimeout } from '../composables/useSessionTimeout.js'
 import { useModuleNavigation } from '../composables/useModuleNavigation.js'
+import { useRouteState } from '../composables/useRouteState.js'
+import { appStore } from '../store/appStore.js'
 
 // Importar componente Sidebar
 import Sidebar from '../components/Sidebar.vue'
@@ -187,6 +190,9 @@ const route = useRoute()
 
 // Navegación global de módulos (para chat AI y otros componentes)
 const { onModuleChange } = useModuleNavigation()
+
+// 🔄 Sistema de persistencia de ruta/módulo
+const { saveCurrentModule, restoreLastModule, markRefresh, wasRecentlyRefreshed } = useRouteState()
 
 // Sistema de timeout de sesión
 const sessionTimeout = useSessionTimeout()
@@ -223,9 +229,6 @@ const StockTransfersView = defineAsyncComponent(() => import('../components/Stoc
 
 // Componentes temporales para módulos no desarrollados aún
 const PlaceholderView = defineAsyncComponent(() => import('../components/PlaceholderView.vue'))
-
-// Importar appStore para acceso al plan del tenant
-import { appStore } from '../store/appStore.js'
 
 // ===== ESTADO REACTIVO GLOBAL =====
 
@@ -338,9 +341,16 @@ const getUserPermissions = (role) => {
 const hasModulePermission = (module) => {
   // Módulos que siempre están disponibles para todos los usuarios autenticados
   // (tienen su propio control de acceso interno)
-  const alwaysAvailableModules = ['expenses', 'web-catalog-config']
+  const alwaysAvailableModules = ['expenses']
   if (alwaysAvailableModules.includes(module)) {
     return true
+  }
+
+  // Verificación especial para Catálogo Web (Solo Premium/Enterprise)
+  if (module === 'web-catalog-config') {
+    const tenantPlan = appStore.tenantPlan || 'free_trial'
+    const allowedPlans = ['premium', 'enterprise']
+    return allowedPlans.includes(tenantPlan)
   }
   
   // Si no hay usuario o rol, denegar acceso
@@ -404,7 +414,8 @@ const loadInvoices = async () => {
         customer: document.customer?.name || document.customer_name || 'Cliente General',
         customer_name: document.customer_name,
         customer_id: document.customer_id,
-        cashier: document.cashier_name || 'Vendedor',
+        seller_name: document.seller_name, // ✅ Pass seller_name explicitly
+        cashier: document.seller_name || document.cashier_name || 'Vendedor',
         items: document.items || document.sale_items || [],
         subtotal: parseFloat(document.subtotal || 0),
         tax: parseFloat(document.tax || document.tax_amount || 0),
@@ -1139,7 +1150,8 @@ const toggleSidebar = () => {
 // Cambiar módulo actual
 const setCurrentModule = (module, options = {}) => {
   // Verificar permisos antes de cambiar módulo
-  if (!hasModulePermission(module)) {
+  // SOLO si el usuario ya está cargado (evitar check durante inicialización)
+  if (currentUser.value && currentUser.value.name !== 'Cargando...' && !hasModulePermission(module)) {
     alert('No tienes permisos para acceder a este módulo')
     return
   }
@@ -1152,6 +1164,9 @@ const setCurrentModule = (module, options = {}) => {
   }
 
   currentModule.value = module
+  
+  // 🔄 PERSISTIR el módulo actual en localStorage
+  saveCurrentModule(module)
   
   // Manejar acciones especiales después del cambio de módulo
   if (options.action && module === 'pos') {
@@ -1463,6 +1478,13 @@ watch(() => route.params.module, (newModule, oldModule) => {
   }
 }, { immediate: true })
 
+// Watcher para sincronizar query params
+watch(() => route.query, (newQuery) => {
+  if (newQuery) {
+    moduleQueryParams.value = newQuery
+  }
+}, { immediate: true })
+
 // Watcher para ejecutar acciones pendientes cuando el componente PosView se monte
 watch(posViewRef, async (newRef) => {
   if (newRef && pendingPosAction.value) {
@@ -1574,6 +1596,9 @@ const handleClickOutsideSidebar = (event) => {
 let timeInterval
 
 onMounted(() => {
+  // Marcar que se hizo refresh (para detección en componentes hijos)
+  markRefresh()
+  
   // Inicializar usuario autenticado
   initializeUser()
   
@@ -1581,6 +1606,13 @@ onMounted(() => {
   if (!authService.isAuthenticated()) {
     router.push('/login')
     return
+  }
+  
+  // 🔄 RESTAURAR el último módulo si se hizo refresh
+  const lastModule = restoreLastModule()
+  if (lastModule && lastModule !== 'pos') {
+    console.log('🔄 Restaurando último módulo después de refresh:', lastModule)
+    currentModule.value = lastModule
   }
   
   // Registrar listener para navegación global (desde chat AI u otros componentes)

@@ -1,462 +1,472 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
-    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
+  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-4 lg:px-6">
+    <div class="p-3 lg:p-4 space-y-4 pb-6 animate-fade-in">
       
-      <!-- Header sin icono -->
-      <div class="flex items-center justify-between pb-4">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Clientes</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Administra tu base de clientes y historial de compras</p>
-        </div>
+      <!-- NIVEL 1: Header Minimalista -->
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Clientes</h1>
         
-        <div class="flex items-center gap-3">
-          <!-- Botón Secundario -->
-          <button @click="refreshCustomers" 
-                  :disabled="loading"
-                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200 disabled:opacity-50 flex items-center gap-2">
-            <svg class="w-4 h-4" :class="{'animate-spin': loading}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-            <span>{{ loading ? 'Actualizando...' : 'Actualizar' }}</span>
-          </button>
-          
-          <!-- Botón Principal -->
-          <button @click="openCreateModal" 
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>Nuevo Cliente</span>
-          </button>
-        </div>
-      </div>
-      
-      <!-- Métricas Principales con Glassmorphism -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Total Clientes -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Clientes</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ customers.length }}</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Clientes Activos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Clientes Activos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ activeCustomers }}</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Ventas Totales -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Ventas Totales</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatCurrency(totalSales) }}</p>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Promedio Compra -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Ticket Promedio</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatCurrency(averagePurchase) }}</p>
-            </div>
-          </div>
-        </div>
+        <button @click="openCreateModal" 
+                class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <span>Nuevo Cliente</span>
+        </button>
       </div>
 
-      <!-- Contenedor Unificado: Filtros + Tabla -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-        <!-- Panel de Filtros -->
-        <div class="p-4 border-b border-gray-200 dark:border-zinc-800">
-        <div class="flex flex-wrap items-center gap-3">
-          <!-- Búsqueda -->
-          <div class="flex-1 min-w-[200px] relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- Master-Detail Layout Enterprise: 30/70 -->
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="height: calc(100vh - 130px); min-height: 550px;">
+        <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
+        
+        <!-- PANEL IZQUIERDO: Lista de Clientes (30%) -->
+        <div class="lg:col-span-3 overflow-hidden flex flex-col border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
+          
+          <!-- Header con búsqueda -->
+          <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900">
+            <!-- Búsqueda -->
+            <div class="relative mb-3">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
-            </div>
-            <input v-model="searchTerm" 
-                   type="text" 
-                   placeholder="Buscar clientes..."
-                   class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
-          </div>
-          
-          <!-- Filtro Estado -->
-          <select v-model="statusFilter" 
-                  class="min-w-[140px] px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200">
-            <option value="">Todos los estados</option>
-            <option value="active">Activos</option>
-            <option value="inactive">Inactivos</option>
-          </select>
-          
-          <!-- Filtro Ciudad -->
-          <select v-model="cityFilter" 
-                  class="min-w-[140px] px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200">
-            <option value="">Todas las ciudades</option>
-            <option v-for="city in uniqueCities" :key="city" :value="city">{{ city }}</option>
-          </select>
-          
-          <!-- Limpiar Filtros -->
-          <button @click="searchTerm = ''; statusFilter = ''; cityFilter = ''" 
-                  title="Limpiar filtros"
-                  class="p-3 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl border border-transparent hover:border-red-100 dark:hover:border-red-900/30 transition-all duration-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-            </svg>
-          </button>
-          
-          <!-- Toggle Vista -->
-          <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-1 border border-gray-200 dark:border-zinc-700 h-[46px] flex items-center gap-1">
-            <button @click="setViewMode('table')" 
-                    :class="viewMode === 'table' ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'"
-                    class="p-2.5 rounded-lg transition-all duration-200">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-              </svg>
-            </button>
-            <button @click="setViewMode('grid')" 
-                    :class="viewMode === 'grid' ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'"
-                    class="p-2.5 rounded-lg transition-all duration-200">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Vista de Tarjetas -->
-      <div v-if="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div v-for="customer in filteredCustomers" 
-             :key="customer.id" 
-             class="bg-white dark:bg-zinc-900 rounded-xl shadow-sm dark:shadow-black/20 border border-gray-300 dark:border-zinc-800 hover:shadow-md dark:hover:shadow-black/40 transition-all duration-200 overflow-hidden">
-          
-          <!-- Header de la tarjeta -->
-          <div class="p-4 border-b border-gray-200 dark:border-zinc-800">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center">
-                  <span class="text-blue-600 dark:text-blue-400 font-bold text-sm">{{ customer.name.charAt(0) }}</span>
-                </div>
-                <div>
-                  <h3 class="font-semibold text-gray-900 dark:text-white text-sm">{{ customer.name }}</h3>
-                  <p class="text-xs text-gray-500 dark:text-zinc-400">{{ customer.document_type }} {{ customer.document_number }}</p>
-                </div>
-              </div>
-              <span :class="customer.active ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'" 
-                    class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide">
-                {{ customer.active ? 'Activo' : 'Inactivo' }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Información de la tarjeta -->
-          <div class="p-4 space-y-3">
-            <div class="flex items-center space-x-2">
-              <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-              </svg>
-              <span class="text-sm text-gray-600 dark:text-zinc-300">{{ customer.phone || 'Sin teléfono' }}</span>
+              <input
+                v-model="searchTerm"
+                type="text"
+                placeholder="Buscar por nombre o documento..."
+                class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300">
             </div>
             
-            <div class="flex items-center space-x-2">
-              <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
-              <span class="text-sm text-gray-600 dark:text-zinc-300">{{ customer.email || 'Sin email' }}</span>
+            <!-- Filtro de estado -->
+            <select
+              v-model="statusFilter"
+              class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
+              <option value="">📊 Todos los estados</option>
+              <option value="active">✅ Activos</option>
+              <option value="inactive">❌ Inactivos</option>
+            </select>
+          </div>
+          
+          <!-- Lista de clientes estilo WhatsApp -->
+          <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 px-2">
+            
+            <!-- Loading state -->
+            <div v-if="loading" class="flex items-center justify-center py-12">
+              <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <span class="ml-3 text-sm text-gray-500 dark:text-zinc-400">Cargando clientes...</span>
             </div>
             
-            <div class="flex items-center space-x-2">
-              <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <!-- Empty state -->
+            <div v-else-if="filteredCustomers.length === 0" class="flex flex-col items-center justify-center py-12 text-center px-4">
+              <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
               </svg>
-              <span class="text-sm text-gray-600 dark:text-zinc-300">{{ customer.city }}</span>
+              <p class="text-sm font-semibold text-gray-600 dark:text-zinc-300">Sin clientes</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">No se encontraron clientes con los filtros aplicados</p>
             </div>
-
-            <div class="pt-2 border-t border-gray-200 dark:border-zinc-800">
-              <div class="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span class="text-gray-500 dark:text-zinc-400">Compras:</span>
-                  <span class="font-medium text-gray-900 dark:text-white block">${{ formatCurrency(customer.total_purchases) }}</span>
-                </div>
-                <div>
-                  <span class="text-gray-500 dark:text-zinc-400">Órdenes:</span>
-                  <span class="font-medium text-gray-900 dark:text-white block">{{ customer.total_orders || 0 }}</span>
-                </div>
-              </div>
+            
+            <!-- Lista de clientes -->
+            <div
+              v-else
+              v-for="customer in filteredCustomers"
+              :key="customer.id"
+              @click="selectCustomer(customer)"
+              class="px-3 py-3.5 my-1 cursor-pointer transition-all rounded-xl group relative"
+              :class="[
+                selectedCustomer?.id === customer.id 
+                  ? 'bg-indigo-50 dark:bg-indigo-500/10 shadow-sm' 
+                  : 'bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800/60'
+              ]"
+            >
+              <!-- Borde izquierdo de selección -->
+              <div 
+                v-if="selectedCustomer?.id === customer.id"
+                class="absolute left-0 top-2 bottom-2 w-1 bg-indigo-500 rounded-r-full"
+              ></div>
               
-              <template v-if="isCreditiendaEnabled">
-                <div class="flex justify-between items-center text-sm mt-2">
-                  <span class="text-gray-500 dark:text-zinc-400">Crédito:</span>
-                  <span class="font-medium text-gray-900 dark:text-white">${{ formatCurrency(customer.credit_limit) }}</span>
+              <div class="flex items-center gap-3">
+                <!-- Avatar con foto o inicial -->
+                <div 
+                  class="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden transition-transform duration-200"
+                  :style="{ backgroundColor: customer.credit_photo ? 'transparent' : getCustomerColor(customer.name) + '20', color: getCustomerColor(customer.name) }">
+                  <img v-if="customer.credit_photo" 
+                       :src="customer.credit_photo" 
+                       :alt="customer.name"
+                       class="w-full h-full object-cover"
+                       @error="$event.target.style.display='none'; $event.target.parentElement.innerHTML=`<span class='text-sm font-bold'>${customer.name.charAt(0).toUpperCase()}</span>`">
+                  <span v-else class="text-sm font-bold">{{ customer.name.charAt(0).toUpperCase() }}</span>
                 </div>
                 
-                <div class="flex justify-between items-center text-sm">
-                  <span class="text-gray-500 dark:text-zinc-400">Deuda:</span>
-                  <span :class="parseFloat(customer.current_debt) > parseFloat(customer.credit_limit) ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-gray-900 dark:text-white'" 
-                        class="font-medium">
-                    ${{ formatCurrency(customer.current_debt) }}
-                  </span>
+                <!-- Info del cliente -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <p class="text-[13px] font-semibold text-gray-800 dark:text-zinc-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {{ customer.name }}
+                    </p>
+                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0"
+                          :class="customer.active ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'">
+                      {{ customer.active ? 'ACTIVO' : 'INACTIVO' }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2 mt-1">
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">
+                      {{ customer.document_type }}: {{ customer.document_number }}
+                    </p>
+                  </div>
                 </div>
-              </template>
-            </div>
-          </div>
-
-          <!-- Acciones de la tarjeta -->
-          <div class="p-4 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50">
-            <div class="flex space-x-2">
-              <button @click="viewCustomerHistory(customer)" 
-                      class="flex-1 px-3 py-2 bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-400 rounded-lg text-sm font-medium transition-all flex items-center justify-center space-x-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                <span>Historial</span>
-              </button>
-              <button @click="editCustomer(customer)" 
-                      class="px-3 py-2 bg-amber-50 dark:bg-amber-950 hover:bg-amber-100 dark:hover:bg-amber-900 text-amber-700 dark:text-amber-400 rounded-lg text-sm font-medium transition-all">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-              </button>
+                
+                <!-- Compras a la derecha -->
+                <div class="text-right flex-shrink-0">
+                  <span class="text-sm font-bold text-gray-900 dark:text-white">
+                    ${{ formatCurrency(customer.total_purchases || 0) }}
+                  </span>
+                  <p class="text-[10px] text-gray-400 dark:text-zinc-500">Compras</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Vista de Tabla -->
-      <div v-else>
-        <!-- Header de Tabla -->
-        <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
-          <div>
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Lista de Clientes</h2>
-            <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ filteredCustomers.length }} clientes encontrados</p>
+        <!-- PANEL DERECHO: Detalle del Cliente (70%) -->
+        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-gray-50/30 dark:bg-zinc-950/30 transition-colors duration-300">
+          
+          <!-- Estado: No seleccionado - Empty State Profesional -->
+          <div v-if="!selectedCustomer" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-zinc-900/50 dark:via-zinc-900/30 dark:to-zinc-900/50 relative">
+            
+            <!-- Ilustración SVG profesional -->
+            <div class="mb-8 relative">
+              <div class="absolute inset-0 bg-gradient-to-br from-indigo-200/30 via-transparent to-emerald-200/30 dark:from-indigo-500/10 dark:to-emerald-500/10 rounded-3xl blur-3xl scale-150"></div>
+              
+              <svg class="w-48 h-48 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Círculo de fondo -->
+                <circle cx="90" cy="90" r="70" class="fill-gray-100 dark:fill-zinc-800/50"/>
+                
+                <!-- Silueta de persona -->
+                <circle cx="90" cy="65" r="25" class="fill-indigo-200 dark:fill-indigo-500/30"/>
+                <path d="M50 130 C50 105, 70 95, 90 95 C110 95, 130 105, 130 130" class="fill-indigo-200 dark:fill-indigo-500/30"/>
+                
+                <!-- Icono de búsqueda -->
+                <circle cx="120" cy="120" r="25" class="fill-blue-100 dark:fill-blue-500/20"/>
+                <circle cx="120" cy="120" r="18" class="fill-blue-500 dark:fill-blue-400"/>
+                <path d="M115 115 L125 125 M125 115 L115 125" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            
+            <!-- Texto de bienvenida -->
+            <div class="relative z-10 max-w-md">
+              <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+                Gestión de Clientes
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
+                Selecciona un cliente del panel izquierdo para visualizar su información completa, historial de compras y puntos de fidelidad.
+              </p>
+            </div>
           </div>
-        </div>
-        
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-            <thead class="bg-gray-50 dark:bg-zinc-900">
-              <tr>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Cliente</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Contacto</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Compras</th>
-                <th v-if="isCreditiendaEnabled" class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Crédito</th>
-                <th v-if="isLoyaltyEnabled" class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Puntos</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Estado</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Acciones</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
-              <tr v-for="customer in paginatedCustomers" :key="customer.id" class="hover:bg-slate-50 dark:hover:bg-zinc-800/50 hover:shadow-sm transition-all duration-200 border-b border-gray-200 dark:border-zinc-800">
-                <!-- Cliente con Avatar -->
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                      <span class="font-bold text-base text-blue-600 dark:text-blue-400">
-                        {{ customer.name.charAt(0).toUpperCase() }}
+
+          <!-- Estado: Cliente Seleccionado - Vista de Detalle -->
+          <div v-else class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- Header del cliente seleccionado -->
+            <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 p-5 flex-shrink-0">
+              <div class="flex items-start justify-between">
+                <!-- Info del cliente -->
+                <div class="flex items-center gap-4">
+                  <!-- Avatar grande con foto o inicial -->
+                  <div 
+                    class="w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold shadow-lg overflow-hidden transition-all duration-200"
+                    :style="{ backgroundColor: selectedCustomer.credit_photo ? 'transparent' : getCustomerColor(selectedCustomer.name) + '20', color: getCustomerColor(selectedCustomer.name) }">
+                    <img v-if="selectedCustomer.credit_photo" 
+                         :src="selectedCustomer.credit_photo" 
+                         :alt="selectedCustomer.name"
+                         class="w-full h-full object-cover">
+                    <span v-else class="text-2xl">{{ selectedCustomer.name.charAt(0).toUpperCase() }}</span>
+                  </div>
+                  
+                  <div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+                      {{ selectedCustomer.name }}
+                    </h2>
+                    <div class="flex items-center gap-3 mt-1">
+                      <span class="flex items-center gap-1 text-sm text-gray-500 dark:text-zinc-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
+                        {{ selectedCustomer.phone || 'Sin teléfono' }}
+                      </span>
+                      <span v-if="selectedCustomer.email" class="flex items-center gap-1 text-sm text-gray-500 dark:text-zinc-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        {{ selectedCustomer.email }}
                       </span>
                     </div>
-                    <div class="min-w-0">
-                      <div class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ customer.name }}</div>
-                      <div class="text-xs text-gray-500 dark:text-zinc-400">{{ customer.document_type }} {{ customer.document_number }}</div>
-                    </div>
                   </div>
-                </td>
+                </div>
                 
-                <!-- Contacto -->
-                <td class="px-6 py-4">
-                  <div class="text-sm text-gray-700 dark:text-zinc-300 font-medium flex items-center gap-1">
-                    <svg class="w-3 h-3 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                <!-- Botones de Acción -->
+                <div class="flex items-center gap-2">
+                  <button
+                    @click="editCustomer(selectedCustomer)"
+                    class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
-                    <span>{{ customer.phone || 'Sin teléfono' }}</span>
-                  </div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 truncate mt-0.5" v-if="customer.email">{{ customer.email }}</div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ customer.city || '-' }}</div>
-                </td>
-                
-                <!-- Compras -->
-                <td class="px-6 py-4">
-                  <div class="text-base font-black text-gray-900 dark:text-white">${{ formatCurrency(customer.total_purchases) }}</div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ customer.total_orders || 0 }} órdenes</div>
-                </td>
-                
-                <!-- Crédito -->
-                <td v-if="isCreditiendaEnabled" class="px-6 py-4">
-                  <div class="text-sm text-gray-700 dark:text-zinc-300">
-                    <span class="text-xs text-gray-500 dark:text-zinc-400">Límite:</span> 
-                    <span class="font-semibold">${{ formatCurrency(customer.credit_limit) }}</span>
-                  </div>
-                  <div class="text-sm mt-0.5" 
-                       :class="parseFloat(customer.current_debt) > parseFloat(customer.credit_limit) ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-gray-700 dark:text-zinc-300'">
-                    <span class="text-xs text-gray-500 dark:text-zinc-400">Deuda:</span> 
-                    <span class="font-semibold">${{ formatCurrency(customer.current_debt) }}</span>
-                  </div>
-                </td>
-                
-                <!-- Puntos de Fidelidad -->
-                <td v-if="isLoyaltyEnabled" class="px-6 py-4">
-                  <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-amber-50 dark:bg-amber-950 rounded-lg flex items-center justify-center flex-shrink-0 border border-amber-100 dark:border-amber-800">
-                      <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                      </svg>
-                    </div>
-                    <div class="min-w-0">
-                      <div class="text-base font-bold text-amber-700 dark:text-amber-400">{{ customer.loyalty_points || 0 }}</div>
-                      <div class="text-xs text-gray-500 dark:text-zinc-400">puntos</div>
-                    </div>
-                  </div>
-                </td>
-                
-                <!-- Estado -->
-                <td class="px-6 py-4">
-                  <span :class="customer.active ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'" 
-                        class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide inline-flex items-center">
-                    <span class="w-1.5 h-1.5 rounded-full mr-1.5" 
-                          :class="customer.active ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-rose-500 dark:bg-rose-400'"></span>
-                    {{ customer.active ? 'Activo' : 'Inactivo' }}
-                  </span>
-                </td>
-                
-                <!-- Acciones -->
-                <td class="px-6 py-4">
-                  <div class="flex items-center justify-center gap-1.5">
-                    <button @click="viewCustomerHistory(customer)" 
-                            class="p-2 text-slate-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 transition-all duration-200"
-                            title="Ver historial">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                      </svg>
-                    </button>
-                    <button @click="editCustomer(customer)" 
-                            class="p-2 text-slate-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-xl border border-transparent hover:border-amber-100 dark:hover:border-amber-900/30 transition-all duration-200"
-                            title="Editar">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                      </svg>
-                    </button>
-                    <button @click="deleteCustomer(customer)" 
-                            class="p-2 text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
-                            title="Eliminar">
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              
-              <!-- Estado vacío -->
-              <tr v-if="filteredCustomers.length === 0">
-                <td colspan="6" class="px-4 py-12 text-center">
-                  <div class="flex flex-col items-center space-y-3">
-                    <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-                      <svg class="w-6 h-6 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300">No hay clientes</p>
-                      <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">No se encontraron clientes con los filtros aplicados</p>
-                    </div>
-                    <button @click="clearFilters" class="px-3 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-medium rounded-lg shadow-lg transition-all duration-200">
-                      Limpiar Filtros
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-        <!-- Paginador - Solo mostrar si hay más de 10 clientes -->
-        <div v-if="totalItems > 10" class="bg-gray-50 dark:bg-zinc-900 px-6 py-4 border-t border-gray-200 dark:border-zinc-800">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <span class="text-sm text-gray-700 dark:text-zinc-300">
-                Mostrando <span class="font-medium">{{ startItem }}</span> a <span class="font-medium">{{ endItem }}</span> de <span class="font-medium">{{ totalItems }}</span> clientes
-              </span>
-              <select v-model="itemsPerPage" @change="currentPage = 1" class="text-sm px-3 py-2 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-                <option value="10">10 por página</option>
-                <option value="25">25 por página</option>
-                <option value="50">50 por página</option>
-                <option value="100">100 por página</option>
-              </select>
-            </div>
-            
-            <div class="flex items-center space-x-2">
-              <button @click="currentPage = 1" :disabled="currentPage === 1" 
-                      class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
-                Primero
-              </button>
-              <button @click="currentPage--" :disabled="currentPage === 1" 
-                      class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
-                Anterior
-              </button>
-              
-              <div class="flex space-x-1">
-                <button v-for="page in visiblePages" :key="page" @click="currentPage = page"
-                        :class="[
-                          'px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
-                          page === currentPage 
-                            ? 'bg-slate-900 dark:bg-slate-700 text-white border border-slate-900 dark:border-slate-700 shadow-lg' 
-                            : 'text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800'
-                        ]">
-                  {{ page }}
+                    Editar
+                  </button>
+                  
+                  <button
+                    @click="deleteCustomer(selectedCustomer)"
+                    class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-rose-100 hover:bg-rose-200 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tabs de Navegación -->
+              <div class="flex items-center gap-6 mt-6 border-b border-gray-200 dark:border-zinc-800">
+                <button 
+                  @click="activeTab = 'info'"
+                  class="pb-3 text-sm font-bold border-b-2 transition-all duration-200"
+                  :class="activeTab === 'info' ? 'text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400' : 'text-gray-500 dark:text-zinc-400 border-transparent hover:text-gray-700 dark:hover:text-zinc-300'">
+                  Información General
+                </button>
+                <button 
+                  @click="activeTab = 'history'"
+                  class="pb-3 text-sm font-bold border-b-2 transition-all duration-200"
+                  :class="activeTab === 'history' ? 'text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400' : 'text-gray-500 dark:text-zinc-400 border-transparent hover:text-gray-700 dark:hover:text-zinc-300'">
+                  Historial de Compras
+                </button>
+                <button 
+                  v-if="isLoyaltyEnabled"
+                  @click="activeTab = 'loyalty'"
+                  class="pb-3 text-sm font-bold border-b-2 transition-all duration-200"
+                  :class="activeTab === 'loyalty' ? 'text-amber-600 dark:text-amber-400 border-amber-600 dark:border-amber-400' : 'text-gray-500 dark:text-zinc-400 border-transparent hover:text-gray-700 dark:hover:text-zinc-300'">
+                  Puntos de Fidelidad
                 </button>
               </div>
+            </div>
+
+            <!-- Contenido de Tabs -->
+            <div class="flex-1 overflow-y-auto p-6">
               
-              <button @click="currentPage++" :disabled="currentPage === totalPages" 
-                      class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
-                Siguiente
-              </button>
-              <button @click="currentPage = totalPages" :disabled="currentPage === totalPages" 
-                      class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
-                Último
-              </button>
+              <!-- TAB 1: Información General -->
+              <div v-if="activeTab === 'info'" class="space-y-6 animate-fade-in">
+                <!-- Stats Rápidos - Calculados desde facturas reales -->
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold">Total Compras</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">${{ formatCurrency(customerHistorySummary.totalSpent) }}</p>
+                  </div>
+                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold">Total Órdenes</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ customerInvoices.length }}</p>
+                  </div>
+                  <div class="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold">Ticket Promedio</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">
+                      ${{ formatCurrency(customerHistorySummary.average) }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Datos Detallados -->
+                <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+                  <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50">
+                    <h3 class="font-bold text-gray-900 dark:text-white">Datos Personales</h3>
+                  </div>
+                  <div class="p-6 grid grid-cols-2 gap-6">
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold mb-1">Documento</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedCustomer.document_type }} {{ selectedCustomer.document_number }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold mb-1">Ciudad</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedCustomer.city || 'No registrada' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold mb-1">Dirección</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedCustomer.address || 'No registrada' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold mb-1">Fecha Nacimiento</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedCustomer.birth_date || 'No registrada' }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Sección Crédito (si aplica) -->
+                <div v-if="isCreditiendaEnabled" class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+                  <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-900 dark:text-white">Estado de Crédito</h3>
+                    <span :class="selectedCustomer.credit_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'" class="px-2 py-1 rounded-lg text-xs font-bold uppercase">
+                      {{ selectedCustomer.credit_active ? 'Habilitado' : 'Deshabilitado' }}
+                    </span>
+                  </div>
+                  <div class="p-6 grid grid-cols-2 gap-6">
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold mb-1">Cupo Total</p>
+                      <p class="text-lg font-bold text-gray-900 dark:text-white">${{ formatCurrency(selectedCustomer.credit_limit) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-wide font-bold mb-1">Deuda Actual</p>
+                      <p class="text-lg font-bold" :class="selectedCustomer.current_debt > 0 ? 'text-rose-600' : 'text-emerald-600'">
+                        ${{ formatCurrency(selectedCustomer.current_debt) }}
+                      </p>
+                    </div>
+                    <div class="col-span-2">
+                      <div class="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full" :style="{ width: Math.min((selectedCustomer.current_debt / selectedCustomer.credit_limit) * 100, 100) + '%' }"></div>
+                      </div>
+                      <p class="text-xs text-right mt-1 text-gray-500">
+                        {{ Math.round((selectedCustomer.current_debt / selectedCustomer.credit_limit) * 100) || 0 }}% utilizado
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 2: Historial -->
+              <div v-if="activeTab === 'history'" class="animate-fade-in h-full flex flex-col">
+                <!-- Loading State -->
+                <div v-if="historyLoading" class="flex-1 flex items-center justify-center">
+                  <div class="text-center">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                    <p class="text-sm text-gray-500 dark:text-zinc-400">Cargando historial...</p>
+                  </div>
+                </div>
+
+                <!-- Sin facturas -->
+                <div v-else-if="customerInvoices.length === 0" class="flex-1 flex items-center justify-center">
+                  <div class="text-center text-gray-500 dark:text-zinc-400">
+                    <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="text-sm font-medium">No hay compras registradas</p>
+                  </div>
+                </div>
+
+                <!-- Historial Completo -->
+                <div v-else class="flex flex-col h-full space-y-4">
+                  <!-- Resumen rápido -->
+                  <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-3 border border-blue-100 dark:border-blue-900/50">
+                      <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">Facturas</p>
+                      <p class="text-lg font-bold text-gray-900 dark:text-white">{{ customerInvoices.length }}</p>
+                    </div>
+                    <div class="bg-emerald-50 dark:bg-emerald-950/30 rounded-lg p-3 border border-emerald-100 dark:border-emerald-900/50">
+                      <p class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Total Gastado</p>
+                      <p class="text-lg font-bold text-gray-900 dark:text-white">${{ formatCurrency(customerHistorySummary.totalSpent) }}</p>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-purple-950/30 rounded-lg p-3 border border-purple-100 dark:border-purple-900/50">
+                      <p class="text-xs text-purple-600 dark:text-purple-400 font-medium">Promedio</p>
+                      <p class="text-lg font-bold text-gray-900 dark:text-white">${{ formatCurrency(customerHistorySummary.average) }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Tabla de Facturas -->
+                  <div class="flex-1 overflow-hidden bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800">
+                    <div class="overflow-y-auto h-full">
+                      <table class="w-full">
+                        <thead class="bg-gray-50 dark:bg-zinc-800 sticky top-0">
+                          <tr>
+                            <th class="px-4 py-2.5 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Factura</th>
+                            <th class="px-4 py-2.5 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Fecha</th>
+                            <th class="px-4 py-2.5 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Productos</th>
+                            <th class="px-4 py-2.5 text-right text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Total</th>
+                            <th class="px-4 py-2.5 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Estado</th>
+                            <th class="px-4 py-2.5 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
+                          <tr v-for="invoice in customerInvoices" :key="invoice.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+                            <td class="px-4 py-3">
+                              <span class="text-sm font-medium text-gray-900 dark:text-white">{{ invoice.custom_number || invoice.number || `#${invoice.id}` }}</span>
+                            </td>
+                            <td class="px-4 py-3">
+                              <span class="text-sm text-gray-600 dark:text-zinc-400">{{ formatInvoiceDate(invoice.date) }}</span>
+                            </td>
+                            <td class="px-4 py-3">
+                              <span class="text-sm text-gray-900 dark:text-white">{{ invoice.items?.length || 0 }} artículos</span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                              <span class="text-sm font-semibold text-gray-900 dark:text-white">${{ formatCurrency(invoice.total) }}</span>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                              <span :class="invoice.status === 'paid' 
+                                ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' 
+                                : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800'"
+                                class="px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase">
+                                {{ invoice.status === 'paid' ? 'Pagada' : 'Pendiente' }}
+                              </span>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                              <button @click="viewInvoiceDetails(invoice)" 
+                                class="p-1.5 text-slate-400 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                                title="Ver detalles">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 3: Fidelidad -->
+              <div v-if="activeTab === 'loyalty'" class="animate-fade-in space-y-6">
+                <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                  <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+                  
+                  <div class="relative z-10">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <p class="text-amber-100 font-medium uppercase tracking-wider text-sm">Puntos Disponibles</p>
+                        <h3 class="text-4xl font-bold mt-1">{{ selectedCustomer.loyalty_points || 0 }}</h3>
+                      </div>
+                      <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-6 border-t border-white/20 flex justify-between items-center">
+                      <p class="text-sm text-amber-100">Nivel: <span class="font-bold text-white">Bronce</span></p>
+                      <p class="text-sm text-amber-100">Próximo nivel: <span class="font-bold text-white">500 pts</span></p>
+                    </div>
+                    
+                    <div class="w-full bg-black/20 rounded-full h-1.5 mt-2">
+                      <div class="bg-white h-1.5 rounded-full" style="width: 45%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+                  <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50">
+                    <h3 class="font-bold text-gray-900 dark:text-white">Historial de Puntos</h3>
+                  </div>
+                  <div class="p-8 text-center text-gray-500 dark:text-zinc-400">
+                    <p>No hay movimientos de puntos recientes</p>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
       </div>
     </div>
-
-      <!-- Modal Crear/Editar Cliente -->
-    </div>
   </div>
+</div>
 
   <!-- 🎨 MODAL CREAR/EDITAR CLIENTE - Teleport al Body (evita conflictos z-index) -->
   <Teleport to="body">
@@ -641,6 +651,63 @@
               </div>
             </div>
 
+            <!-- 📷 Foto del Cliente -->
+            <div class="mt-6 pt-6 border-t-2 border-gray-200 dark:border-zinc-800">
+              <div class="pb-3">
+                <h4 class="text-base font-extrabold text-gray-800 dark:text-white uppercase tracking-wide">Foto del Cliente</h4>
+                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Sube una foto para identificar fácilmente al cliente</p>
+              </div>
+              
+              <div class="flex items-center gap-6">
+                <!-- Preview de la foto -->
+                <div class="relative">
+                  <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-dashed border-gray-300 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
+                    <img v-if="customerForm.credit_photo" 
+                         :src="customerForm.credit_photo" 
+                         alt="Foto del cliente"
+                         class="w-full h-full object-cover">
+                    <div v-else class="text-center p-2">
+                      <svg class="w-8 h-8 mx-auto text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                      </svg>
+                      <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-1">Sin foto</p>
+                    </div>
+                  </div>
+                  <!-- Botón eliminar foto -->
+                  <button v-if="customerForm.credit_photo" 
+                          @click="customerForm.credit_photo = ''"
+                          class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex flex-col gap-2">
+                  <label class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl cursor-pointer transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Subir Foto</span>
+                    <input type="file" 
+                           accept="image/*" 
+                           class="hidden" 
+                           @change="handlePhotoUpload">
+                  </label>
+                  <button type="button"
+                          @click="openCamera"
+                          class="px-4 py-2.5 bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-zinc-600 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-xl transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span>Usar Cámara</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <!-- ✅ Checkboxes de Estado -->
             <div class="mt-8 pt-6 border-t-2 border-gray-200 dark:border-zinc-800 flex flex-wrap items-center gap-6">
               <label class="flex items-center gap-3 cursor-pointer group">
@@ -700,20 +767,154 @@
     </Transition>
   </Teleport>
 
-  <!-- Modal Historial de Cliente -->
-  <CustomerHistoryModal
-        v-if="showHistoryModal"
-        :customer="selectedCustomer"
-        @close="showHistoryModal = false"
-      />
+  <!-- 🎨 MODAL DETALLES DE FACTURA - Diseño Profesional -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="showInvoiceDetailModal && selectedInvoice"
+           class="fixed inset-0 bg-black/70 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in"
+           @click.self="showInvoiceDetailModal = false">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-200 dark:border-zinc-800">
+          
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Detalles de Factura</h2>
+                <p class="text-sm text-gray-500 dark:text-zinc-400">{{ selectedInvoice.custom_number || selectedInvoice.number || `#${selectedInvoice.id}` }}</p>
+              </div>
+            </div>
+            <button @click="showInvoiceDetailModal = false"
+                    class="w-10 h-10 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Contenido -->
+          <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-4">
+            <!-- Info General y Totales -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Información General</h3>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-500 dark:text-zinc-400">Número:</span>
+                    <span class="font-medium text-gray-900 dark:text-white">{{ selectedInvoice.custom_number || selectedInvoice.number || `#${selectedInvoice.id}` }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-500 dark:text-zinc-400">Fecha:</span>
+                    <span class="font-medium text-gray-900 dark:text-white">{{ formatInvoiceDate(selectedInvoice.date) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-500 dark:text-zinc-400">Vencimiento:</span>
+                    <span class="font-medium text-gray-900 dark:text-white">{{ formatInvoiceDate(selectedInvoice.due_date) || 'N/A' }}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-gray-500 dark:text-zinc-400">Estado:</span>
+                    <span :class="selectedInvoice.status === 'paid' 
+                      ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' 
+                      : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800'"
+                      class="px-2 py-0.5 rounded-full text-xs font-bold border">
+                      {{ selectedInvoice.status === 'paid' ? 'Pagada' : 'Pendiente' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Totales</h3>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-500 dark:text-zinc-400">Subtotal:</span>
+                    <span class="font-medium text-gray-900 dark:text-white">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-500 dark:text-zinc-400">Descuento:</span>
+                    <span class="font-medium text-gray-900 dark:text-white">-${{ formatCurrency(selectedInvoice.discount || 0) }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-500 dark:text-zinc-400">Impuestos:</span>
+                    <span class="font-medium text-gray-900 dark:text-white">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
+                  </div>
+                  <div class="flex justify-between border-t border-gray-200 dark:border-zinc-700 pt-2 mt-2">
+                    <span class="font-bold text-gray-900 dark:text-white">Total:</span>
+                    <span class="font-bold text-lg text-blue-600 dark:text-blue-400">${{ formatCurrency(selectedInvoice.total) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Productos con tabla profesional -->
+            <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-4 py-3 bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-800">
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Productos ({{ selectedInvoice.items?.length || 0 }})</h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-gray-50 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Producto</th>
+                      <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Cantidad</th>
+                      <th class="px-4 py-3 text-right text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Precio Unit.</th>
+                      <th class="px-4 py-3 text-right text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
+                    <tr v-for="item in (selectedInvoice.items || [])" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50">
+                      <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden flex-shrink-0">
+                            <img v-if="item.product?.image_url || item.image_url" 
+                                 :src="item.product?.image_url || item.image_url" 
+                                 :alt="item.product?.name || item.product_name"
+                                 class="w-full h-full object-cover"
+                                 @error="$event.target.style.display='none'">
+                            <svg v-else class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                          </div>
+                          <div>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.product?.name || item.product_name || item.name || 'Producto' }}</p>
+                            <p class="text-xs text-gray-500 dark:text-zinc-500">SKU: {{ item.product?.sku || item.sku || 'N/A' }}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-4 py-3 text-center text-sm text-gray-900 dark:text-white">{{ Math.abs(item.quantity || 1) }}</td>
+                      <td class="px-4 py-3 text-right text-sm text-gray-900 dark:text-white">${{ formatCurrency(item.unit_price || item.price) }}</td>
+                      <td class="px-4 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">${{ formatCurrency(item.total_price || (Math.abs(item.quantity || 1) * (item.unit_price || item.price || 0))) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 flex justify-end">
+            <button @click="showInvoiceDetailModal = false"
+                    class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl transition-colors">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onActivated } from 'vue'
 import { customersService } from '../services/customersService.js'
+import { invoicesService } from '../services/invoicesService.js'
 import { useToast } from '../composables/useToast.js'
 import { useCreditienda } from '../composables/useCreditienda.js'
-import CustomerHistoryModal from './CustomerHistoryModal.vue'
+import { useAutoRefresh } from '../composables/useRouteState.js'
 import { appStore } from '../store/appStore.js'
 
 // Sistema de toasts
@@ -744,9 +945,78 @@ const itemsPerPage = ref(25)
 
 // Modals
 const showCustomerModal = ref(false)
-const showHistoryModal = ref(false)
 const isEditing = ref(false)
 const selectedCustomer = ref(null)
+const activeTab = ref('info')
+
+// Historial inline del cliente
+const historyLoading = ref(false)
+const customerInvoices = ref([])
+
+// Computed para resumen del historial
+const customerHistorySummary = computed(() => {
+  const total = customerInvoices.value.reduce((sum, inv) => sum + parseFloat(inv.total || 0), 0)
+  const count = customerInvoices.value.length
+  return {
+    totalSpent: total,
+    average: count > 0 ? total / count : 0
+  }
+})
+
+// Cargar historial cuando cambia el cliente (siempre, para los stats)
+const loadCustomerHistory = async () => {
+  if (!selectedCustomer.value?.id) return
+  
+  historyLoading.value = true
+  try {
+    const response = await invoicesService.getInvoices()
+    if (response.success) {
+      customerInvoices.value = response.data
+        .filter(inv => inv.customer_id === selectedCustomer.value.id || inv.customer_name === selectedCustomer.value.name)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+    }
+  } catch (error) {
+    console.error('Error cargando historial:', error)
+  } finally {
+    historyLoading.value = false
+  }
+}
+
+// Formatear fecha de factura
+const formatInvoiceDate = (dateStr) => {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+// Ver detalles de factura (modal simple)
+const showInvoiceDetailModal = ref(false)
+const selectedInvoice = ref(null)
+
+const viewInvoiceDetails = (invoice) => {
+  selectedInvoice.value = invoice
+  showInvoiceDetailModal.value = true
+}
+
+// Watch para cargar historial cuando cambia el tab (no necesario, pero mantiene compatibilidad)
+watch(activeTab, (newTab) => {
+  if (newTab === 'history' && customerInvoices.value.length === 0) {
+    loadCustomerHistory()
+  }
+})
+
+// Watch para recargar historial cuando cambia el cliente seleccionado
+watch(selectedCustomer, (newCustomer) => {
+  customerInvoices.value = []
+  if (newCustomer?.id) {
+    loadCustomerHistory()
+  }
+})
+
+const selectCustomer = (customer) => {
+  selectedCustomer.value = customer
+  activeTab.value = 'info'
+}
 
 const customerForm = ref({
   name: '',
@@ -761,7 +1031,8 @@ const customerForm = ref({
   credit_limit: 0,
   current_debt: 0,
   active: true,
-  credit_active: false
+  credit_active: false,
+  credit_photo: ''
 })
 
 // Cargar preferencias del usuario
@@ -979,9 +1250,144 @@ const openCreateModal = () => {
     gender: '',
     credit_limit: 0,
     current_debt: 0,
-    active: true
+    active: true,
+    credit_active: false,
+    credit_photo: ''
   }
   showCustomerModal.value = true
+}
+
+// 📷 Funciones para manejo de foto del cliente
+const handlePhotoUpload = (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+  
+  // Validar tipo de archivo
+  if (!file.type.startsWith('image/')) {
+    showError('Por favor selecciona una imagen válida')
+    return
+  }
+  
+  // Validar tamaño (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    showError('La imagen no puede superar 5MB')
+    return
+  }
+  
+  // Convertir a base64
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    // Redimensionar imagen si es muy grande
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const MAX_SIZE = 400
+      let width = img.width
+      let height = img.height
+      
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height *= MAX_SIZE / width
+          width = MAX_SIZE
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width *= MAX_SIZE / height
+          height = MAX_SIZE
+        }
+      }
+      
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0, width, height)
+      
+      customerForm.value.credit_photo = canvas.toDataURL('image/jpeg', 0.8)
+      showSuccess('Foto agregada correctamente')
+    }
+    img.src = e.target.result
+  }
+  reader.readAsDataURL(file)
+}
+
+const openCamera = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+    
+    // Crear modal de cámara
+    const modal = document.createElement('div')
+    modal.className = 'fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-[99999] p-4'
+    modal.innerHTML = `
+      <div class="bg-zinc-900 rounded-2xl overflow-hidden max-w-lg w-full">
+        <div class="p-4 border-b border-zinc-700 flex justify-between items-center">
+          <h3 class="text-white font-bold">Tomar Foto</h3>
+          <button id="closeCamera" class="text-zinc-400 hover:text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <video id="cameraVideo" autoplay playsinline class="w-full"></video>
+        <div class="p-4 flex justify-center">
+          <button id="capturePhoto" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            Capturar
+          </button>
+        </div>
+      </div>
+    `
+    document.body.appendChild(modal)
+    
+    const video = modal.querySelector('#cameraVideo')
+    video.srcObject = stream
+    
+    // Cerrar cámara
+    modal.querySelector('#closeCamera').onclick = () => {
+      stream.getTracks().forEach(track => track.stop())
+      modal.remove()
+    }
+    
+    // Capturar foto
+    modal.querySelector('#capturePhoto').onclick = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      canvas.getContext('2d').drawImage(video, 0, 0)
+      
+      // Redimensionar
+      const MAX_SIZE = 400
+      const resizedCanvas = document.createElement('canvas')
+      let width = canvas.width
+      let height = canvas.height
+      
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height *= MAX_SIZE / width
+          width = MAX_SIZE
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width *= MAX_SIZE / height
+          height = MAX_SIZE
+        }
+      }
+      
+      resizedCanvas.width = width
+      resizedCanvas.height = height
+      resizedCanvas.getContext('2d').drawImage(canvas, 0, 0, width, height)
+      
+      customerForm.value.credit_photo = resizedCanvas.toDataURL('image/jpeg', 0.8)
+      stream.getTracks().forEach(track => track.stop())
+      modal.remove()
+      showSuccess('Foto capturada correctamente')
+    }
+  } catch (error) {
+    console.error('Error accediendo a la cámara:', error)
+    showError('No se pudo acceder a la cámara. Verifica los permisos.')
+  }
 }
 
 // Manejar click en checkbox de crédito
@@ -1032,11 +1438,6 @@ const saveCustomer = async () => {
   } finally {
     loading.value = false
   }
-}
-
-const viewCustomerHistory = (customer) => {
-  selectedCustomer.value = customer
-  showHistoryModal.value = true
 }
 
 const deleteCustomer = async (customer) => {
@@ -1112,6 +1513,12 @@ onMounted(async () => {
   // 🔧 Cargar preferencias del usuario primero
   loadUserPreferences()
   
+  await loadCustomers()
+})
+
+// 🔄 AUTO-REFRESH al reactivar el componente
+onActivated(async () => {
+  console.log('🔄 [CustomersView] Component activated - Refreshing data...')
   await loadCustomers()
 })
 </script>

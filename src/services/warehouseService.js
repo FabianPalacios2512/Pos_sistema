@@ -47,7 +47,7 @@ export const warehouseService = {
    * Obtener inventario de una bodega
    */
   async getInventory(id) {
-    return await api.get(`/warehouses/${id}/products`);
+    return await api.get(`/warehouses/${id}/inventory`);
   },
 
   /**

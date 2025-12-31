@@ -1848,6 +1848,14 @@ watch(activeSection, (newVal) => {
   }
 })
 
+// Watch para cambiar sección desde query params
+watch(() => props.queryParams, (newParams) => {
+  if (newParams && newParams.section) {
+    console.log('🔄 Cambiando sección desde query params:', newParams.section)
+    activeSection.value = newParams.section
+  }
+}, { immediate: true, deep: true })
+
 // Manejo de upgrade exitoso
 const handleUpgradeSuccess = async (upgradeData) => {
   // El plan fue actualizado exitosamente

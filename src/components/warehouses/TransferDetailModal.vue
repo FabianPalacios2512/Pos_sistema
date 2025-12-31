@@ -1,33 +1,36 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-70 flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-300 dark:border-zinc-800">
-      
-      <!-- Header -->
-      <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-gray-900 dark:text-white">Detalle del Traslado</h3>
-            <p class="text-xs text-gray-500 dark:text-zinc-400">{{ transfer.reference_number }}</p>
-          </div>
-        </div>
-        <button 
-          @click="$emit('close')"
-          class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
-          <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Body -->
-      <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+  <Teleport to="body">
+    <div 
+      class="fixed top-0 left-0 right-0 bottom-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4"
+      style="z-index: 99999; position: fixed; inset: 0;">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-300 dark:border-zinc-800">
         
-        <!-- Información General -->
+        <!-- Header -->
+        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900 dark:text-white">Detalle del Traslado</h3>
+              <p class="text-xs text-gray-500 dark:text-zinc-400">{{ transfer.reference_number }}</p>
+            </div>
+          </div>
+          <button 
+            @click="$emit('close')"
+            class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+            <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+          
+          <!-- Información General -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           
           <!-- Estado -->
@@ -167,13 +170,31 @@
       </div>
 
     </div>
-  </div>
+    </div>
+  </Teleport>
+
+  <!-- Modal de Confirmación -->
+  <ConfirmModal
+    v-if="confirmModal.show"
+    :title="confirmModal.title"
+    :subtitle="confirmModal.subtitle"
+    :message="confirmModal.message"
+    :description="confirmModal.description"
+    :confirmText="confirmModal.confirmText"
+    :cancelText="confirmModal.cancelText"
+    :loadingText="confirmModal.loadingText"
+    :variant="confirmModal.variant"
+    :loading="confirmModal.loading"
+    @confirm="confirmModal.onConfirm"
+    @cancel="closeConfirmModal"
+  />
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { stockTransferService } from '@/services/stockTransferService';
 import { useToast } from '@/composables/useToast';
+import ConfirmModal from '@/components/ConfirmModal.vue';
 
 const props = defineProps({
   transfer: {
@@ -185,6 +206,21 @@ const props = defineProps({
 const emit = defineEmits(['close', 'updated']);
 
 const { showSuccess, showError } = useToast();
+
+// Estado del modal de confirmación
+const confirmModal = ref({
+  show: false,
+  title: '',
+  subtitle: '',
+  message: '',
+  description: '',
+  confirmText: 'Confirmar',
+  cancelText: 'Cancelar',
+  loadingText: 'Procesando...',
+  variant: 'warning',
+  loading: false,
+  onConfirm: () => {}
+});
 
 const totalProducts = computed(() => {
   return props.transfer.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
@@ -222,33 +258,64 @@ const formatDate = (dateString) => {
   }).format(date);
 };
 
-const handleComplete = async () => {
-  if (!confirm('¿Estás seguro de completar este traslado? El stock se moverá entre las sedes.')) {
-    return;
-  }
+const closeConfirmModal = () => {
+  confirmModal.value.show = false;
+  confirmModal.value.loading = false;
+};
 
-  try {
-    await stockTransferService.complete(props.transfer.id);
-    showSuccess('✅ Traslado completado exitosamente');
-    emit('updated');
-  } catch (error) {
-    console.error('Error al completar traslado:', error);
-    showError(error.response?.data?.message || 'Error al completar el traslado');
-  }
+const handleComplete = async () => {
+  confirmModal.value = {
+    show: true,
+    title: 'Completar Traslado',
+    subtitle: props.transfer.reference_number,
+    message: `¿Estás seguro de completar el traslado ${props.transfer.reference_number}?`,
+    description: 'El stock se moverá entre las sedes y esta acción no se puede deshacer.',
+    confirmText: 'Sí, Completar',
+    cancelText: 'Cancelar',
+    loadingText: 'Completando...',
+    variant: 'warning',
+    loading: false,
+    onConfirm: async () => {
+      confirmModal.value.loading = true;
+      try {
+        await stockTransferService.complete(props.transfer.id);
+        closeConfirmModal();
+        showSuccess('✅ Traslado completado exitosamente');
+        emit('updated');
+      } catch (error) {
+        console.error('Error al completar traslado:', error);
+        showError(error.response?.data?.message || 'Error al completar el traslado');
+        confirmModal.value.loading = false;
+      }
+    }
+  };
 };
 
 const handleCancel = async () => {
-  if (!confirm('¿Estás seguro de cancelar este traslado? Esta acción no se puede deshacer.')) {
-    return;
-  }
-
-  try {
-    await stockTransferService.cancel(props.transfer.id);
-    showSuccess('✅ Traslado cancelado exitosamente');
-    emit('updated');
-  } catch (error) {
-    console.error('Error al cancelar traslado:', error);
-    showError(error.response?.data?.message || 'Error al cancelar el traslado');
-  }
+  confirmModal.value = {
+    show: true,
+    title: 'Cancelar Traslado',
+    subtitle: props.transfer.reference_number,
+    message: `¿Estás seguro de cancelar el traslado ${props.transfer.reference_number}?`,
+    description: 'Esta acción no se puede deshacer y el traslado quedará marcado como cancelado.',
+    confirmText: 'Sí, Cancelar',
+    cancelText: 'No',
+    loadingText: 'Cancelando...',
+    variant: 'danger',
+    loading: false,
+    onConfirm: async () => {
+      confirmModal.value.loading = true;
+      try {
+        await stockTransferService.cancel(props.transfer.id);
+        closeConfirmModal();
+        showSuccess('✅ Traslado cancelado exitosamente');
+        emit('updated');
+      } catch (error) {
+        console.error('Error al cancelar traslado:', error);
+        showError(error.response?.data?.message || 'Error al cancelar el traslado');
+        confirmModal.value.loading = false;
+      }
+    }
+  };
 };
 </script>

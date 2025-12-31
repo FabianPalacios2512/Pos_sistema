@@ -737,8 +737,19 @@ function getYearlySalesData() {
     $nowColombia = Carbon::now()->setTimezone('America/Bogota');
 
     $salesData = [];
+    $processedMonths = []; // Evitar duplicados
+
     for ($i = 11; $i >= 0; $i--) {
-        $monthDate = $nowColombia->copy()->subMonths($i);
+        // CORRECCIÓN: Usar startOfMonth primero para evitar problemas con días que no existen en todos los meses
+        $monthDate = $nowColombia->copy()->startOfMonth()->subMonths($i);
+        $monthKey = $monthDate->format('Y-m');
+
+        // Evitar procesar el mismo mes dos veces
+        if (in_array($monthKey, $processedMonths)) {
+            continue;
+        }
+        $processedMonths[] = $monthKey;
+
         $monthStart = $monthDate->copy()->startOfMonth()->toDateTimeString();
         $monthEnd = $monthDate->copy()->endOfMonth()->toDateTimeString();
 
@@ -755,7 +766,7 @@ function getYearlySalesData() {
 
         $salesData[] = [
             'label' => $monthNames[$monthDate->month - 1],
-            'date' => $monthDate->format('Y-m'),
+            'date' => $monthKey,
             'transactions' => $monthData ? (int) $monthData->transactions : 0,
             'sales' => $monthData ? (float) $monthData->sales : 0
         ];

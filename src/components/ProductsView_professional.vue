@@ -89,78 +89,78 @@
         </div>
       </div>
       
-      <!-- KPIs Standard (Con iconos) -->
+      <!-- KPIs Standard (Con iconos) - Estilo fantasma profesional -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <!-- Total Productos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-11 h-11 bg-slate-100 dark:bg-zinc-800/50 border border-slate-200/50 dark:border-zinc-700/30 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Productos</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Total Productos</p>
               <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ displayProducts.length }}</p>
             </div>
           </div>
         </div>
 
         <!-- Productos Activos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100/50 dark:border-emerald-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Activos</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Activos</p>
               <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ activeProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/30 border border-amber-100/50 dark:border-amber-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Stock Bajo</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Stock Bajo</p>
               <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ lowStockProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Valor Total -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950/30 border border-blue-100/50 dark:border-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Valor Total</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Valor Total</p>
               <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatCurrency(totalValue) }}</p>
             </div>
           </div>
         </div>
 
         <!-- Categorías -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100/50 dark:border-indigo-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Categorías</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Categorías</p>
               <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ uniqueCategories }}</p>
             </div>
           </div>
@@ -169,8 +169,8 @@
 
       <!-- Contenedor Principal Tour - Filtros + Productos -->
       <div id="tour-products-main">
-      <!-- Filtros - Diseño exacto de Facturas -->
-    <div class="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm rounded-xl p-4 mb-6 transition-colors duration-300">
+      <!-- Filtros - Diseño limpio y profesional -->
+    <div class="bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl p-4 mb-6 border border-gray-200/40 dark:border-zinc-800/40 transition-colors duration-300">
       <div class="flex flex-wrap items-center gap-4">
         <!-- Búsqueda limpia (como Facturas) -->
         <div class="flex-1 min-w-[200px] relative">
@@ -298,101 +298,82 @@
           />
         </template>
         
-        <!-- 🛒 RETAIL CARD - Diseño clásico para tiendas normales -->
+        <!-- 🛒 RETAIL CARD - Diseño minimalista profesional -->
         <template v-else>
           <div v-for="product in paginatedProducts" 
                :key="product.id" 
                @click="viewProduct(product)"
-               class="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-300 dark:border-zinc-800 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 overflow-hidden group flex flex-col cursor-pointer">
+               class="bg-white dark:bg-zinc-900/90 rounded-2xl border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 hover:shadow-xl dark:hover:shadow-black/40 transition-all duration-300 overflow-hidden group cursor-pointer">
           
-            <!-- Imagen del producto -->
-            <div class="relative h-40 bg-slate-50 dark:bg-zinc-800 overflow-hidden">
+            <!-- Imagen del producto con overlay en hover -->
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
               <img :src="getProductImage(product)" 
                    :alt="product.name" 
                    @error="(e) => handleImageError(e, product)"
                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
               
-              <!-- Badges Flotantes -->
-              <div class="absolute top-2 right-2 flex flex-col gap-1">
-                <span :class="getProductStatus(product) ? 'bg-emerald-500/90 text-white' : 'bg-rose-500/90 text-white'" 
-                      class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm backdrop-blur-sm">
+              <!-- Overlay con acciones en hover -->
+              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                <button @click.stop="viewProduct(product)" 
+                        class="w-9 h-9 rounded-full bg-white/95 hover:bg-white text-gray-700 hover:text-gray-900 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-200"
+                        title="Ver">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </button>
+                <button @click.stop="editProduct(product)" 
+                        class="w-9 h-9 rounded-full bg-white/95 hover:bg-white text-gray-700 hover:text-gray-900 flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-200 delay-75"
+                        title="Editar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <!-- Badge Estado - Esquina superior derecha -->
+              <div class="absolute top-3 right-3">
+                <span :class="getProductStatus(product) 
+                  ? 'bg-emerald-500 text-white' 
+                  : 'bg-gray-500 text-white'" 
+                      class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide shadow-sm">
                   {{ getProductStatus(product) ? 'Activo' : 'Inactivo' }}
                 </span>
               </div>
               
-              <div v-if="(product.current_stock || 0) <= (product.min_stock || 0)" class="absolute top-2 left-2">
-                <span class="bg-amber-500/90 text-white px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider shadow-sm backdrop-blur-sm animate-pulse">
+              <!-- Badge Stock Bajo - Esquina superior izquierda -->
+              <div v-if="(product.current_stock || 0) <= (product.min_stock || 0)" class="absolute top-3 left-3">
+                <span class="bg-amber-500 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide shadow-sm">
                   Stock Bajo
                 </span>
               </div>
             </div>
 
-            <!-- Información del producto -->
-            <div class="p-4 flex-1 flex flex-col">
-              <div class="mb-3 flex-1">
-                <div class="flex items-start justify-between gap-2 mb-1">
-                  <h3 class="font-bold text-slate-900 dark:text-white text-sm leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" :title="product.name">
-                    {{ product.name }}
-                  </h3>
-                </div>
-                <p class="text-[11px] font-medium text-slate-500 dark:text-zinc-400 uppercase tracking-wide mb-2">
-                  {{ product.category?.name || 'Sin categoría' }}
-                </p>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-mono text-slate-400 dark:text-zinc-500 bg-slate-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
-                    {{ product.sku || 'SIN SKU' }}
-                  </span>
-                </div>
-              </div>
+            <!-- Información del producto - Diseño limpio -->
+            <div class="p-4">
+              <!-- Nombre -->
+              <h3 class="font-semibold text-gray-900 dark:text-white text-[13px] leading-snug line-clamp-1 mb-1" :title="product.name">
+                {{ product.name }}
+              </h3>
               
-              <!-- Precio y Stock -->
-              <div class="flex items-end justify-between mb-4 pt-3 border-t border-slate-100 dark:border-zinc-800">
-                <div>
-                  <p class="text-[10px] text-slate-500 dark:text-zinc-400 font-medium mb-0.5">Precio</p>
-                  <span class="font-black text-slate-900 dark:text-white text-lg leading-none">
-                    ${{ formatCurrency(product.sale_price) }}
-                  </span>
-                </div>
-                <div class="text-right">
-                  <p class="text-[10px] text-slate-500 dark:text-zinc-400 font-medium mb-0.5">Stock</p>
-                  <span class="font-bold text-slate-700 dark:text-zinc-300 text-sm bg-slate-50 dark:bg-zinc-800 px-2 py-0.5 rounded-md border border-slate-100 dark:border-zinc-700">
-                    {{ product.current_stock || 0 }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Acciones (Ghost Style) -->
-              <div class="grid grid-cols-3 gap-2">
-                <button @click.stop="viewProduct(product)" 
-                        class="flex items-center justify-center py-2 rounded-lg text-slate-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-800"
-                        title="Ver Detalles">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                  </svg>
-                </button>
-                
-                <button @click.stop="editProduct(product)" 
-                        class="flex items-center justify-center py-2 rounded-lg text-slate-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950 transition-all border border-transparent hover:border-amber-100 dark:hover:border-amber-800"
-                        title="Editar">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
-                </button>
-                
-                <button @click.stop="toggleProductStatus(product)" 
-                        class="flex items-center justify-center py-2 rounded-lg transition-all border border-transparent"
-                        :class="getProductStatus(product) !== false 
-                          ? 'text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950 hover:border-rose-100 dark:hover:border-rose-800' 
-                          : 'text-slate-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950 hover:border-emerald-100 dark:hover:border-emerald-800'"
-                        :title="getProductStatus(product) !== false ? 'Desactivar' : 'Activar'">
-                  <svg v-if="getProductStatus(product) !== false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                  </svg>
-                  <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                </button>
+              <!-- Categoría -->
+              <p class="text-[11px] text-gray-500 dark:text-zinc-500 mb-3">
+                {{ product.category?.name || 'Sin categoría' }}
+              </p>
+              
+              <!-- Precio y Stock en línea -->
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-gray-900 dark:text-white text-lg">
+                  ${{ formatCurrency(product.sale_price) }}
+                </span>
+                <span :class="[
+                  'text-sm font-medium px-2 py-0.5 rounded-md',
+                  (product.current_stock || 0) <= (product.min_stock || 0) 
+                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' 
+                    : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400'
+                ]">
+                  {{ product.current_stock || 0 }} uds
+                </span>
               </div>
             </div>
           </div>
@@ -412,10 +393,10 @@
       </div>
     </div>
 
-    <!-- Vista de Tabla - Colores unificados con panel izquierdo de Facturas -->
-  <div v-else class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden transition-colors duration-300">
+    <!-- Vista de Tabla - Diseño limpio y profesional -->
+  <div v-else class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg dark:shadow-black/40 border border-gray-200/80 dark:border-zinc-800/80 overflow-hidden transition-colors duration-300">
       <!-- Header de tabla -->
-      <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
+      <div class="bg-gray-50/50 dark:bg-zinc-800/30 border-b border-gray-100 dark:border-zinc-800/60 px-6 py-4 flex items-center justify-between">
         <div>
           <h2 class="text-base font-bold text-gray-900 dark:text-white">Catálogo de Productos</h2>
           <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ totalItems }} productos encontrados</p>
@@ -425,26 +406,26 @@
       <!-- Tabla -->
       <table class="min-w-full">
         <thead>
-          <tr class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
-            <th class="px-6 py-3.5 text-left text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+          <tr class="bg-slate-50/50 dark:bg-zinc-800/20 border-b border-gray-100 dark:border-zinc-800/60">
+            <th class="px-6 py-3.5 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
               Producto
             </th>
-            <th class="px-6 py-3.5 text-left text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
               Categoría
             </th>
-            <th class="px-6 py-3.5 text-left text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
               Proveedor
             </th>
-            <th class="px-6 py-3.5 text-right text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-right text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
               Precio
             </th>
             
             <!-- Columnas de Stock Dinámicas -->
             <template v-if="showMultipleStockColumns">
               <th v-for="warehouse in availableWarehouses" :key="warehouse.id"
-                  class="px-4 py-3.5 text-center text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                  class="px-4 py-3.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
                 <div class="flex items-center justify-center space-x-1">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-3 h-3 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                   </svg>
                   <span>{{ warehouse.name }}</span>
@@ -452,26 +433,26 @@
               </th>
             </template>
             <template v-else>
-              <th class="px-6 py-3.5 text-center text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+              <th class="px-6 py-3.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
                 Stock
               </th>
             </template>
             
-            <th class="px-6 py-3.5 text-center text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
               Estado
             </th>
-            <th class="px-6 py-3.5 text-center text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
               Acciones
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
+        <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800/60">
           <!-- Loading State -->
           <tr v-if="loading">
             <td :colspan="6 + availableWarehouses.length" class="px-4 py-12 text-center">
               <div class="flex flex-col items-center space-y-3">
-                <div class="w-8 h-8 border-4 border-blue-600 dark:border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <p class="text-sm text-gray-600 dark:text-zinc-400 font-medium">Cargando productos...</p>
+                <div class="w-8 h-8 border-4 border-slate-300 dark:border-zinc-600 border-t-slate-600 dark:border-t-slate-400 rounded-full animate-spin"></div>
+                <p class="text-sm text-gray-500 dark:text-zinc-500 font-medium">Cargando productos...</p>
               </div>
             </td>
           </tr>
@@ -501,23 +482,23 @@
             </td>
           </tr>
 
-          <!-- Product Rows - Premium Design con colores de Facturas -->
+          <!-- Product Rows - Diseño limpio y profesional -->
           <tr v-for="product in paginatedProducts" 
               :key="product.id"
               @click="viewProduct(product)"
-              class="hover:bg-slate-50 dark:hover:bg-zinc-800/50 hover:shadow-sm transition-all duration-200 group cursor-pointer border-b border-gray-200 dark:border-zinc-800 last:border-0">
+              class="hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-all duration-200 group cursor-pointer border-b border-gray-100 dark:border-zinc-800/50 last:border-0">
             <!-- Columna Producto (La Estrella) -->
             <td class="px-6 py-4">
               <div class="flex items-center gap-4">
-                <div class="relative w-14 h-14 flex-shrink-0">
+                <div class="relative w-12 h-12 flex-shrink-0">
                   <img :src="getProductImage(product)" 
                        :alt="product.name" 
                        @error="(e) => handleImageError(e, product)"
-                       class="w-full h-full object-cover rounded-lg ring-1 ring-gray-300 dark:ring-zinc-700 group-hover:ring-gray-400 dark:group-hover:ring-zinc-600 transition-all">
+                       class="w-full h-full object-cover rounded-lg ring-1 ring-gray-200 dark:ring-zinc-700/50 group-hover:ring-gray-300 dark:group-hover:ring-zinc-600 transition-all">
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 mb-1">
-                    <div class="text-sm font-medium text-gray-900 dark:text-zinc-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">{{ product.name }}</div>
+                    <div class="text-sm font-medium text-gray-800 dark:text-zinc-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors truncate">{{ product.name }}</div>
                     <!-- Badge "Producto con Variantes" -->
                     <span v-if="hasVariants(product)" 
                           class="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 rounded-md text-[10px] font-bold uppercase tracking-wide whitespace-nowrap">
@@ -535,16 +516,16 @@
             </td>
             <!-- Columna Categoría (Badges/Pills) -->
             <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 font-medium">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs bg-slate-50 dark:bg-zinc-800/60 text-slate-600 dark:text-zinc-400 border border-slate-200/60 dark:border-zinc-700/40 font-medium">
                 {{ product.category?.name || 'Sin categoría' }}
               </span>
             </td>
             <!-- Columna Proveedor -->
             <td class="px-6 py-4">
-              <span v-if="product.supplier?.name" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-800 font-medium">
+              <span v-if="product.supplier?.name" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100/60 dark:border-indigo-900/40 font-medium">
                 {{ product.supplier.name }}
               </span>
-              <span v-else class="text-xs text-gray-400 dark:text-zinc-500 italic">
+              <span v-else class="text-xs text-gray-400 dark:text-zinc-600 italic">
                 Sin proveedor
               </span>
             </td>
@@ -561,14 +542,14 @@
                 <div v-if="getWarehouseStock(product, warehouse.id) !== null" class="flex flex-col items-center">
                   <!-- ✅ Producto EXISTE en esta sede -->
                   <span :class="[
-                    'text-sm font-mono font-bold tabular-nums',
-                    getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0) ? 'text-orange-500' : 'text-emerald-400'
+                    'text-sm font-mono font-semibold tabular-nums',
+                    getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0) ? 'text-amber-600 dark:text-amber-500' : 'text-gray-900 dark:text-zinc-200'
                   ]">
                     {{ getWarehouseStock(product, warehouse.id) }}
                   </span>
                   <!-- Alerta de stock bajo para esta bodega -->
                   <span v-if="getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0)" 
-                        class="text-[10px] font-bold text-orange-500 mt-0.5">
+                        class="text-[10px] font-semibold text-amber-600 dark:text-amber-500 mt-0.5">
                     Bajo
                   </span>
                 </div>
@@ -588,8 +569,8 @@
               <td class="px-6 py-4 text-center">
                 <div class="flex flex-col items-center relative group/stock">
                   <span :class="[
-                    'text-lg font-mono font-bold tabular-nums',
-                    getTotalStock(product) <= (product.min_stock || 0) ? 'text-orange-500' : 'text-emerald-400'
+                    'text-base font-mono font-semibold tabular-nums',
+                    getTotalStock(product) <= (product.min_stock || 0) ? 'text-amber-600 dark:text-amber-500' : 'text-gray-900 dark:text-zinc-200'
                   ]">
                     {{ hasVariants(product) ? getStockSummary(product).total : getTotalStock(product) }}
                   </span>
@@ -814,9 +795,11 @@
     </div>
 
     <!-- Modal Crear/Editar Producto -->
-    <div v-if="showProductModal" 
-         class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50"
-         @click.self="showProductModal = false">
+    <Teleport to="body">
+      <div v-if="showProductModal" 
+           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50"
+           style="z-index: 99999"
+           @click.self="showProductModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden border border-gray-300 dark:border-zinc-800 mx-4 flex flex-col">
         
         <!-- Header -->
@@ -1496,7 +1479,8 @@
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </Teleport>
 
     <!-- ⚠️ Modal de Confirmación: Producto sin Stock -->
     <div v-if="showStockWarningModal" 
@@ -1605,9 +1589,11 @@
     </div>
 
     <!-- Modal Ver Producto AVANZADO (Fashion/Variantes) -->
-    <div v-if="showViewModal" 
-         class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-         @click.self="showViewModal = false">
+    <Teleport to="body">
+      <div v-if="showViewModal" 
+           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+           style="z-index: 99999"
+           @click.self="showViewModal = false">
       <!-- Modal Full Width para productos con variantes -->
       <div v-if="selectedProduct && hasVariants(selectedProduct)" 
            class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[90vh] overflow-hidden border border-gray-300 dark:border-zinc-800">
@@ -1675,14 +1661,14 @@
                   <!-- Stock Total Global -->
                   <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl p-5 border border-gray-300 dark:border-zinc-700 shadow-sm">
                     <div class="flex items-center gap-3">
-                      <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-950 rounded-lg flex items-center justify-center">
+                      <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-950 rounded-lg flex items-center justify-center flex-shrink-0">
                         <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
                       </div>
-                      <div>
+                      <div class="flex-1 min-w-0">
                         <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Stock Total Global</p>
-                        <p class="text-3xl font-black text-gray-900 dark:text-white">{{ getStockSummary(selectedProduct).total }}</p>
+                        <p class="text-2xl lg:text-3xl font-black text-gray-900 dark:text-white truncate" :title="getStockSummary(selectedProduct).total">{{ getStockSummary(selectedProduct).total }}</p>
                         <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">unidades</p>
                       </div>
                     </div>
@@ -1691,14 +1677,14 @@
                   <!-- Valor Total Inventario -->
                   <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl p-5 border border-gray-300 dark:border-zinc-700 shadow-sm">
                     <div class="flex items-center gap-3">
-                      <div class="w-12 h-12 bg-blue-100 dark:bg-blue-950 rounded-lg flex items-center justify-center">
+                      <div class="w-12 h-12 bg-blue-100 dark:bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
                         <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                         </svg>
                       </div>
-                      <div>
+                      <div class="flex-1 min-w-0">
                         <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Valor Total</p>
-                        <p class="text-3xl font-black text-gray-900 dark:text-white">${{ formatCurrency(getTotalInventoryValue(selectedProduct)) }}</p>
+                        <p class="text-2xl lg:text-3xl font-black text-gray-900 dark:text-white truncate" :title="'$' + formatCurrency(getTotalInventoryValue(selectedProduct))">${{ formatCurrency(getTotalInventoryValue(selectedProduct)) }}</p>
                         <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">inventario</p>
                       </div>
                     </div>
@@ -1707,14 +1693,14 @@
                   <!-- Total Variantes -->
                   <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl p-5 border border-gray-300 dark:border-zinc-700 shadow-sm">
                     <div class="flex items-center gap-3">
-                      <div class="w-12 h-12 bg-purple-100 dark:bg-purple-950 rounded-lg flex items-center justify-center">
+                      <div class="w-12 h-12 bg-purple-100 dark:bg-purple-950 rounded-lg flex items-center justify-center flex-shrink-0">
                         <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                         </svg>
                       </div>
-                      <div>
+                      <div class="flex-1 min-w-0">
                         <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Variantes Activas</p>
-                        <p class="text-3xl font-black text-gray-900 dark:text-white">{{ getVariantsCount(selectedProduct) }}</p>
+                        <p class="text-2xl lg:text-3xl font-black text-gray-900 dark:text-white truncate" :title="getVariantsCount(selectedProduct)">{{ getVariantsCount(selectedProduct) }}</p>
                         <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">combinaciones</p>
                       </div>
                     </div>
@@ -1974,7 +1960,8 @@
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Teleport>
 
     <!-- Modal: No hay categorías -->
     <div v-if="showNoCategoriesModal" 
@@ -2371,7 +2358,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick, Teleport, Transition } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick, Teleport, Transition, onActivated } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import apiClient from '../services/apiClient'
 import { productsService } from '../services/productsService.js'
@@ -2379,6 +2366,7 @@ import { categoriesService } from '../services/categoriesService.js'
 import { warehouseService } from '../services/warehouseService.js'
 import { apiCall } from '../services/api.js' // 🏭 Para cargar proveedores
 import { appStore } from '../store/appStore.js'
+import { useAutoRefresh } from '../composables/useRouteState.js'
 import TablePaginator from './TablePaginator.vue'
 import ContextualTour from './ContextualTour.vue'
 import ExcelImportModal from './ExcelImportModal.vue'

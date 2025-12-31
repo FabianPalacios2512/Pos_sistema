@@ -28,10 +28,10 @@ class WarehouseController extends Controller
         $warehouseCount = $warehouses->count();
 
         $limits = [
-            'free_trial' => ['max' => 0, 'allowed' => false],
-            'basic' => ['max' => 0, 'allowed' => false],
-            'premium' => ['max' => 3, 'allowed' => true],
-            'enterprise' => ['max' => -1, 'allowed' => true] // -1 = ilimitado
+            'free_trial' => ['max' => 1, 'allowed' => false], // Solo 1 (default), no crear más
+            'basic' => ['max' => 1, 'allowed' => false],      // Solo 1 (default), no crear más
+            'premium' => ['max' => 3, 'allowed' => true],     // Máximo 3
+            'enterprise' => ['max' => -1, 'allowed' => true]  // Ilimitado
         ];
 
         $planLimits = $limits[$tenantPlan] ?? ['max' => 0, 'allowed' => false];
@@ -218,24 +218,67 @@ class WarehouseController extends Controller
         $products = $warehouse->products()
             ->with(['category', 'supplier'])
             ->get()
-            ->map(function($product) {
+            ->unique('id') // Evitar duplicados si hay múltiples variantes
+            ->map(function($product) use ($warehouse) {
+
+                $stock = $product->pivot->stock;
+
+                // 🛠️ FIX: Si es producto variable, sumar stock de todas sus variantes en esta bodega
+                if ($product->product_type === 'variable') {
+                    $stock = DB::table('product_warehouse')
+                        ->where('warehouse_id', $warehouse->id)
+                        ->where('product_id', $product->id)
+                        ->sum('stock');
+                }
+
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'sku' => $product->sku,
-                    'category' => $product->category->name ?? 'Sin categoría',
-                    'supplier' => $product->supplier->name ?? 'Sin proveedor',
-                    'sale_price' => $product->sale_price,
-                    'cost_price' => $product->cost_price,
-                    'stock' => $product->pivot->stock,
-                    'min_stock' => $product->min_stock,
-                    'is_low_stock' => $product->pivot->stock <= $product->min_stock,
+                    'barcode' => $product->barcode,
+                    'image_url' => $product->image_url,
+                    'category_name' => $product->category->name ?? 'Sin categoría',
+                    'supplier_name' => $product->supplier->name ?? 'Sin proveedor',
+                    'sale_price' => (float)$product->sale_price,
+                    'cost_price' => (float)$product->cost_price,
+                    'stock' => (int)$stock, // Asegurar entero
+                    'min_stock' => (int)$product->min_stock,
+                    'max_stock' => (int)$product->max_stock,
+                    'measurement_unit' => $product->measurement_unit ?? 'un',
+                    'is_low_stock' => $stock > 0 && $stock <= $product->min_stock, // 🛠️ FIX: Solo si tiene stock > 0
+                    'product_type' => $product->product_type
                 ];
-            });
+            })
+            ->values(); // Reindexar array después de unique()
+
+        // Calcular summary
+        $totalStock = $products->sum('stock');
+
+        // 🛠️ FIX: Calcular valor con sale_price (precio de venta), no cost_price
+        $totalValue = $products->reduce(function($sum, $product) {
+            return $sum + ($product['stock'] * $product['sale_price']);
+        }, 0);
+
+        // 🛠️ FIX: "Stock Bajo" = productos sin stock (0) + productos con stock bajo (0 < stock <= min_stock)
+        $lowStock = $products->filter(function($product) {
+            return $product['stock'] <= $product['min_stock'];
+        })->count();
+
+        // Contar solo productos sin stock (para referencia interna)
+        $outOfStock = $products->filter(function($product) {
+            return $product['stock'] === 0;
+        })->count();
 
         return response()->json([
             'warehouse' => $warehouse,
-            'products' => $products
+            'products' => $products,
+            'summary' => [
+                'total_products' => $products->count(),
+                'total_stock' => $totalStock,
+                'total_value' => $totalValue,
+                'out_of_stock_count' => $outOfStock,
+                'low_stock_count' => $lowStock
+            ]
         ]);
     }
 

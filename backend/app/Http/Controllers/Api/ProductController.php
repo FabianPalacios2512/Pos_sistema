@@ -44,14 +44,28 @@ class ProductController extends Controller
             $query->where('supplier_id', $request->supplier_id);
         }
 
+        // 🏢 Filtrar por warehouse (multi-sede)
+        $warehouseId = $request->get('warehouse_id');
+        if ($warehouseId) {
+            $query->whereHas('warehouses', function($q) use ($warehouseId) {
+                $q->where('warehouse_id', $warehouseId);
+            });
+
+            // Cargar solo el warehouse específico
+            $query->with(['warehouses' => function($q) use ($warehouseId) {
+                $q->where('warehouse_id', $warehouseId);
+            }]);
+        }
+
         // Obtener el número de elementos por página (por defecto 15, máximo 1000)
         $perPage = min($request->get('per_page', 15), 1000);
 
         $products = $query->orderBy('name')
                          ->paginate($perPage);
 
-        // Formatear las variantes para incluir options_summary
-        $products->getCollection()->transform(function($product) {
+        // Formatear las variantes y ajustar stock por warehouse
+        $products->getCollection()->transform(function($product) use ($warehouseId) {
+            // Formatear options_summary de variantes
             if ($product->variants) {
                 $product->variants->each(function($variant) {
                     $optionsSummary = $variant->optionValues->map(function($optionValue) {
@@ -63,6 +77,28 @@ class ProductController extends Controller
                     $variant->options_summary = $optionsSummary;
                 });
             }
+
+            // 🏢 Si hay filtro de warehouse, ajustar el stock
+            if ($warehouseId) {
+                // 🛠️ FIX: Para productos variables, sumar stock de TODAS sus variantes en el warehouse
+                if ($product->product_type === 'variable') {
+                    $totalVariantStock = DB::table('product_warehouse')
+                        ->where('warehouse_id', $warehouseId)
+                        ->where('product_id', $product->id)
+                        ->sum('stock');
+
+                    $product->current_stock = (int)$totalVariantStock;
+                    $product->stock = (int)$totalVariantStock;
+                } else {
+                    // Para productos simples, usar el stock directo del warehouse
+                    if ($product->warehouses && $product->warehouses->isNotEmpty()) {
+                        $warehouseStock = $product->warehouses->first()->pivot->stock;
+                        $product->current_stock = (int)$warehouseStock;
+                        $product->stock = (int)$warehouseStock;
+                    }
+                }
+            }
+
             return $product;
         });
 
@@ -497,9 +533,17 @@ class ProductController extends Controller
                         }
                     }
 
-                    // Recalcular stock total del padre
-                    $totalStock = $product->variants()->sum('stock');
+                    // 🛠️ FIX: Recalcular stock total del padre desde product_warehouse (NO desde variants.stock)
+                    $totalStock = DB::table('product_warehouse')
+                        ->where('product_id', $product->id)
+                        ->sum('stock');
+
                     $product->update(['current_stock' => $totalStock]);
+
+                    \Log::info('✅ Stock total recalculado para producto variable:', [
+                        'product_id' => $product->id,
+                        'total_stock' => $totalStock
+                    ]);
                 }
             }
 
@@ -581,10 +625,13 @@ class ProductController extends Controller
             'variants.*.stock' => 'nullable|integer|min:0',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.cost_price' => 'nullable|numeric|min:0',
+            'warehouse_id' => 'nullable|exists:warehouses,id', // Agregar validación de warehouse
         ]);
 
         try {
             $updatedCount = 0;
+            $warehouseId = $request->warehouse_id ?? 1; // Warehouse por defecto si no se especifica
+            $productIds = []; // Para recalcular stock de productos padre
 
             foreach ($request->variants as $variantData) {
                 $variant = \App\Models\ProductVariant::find($variantData['id']);
@@ -592,8 +639,38 @@ class ProductController extends Controller
                 if ($variant) {
                     $updateData = [];
 
+                    // 🛠️ FIX: Si se actualiza el stock, sincronizar con product_warehouse
                     if (isset($variantData['stock'])) {
-                        $updateData['stock'] = $variantData['stock'];
+                        $newStock = $variantData['stock'];
+                        $updateData['stock'] = $newStock;
+
+                        // Actualizar stock en product_warehouse
+                        $pivotExists = DB::table('product_warehouse')
+                            ->where('product_id', $variant->product_id)
+                            ->where('product_variant_id', $variant->id)
+                            ->where('warehouse_id', $warehouseId)
+                            ->exists();
+
+                        if ($pivotExists) {
+                            DB::table('product_warehouse')
+                                ->where('product_id', $variant->product_id)
+                                ->where('product_variant_id', $variant->id)
+                                ->where('warehouse_id', $warehouseId)
+                                ->update(['stock' => $newStock]);
+                        } else {
+                            // Crear registro si no existe
+                            DB::table('product_warehouse')->insert([
+                                'product_id' => $variant->product_id,
+                                'product_variant_id' => $variant->id,
+                                'warehouse_id' => $warehouseId,
+                                'stock' => $newStock,
+                                'created_at' => now(),
+                                'updated_at' => now()
+                            ]);
+                        }
+
+                        // Marcar producto para recalcular stock total
+                        $productIds[$variant->product_id] = true;
                     }
 
                     if (isset($variantData['price'])) {
@@ -609,6 +686,22 @@ class ProductController extends Controller
                         $updatedCount++;
                     }
                 }
+            }
+
+            // 🛠️ FIX: Recalcular current_stock de los productos padre afectados
+            foreach (array_keys($productIds) as $productId) {
+                $totalStock = DB::table('product_warehouse')
+                    ->where('product_id', $productId)
+                    ->sum('stock');
+
+                DB::table('products')
+                    ->where('id', $productId)
+                    ->update(['current_stock' => $totalStock]);
+
+                \Log::info('✅ Stock recalculado para producto variable:', [
+                    'product_id' => $productId,
+                    'new_total_stock' => $totalStock
+                ]);
             }
 
             return response()->json([

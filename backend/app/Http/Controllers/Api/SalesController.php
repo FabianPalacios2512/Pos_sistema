@@ -173,6 +173,9 @@ class SalesController extends Controller
             // Cargar la venta con sus relaciones
             $sale->load(['customer', 'user', 'saleItems.product']);
 
+            // Agregar nombre del vendedor explícitamente
+            $sale->seller_name = $sale->user ? $sale->user->name : 'Vendedor';
+
             return response()->json([
                 'success' => true,
                 'data' => $sale,

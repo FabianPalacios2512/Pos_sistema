@@ -143,9 +143,12 @@ const api = {
   },
   
   post: (endpoint, data = {}, options = {}) => {
+    // Si data es FormData, NO hacer stringify
+    const body = data instanceof FormData ? data : JSON.stringify(data)
+    
     return apiCall(endpoint, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body,
       ...options
     })
   },

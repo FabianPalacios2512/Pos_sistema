@@ -98,6 +98,7 @@ Route::prefix('excel-import')->group(function () {
 
 // ===== AI USAGE - Endpoints públicos para monitoreo =====
 Route::get('/ai/usage-status', [AiUsageController::class, 'getUsageStatus']);
+Route::post('/ai/chat-with-file', [\App\Http\Controllers\Api\AIController::class, 'chatWithFile']); // Public for file upload compatibility
 Route::get('/ai/check-limit', [AiUsageController::class, 'checkLimit']);
 
 // ===== TRIAL STATUS - Endpoint público =====
@@ -346,6 +347,7 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     // ==================== AI CHAT (con límites de uso) ====================
     Route::middleware(['ai.limit'])->group(function () {
         Route::post('/ai/chat', [\App\Http\Controllers\Api\AIController::class, 'chat']);
+        // Route::post('/ai/chat-with-file', [\App\Http\Controllers\Api\AIController::class, 'chatWithFile']); // Moved to public routes
 
         // AI ACTIONS (Acciones ejecutables con límites)
         Route::post('/ai/actions/create-discount', [\App\Http\Controllers\Api\AIActionsController::class, 'createDiscount']);
@@ -356,6 +358,8 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
 
     // Rutas de IA sin límite (no consumen tokens)
     Route::post('/ai/clear-history', [\App\Http\Controllers\Api\AIController::class, 'clearHistory']);
+    Route::get('/ai/usage-stats', [\App\Http\Controllers\Api\AIController::class, 'getUsageStats']);
+    Route::get('/ai/provider-config', [\App\Http\Controllers\Api\AIController::class, 'getProviderConfig']);
     Route::post('/ai/actions/create-category', [\App\Http\Controllers\Api\AIActionsController::class, 'createCategory']);
 
 });

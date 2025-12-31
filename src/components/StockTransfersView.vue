@@ -205,6 +205,22 @@
       @close="closeDetailModal"
       @updated="handleSaved"
     />
+
+    <!-- Modal de Confirmación -->
+    <ConfirmModal
+      v-if="confirmModal.show"
+      :title="confirmModal.title"
+      :subtitle="confirmModal.subtitle"
+      :message="confirmModal.message"
+      :description="confirmModal.description"
+      :confirmText="confirmModal.confirmText"
+      :cancelText="confirmModal.cancelText"
+      :loadingText="confirmModal.loadingText"
+      :variant="confirmModal.variant"
+      :loading="confirmModal.loading"
+      @confirm="confirmModal.onConfirm"
+      @cancel="closeConfirmModal"
+    />
   </div>
 </template>
 
@@ -214,6 +230,7 @@ import { stockTransferService } from '@/services/stockTransferService';
 import { warehouseService } from '@/services/warehouseService';
 import StockTransferModal from '@/components/warehouses/StockTransferModal.vue';
 import TransferDetailModal from '@/components/warehouses/TransferDetailModal.vue';
+import ConfirmModal from '@/components/ConfirmModal.vue';
 import ToastContainer from '@/components/ToastContainer.vue';
 import { useToast } from '@/composables/useToast';
 
@@ -235,6 +252,21 @@ const selectedTransfer = ref(null);
 const filters = ref({
   status: '',
   source_warehouse_id: ''
+});
+
+// Estado del modal de confirmación
+const confirmModal = ref({
+  show: false,
+  title: '',
+  subtitle: '',
+  message: '',
+  description: '',
+  confirmText: 'Confirmar',
+  cancelText: 'Cancelar',
+  loadingText: 'Procesando...',
+  variant: 'warning',
+  loading: false,
+  onConfirm: () => {}
 });
 
 const fetchTransfers = async () => {
@@ -312,30 +344,65 @@ const closeDetailModal = () => {
   selectedTransfer.value = null;
 };
 
+const closeConfirmModal = () => {
+  confirmModal.value.show = false;
+  confirmModal.value.loading = false;
+};
+
 const completeTransfer = async (transfer) => {
-  if (!confirm(`¿Completar el traslado ${transfer.reference_number}?`)) return;
-  
-  try {
-    await stockTransferService.complete(transfer.id);
-    await fetchTransfers();
-    showSuccess('✅ Traslado completado exitosamente');
-  } catch (error) {
-    console.error('Error al completar traslado:', error);
-    showError(error.response?.data?.message || 'Error al completar el traslado');
-  }
+  confirmModal.value = {
+    show: true,
+    title: 'Completar Traslado',
+    subtitle: transfer.reference_number,
+    message: `¿Estás seguro de que deseas completar el traslado ${transfer.reference_number}?`,
+    description: 'Esta acción actualizará el inventario de ambas sedes y no se puede deshacer.',
+    confirmText: 'Sí, Completar',
+    cancelText: 'Cancelar',
+    loadingText: 'Completando...',
+    variant: 'warning',
+    loading: false,
+    onConfirm: async () => {
+      confirmModal.value.loading = true;
+      try {
+        await stockTransferService.complete(transfer.id);
+        closeConfirmModal();
+        await fetchTransfers();
+        showSuccess('✅ Traslado completado exitosamente');
+      } catch (error) {
+        console.error('Error al completar traslado:', error);
+        showError(error.response?.data?.message || 'Error al completar el traslado');
+        confirmModal.value.loading = false;
+      }
+    }
+  };
 };
 
 const cancelTransfer = async (transfer) => {
-  if (!confirm(`¿Cancelar el traslado ${transfer.reference_number}?`)) return;
-  
-  try {
-    await stockTransferService.cancel(transfer.id);
-    await fetchTransfers();
-    showSuccess('✅ Traslado cancelado exitosamente');
-  } catch (error) {
-    console.error('Error al cancelar traslado:', error);
-    showError(error.response?.data?.message || 'Error al cancelar el traslado');
-  }
+  confirmModal.value = {
+    show: true,
+    title: 'Cancelar Traslado',
+    subtitle: transfer.reference_number,
+    message: `¿Estás seguro de que deseas cancelar el traslado ${transfer.reference_number}?`,
+    description: 'El traslado será marcado como cancelado y no se moverá ningún inventario.',
+    confirmText: 'Sí, Cancelar',
+    cancelText: 'No',
+    loadingText: 'Cancelando...',
+    variant: 'danger',
+    loading: false,
+    onConfirm: async () => {
+      confirmModal.value.loading = true;
+      try {
+        await stockTransferService.cancel(transfer.id);
+        closeConfirmModal();
+        await fetchTransfers();
+        showSuccess('✅ Traslado cancelado exitosamente');
+      } catch (error) {
+        console.error('Error al cancelar traslado:', error);
+        showError(error.response?.data?.message || 'Error al cancelar el traslado');
+        confirmModal.value.loading = false;
+      }
+    }
+  };
 };
 
 const clearFilters = () => {

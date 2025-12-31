@@ -24,6 +24,11 @@ class CheckAiUsageLimit
         // Obtener tenant_id del tenant actual
         $tenantId = tenant('id');
 
+        // 🔓 BYPASS TEMPORAL PARA GEMINI AGENT (SPRINT)
+        if ($request->input('provider') === 'gemini') {
+            return $next($request);
+        }
+
         if (!$tenantId) {
             return response()->json([
                 'success' => false,
@@ -63,7 +68,8 @@ class CheckAiUsageLimit
 
             $message = $check['reason'];
             if (str_contains($check['reason'], 'hora')) {
-                $message = "Has alcanzado tu límite de {$stats['limits']['limits']['requests_per_hour']} peticiones por hora. ";
+                $limitPerHour = data_get($stats, 'limits.limits.requests_per_hour', 0);
+                $message = "Has alcanzado tu límite de {$limitPerHour} peticiones por hora. ";
                 $message .= "Podrás volver a usar la IA en " . ceil($minutesRemaining) . " minutos (a las " . $waitUntil->format('H:i') . ").";
             }
 
@@ -73,12 +79,12 @@ class CheckAiUsageLimit
                 'error' => 'AI_LIMIT_EXCEEDED',
                 'limit_type' => str_contains($check['reason'], 'hora') ? 'hourly' : 'daily',
                 'usage' => [
-                    'current_hour' => $stats['usage']['last_hour']['requests'],
-                    'limit_hour' => $stats['limits']['limits']['requests_per_hour'],
-                    'remaining_hour' => $stats['usage']['last_hour']['remaining_requests'],
-                    'current_day' => $stats['usage']['today']['requests'],
-                    'limit_day' => $stats['limits']['limits']['requests_per_day'],
-                    'remaining_day' => $stats['usage']['today']['remaining_requests'],
+                    'current_hour' => data_get($stats, 'usage.last_hour.requests', 0),
+                    'limit_hour' => data_get($stats, 'limits.limits.requests_per_hour', 0),
+                    'remaining_hour' => data_get($stats, 'usage.last_hour.remaining_requests', 0),
+                    'current_day' => data_get($stats, 'usage.today.requests', 0),
+                    'limit_day' => data_get($stats, 'limits.limits.requests_per_day', 0),
+                    'remaining_day' => data_get($stats, 'usage.today.remaining_requests', 0),
                 ],
                 'wait_until' => $waitUntil->format('H:i'),
                 'minutes_remaining' => ceil($minutesRemaining),

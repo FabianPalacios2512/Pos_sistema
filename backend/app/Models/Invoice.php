@@ -23,6 +23,7 @@ class Invoice extends Model
         'status',
         'return_reference',
         'notes',
+        'seller_name', // ✅ Added seller_name to fillable
         'items'
     ];
 
@@ -55,6 +56,11 @@ class Invoice extends Model
     public function appliedDiscounts(): HasMany
     {
         return $this->hasMany(AppliedDiscount::class);
+    }
+
+    public function cashSession(): BelongsTo
+    {
+        return $this->belongsTo(CashSession::class);
     }
 
     // Método para generar el siguiente número de factura

@@ -24,7 +24,7 @@ class CustomerController extends Controller
             $selectFields = [
                 'id', 'name', 'email', 'phone', 'address', 'city',
                 'document_type', 'document_number', 'birth_date', 'gender',
-                'credit_limit', 'current_debt', 'debt_since', 'credit_active', 'active',
+                'credit_limit', 'current_debt', 'debt_since', 'credit_active', 'credit_photo', 'active',
                 'total_purchases', 'total_orders', 'created_at', 'updated_at'
             ];
 
@@ -70,6 +70,7 @@ class CustomerController extends Controller
                 'credit_limit' => 'nullable|numeric|min:0',
                 'current_debt' => 'nullable|numeric|min:0',
                 'credit_active' => 'boolean',
+                'credit_photo' => 'nullable|string',
                 'active' => 'boolean'
             ]);
 
@@ -108,7 +109,7 @@ class CustomerController extends Controller
             $selectFields = [
                 'id', 'name', 'email', 'phone', 'address', 'city',
                 'document_type', 'document_number', 'birth_date', 'gender',
-                'credit_limit', 'current_debt', 'credit_active', 'active',
+                'credit_limit', 'current_debt', 'credit_active', 'credit_photo', 'active',
                 'total_purchases', 'total_orders', 'created_at', 'updated_at'
             ];
 
@@ -153,6 +154,7 @@ class CustomerController extends Controller
                 'credit_limit' => 'nullable|numeric|min:0',
                 'current_debt' => 'nullable|numeric|min:0',
                 'credit_active' => 'boolean',
+                'credit_photo' => 'nullable|string',
                 'active' => 'boolean'
             ]);
 

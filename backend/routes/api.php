@@ -168,3 +168,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/ai-monitoring/dashboard', [\App\Http\Controllers\Api\SuperAdminAIMonitoringController::class, 'dashboard']);
 });
+
+// ==================== 🧪 TEST ROUTES - EXCEL IMPORT AI ====================
+// ⚠️ SOLO PARA DESARROLLO - Eliminar en producción
+if (config('app.env') !== 'production') {
+    require __DIR__.'/test_excel.php';
+}

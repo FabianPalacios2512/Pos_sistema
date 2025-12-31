@@ -15,3 +15,17 @@ Schedule::command('trial:send-expiration-emails')
     ->timezone('America/Bogota')
     ->withoutOverlapping()
     ->onOneServer();
+
+// 🧹 CRON: Limpiar archivos temporales antiguos
+// Ejecutar cada hora para evitar acumulación de archivos grandes
+Schedule::command('temp:clean --hours=1')
+    ->hourly()
+    ->withoutOverlapping()
+    ->onOneServer();
+
+// 🗑️ CRON: Limpiar historial de conversaciones IA
+// Ejecutar cada hora para evitar acumulación de datos temporales
+Schedule::command('conversation:clean --hours=1')
+    ->hourly()
+    ->withoutOverlapping()
+    ->onOneServer();

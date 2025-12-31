@@ -62,7 +62,7 @@ class InvoiceController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Invoice::with(['customer', 'items.product'])
+            $query = Invoice::with(['customer', 'items.product', 'cashSession.user'])
                 ->orderBy('created_at', 'desc');
 
             // Filter by customer_id if provided
@@ -97,6 +97,7 @@ class InvoiceController extends Controller
                         'customer_document' => $invoice->customer->document,
                         'customer_email' => $invoice->customer->email,
                         'customer_phone' => $invoice->customer->phone,
+                        'seller_name' => $invoice->seller_name ?? ($invoice->cashSession?->user?->name ?? 'Vendedor'),
                         'date' => $invoice->date->format('Y-m-d'),
                         'due_date' => $invoice->due_date?->format('Y-m-d'),
                         'subtotal' => (float) $invoice->subtotal,
@@ -169,6 +170,7 @@ class InvoiceController extends Controller
 
             $data = $validator->validated();
             $data['number'] = Invoice::generateNextNumber($data['type']);
+            $data['seller_name'] = Auth::user()->name;
 
             // Establecer status según el tipo de documento
             if ($data['type'] === 'quote') {
@@ -356,6 +358,10 @@ class InvoiceController extends Controller
 
             $invoice->load(['customer', 'invoiceItems', 'appliedDiscounts']);
 
+            // Agregar nombre del vendedor explícitamente
+            $user = auth()->user();
+            $invoice->seller_name = $user ? $user->name : 'Vendedor';
+
             return response()->json([
                 'success' => true,
                 'message' => 'Factura creada exitosamente',
@@ -378,7 +384,7 @@ class InvoiceController extends Controller
     public function show(string $id): JsonResponse
     {
         try {
-            $invoice = Invoice::with(['customer'])->findOrFail($id);
+            $invoice = Invoice::with(['customer', 'cashSession.user'])->findOrFail($id);
             // Cargar items manualmente para debug
             $invoice->load(['items']);
 
@@ -391,6 +397,7 @@ class InvoiceController extends Controller
                 'customer_document' => $invoice->customer->document,
                 'customer_email' => $invoice->customer->email,
                 'customer_phone' => $invoice->customer->phone,
+                'seller_name' => $invoice->seller_name ?? ($invoice->cashSession?->user?->name ?? 'Vendedor'),
                 'date' => $invoice->date->format('Y-m-d'),
                 'due_date' => $invoice->due_date?->format('Y-m-d'),
                 'subtotal' => (float) $invoice->subtotal,
@@ -810,6 +817,11 @@ class InvoiceController extends Controller
                 \Log::info('💰 Descuento agregado a la factura', [
                     'discount_amount' => $data['discount_amount']
                 ]);
+            }
+
+            // Agregar seller_name
+            if (Auth::check()) {
+                $data['seller_name'] = Auth::user()->name;
             }
 
             // Crear la factura principal
@@ -1269,10 +1281,19 @@ class InvoiceController extends Controller
 
             $invoice->load(['customer', 'invoiceItems']);
 
+            // ⚠️ FORCE INJECTION OF SELLER NAME IN RESPONSE
+            // Esto asegura que el frontend reciba el nombre correcto incluso si la BD no lo guardó
+            if (isset($data['seller_name'])) {
+                $invoice->seller_name = $data['seller_name'];
+            } elseif (Auth::check()) {
+                $invoice->seller_name = Auth::user()->name;
+            }
+
             \Log::info('✅ Factura POS creada exitosamente', [
                 'invoice_id' => $invoice->id,
                 'invoice_number' => $invoice->number,
-                'total' => $invoice->total
+                'total' => $invoice->total,
+                'seller_name' => $invoice->seller_name
             ]);
 
             return response()->json([

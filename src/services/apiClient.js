@@ -20,6 +20,12 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
     
+    // 🔧 FIX: Si es FormData, ELIMINAR Content-Type para que el navegador lo establezca con boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type']
+      console.log('🔧 FormData detectado - Content-Type eliminado para boundary automático')
+    }
+    
     // Log para debugging (solo en desarrollo)
     if (process.env.NODE_ENV === 'development') {
   /*

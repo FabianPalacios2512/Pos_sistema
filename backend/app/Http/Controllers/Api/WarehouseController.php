@@ -64,7 +64,22 @@ class WarehouseController extends Controller
                     'p.unit',
                     'p.measurement_unit',
                     'c.name as category_name',
-                    'pw.stock as stock'  // Ya no necesitamos COALESCE porque siempre habrá valor
+                    \DB::raw('SUM(pw.stock) as stock')  // ✅ Sumar stock (para variantes)
+                )
+                ->groupBy(
+                    'p.id',
+                    'p.name',
+                    'p.sku',
+                    'p.barcode',
+                    'p.image_url',
+                    'p.product_type',
+                    'p.cost_price',
+                    'p.sale_price',
+                    'p.min_stock',
+                    'p.max_stock',
+                    'p.unit',
+                    'p.measurement_unit',
+                    'c.name'
                 )
                 ->orderBy('p.name', 'asc')
                 ->get()

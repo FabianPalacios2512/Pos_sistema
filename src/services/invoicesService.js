@@ -250,7 +250,8 @@ export const invoicesService = {
         date: quote.sale_date,
         customer: quote.customer || { name: 'Cliente General' },
         total: quote.total_amount,
-        items: quote.sale_items || []
+        items: quote.sale_items || [],
+        seller_name: quote.seller_name || quote.cashier_name || 'Vendedor' // ✅ Ensure seller_name is passed
       }))
 
       // Combinar todos los documentos
