@@ -83,13 +83,6 @@
       </main>
     </div>
 
-    <!-- Overlay para móvil -->
-    <div
-      v-if="sidebarOpen"
-      @click="sidebarOpen = false"
-      class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-    ></div>
-
     <!-- Modal de Confirmación - Salir del POS con productos en carrito -->
     <Teleport to="body">
       <Transition
@@ -1179,6 +1172,9 @@ const setCurrentModule = (module, options = {}) => {
   }
 
   currentModule.value = module
+  
+  // 📱 Cerrar sidebar en móvil al cambiar de módulo
+  sidebarOpen.value = false
   
   // 🔄 PERSISTIR el módulo actual en localStorage
   saveCurrentModule(module)

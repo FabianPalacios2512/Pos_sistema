@@ -6,6 +6,17 @@
         
         <!-- Sección Izquierda: Marca Minimalista -->
         <div class="flex items-center space-x-4">
+          <!-- 📱 Botón Hamburger (Solo móvil) -->
+          <button
+            @click="$emit('toggleSidebar')"
+            class="lg:hidden p-2 -ml-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-colors duration-200"
+            title="Menú"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+          
           <div>
             <h1 class="text-lg font-bold text-gray-900 dark:text-white transition-colors duration-300">105 POS Pro</h1>
             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium transition-colors duration-300">Sistema de Gestión Empresarial</p>
@@ -556,6 +567,7 @@ const props = defineProps({
 // Emits
 const emit = defineEmits([
   'navigate-to-settings',
+  'navigate-to-profile',
   'logout',
   'show-help',
   'notifications-silenced',

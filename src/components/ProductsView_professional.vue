@@ -261,68 +261,14 @@
         </div>
       </div>
 
-      <!-- Empty State - Ilustración Profesional -->
+      <!-- Empty State - Icono Limpio y Profesional -->
       <div v-else-if="!loading && !paginatedProducts.length" class="flex justify-center items-center py-16">
         <div class="flex flex-col items-center text-center max-w-md mx-auto">
           
-          <!-- Ilustración SVG única de Inventario -->
-          <div class="mb-8 relative">
-            <!-- Efecto glow de fondo -->
-            <div class="absolute inset-0 bg-gradient-to-br from-indigo-200/40 via-transparent to-purple-200/40 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-3xl blur-3xl scale-150"></div>
-            
-            <svg class="w-52 h-52 relative z-10" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Estante/Rack de fondo -->
-              <rect x="30" y="60" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
-              <rect x="30" y="100" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
-              <rect x="30" y="140" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
-              <!-- Patas del estante -->
-              <rect x="35" y="60" width="6" height="95" rx="2" class="fill-gray-300 dark:fill-zinc-600"/>
-              <rect x="159" y="60" width="6" height="95" rx="2" class="fill-gray-300 dark:fill-zinc-600"/>
-              
-              <!-- Caja 1 (Grande - Principal) -->
-              <g transform="translate(55, 25)">
-                <rect x="0" y="15" width="50" height="40" rx="4" class="fill-indigo-100 dark:fill-indigo-900/40"/>
-                <rect x="0" y="15" width="50" height="40" rx="4" class="fill-none stroke-indigo-300 dark:stroke-indigo-700" stroke-width="1.5"/>
-                <rect x="5" y="0" width="40" height="15" rx="2" class="fill-indigo-200 dark:fill-indigo-800/60"/>
-                <rect x="18" y="28" width="14" height="14" rx="2" class="fill-indigo-400 dark:fill-indigo-500"/>
-                <path d="M22 35L24 37L28 33" class="stroke-white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </g>
-              
-              <!-- Caja 2 (Mediana) -->
-              <g transform="translate(115, 35)">
-                <rect x="0" y="10" width="35" height="30" rx="3" class="fill-purple-100 dark:fill-purple-900/40"/>
-                <rect x="0" y="10" width="35" height="30" rx="3" class="fill-none stroke-purple-300 dark:stroke-purple-700" stroke-width="1.5"/>
-                <rect x="3" y="0" width="29" height="10" rx="2" class="fill-purple-200 dark:fill-purple-800/60"/>
-              </g>
-              
-              <!-- Caja 3 (Pequeña) -->
-              <g transform="translate(45, 75)">
-                <rect x="0" y="8" width="28" height="22" rx="2" class="fill-emerald-100 dark:fill-emerald-900/40"/>
-                <rect x="0" y="8" width="28" height="22" rx="2" class="fill-none stroke-emerald-300 dark:stroke-emerald-700" stroke-width="1.5"/>
-                <rect x="2" y="0" width="24" height="8" rx="1.5" class="fill-emerald-200 dark:fill-emerald-800/60"/>
-              </g>
-              
-              <!-- Caja 4 (En el estante inferior) -->
-              <g transform="translate(90, 115)">
-                <rect x="0" y="8" width="32" height="25" rx="3" class="fill-amber-100 dark:fill-amber-900/40"/>
-                <rect x="0" y="8" width="32" height="25" rx="3" class="fill-none stroke-amber-300 dark:stroke-amber-700" stroke-width="1.5"/>
-                <rect x="2" y="0" width="28" height="8" rx="1.5" class="fill-amber-200 dark:fill-amber-800/60"/>
-              </g>
-              
-              <!-- Líneas punteadas (vacío/placeholder) -->
-              <rect x="80" y="78" width="30" height="25" rx="3" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
-              <rect x="130" y="118" width="25" height="22" rx="2" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
-              <rect x="50" y="118" width="25" height="22" rx="2" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
-              
-              <!-- Icono de + flotante -->
-              <circle cx="160" cy="45" r="16" class="fill-slate-100 dark:fill-zinc-700"/>
-              <circle cx="160" cy="45" r="12" class="fill-slate-900 dark:fill-slate-600"/>
-              <path d="M160 40V50M155 45H165" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
-              
-              <!-- Sparkles decorativos -->
-              <circle cx="175" cy="80" r="3" class="fill-indigo-300 dark:fill-indigo-500/50"/>
-              <circle cx="25" cy="95" r="2" class="fill-purple-300 dark:fill-purple-500/50"/>
-              <circle cx="180" cy="130" r="2.5" class="fill-emerald-300 dark:fill-emerald-500/50"/>
+          <!-- Icono de Caja/Paquete Profesional -->
+          <div class="w-24 h-24 mb-6 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-black/30">
+            <svg class="w-12 h-12 text-slate-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
           
@@ -519,65 +465,15 @@
             </td>
           </tr>
 
-          <!-- Empty State - Ilustración Profesional -->
+          <!-- Empty State - Icono Limpio y Profesional -->
           <tr v-else-if="!loading && !paginatedProducts.length">
             <td :colspan="5 + availableWarehouses.length" class="px-4 py-12">
               <div class="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
                 
-                <!-- Ilustración SVG única de Inventario -->
-                <div class="mb-6 relative">
-                  <div class="absolute inset-0 bg-gradient-to-br from-indigo-200/40 via-transparent to-purple-200/40 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-3xl blur-3xl scale-150"></div>
-                  
-                  <svg class="w-44 h-44 relative z-10" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Estante/Rack de fondo -->
-                    <rect x="30" y="60" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
-                    <rect x="30" y="100" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
-                    <rect x="30" y="140" width="140" height="8" rx="2" class="fill-gray-200 dark:fill-zinc-700/50"/>
-                    <rect x="35" y="60" width="6" height="95" rx="2" class="fill-gray-300 dark:fill-zinc-600"/>
-                    <rect x="159" y="60" width="6" height="95" rx="2" class="fill-gray-300 dark:fill-zinc-600"/>
-                    
-                    <!-- Caja 1 (Grande) -->
-                    <g transform="translate(55, 25)">
-                      <rect x="0" y="15" width="50" height="40" rx="4" class="fill-indigo-100 dark:fill-indigo-900/40"/>
-                      <rect x="0" y="15" width="50" height="40" rx="4" class="fill-none stroke-indigo-300 dark:stroke-indigo-700" stroke-width="1.5"/>
-                      <rect x="5" y="0" width="40" height="15" rx="2" class="fill-indigo-200 dark:fill-indigo-800/60"/>
-                      <rect x="18" y="28" width="14" height="14" rx="2" class="fill-indigo-400 dark:fill-indigo-500"/>
-                      <path d="M22 35L24 37L28 33" class="stroke-white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </g>
-                    
-                    <!-- Caja 2 -->
-                    <g transform="translate(115, 35)">
-                      <rect x="0" y="10" width="35" height="30" rx="3" class="fill-purple-100 dark:fill-purple-900/40"/>
-                      <rect x="0" y="10" width="35" height="30" rx="3" class="fill-none stroke-purple-300 dark:stroke-purple-700" stroke-width="1.5"/>
-                      <rect x="3" y="0" width="29" height="10" rx="2" class="fill-purple-200 dark:fill-purple-800/60"/>
-                    </g>
-                    
-                    <!-- Caja 3 -->
-                    <g transform="translate(45, 75)">
-                      <rect x="0" y="8" width="28" height="22" rx="2" class="fill-emerald-100 dark:fill-emerald-900/40"/>
-                      <rect x="0" y="8" width="28" height="22" rx="2" class="fill-none stroke-emerald-300 dark:stroke-emerald-700" stroke-width="1.5"/>
-                      <rect x="2" y="0" width="24" height="8" rx="1.5" class="fill-emerald-200 dark:fill-emerald-800/60"/>
-                    </g>
-                    
-                    <!-- Caja 4 -->
-                    <g transform="translate(90, 115)">
-                      <rect x="0" y="8" width="32" height="25" rx="3" class="fill-amber-100 dark:fill-amber-900/40"/>
-                      <rect x="0" y="8" width="32" height="25" rx="3" class="fill-none stroke-amber-300 dark:stroke-amber-700" stroke-width="1.5"/>
-                      <rect x="2" y="0" width="28" height="8" rx="1.5" class="fill-amber-200 dark:fill-amber-800/60"/>
-                    </g>
-                    
-                    <!-- Placeholders vacíos -->
-                    <rect x="80" y="78" width="30" height="25" rx="3" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
-                    <rect x="130" y="118" width="25" height="22" rx="2" class="fill-none stroke-gray-300 dark:stroke-zinc-600" stroke-width="1.5" stroke-dasharray="4 2"/>
-                    
-                    <!-- Icono + -->
-                    <circle cx="160" cy="45" r="16" class="fill-slate-100 dark:fill-zinc-700"/>
-                    <circle cx="160" cy="45" r="12" class="fill-slate-900 dark:fill-slate-600"/>
-                    <path d="M160 40V50M155 45H165" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
-                    
-                    <!-- Sparkles -->
-                    <circle cx="175" cy="80" r="3" class="fill-indigo-300 dark:fill-indigo-500/50"/>
-                    <circle cx="25" cy="95" r="2" class="fill-purple-300 dark:fill-purple-500/50"/>
+                <!-- Icono de Caja/Paquete Profesional -->
+                <div class="w-20 h-20 mb-5 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-black/30">
+                  <svg class="w-10 h-10 text-slate-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                   </svg>
                 </div>
                 

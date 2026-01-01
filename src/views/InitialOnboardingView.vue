@@ -4,26 +4,39 @@
     <div class="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
       
       <!-- Header con tu estilo -->
-      <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-6 mb-8">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
-              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div class="flex items-center space-x-3 sm:space-x-4">
+            <div class="w-11 h-11 sm:w-14 sm:h-14 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+              <svg class="w-5 h-5 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
             </div>
-            <div>
-              <h1 class="text-2xl font-black text-slate-900 tracking-tight">
+            <div class="min-w-0">
+              <h1 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight truncate">
                 Configuración de {{ config.storeName || 'Tu Tienda' }}
               </h1>
-              <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mt-1">
+              <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide mt-0.5 sm:mt-1">
                 Personaliza tu sistema en {{ totalSteps }} pasos sencillos
               </p>
             </div>
           </div>
 
-          <!-- Stepper horizontal -->
+          <!-- Stepper móvil compacto (visible en móvil) -->
+          <div class="flex md:hidden items-center justify-center gap-2">
+            <template v-for="step in totalSteps" :key="step">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all duration-300"
+                   :class="currentStep >= step ? 'bg-slate-900 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-400'">
+                <span v-if="currentStep > step || (!isPremiumPlan && step === 2 && currentStep === 2)">✓</span>
+                <span v-else>{{ step }}</span>
+              </div>
+              <div v-if="step < totalSteps" class="w-6 h-0.5 rounded-full transition-all duration-300" 
+                   :class="currentStep > step ? 'bg-slate-900' : 'bg-slate-200'"></div>
+            </template>
+          </div>
+
+          <!-- Stepper horizontal (oculto en móvil) -->
           <div class="hidden md:flex items-center space-x-4">
             <div class="flex items-center">
               <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300"
@@ -64,22 +77,22 @@
       <Transition name="fade-slide" mode="out-in">
         
         <div v-if="currentStep === 1" key="step1" class="space-y-6">
-          <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-6 mb-6">
-            <h2 class="text-xl font-black text-slate-900 tracking-tight mb-2">Elige tu Plantilla de Facturación</h2>
-            <p class="text-sm font-semibold text-slate-600">
+          <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight mb-1 sm:mb-2">Elige tu Plantilla de Facturación</h2>
+            <p class="text-xs sm:text-sm font-semibold text-slate-600">
               Selecciona el diseño que mejor represente tu marca. Podrás cambiarlo después en configuración.
             </p>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-7xl mx-auto">
             
             <div @click="selectedTemplate = 'classic'" 
-                 class="group relative bg-white rounded-[24px] overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl"
-                 :class="selectedTemplate === 'classic' ? 'ring-4 ring-slate-900 ring-offset-4 ring-offset-[#EEF2F6] shadow-xl' : 'border border-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)]'">
+                 class="group relative bg-white rounded-2xl sm:rounded-[24px] overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl"
+                 :class="selectedTemplate === 'classic' ? 'ring-4 ring-slate-900 ring-offset-2 sm:ring-offset-4 ring-offset-[#EEF2F6] shadow-xl' : 'border border-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)]'">
               
-              <div v-if="selectedTemplate === 'classic'" class="absolute top-4 right-4 z-20 animate-scale-in">
-                <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+              <div v-if="selectedTemplate === 'classic'" class="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 animate-scale-in">
+                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-900 flex items-center justify-center shadow-lg">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                 </div>
               </div>
               
@@ -89,7 +102,7 @@
                 </div>
               </div>
               
-              <div class="p-5 text-center bg-white relative z-10">
+              <div class="p-3 sm:p-5 text-center bg-white relative z-10">
                 <h3 class="font-black text-slate-900 mb-1 tracking-tight">Clásico Profesional</h3>
                 <p class="text-xs text-slate-500 font-bold">Ideal para régimen común y empresas</p>
               </div>

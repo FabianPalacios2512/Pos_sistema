@@ -1,4 +1,22 @@
 <template>
+  <!-- 📱 Overlay para móvil -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div 
+        v-if="sidebarOpen" 
+        class="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        @click="$emit('toggle-sidebar')"
+      ></div>
+    </Transition>
+  </Teleport>
+  
   <!-- Sidebar Empresarial Limpio (Shopify/Stripe Style) -->
   <div 
     class="sidebar-container fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out flex flex-col lg:translate-x-0 bg-gray-50 dark:bg-[#25252d] border-r border-gray-200 dark:border-zinc-700/50"
@@ -10,7 +28,7 @@
     
     <!-- Logo y Marca - Estilo Empresarial Sobrio -->
     <div class="flex items-center border-b border-gray-200 dark:border-zinc-700/50" :class="sidebarCollapsed ? 'h-16 px-4 justify-center' : 'p-5'">
-      <div class="flex items-center" :class="sidebarCollapsed ? '' : 'gap-3'">
+      <div class="flex items-center flex-1" :class="sidebarCollapsed ? '' : 'gap-3'">
         <!-- Logo Personalizado -->
         <div class="flex items-center justify-center flex-shrink-0">
           <img src="/logo.png" alt="Logo" class="w-10 h-10 object-contain">
@@ -22,6 +40,17 @@
           <p class="text-[11px] text-gray-600 dark:text-gray-400 leading-tight font-medium">Sistema Empresarial</p>
         </div>
       </div>
+      
+      <!-- 📱 Botón cerrar sidebar móvil -->
+      <button 
+        v-show="!sidebarCollapsed"
+        @click="$emit('toggle-sidebar')"
+        class="lg:hidden p-2 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
     </div>
 
     <!-- Navegación Principal -->

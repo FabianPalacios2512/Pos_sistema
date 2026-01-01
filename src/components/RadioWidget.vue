@@ -165,7 +165,7 @@
                   v-model="requestStationName"
                   type="text" 
                   placeholder="Nombre o URL..." 
-                  class="flex-1 text-xs px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-900 focus:ring-2 focus:ring-emerald-500 outline-none"
+                  class="flex-1 text-xs px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-emerald-500 outline-none"
                 >
                 <button 
                   @click="submitRequest"
@@ -405,6 +405,10 @@ onUnmounted(() => {
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+/* Dark mode scrollbar */
+:root.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; }
+:root.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
 /* Visualizer Animation */
 @keyframes music-bar {

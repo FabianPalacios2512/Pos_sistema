@@ -101,6 +101,23 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         
         <div class="flex items-center gap-3 flex-1 w-full md:w-auto">
+          <!-- 📱 BOTÓN CAJA MÓVIL (Solo visible en móvil, al lado del buscador) -->
+          <button 
+            @click="hasOpenSession ? showCloseCashModal() : showOpenCashModal()"
+            class="lg:hidden flex-shrink-0 w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all duration-200 shadow-sm"
+            :class="hasOpenSession 
+              ? 'bg-emerald-500 border-emerald-500 text-white' 
+              : 'bg-white dark:bg-zinc-800 border-rose-300 dark:border-rose-700 text-rose-500 dark:text-rose-400 animate-pulse'"
+            :title="hasOpenSession ? 'Cerrar Caja' : '⚠️ Abrir Caja para vender'"
+          >
+            <svg v-if="hasOpenSession" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </button>
+          
           <div class="flex-1 max-w-2xl relative group z-20">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-slate-400 dark:text-zinc-500 group-focus-within:text-slate-600 dark:group-focus-within:text-slate-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,7 +237,7 @@
           <button 
             id="tour-pos-cash-btn"
             @click="hasOpenSession ? showCloseCashModal() : showOpenCashModal()"
-            class="relative flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group"
+            class="hidden sm:flex relative items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group"
             :class="hasOpenSession 
               ? 'bg-white dark:bg-zinc-900 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 shadow-sm' 
               : 'bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900 hover:border-rose-300 dark:hover:border-rose-700'"
@@ -275,9 +292,372 @@
 </div>
     <!-- FIN BARRA DE HERRAMIENTAS EMPRESARIAL -->
     
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5" style="height: calc(100vh - 11rem - 54px); margin-bottom: 24px;">
-  <!-- Panel Izquierdo: Catálogo de Productos - 70% Fashion (8/12) | 50% General (6/12) -->
-  <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="h-full overflow-hidden transition-all duration-300">
+    <!-- 📱 BOTÓN FLOTANTE CARRITO MÓVIL -->
+    <button 
+      @click="showMobileCart = true"
+      class="lg:hidden fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 active:scale-95 shadow-2xl"
+      :class="cart.items.length > 0 
+        ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/40' 
+        : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 shadow-black/10'"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+      </svg>
+      <span v-if="cart.items.length > 0">${{ subtotal.toLocaleString() }}</span>
+      <span v-else>Carrito</span>
+      <!-- Badge cantidad -->
+      <span v-if="cart.items.length > 0" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+        {{ cart.items.length }}
+      </span>
+    </button>
+
+    <!-- 📱 MODAL CARRITO MÓVIL (Slide from bottom) -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition ease-out duration-300"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-200"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showMobileCart" class="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" @click="showMobileCart = false"></div>
+      </Transition>
+      
+      <Transition
+        enter-active-class="transition ease-out duration-300"
+        enter-from-class="translate-y-full"
+        enter-to-class="translate-y-0"
+        leave-active-class="transition ease-in duration-200"
+        leave-from-class="translate-y-0"
+        leave-to-class="translate-y-full"
+      >
+        <div v-if="showMobileCart" class="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-zinc-900 rounded-t-3xl shadow-2xl max-h-[90vh] flex flex-col border-t border-gray-200 dark:border-zinc-700">
+          <!-- Handle para arrastrar -->
+          <div class="flex justify-center pt-3 pb-2">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-zinc-600 rounded-full"></div>
+          </div>
+          
+          <!-- ⚠️ Alerta Caja Cerrada (Solo si no hay sesión) -->
+          <div v-if="!hasOpenSession" class="mx-5 mb-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-bold text-amber-800 dark:text-amber-300">Caja Cerrada</p>
+              <p class="text-xs text-amber-600 dark:text-amber-500">Abre la caja para procesar ventas</p>
+            </div>
+            <button 
+              @click="showOpenCashModal(); showMobileCart = false;"
+              class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-colors"
+            >
+              Abrir
+            </button>
+          </div>
+          
+          <!-- Header del carrito móvil -->
+          <div class="px-5 pb-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">Ticket de Venta</h2>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">{{ cart.items.length }} productos</p>
+            </div>
+            <button @click="showMobileCart = false" class="p-2.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">
+              <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Cliente -->
+          <div class="px-5 pb-4">
+            <button
+              @click="showCustomerSelector = true; showMobileCart = false;"
+              class="w-full flex items-center justify-between p-3.5 rounded-2xl transition-all duration-200 border"
+              :class="selectedCustomer 
+                ? 'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800' 
+                : 'bg-gray-50 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700'"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center"
+                     :class="selectedCustomer ? 'bg-indigo-100 dark:bg-indigo-900/50' : 'bg-white dark:bg-zinc-700'">
+                  <svg class="w-5 h-5" :class="selectedCustomer ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-zinc-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                </div>
+                <div class="text-left">
+                  <p class="text-[10px] font-bold uppercase tracking-wider" :class="selectedCustomer ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-zinc-500'">
+                    {{ selectedCustomer ? 'Cliente Asignado' : 'Sin Cliente' }}
+                  </p>
+                  <p class="text-sm font-semibold" :class="selectedCustomer ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-zinc-400'">
+                    {{ selectedCustomer ? selectedCustomer.name : 'Tocar para seleccionar...' }}
+                  </p>
+                </div>
+              </div>
+              <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Items del carrito móvil -->
+          <div class="flex-1 overflow-y-auto px-5" style="max-height: 40vh;">
+            <div v-if="cart.items.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+              <!-- SVG bolsa de compras elegante -->
+              <svg class="w-24 h-24 text-gray-200 dark:text-zinc-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+              <p class="text-base font-semibold text-gray-400 dark:text-zinc-500">Tu carrito está vacío</p>
+              <p class="text-sm text-gray-400 dark:text-zinc-600 mt-1">Agrega productos para comenzar</p>
+            </div>
+            
+            <div v-else class="space-y-2">
+              <div v-for="item in cart.items" :key="item.id" class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-zinc-800/50 rounded-xl border border-gray-100 dark:border-zinc-800">
+                <div class="w-14 h-14 rounded-xl bg-white dark:bg-zinc-700 border border-gray-200 dark:border-zinc-600 overflow-hidden flex items-center justify-center flex-shrink-0">
+                  <img :src="getCartItemImage(item)" class="max-w-full max-h-full object-contain" :alt="item.name"/>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200 truncate">{{ item.name.split(' (')[0] }}</p>
+                  <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">${{ (item.price * item.quantity).toLocaleString() }}</p>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button @click="updateQuantity(item.id, item.quantity - 1)" class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-700 border border-gray-200 dark:border-zinc-600 flex items-center justify-center text-gray-600 dark:text-zinc-300 active:scale-95 transition-transform">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                  </button>
+                  <span class="text-sm font-bold text-gray-800 dark:text-white w-8 text-center">{{ item.quantity }}</span>
+                  <button @click="updateQuantity(item.id, item.quantity + 1)" class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-700 border border-gray-200 dark:border-zinc-600 flex items-center justify-center text-gray-600 dark:text-zinc-300 active:scale-95 transition-transform">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Totales y botones móvil -->
+          <div class="px-5 py-5 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-800/30 safe-area-bottom">
+            <!-- Total -->
+            <div class="flex items-center justify-between mb-5">
+              <div>
+                <p class="text-xs font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Total a Pagar</p>
+                <p class="text-3xl font-black text-gray-900 dark:text-white">${{ subtotal.toLocaleString() }}</p>
+              </div>
+              <!-- Botón limpiar carrito -->
+              <button 
+                v-if="cart.items.length > 0"
+                @click="clearCart()"
+                class="p-3 text-gray-400 dark:text-zinc-500 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors"
+                title="Vaciar carrito"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <button 
+                @click="openQuoteModal(); showMobileCart = false;"
+                :disabled="cart.items.length === 0"
+                class="px-4 py-3.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 font-bold text-sm rounded-xl flex items-center justify-center gap-2 disabled:opacity-40 active:scale-95 transition-all"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Cotizar
+              </button>
+              <button 
+                @click="showMobilePaymentSelector = true; showMobileCart = false;"
+                :disabled="cart.items.length === 0"
+                class="px-4 py-3.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 font-bold text-sm rounded-xl flex items-center justify-center gap-2 disabled:opacity-40 active:scale-95 transition-all"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                Otros Pagos
+              </button>
+            </div>
+            
+            <!-- Botón principal pagar -->
+            <button 
+              @click="handleCobrarClick(); showMobileCart = false;"
+              :disabled="cart.items.length === 0 || !hasOpenSession"
+              class="w-full px-6 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 dark:disabled:bg-zinc-700 text-white disabled:text-gray-500 dark:disabled:text-zinc-500 font-bold text-base rounded-xl shadow-lg shadow-emerald-600/30 disabled:shadow-none transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98]"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+              Pagar en Efectivo
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+    
+    <!-- 📱 MODAL SELECTOR DE MÉTODOS DE PAGO MÓVIL -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition ease-out duration-300"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-200"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showMobilePaymentSelector" class="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" @click="showMobilePaymentSelector = false"></div>
+      </Transition>
+      
+      <Transition
+        enter-active-class="transition ease-out duration-300"
+        enter-from-class="translate-y-full"
+        enter-to-class="translate-y-0"
+        leave-active-class="transition ease-in duration-200"
+        leave-from-class="translate-y-0"
+        leave-to-class="translate-y-full"
+      >
+        <div v-if="showMobilePaymentSelector" class="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-zinc-900 rounded-t-3xl shadow-2xl max-h-[70vh] flex flex-col border-t border-gray-200 dark:border-zinc-700">
+          <!-- Handle -->
+          <div class="flex justify-center pt-3 pb-2">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-zinc-600 rounded-full"></div>
+          </div>
+          
+          <!-- Header -->
+          <div class="px-5 pb-4 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800">
+            <div>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">Método de Pago</h2>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Selecciona cómo deseas cobrar</p>
+            </div>
+            <button @click="showMobilePaymentSelector = false" class="p-2.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">
+              <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Métodos de Pago -->
+          <div class="flex-1 overflow-y-auto px-5 py-5">
+            <div v-if="paymentMethods.length > 0" class="grid grid-cols-2 gap-3">
+              <button 
+                v-for="method in paymentMethods" 
+                :key="method.id"
+                @click="handleMobilePaymentMethodSelect(method)"
+                class="flex flex-col items-center justify-center gap-3 p-5 rounded-2xl border-2 transition-all duration-200 active:scale-95"
+                :class="selectedPaymentMethod === method.id 
+                  ? 'bg-slate-800 dark:bg-slate-700 border-slate-800 dark:border-slate-700 text-white shadow-lg' 
+                  : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:border-slate-400 dark:hover:border-slate-600'"
+              >
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center"
+                     :class="selectedPaymentMethod === method.id 
+                       ? 'bg-white/10' 
+                       : 'bg-gray-50 dark:bg-zinc-700/50'">
+                  <svg v-if="method.id === 'efectivo'" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                  </svg>
+                  <svg v-else class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                  </svg>
+                </div>
+                <div class="text-center">
+                  <p class="text-sm font-bold">{{ method.name }}</p>
+                  <p v-if="method.fee > 0" class="text-xs opacity-70 mt-1">+{{ method.fee_type === 'percent' ? method.fee + '%' : '$' + method.fee.toLocaleString() }}</p>
+                </div>
+              </button>
+            </div>
+            <p v-else class="text-center text-gray-500 dark:text-zinc-400 py-8">Cargando métodos de pago...</p>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+    
+    <!-- 📱 MODAL INPUT EFECTIVO MÓVIL -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition ease-out duration-300"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-200"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showMobileCashInput" class="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" @click="showMobileCashInput = false"></div>
+      </Transition>
+      
+      <Transition
+        enter-active-class="transition ease-out duration-300"
+        enter-from-class="translate-y-full"
+        enter-to-class="translate-y-0"
+        leave-active-class="transition ease-in duration-200"
+        leave-from-class="translate-y-0"
+        leave-to-class="translate-y-full"
+      >
+        <div v-if="showMobileCashInput" class="lg:hidden fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-zinc-900 rounded-t-3xl shadow-2xl flex flex-col border-t border-gray-200 dark:border-zinc-700 pb-safe">
+          <!-- Handle -->
+          <div class="flex justify-center pt-3 pb-2">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-zinc-600 rounded-full"></div>
+          </div>
+          
+          <!-- Header -->
+          <div class="px-5 pb-4 border-b border-gray-100 dark:border-zinc-800">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Pago en Efectivo</h2>
+            <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Total a pagar: ${{ total.toLocaleString() }}</p>
+          </div>
+          
+          <!-- Input de efectivo -->
+          <div class="px-5 py-5">
+            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">¿Cuánto dinero recibe?</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 font-bold text-2xl">$</span>
+              <input
+                ref="mobileCashInput"
+                v-model.number="cashReceived"
+                type="number"
+                :min="total"
+                step="1000"
+                class="w-full pl-12 pr-4 py-4 text-3xl font-black rounded-2xl bg-gray-50 dark:bg-zinc-800 text-slate-900 dark:text-white placeholder-gray-300 dark:placeholder-zinc-600 border-2 border-gray-200 dark:border-zinc-700 focus:border-emerald-500 dark:focus:border-emerald-500 focus:ring-4 focus:ring-emerald-200 dark:focus:ring-emerald-900/30 transition-all"
+                :placeholder="total.toString()"
+                @focus="$event.target.select()"
+              />
+            </div>
+            
+            <!-- Cambio -->
+            <div v-if="cashReceived >= total" class="mt-4 p-4 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-800">
+              <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">Cambio</p>
+              <p class="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1">${{ (cashReceived - total).toLocaleString() }}</p>
+            </div>
+            
+            <!-- Botones rápidos -->
+            <div class="grid grid-cols-4 gap-2 mt-4">
+              <button 
+                v-for="amount in [5000, 10000, 20000, 50000]" 
+                :key="amount"
+                @click="cashReceived = total + amount"
+                class="px-3 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-bold text-xs rounded-lg border border-gray-200 dark:border-zinc-700 transition-colors"
+              >
+                +${{ (amount / 1000).toFixed(0) }}k
+              </button>
+            </div>
+          </div>
+          
+          <!-- Botones de acción -->
+          <div class="px-5 pb-5 pt-3 border-t border-gray-100 dark:border-zinc-800 flex gap-3">
+            <button 
+              @click="showMobileCashInput = false; selectedPaymentMethod = null;"
+              class="flex-1 px-4 py-3.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 font-bold text-sm rounded-xl transition-all"
+            >
+              Cancelar
+            </button>
+            <button 
+              @click="showMobileCashInput = false; showPaymentModal = true;"
+              :disabled="!cashReceived || cashReceived < total"
+              class="flex-1 px-4 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 dark:disabled:bg-zinc-700 text-white disabled:text-gray-500 dark:disabled:text-zinc-500 font-bold text-sm rounded-xl shadow-lg disabled:shadow-none transition-all"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5 pb-6 lg:pb-2.5" style="height: calc(100vh - 11rem - 54px); margin-bottom: 24px;">
+  <!-- Panel Izquierdo: Catálogo de Productos - Full en móvil, 70% Fashion (8/12) | 50% General (6/12) en desktop -->
+  <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="col-span-1 lg:col-span-auto h-full overflow-hidden transition-all duration-300">
     <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col overflow-hidden transition-all duration-300">
       
       <div class="flex-1 p-3 overflow-y-auto bg-slate-100/80 dark:bg-zinc-950/50 backdrop-blur-sm" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
@@ -291,55 +671,13 @@
         </div>
       </div>
       
-      <!-- Primera vez: NO hay productos en la base de datos - Ilustración Profesional -->
-      <div v-else-if="isFirstTimeNoProducts" class="h-full flex flex-col items-center justify-center text-center py-8 min-h-[500px] bg-gradient-to-b from-transparent via-slate-50/30 to-transparent dark:from-transparent dark:via-zinc-800/20 dark:to-transparent">
+      <!-- Primera vez: NO hay productos en la base de datos - Icono Limpio y Profesional -->
+      <div v-else-if="isFirstTimeNoProducts" class="h-full flex flex-col items-center justify-center text-center py-8 min-h-[500px]">
         
-        <!-- Ilustración SVG única de Tienda/Carrito -->
-        <div class="mb-6 relative">
-          <div class="absolute inset-0 bg-gradient-to-br from-blue-200/30 via-transparent to-emerald-200/30 dark:from-blue-500/10 dark:to-emerald-500/10 rounded-3xl blur-3xl scale-150"></div>
-          
-          <svg class="w-40 h-40 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Carrito de compras principal -->
-            <g transform="translate(35, 30)">
-              <!-- Cuerpo del carrito -->
-              <path d="M15 35 L25 35 L35 75 L95 75 L105 45 L30 45" class="fill-blue-100 dark:fill-blue-900/40"/>
-              <path d="M15 35 L25 35 L35 75 L95 75 L105 45 L30 45" class="fill-none stroke-blue-300 dark:stroke-blue-700" stroke-width="2"/>
-              
-              <!-- Manija del carrito -->
-              <path d="M5 30 L15 35" class="stroke-blue-400 dark:stroke-blue-500" stroke-width="3" stroke-linecap="round"/>
-              
-              <!-- Ruedas -->
-              <circle cx="45" cy="85" r="8" class="fill-gray-200 dark:fill-zinc-700"/>
-              <circle cx="45" cy="85" r="5" class="fill-gray-400 dark:fill-zinc-500"/>
-              <circle cx="85" cy="85" r="8" class="fill-gray-200 dark:fill-zinc-700"/>
-              <circle cx="85" cy="85" r="5" class="fill-gray-400 dark:fill-zinc-500"/>
-              
-              <!-- Producto dentro del carrito (caja) -->
-              <rect x="40" y="50" width="22" height="20" rx="3" class="fill-emerald-200 dark:fill-emerald-800/60"/>
-              <rect x="40" y="50" width="22" height="20" rx="3" class="fill-none stroke-emerald-400 dark:stroke-emerald-600" stroke-width="1.5"/>
-              <rect x="44" y="58" width="14" height="3" rx="1" class="fill-emerald-400 dark:fill-emerald-500"/>
-              
-              <!-- Segundo producto -->
-              <rect x="66" y="55" width="18" height="16" rx="2" class="fill-amber-200 dark:fill-amber-800/60"/>
-              <rect x="66" y="55" width="18" height="16" rx="2" class="fill-none stroke-amber-400 dark:stroke-amber-600" stroke-width="1.5"/>
-            </g>
-            
-            <!-- Signo de interrogación flotante -->
-            <g transform="translate(115, 25)">
-              <circle cx="20" cy="20" r="18" class="fill-slate-100 dark:fill-zinc-700"/>
-              <circle cx="20" cy="20" r="14" class="fill-slate-800 dark:fill-slate-600"/>
-              <text x="20" y="26" text-anchor="middle" class="fill-white font-bold" style="font-size: 18px; font-family: system-ui;">?</text>
-            </g>
-            
-            <!-- Estrellitas decorativas -->
-            <circle cx="25" cy="50" r="3" class="fill-blue-300 dark:fill-blue-500/50"/>
-            <circle cx="155" cy="80" r="2.5" class="fill-emerald-300 dark:fill-emerald-500/50"/>
-            <circle cx="140" cy="130" r="2" class="fill-amber-300 dark:fill-amber-500/50"/>
-            
-            <!-- Flecha hacia productos -->
-            <path d="M130 110 L145 125" class="stroke-gray-300 dark:stroke-zinc-600" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 3"/>
-            <circle cx="150" cy="130" r="6" class="fill-gray-200 dark:fill-zinc-700"/>
-            <path d="M147 130H153M150 127V133" class="stroke-gray-500 dark:stroke-zinc-400" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Icono de Carrito Profesional -->
+        <div class="w-24 h-24 mb-5 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-black/30">
+          <svg class="w-12 h-12 text-slate-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
           </svg>
         </div>
         
@@ -617,7 +955,8 @@
 
 <!-- bloque de ventas - 30% Fashion (4/12) | Panel Central General (3/12) -->
 
-<div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="h-full overflow-hidden transition-all duration-300">
+<!-- Panel Derecho: Carrito/Ticket - OCULTO EN MÓVIL -->
+<div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block h-full overflow-hidden transition-all duration-300">
   <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col overflow-hidden transition-all duration-300">
     
     <div class="p-4 flex-shrink-0">
@@ -897,8 +1236,8 @@
 
 <!-- fin bloque de ventas -->  
 
-<!-- Panel de Pagos - Solo visible en modo General (3/12) - Se oculta en Fashion -->
-<div v-if="!isFashionStore" id="tour-pos-cart" class="lg:col-span-3 h-full overflow-hidden">
+<!-- Panel de Pagos - Solo visible en modo General (3/12) - Se oculta en Fashion - OCULTO EN MÓVIL -->
+<div v-if="!isFashionStore" id="tour-pos-cart" class="hidden lg:block lg:col-span-3 h-full overflow-hidden">
   
   <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col justify-between shadow-lg dark:shadow-2xl dark:shadow-black/40 transition-all duration-300">
     
@@ -1741,8 +2080,8 @@
     @close="showConfirmCustomerModal = false"
   />
 
-  <!-- 🎫 BARRA DE MULTI-TABS INFERIOR (Footer Fijo) -->
-  <div id="tour-pos-multisales" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shadow-sm z-50 h-11">
+  <!-- 🎫 BARRA DE MULTI-TABS INFERIOR (Footer Fijo) - SOLO DESKTOP -->
+  <div id="tour-pos-multisales" class="hidden lg:block fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shadow-sm z-50 h-11">
     <div class="flex items-center h-full px-1 max-w-screen-2xl mx-auto">
       
       <!-- Pestañas de ventas -->
@@ -2438,6 +2777,10 @@ const calculatorOperation = ref('') // Para mostrar la operación actual
 // Referencia al componente WhatsAppStatus
 const whatsappStatus = ref(null)
 
+const showMobileCart = ref(false) // Modal carrito para móvil
+const showMobilePaymentSelector = ref(false) // Selector de métodos de pago móvil
+const showMobileCashInput = ref(false) // Input de efectivo para móvil
+const mobileCashInput = ref(null) // Ref del input de efectivo móvil
 const showCustomerSelector = ref(false)
 const startCustomerCreation = ref(false)
 const showCustomerHistory = ref(false)
@@ -3852,6 +4195,31 @@ const handleAddToCartFromHistory = (product) => {
   } else {
     // Si no está en stock o no existe, mostrar mensaje
     showError('Este producto no está disponible en este momento')
+  }
+}
+
+// 📱 Manejador de selección de método de pago móvil
+const handleMobilePaymentMethodSelect = (method) => {
+  selectedPaymentMethod.value = method.id
+  showMobilePaymentSelector.value = false
+  
+  // Si es efectivo, mostrar input de monto
+  if (method.id === 'efectivo') {
+    // Pre-llenar con el total si está vacío
+    if (!cashReceived.value || cashReceived.value < total.value) {
+      cashReceived.value = total.value
+    }
+    showMobileCashInput.value = true
+    // Focus en el input cuando se abra
+    nextTick(() => {
+      if (mobileCashInput.value) {
+        mobileCashInput.value.focus()
+        mobileCashInput.value.select()
+      }
+    })
+  } else {
+    // Para otros métodos, ir directo al modal de confirmación
+    showPaymentModal.value = true
   }
 }
 
