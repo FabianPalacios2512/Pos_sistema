@@ -37,6 +37,7 @@ export const appStore = reactive({
   
   // Estado de inicialización
   initialized: false,
+  isSubscriptionExpired: false, // Nuevo estado para controlar expiración
   
   // Métodos para cargar datos
   async loadProducts(warehouseId = null, searchScope = 'local') {
@@ -171,6 +172,32 @@ export const appStore = reactive({
       }
     } catch (error) {
   // console.error('❌ Error precargando configuración:', error)
+      // Detectar si el error es por suscripción expirada
+      if (error.response?.status === 403 && (
+          error.response?.data?.subscription_expired === true ||
+          error.response?.data?.message?.includes('suscripción ha finalizado') ||
+          error.response?.data?.message?.includes('suscripción ha expirado') || 
+          error.response?.data?.message?.includes('plan ha expirado')
+      )) {
+        console.log('⛔ [Store] Suscripción expirada detectada')
+        this.isSubscriptionExpired = true
+        
+        // Establecer valores por defecto para evitar errores
+        this.systemSettings = {
+          onboarding_completed: true, // Asumimos que si tiene cuenta, ya completó onboarding
+          business_name: 'Mi Negocio'
+        }
+        this.businessName = 'Mi Negocio'
+        this.tenant = {
+          id: error.response?.data?.tenant_id || 'unknown',
+          plan_type: 'expired',
+          subscription_status: 'expired'
+        }
+        // NO lanzar el error para permitir que el componente continúe
+        return
+      }
+      // Para otros errores, sí lanzarlos
+      throw error
     } finally {
       this.loading.systemSettings = false
     }
@@ -234,20 +261,30 @@ export const appStore = reactive({
       return;
     }
   
-  // console.log('🚀 Inicializando store global...')
+    console.log('🚀 Inicializando store global...')
     
-    // 🏪 PRIMERO: Cargar sesión de caja para obtener el warehouse_id
+    // PRIMERO: Cargar systemSettings para verificar estado de suscripción
+    await this.loadSystemSettings()
+    
+    // ⛔ Si la suscripción está expirada, NO cargar datos operacionales
+    if (this.isSubscriptionExpired) {
+      console.log('⛔ Suscripción expirada - omitiendo carga de datos operacionales')
+      this.initialized = true
+      return
+    }
+    
+    // Si la suscripción está activa, cargar todos los datos
+    // 🏪 Cargar sesión de caja para obtener el warehouse_id
     await this.loadCashSession()
     
-    // SEGUNDO: Cargar productos usando el warehouse_id de la sesión (si existe)
+    // Cargar productos usando el warehouse_id de la sesión (si existe)
     await this.loadProducts()
     
-    // TERCERO: Cargar el resto de datos en paralelo
+    // Cargar el resto de datos en paralelo
     await Promise.all([
       this.loadCategories(),
       this.loadCustomers(),
-      this.loadPaymentMethods(),
-      this.loadSystemSettings()
+      this.loadPaymentMethods()
     ])
     
     this.initialized = true

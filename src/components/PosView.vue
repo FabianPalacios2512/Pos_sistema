@@ -3664,8 +3664,41 @@ const getTotalStock = (product) => {
 
 // Métodos
 const addToCart = (product) => {
-  // 👗 INTERCEPTAR: Si el producto tiene variantes (Fashion/Moda), abrir modal de selección
+  // 👗 INTERCEPTAR: Si el producto tiene variantes REALES (no productos simples)
+  // Un producto simple tiene 1 variante sin options, un producto con variantes tiene múltiples variantes o options
+  let hasRealVariants = false
+  
   if (product.variants && product.variants.length > 0) {
+    if (product.variants.length > 1) {
+      // Múltiples variantes = producto con opciones
+      hasRealVariants = true
+    } else {
+      // 1 sola variante - verificar si tiene opciones
+      const variant = product.variants[0]
+      
+      // Verificar options (array)
+      if (variant.options && Array.isArray(variant.options) && variant.options.length > 0) {
+        hasRealVariants = true
+      }
+      
+      // Verificar options_summary (JSON string)
+      if (!hasRealVariants && variant.options_summary) {
+        try {
+          const optionsSummary = typeof variant.options_summary === 'string' 
+            ? JSON.parse(variant.options_summary) 
+            : variant.options_summary
+          if (Array.isArray(optionsSummary) && optionsSummary.length > 0) {
+            hasRealVariants = true
+          }
+        } catch (e) {
+          // Si falla el parse, no tiene opciones válidas
+          hasRealVariants = false
+        }
+      }
+    }
+  }
+  
+  if (hasRealVariants) {
     selectedProductForVariants.value = product
     showVariantSelector.value = true
     

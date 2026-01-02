@@ -55,6 +55,10 @@ const backendAPI = axios.create({
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       // En localhost: el backend está en http://localhost:8000
       return 'http://localhost:8000'
+    } else if (window.location.hostname.includes('.localhost')) {
+      // Subdominios de localhost (ej: tenant.localhost:3000)
+      // El backend sigue siendo http://localhost:8000
+      return 'http://localhost:8000'
     } else {
       // En producción: el backend está en el mismo dominio (105pos.pro)
       // pero sin subdominio
@@ -65,7 +69,9 @@ const backendAPI = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
-  }
+  },
+  // 🔥 IMPORTANTE: Permitir URLs absolutas para subdominios
+  allowAbsoluteUrls: true
 })
 
 console.log('🚀 PaymentSuccess.vue - COMPONENTE CARGADO')
@@ -229,6 +235,18 @@ onMounted(async () => {
 })
 
 const redirectToDashboard = () => {
+  // Verificar si es renovación
+  const isRenewal = route.query.renewal === 'true'
+  
+  if (isRenewal) {
+    // Limpiar datos de pago
+    localStorage.removeItem('pending_payment')
+    
+    // Redirigir al dashboard directamente (ya estamos en el dominio correcto)
+    window.location.href = '/dashboard'
+    return
+  }
+
   const registrationData = localStorage.getItem('registration_data')
   
   if (registrationData) {

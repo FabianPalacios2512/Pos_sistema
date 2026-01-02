@@ -32,6 +32,16 @@ export const productsService = {
 
   // Actualizar producto
   async update(id, productData) {
+    // Si es FormData (tiene imágenes), usar POST con _method
+    if (productData instanceof FormData) {
+      return await apiCall(`/products/${id}`, {
+        method: 'POST',
+        body: productData
+        // ✅ NO enviar headers: {}, dejar que apiCall maneje los headers de autenticación
+      })
+    }
+    
+    // Si es objeto normal, usar PUT con JSON
     return await apiCall(`/products/${id}`, {
       method: 'PUT',
       body: JSON.stringify(productData)

@@ -107,10 +107,16 @@ const props = defineProps({
 
 defineEmits(['view', 'edit'])
 
-// 🎨 Helper: Detectar si tiene variantes
+// 🎨 Helper: Detectar si tiene variantes REALES (no productos simples)
 const hasVariants = computed(() => {
   const variants = props.product.variants || []
-  return variants.length > 1 // Más de 1 variante = producto con opciones
+  if (variants.length === 0) return false
+  // Producto simple: 1 variante sin opciones
+  if (variants.length === 1) {
+    return variants[0].options && variants[0].options.length > 0
+  }
+  // Múltiples variantes
+  return true
 })
 
 // 📊 Helper: Calcular rango de precios

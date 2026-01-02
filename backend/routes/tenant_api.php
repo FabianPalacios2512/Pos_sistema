@@ -40,6 +40,65 @@ Route::post('/register', [AuthController::class, 'register']);
 // Route::post('/register-tenant', [\App\Http\Controllers\Api\TenantRegisterController::class, 'register']); // Removed from tenant routes
 Route::post('/auth/validate-admin', [AuthController::class, 'validateAdmin']);
 
+// 🔥 Endpoint especial para obtener tenant_id incluso con suscripción expirada
+// NO requiere autenticación, solo identifica el tenant por el subdominio
+Route::get('/tenant-info', function (Illuminate\Http\Request $request) {
+    // Obtener el subdominio del request
+    $host = $request->getHost();
+    $subdomain = explode('.', $host)[0];
+    
+    // Buscar el tenant por subdominio
+    $tenant = \App\Models\Tenant::where('subdomain', $subdomain)->first();
+    
+    if (!$tenant) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No tenant found for subdomain: ' . $subdomain
+        ], 404);
+    }
+    
+    return response()->json([
+        'success' => true,
+        'tenant_id' => $tenant->id,
+        'business_name' => $tenant->business_name ?? 'Mi Negocio',
+        'subscription_status' => $tenant->subscription_ends_at && now()->isAfter($tenant->subscription_ends_at) ? 'expired' : 'active',
+        'subdomain' => $tenant->subdomain
+    ]);
+}); // Sin middleware - completamente público
+
+// Verificar estado de suscripción (sin auth, solo para mostrar alertas)
+Route::get('/check-subscription', function () {
+    $tenant = tenant();
+
+    if (!$tenant || !$tenant->subscription_ends_at) {
+        return response()->json([
+            'success' => true,
+            'has_subscription' => false,
+            'status' => 'no_subscription'
+        ]);
+    }
+
+    $now = now();
+    $expiresAt = \Carbon\Carbon::parse($tenant->subscription_ends_at);
+    $daysRemaining = $now->diffInDays($expiresAt, false);
+
+    $isExpired = $now->isAfter($expiresAt);
+
+    return response()->json([
+        'success' => true,
+        'has_subscription' => true,
+        'status' => $isExpired ? 'expired' : ($daysRemaining <= 7 ? 'expiring_soon' : 'active'),
+        'plan' => $tenant->plan,
+        'expires_at' => $expiresAt->format('Y-m-d H:i:s'),
+        'days_remaining' => $isExpired ? 0 : max(0, ceil($daysRemaining)),
+        'days_expired' => $isExpired ? abs($daysRemaining) : 0,
+        'is_expired' => $isExpired,
+        'is_expiring_soon' => !$isExpired && $daysRemaining <= 7,
+        'tenant_id' => $tenant->id, // 🔥 AGREGAR tenant_id para el modal
+        '_subscription_expired' => $isExpired, // 🔥 Campo que detecta apiClient
+    ]);
+});
+
 // RUTA TEMPORAL PARA QR - Búsqueda de cotizaciones sin autenticación
 Route::get('/quotes/search/{code}', [SalesController::class, 'searchQuotePublic']);
 

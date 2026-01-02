@@ -239,21 +239,108 @@
           </div>
         </div>
 
-        <!-- Botón Generar Variantes - MÁS GRANDE -->
-        <button 
-          type="button"
-          ref="generateButton"
-          @click="generateVariantsWithScroll"
-          :disabled="form.options.length === 0"
-          class="w-full py-4 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-base font-black rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-[0.98]"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-          <span class="uppercase tracking-wide">Generar Variantes</span>
-        </button>
+        <!-- Botón Dinámico: Continuar o Generar Variantes -->
+        <div class="space-y-2">
+          <button 
+            type="button"
+            ref="generateButton"
+            @click="handleContinueOrGenerate"
+            class="w-full py-4 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-base font-black rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <svg v-if="!hasValidOptions" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+            <span class="uppercase tracking-wide">{{ buttonText }}</span>
+          </button>
+          <p class="text-center text-xs text-gray-500 dark:text-zinc-400">
+            <span v-if="!hasValidOptions">
+              💡 Sin atributos, el producto se creará como <span class="font-medium">simple</span>
+            </span>
+            <span v-else>
+              🎯 Genera la matriz de variantes para configurar precios y stock
+            </span>
+          </p>
+        </div>
       </div>
 
+      <!-- ✅ Formulario Simple (para productos sin variantes) -->
+      <section v-if="showSimpleForm" ref="simpleFormSection" class="space-y-4 animate-fade-in">
+        <div class="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30 rounded-xl p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-sm font-bold text-blue-900 dark:text-blue-300 mb-1">Producto Simple</h3>
+              <p class="text-xs text-blue-700 dark:text-blue-400">Configura el precio, costo y stock para este producto sin variantes</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">
+              Costo <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-2.5 text-gray-400 dark:text-zinc-500">$</span>
+              <input 
+                v-model.number="simpleProduct.cost"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                class="w-full pl-7 pr-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="0.00"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">
+              Precio de Venta <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-2.5 text-gray-400 dark:text-zinc-500">$</span>
+              <input 
+                v-model.number="simpleProduct.price"
+                type="number"
+                step="0.01"
+                min="0"
+                required
+                class="w-full pl-7 pr-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="0.00"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">
+              Stock Inicial <span class="text-red-500">*</span>
+            </label>
+            <input 
+              v-model.number="simpleProduct.stock"
+              type="number"
+              min="0"
+              required
+              class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="0"
+            >
+          </div>
+        </div>
+
+        <!-- Cálculo de Margen -->
+        <div v-if="simpleProduct.cost > 0 && simpleProduct.price > 0" class="bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-3 flex items-center justify-between">
+          <span class="text-xs font-medium text-gray-600 dark:text-zinc-400">Margen de Ganancia:</span>
+          <span class="text-sm font-bold" :class="profitMargin >= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'">
+            {{ profitMargin }}%
+          </span>
+        </div>
+      </section>
+
       <!-- Matriz de Variantes Generadas -->
-      <section v-if="form.variants.length > 0" ref="variantsSection" class="px-6 pb-6 space-y-3 animate-fade-in">
+      <section v-if="form.variants.length > 0 && !showSimpleForm" ref="variantsSection" class="px-6 pb-6 space-y-3 animate-fade-in">
         <h3 class="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
           Variantes Generadas <span class="text-gray-400">({{ form.variants.length }})</span>
         </h3>
@@ -334,7 +421,10 @@
 </template>
 
 <script setup>
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed, ref, watch } from 'vue'
+import { useToast } from '../composables/useToast'
+
+const { showWarning } = useToast()
 
 const props = defineProps({
   categories: {
@@ -344,6 +434,10 @@ const props = defineProps({
   suppliers: {
     type: Array,
     default: () => []
+  },
+  editingProduct: {
+    type: Object,
+    default: null
   }
 })
 
@@ -352,10 +446,27 @@ const emit = defineEmits(['save', 'cancel', 'create-category', 'create-supplier'
 // Refs para scroll y color pickers
 const generateButton = ref(null)
 const variantsSection = ref(null)
+const simpleFormSection = ref(null)
 const colorInputRefs = ref({})
+
+// Estado para producto simple (sin variantes)
+const showSimpleForm = ref(false)
+const simpleProduct = reactive({
+  cost: 0,
+  price: 0,
+  stock: 0
+})
+
+// Computed: Calcular margen de ganancia para producto simple
+const profitMargin = computed(() => {
+  if (simpleProduct.cost <= 0 || simpleProduct.price <= 0) return 0
+  const margin = ((simpleProduct.price - simpleProduct.cost) / simpleProduct.price) * 100
+  return Math.round(margin * 100) / 100
+})
 
 // Estado Reactivo del Formulario
 const form = reactive({
+  id: null, // ID del producto (para edición)
   name: '',
   sku: '',
   description: '',
@@ -368,6 +479,126 @@ const form = reactive({
   variants: [],
   images: []
 })
+
+// 🔄 Cargar datos cuando se edita un producto
+watch(() => props.editingProduct, (product) => {
+  if (product) {
+    console.log('📝 [FashionForm] Producto recibido para editar:', product)
+    
+    form.id = product.id || null
+    form.name = product.name || ''
+    form.sku = product.sku || ''
+    form.description = product.description || ''
+    form.category_id = product.category_id || ''
+    form.supplier_id = product.supplier_id || null
+    
+    // Cargar opciones
+    if (product.options && Array.isArray(product.options)) {
+      form.options = product.options.map(opt => ({
+        name: opt.name,
+        values: opt.values || [],
+        tempValue: ''
+      }))
+    } else {
+      // Reset a opciones por defecto si no hay
+      form.options = [
+        { name: 'Talla', values: [], tempValue: '' },
+        { name: 'Color', values: [], tempValue: '' }
+      ]
+    }
+    
+    // Cargar variantes
+    if (product.variants && Array.isArray(product.variants)) {
+      form.variants = product.variants.map(variant => ({
+        sku: variant.sku,
+        price: parseFloat(variant.price || 0),
+        cost: parseFloat(variant.cost_price || variant.cost || 0),
+        stock: parseInt(variant.stock || 0),
+        active: variant.active !== false,
+        options: variant.options || []
+      }))
+    } else {
+      form.variants = []
+    }
+    
+    // Detectar si es producto simple (1 variante sin opciones O sin variantes)
+    const hasNoVariants = form.variants.length === 0
+    const isSimpleProduct = form.variants.length === 1 && 
+                           (!form.variants[0].options || form.variants[0].options.length === 0)
+    
+    if (isSimpleProduct) {
+      // ✅ Es un producto simple - cargar datos en el formulario simple
+      simpleProduct.cost = form.variants[0].cost || form.variants[0].cost_price || 0
+      simpleProduct.price = form.variants[0].price
+      simpleProduct.stock = form.variants[0].stock
+      showSimpleForm.value = true
+      
+      console.log('📦 [FashionForm] Producto simple detectado al editar:', {
+        cost: simpleProduct.cost,
+        price: simpleProduct.price,
+        stock: simpleProduct.stock,
+        variant_original: form.variants[0]
+      })
+      
+      // Limpiar las opciones (no tiene atributos)
+      form.options = [
+        { name: 'Talla', values: [], tempValue: '' },
+        { name: 'Color', values: [], tempValue: '' }
+      ]
+    } else if (hasNoVariants) {
+      // ✅ No tiene variantes - intentar cargar desde product padre
+      console.log('📦 [FashionForm] Producto sin variantes, cargando desde padre:', {
+        sale_price: product.sale_price,
+        cost_price: product.cost_price,
+        current_stock: product.current_stock
+      })
+      
+      simpleProduct.cost = parseFloat(product.cost_price || 0)
+      simpleProduct.price = parseFloat(product.sale_price || product.price || 0)
+      simpleProduct.stock = parseInt(product.current_stock || product.stock || 0)
+      showSimpleForm.value = true
+      
+      // Limpiar opciones
+      form.options = [
+        { name: 'Talla', values: [], tempValue: '' },
+        { name: 'Color', values: [], tempValue: '' }
+      ]
+    } else if (form.variants.length > 1) {
+      // Producto con múltiples variantes - ocultar formulario simple
+      showSimpleForm.value = false
+    } else {
+      // No hay variantes
+      showSimpleForm.value = false
+    }
+    
+    // Cargar imágenes
+    form.images = []
+    if (product.image_url) {
+      form.images.push({
+        preview: product.image_url,
+        file: null
+      })
+    }
+  } else {
+    // Limpiar formulario cuando no hay producto (modo crear)
+    form.id = null
+    form.name = ''
+    form.sku = ''
+    form.description = ''
+    form.category_id = ''
+    form.supplier_id = null
+    form.options = [
+      { name: 'Talla', values: [], tempValue: '' },
+      { name: 'Color', values: [], tempValue: '' }
+    ]
+    form.variants = []
+    form.images = []
+    showSimpleForm.value = false
+    simpleProduct.cost = 0
+    simpleProduct.price = 0
+    simpleProduct.stock = 0
+  }
+}, { immediate: true })
 
 const handleCategoryChange = (event) => {
   if (event.target.value === '__new__') {
@@ -458,14 +689,30 @@ const handleBackspace = (optionIndex) => {
 
 // --- Lógica Cartesiana (Generación de Variantes) ---
 
+// Computed: Determinar si hay atributos con valores
+const hasValidOptions = computed(() => {
+  return form.options.some(opt => opt.values.length > 0 && opt.name.trim() !== '')
+})
+
+// Computed: Texto dinámico del botón
+const buttonText = computed(() => {
+  if (!hasValidOptions.value) {
+    return 'Continuar sin Variantes'
+  }
+  return form.variants.length > 0 ? 'Regenerar Variantes' : 'Generar Variantes'
+})
+
 const generateVariants = () => {
   // Filtrar opciones que tengan valores
   const validOptions = form.options.filter(opt => opt.values.length > 0 && opt.name.trim() !== '')
   
   if (validOptions.length === 0) {
-    alert('Debes agregar al menos una opción con valores (ej: Talla: S, M)')
+    showWarning('⚠️ Debes agregar al menos un atributo con valores (ej: Talla: S, M, L)', 4000)
     return
   }
+
+  // Ocultar formulario simple cuando se generan variantes
+  showSimpleForm.value = false
 
   // Algoritmo de Producto Cartesiano
   const cartesian = (args) => {
@@ -523,6 +770,28 @@ const generateVariantsWithScroll = () => {
   }, 100)
 }
 
+// 🎯 Manejar click en el botón dinámico
+const handleContinueOrGenerate = () => {
+  if (!hasValidOptions.value) {
+    // No hay atributos, mostrar formulario simple
+    showSimpleForm.value = true
+    
+    // Scroll suave al formulario simple
+    setTimeout(() => {
+      if (simpleFormSection.value) {
+        simpleFormSection.value.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        })
+      }
+    }, 100)
+  } else {
+    // Hay atributos, generar variantes
+    showSimpleForm.value = false
+    generateVariantsWithScroll()
+  }
+}
+
 const removeVariant = (index) => {
   form.variants.splice(index, 1)
 }
@@ -574,17 +843,42 @@ const removeImage = (index) => {
 const handleSubmit = () => {
   // Validaciones básicas
   if (!form.name) {
-    alert('El nombre es requerido')
+    showWarning('⚠️ El nombre del producto es requerido', 3000)
     return
   }
   
   if (!form.category_id) {
-    alert('Debes seleccionar una categoría')
+    showWarning('⚠️ Debes seleccionar una categoría', 3000)
     return
   }
   
-  // ✅ PERMITIR productos sin variantes (productos simples en modo fashion)
-  // Si no hay variantes, crear una variante por defecto con el nombre del producto
+  // ✅ Manejar productos simples (sin variantes o con 1 variante sin opciones)
+  if (showSimpleForm.value) {
+    // Validar campos del producto simple
+    if (simpleProduct.price <= 0) {
+      showWarning('⚠️ El precio de venta debe ser mayor a 0', 3000)
+      return
+    }
+    
+    if (simpleProduct.stock < 0) {
+      showWarning('⚠️ El stock no puede ser negativo', 3000)
+      return
+    }
+    
+    // Actualizar o crear variante simple con los datos del formulario
+    form.variants = [{
+      sku: form.sku || `SKU-${Date.now()}`,
+      price: simpleProduct.price,
+      cost: simpleProduct.cost,
+      stock: simpleProduct.stock,
+      active: true,
+      options: []
+    }]
+    
+    console.log('📦 [FashionForm] Variante simple creada/actualizada:', form.variants[0])
+  }
+  
+  // Si no hay variantes ni formulario simple mostrado, crear variante por defecto
   if (form.variants.length === 0) {
     form.variants = [{
       sku: form.sku || `SKU-${Date.now()}`,
@@ -597,9 +891,13 @@ const handleSubmit = () => {
   }
 
   // Preparar payload final
+  // Detectar si es producto simple o con variantes
+  const isSimpleProduct = form.variants.length === 1 && 
+                         (!form.variants[0].options || form.variants[0].options.length === 0)
+  
   const payload = {
     ...form,
-    type: 'variable', // CRÍTICO para el backend
+    type: isSimpleProduct ? 'simple' : 'variable', // CRÍTICO: distinguir tipo
     // Limpiar campos temporales y solo enviar opciones que tengan valores
     options: form.options
       .filter(o => o.values && o.values.length > 0) // Solo opciones con valores
@@ -609,7 +907,6 @@ const handleSubmit = () => {
       }))
   }
 
-  console.log('📤 Enviando producto variable:', payload)
   emit('save', payload)
 }
 

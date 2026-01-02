@@ -30,8 +30,6 @@ const authService = {
           }
         } catch (adminError) {
           // Si falla el login de super admin, intentar como tenant normal
-          console.log('No es super admin, intentando login de tenant...');
-          
           response = await apiClient.post('/login', {
             email: credentials.email,
             password: credentials.password
@@ -49,9 +47,11 @@ const authService = {
         
         // 🚀 INICIALIZAR STORE GLOBAL DESPUÉS DEL LOGIN
         console.log('🏪 Inicializando datos globales después del login...')
-        appStore.initialize().catch(error => {
+        try {
+          await appStore.initialize()
+        } catch (error) {
           console.warn('⚠️ Error inicializando store:', error)
-        })
+        }
         
         // Verificar que se guardó correctamente
         const savedToken = localStorage.getItem('authToken');
@@ -114,6 +114,22 @@ const authService = {
       return response.data;
     } catch (error) {
       // Si falla, limpiar datos locales
+      // ⛔ FIX: No hacer logout si es error 403 (Suscripción expirada) o 401 en rutas de renovación
+      if (error.response?.status === 403) {
+        console.log('⛔ [AuthService] Error 403 en getCurrentUser - Posible suscripción expirada. NO haciendo logout.')
+        throw error
+      }
+      
+      // También proteger contra 401 si estamos en proceso de renovación
+      if (error.response?.status === 401) {
+        const currentPath = window.location.pathname
+        const allowedExpiredRoutes = ['/subscription-expired', '/select-plan', '/payment/success', '/payment/failure']
+        if (allowedExpiredRoutes.includes(currentPath)) {
+          console.log('⛔ [AuthService] Error 401 en ruta de renovación - NO haciendo logout.')
+          throw error
+        }
+      }
+
       this.logout();
       if (USE_MOCK) {
         throw error;

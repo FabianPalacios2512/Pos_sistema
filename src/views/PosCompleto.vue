@@ -2,6 +2,9 @@
   <!-- Sistema POS Empresarial Completo -->
   <div :class="{ 'dark': isDarkMode }" class="min-h-screen bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-zinc-900 dark:via-zinc-950 dark:to-black transition-colors duration-300">
     
+    <!-- 🔥 Modal de Suscripción Expirada (NO se puede cerrar) -->
+    <SubscriptionExpiredModal />
+    
     <!-- Sidebar Component -->
     <Sidebar 
       :currentModule="currentModule"
@@ -183,6 +186,9 @@ import AppHeader from '../components/AppHeader.vue'
 
 // Importar RadioPlayerModal
 import RadioPlayerModal from '../components/RadioPlayerModal.vue'
+
+// 🔥 Importar Modal de Suscripción Expirada
+import SubscriptionExpiredModal from '../components/SubscriptionExpiredModal.vue'
 
 // Router
 const router = useRouter()

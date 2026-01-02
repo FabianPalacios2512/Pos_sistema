@@ -8,6 +8,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductOption;
 use App\Models\ProductImage;
 use App\Models\ProductOptionValue;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -19,6 +20,9 @@ class ProductController extends Controller
         $query = Product::with([
             'category',
             'supplier',
+            'images' => function($q) {
+                $q->orderBy('order');
+            },
             'warehouses' => function($q) {
                 $q->select('warehouses.id', 'warehouses.name')
                   ->withPivot('stock'); // 🏢 Incluir stock de la tabla pivot
@@ -123,6 +127,9 @@ class ProductController extends Controller
             ])
             ->with([
                 'category:id,name,color',
+                'images' => function($q) {
+                    $q->orderBy('order');
+                },
                 'warehouses' => function($q) {
                     $q->select('warehouses.id', 'warehouses.name', 'stock');
                 },
@@ -159,6 +166,16 @@ class ProductController extends Controller
                 // Añadir el nombre de la categoría directamente al producto
                 $product->category_name = $product->category ? $product->category->name : 'Sin categoría';
                 $product->category_color = $product->category ? $product->category->color : '#6b7280';
+
+                // 🖼️ Mapear imágenes al formato del POS
+                if ($product->images && $product->images->isNotEmpty()) {
+                    // Usar la imagen primaria o la primera
+                    $primaryImage = $product->images->firstWhere('is_primary', true) ?? $product->images->first();
+                    if ($primaryImage) {
+                        $product->image = $primaryImage->image_url;
+                        $product->image_url = $primaryImage->image_url;
+                    }
+                }
 
                 // Información de stock por bodega (transformar a formato correcto)
                 $product->warehouse_stock = $product->warehouses ? $product->warehouses->map(function($wh) {
@@ -248,10 +265,21 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             // Validación condicional
             'sku' => 'required_if:product_type,simple|nullable|string|unique:products,sku',
-            'sale_price' => 'required_if:product_type,simple|nullable|numeric|min:0',
+            // ✅ FLEXIBILIZAR: sale_price es requerido solo si no viene en variants[0].price
+            'sale_price' => 'nullable|numeric|min:0',
             'variants' => 'required_if:product_type,variable|array',
             'warehouse_id' => 'nullable|exists:warehouses,id',
         ]);
+
+        // ✅ Validación adicional para productos simples
+        if ($request->product_type === 'simple') {
+            if (!$request->sale_price && !isset($request->variants[0]['price'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El precio de venta es requerido para productos simples'
+                ], 422);
+            }
+        }
 
         return DB::transaction(function () use ($request) {
             // 2. Crear Producto Padre
@@ -264,7 +292,8 @@ class ProductController extends Controller
             // Si es simple, tomamos sku y precio del request.
             if ($request->product_type === 'simple') {
                 $productData['sku'] = $request->sku;
-                $productData['sale_price'] = $request->sale_price;
+                // ✅ Tomar sale_price o desde variants[0].price como fallback
+                $productData['sale_price'] = $request->sale_price ?? ($request->variants[0]['price'] ?? 0);
                 $productData['current_stock'] = $request->current_stock ?? 0;
             } else {
                 // Para variable, calculamos el precio base desde las variantes
@@ -419,24 +448,33 @@ class ProductController extends Controller
         $product->load([
             'category',
             'supplier',
-            'variants' => function($query) {
-                $query->select('product_variants.*')
-                      ->with(['optionValues.option']);
-            },
+            'options.values', // Opciones del producto con sus valores
+            'variants', // Variantes sin eager loading de opciones
             'images'
         ]);
 
-        // Formatear las variantes para incluir options_summary
+        // Formatear las variantes para incluir options como array simple
         if ($product->variants) {
             $product->variants->each(function($variant) {
-                $optionsSummary = $variant->optionValues->map(function($optionValue) {
-                    return [
-                        'name' => $optionValue->option->name,
-                        'value' => $optionValue->value
-                    ];
-                });
-                $variant->options_summary = $optionsSummary;
+                // Decodificar options_summary si existe
+                if ($variant->options_summary) {
+                    $variant->options = is_string($variant->options_summary)
+                        ? json_decode($variant->options_summary, true)
+                        : $variant->options_summary;
+                } else {
+                    $variant->options = [];
+                }
             });
+        }
+
+        // Formatear las opciones del producto
+        if ($product->options) {
+            $product->options = $product->options->map(function($option) {
+                return [
+                    'name' => $option->name,
+                    'values' => $option->values->pluck('value')->toArray()
+                ];
+            })->toArray();
         }
 
         return response()->json([
@@ -449,103 +487,237 @@ class ProductController extends Controller
     {
         \Log::info('🔄 [ProductController@update] Actualizando producto:', [
             'product_id' => $product->id,
-            'type' => $product->product_type,
-            'data' => $request->all()
+            'current_type' => $product->product_type,
+            'new_type' => $request->product_type,
+            'has_files' => $request->hasFile('images'),
+            'all_files' => $request->allFiles(),
+            'images' => $request->images,
+            'request_all' => $request->all(),
+            'name' => $request->input('name'),
+            'sku' => $request->input('sku'),
+            'variants' => $request->variants,
+            'cost_price' => $request->cost_price
         ]);
 
         return DB::transaction(function () use ($request, $product) {
-            // 1. Actualizar campos básicos
-            $product->update($request->except(['warehouse_id', 'warehouse_stocks', 'variants', 'options', 'images']));
+            // 1. Actualizar tipo de producto si cambió
+            $oldType = $product->product_type;
+            $newType = $request->input('product_type', $oldType);
 
-            // 2. Manejo de Imágenes (Agregar nuevas)
-            if ($request->hasFile('images')) {
-                $currentMaxOrder = $product->images()->max('order') ?? 0;
-                foreach ($request->file('images') as $index => $file) {
-                    $path = $file->store('products', 'public');
-                    $url = Storage::url($path);
+            // ✅ Obtener cost_price desde múltiples fuentes
+            $costPrice = $request->input('cost_price')
+                ?? $request->variants[0]['cost']
+                ?? $request->variants[0]['cost_price']
+                ?? 0;
 
-                    $product->images()->create([
-                        'image_url' => $url,
-                        'is_primary' => false,
-                        'order' => $currentMaxOrder + $index + 1
-                    ]);
-                }
+            // 2. Actualizar campos básicos del producto
+            $updateData = [
+                'name' => $request->input('name'),
+                'sku' => $request->input('sku'),
+                'description' => $request->input('description', ''),
+                'category_id' => $request->input('category_id'),
+                'supplier_id' => $request->input('supplier_id'),
+                'product_type' => $newType,
+                'cost_price' => $costPrice,
+            ];
+
+            // ✅ AGREGAR sale_price si es producto simple
+            if ($newType === 'simple' && $request->has('sale_price')) {
+                $updateData['sale_price'] = $request->input('sale_price');
             }
 
-            // 3. Lógica según tipo
-            if ($product->product_type === 'simple') {
-                // --- LÓGICA SIMPLE (LEGACY) ---
+            $product->update($updateData);
 
-                // Actualizar stock en warehouses
-                if ($request->has('warehouse_stocks') && is_array($request->warehouse_stocks)) {
-                    $warehouseStocks = [];
-                    foreach ($request->warehouse_stocks as $warehouseId => $stock) {
-                        $stockValue = intval($stock);
-                        if ($stockValue >= 0) {
-                            $warehouseStocks[$warehouseId] = ['stock' => $stockValue, 'product_variant_id' => null];
+            // 3. Manejo de Imágenes
+            if ($request->hasFile('images')) {
+                \Log::info('📸 [ProductController@update] Procesando imágenes', [
+                    'product_id' => $product->id,
+                    'num_files' => count($request->file('images'))
+                ]);
+
+                $currentMaxOrder = $product->images()->max('order') ?? 0;
+                foreach ($request->file('images') as $index => $file) {
+                    try {
+                        \Log::info('🔍 [ProductController@update] Procesando archivo', [
+                            'index' => $index,
+                            'original_name' => $file->getClientOriginalName(),
+                            'size' => $file->getSize(),
+                            'mime' => $file->getMimeType(),
+                            'is_valid' => $file->isValid(),
+                            'error' => $file->getError()
+                        ]);
+
+                        $path = $file->store('products', 'public');
+
+                        if (!$path) {
+                            \Log::error('❌ [ProductController@update] store() retornó false/null');
+                            continue;
                         }
+
+                        // Para multi-tenancy: construir URL con tenant
+                        $tenantId = tenant('id');
+                        if ($tenantId) {
+                            $url = "/storage{$tenantId}/{$path}";
+                        } else {
+                            $url = Storage::url($path);
+                        }
+
+                        \Log::info('💾 [ProductController@update] Imagen guardada', [
+                            'path' => $path,
+                            'url' => $url,
+                            'order' => $currentMaxOrder + $index + 1,
+                            'exists_in_disk' => Storage::disk('public')->exists($path)
+                        ]);
+
+                        $product->images()->create([
+                            'image_url' => $url,
+                            'is_primary' => $currentMaxOrder === 0 && $index === 0,
+                            'order' => $currentMaxOrder + $index + 1
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('❌ [ProductController@update] Error guardando imagen', [
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString()
+                        ]);
                     }
-                    $product->warehouses()->syncWithoutDetaching($warehouseStocks);
+                }
+            } else {
+                \Log::warning('⚠️ [ProductController@update] No se detectaron archivos de imagen en el request');
+            }
+
+            // 4. Manejar variantes y opciones
+            if ($newType === 'simple') {
+                // PRODUCTO SIMPLE - debe tener exactamente 1 variante sin opciones
+
+                // Eliminar opciones del producto
+                $product->options()->delete();
+
+                // ✅ Obtener precio desde sale_price o desde variants[0].price
+                $salePrice = $request->input('sale_price') ?? $request->variants[0]['price'] ?? 0;
+
+                // ✅ Obtener costo desde múltiples fuentes posibles
+                $costPrice = $request->cost_price
+                    ?? $request->variants[0]['cost']
+                    ?? $request->variants[0]['cost_price']
+                    ?? 0;
+
+                \Log::info('💰 [ProductController] Precios detectados:', [
+                    'sale_price' => $salePrice,
+                    'cost_price' => $costPrice,
+                    'request->cost_price' => $request->cost_price,
+                    'variants[0][cost]' => $request->variants[0]['cost'] ?? 'no existe',
+                    'variants[0][cost_price]' => $request->variants[0]['cost_price'] ?? 'no existe'
+                ]);
+
+                // Obtener o crear la variante simple
+                $variant = $product->variants()->first();
+                if (!$variant) {
+                    $variant = $product->variants()->create([
+                        'sku' => $request->sku ?? "SKU-{$product->id}",
+                        'price' => $salePrice,
+                        'cost_price' => $costPrice,
+                        'stock' => $request->variants[0]['stock'] ?? 0,
+                        'active' => true,
+                    ]);
+                } else {
+                    // Actualizar variante existente
+                    $variant->update([
+                        'sku' => $request->sku ?? $variant->sku,
+                        'price' => $salePrice,
+                        'cost_price' => $costPrice,
+                        'stock' => $request->variants[0]['stock'] ?? $variant->stock,
+                    ]);
                 }
 
-                // Recalcular stock total
-                $totalStock = $product->warehouses()->whereNull('product_variant_id')->sum('stock');
-                $product->update(['current_stock' => $totalStock]);
+                // ✅ Limpiar opciones del producto simple (no de las variantes)
+                // Los productos simples NO tienen opciones
+
+                // Eliminar otras variantes si existen
+                $product->variants()->where('id', '!=', $variant->id)->delete();
+
+                // Actualizar stock en warehouse (primera bodega disponible)
+                $warehouseId = $request->warehouse_id ?? Warehouse::first()->id ?? 1;
+                DB::table('product_warehouse')
+                    ->updateOrInsert(
+                        [
+                            'product_id' => $product->id,
+                            'product_variant_id' => $variant->id,
+                            'warehouse_id' => $warehouseId
+                        ],
+                        ['stock' => $variant->stock]
+                    );
+
+                // Actualizar stock total del producto y sale_price
+                $product->update([
+                    'current_stock' => $variant->stock,
+                    'sale_price' => $salePrice
+                ]);
 
             } else {
-                // --- LÓGICA VARIABLE ---
-                // Por ahora, solo permitimos actualizar campos básicos del padre y agregar imágenes.
-                // La edición de variantes (agregar/quitar opciones) es compleja y requiere un endpoint dedicado o lógica avanzada.
-                // Si se envían variantes, podríamos intentar actualizar precios/stock de las existentes por SKU.
+                // PRODUCTO VARIABLE - puede tener múltiples variantes con opciones
 
-                if ($request->has('variants') && is_array($request->variants)) {
-                    foreach ($request->variants as $variantData) {
-                        if (isset($variantData['id'])) {
-                            // Actualizar variante existente
-                            $variant = ProductVariant::find($variantData['id']);
-                            if ($variant && $variant->product_id === $product->id) {
-                                $variant->update([
-                                    'sku' => $variantData['sku'] ?? $variant->sku,
-                                    'price' => $variantData['price'] ?? $variant->price,
-                                    'stock' => $variantData['stock'] ?? $variant->stock
-                                ]);
+                // Guardar opciones del producto
+                if ($request->has('options') && is_array($request->options)) {
+                    // Eliminar opciones anteriores
+                    $product->options()->delete();
 
-                                // Actualizar stock en warehouse (asumiendo warehouse_id del request o default)
-                                $warehouseId = $request->warehouse_id ?? 1;
-                                // Buscar si existe registro en pivot, si no crear
-                                $existingPivot = DB::table('product_warehouse')
-                                    ->where('product_id', $product->id)
-                                    ->where('product_variant_id', $variant->id)
-                                    ->where('warehouse_id', $warehouseId)
-                                    ->first();
-
-                                if ($existingPivot) {
-                                    DB::table('product_warehouse')
-                                        ->where('id', $existingPivot->id)
-                                        ->update(['stock' => $variantData['stock'] ?? 0]);
-                                } else {
-                                    $product->warehouses()->attach($warehouseId, [
-                                        'product_variant_id' => $variant->id,
-                                        'stock' => $variantData['stock'] ?? 0
-                                    ]);
-                                }
-                            }
+                    // Crear nuevas opciones
+                    foreach ($request->options as $optionData) {
+                        if (!empty($optionData['values'])) {
+                            $product->options()->create([
+                                'name' => $optionData['name'],
+                                'values' => json_encode($optionData['values'])
+                            ]);
                         }
                     }
+                }
 
-                    // 🛠️ FIX: Recalcular stock total del padre desde product_warehouse (NO desde variants.stock)
+                // Actualizar o crear variantes
+                if ($request->has('variants') && is_array($request->variants)) {
+                    // Eliminar variantes anteriores
+                    $product->variants()->delete();
+
+                    $warehouseId = $request->warehouse_id ?? Warehouse::first()->id ?? 1;
+
+                    foreach ($request->variants as $variantData) {
+                        $variant = $product->variants()->create([
+                            'sku' => $variantData['sku'],
+                            'price' => $variantData['price'],
+                            'cost_price' => $variantData['cost'] ?? $variantData['cost_price'] ?? 0,
+                            'stock' => $variantData['stock'] ?? 0,
+                            'active' => $variantData['active'] ?? true,
+                        ]);
+
+                        // ✅ Guardar opciones de la variante en options_summary (JSON)
+                        if (isset($variantData['options']) && is_array($variantData['options'])) {
+                            $variant->update([
+                                'options_summary' => json_encode($variantData['options'])
+                            ]);
+                        }
+
+                        // Agregar stock en warehouse
+                        DB::table('product_warehouse')->insert([
+                            'product_id' => $product->id,
+                            'product_variant_id' => $variant->id,
+                            'warehouse_id' => $warehouseId,
+                            'stock' => $variant->stock
+                        ]);
+                    }
+
+                    // Recalcular stock total
                     $totalStock = DB::table('product_warehouse')
                         ->where('product_id', $product->id)
                         ->sum('stock');
 
                     $product->update(['current_stock' => $totalStock]);
-
-                    \Log::info('✅ Stock total recalculado para producto variable:', [
-                        'product_id' => $product->id,
-                        'total_stock' => $totalStock
-                    ]);
                 }
             }
+
+            \Log::info('✅ Producto actualizado correctamente', [
+                'product_id' => $product->id,
+                'type' => $newType,
+                'variants_count' => $product->variants()->count()
+            ]);
 
             return response()->json([
                 'success' => true,

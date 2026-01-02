@@ -400,7 +400,14 @@ const isNewProduct = (product) => {
 }
 
 const hasVariants = (product) => {
-  return product.variants && product.variants.length > 0
+  if (!product.variants || product.variants.length === 0) return false
+  // Producto simple: 1 variante sin opciones
+  if (product.variants.length === 1) {
+    const variant = product.variants[0]
+    return variant.options && variant.options.length > 0
+  }
+  // Múltiples variantes
+  return true
 }
 
 const getMinVariantPrice = (product) => {

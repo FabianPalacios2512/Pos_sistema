@@ -853,6 +853,7 @@
                 ref="fashionFormRef"
                 :categories="categories"
                 :suppliers="suppliers"
+                :editing-product="selectedProduct"
                 @save="handleFashionSave"
                 @cancel="showProductModal = false"
                 @create-category="showCategoryModal = true"
@@ -1489,7 +1490,7 @@
                   @click="saveFashionProduct"
                   :disabled="loading"
                   class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-lg font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            {{ loading ? 'Guardando...' : 'Crear Producto' }}
+            {{ loading ? 'Guardando...' : (isEditing ? 'Actualizar Producto' : 'Crear Producto') }}
           </button>
         </div>
       </div>
@@ -2010,7 +2011,7 @@
 
     <!-- Modal: Crear Categoría -->
     <div v-if="showCategoryModal" 
-         class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
          @click.self="showCategoryModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-lg w-full animate-fade-in">
         <!-- Header Simple -->
@@ -2087,7 +2088,7 @@
 
   <!-- Modal: Crear Proveedor Rápido -->
   <div v-if="showSupplierModal" 
-       class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+       class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
        @click.self="showSupplierModal = false">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full animate-fade-in">
       <!-- Header -->
@@ -2452,7 +2453,24 @@ const router = useRouter()
 
 // 🖼️ Función utilitaria para manejo inteligente de imágenes
 const getProductImage = (product) => {
-  // Intentar múltiples propiedades de imagen
+  // 1. Intentar con el array de imágenes (relación images)
+  if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
+    const primaryImage = product.images.find(img => img.is_primary) || product.images[0]
+    if (primaryImage?.image_url) {
+      const imageUrl = primaryImage.image_url
+      // Si la imagen es base64, devolverla directamente
+      if (imageUrl.startsWith('data:image')) {
+        return imageUrl
+      }
+      // Fix relative URLs for tenant backend
+      if (imageUrl.startsWith('/storage')) {
+        return `http://${window.location.hostname}:8000${imageUrl}`
+      }
+      return imageUrl
+    }
+  }
+  
+  // 2. Intentar múltiples propiedades de imagen (fallback)
   const imageUrl = product?.image_url || product?.image || product?.img || product?.photo
   
   // Si la imagen es base64 (data:image), devolverla directamente
@@ -3564,6 +3582,9 @@ const updateAllowDecimal = () => {
 }
 
 const openCreateModal = async () => {
+  // Limpiar producto seleccionado (importante para que el watcher en FashionProductForm no cargue datos)
+  selectedProduct.value = null
+  
   // VALIDACIÓN: Verificar si existen categorías primero
   if (!categories.value || categories.value.length === 0) {
     showNotification(
@@ -3733,6 +3754,18 @@ const editProduct = async (product) => {
     }
   } else {
     imageUploadMethod.value = 'url'
+  }
+  
+  // 👗 Si es modo fashion, cargar detalles completos del producto
+  if (isFashionMode.value) {
+    try {
+      const response = await productsService.getById(product.id)
+      if (response.success && response.data) {
+        selectedProduct.value = response.data
+      }
+    } catch (error) {
+      console.error('Error cargando detalles del producto:', error)
+    }
   }
   
   showProductModal.value = true
@@ -4309,69 +4342,123 @@ const handleFashionSave = async (productData) => {
     showProductModal.value = false // Cerrar modal inmediatamente
     
     console.log('👗 Enviando producto fashion al backend:', productData)
+    console.log('💰 Verificando costos:', {
+      'productData.variants': productData.variants,
+      'variant[0].cost': productData.variants?.[0]?.cost,
+      'variant[0].cost_price': productData.variants?.[0]?.cost_price
+    })
 
-    // Convertir a FormData para soportar imágenes
-    const formData = new FormData()
-    formData.append('name', productData.name)
-    formData.append('product_type', productData.type || 'variable') // Fallback a 'variable'
-    // Solo agregar category_id si tiene valor válido
-    if (productData.category_id) {
-      formData.append('category_id', productData.category_id)
-    }
-    // Agregar supplier_id si existe
-    if (productData.supplier_id) {
-      formData.append('supplier_id', productData.supplier_id)
-    }
-    formData.append('description', productData.description || '')
-    formData.append('sku', productData.sku || `SKU-${Date.now()}`) // Agregar SKU (requerido)
+    // Detectar si hay imágenes nuevas (archivos)
+    const hasNewImages = productData.images && productData.images.some(img => img.file)
     
-    // Options
-    if (productData.options) {
-      productData.options.forEach((opt, index) => {
-        formData.append(`options[${index}][name]`, opt.name)
-        if (opt.values) {
-          opt.values.forEach((val, vIndex) => {
-            formData.append(`options[${index}][values][${vIndex}]`, val)
-          })
-        }
-      })
-    }
+    // Determinar si es producto simple
+    const isSimpleProduct = productData.type === 'simple'
+    
+    let response
+    
+    if (hasNewImages) {
+      // ===== USAR FORMDATA SI HAY IMÁGENES =====
+      const formData = new FormData()
+      formData.append('name', productData.name)
+      formData.append('product_type', productData.type || 'variable')
+      
+      if (productData.category_id) {
+        formData.append('category_id', productData.category_id)
+      }
+      if (productData.supplier_id) {
+        formData.append('supplier_id', productData.supplier_id)
+      }
+      formData.append('description', productData.description || '')
+      formData.append('sku', productData.sku || `SKU-${Date.now()}`)
+      
+      const firstVariant = productData.variants && productData.variants[0]
+      formData.append('cost_price', firstVariant?.cost || 0)
+      
+      // ✅ AGREGAR sale_price si es producto simple
+      if (isSimpleProduct && firstVariant) {
+        formData.append('sale_price', firstVariant.price || 0)
+      }
+      
+      // Options
+      if (productData.options) {
+        productData.options.forEach((opt, index) => {
+          formData.append(`options[${index}][name]`, opt.name)
+          if (opt.values) {
+            opt.values.forEach((val, vIndex) => {
+              formData.append(`options[${index}][values][${vIndex}]`, val)
+            })
+          }
+        })
+      }
 
-    // Variants
-    if (productData.variants) {
-      productData.variants.forEach((variant, index) => {
-        formData.append(`variants[${index}][sku]`, variant.sku)
-        formData.append(`variants[${index}][price]`, variant.price)
-        formData.append(`variants[${index}][cost_price]`, variant.cost || 0)
-        formData.append(`variants[${index}][stock]`, variant.stock)
-        formData.append(`variants[${index}][active]`, variant.active ? 1 : 0)
-        
-        // Variant options
-        if (variant.options) {
-          variant.options.forEach((opt, oIndex) => {
-            formData.append(`variants[${index}][options][${oIndex}][name]`, opt.name)
-            formData.append(`variants[${index}][options][${oIndex}][value]`, opt.value)
-          })
-        }
-      })
-    }
+      // Variants
+      if (productData.variants) {
+        productData.variants.forEach((variant, index) => {
+          formData.append(`variants[${index}][sku]`, variant.sku)
+          formData.append(`variants[${index}][price]`, variant.price)
+          formData.append(`variants[${index}][cost_price]`, variant.cost || 0)
+          formData.append(`variants[${index}][stock]`, variant.stock)
+          formData.append(`variants[${index}][active]`, variant.active ? 1 : 0)
+          
+          // Variant options
+          if (variant.options) {
+            variant.options.forEach((opt, oIndex) => {
+              formData.append(`variants[${index}][options][${oIndex}][name]`, opt.name)
+              formData.append(`variants[${index}][options][${oIndex}][value]`, opt.value)
+            })
+          }
+        })
+      }
 
-    // Images
-    if (productData.images && productData.images.length > 0) {
-      productData.images.forEach((img, index) => {
-        if (img.file) {
-          formData.append(`images[${index}]`, img.file)
-        }
-      })
-    }
+      // Images - ✅ Enviar como array para que PHP lo interprete correctamente
+      if (productData.images && productData.images.length > 0) {
+        productData.images.forEach((img) => {
+          if (img.file) {
+            formData.append(`images[]`, img.file) // ✅ Usar images[] en lugar de images[index]
+          }
+        })
+      }
 
-    // Enviar al backend
-    const response = await productsService.create(formData)
+      // Detectar si es edición o creación
+      if (isEditing.value && productForm.value.id) {
+        formData.append('_method', 'PUT')
+        response = await productsService.update(productForm.value.id, formData)
+      } else {
+        response = await productsService.create(formData)
+      }
+    } else {
+      // ===== USAR JSON SI NO HAY IMÁGENES =====
+      const payload = {
+        name: productData.name,
+        product_type: productData.type || 'variable',
+        category_id: productData.category_id,
+        supplier_id: productData.supplier_id,
+        description: productData.description || '',
+        sku: productData.sku || `SKU-${Date.now()}`,
+        cost_price: productData.variants?.[0]?.cost || 0,
+        options: productData.options || [],
+        variants: productData.variants || []
+      }
+      
+      // ✅ AGREGAR sale_price si es producto simple
+      if (isSimpleProduct && productData.variants?.[0]) {
+        payload.sale_price = productData.variants[0].price || 0
+      }
+      
+      // Detectar si es edición o creación
+      if (isEditing.value && productForm.value.id) {
+        response = await productsService.update(productForm.value.id, payload)
+      } else {
+        response = await productsService.create(payload)
+      }
+    }
     
     if (response.success) {
       showNotification(
-        'Producto creado',
-        'El producto con variantes se ha creado correctamente',
+        isEditing.value ? 'Producto actualizado' : 'Producto creado',
+        isEditing.value 
+          ? 'El producto se ha actualizado correctamente'
+          : 'El producto se ha creado correctamente',
         'success'
       )
       await loadProducts() // Recargar lista
@@ -4382,7 +4469,7 @@ const handleFashionSave = async (productData) => {
     console.error('Error saving fashion product:', error)
     showNotification(
       'Error',
-      'No se pudo crear el producto: ' + error.message,
+      'No se pudo guardar el producto: ' + error.message,
       'error'
     )
     showProductModal.value = true // Reabrir modal si hay error

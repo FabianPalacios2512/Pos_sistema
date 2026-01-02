@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ePayco - Plan $100k</title>
+    <script src="https://checkout.epayco.co/checkout.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #6B46C1;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #553C9A;
+        }
+        .info {
+            background: #EBF8FF;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3182CE;
+        }
+        .price {
+            font-size: 48px;
+            font-weight: bold;
+            color: #6B46C1;
+            text-align: center;
+            margin: 20px 0;
+        }
+        h1 {
+            color: #2D3748;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧪 Test ePayco - Plan $100k</h1>
+        
+        <div class="info">
+            <strong>⚠️ Nota:</strong> Esta es una prueba directa con el único monto que funciona en tu cuenta de ePayco.
+        </div>
+
+        <div class="price">$100.000</div>
+        <p style="text-align: center; color: #718096;">Plan Empresarial - Mensual</p>
+
+        <ul style="color: #4A5568; line-height: 1.8;">
+            <li>✅ Usuarios Ilimitados</li>
+            <li>✅ Multi-Sede / Multi-Caja</li>
+            <li>✅ Tienda Web + WhatsApp</li>
+            <li>✅ Agente IA + CRM</li>
+            <li>✅ Soporte 24/7</li>
+        </ul>
+
+        <button onclick="pagarAhora()">💳 Pagar con ePayco</button>
+
+        <div style="margin-top: 20px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #E53E3E;">
+            <strong>Tarjeta de prueba:</strong><br>
+            Número: 4575 6231 0548 2283<br>
+            CVV: 123<br>
+            Fecha: 12/25
+        </div>
+    </div>
+
+    <script>
+        function pagarAhora() {
+            const tenantId = 'fabiana'; // Cambia esto por tu tenant_id real
+            const reference = `test_100k_${Date.now()}`;
+            
+            // Configurar ePayco
+            const handler = ePayco.checkout.configure({
+                key: '2943652c673afffaa5b7b67829f00a0c',
+                test: false // Modo producción
+            });
+
+            // Abrir checkout
+            handler.open({
+                name: 'Plan Empresarial - 105 POS',
+                description: 'Suscripción Mensual - Plan Enterprise',
+                invoice: reference,
+                currency: 'cop',
+                amount: '100000', // $100.000 - EL ÚNICO QUE FUNCIONA
+                tax_base: '0',
+                tax: '0',
+                country: 'co',
+                lang: 'es',
+                external: 'true',
+                response: window.location.origin + '/payment/success',
+                confirmation: 'https://105pos.pro/api/epayco/webhook',
+                name_billing: 'Test Cliente',
+                address_billing: 'Calle 123 # 45-67',
+                type_doc_billing: 'cc',
+                mobilephone_billing: '3000000000',
+                number_doc_billing: '1000000000',
+                email_billing: 'cliente@105pos.pro',
+                extra1: tenantId,
+                extra2: 'enterprise',
+                extra3: 'test'
+            });
+
+            console.log('🚀 Abriendo ePayco con $100.000');
+            console.log('📋 Referencia:', reference);
+        }
+    </script>
+</body>
+</html>

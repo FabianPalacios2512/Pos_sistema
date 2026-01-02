@@ -313,8 +313,26 @@ router.beforeEach((to, from, next) => {
 
 // Guard para redirección a onboarding (primera vez)
 router.beforeEach(async (to, from, next) => {
-  // Excluir SOLO rutas públicas reales (login, register, catalog, select-plan, payment/*)
-  const publicRoutes = ['/login', '/register', '/catalog', '/select-plan', '/payment/success', '/payment/failure', '/payment/pending']
+  // 🔥 PRIORIDAD: Si va a /pos, dejarlo pasar para que el modal maneje la suscripción
+  if (to.path === '/pos') {
+    next()
+    return
+  }
+  
+  // Excluir SOLO rutas públicas reales (login, register, catalog, select-plan, payment/*, términos, etc.)
+  const publicRoutes = [
+    '/login', 
+    '/register', 
+    '/catalog', 
+    '/select-plan',  // ✅ CRÍTICO: Permitir acceso a selección de planes para renovación
+    '/payment/success', 
+    '/payment/failure', 
+    '/payment/pending',
+    '/terminos-condiciones',
+    '/politica-privacidad',
+    '/forgot-password',
+    '/reset-password'
+  ]
   
   // Si es una ruta pública real, permitir acceso sin verificar onboarding
   if (publicRoutes.includes(to.path)) {
@@ -332,11 +350,30 @@ router.beforeEach(async (to, from, next) => {
       return
     }
     
-    // ✅ VALIDACIÓN DESDE BASE DE DATOS (no localStorage)
-    // Cargar systemSettings si no están cargados
+    console.log('🔍 Router Guard - Navegando de', from.path, 'a', to.path)
+    console.log('🔍 Router Guard - isSubscriptionExpired:', appStore.isSubscriptionExpired)
+    
+    // ⛔ NUEVO FLUJO: Ya NO bloquear rutas cuando la suscripción expira
+    // El modal aparecerá automáticamente en el POS y bloqueará el acceso
+    // Solo cargar datos si no están cargados
     if (!appStore.systemSettings || Object.keys(appStore.systemSettings).length === 0) {
       await appStore.loadSystemSettings()
+      console.log('✅ SystemSettings cargados, isSubscriptionExpired:', appStore.isSubscriptionExpired)
     }
+    
+    // 🔥 PRIORIDAD MÁXIMA: Si suscripción expirada, ir directo al POS
+    // El modal se encargará de bloquear todo
+    if (appStore.isSubscriptionExpired) {
+      console.log('🔥 Suscripción expirada - Forzando acceso a /pos para mostrar modal')
+      if (to.path !== '/pos' && !to.path.startsWith('/payment/')) {
+        next('/pos')
+        return
+      }
+      next()
+      return
+    }
+    
+    // Permitir navegación normal - el modal se encargará de bloquear si es necesario
 
     const onboardingCompleted = appStore.systemSettings.onboarding_completed || false
 

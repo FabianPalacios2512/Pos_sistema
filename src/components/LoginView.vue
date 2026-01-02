@@ -404,17 +404,17 @@ const loginWithGoogle = async () => {
 
 // Verificar mensaje de registro exitoso
 onMounted(async () => {
-  // 🎯 AUTO-LOGIN desde dominio central
+  // 🎯 AUTO-LOGIN desde dominio central (SILENCIOSO - sin mostrar pantalla de login)
   const autoLoginCreds = sessionStorage.getItem('auto_login_credentials')
   if (autoLoginCreds) {
     try {
       loading.value = true
-      message.text = 'Iniciando sesión automáticamente...'
+      message.text = 'Ingresando a tu cuenta...'
       message.type = 'info'
       
       const creds = JSON.parse(autoLoginCreds)
       
-      // Limpiar credenciales temporales
+      // Limpiar credenciales temporales ANTES de hacer el login
       sessionStorage.removeItem('auto_login_credentials')
       
       // 🔐 LOGIN DIRECTO EN EL TENANT (sin redirección)
@@ -423,24 +423,18 @@ onMounted(async () => {
         password: creds.password
       })
 
-      console.log('✅ Auto-login exitoso')
-      message.text = '✅ Inicio de sesión exitoso. Redirigiendo...'
-      message.type = 'success'
-
-      // Verificar rol y redireccionar al POS
+      // Verificar rol y redireccionar INMEDIATAMENTE al POS (sin delay)
       const user = response.data?.user || response.user
       
-      setTimeout(() => {
-        if (user?.is_super_admin || user?.role?.name === 'superadmin') {
-          router.push('/admin/god-mode')
-        } else {
-          router.push('/pos')
-        }
-      }, 500)
+      if (user?.is_super_admin || user?.role?.name === 'superadmin') {
+        router.push('/admin/god-mode')
+      } else {
+        router.push('/pos')
+      }
       
       return
     } catch (error) {
-      console.error('Error en auto-login:', error)
+      console.error('❌ Error en auto-login:', error)
       sessionStorage.removeItem('auto_login_credentials')
       message.text = 'Error al iniciar sesión. Por favor, intenta manualmente.'
       message.type = 'error'
@@ -469,8 +463,6 @@ onMounted(async () => {
   const googleLoginToken = urlParams.get('google_login_token')
 
   if (googleLoginToken) {
-    console.log('🔑 Token de Google detectado en URL, procesando autenticación...')
-    
     try {
       loading.value = true
       message.text = 'Iniciando sesión con Google...'
@@ -484,20 +476,11 @@ onMounted(async () => {
         }
       })
       
-      console.log('📡 Obteniendo datos de sesión de Google desde:', `${window.location.origin}/api/auth/google/login-session?token=${googleLoginToken}`)
-      
       // Obtener sesión usando el token
       const response = await cleanAxios.get(`/api/auth/google/login-session?token=${googleLoginToken}`)
       
-      console.log('📦 Respuesta del servidor:', response.data)
-      
       if (response.data.success && response.data.data) {
         const { token, user } = response.data.data
-        
-        console.log('✅ Datos de usuario recibidos:', user)
-        console.log('✅ Rol del usuario:', user.role)
-        console.log('✅ Permisos del rol:', user.role?.permissions)
-        console.log('✅ Token Sanctum recibido:', token.substring(0, 20) + '...')
         
         // 🔥 IMPORTANTE: Guardar token Sanctum real y datos de usuario
         localStorage.setItem('authToken', token)
@@ -506,16 +489,11 @@ onMounted(async () => {
         // Configurar token en axios global
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
         
-        console.log('✅ Token Sanctum guardado en localStorage y axios configurado')
-        console.log('✅ Usuario autenticado con Google:', user.name, '(', user.email, ')')
-        console.log('✅ Usuario tiene', user.role?.permissions?.length || 0, 'permisos')
-        
         message.text = '✅ Inicio de sesión exitoso. Redirigiendo...'
         message.type = 'success'
         
         // Pequeño delay para que el usuario vea el mensaje de éxito
         setTimeout(() => {
-          console.log('🔄 Redirigiendo a /pos')
           window.location.href = '/pos'
         }, 500)
       } else {
@@ -606,22 +584,19 @@ const handleLogin = async () => {
       })
 
       if (response.data.success) {
-        message.text = '✅ ' + response.data.message
+        message.text = '✅ Accediendo a tu cuenta...'
         message.type = 'success'
         
-        console.log('✅ Tenant encontrado:', response.data.data.tenant_domain)
-        console.log('🔄 Redirigiendo a:', response.data.data.redirect_url)
-        
-        // Guardar credenciales temporalmente para auto-login en el tenant
+        // Guardar credenciales temporalmente para auto-login silencioso en el tenant
         sessionStorage.setItem('auto_login_credentials', JSON.stringify({
           email: response.data.data.credentials.email,
           password: response.data.data.credentials.password
         }))
         
-        // Esperar un momento y redirigir al tenant
+        // Redirigir inmediatamente al tenant (el auto-login será transparente)
         setTimeout(() => {
           window.location.href = response.data.data.redirect_url + '/login'
-        }, 1000)
+        }, 800)
         
         return
       }
@@ -655,14 +630,12 @@ const handleLogin = async () => {
 
     // Verificar rol y redireccionar
     const user = response.data?.user || response.user // Compatibilidad con ambas estructuras
-    console.log('Usuario autenticado:', user)
 
     // 🎯 VERIFICAR SI HAY SUBDOMAIN PENDIENTE (desde registro trial)
     const registrationSuccess = localStorage.getItem('registration_success')
     if (registrationSuccess) {
       const data = JSON.parse(registrationSuccess)
       if (data.subdomain) {
-        console.log('✅ Redirigiendo a tenant:', data.subdomain)
         localStorage.removeItem('registration_success')
         
         // Esperar un momento para mostrar el mensaje

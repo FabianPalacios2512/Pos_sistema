@@ -62,6 +62,16 @@ apiClient.interceptors.response.use(
   */
     }
     
+    // 🔥 DETECTAR SUSCRIPCIÓN EXPIRADA EN RESPUESTAS EXITOSAS
+    if (response.data?._subscription_expired === true) {
+      console.log('⛔ Suscripción expirada detectada - activando modal')
+      // Actualizar el store para mostrar el modal
+      import('@/stores/app').then(({ useAppStore }) => {
+        const appStore = useAppStore()
+        appStore.isSubscriptionExpired = true
+      })
+    }
+    
     return response
   },
   (error) => {
@@ -83,11 +93,21 @@ apiClient.interceptors.response.use(
         case 401:
           // Token expirado o inválido
           console.log('🔒 Token expirado o inválido detectado')
+          
+          // 🔥 NO hacer logout si estamos en rutas relacionadas con suscripción expirada
+          const allowedExpiredRoutes = ['/subscription-expired', '/select-plan', '/payment/success', '/payment/failure', '/payment/pending']
+          const currentPath = window.location.pathname
+          
+          if (allowedExpiredRoutes.includes(currentPath)) {
+            console.log('⚠️ Error 401 en ruta de renovación - NO haciendo logout')
+            break
+          }
+          
           localStorage.removeItem('authToken')
           localStorage.removeItem('user')
           
           // Solo redirigir si no estamos ya en login
-          if (window.location.pathname !== '/login') {
+          if (currentPath !== '/login') {
             // Redirigir con información de expiración
             window.location.href = '/login?reason=expired&message=Tu sesión ha expirado'
           }
@@ -96,6 +116,19 @@ apiClient.interceptors.response.use(
         case 403:
           // Sin permisos
           // console.warn('Acceso denegado:', data.message)
+          
+          // Detectar si es por suscripción expirada
+          if (data?.subscription_expired === true || (data?.message && (
+              data.message.includes('suscripción ha finalizado') ||
+              data.message.includes('suscripción ha expirado') || 
+              data.message.includes('plan ha expirado') ||
+              data.message.includes('renueva tu plan')
+          ))) {
+            console.log('⛔ Suscripción expirada detectada en apiClient')
+            // YA NO REDIRIGIR - El modal aparecerá automáticamente en el POS
+            // Solo registrar el evento
+            console.log('⛔ Modal de renovación se mostrará automáticamente')
+          }
           break
           
         case 404:

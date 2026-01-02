@@ -1,4 +1,5 @@
 <template>
+  <div>
   <!-- MODAL DE ÉXITO PARA TRIAL -->
   <transition
     enter-active-class="transition ease-out duration-300"
@@ -108,11 +109,13 @@
         </div>
       </div>
 
-      <!-- 🏢 GRID DE 4 PLANES: Arquitectónico y Espacioso -->
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-12">
+      <!-- 🏢 GRID DE 3 PLANES: Centrado y Profesional -->
+      <div class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
         
-        <!-- 🎁 PLAN TRIAL: 3 Días Gratis -->
+        <!-- 🎁 PLAN TRIAL: 3 Días Gratis (Oculto en renovación) -->
         <div 
+          v-if="!isRenewalMode"
           @click="selectedPlan = 'trial_express'"
           class="relative bg-white rounded-2xl border shadow-sm transition-all duration-300 cursor-pointer p-8 hover:shadow-xl hover:-translate-y-1"
           :class="selectedPlan === 'trial_express' ? 'border-slate-400 ring-2 ring-slate-200' : 'border-slate-200'"
@@ -258,13 +261,7 @@
                 <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                 </svg>
-                <span>Catálogo Web</span>
-              </div>
-              <div class="flex items-start gap-3 text-slate-700">
-                <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-                <span>Envío Facturas WhatsApp</span>
+                <span>Radio Escucha (Sonido)</span>
               </div>
               <div class="flex items-start gap-3 text-slate-700">
                 <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -390,7 +387,13 @@
                 <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                 </svg>
-                <span>Catálogo Web</span>
+                <span>Tienda Web</span>
+              </div>
+              <div class="flex items-start gap-3 text-slate-700">
+                <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span>Envío Facturas WhatsApp</span>
               </div>
               <div class="flex items-start gap-3 text-slate-700">
                 <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -535,20 +538,8 @@
             </div>
           </div>
         </div>
-
       </div>
-
-      <!-- Trust Line: Alojamiento Incluido -->
-      <div class="text-center mb-6">
-        <div class="inline-flex items-center gap-2 px-5 py-2 bg-slate-100 rounded-lg border border-slate-200">
-          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
-          </svg>
-          <span class="text-sm font-medium text-slate-700">
-            Alojamiento y Dominio Incluidos
-          </span>
-        </div>
-      </div>
+      </div> <!-- Cierre max-w-5xl mx-auto -->
 
       <!-- Trust Badges: Discreto y Profesional -->
       <div class="flex flex-wrap items-center justify-center gap-6 mb-8 text-xs font-medium text-slate-500">
@@ -574,13 +565,16 @@
         </div>
       </div>
 
-    </div>
-  </div>
+    </div> <!-- Cierre max-w-7xl mx-auto -->
+  </div> <!-- Cierre min-h-screen bg-slate-50 -->
+  </div> <!-- Cierre wrapper principal -->
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import authService from '../services/authService'
+import { appStore } from '../store/appStore'
 
 // Estado
 const selectedPlan = ref(null)
@@ -592,6 +586,7 @@ const tenantId = ref(null)
 const redirectUrl = ref('')
 const showTrialSuccessModal = ref(false)
 const countdownSeconds = ref(5)
+const isRenewalMode = ref(false)
 
 // Detectar ambiente de desarrollo
 const isDevelopment = ref(
@@ -600,14 +595,106 @@ const isDevelopment = ref(
 )
 
 // Cargar datos del registro desde URL params (cross-domain) o localStorage (fallback)
-onMounted(() => {
-  // 🔑 PRIORIDAD 1: Leer desde URL params (cuando vienes del registro en otro dominio)
+onMounted(async () => {
+  // Limpiar flag de redirección al montar
+  if (window.__redirecting_to_expired) {
+    delete window.__redirecting_to_expired
+  }
+
+  // 🔍 DEBUG: Verificar estado de autenticación
+  const token = localStorage.getItem('authToken')
+  const userStr = localStorage.getItem('user')
+  console.log('🔍 PlanSelection Debug:', { 
+    token: !!token, 
+    user: !!userStr, 
+    isAuthenticated: authService.isAuthenticated() 
+  })
+
+  // 🚨 PRIORIDAD MÁXIMA: Leer URL params una sola vez
   const urlParams = new URLSearchParams(window.location.search)
+  
+  // Detectar parámetro ?renewal=true (indica renovación explícita)
+  const isRenewalParam = urlParams.get('renewal') === 'true'
+  if (isRenewalParam) {
+    console.log('✅ Parámetro ?renewal=true detectado - MODO RENOVACIÓN ACTIVADO')
+    isRenewalMode.value = true
+  }
+  
+  // Leer parámetros de registro (cross-domain)
   const tenantIdParam = urlParams.get('tenant_id')
   const companyParam = urlParams.get('company')
-  const subdomainParam = urlParams.get('subdomain') // 🔥 LEER EL SUBDOMAIN
+  const subdomainParam = urlParams.get('subdomain')
   const redirectParam = urlParams.get('redirect_url')
+
+  // 🔑 PRIORIDAD 0: Verificar si es usuario autenticado (Renovación)
+  // Usar verificación directa de token como fallback si authService falla
+  const isAuthenticatedUser = authService.isAuthenticated() || !!token
   
+  if (isAuthenticatedUser) {
+    console.log('🔄 Modo Renovación Detectado')
+    isRenewalMode.value = true
+    
+    // Intentar obtener datos del store o authService
+    const user = authService.getUser() || (userStr ? JSON.parse(userStr) : null)
+    
+    // Si tenemos el tenant en el store
+    if (appStore.tenant && appStore.tenant.id) {
+      tenantId.value = appStore.tenant.id
+      companyName.value = appStore.businessName || 'Mi Negocio'
+    } else if (user && user.tenant_id) {
+      // Fallback al usuario
+      tenantId.value = user.tenant_id
+      companyName.value = user.company_name || 'Mi Negocio'
+    }
+    
+    // Si no tenemos tenantId, intentar cargar settings
+    if (!tenantId.value) {
+      try {
+        await appStore.loadSystemSettings(true)
+        if (appStore.tenant && appStore.tenant.id) {
+          tenantId.value = appStore.tenant.id
+          companyName.value = appStore.businessName
+        }
+      } catch (e) {
+        console.error('Error cargando datos para renovación', e)
+        // Ignorar errores 403 (suscripción expirada) - es esperado en modo renovación
+        if (e.response?.status !== 403) {
+          console.error('Error no relacionado con suscripción:', e)
+        }
+      }
+    }
+    
+    // Si aún no tenemos tenantId pero tenemos usuario, intentar usar el del usuario
+    if (!tenantId.value && user && user.tenant_id) {
+       tenantId.value = user.tenant_id
+    }
+
+    if (tenantId.value) {
+      console.log('✅ Modo Renovación configurado con Tenant ID:', tenantId.value)
+      return // Ya tenemos los datos necesarios
+    } else {
+      console.warn('⚠️ Modo renovación activo pero no se encontró tenantId')
+      // Intentar recuperar del localStorage como último recurso
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          const u = JSON.parse(storedUser)
+          if (u.tenant_id) {
+            tenantId.value = u.tenant_id
+            console.log('✅ TenantId recuperado de localStorage (fallback final):', tenantId.value)
+            return
+          }
+        } catch (e) { console.error(e) }
+      }
+      
+      // ⚠️ Si llegamos aquí en modo renovación, es un error crítico
+      console.error('❌ Error crítico: Modo renovación activo pero sin Tenant ID')
+      alert('Error: No se pudo identificar tu cuenta. Por favor contacta a soporte.')
+      return // NO redirigir a /register
+    }
+  }
+
+  // 🔑 PRIORIDAD 1: Si hay tenant_id en URL params (cuando vienes del registro en otro dominio)
   if (tenantIdParam) {
     // Datos vienen de URL params (cross-domain desde registro)
     console.log('📦 Cargando datos desde URL params')
@@ -643,9 +730,26 @@ onMounted(() => {
     return
   }
   
-  // Si no hay datos de ninguna fuente, redirigir al registro
-  console.warn('⚠️ No hay datos de registro - redirigiendo a /register')
-  window.location.href = '/register'
+  // ⚠️ VALIDACIÓN FINAL: Solo redirigir si NO es renovación Y NO está autenticado
+  if (isRenewalMode.value) {
+    // ✅ MODO RENOVACIÓN: No hacer validaciones adicionales
+    console.log('✅ Modo Renovación - Saltando validaciones de registro')
+    // Si aún no tenemos tenantId, no es problema - se obtendrá al seleccionar el plan
+    if (!tenantId.value) {
+      console.warn('⚠️ Renovación sin TenantId - se obtendrá después')
+    }
+    return // NO ejecutar más validaciones
+  }
+  
+  // ✅ FIX CRÍTICO: NUNCA redirigir si el usuario está autenticado
+  if (!isAuthenticatedUser) {
+    console.warn('⚠️ No hay datos de registro y no está autenticado - redirigiendo a /register')
+    window.location.href = '/register'
+  } else if (isAuthenticatedUser && !tenantId.value) {
+    // Usuario autenticado pero sin datos - error crítico
+    console.error('❌ Error: Usuario autenticado pero no se pudo obtener Tenant ID')
+    alert('Error: No se pudo identificar tu cuenta. Por favor intenta cerrar sesión y volver a entrar.')
+  }
 })
 
 // Manejo de selección de plan
@@ -658,6 +762,13 @@ const handlePlanSelection = async (plan) => {
   if (plan === 'trial_express') {
     try {
       isProcessing.value = true
+      
+      // 🔥 VALIDACIÓN: Trial NO está disponible en modo renovación
+      if (isRenewalMode.value) {
+        alert('❌ El plan de prueba no está disponible para renovación.\n\nPor favor selecciona uno de los planes de pago.')
+        return
+      }
+      
       await updateTenantPlan(plan)
     } catch (error) {
       console.error('Error activating trial:', error)
@@ -676,6 +787,61 @@ const handlePlanSelection = async (plan) => {
   // Para planes de pago, procesar pago con ePayco
   try {
     isProcessing.value = true
+    
+    // 🔥 VALIDACIÓN CRÍTICA: Asegurar que tenemos tenantId en modo renovación
+    if (isRenewalMode.value && !tenantId.value) {
+      console.warn('⚠️ Modo renovación sin tenantId - obteniendo desde múltiples fuentes...')
+      
+      // PRIORIDAD 1: TenantId guardado específicamente para renovación
+      tenantId.value = localStorage.getItem('expiredTenantId')
+      if (tenantId.value) {
+        console.log('✅ TenantId recuperado desde expiredTenantId:', tenantId.value)
+      } else {
+        // PRIORIDAD 2: Usuario en localStorage
+        let user = authService.getUser()
+        console.log('👤 Usuario desde localStorage:', user)
+        
+        // PRIORIDAD 3: Si no hay usuario en localStorage, intentar obtenerlo del backend
+        if (!user) {
+          console.log('🔄 Usuario no en localStorage, consultando backend /me...')
+          try {
+            const response = await authService.getCurrentUser()
+            if (response.success && response.data?.user) {
+              user = response.data.user
+              console.log('✅ Usuario obtenido del backend:', user)
+              localStorage.setItem('user', JSON.stringify(user))
+            }
+          } catch (error) {
+            console.error('❌ Error obteniendo usuario del backend:', error)
+          }
+        }
+        
+        // PRIORIDAD 4: Intentar extraer tenant_id del usuario
+        if (user) {
+          tenantId.value = user.tenant_id || user.tenantId || localStorage.getItem('tenantId')
+        }
+        
+        // PRIORIDAD 5: Si aún no tenemos tenant_id, intentar obtenerlo del subdominio
+        if (!tenantId.value) {
+          const subdomain = window.location.hostname.split('.')[0]
+          if (subdomain && subdomain !== 'localhost' && subdomain !== '127') {
+            console.log('🌐 Obteniendo tenant desde subdominio:', subdomain)
+            tenantId.value = subdomain
+          }
+        }
+        
+        if (tenantId.value) {
+          console.log('✅ TenantId obtenido:', tenantId.value)
+        } else {
+          throw new Error('No se pudo identificar tu cuenta. Por favor intenta cerrar sesión y volver a entrar.')
+        }
+      }
+    }
+    
+    // Validar que tenemos tenantId antes de continuar
+    if (!tenantId.value) {
+      throw new Error('Error: No se pudo identificar el tenant. Por favor recarga la página.')
+    }
     
     // Calcular precio final
     const basePrice = calculatePlanPrice(plan)
@@ -700,13 +866,27 @@ const handlePlanSelection = async (plan) => {
     // 🔥 Obtener subdomain del tenant desde localStorage
     const registrationData = localStorage.getItem('registration_data')
     let tenantSubdomain = ''
-    if (registrationData) {
+    
+    if (isRenewalMode.value) {
+      // En modo renovación, el subdominio es el actual o el tenant_id
+      tenantSubdomain = window.location.hostname.split('.')[0]
+      if (tenantSubdomain === 'localhost' || tenantSubdomain === 'www') {
+        tenantSubdomain = tenantId.value
+      }
+    } else if (registrationData) {
       const data = JSON.parse(registrationData)
       tenantSubdomain = data.subdomain || ''
     }
     
     // 🔥 Determinar URL de redirección correcta basada en el entorno
     const getRedirectUrl = () => {
+      // Si es renovación, volver al dashboard/pos
+      if (isRenewalMode.value) {
+         const protocol = window.location.protocol
+         const host = window.location.host
+         return `${protocol}//${host}/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&renewal=true`
+      }
+
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return `http://localhost:3000/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
       }

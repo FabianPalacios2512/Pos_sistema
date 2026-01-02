@@ -39,6 +39,9 @@ class EPaycoPaymentController extends Controller
                 'include_dian' => 'sometimes|boolean',
             ]);
 
+            // 🔐 Generar token de verificación único y seguro
+            $verificationToken = hash('sha256', $validated['reference'] . config('app.key') . microtime(true));
+
             // Guardar datos del pago pendiente
             PendingPayment::create([
                 'reference' => $validated['reference'],
@@ -48,18 +51,21 @@ class EPaycoPaymentController extends Controller
                 'amount_in_cents' => $validated['amount'] * 100, // Guardamos en centavos para consistencia
                 'customer_email' => $validated['customer_email'],
                 'status' => 'pending',
-                'gateway' => 'epayco'
+                'gateway' => 'epayco',
+                'verification_token' => $verificationToken
             ]);
 
             Log::info('ePayco: Pending payment guardado', [
                 'reference' => $validated['reference'],
                 'payment_frequency' => $validated['payment_frequency'],
                 'plan' => $validated['plan'],
+                'verification_token' => substr($verificationToken, 0, 16) . '...'
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Transaction initialized'
+                'message' => 'Transaction initialized',
+                'verification_token' => $verificationToken  // 🔑 Devolver token al frontend
             ]);
 
         } catch (\Exception $e) {
@@ -310,6 +316,77 @@ class EPaycoPaymentController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Error activando plan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * 🔒 ENDPOINT SEGURO: Verificar estado de pago con token
+     * Público pero protegido con verification_token
+     * Usado tanto en localhost como producción
+     */
+    public function verifyPaymentWithToken(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'reference' => 'required|string',
+                'verification_token' => 'required|string'
+            ]);
+
+            // Buscar el pago con reference Y token (seguridad doble)
+            $pendingPayment = PendingPayment::where('reference', $validated['reference'])
+                ->where('verification_token', $validated['verification_token'])
+                ->first();
+
+            if (!$pendingPayment) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 'invalid_token',
+                    'message' => 'Token de verificación inválido o pago no encontrado'
+                ], 403);
+            }
+
+            // Verificar que el token no sea muy antiguo (expiración de 1 hora)
+            if ($pendingPayment->created_at->diffInHours(now()) > 1) {
+                return response()->json([
+                    'success' => false,
+                    'status' => 'token_expired',
+                    'message' => 'El token de verificación ha expirado'
+                ], 403);
+            }
+
+            // Si está pendiente, intentar sincronizar con ePayco
+            if ($pendingPayment->status === 'pending') {
+                $this->syncPaymentWithEpayco($pendingPayment);
+                $pendingPayment->refresh();
+            }
+
+            Log::info('✅ Verificación de pago solicitada', [
+                'reference' => $validated['reference'],
+                'status' => $pendingPayment->status,
+                'tenant_id' => $pendingPayment->tenant_id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'status' => $pendingPayment->status,
+                'payment' => [
+                    'reference' => $pendingPayment->reference,
+                    'plan' => $pendingPayment->plan,
+                    'payment_frequency' => $pendingPayment->payment_frequency,
+                    'amount' => $pendingPayment->amount_in_cents / 100,
+                    'tenant_id' => $pendingPayment->tenant_id,
+                    'gateway' => $pendingPayment->gateway,
+                    'created_at' => $pendingPayment->created_at->toIso8601String()
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('❌ Error verificando pago con token: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 

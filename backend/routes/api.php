@@ -134,6 +134,9 @@ Route::post('/epayco/init-transaction', [EPaycoPaymentController::class, 'initTr
 Route::post('/epayco/webhook', [EPaycoPaymentController::class, 'webhook']);
 Route::get('/epayco/check-payment-status/{reference}', [EPaycoPaymentController::class, 'checkPaymentStatus']);
 
+// 🔒 ENDPOINT SEGURO: Verificación de pago con token (público pero protegido)
+Route::post('/epayco/verify-payment', [EPaycoPaymentController::class, 'verifyPaymentWithToken']);
+
 // 🔧 DEV ONLY: Aprobar pago manualmente (cuando webhook no llega en localhost)
 Route::post('/epayco/manual-approve/{reference}', [EPaycoPaymentController::class, 'manualApprove']);
 

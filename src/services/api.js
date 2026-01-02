@@ -82,6 +82,20 @@ export const getAuthHeaders = () => {
 
 // API response wrapper
 export const handleApiResponse = async (response) => {
+  const contentType = response.headers.get('content-type')
+  
+  // Si no es JSON, mostrar el texto de la respuesta
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text().catch(() => 'Sin respuesta')
+    console.error('❌ Respuesta no-JSON del servidor:', {
+      status: response.status,
+      statusText: response.statusText,
+      contentType,
+      body: text.substring(0, 500) // Primeros 500 caracteres
+    })
+    throw new Error(`Error del servidor (${response.status}): ${response.statusText}`)
+  }
+  
   const data = await response.json().catch(() => ({ message: 'Error de conexión' }))
   
   if (!response.ok) {
@@ -100,8 +114,51 @@ export const handleApiResponse = async (response) => {
       }
       throw error
     }
+
+    // ⛔ MANEJO DE ERROR 403 (Suscripción Expirada)
+    if (response.status === 403) {
+      const error = new Error(data.message || 'Acceso denegado')
+      error.response = {
+        status: 403,
+        data: data
+      }
+      
+      // Detectar si es por suscripción expirada y redirigir
+      if (data?.subscription_expired === true || (data?.message && (
+          data.message.includes('suscripción ha finalizado') ||
+          data.message.includes('suscripción ha expirado') || 
+          data.message.includes('plan ha expirado') ||
+          data.message.includes('renueva tu plan')
+      ))) {
+        console.log('⛔ [API] Suscripción expirada detectada')
+        // NO redirigir si ya estamos en rutas permitidas para usuarios expirados
+        const allowedExpiredRoutes = ['/subscription-expired', '/select-plan', '/payment/success', '/payment/failure']
+        const currentPath = window.location.pathname
+        
+        if (!allowedExpiredRoutes.includes(currentPath)) {
+          // Evitar redirecciones múltiples con un flag temporal
+          if (!window.__redirecting_to_expired) {
+            window.__redirecting_to_expired = true
+            console.log('⛔ [API] Redirigiendo a /subscription-expired desde:', currentPath)
+            setTimeout(() => {
+              window.location.href = '/subscription-expired'
+            }, 100)
+          }
+        } else {
+          console.log('✅ [API] Ya en ruta permitida, no redirigir:', currentPath)
+        }
+      }
+      
+      throw error
+    }
     
-    throw new Error(data.message || `HTTP error! status: ${response.status}`)
+    // Para otros errores, adjuntar respuesta para compatibilidad con Axios
+    const error = new Error(data.message || `HTTP error! status: ${response.status}`)
+    error.response = {
+      status: response.status,
+      data: data
+    }
+    throw error
   }
   
   return data
