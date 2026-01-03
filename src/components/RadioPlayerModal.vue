@@ -6,9 +6,9 @@
         class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4"
         @click="closeModal"
       >
-        <!-- Contenedor Principal - Usa el tema del POS automáticamente -->
+        <!-- Contenedor Principal - Responsive con max-width/max-height + clase para scaling -->
         <div 
-          class="w-[1100px] h-[700px] rounded-2xl shadow-2xl overflow-hidden flex flex-col relative transition-colors duration-300"
+          class="radio-modal-container w-full max-w-[1100px] h-[85vh] max-h-[700px] rounded-2xl shadow-2xl overflow-hidden flex flex-col relative transition-colors duration-300"
           :class="isDarkMode ? 'bg-[#0a0a0c] border border-white/10' : 'bg-white border border-gray-200'"
           @click.stop
         >

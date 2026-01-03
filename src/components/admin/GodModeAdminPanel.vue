@@ -227,7 +227,7 @@
                 <svg class="w-4 h-4 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                Nueva Tienda
+                Crear Cuenta Manualmente
               </button>
             </div>
           </div>
@@ -264,13 +264,13 @@
                 <tr v-for="tenant in filteredTenants" :key="tenant.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-200 border-b border-gray-100 dark:border-zinc-800">
                   <td class="px-6 py-4">
                     <div>
-                      <p class="text-sm font-bold text-gray-900 dark:text-white">{{ tenant.business_name }}</p>
+                      <p class="text-sm font-bold text-gray-900 dark:text-white">{{ tenant.name }}</p>
                       <p class="text-xs text-gray-500 dark:text-zinc-500 font-mono">{{ tenant.id }}</p>
                     </div>
                   </td>
                   <td class="px-6 py-4">
-                    <a :href="'http://' + tenant.primary_domain" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                      {{ tenant.primary_domain }}
+                    <a :href="'https://' + tenant.domain" target="_blank" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                      {{ tenant.domain }}
                     </a>
                   </td>
                   <td class="px-6 py-4">
@@ -309,7 +309,7 @@
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                       </button>
-                      <a :href="'http://' + tenant.primary_domain + '/login'" target="_blank" class="p-2 text-slate-400 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 transition-all" title="Acceder">
+                      <a :href="'https://' + tenant.domain + '/login'" target="_blank" class="p-2 text-slate-400 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 transition-all" title="Acceder">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                         </svg>
@@ -544,12 +544,34 @@
         </div>
       </div>
 
+      <!-- Modal: Creando Cuenta (Loading) -->
+      <div v-if="creatingTenant" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 border border-gray-300 dark:border-zinc-800">
+          <div class="text-center">
+            <!-- Spinner animado -->
+            <div class="w-16 h-16 mx-auto mb-4">
+              <svg class="animate-spin text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Creando cuenta...</h3>
+            <p class="text-sm text-gray-600 dark:text-zinc-400 mb-4">
+              Estamos configurando la tienda, creando la base de datos y generando las credenciales.
+            </p>
+            <p class="text-xs text-gray-500 dark:text-zinc-500">
+              Esto puede tomar unos segundos, por favor espera...
+            </p>
+          </div>
+        </div>
+      </div>
+
       <!-- Modal: Crear Tienda -->
       <CreateTenantModal 
         v-if="showCreateModal"
-        :newTenant="newTenant"
         @close="showCreateModal = false"
-        @create="createTenant"
+        @created="onTenantCreated"
       />
 
       <!-- Modal: Detalles de Tienda -->
@@ -601,6 +623,7 @@ const kpis = ref({
 const tenants = ref({ data: [], total: 0 })
 const selectedTenant = ref(null)
 const showCreateModal = ref(false)
+const creatingTenant = ref(false)
 const showDetailsModal = ref(false)
 const showDeleteModal = ref(false)
 const showConfigModal = ref(false)
@@ -629,10 +652,13 @@ const aiPeriod = ref('24h')
 
 // Formulario de creación
 const newTenant = ref({
-  tenant_id: '',
+  owner_name: '',
+  cedula: '',
   business_name: '',
-  domain: '',
-  plan: 'free_trial'
+  subdomain: '',
+  plan: 'basic',
+  admin_email: '',
+  admin_password: ''
 })
 
 // Auto-refresh interval
@@ -643,8 +669,8 @@ const fetchData = async () => {
   loading.value = true
   try {
     const [kpisRes, tenantsRes] = await Promise.all([
-      axios.get('/admin/api/kpis'),
-      axios.get('/admin/api/tenants')
+      axios.get('/api/admin/kpis'),
+      axios.get('/api/admin/tenants')
     ])
     if (kpisRes.data.success) kpis.value = kpisRes.data.data
     if (tenantsRes.data.success) tenants.value = tenantsRes.data.data
@@ -669,17 +695,283 @@ const fetchAIMonitoring = async () => {
 }
 
 const createTenant = async () => {
+  creatingTenant.value = true
+  loading.value = true
   try {
-    const res = await axios.post('/admin/api/tenants', newTenant.value)
+    const res = await axios.post('/api/admin/tenants', newTenant.value)
     if (res.data.success) {
-      alert('✅ ' + res.data.message)
+      const data = res.data.data
+      
+      // Generar PDF profesional con credenciales
+      await generateCredentialsPDF(data)
+      
+      // Cerrar modal de creación
+      creatingTenant.value = false
       showCreateModal.value = false
-      newTenant.value = { tenant_id: '', business_name: '', domain: '', plan: 'free_trial' }
+      
+      // Mostrar modal de éxito (no alert)
+      alert(`✅ ¡Cuenta creada exitosamente!
+
+📄 Se ha descargado un PDF con todas las credenciales.
+🌐 URL: ${data.login_url}
+
+¡Listo para enviar al cliente!`)
+      
+      newTenant.value = { 
+        owner_name: '',
+        cedula: '',
+        business_name: '', 
+        subdomain: '', 
+        plan: 'basic',
+        admin_email: '',
+        admin_password: ''
+      }
       fetchData()
     }
   } catch (error) {
-    alert('❌ Error: ' + (error.response?.data?.message || error.message))
+    const errorMsg = error.response?.data?.message || error.message
+    const errors = error.response?.data?.errors
+    
+    if (errors) {
+      const errorList = Object.entries(errors)
+        .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+        .join('\n')
+      alert(`❌ Errores de validación:\n\n${errorList}`)
+    } else {
+      alert(`❌ Error: ${errorMsg}`)
+    }
+    creatingTenant.value = false
   }
+  loading.value = false
+}
+
+// Cuando se crea un tenant desde el nuevo modal
+const onTenantCreated = async (data) => {
+  // Generar PDF profesional con credenciales
+  await generateCredentialsPDF(data)
+  
+  // Refrescar datos
+  fetchData()
+}
+
+// 📄 Generar PDF profesional con credenciales
+const generateCredentialsPDF = async (data) => {
+  // Importación dinámica para evitar problemas de módulos en producción
+  const { default: jsPDF } = await import('jspdf')
+  
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'letter'
+  })
+
+  const pageWidth = pdf.internal.pageSize.getWidth()
+  const pageHeight = pdf.internal.pageSize.getHeight()
+  
+  // Colores corporativos
+  const primaryColor = [15, 23, 42] // slate-900
+  const accentColor = [16, 185, 129] // emerald-500
+  const grayColor = [100, 116, 139] // slate-500
+  
+  // Header con fondo
+  pdf.setFillColor(...primaryColor)
+  pdf.rect(0, 0, pageWidth, 45, 'F')
+  
+  // Logo/Título
+  pdf.setTextColor(255, 255, 255)
+  pdf.setFontSize(26)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text('105POS', pageWidth / 2, 20, { align: 'center' })
+  
+  pdf.setFontSize(14)
+  pdf.setFont('helvetica', 'normal')
+  pdf.text('Sistema de Punto de Venta en la Nube', pageWidth / 2, 28, { align: 'center' })
+  
+  // Subtítulo
+  pdf.setFontSize(11)
+  pdf.text('Credenciales de Acceso', pageWidth / 2, 37, { align: 'center' })
+  
+  // Fecha de creación
+  pdf.setFontSize(9)
+  pdf.setTextColor(...grayColor)
+  pdf.text(`Generado: ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`, pageWidth / 2, 53, { align: 'center' })
+  
+  let yPos = 70
+  
+  // ==================== INFORMACIÓN DEL CLIENTE ====================
+  pdf.setFillColor(247, 250, 252)
+  pdf.roundedRect(15, yPos, pageWidth - 30, 48, 3, 3, 'F')
+  
+  yPos += 8
+  pdf.setTextColor(...primaryColor)
+  pdf.setFontSize(13)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text('👤 Información del Cliente', 20, yPos)
+  
+  yPos += 10
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...grayColor)
+  
+  pdf.text('Propietario:', 20, yPos)
+  pdf.setTextColor(...primaryColor)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text(data.owner_name || 'N/A', 60, yPos)
+  
+  yPos += 7
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...grayColor)
+  pdf.text('Cédula/NIT:', 20, yPos)
+  pdf.setTextColor(...primaryColor)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text(data.cedula || 'N/A', 60, yPos)
+  
+  yPos += 7
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...grayColor)
+  pdf.text('Negocio:', 20, yPos)
+  pdf.setTextColor(...primaryColor)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text(data.business_name || data.tenant_id, 60, yPos)
+  
+  yPos += 7
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...grayColor)
+  pdf.text('ID Tenant:', 20, yPos)
+  pdf.setTextColor(...primaryColor)
+  pdf.setFont('helvetica', 'mono')
+  pdf.text(data.tenant_id || 'N/A', 60, yPos)
+  
+  yPos += 20
+  
+  // ==================== ACCESO AL SISTEMA ====================
+  pdf.setFillColor(254, 252, 232) // yellow-50
+  pdf.roundedRect(15, yPos, pageWidth - 30, 48, 3, 3, 'F')
+  
+  yPos += 8
+  pdf.setTextColor(...primaryColor)
+  pdf.setFontSize(13)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text('🔐 Credenciales de Acceso', 20, yPos)
+  
+  yPos += 10
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...grayColor)
+  
+  pdf.text('URL de Acceso:', 20, yPos)
+  pdf.setTextColor(37, 99, 235) // blue-600
+  pdf.setFont('helvetica', 'bold')
+  pdf.textWithLink(data.login_url || '', 60, yPos, { url: data.login_url })
+  
+  yPos += 10
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...grayColor)
+  pdf.text('Usuario (Email):', 20, yPos)
+  pdf.setTextColor(...primaryColor)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text(data.credentials.email, 60, yPos)
+  
+  yPos += 10
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...grayColor)
+  pdf.text('Contraseña:', 20, yPos)
+  pdf.setTextColor(239, 68, 68) // red-500
+  pdf.setFont('helvetica', 'bold')
+  pdf.text(data.credentials.password, 60, yPos)
+  
+  yPos += 20
+  
+  // ==================== INFORMACIÓN DEL PLAN ====================
+  const planNames = {
+    free: '🆓 Plan Free',
+    basic: '💼 Plan Basic ($29/mes)',
+    premium: '⭐ Plan Premium ($59/mes)',
+    enterprise: '🏢 Plan Enterprise ($99/mes)'
+  }
+  
+  const planColors = {
+    free: [209, 213, 219],
+    basic: [59, 130, 246],
+    premium: [168, 85, 247],
+    enterprise: [245, 158, 11]
+  }
+  
+  const planColor = planColors[data.plan] || planColors.basic
+  pdf.setFillColor(...planColor)
+  pdf.roundedRect(15, yPos, pageWidth - 30, 35, 3, 3, 'F')
+  
+  yPos += 8
+  pdf.setTextColor(255, 255, 255)
+  pdf.setFontSize(13)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text('💳 Plan Contratado', 20, yPos)
+  
+  yPos += 10
+  pdf.setFontSize(16)
+  pdf.text(planNames[data.plan] || data.plan.toUpperCase(), 20, yPos)
+  
+  yPos += 9
+  pdf.setFontSize(9)
+  pdf.setFont('helvetica', 'normal')
+  pdf.text(`Válido hasta: ${new Date(data.subscription_end).toLocaleDateString('es-ES')}`, 20, yPos)
+  
+  yPos += 18
+  
+  // ==================== INSTRUCCIONES ====================
+  pdf.setFillColor(239, 246, 255) // blue-50
+  pdf.roundedRect(15, yPos, pageWidth - 30, 40, 3, 3, 'F')
+  
+  yPos += 8
+  pdf.setTextColor(...primaryColor)
+  pdf.setFontSize(12)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text('📋 Primeros Pasos', 20, yPos)
+  
+  yPos += 8
+  pdf.setFontSize(9)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...grayColor)
+  
+  const steps = [
+    '1. Ingresa a la URL de acceso',
+    '2. Usa el email y contraseña proporcionados',
+    '3. Completa el asistente de configuración inicial',
+    '4. ¡Comienza a vender de inmediato!'
+  ]
+  
+  steps.forEach(step => {
+    pdf.text(step, 20, yPos)
+    yPos += 6
+  })
+  
+  yPos += 10
+  
+  // ==================== SOPORTE ====================
+  pdf.setFillColor(254, 242, 242) // red-50
+  pdf.roundedRect(15, yPos, pageWidth - 30, 20, 3, 3, 'F')
+  
+  yPos += 7
+  pdf.setTextColor(...primaryColor)
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text('📞 ¿Necesitas ayuda?', 20, yPos)
+  
+  yPos += 7
+  pdf.setFontSize(8)
+  pdf.setFont('helvetica', 'normal')
+  pdf.text('Soporte técnico disponible 24/7 • WhatsApp: +57 300 123 4567 • Email: soporte@105pos.pro', 20, yPos)
+  
+  // Footer
+  pdf.setTextColor(...grayColor)
+  pdf.setFontSize(7)
+  pdf.setFont('helvetica', 'italic')
+  pdf.text('Este documento contiene información confidencial. Mantenlo seguro.', pageWidth / 2, pageHeight - 10, { align: 'center' })
+  pdf.text('105POS © 2026 - Sistema de Punto de Venta Profesional', pageWidth / 2, pageHeight - 6, { align: 'center' })
+  
+  // Descargar PDF
+  const fileName = `105POS_Credenciales_${data.business_name.replace(/\s+/g, '_')}_${Date.now()}.pdf`
+  pdf.save(fileName)
 }
 
 const openStoreConfig = (tenant) => {
@@ -753,7 +1045,7 @@ const deleteTenant = async () => {
 
 const generateSignupLink = async () => {
   try {
-    const res = await axios.post('/admin/api/generate-signup-link', {
+    const res = await axios.post('/api/admin/generate-signup-link', {
       plan: selectedPlan.value
     })
     if (res.data.success) {
@@ -808,11 +1100,11 @@ const getPlanBadge = (plan) => {
 }
 
 const filteredTenants = computed(() => {
-  if (!searchQuery.value) return tenants.value.data
-  return tenants.value.data.filter(t =>
-    t.business_name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+  if (!searchQuery.value) return tenants.value
+  return tenants.value.filter(t =>
+    (t.name || '').toLowerCase().includes(searchQuery.value.toLowerCase()) ||
     t.id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    t.primary_domain.toLowerCase().includes(searchQuery.value.toLowerCase())
+    (t.domain || '').toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
