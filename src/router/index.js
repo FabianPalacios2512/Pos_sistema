@@ -313,11 +313,6 @@ router.beforeEach((to, from, next) => {
 
 // Guard para redirección a onboarding (primera vez)
 router.beforeEach(async (to, from, next) => {
-  // 🔥 PRIORIDAD: Si va a /pos, dejarlo pasar para que el modal maneje la suscripción
-  if (to.path === '/pos') {
-    next()
-    return
-  }
   
   // Excluir SOLO rutas públicas reales (login, register, catalog, select-plan, payment/*, términos, etc.)
   const publicRoutes = [
@@ -344,8 +339,8 @@ router.beforeEach(async (to, from, next) => {
   if (authService.isAuthenticated()) {
     // ✅ EXCEPCIÓN: Super admins NO pasan por onboarding (no tienen tenant)
     const user = authService.getUser()
-    if (user?.is_super_admin) {
-      console.log('🔐 Super Admin detectado - omitiendo validación de onboarding')
+    if (user?.role === 'superadmin') {
+      console.log('👑 Super Admin detectado - omitiendo validación de onboarding')
       next()
       return
     }

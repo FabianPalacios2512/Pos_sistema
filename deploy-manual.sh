@@ -9,7 +9,15 @@ echo "🎨 Building frontend locally..."
 npm run build
 
 echo ""
-echo "📤 Uploading frontend to VPS..."
+echo "📦 Copying frontend to backend/public..."
+cp -r dist/* backend/public/
+
+echo ""
+echo "📤 Uploading frontend to VPS (backend/public)..."
+rsync -avz --progress --delete backend/public/ root@72.61.73.245:/var/www/105pos/backend/public/
+
+echo ""
+echo "📤 Uploading frontend to VPS (dist folder for subdomains)..."
 rsync -avz --progress --delete dist/ root@72.61.73.245:/var/www/105pos/dist/
 
 echo ""
@@ -22,7 +30,7 @@ rsync -avz --progress \
   --exclude 'storage' \
   --exclude '.env' \
   backend/ root@72.61.73.245:/var/www/105pos/backend/
-
+  
 echo ""
 echo "🔄 Uploading src/ (Vue components)..."
 rsync -avz --progress src/ root@72.61.73.245:/var/www/105pos/src/

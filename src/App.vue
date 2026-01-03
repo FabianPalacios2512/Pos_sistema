@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="min-h-screen">
     <!-- Splash Screen Inicial -->
     <SplashScreen 
       v-if="showSplash"

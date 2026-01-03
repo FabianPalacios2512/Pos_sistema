@@ -3,6 +3,10 @@ import App from './App.vue'
 import router from './router/index.js'
 import './style.css'
 
+// 🖥️ Inicializar adaptación de escalado de pantalla (Windows 125%, 150%)
+import { initScreenScaling } from './composables/useScreenScaling.js'
+initScreenScaling()
+
 // Registrar PWA Service Worker
 import { registerSW } from 'virtual:pwa-register'
 

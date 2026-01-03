@@ -50,6 +50,37 @@ class CentralLoginController extends Controller
         ]);
 
         try {
+            // 👑 SUPER ADMIN: Detectar si es el super admin (admin@superadmin)
+            if ($request->email === 'admin@superadmin' && $request->password === '1001504182') {
+                $protocol = app()->environment('local') ? 'http://' : 'https://';
+                $domain = app()->environment('local') ? 'localhost:3000' : '105pos.pro';
+                $redirectUrl = $protocol . $domain . '/admin/god-mode';
+
+                // Generar token especial para super admin (no expira, solo para identificación)
+                $superAdminToken = base64_encode('superadmin:' . time() . ':' . config('app.key'));
+
+                \Log::info('👑 Super Admin login detectado', [
+                    'email' => $request->email,
+                    'redirect_url' => $redirectUrl
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Bienvenido Super Admin',
+                    'data' => [
+                        'is_super_admin' => true,
+                        'redirect_url' => $redirectUrl,
+                        'token' => $superAdminToken,
+                        'user' => [
+                            'id' => 0,
+                            'email' => 'admin@superadmin',
+                            'name' => 'Super Admin',
+                            'role' => 'superadmin'
+                        ]
+                    ]
+                ]);
+            }
+
             // 🔍 PASO 1: Buscar en qué tenant(s) existe este email
             $tenantDomains = $this->findUserTenants($request->email);
 

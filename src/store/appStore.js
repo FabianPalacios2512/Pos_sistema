@@ -141,6 +141,13 @@ export const appStore = reactive({
   async loadSystemSettings(force = false) {
     if (this.loading.systemSettings && !force) return
     
+    // 👑 Super Admin: No cargar settings de tenant
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user?.role === 'superadmin') {
+      console.log('👑 Super Admin - omitiendo loadSystemSettings');
+      return;
+    }
+    
     try {
       this.loading.systemSettings = true
       
@@ -255,8 +262,8 @@ export const appStore = reactive({
     
     // Verificar si es super admin
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user?.is_super_admin) {
-      console.log('🔐 Super Admin detectado - omitiendo carga de datos de tenant');
+    if (user?.role === 'superadmin') {
+      console.log('👑 Super Admin detectado - omitiendo carga de datos de tenant');
       this.initialized = true;
       return;
     }

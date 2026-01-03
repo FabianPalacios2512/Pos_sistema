@@ -1,37 +1,30 @@
 <template>
   <!-- 🎨 PREMIUM SPLIT SCREEN - Diseño SaaS Empresarial 2025 -->
-  <div class="min-h-screen flex bg-slate-50">
+  <div class="min-h-screen flex bg-slate-50 overflow-hidden">
     
     <!-- 📸 LADO IZQUIERDO: Panel de Marca Premium -->
-    <div class="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden">
-      <!-- Gradiente base oscuro elegante -->
+    <div class="hidden md:flex md:w-1/2 xl:w-[55%] absolute md:relative inset-y-0 left-0 overflow-hidden">
+      <!-- Gradiente base oscuro elegante (visible inmediatamente) -->
       <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
       
-      <!-- Imagen con overlay profesional -->
+      <!-- Imagen con overlay profesional (carga en background) -->
       <div class="absolute inset-0">
         <img 
           src="/login.png" 
           alt="105 POS Pro - Sistema de Punto de Venta" 
-          class="w-full h-full object-cover transition-opacity duration-1000 ease-out"
-          :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
+          class="w-full h-full object-cover transition-opacity duration-500 ease-out"
+          :class="imageLoaded ? 'opacity-30' : 'opacity-0'"
           @load="imageLoaded = true"
           loading="eager"
+          fetchpriority="high"
           decoding="async"
         />
         <!-- Overlay con gradiente premium -->
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-slate-900/30"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-transparent to-transparent"></div>
       </div>
-      
-      <!-- Skeleton mientras carga -->
-      <div 
-        v-if="!imageLoaded" 
-        class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"
-      >
-        <div class="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-slate-700/20 to-transparent"></div>
-      </div>
 
-      <!-- Contenido superpuesto -->
+      <!-- Contenido superpuesto (visible inmediatamente) -->
       <div class="relative z-10 flex flex-col justify-between w-full h-full p-10 xl:p-14">
         
         <!-- Logo y marca superior -->
@@ -44,73 +37,61 @@
           <span class="text-white/90 font-bold text-xl tracking-tight">105 POS</span>
         </div>
 
-        <!-- Contenido central con estadísticas -->
+        <!-- Contenido central con estadísticas (sin esperar imagen) -->
         <div class="flex-1 flex flex-col justify-center max-w-lg">
-          <transition
-            enter-active-class="transition ease-out duration-700 delay-200"
-            enter-from-class="translate-y-8 opacity-0"
-            enter-to-class="translate-y-0 opacity-100"
-          >
-            <div v-if="imageLoaded" class="space-y-8">
-              <div>
-                <h2 class="text-4xl xl:text-5xl font-bold text-white leading-tight">
-                  Potencia tu negocio con
-                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                    tecnología inteligente
-                  </span>
-                </h2>
-                <p class="mt-4 text-lg text-slate-300 leading-relaxed">
-                  El sistema POS más completo para empresas que buscan crecer. 
-                  Controla ventas, inventario y clientes desde cualquier lugar.
-                </p>
-              </div>
-
-              <!-- Stats Grid -->
-              <div class="grid grid-cols-3 gap-4">
-                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                  <div class="text-3xl font-bold text-white">99.9%</div>
-                  <div class="text-sm text-slate-400 mt-1">Uptime garantizado</div>
-                </div>
-                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                  <div class="text-3xl font-bold text-white">+2K</div>
-                  <div class="text-sm text-slate-400 mt-1">Negocios activos</div>
-                </div>
-                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
-                  <div class="text-3xl font-bold text-white">24/7</div>
-                  <div class="text-sm text-slate-400 mt-1">Soporte técnico</div>
-                </div>
-              </div>
+          <div class="space-y-8">
+            <div>
+              <h2 class="text-4xl xl:text-5xl font-bold text-white leading-tight">
+                Potencia tu negocio con
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+                  tecnología inteligente
+                </span>
+              </h2>
+              <p class="mt-4 text-lg text-slate-300 leading-relaxed">
+                El sistema POS más completo para empresas que buscan crecer. 
+                Controla ventas, inventario y clientes desde cualquier lugar.
+              </p>
             </div>
-          </transition>
-        </div>
 
-        <!-- Testimonial Card inferior -->
-        <transition
-          enter-active-class="transition ease-out duration-700 delay-500"
-          enter-from-class="translate-y-6 opacity-0"
-          enter-to-class="translate-y-0 opacity-100"
-        >
-          <div v-if="imageLoaded" class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-            <div class="flex items-start gap-4">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
-                <span class="text-white font-bold text-lg">CP</span>
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-3 gap-4">
+              <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <div class="text-3xl font-bold text-white">99.9%</div>
+                <div class="text-sm text-slate-400 mt-1">Uptime garantizado</div>
               </div>
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-2">
-                  <div class="flex gap-0.5">
-                    <svg v-for="i in 5" :key="i" class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                  </div>
-                </div>
-                <p class="text-white/90 text-sm leading-relaxed italic">
-                  "Desde que implementamos 105 POS, nuestras ventas aumentaron un 40% y el control de inventario es impecable."
-                </p>
-                <p class="text-slate-400 text-sm mt-3 font-medium">Carlos Pérez — CEO, Supermercados del Valle</p>
+              <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <div class="text-3xl font-bold text-white">+2K</div>
+                <div class="text-sm text-slate-400 mt-1">Negocios activos</div>
+              </div>
+              <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <div class="text-3xl font-bold text-white">24/7</div>
+                <div class="text-sm text-slate-400 mt-1">Soporte técnico</div>
               </div>
             </div>
           </div>
-        </transition>
+        </div>
+
+        <!-- Testimonio inferior (sin esperar) -->
+        <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
+              <span class="text-white font-bold text-lg">CP</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="flex gap-0.5">
+                  <svg v-for="i in 5" :key="i" class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                </div>
+              </div>
+              <p class="text-white/90 text-sm leading-relaxed italic">
+                "Desde que implementamos 105 POS, nuestras ventas aumentaron un 40% y el control de inventario es impecable."
+              </p>
+              <p class="text-slate-400 text-sm mt-3 font-medium">Carlos Pérez — CEO, Supermercados del Valle</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -122,7 +103,7 @@
       <div class="w-full max-w-[420px] relative z-10">
         
         <!-- Badge versión móvil -->
-        <div class="lg:hidden flex items-center gap-2.5 mb-10">
+        <div class="md:hidden flex items-center gap-2.5 mb-10">
           <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg shadow-slate-900/20">
             <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -133,7 +114,7 @@
 
         <!-- Header del formulario -->
         <div class="mb-8">
-          <div class="hidden lg:block">
+          <div class="hidden md:block">
             <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-4 border border-emerald-100">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               Plataforma activa
@@ -348,7 +329,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import authService from '../services/authService.js'
@@ -404,6 +385,10 @@ const loginWithGoogle = async () => {
 
 // Verificar mensaje de registro exitoso
 onMounted(async () => {
+  // 🎯 Calcular altura inicial y escuchar cambios
+  updateContainerHeight()
+  window.addEventListener('resize', updateContainerHeight)
+  
   // 🎯 AUTO-LOGIN desde dominio central (SILENCIOSO - sin mostrar pantalla de login)
   const autoLoginCreds = sessionStorage.getItem('auto_login_credentials')
   if (autoLoginCreds) {
@@ -544,7 +529,8 @@ const validateForm = () => {
   if (!credentials.email.trim()) {
     errors.email = 'El correo es requerido'
     isValid = false
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credentials.email.trim())) {
+  } else if (credentials.email.trim() !== 'admin@superadmin' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credentials.email.trim())) {
+    // Permitir admin@superadmin como excepción especial
     errors.email = 'Ingrese un correo válido'
     isValid = false
   }
@@ -586,6 +572,20 @@ const handleLogin = async () => {
       if (response.data.success) {
         message.text = '✅ Accediendo a tu cuenta...'
         message.type = 'success'
+        
+        // 👑 SUPER ADMIN: Redirigir directamente a god-mode
+        if (response.data.data.is_super_admin) {
+          console.log('👑 Super Admin detectado - Redirigiendo a God Mode')
+          
+          // Guardar token y datos de usuario en localStorage para que pase el requireAuth
+          localStorage.setItem('authToken', response.data.data.token)
+          localStorage.setItem('user', JSON.stringify(response.data.data.user))
+          
+          setTimeout(() => {
+            window.location.href = response.data.data.redirect_url
+          }, 800)
+          return
+        }
         
         // Guardar credenciales temporalmente para auto-login silencioso en el tenant
         sessionStorage.setItem('auto_login_credentials', JSON.stringify({
@@ -735,6 +735,11 @@ const setDemoCredentials = (role) => {
 if (authService.isAuthenticated()) {
   router.push('/pos')
 }
+
+// 🎯 Limpiar listener al desmontar
+onUnmounted(() => {
+  window.removeEventListener('resize', updateContainerHeight)
+})
 </script>
 
 <style scoped>

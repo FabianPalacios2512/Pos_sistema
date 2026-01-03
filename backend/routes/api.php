@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CentralLoginController;
+use App\Http\Controllers\Api\SuperAdminController;
 use App\Http\Controllers\Api\TenantRegisterController;
 use App\Http\Controllers\Api\PlanUpgradeController;
 use App\Http\Controllers\Api\PaymentHistoryController;
@@ -61,6 +62,17 @@ Route::get('/radio/search', [RadioProxyController::class, 'search']);
 // ==================== CENTRAL LOGIN (Smart Login) ====================
 Route::post('/central/login', [CentralLoginController::class, 'centralLogin']);
 Route::get('/central/check-email', [CentralLoginController::class, 'checkEmailExists']);
+Route::get('/central/check-document', [CentralLoginController::class, 'checkDocumentExists']);
+
+// ==================== SUPER ADMIN (GOD MODE) ====================
+Route::get('/admin/kpis', [SuperAdminController::class, 'getKPIs']);
+Route::get('/admin/tenants', [SuperAdminController::class, 'getTenants']);
+Route::get('/admin/tenants/{id}', [SuperAdminController::class, 'getTenantDetails']);
+Route::post('/admin/tenants', [SuperAdminController::class, 'createTenant']);
+Route::get('/check-domain/{domain}', [SuperAdminController::class, 'checkDomainAvailability']);
+Route::get('/check-cedula/{cedula}', [SuperAdminController::class, 'checkCedulaAvailability']);
+Route::get('/check-email/{email}', [SuperAdminController::class, 'checkEmailAvailability']);
+
 
 // ==================== PASSWORD RESET ROUTES ====================
 Route::post('/password/forgot', [PasswordResetController::class, 'forgotPassword']);

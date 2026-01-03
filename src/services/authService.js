@@ -76,7 +76,7 @@ const authService = {
         await mockAuthService.logout();
       } else {
         // Solo llamar logout API si NO es super admin
-        if (!user?.is_super_admin) {
+        if (user?.role !== 'superadmin') {
           await apiClient.post('/logout');
         }
       }
@@ -93,16 +93,16 @@ const authService = {
   // Obtener usuario actual
   async getCurrentUser() {
     try {
-      // Si es super admin, retornar desde localStorage
-      const localUser = this.getUser();
-      if (localUser?.is_super_admin) {
+      let response;
+      
+      // 👑 Si es super admin, retornar datos de localStorage sin llamar API
+      const localUser = this.getUser()
+      if (localUser?.role === 'superadmin') {
         return {
           success: true,
           data: { user: localUser }
-        };
+        }
       }
-      
-      let response;
       
       if (USE_MOCK) {
         const token = this.getToken();

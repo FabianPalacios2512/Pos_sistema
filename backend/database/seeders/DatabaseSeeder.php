@@ -10,66 +10,94 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Crear rol Administrador con todos los permisos
-        $adminRoleId = DB::table('roles')->insertGetId([
-            'name' => 'Administrador',
-            'description' => 'Acceso completo al sistema',
-            'permissions' => json_encode([
-                "dashboard.view",
-                "pos.view", "pos.create_sale", "pos.apply_discount", "pos.cancel_sale",
-                "invoices.view", "invoices.create", "invoices.edit", "invoices.delete", "invoices.print",
-                "returns.view", "returns.create", "returns.approve",
-                "products.view", "products.create", "products.edit", "products.delete",
-                "categories.view", "categories.create", "categories.edit", "categories.delete",
-                "stock.view", "stock.adjust", "stock.transfer",
-                "intelligent_inventory.view", "intelligent_inventory.predictions",
-                "customers.view", "customers.create", "customers.edit", "customers.delete", "customers.view_history",
-                "suppliers.view", "suppliers.create", "suppliers.edit", "suppliers.delete",
-                "users.view", "users.create", "users.edit", "users.delete", "users.change_password", "users.manage_roles",
-                "cash_register.view", "cash_register.open", "cash_register.close", "cash_register.movements",
-                "reports.view", "reports.sales", "reports.inventory", "reports.financial", "reports.export",
-                "settings.view", "settings.edit", "settings.manage_business"
-            ]),
-            'active' => 1,
-            'users_count' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // ✅ Verificar si el rol Administrador ya existe (evitar duplicados)
+        $existingAdminRole = DB::table('roles')->where('name', 'Administrador')->first();
 
-        // Crear usuario administrador
-        DB::table('users')->insert([
-            'name' => 'Administrador',
-            'email' => 'admin@pos.com',
-            'cc' => '1001504182',
-            'password' => Hash::make('admin123'),
-            'phone' => '3001234567',
-            'active' => 1,
-            'role_id' => $adminRoleId,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if ($existingAdminRole) {
+            // El rol ya existe, usar su ID
+            $adminRoleId = $existingAdminRole->id;
+            \Log::info('🔄 DatabaseSeeder: Rol Administrador ya existe, usando ID: ' . $adminRoleId);
+        } else {
+            // Crear rol Administrador con todos los permisos
+            $adminRoleId = DB::table('roles')->insertGetId([
+                'name' => 'Administrador',
+                'description' => 'Acceso completo al sistema',
+                'permissions' => json_encode([
+                    "dashboard.view",
+                    "pos.view", "pos.create_sale", "pos.apply_discount", "pos.cancel_sale",
+                    "invoices.view", "invoices.create", "invoices.edit", "invoices.delete", "invoices.print",
+                    "returns.view", "returns.create", "returns.approve",
+                    "products.view", "products.create", "products.edit", "products.delete",
+                    "categories.view", "categories.create", "categories.edit", "categories.delete",
+                    "stock.view", "stock.adjust", "stock.transfer",
+                    "intelligent_inventory.view", "intelligent_inventory.predictions",
+                    "customers.view", "customers.create", "customers.edit", "customers.delete", "customers.view_history",
+                    "suppliers.view", "suppliers.create", "suppliers.edit", "suppliers.delete",
+                    "users.view", "users.create", "users.edit", "users.delete", "users.change_password", "users.manage_roles",
+                    "cash_register.view", "cash_register.open", "cash_register.close", "cash_register.movements",
+                    "reports.view", "reports.sales", "reports.inventory", "reports.financial", "reports.export",
+                    "settings.view", "settings.edit", "settings.manage_business"
+                ]),
+                'active' => 1,
+                'users_count' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            \Log::info('✅ DatabaseSeeder: Rol Administrador creado con ID: ' . $adminRoleId);
+        }
 
-        // Crear rol Vendedor
-        DB::table('roles')->insert([
-            'name' => 'Vendedor',
-            'description' => 'Acceso a ventas y consultas básicas',
-            'permissions' => json_encode([
-                "dashboard.view",
-                "products.view",
-                "inventory.view",
-                "sales.view", "sales.create",
-                "customers.view", "customers.create",
-                "reports.view", "reports.sales",
-                "pos.view", "pos.create_sale", "pos.apply_discount", "pos.cancel_sale"
-            ]),
-            'active' => 1,
-            'users_count' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // ✅ Verificar si el usuario admin ya existe
+        $existingAdmin = DB::table('users')->where('role_id', $adminRoleId)->first();
 
-        // Configuración del sistema por defecto
-        DB::table('system_settings')->insert([
+        if (!$existingAdmin) {
+            // Crear usuario administrador
+            DB::table('users')->insert([
+                'name' => 'Administrador',
+                'email' => 'admin@pos.com',
+                'cc' => '1001504182',
+                'password' => Hash::make('admin123'),
+                'phone' => '3001234567',
+                'active' => 1,
+                'role_id' => $adminRoleId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            \Log::info('✅ DatabaseSeeder: Usuario administrador creado');
+        } else {
+            \Log::info('🔄 DatabaseSeeder: Usuario administrador ya existe');
+        }
+
+        // ✅ Verificar si el rol Vendedor ya existe
+        $existingVendedor = DB::table('roles')->where('name', 'Vendedor')->first();
+
+        if (!$existingVendedor) {
+            // Crear rol Vendedor
+            DB::table('roles')->insert([
+                'name' => 'Vendedor',
+                'description' => 'Acceso a ventas y consultas básicas',
+                'permissions' => json_encode([
+                    "dashboard.view",
+                    "products.view",
+                    "inventory.view",
+                    "sales.view", "sales.create",
+                    "customers.view", "customers.create",
+                    "reports.view", "reports.sales",
+                    "pos.view", "pos.create_sale", "pos.apply_discount", "pos.cancel_sale"
+                ]),
+                'active' => 1,
+                'users_count' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            \Log::info('✅ DatabaseSeeder: Rol Vendedor creado');
+        }
+
+        // ✅ Verificar si system_settings ya existe
+        $existingSettings = DB::table('system_settings')->where('id', 1)->first();
+
+        if (!$existingSettings) {
+            // Configuración del sistema por defecto
+            DB::table('system_settings')->insert([
             'company_name' => 'Mi Tienda POS',
             'company_document' => '900123456',
             'company_phone' => '3001234567',
@@ -94,10 +122,16 @@ class DatabaseSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+            \Log::info('✅ DatabaseSeeder: System settings creados');
+        }
 
-        // Crear métodos de pago por defecto (solo 3 básicos)
-        // Creditienda se agrega automáticamente cuando está activo
-        $paymentMethods = [
+        // ✅ Verificar si ya existen métodos de pago
+        $existingPaymentMethods = DB::table('payment_methods')->count();
+
+        if ($existingPaymentMethods == 0) {
+            // Crear métodos de pago por defecto (solo 3 básicos)
+            // Creditienda se agrega automáticamente cuando está activo
+            $paymentMethods = [
             [
                 'name' => 'Efectivo',
                 'code' => 'efectivo',
@@ -136,9 +170,15 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ]));
         }
+            \Log::info('✅ DatabaseSeeder: Métodos de pago creados');
+        }
 
-        // Crear categorías de gastos por defecto
-        $expenseCategories = [
+        // ✅ Verificar si ya existen categorías de gastos
+        $existingExpenseCategories = DB::table('expense_categories')->count();
+
+        if ($existingExpenseCategories == 0) {
+            // Crear categorías de gastos por defecto
+            $expenseCategories = [
             ['name' => 'Servicios Públicos', 'color' => '#3B82F6', 'description' => 'Agua, luz, internet, teléfono', 'is_active' => true],
             ['name' => 'Nómina y Salarios', 'color' => '#10B981', 'description' => 'Salarios, prestaciones, pagos a empleados', 'is_active' => true],
             ['name' => 'Mantenimiento', 'color' => '#F59E0B', 'description' => 'Reparaciones, mantenimiento de equipos e instalaciones', 'is_active' => true],
@@ -153,6 +193,8 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]));
+        }
+            \Log::info('✅ DatabaseSeeder: Categorías de gastos creadas');
         }
 
         // ✅ COMENTADO: Los echo contaminan la respuesta HTTP JSON durante registro de tenants
