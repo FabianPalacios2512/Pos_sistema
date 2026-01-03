@@ -60,3 +60,22 @@ whatsapp_qr.txt
 # Backups
 *.backup
 *_backup.*
+
+# Backend public (archivos compilados del frontend)
+backend/public/assets/
+backend/public/*.png
+backend/public/*.svg
+backend/public/*.webmanifest
+backend/public/*.json
+backend/public/index.html
+backend/public/login.png
+backend/public/logo.png
+backend/public/logo2.png
+backend/public/sw.js
+backend/public/sw-config.js
+backend/public/registerSW.js
+backend/public/workbox-*.js
+backend/public/img-radio/
+
+# Dev dist
+dev-dist/
