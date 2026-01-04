@@ -130,6 +130,16 @@ const routes = [
     }
   },
   // Rutas de resultado de pago
+  // 🔍 Ruta de verificación intermedia (ePayco redirige aquí SIEMPRE)
+  {
+    path: '/payment/verify',
+    name: 'PaymentVerification',
+    component: () => import('../views/PaymentVerification.vue'),
+    meta: {
+      title: 'Verificando Pago - 105 POS',
+      requiresAuth: false
+    }
+  },
   {
     path: '/payment/success',
     name: 'PaymentSuccess',

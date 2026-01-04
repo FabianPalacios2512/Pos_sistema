@@ -2179,6 +2179,7 @@ import { generateInvoicePDF as generateInvoicePDFTemplate, generateQuotationPDF 
 import { useCashSession } from '../services/cashSessionService.js'
 import { appStore } from '../store/appStore.js' // Importar store global
 import { useAutoRefresh } from '../composables/useRouteState.js'
+import { useScreenScaling } from '../composables/useScreenScaling.js'
 import axiosInstance from '../services/apiClient.js'
 import { useToast } from '../composables/useToast.js'
 import { useLoyaltyPoints } from '../composables/useLoyaltyPoints.js'
@@ -2355,6 +2356,10 @@ const triggerConfetti = () => {
   const duration = 3000
   const animationEnd = Date.now() + duration
   const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#ef4444']
+  
+  // 🎯 Obtener factor de compensación de escalado
+  const { appliedZoom, isCompensating } = useScreenScaling()
+  const zoomFactor = isCompensating.value ? appliedZoom.value : 1
 
   function randomInRange(min, max) {
     return Math.random() * (max - min) + min
@@ -2380,7 +2385,7 @@ const triggerConfetti = () => {
 
       const particleCount = 30 * (timeLeft / duration)
 
-      // Desde la izquierda
+      // Desde la izquierda (no necesita compensación, x:0 siempre es el borde izquierdo)
       window.confetti({
         particleCount,
         angle: 60,
@@ -2390,12 +2395,13 @@ const triggerConfetti = () => {
         zIndex: 9999
       })
       
-      // Desde la derecha
+      // Desde la derecha (compensar para pantallas escaladas)
+      // Si está escalado, ajustamos la posición para que salga del borde real
       window.confetti({
         particleCount,
         angle: 120,
         spread: 55,
-        origin: { x: 1, y: 0.6 },
+        origin: { x: 1 / zoomFactor, y: 0.6 },
         colors: colors,
         zIndex: 9999
       })

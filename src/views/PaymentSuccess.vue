@@ -242,8 +242,9 @@ const redirectToDashboard = () => {
     // Limpiar datos de pago
     localStorage.removeItem('pending_payment')
     
-    // Redirigir al dashboard directamente (ya estamos en el dominio correcto)
-    window.location.href = '/dashboard'
+    // 🔥 Redirigir al dashboard SIN parámetros de pago en la URL
+    // Usar replace() para no dejar params en la URL
+    window.location.replace('/dashboard')
     return
   }
 

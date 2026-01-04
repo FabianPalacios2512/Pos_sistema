@@ -158,13 +158,32 @@ class EPaycoPaymentController extends Controller
     }
 
     /**
-     * Verificar estado de un pago por referencia
+     * Verificar estado de un pago por referencia o ref_payco
      * Consulta tanto la BD como la API de ePayco
      */
-    public function checkPaymentStatus($reference)
+    public function checkPaymentStatus(Request $request)
     {
         try {
-            $pendingPayment = PendingPayment::where('reference', $reference)->first();
+            // Aceptar tanto por parámetro de ruta como query params
+            $reference = $request->reference ?? $request->query('reference');
+            $refPayco = $request->ref_payco ?? $request->query('ref_payco');
+
+            if (!$reference && !$refPayco) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Se requiere reference o ref_payco'
+                ], 400);
+            }
+
+            // Buscar por reference o por payment_link_id (ref_payco)
+            $pendingPayment = PendingPayment::where(function($query) use ($reference, $refPayco) {
+                if ($reference) {
+                    $query->orWhere('reference', $reference);
+                }
+                if ($refPayco) {
+                    $query->orWhere('payment_link_id', $refPayco);
+                }
+            })->first();
 
             if (!$pendingPayment) {
                 return response()->json([

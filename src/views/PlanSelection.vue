@@ -877,20 +877,23 @@ const handlePlanSelection = async (plan) => {
       const data = JSON.parse(registrationData)
       tenantSubdomain = data.subdomain || ''
     }
-    
     // 🔥 Determinar URL de redirección correcta basada en el entorno
     const getRedirectUrl = () => {
-      // Si es renovación, volver al dashboard/pos
+      // 🎯 SIEMPRE redirigir a /payment/verify para verificar el estado real
+      // ePayco puede decir "rechazada" antes de que llegue el webhook
+      const baseParams = `tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
+      
+      // Si es renovación, agregar parámetro adicional
       if (isRenewalMode.value) {
          const protocol = window.location.protocol
          const host = window.location.host
-         return `${protocol}//${host}/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&renewal=true`
+         return `${protocol}//${host}/payment/verify?${baseParams}&renewal=true`
       }
 
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return `http://localhost:3000/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
+        return `http://localhost:3000/payment/verify?${baseParams}`
       }
-      return `https://105pos.pro/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
+      return `https://105pos.pro/payment/verify?${baseParams}`
     }
 
     // Inicializar transacción en backend (guardar pending payment)

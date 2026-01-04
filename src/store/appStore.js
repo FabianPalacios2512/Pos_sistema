@@ -1,4 +1,4 @@
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { customersService } from '../services/customersService.js'
@@ -336,3 +336,8 @@ export const appStore = reactive({
     }
   }
 })
+
+// 🆕 Computed properties para acceso simplificado a datos del tenant
+export const subscriptionEndDate = computed(() => appStore.tenant?.subscription_end_date || null)
+export const subscriptionStatus = computed(() => appStore.tenant?.subscription_status || 'unknown')
+export const maxUsers = computed(() => appStore.tenant?.max_users || 2)

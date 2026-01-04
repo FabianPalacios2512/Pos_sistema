@@ -373,6 +373,44 @@
 
             <!-- Footer con resumen y botones -->
             <div class="px-6 py-5 bg-gray-50 dark:bg-zinc-900/80 border-t border-gray-100 dark:border-zinc-800">
+              
+              <!-- Desglose de Precio (si hay crédito disponible) -->
+              <div v-if="selectedPlan && availableCredit > 0" class="mb-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl space-y-2">
+                <div class="flex items-center gap-2 mb-3">
+                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <p class="text-sm font-bold text-emerald-900 dark:text-emerald-100">Descuento aplicado</p>
+                </div>
+                
+                <div class="space-y-1.5 text-sm">
+                  <div class="flex justify-between text-gray-700 dark:text-zinc-300">
+                    <span>Precio del plan</span>
+                    <span class="font-semibold">{{ formatPrice(planPrices[selectedPlan]?.[paymentFrequency]?.total || 0) }}</span>
+                  </div>
+                  <div class="flex justify-between text-emerald-700 dark:text-emerald-400">
+                    <span class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Crédito por {{ daysRemaining }} días restantes
+                    </span>
+                    <span class="font-semibold">-{{ formatPrice(availableCredit) }}</span>
+                  </div>
+                  <div class="pt-2 mt-2 border-t border-emerald-200 dark:border-emerald-800 flex justify-between text-base font-bold text-emerald-900 dark:text-emerald-100">
+                    <span>Total a pagar</span>
+                    <span>{{ selectedPlanTotalPrice }}</span>
+                  </div>
+                </div>
+                
+                <p class="text-xs text-emerald-700 dark:text-emerald-400 mt-3 flex items-start gap-1">
+                  <svg class="w-3.5 h-3.5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span>Aplicamos un descuento proporcional por los días no usados de tu plan actual.</span>
+                </p>
+              </div>
+              
               <!-- Terms -->
               <div v-if="selectedPlan" class="mb-4 p-3 bg-white dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl">
                 <label class="flex items-start gap-3 cursor-pointer">
@@ -454,8 +492,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { appStore } from '../store/appStore.js'
+import { ref, computed, watch, onMounted } from 'vue'
+import { appStore, subscriptionEndDate } from '../store/appStore.js'
 import axios from 'axios'
 
 const props = defineProps({
@@ -474,9 +512,27 @@ const isProcessing = ref(false)
 const paymentFrequency = ref('monthly')
 const includeDianInvoicing = ref(false)
 
+// 🐛 DEBUG: Log del estado del store al cargar el componente
+onMounted(() => {
+  console.log('🔍 UpgradePlanModal mounted - Estado del store:', {
+    tenantPlan: appStore.tenantPlan,
+    tenant: appStore.tenant,
+    subscriptionEndDate_computed: subscriptionEndDate.value,
+    subscriptionEndDate_direct: appStore.tenant?.subscription_end_date
+  })
+})
+
 // Get current tenant data
 const currentPlan = computed(() => appStore.tenantPlan)
-const subscriptionEndsAt = computed(() => appStore.subscriptionEndDate)
+const subscriptionEndsAt = computed(() => {
+  const date = subscriptionEndDate.value // Usar el computed exportado del store
+  console.log('📅 subscriptionEndsAt computed:', {
+    date,
+    tenant: appStore.tenant,
+    hasProperty: 'subscription_end_date' in appStore.tenant
+  })
+  return date
+})
 
 // Plan hierarchy for validation
 const planHierarchy = {
@@ -512,6 +568,77 @@ const planPrices = {
   }
 }
 
+// 💰 CALCULAR CRÉDITO PROPORCIONAL DEL PLAN ACTUAL
+const calculateProportionalCredit = () => {
+  console.log('💰 calculateProportionalCredit llamado:', {
+    currentPlan: currentPlan.value,
+    subscriptionEndsAt: subscriptionEndsAt.value,
+    appStore_tenant: appStore.tenant,
+    appStore_subscriptionEndDate: appStore.subscriptionEndDate
+  })
+  
+  // Si no hay plan actual o fecha de vencimiento, no hay crédito
+  if (!currentPlan.value || !subscriptionEndsAt.value || currentPlan.value === 'trial_express') {
+    console.log('⚠️ No hay crédito porque falta:', {
+      currentPlan: currentPlan.value,
+      subscriptionEndsAt: subscriptionEndsAt.value
+    })
+    return 0
+  }
+
+  try {
+    const now = new Date()
+    const endDate = new Date(subscriptionEndsAt.value)
+    
+    // Si ya expiró, no hay crédito
+    if (endDate <= now) {
+      return 0
+    }
+
+    // Calcular días restantes
+    const daysRemaining = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24))
+    
+    // Obtener el precio que pagó por el plan actual
+    // Asumimos que pagó el precio actual del plan (puede venir de la BD si necesitas exactitud)
+    const currentPlanPrices = planPrices[currentPlan.value]?.monthly
+    if (!currentPlanPrices) return 0
+    
+    const currentMonthlyPrice = currentPlanPrices.total
+    
+    // Calcular valor diario del plan actual
+    const dailyValue = currentMonthlyPrice / 30
+    
+    // Calcular crédito total = días restantes * valor diario
+    const credit = Math.round(daysRemaining * dailyValue)
+    
+    console.log('💰 Crédito proporcional calculado:', {
+      currentPlan: currentPlan.value,
+      daysRemaining,
+      dailyValue: dailyValue.toFixed(2),
+      credit
+    })
+    
+    return credit
+  } catch (error) {
+    console.error('Error calculando crédito proporcional:', error)
+    return 0
+  }
+}
+
+// Días restantes del plan actual
+const daysRemaining = computed(() => {
+  if (!subscriptionEndsAt.value) return 0
+  const now = new Date()
+  const endDate = new Date(subscriptionEndsAt.value)
+  const days = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24))
+  return days > 0 ? days : 0
+})
+
+// Crédito disponible
+const availableCredit = computed(() => {
+  return calculateProportionalCredit()
+})
+
 // Get plan display price (monthly equivalent)
 const getPlanPrice = (plan) => {
   const prices = planPrices[plan]?.[paymentFrequency.value]
@@ -523,15 +650,22 @@ const getPlanPrice = (plan) => {
   return prices.display
 }
 
-// Get total price to pay
+// Get total price to pay (con descuento por crédito proporcional)
 const getTotalPrice = (plan) => {
   const prices = planPrices[plan]?.[paymentFrequency.value]
   if (!prices) return 0
   
+  let basePrice = prices.total
+  
   if (plan === 'premium' && includeDianInvoicing.value) {
-    return prices.totalWithDian || prices.total
+    basePrice = prices.totalWithDian || prices.total
   }
-  return prices.total
+  
+  // 💰 Aplicar crédito proporcional del plan actual
+  const credit = availableCredit.value
+  const finalPrice = Math.max(0, basePrice - credit) // No puede ser negativo
+  
+  return finalPrice
 }
 
 // Format price with Colombian format
@@ -648,7 +782,7 @@ const processPayment = async () => {
       extra2: selectedPlan.value,
       extra3: paymentFrequency.value,
       confirmation: `${window.location.origin}/api/epayco/webhook`,
-      response: `${window.location.origin}/#/dashboard`, // Volver al dashboard después del pago
+      response: `${window.location.origin}/#/payment/verify?tenant_id=${tenantId}&plan=${selectedPlan.value}&reference=${reference}&is_upgrade=true`, // Verificar estado antes de mostrar resultado
       email_billing: appStore.userEmail || 'cliente@105pos.pro',
       name_billing: appStore.userName || 'Cliente 105 POS',
       

@@ -144,7 +144,7 @@ Route::get('/ping', function () {
 // ==================== EPAYCO - PAYMENT ROUTES ====================
 Route::post('/epayco/init-transaction', [EPaycoPaymentController::class, 'initTransaction']);
 Route::post('/epayco/webhook', [EPaycoPaymentController::class, 'webhook']);
-Route::get('/epayco/check-payment-status/{reference}', [EPaycoPaymentController::class, 'checkPaymentStatus']);
+Route::get('/epayco/check-payment-status', [EPaycoPaymentController::class, 'checkPaymentStatus']); // Acepta query params: ?reference=xxx o ?ref_payco=xxx
 
 // 🔒 ENDPOINT SEGURO: Verificación de pago con token (público pero protegido)
 Route::post('/epayco/verify-payment', [EPaycoPaymentController::class, 'verifyPaymentWithToken']);

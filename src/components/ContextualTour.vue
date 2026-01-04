@@ -159,6 +159,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { useScreenScaling } from '@/composables/useScreenScaling'
 
 const props = defineProps({
   moduleName: {
@@ -176,6 +177,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['complete', 'skip', 'step-change'])
+
+// 🎯 Importar lógica de compensación de escalado
+const { appliedZoom, isCompensating } = useScreenScaling()
 
 const isActive = ref(false)
 const currentStepIndex = ref(0)
@@ -240,26 +244,43 @@ const updateHighlight = async () => {
 
   // Recalcular posición después del scroll
   const finalRect = element.getBoundingClientRect()
+  
+  // 🎯 COMPENSAR ESCALADO DE PANTALLA
+  // Si el sistema detectó escalado (125%, 150%), necesitamos compensar las coordenadas
+  // porque getBoundingClientRect() devuelve valores en el espacio visual escalado
+  const zoomCompensation = isCompensating.value ? (1 / appliedZoom.value) : 1
+  
   highlightRect.value = {
-    x: finalRect.left,
-    y: finalRect.top,
-    width: finalRect.width,
-    height: finalRect.height
+    x: finalRect.left * zoomCompensation,
+    y: finalRect.top * zoomCompensation,
+    width: finalRect.width * zoomCompensation,
+    height: finalRect.height * zoomCompensation
   }
 
   // Calcular posición del tooltip (con ajuste para que se vea completo)
   const tooltipWidth = 350 // max-w-[350px]
   const tooltipHeight = 300 // Estimado conservador
-  const spaceBelow = window.innerHeight - finalRect.bottom
-  const spaceAbove = finalRect.top
+  
+  // Usar valores compensados para los cálculos
+  const compensatedRect = {
+    top: finalRect.top * zoomCompensation,
+    bottom: finalRect.bottom * zoomCompensation,
+    left: finalRect.left * zoomCompensation,
+    right: finalRect.right * zoomCompensation,
+    width: finalRect.width * zoomCompensation,
+    height: finalRect.height * zoomCompensation
+  }
+  
+  const spaceBelow = (window.innerHeight * zoomCompensation) - compensatedRect.bottom
+  const spaceAbove = compensatedRect.top
   
   // Calcular posición X centrada, pero ajustada a los límites de la pantalla
-  let tooltipX = rect.left + rect.width / 2
-  const padding = 16 // Margen mínimo del borde
+  let tooltipX = compensatedRect.left + compensatedRect.width / 2
+  const padding = 16 * zoomCompensation // Margen mínimo del borde (también compensado)
   
   // Ajustar si el tooltip se sale por la derecha
-  if (tooltipX + tooltipWidth / 2 > window.innerWidth - padding) {
-    tooltipX = window.innerWidth - tooltipWidth / 2 - padding
+  if (tooltipX + tooltipWidth / 2 > (window.innerWidth * zoomCompensation) - padding) {
+    tooltipX = (window.innerWidth * zoomCompensation) - tooltipWidth / 2 - padding
   }
   
   // Ajustar si el tooltip se sale por la izquierda
@@ -271,33 +292,33 @@ const updateHighlight = async () => {
     // Mostrar abajo (preferido si hay suficiente espacio)
     currentTooltipPosition.value = {
       x: tooltipX,
-      y: rect.bottom + 20,
+      y: compensatedRect.bottom + (20 * zoomCompensation),
       arrowSide: 'top'
     }
   } else if (spaceAbove > tooltipHeight) {
     // Mostrar arriba
     currentTooltipPosition.value = {
       x: tooltipX,
-      y: rect.top - 20,
+      y: compensatedRect.top - (20 * zoomCompensation),
       arrowSide: 'bottom'
     }
   } else {
     // Mostrar al lado si no cabe arriba ni abajo
-    const spaceRight = window.innerWidth - rect.right
-    const spaceLeft = rect.left
+    const spaceRight = (window.innerWidth * zoomCompensation) - compensatedRect.right
+    const spaceLeft = compensatedRect.left
     
     if (spaceRight > spaceLeft) {
       // Mostrar a la derecha
       currentTooltipPosition.value = {
-        x: rect.right + 20,
-        y: Math.max(tooltipHeight / 2 + padding, Math.min(window.innerHeight - tooltipHeight / 2 - padding, rect.top + rect.height / 2)),
+        x: compensatedRect.right + (20 * zoomCompensation),
+        y: Math.max(tooltipHeight / 2 + padding, Math.min((window.innerHeight * zoomCompensation) - tooltipHeight / 2 - padding, compensatedRect.top + compensatedRect.height / 2)),
         arrowSide: 'left'
       }
     } else {
       // Mostrar a la izquierda
       currentTooltipPosition.value = {
-        x: rect.left - 20,
-        y: Math.max(tooltipHeight / 2 + padding, Math.min(window.innerHeight - tooltipHeight / 2 - padding, rect.top + rect.height / 2)),
+        x: compensatedRect.left - (20 * zoomCompensation),
+        y: Math.max(tooltipHeight / 2 + padding, Math.min((window.innerHeight * zoomCompensation) - tooltipHeight / 2 - padding, compensatedRect.top + compensatedRect.height / 2)),
         arrowSide: 'right'
       }
     }

@@ -279,9 +279,9 @@ const proceedToPayment = async () => {
       test: true // Mantener en TRUE para usar tarjeta de prueba
     })
 
-    // Obtener URL de respuesta correcta
+    // Obtener URL de respuesta correcta (usar verificación)
     const currentUrl = window.location.origin
-    const responseUrl = `${currentUrl}/payment/success?tenant_id=${tenantId.value}&plan=${selectedPlan.value}&reference=${reference}&renewal=true`
+    const responseUrl = `${currentUrl}/payment/verify?tenant_id=${tenantId.value}&plan=${selectedPlan.value}&reference=${reference}&renewal=true`
 
     handler.open({
       name: `Plan ${selectedPlan.value.toUpperCase()} - Renovación`,
