@@ -12,25 +12,13 @@
   box-sizing: border-box;
 }
 
-/* 🎯 Altura dinámica del viewport - Compatible con zoom y móviles */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  min-height: 100vh;
-  min-height: 100dvh; /* Dynamic viewport height - mejor para zoom y móviles */
   overflow-x: hidden;
-}
-
-/* Body debe tener fondo oscuro para modo oscuro y claro para modo claro */
-body {
-  background-color: #f1f5f9; /* slate-100 - modo claro */
-}
-
-.dark body,
-body.dark {
-  background-color: #0a0a0c; /* fondo oscuro del sistema */
+  background: black !important;
 }
 
 #app {
@@ -38,8 +26,7 @@ body.dark {
   padding: 0;
   width: 100%;
   height: 100%;
-  min-height: 100vh;
-  min-height: 100dvh; /* Dynamic viewport height */
+  background: black !important;
 }
 
 /* Scrollbar personalizado */
@@ -179,21 +166,4 @@ body.dark {
 
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 0px);
-}
-
-/* ============================================
-   🖥️ SCREEN SCALING v5 - MINIMALISTA
-   ============================================
-   Solo actúa cuando hay Windows 125%+
-   Completamente transparente cuando no hay escalado
-   ============================================ */
-
-/* Estado normal - sin cambios */
-html, body, #app {
-  /* Dejar que el navegador maneje las alturas naturalmente */
-}
-
-/* Solo cuando hay compensación activa (Windows 125%+) */
-body.screen-compensated {
-  /* El zoom ya se aplica via JS, aquí solo ajustes menores */
 }

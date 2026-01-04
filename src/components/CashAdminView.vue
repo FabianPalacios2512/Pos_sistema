@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] font-sans transition-colors duration-300 px-8">
-    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
+  <div class="bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] font-sans transition-colors duration-300 px-8" style="height: 100%; display: flex; flex-direction: column;">
+    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
       
       <!-- 🎯 Header Elegante y Profesional OBLIGATORIO -->
       <div class="flex items-center justify-between pb-4">
@@ -141,8 +141,8 @@
       </div>
 
       <!-- Sessions Table Compacta -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 overflow-hidden border border-gray-300 dark:border-zinc-800">
-        <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 py-3">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 overflow-hidden border border-gray-300 dark:border-zinc-800" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+        <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 py-3" style="flex-shrink: 0;">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-blue-100 dark:bg-blue-950 rounded-lg flex items-center justify-center">
@@ -165,7 +165,7 @@
           </div>
         </div>
         
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto flex-1 overflow-y-auto">
           <table class="min-w-full">
             <thead class="border-b border-gray-200 dark:border-zinc-800">
               <tr>

@@ -1,9 +1,9 @@
 <template>
   <!-- Layout Principal: Sidebar + Contenido -->
-  <div class="min-h-screen bg-gray-50 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] font-sans flex">
+  <div class="bg-gray-50 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] font-sans flex" style="height: 100%;">
     
     <!-- Sidebar de Navegación (Columna Izquierda) -->
-    <aside class="w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex-shrink-0 overflow-y-auto">
+    <aside class="w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex-shrink-0 overflow-y-auto" style="height: 100%; display: flex; flex-direction: column;">
       <div class="p-6 border-b border-gray-200 dark:border-zinc-800">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-700 dark:to-slate-600 rounded-lg flex items-center justify-center shadow-sm">
@@ -145,7 +145,7 @@
     </aside>
     
     <!-- Panel de Contenido (Columna Derecha) -->
-    <div class="flex-1 overflow-hidden flex flex-col">
+    <div class="flex-1 overflow-hidden flex flex-col" style="min-height: 0;">
       <!-- Header Sticky con Botones de Acción -->
       <div class="sticky top-0 z-10 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between shadow-sm">
         <div>
@@ -1253,7 +1253,7 @@ const props = defineProps({
 })
 
 // Emits para eventos
-const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos'])
+const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'refresh'])
 
 // Estado del modal de upgrade de plan
 const showUpgradeModal = ref(false)

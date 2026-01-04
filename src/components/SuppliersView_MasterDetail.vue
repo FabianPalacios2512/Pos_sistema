@@ -1,6 +1,6 @@
 <template>
   <!-- Master-Detail Layout Enterprise: 30/70 - Unificado como WhatsApp -->
-  <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="height: calc(100vh - 200px); min-height: 550px;">
+  <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="flex: 1; min-height: 0;">
     <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
     
     <!-- PANEL IZQUIERDO: Lista de Proveedores (30%) -->

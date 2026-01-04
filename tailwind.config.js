@@ -56,13 +56,6 @@ export default {
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
       },
-      // 🎯 Soporte para Dynamic Viewport Height (dvh) - Compatible con zoom
-      height: {
-        'screen-dvh': '100dvh',
-      },
-      minHeight: {
-        'screen-dvh': '100dvh',
-      },
     },
   },
   plugins: [],

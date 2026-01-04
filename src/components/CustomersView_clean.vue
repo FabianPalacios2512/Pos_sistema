@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-4 lg:px-6">
-    <div class="p-3 lg:p-4 space-y-4 pb-6 animate-fade-in">
+  <div class="font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-4 lg:px-6" style="height: 100%; display: flex; flex-direction: column;">
+    <div class="p-3 lg:p-4 space-y-4 pb-6 animate-fade-in" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
       
       <!-- NIVEL 1: Header Minimalista -->
       <div class="flex items-center justify-between">
@@ -16,7 +16,7 @@
       </div>
 
       <!-- Master-Detail Layout Enterprise: 30/70 -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="height: calc(100vh - 130px); min-height: 550px;">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="flex: 1; min-height: 0;">
         <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
         <!-- PANEL IZQUIERDO: Lista de Clientes (30%) -->
@@ -916,6 +916,15 @@ import { useToast } from '../composables/useToast.js'
 import { useCreditienda } from '../composables/useCreditienda.js'
 import { useAutoRefresh } from '../composables/useRouteState.js'
 import { appStore } from '../store/appStore.js'
+
+// ✅ Definir props y emits para heredar correctamente desde el padre
+const props = defineProps({
+  moduleName: String,
+  queryParams: Object,
+  customers: Array
+})
+
+const emit = defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'refresh'])
 
 // Sistema de toasts
 const { showSuccess, showError, showWarning, showInfo } = useToast()

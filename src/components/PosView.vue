@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full relative bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 pb-4" @click="handlePosClick">
+  <div class="relative bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300" style="height: 100%; display: flex; flex-direction: column; overflow: hidden;" @click="handlePosClick">
     
     <!-- 🎯 Modal de Bienvenida Primera Vez - DISEÑO LIMPIO CON ELEVACIÓN POR LUMINOSIDAD -->
     <Teleport to="body">
@@ -655,12 +655,12 @@
       </Transition>
     </Teleport>
     
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5 pb-6 lg:pb-2.5" style="height: calc(100vh - 11rem - 54px); margin-bottom: 24px;">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5 pb-6" style="flex: 1; min-height: 0; height: 100%; max-height: 100%; overflow: hidden;">
   <!-- Panel Izquierdo: Catálogo de Productos - Full en móvil, 70% Fashion (8/12) | 50% General (6/12) en desktop -->
-  <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="col-span-1 lg:col-span-auto h-full overflow-hidden transition-all duration-300">
-    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col overflow-hidden transition-all duration-300">
+  <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="col-span-1 lg:col-span-auto overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
+    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 flex flex-col overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
       
-      <div class="flex-1 p-3 overflow-y-auto bg-slate-100/80 dark:bg-zinc-950/50 backdrop-blur-sm" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+      <div class="p-3 overflow-y-auto bg-slate-100/80 dark:bg-zinc-950/50 backdrop-blur-sm" style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
         <!-- Loading skeleton - Modo oscuro mejorado -->
       <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -956,8 +956,8 @@
 <!-- bloque de ventas - 30% Fashion (4/12) | Panel Central General (3/12) -->
 
 <!-- Panel Derecho: Carrito/Ticket - OCULTO EN MÓVIL -->
-<div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block h-full overflow-hidden transition-all duration-300">
-  <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col overflow-hidden transition-all duration-300">
+<div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block overflow-hidden transition-all duration-300" style="max-height: 100%;">
+  <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 flex flex-col overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
     
     <div class="p-4 flex-shrink-0">
       <div class="flex items-center justify-between mb-3">

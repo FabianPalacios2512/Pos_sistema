@@ -2445,7 +2445,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['navigate', 'changeModule', 'openQuotationInPos'])
+const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'refresh'])
 
 // Router - DEBE estar a nivel de setup, NO dentro de onMounted
 const route = useRoute()

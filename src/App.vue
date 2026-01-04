@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="min-h-screen">
+  <div id="app" class="h-full min-h-screen flex flex-col">
     <!-- Splash Screen Inicial -->
     <SplashScreen 
       v-if="showSplash"
@@ -9,7 +9,7 @@
     <TrialBanner />
     
     <!-- Aplicación Principal -->
-    <router-view v-show="!showSplash" />
+    <router-view v-show="!showSplash" style="flex: 1; min-height: 0;" />
     <ToastContainer />
     
     <!-- Modal de advertencia de timeout de sesión -->
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import authStore from './store/auth.js'
 import { appStore } from './store/appStore.js'
 import SplashScreen from './components/SplashScreen.vue'

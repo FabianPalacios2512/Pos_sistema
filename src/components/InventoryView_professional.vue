@@ -985,7 +985,7 @@ const props = defineProps({
 })
 
 // Eventos emitidos
-const emit = defineEmits(['navigate', 'changeModule'])
+const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'refresh'])
 
 // Sistema de toasts
 const { showSuccess, showError, showWarning } = useToast()

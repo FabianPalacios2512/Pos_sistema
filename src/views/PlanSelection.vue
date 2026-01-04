@@ -894,7 +894,7 @@ const handlePlanSelection = async (plan) => {
     }
 
     // Inicializar transacción en backend (guardar pending payment)
-    await axios.post('/api/epayco/init-transaction', {
+    const initResponse = await axios.post('/api/epayco/init-transaction', {
       amount: finalPrice,
       reference: reference,
       customer_email: localStorage.getItem('user_email') || 'cliente@105pos.pro',
@@ -903,37 +903,39 @@ const handlePlanSelection = async (plan) => {
       tenant_id: tenantId.value
     })
 
-    // Configurar ePayco
-    const handler = window.ePayco.checkout.configure({
-      key: '2943652c673afffaa5b7b67829f00a0c',
-      test: true
+    console.log('✅ Transacción inicializada:', initResponse.data)
+
+    // 🚀 Construir URL de ePayco directamente (más rápido que SDK)
+    const epaycoParams = new URLSearchParams({
+      'p_cust_id_cliente': '2943652c673afffaa5b7b67829f00a0c',
+      'p_key': '2943652c673afffaa5b7b67829f00a0c',
+      'p_id_invoice': reference,
+      'p_description': `Suscripción ${paymentFrequency.value} al plan ${plan}`,
+      'p_amount': finalPrice.toString(),
+      'p_amount_base': finalPrice.toString(),
+      'p_tax': '0',
+      'p_currency_code': 'COP',
+      'p_signature_key': '3a7a8c6b67b21ab6ce54f1d55e70aa18',
+      'p_test_request': 'true',
+      'p_extra1': tenantId.value,
+      'p_extra2': plan,
+      'p_extra3': paymentFrequency.value,
+      'p_url_response': getRedirectUrl(),
+      'p_url_confirmation': 'https://105pos.pro/api/epayco/webhook',
+      'p_name_billing': companyName.value || 'Cliente 105POS',
+      'p_address_billing': 'Calle 123 # 45-67',
+      'p_type_doc_billing': 'cc',
+      'p_number_doc_billing': '1234567890',
+      'p_email_billing': localStorage.getItem('user_email') || 'cliente@105pos.pro',
+      'p_mobilephone_billing': '3000000000'
     })
 
-    const data = {
-      name: `Plan ${plan} - ${companyName.value}`,
-      description: `Suscripción ${paymentFrequency.value} al plan ${plan}`,
-      invoice: reference,
-      currency: 'cop',
-      amount: finalPrice,
-      tax_base: '0',
-      tax: '0',
-      country: 'co',
-      lang: 'es',
-      external: 'true', // true = Standard Checkout (Redirección a la página de ePayco)
-      extra1: tenantId.value,
-      extra2: plan,
-      extra3: paymentFrequency.value,
-      confirmation: 'https://105pos.pro/api/epayco/webhook',
-      response: getRedirectUrl(),
-      name_billing: companyName.value || 'Cliente 105POS',
-      address_billing: 'Calle 123 # 45-67',
-      type_doc_billing: 'cc',
-      mobilephone_billing: '3000000000',
-      number_doc_billing: '1234567890',
-      email_billing: localStorage.getItem('user_email') || 'cliente@105pos.pro',
-    }
-
-    handler.open(data)
+    const epaycoUrl = `https://checkout.epayco.co/checkout.php?${epaycoParams.toString()}`
+    
+    console.log('🌐 Abriendo portal de pago ePayco en ventana nueva...')
+    
+    // Abrir en ventana nueva (más rápido y limpio)
+    window.open(epaycoUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes')
     
     // Guardar referencia en localStorage
     localStorage.setItem('pending_payment', JSON.stringify({

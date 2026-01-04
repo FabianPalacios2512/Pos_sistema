@@ -311,6 +311,8 @@ Chart.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement
 
 // Props
 const props = defineProps({
+  moduleName: String,
+  queryParams: Object,
   salesData: {
     type: Object,
     default: () => ({
@@ -337,7 +339,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['change-module'])
+const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'refresh'])
 
 // Composables
 const { 

@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
-    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
+  <div class="font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8" style="height: 100%; display: flex; flex-direction: column;">
+    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
       
       <!-- Header Simple y Elegante -->
       <div class="flex items-center justify-between pb-4">
@@ -74,9 +74,9 @@
       </div>
 
       <!-- TAB: PROVEEDORES -->
-      <div v-if="activeTab === 'suppliers'">
+      <div v-if="activeTab === 'suppliers'" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
         <!-- Mostrar lista de proveedores -->
-        <div v-if="viewMode === 'list'">
+        <div v-if="viewMode === 'list'" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
           <SuppliersViewMasterDetail ref="suppliersView" />
         </div>
 
@@ -227,10 +227,10 @@
       </div>
 
       <!-- TAB: ÓRDENES DE COMPRA -->
-      <div v-if="activeTab === 'orders'">
+      <div v-if="activeTab === 'orders'" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
 
       <!-- Master-Detail Layout Enterprise: 30/70 - Unificado como WhatsApp -->
-      <div v-if="viewMode === 'list'" class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="height: calc(100vh - 200px); min-height: 550px;">
+      <div v-if="viewMode === 'list'" class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="flex: 1; min-height: 0;">
         <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
         <!-- PANEL IZQUIERDO: Lista de Órdenes (30%) -->
