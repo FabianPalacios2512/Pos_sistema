@@ -1,10 +1,10 @@
 <template>
   <div>
   <!-- Layout de 3 Columnas: Menú Lateral + Contenido + Preview -->
-  <div class="flex overflow-hidden bg-gray-50 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c]" style="height: calc(100vh - 64px);">
+  <div class="flex overflow-hidden bg-gray-50 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c]" style="height: 100%;">
     
     <!-- SIDEBAR IZQUIERDO - Menú de Navegación -->
-    <aside class="w-64 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-r border-gray-200/80 dark:border-zinc-800/50 flex flex-col overflow-y-auto shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+    <aside class="w-64 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-r border-gray-200/80 dark:border-zinc-800/50 flex flex-col shadow-lg shadow-gray-200/50 dark:shadow-black/30" style="min-height: 0;">
       <!-- Header Sidebar - Compacto -->
       <div class="px-4 py-3 border-b border-gray-100/80 dark:border-zinc-800/50 flex-shrink-0">
         <div class="flex items-center gap-2 mb-3">

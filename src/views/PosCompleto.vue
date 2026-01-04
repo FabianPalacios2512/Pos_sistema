@@ -1,6 +1,6 @@
 <template>
   <!-- Sistema POS Empresarial Completo -->
-  <div :class="{ 'dark': isDarkMode }" class="bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-zinc-900 dark:via-zinc-950 dark:to-black transition-colors duration-300 border-8 border-yellow-500" style="height: 100%; display: flex; flex-direction: column;">
+  <div :class="{ 'dark': isDarkMode }" class="bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-zinc-900 dark:via-zinc-950 dark:to-black transition-colors duration-300" style="height: 100%; display: flex; flex-direction: column;">
     
     <!-- 🔥 Modal de Suscripción Expirada (NO se puede cerrar) -->
     <SubscriptionExpiredModal />
@@ -16,7 +16,7 @@
     />
 
     <!-- Área Principal de Contenido Adaptable -->
-    <div class="transition-all duration-300 border-8 border-red-500" style="flex: 1; display: flex; flex-direction: column; min-height: 0;" 
+    <div class="transition-all duration-300" style="flex: 1; display: flex; flex-direction: column; min-height: 0;" 
          :class="{
            'lg:ml-60 lg:pl-4': !sidebarCollapsed,
            'lg:ml-20': sidebarCollapsed
@@ -45,7 +45,7 @@
 
 
       <!-- Contenido Principal -->
-      <main style="flex: 1; min-height: 0;" class="border-8 border-cyan-500">
+      <main style="flex: 1; min-height: 0;">
         
         <!-- Dashboard -->
         <div v-if="currentModule === 'dashboard'">
@@ -73,7 +73,7 @@
         </div>
 
         <!-- Módulos restantes se cargan dinámicamente -->
-        <div v-if="currentModule !== 'dashboard' && currentModule !== 'pos'" style="height: 100%;" class="border-8 border-green-500">
+        <div v-if="currentModule !== 'dashboard' && currentModule !== 'pos'" style="height: 100%;">
           <component
             :is="currentModuleComponent"
             v-bind="getModuleProps()"

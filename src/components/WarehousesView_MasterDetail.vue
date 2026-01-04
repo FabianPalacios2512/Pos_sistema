@@ -3,8 +3,8 @@
   <ToastContainer />
   
   <!-- Gradiente en TODO el fondo -->
-  <div class="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
-    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
+  <div class="font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8" style="height: 100%; display: flex; flex-direction: column;">
+    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
       
       <!-- Header sin borde, sin contenedor separado -->
       <div class="flex items-center justify-between pb-4">
@@ -538,7 +538,7 @@
       <!-- Fin contenido Sedes -->
 
       <!-- Contenido Traslados -->
-      <div v-if="activeTab === 'transfers'">
+      <div v-if="activeTab === 'transfers'" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
         <StockTransfersView ref="transfersComponent" :embedded="true" />
       </div>
 

@@ -2,8 +2,8 @@
   <!-- Toast Notifications -->
   <ToastContainer />
   
-  <div :class="embedded ? 'space-y-6' : 'min-h-screen font-sans mx-8'" :style="embedded ? '' : 'background-color: #F4F6F8;'">
-    <div :class="embedded ? 'space-y-6' : 'p-4 lg:p-6 space-y-6 pb-8 animate-fade-in'">
+  <div :class="embedded ? 'space-y-6' : 'font-sans mx-8'" :style="embedded ? '' : 'background-color: #F4F6F8; height: 100%; display: flex; flex-direction: column;'">
+    <div :class="embedded ? 'space-y-6' : 'p-4 lg:p-6 space-y-6 pb-8 animate-fade-in'" :style="embedded ? '' : 'flex: 1; display: flex; flex-direction: column; min-height: 0;'">
       
       <!-- Header Elegante -->
       <div v-if="!embedded" class="flex items-center justify-between pb-4 border-b border-gray-300">
@@ -75,7 +75,7 @@
       </div>
 
       <!-- Lista de Traslados -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
         <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-5 py-4 flex items-center justify-between">
           <div>
             <h2 class="text-base font-bold text-gray-900 dark:text-white">Historial de Traslados</h2>
@@ -102,7 +102,7 @@
           </div>
         </div>
 
-        <div v-else class="divide-y divide-gray-200 dark:divide-zinc-800">
+        <div v-else class="divide-y divide-gray-200 dark:divide-zinc-800 overflow-y-auto" style="flex: 1; min-height: 0;">
           <div 
             v-for="transfer in transfers" 
             :key="transfer.id"
