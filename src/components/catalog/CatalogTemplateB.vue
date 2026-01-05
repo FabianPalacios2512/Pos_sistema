@@ -1,6 +1,6 @@
 <template>
   <!-- PLANTILLA B: "SPEED MARKET" - E-commerce Profesional -->
-  <div class="catalog-speed-market min-h-screen bg-gradient-to-b from-slate-50 via-gray-50 to-white">
+  <div class="catalog-speed-market min-h-screen h-full bg-gradient-to-b from-slate-50 via-gray-50 to-white">
     
     <!-- HEADER ELEGANTE: Logo + Buscador -->
     <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200/80">
@@ -24,7 +24,7 @@
             type="text"
             v-model="searchQuery"
             placeholder="Buscar productos..."
-            class="w-full h-10 md:h-12 pl-10 md:pl-12 pr-4 rounded-xl border-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-medium text-gray-900 placeholder-gray-400"
+            class="w-full h-10 md:h-12 pl-10 md:pl-12 pr-4 rounded-xl border-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-colors duration-150 text-sm font-medium text-gray-900 placeholder-gray-400"
           />
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5 text-gray-400 absolute left-3 md:left-4 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -34,16 +34,16 @@
         <!-- Cart Icon Mejorado -->
         <button 
           @click="openCartWithExplosion"
-          class="cart-icon-button relative p-2 md:p-3 hover:bg-gray-100 active:bg-gray-200 rounded-xl transition-all active:scale-95 flex-shrink-0 touch-manipulation"
+          class="cart-icon-button relative p-2 md:p-3 hover:bg-gray-100 active:bg-gray-200 rounded-xl transition-transform duration-150 active:scale-95 flex-shrink-0 touch-manipulation"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
-          <!-- Badge con animación de pulso cuando hay items -->
+          <!-- Badge cuando hay items -->
           <Transition name="badge-pop">
             <span 
               v-if="cartItems.length > 0" 
-              class="absolute -top-0.5 -right-0.5 text-white text-xs font-black w-5 h-5 rounded-full flex items-center justify-center shadow-lg animate-pulse" 
+              class="absolute -top-0.5 -right-0.5 text-white text-xs font-black w-5 h-5 rounded-full flex items-center justify-center shadow-lg" 
               :style="{ backgroundColor: primaryColor }"
             >
               {{ cartItems.length }}
@@ -59,7 +59,7 @@
         <div class="flex gap-2 md:gap-3 min-w-max pb-1">
           <button
             @click="selectedCategory = null"
-            class="px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 border-2 touch-manipulation active:scale-95"
+            class="px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-colors duration-150 flex-shrink-0 border-2 touch-manipulation active:scale-95"
             :class="selectedCategory === null 
               ? 'text-white shadow-lg shadow-blue-500/25 border-transparent' 
               : 'bg-white text-gray-600 hover:bg-gray-50 active:bg-gray-100 border-gray-200 hover:border-gray-300'"
@@ -71,7 +71,7 @@
             v-for="cat in categories"
             :key="cat.id"
             @click="selectedCategory = cat.id"
-            class="px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 border-2 touch-manipulation active:scale-95"
+            class="px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-colors duration-150 flex-shrink-0 border-2 touch-manipulation active:scale-95"
             :class="selectedCategory === cat.id 
               ? 'text-white shadow-lg shadow-blue-500/25 border-transparent' 
               : 'bg-white text-gray-600 hover:bg-gray-50 active:bg-gray-100 border-gray-200 hover:border-gray-300'"
@@ -84,14 +84,14 @@
     </nav>
 
     <!-- LISTADO DE PRODUCTOS: Grid Premium Desktop -->
-    <main class="container mx-auto px-6 py-8 pb-12 max-w-7xl transition-all duration-500" :class="showCheckout ? 'mr-[35%] blur-[2px] opacity-60' : ''">
+    <main class="container mx-auto px-6 py-8 pb-12 max-w-7xl transition-opacity duration-200" :class="showCheckout ? 'mr-[35%] blur-[2px] opacity-60' : ''">
       <!-- Grid de Cards para Desktop -->
       <div class="hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
         <TransitionGroup name="list">
           <div 
             v-for="product in filteredProducts" 
             :key="product.id"
-            class="product-card bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden group cursor-pointer relative"
+            class="product-card bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-150 border border-gray-100 overflow-hidden group cursor-pointer relative"
             :ref="el => { if (el) productRefs[product.id] = el }"
           >
             <!-- Imagen Premium -->
@@ -102,7 +102,7 @@
                 :src="product.images && product.images.length > 0 ? product.images[0] : product.image_url"
                 :alt="product.name"
                 @error="handleImageError(product.id)"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                class="w-full h-full object-cover"
               />
               
               <!-- Placeholder Mejorado -->
@@ -147,7 +147,7 @@
                 <button
                   @click="addToCartWithAnimation(product, $event)"
                   :disabled="product.stock === 0"
-                  class="p-3 rounded-xl text-white hover:scale-110 active:scale-95 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg flex-shrink-0"
+                  class="p-3 rounded-xl text-white active:scale-95 transition-transform duration-150 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg flex-shrink-0"
                   :style="product.stock > 0 ? { backgroundColor: primaryColor } : {}"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -167,7 +167,7 @@
           :key="product.id"
           :ref="el => { if (el) productRefs[product.id] = el }"
           @click="getProductQuantity(product.id) === 0 && product.stock > 0 && addToCartWithAnimation(product, $event)"
-          class="bg-white rounded-xl shadow-sm transition-all duration-200 border border-gray-100 overflow-hidden group touch-manipulation"
+          class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-100 border border-gray-100 overflow-hidden group touch-manipulation"
           :class="[
             product.stock === 0 ? 'opacity-50' : (getProductQuantity(product.id) === 0 ? 'cursor-pointer active:scale-[0.98] active:shadow-lg' : '')
           ]"
@@ -223,11 +223,9 @@
                 v-if="getProductQuantity(product.id) > 0"
                 class="relative"
               >
-                <!-- Fondo circular con pulso -->
-                <div class="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-30"></div>
                 <!-- Badge principal VERDE -->
                 <div 
-                  class="relative px-4 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-base font-black flex items-center gap-2 shadow-lg animate-bounce-once border-2 border-emerald-400"
+                  class="relative px-4 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-base font-black flex items-center gap-2 shadow-lg border-2 border-emerald-400"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -239,7 +237,7 @@
               <!-- Icono de + cuando NO está agregado -->
               <div 
                 v-else
-                class="w-11 h-11 rounded-full flex items-center justify-center border-2 transition-all"
+                class="w-11 h-11 rounded-full flex items-center justify-center border-2"
                 :style="{ borderColor: primaryColor, color: primaryColor }"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 font-bold" viewBox="0 0 20 20" fill="currentColor">
@@ -1340,11 +1338,11 @@ watch(groupedCartItems, (newItems) => {
 }
 
 .fly-enter-active {
-  transition: all 0.3s ease-out;
+  transition: all 0.2s ease-out;
 }
 
 .fly-leave-active {
-  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .fly-enter-from {
@@ -1357,14 +1355,14 @@ watch(groupedCartItems, (newItems) => {
 }
 
 /* ========================================
-   ANIMACIÓN DEL BADGE DEL CARRITO
+   ANIMACIÓN DEL BADGE DEL CARRITO (Simplificada)
    ======================================== */
 .badge-pop-enter-active {
-  animation: badgePop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  animation: badgePop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .badge-pop-leave-active {
-  transition: all 0.3s ease-in;
+  transition: all 0.2s ease-in;
 }
 
 .badge-pop-enter-from,
@@ -1448,13 +1446,13 @@ watch(groupedCartItems, (newItems) => {
   width: 100%;
 }
 
-/* Transitions */
+/* Transitions - Simplificadas para mejor rendimiento */
 /* Desktop */
 @media (min-width: 768px) {
   .list-move,
   .list-enter-active,
   .list-leave-active {
-    transition: all 0.4s cubic-bezier(0.55, 0, 0.1, 1);
+    transition: all 0.25s cubic-bezier(0.55, 0, 0.1, 1);
   }
 
   .list-enter-from {
@@ -1473,10 +1471,10 @@ watch(groupedCartItems, (newItems) => {
   }
 }
 
-/* Móvil - ANIMACIONES BRUTALES */
+/* Móvil - Animaciones optimizadas */
 @media (max-width: 767px) {
   .list-enter-active {
-    animation: slideInMobile 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: slideInMobile 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .list-leave-active {
@@ -1542,26 +1540,6 @@ watch(groupedCartItems, (newItems) => {
   }
 }
 
-/* Animación de bounce para badge agregado */
-@keyframes bounce-once {
-  0%, 100% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(1.1);
-  }
-  50% {
-    transform: scale(0.95);
-  }
-  75% {
-    transform: scale(1.05);
-  }
-}
-
-.animate-bounce-once {
-  animation: bounce-once 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
 /* Mejora de scroll en móvil */
 .overflow-y-auto {
   -webkit-overflow-scrolling: touch;
@@ -1577,14 +1555,14 @@ watch(groupedCartItems, (newItems) => {
   scrollbar-width: none;
 }
 
-/* Transición BRUTAL del panel en móvil */
+/* Transición rápida en móvil */
 @media (max-width: 768px) {
   .slide-right-enter-active {
-    animation: slideInPanel 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: slideInPanel 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   
   .slide-right-leave-active {
-    animation: slideOutPanel 0.25s cubic-bezier(0.55, 0, 0.1, 1);
+    animation: slideOutPanel 0.2s cubic-bezier(0.55, 0, 0.1, 1);
   }
   
   @keyframes slideInPanel {
@@ -1610,11 +1588,11 @@ watch(groupedCartItems, (newItems) => {
   }
 }
 
-/* Transición suave en desktop */
+/* Transición rápida en desktop */
 @media (min-width: 769px) {
   .slide-right-enter-active,
   .slide-right-leave-active {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .slide-right-enter-from,

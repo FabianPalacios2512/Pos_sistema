@@ -159,9 +159,8 @@
         <img 
           src="/login.png" 
           alt="105 POS Pro" 
-          class="w-full h-full object-cover transition-opacity duration-1000 ease-out"
-          :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
-          @load="imageLoaded = true"
+          class="w-full h-full object-cover"
+          fetchpriority="high"
           loading="eager"
           decoding="async"
           style="object-position: center 70%;"
@@ -171,43 +170,24 @@
         <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-transparent to-transparent"></div>
       </div>
 
-      <!-- Skeleton mientras carga -->
-      <div 
-        v-if="!imageLoaded" 
-        class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"
-      >
-        <div class="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-slate-700/20 to-transparent"></div>
-      </div>
-
       <!-- Contenido superpuesto -->
       <div class="relative z-10 flex flex-col justify-between w-full h-full p-10 xl:p-12">
         
         <!-- Logo y marca superior -->
-        <transition
-          enter-active-class="transition ease-out duration-500"
-          enter-from-class="translate-y-4 opacity-0"
-          enter-to-class="translate-y-0 opacity-100"
-        >
-          <div v-if="imageLoaded" class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
-              <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div>
-              <span class="text-white/90 font-bold text-xl tracking-tight">105 POS Pro</span>
-              <p class="text-slate-400 text-sm">Gestiona tu negocio al siguiente nivel</p>
-            </div>
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
+            <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
           </div>
-        </transition>
+          <div>
+            <span class="text-white/90 font-bold text-xl tracking-tight">105 POS Pro</span>
+            <p class="text-slate-400 text-sm">Gestiona tu negocio al siguiente nivel</p>
+          </div>
+        </div>
 
         <!-- Contenido central con beneficios -->
-        <transition
-          enter-active-class="transition ease-out duration-700 delay-200"
-          enter-from-class="translate-y-8 opacity-0"
-          enter-to-class="translate-y-0 opacity-100"
-        >
-          <div v-if="imageLoaded" class="flex-1 flex flex-col justify-center max-w-md">
+        <div class="flex-1 flex flex-col justify-center max-w-md">
             <div class="space-y-6">
               <h2 class="text-3xl xl:text-4xl font-bold text-white leading-tight">
                 Comienza tu prueba
@@ -252,16 +232,10 @@
                 </div>
               </div>
             </div>
-          </div>
-        </transition>
+        </div>
 
         <!-- Testimonial Card inferior -->
-        <transition
-          enter-active-class="transition ease-out duration-700 delay-400"
-          enter-from-class="translate-y-6 opacity-0"
-          enter-to-class="translate-y-0 opacity-100"
-        >
-          <div v-if="imageLoaded" class="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+        <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
             <div class="flex items-start gap-4">
               <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0 border-2 border-white/20">
                 <span class="text-white font-bold text-sm">CR</span>
@@ -278,8 +252,7 @@
                 <p class="text-slate-400 text-sm mt-2 font-medium">Carlos R. — Dueño de Minimarket</p>
               </div>
             </div>
-          </div>
-        </transition>
+        </div>
       </div>
     </div>
 
@@ -502,7 +475,6 @@
                     v-model="form.owner_name" 
                     type="text" 
                     required
-                    @input="form.owner_name = form.owner_name.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\\s'-]/g, '')"
                     class="w-full h-14 px-4 rounded-xl border-2 transition-all outline-none font-medium placeholder-slate-400 bg-slate-50 border-slate-200 focus:bg-white focus:border-slate-900 focus:ring-4 focus:ring-slate-900/10 text-slate-900"
                     placeholder="Ej. Juan Pérez"
                   >
@@ -866,7 +838,6 @@ const googleUserData = ref(null) // 🆕 Datos del usuario de Google
 const googleCode = ref(null) // 🆕 Código de autorización de Google
 const showGoogleToast = ref(false) // 🔔 Control de Toast de Google
 const acceptedTerms = ref(false) // ✅ Aceptación de Términos y Condiciones
-const imageLoaded = ref(false) // 🖼️ Estado de carga de imagen de fondo
 
 // 🚨 Modal Unificado para Duplicados
 const showDuplicateModal = ref(false) // Control del modal unificado

@@ -18,7 +18,6 @@ html, body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
-  background: black !important;
 }
 
 #app {
@@ -26,7 +25,6 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background: black !important;
 }
 
 /* Scrollbar personalizado */

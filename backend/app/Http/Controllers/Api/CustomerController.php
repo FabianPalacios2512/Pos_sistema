@@ -64,13 +64,16 @@ class CustomerController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
-                'document' => 'nullable|string|max:50|unique:customers,document',
+                'document_type' => 'nullable|string|max:10',
+                'document_number' => 'nullable|string|max:50',
                 'email' => 'nullable|email|max:255',
                 'phone' => 'nullable|string|max:50',
                 'address' => 'nullable|string|max:500',
+                'city' => 'nullable|string|max:255',
                 'credit_limit' => 'nullable|numeric|min:0',
-                'credit_days' => 'nullable|integer|min:0',
-                'active' => 'boolean'
+                'credit_active' => 'nullable|boolean',
+                'credit_photo' => 'nullable|string',
+                'active' => 'nullable|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -193,37 +196,55 @@ class CustomerController extends Controller
     public function checkDocument(Request $request)
     {
         try {
+            // 🔍 BÚSQUEDA OPCIONAL: No es obligatorio encontrar el cliente
             $validator = Validator::make($request->all(), [
-                'document' => 'required|string',
+                'document_number' => 'nullable|string',
+                'document' => 'nullable|string',
                 'exclude_id' => 'nullable|integer'
             ]);
 
             if ($validator->fails()) {
+                // ❌ Si la validación falla, devolver éxito con exists=false (no bloquear)
                 return response()->json([
-                    'success' => false,
-                    'errors' => $validator->errors()
-                ], 422);
+                    'success' => true,
+                    'exists' => false,
+                    'data' => null
+                ]);
             }
 
-            $query = Customer::where('document', $request->document);
+            // Soportar tanto 'document' como 'document_number'
+            $documentValue = $request->document_number ?? $request->document;
+
+            if (!$documentValue) {
+                return response()->json([
+                    'success' => true,
+                    'exists' => false,
+                    'data' => null
+                ]);
+            }
+
+            $query = Customer::where('document', $documentValue);
 
             if ($request->has('exclude_id')) {
                 $query->where('id', '!=', $request->exclude_id);
             }
 
-            $exists = $query->exists();
+            $customer = $query->first();
+            $exists = $customer !== null;
 
             return response()->json([
                 'success' => true,
-                'exists' => $exists
+                'exists' => $exists,
+                'data' => $exists ? $customer : null
             ]);
         } catch (\Exception $e) {
             Log::error('Error checking document: ' . $e->getMessage());
+            // ⚠️ Incluso con error, devolver éxito con exists=false (búsqueda opcional)
             return response()->json([
-                'success' => false,
-                'message' => 'Error al verificar documento',
-                'error' => $e->getMessage()
-            ], 500);
+                'success' => true,
+                'exists' => false,
+                'data' => null
+            ]);
         }
     }
 }

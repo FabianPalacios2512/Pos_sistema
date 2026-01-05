@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen font-sans bg-[#EEF2F6] pb-12">
+  <div class="h-screen overflow-y-auto font-sans bg-[#EEF2F6] pb-12">
 
     <div class="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
       

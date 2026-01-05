@@ -527,6 +527,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import authService from '../services/authService'
+import { appStore } from '../store/appStore'
 
 // Estado
 const selectedPlan = ref(null)
@@ -538,6 +540,7 @@ const tenantId = ref(null)
 const redirectUrl = ref('')
 const showTrialSuccessModal = ref(false)
 const countdownSeconds = ref(5)
+const isRenewalMode = ref(false)
 
 // Detectar ambiente de desarrollo
 const isDevelopment = ref(
@@ -546,14 +549,106 @@ const isDevelopment = ref(
 )
 
 // Cargar datos del registro desde URL params (cross-domain) o localStorage (fallback)
-onMounted(() => {
-  // 🔑 PRIORIDAD 1: Leer desde URL params (cuando vienes del registro en otro dominio)
+onMounted(async () => {
+  // Limpiar flag de redirección al montar
+  if (window.__redirecting_to_expired) {
+    delete window.__redirecting_to_expired
+  }
+
+  // 🔍 DEBUG: Verificar estado de autenticación
+  const token = localStorage.getItem('authToken')
+  const userStr = localStorage.getItem('user')
+  console.log('🔍 PlanSelection Debug:', { 
+    token: !!token, 
+    user: !!userStr, 
+    isAuthenticated: authService.isAuthenticated() 
+  })
+
+  // 🚨 PRIORIDAD MÁXIMA: Leer URL params una sola vez
   const urlParams = new URLSearchParams(window.location.search)
+  
+  // Detectar parámetro ?renewal=true (indica renovación explícita)
+  const isRenewalParam = urlParams.get('renewal') === 'true'
+  if (isRenewalParam) {
+    console.log('✅ Parámetro ?renewal=true detectado - MODO RENOVACIÓN ACTIVADO')
+    isRenewalMode.value = true
+  }
+  
+  // Leer parámetros de registro (cross-domain)
   const tenantIdParam = urlParams.get('tenant_id')
   const companyParam = urlParams.get('company')
-  const subdomainParam = urlParams.get('subdomain') // 🔥 LEER EL SUBDOMAIN
+  const subdomainParam = urlParams.get('subdomain')
   const redirectParam = urlParams.get('redirect_url')
+
+  // 🔑 PRIORIDAD 0: Verificar si es usuario autenticado (Renovación)
+  // Usar verificación directa de token como fallback si authService falla
+  const isAuthenticatedUser = authService.isAuthenticated() || !!token
   
+  if (isAuthenticatedUser) {
+    console.log('🔄 Modo Renovación Detectado')
+    isRenewalMode.value = true
+    
+    // Intentar obtener datos del store o authService
+    const user = authService.getUser() || (userStr ? JSON.parse(userStr) : null)
+    
+    // Si tenemos el tenant en el store
+    if (appStore.tenant && appStore.tenant.id) {
+      tenantId.value = appStore.tenant.id
+      companyName.value = appStore.businessName || 'Mi Negocio'
+    } else if (user && user.tenant_id) {
+      // Fallback al usuario
+      tenantId.value = user.tenant_id
+      companyName.value = user.company_name || 'Mi Negocio'
+    }
+    
+    // Si no tenemos tenantId, intentar cargar settings
+    if (!tenantId.value) {
+      try {
+        await appStore.loadSystemSettings(true)
+        if (appStore.tenant && appStore.tenant.id) {
+          tenantId.value = appStore.tenant.id
+          companyName.value = appStore.businessName
+        }
+      } catch (e) {
+        console.error('Error cargando datos para renovación', e)
+        // Ignorar errores 403 (suscripción expirada) - es esperado en modo renovación
+        if (e.response?.status !== 403) {
+          console.error('Error no relacionado con suscripción:', e)
+        }
+      }
+    }
+    
+    // Si aún no tenemos tenantId pero tenemos usuario, intentar usar el del usuario
+    if (!tenantId.value && user && user.tenant_id) {
+       tenantId.value = user.tenant_id
+    }
+
+    if (tenantId.value) {
+      console.log('✅ Modo Renovación configurado con Tenant ID:', tenantId.value)
+      return // Ya tenemos los datos necesarios
+    } else {
+      console.warn('⚠️ Modo renovación activo pero no se encontró tenantId')
+      // Intentar recuperar del localStorage como último recurso
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        try {
+          const u = JSON.parse(storedUser)
+          if (u.tenant_id) {
+            tenantId.value = u.tenant_id
+            console.log('✅ TenantId recuperado de localStorage (fallback final):', tenantId.value)
+            return
+          }
+        } catch (e) { console.error(e) }
+      }
+      
+      // ⚠️ Si llegamos aquí en modo renovación, es un error crítico
+      console.error('❌ Error crítico: Modo renovación activo pero sin Tenant ID')
+      alert('Error: No se pudo identificar tu cuenta. Por favor contacta a soporte.')
+      return // NO redirigir a /register
+    }
+  }
+
+  // 🔑 PRIORIDAD 1: Si hay tenant_id en URL params (cuando vienes del registro en otro dominio)
   if (tenantIdParam) {
     // Datos vienen de URL params (cross-domain desde registro)
     console.log('📦 Cargando datos desde URL params')
@@ -589,9 +684,26 @@ onMounted(() => {
     return
   }
   
-  // Si no hay datos de ninguna fuente, redirigir al registro
-  console.warn('⚠️ No hay datos de registro - redirigiendo a /register')
-  window.location.href = '/register'
+  // ⚠️ VALIDACIÓN FINAL: Solo redirigir si NO es renovación Y NO está autenticado
+  if (isRenewalMode.value) {
+    // ✅ MODO RENOVACIÓN: No hacer validaciones adicionales
+    console.log('✅ Modo Renovación - Saltando validaciones de registro')
+    // Si aún no tenemos tenantId, no es problema - se obtendrá al seleccionar el plan
+    if (!tenantId.value) {
+      console.warn('⚠️ Renovación sin TenantId - se obtendrá después')
+    }
+    return // NO ejecutar más validaciones
+  }
+  
+  // ✅ FIX CRÍTICO: NUNCA redirigir si el usuario está autenticado
+  if (!isAuthenticatedUser) {
+    console.warn('⚠️ No hay datos de registro y no está autenticado - redirigiendo a /register')
+    window.location.href = '/register'
+  } else if (isAuthenticatedUser && !tenantId.value) {
+    // Usuario autenticado pero sin datos - error crítico
+    console.error('❌ Error: Usuario autenticado pero no se pudo obtener Tenant ID')
+    alert('Error: No se pudo identificar tu cuenta. Por favor intenta cerrar sesión y volver a entrar.')
+  }
 })
 
 // Manejo de selección de plan
@@ -604,6 +716,13 @@ const handlePlanSelection = async (plan) => {
   if (plan === 'trial_express') {
     try {
       isProcessing.value = true
+      
+      // 🔥 VALIDACIÓN: Trial NO está disponible en modo renovación
+      if (isRenewalMode.value) {
+        alert('❌ El plan de prueba no está disponible para renovación.\n\nPor favor selecciona uno de los planes de pago.')
+        return
+      }
+      
       await updateTenantPlan(plan)
     } catch (error) {
       console.error('Error activating trial:', error)
@@ -622,6 +741,61 @@ const handlePlanSelection = async (plan) => {
   // Para planes de pago, procesar pago con ePayco
   try {
     isProcessing.value = true
+    
+    // 🔥 VALIDACIÓN CRÍTICA: Asegurar que tenemos tenantId en modo renovación
+    if (isRenewalMode.value && !tenantId.value) {
+      console.warn('⚠️ Modo renovación sin tenantId - obteniendo desde múltiples fuentes...')
+      
+      // PRIORIDAD 1: TenantId guardado específicamente para renovación
+      tenantId.value = localStorage.getItem('expiredTenantId')
+      if (tenantId.value) {
+        console.log('✅ TenantId recuperado desde expiredTenantId:', tenantId.value)
+      } else {
+        // PRIORIDAD 2: Usuario en localStorage
+        let user = authService.getUser()
+        console.log('👤 Usuario desde localStorage:', user)
+        
+        // PRIORIDAD 3: Si no hay usuario en localStorage, intentar obtenerlo del backend
+        if (!user) {
+          console.log('🔄 Usuario no en localStorage, consultando backend /me...')
+          try {
+            const response = await authService.getCurrentUser()
+            if (response.success && response.data?.user) {
+              user = response.data.user
+              console.log('✅ Usuario obtenido del backend:', user)
+              localStorage.setItem('user', JSON.stringify(user))
+            }
+          } catch (error) {
+            console.error('❌ Error obteniendo usuario del backend:', error)
+          }
+        }
+        
+        // PRIORIDAD 4: Intentar extraer tenant_id del usuario
+        if (user) {
+          tenantId.value = user.tenant_id || user.tenantId || localStorage.getItem('tenantId')
+        }
+        
+        // PRIORIDAD 5: Si aún no tenemos tenant_id, intentar obtenerlo del subdominio
+        if (!tenantId.value) {
+          const subdomain = window.location.hostname.split('.')[0]
+          if (subdomain && subdomain !== 'localhost' && subdomain !== '127') {
+            console.log('🌐 Obteniendo tenant desde subdominio:', subdomain)
+            tenantId.value = subdomain
+          }
+        }
+        
+        if (tenantId.value) {
+          console.log('✅ TenantId obtenido:', tenantId.value)
+        } else {
+          throw new Error('No se pudo identificar tu cuenta. Por favor intenta cerrar sesión y volver a entrar.')
+        }
+      }
+    }
+    
+    // Validar que tenemos tenantId antes de continuar
+    if (!tenantId.value) {
+      throw new Error('Error: No se pudo identificar el tenant. Por favor recarga la página.')
+    }
     
     // Calcular precio final
     const basePrice = calculatePlanPrice(plan)
@@ -646,21 +820,38 @@ const handlePlanSelection = async (plan) => {
     // 🔥 Obtener subdomain del tenant desde localStorage
     const registrationData = localStorage.getItem('registration_data')
     let tenantSubdomain = ''
-    if (registrationData) {
+    
+    if (isRenewalMode.value) {
+      // En modo renovación, el subdominio es el actual o el tenant_id
+      tenantSubdomain = window.location.hostname.split('.')[0]
+      if (tenantSubdomain === 'localhost' || tenantSubdomain === 'www') {
+        tenantSubdomain = tenantId.value
+      }
+    } else if (registrationData) {
       const data = JSON.parse(registrationData)
       tenantSubdomain = data.subdomain || ''
     }
-    
     // 🔥 Determinar URL de redirección correcta basada en el entorno
     const getRedirectUrl = () => {
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return `http://localhost:3000/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
+      // 🎯 SIEMPRE redirigir a /payment/verify para verificar el estado real
+      // ePayco puede decir "rechazada" antes de que llegue el webhook
+      const baseParams = `tenant_id=${encodeURIComponent(tenantId.value)}&plan=${encodeURIComponent(plan)}&reference=${encodeURIComponent(reference)}&subdomain=${encodeURIComponent(tenantSubdomain)}`
+      
+      // Si es renovación, agregar parámetro adicional
+      if (isRenewalMode.value) {
+         const protocol = window.location.protocol
+         const host = window.location.host
+         return `${protocol}//${host}/payment/verify?${baseParams}&renewal=true`
       }
-      return `https://105pos.pro/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
+
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return `http://localhost:3000/payment/verify?${baseParams}`
+      }
+      return `https://105pos.pro/payment/verify?${baseParams}`
     }
 
     // Inicializar transacción en backend (guardar pending payment)
-    await axios.post('/api/epayco/init-transaction', {
+    const initResponse = await axios.post('/api/epayco/init-transaction', {
       amount: finalPrice,
       reference: reference,
       customer_email: localStorage.getItem('user_email') || 'cliente@105pos.pro',
@@ -669,45 +860,49 @@ const handlePlanSelection = async (plan) => {
       tenant_id: tenantId.value
     })
 
-    // Configurar ePayco
-    const handler = window.ePayco.checkout.configure({
-      key: '2943652c673afffaa5b7b67829f00a0c',
-      test: true
+    console.log('✅ Transacción inicializada:', initResponse.data)
+
+    // 🚀 Construir URL de ePayco directamente (más rápido que SDK)
+    const epaycoParams = new URLSearchParams({
+      'p_cust_id_cliente': '1569644',
+      'p_key': 'bbc93c88d4780f0898bbe4e9ed29e6bc8e33ca72',
+      'p_id_invoice': reference,
+      'p_description': `Plan ${plan} - ${paymentFrequency.value}`,
+      'p_amount': finalPrice.toString(),
+      'p_amount_base': finalPrice.toString(),
+      'p_tax': '0',
+      'p_currency_code': 'COP',
+      'p_test_request': 'true',
+      'p_extra1': tenantId.value,
+      'p_extra2': plan,
+      'p_extra3': paymentFrequency.value,
+      'p_url_response': getRedirectUrl(),
+      'p_url_confirmation': window.location.hostname === 'localhost' ? 'http://localhost:3000/api/epayco/webhook' : 'https://105pos.pro/api/epayco/webhook',
+      'p_name_billing': (companyName.value || 'Cliente 105POS').replace(/[^a-zA-Z0-9\s]/g, '').substring(0, 50),
+      'p_address_billing': 'Calle 123',
+      'p_type_doc_billing': 'cc',
+      'p_number_doc_billing': '1234567890',
+      'p_email_billing': localStorage.getItem('user_email') || 'cliente@105pos.pro',
+      'p_mobilephone_billing': '3000000000'
     })
 
-    const data = {
-      name: `Plan ${plan} - ${companyName.value}`,
-      description: `Suscripción ${paymentFrequency.value} al plan ${plan}`,
-      invoice: reference,
-      currency: 'cop',
-      amount: finalPrice,
-      tax_base: '0',
-      tax: '0',
-      country: 'co',
-      lang: 'es',
-      external: 'true', // true = Standard Checkout (Redirección a la página de ePayco)
-      extra1: tenantId.value,
-      extra2: plan,
-      extra3: paymentFrequency.value,
-      confirmation: 'https://105pos.pro/api/epayco/webhook',
-      response: getRedirectUrl(),
-      name_billing: companyName.value || 'Cliente 105POS',
-      address_billing: 'Calle 123 # 45-67',
-      type_doc_billing: 'cc',
-      mobilephone_billing: '3000000000',
-      number_doc_billing: '1234567890',
-      email_billing: localStorage.getItem('user_email') || 'cliente@105pos.pro',
-    }
-
-    handler.open(data)
+    const epaycoUrl = `https://checkout.epayco.co/checkout.php?${epaycoParams.toString()}`
     
-    // Guardar referencia en localStorage
+    console.log('🌐 URL ePayco generada:', epaycoUrl)
+    console.log('📍 URL de respuesta:', getRedirectUrl())
+    
+    // Guardar referencia en localStorage ANTES de redirigir
     localStorage.setItem('pending_payment', JSON.stringify({
       reference: reference,
       plan: plan,
       tenant_id: tenantId.value,
       amount: finalPrice
     }))
+    
+    // Redirigir después de un pequeño delay para asegurar que el localStorage se guarde
+    setTimeout(() => {
+      window.location.href = epaycoUrl
+    }, 100)
 
   } catch (error) {
     console.error('Error processing payment:', error)

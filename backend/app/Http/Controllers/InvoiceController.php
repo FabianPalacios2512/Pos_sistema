@@ -132,6 +132,25 @@ class InvoiceController extends Controller
     public function store(Request $request): JsonResponse
     {
         try {
+            // 🚀 VALIDACIÓN: Plan gratuito limitado a 10 facturas
+            $tenant = tenant();
+            if ($tenant && in_array($tenant->plan, ['trial_express', 'free_trial'])) {
+                $invoiceCount = Invoice::where('type', 'invoice')
+                    ->whereIn('status', ['completed', 'paid', 'partial'])
+                    ->count();
+
+                if ($invoiceCount >= 10) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => '🚫 Has alcanzado el límite de 10 facturas del plan gratuito. ¡Actualiza tu plan para continuar vendiendo!',
+                        'error_code' => 'FREE_PLAN_LIMIT_REACHED',
+                        'invoice_count' => $invoiceCount,
+                        'max_invoices' => 10,
+                        'plan' => $tenant->plan
+                    ], 403);
+                }
+            }
+
             $validator = Validator::make($request->all(), [
                 'type' => 'required|in:invoice,quote,credit_note',
                 'customer_id' => 'required|exists:customers,id',

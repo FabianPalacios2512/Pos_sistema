@@ -9,7 +9,9 @@
     <TrialBanner />
     
     <!-- Aplicación Principal -->
-    <router-view v-show="!showSplash" style="flex: 1; min-height: 0;" />
+    <div class="flex-1 flex flex-col min-h-0" v-show="!showSplash">
+      <router-view />
+    </div>
     <ToastContainer />
     
     <!-- Modal de advertencia de timeout de sesión -->

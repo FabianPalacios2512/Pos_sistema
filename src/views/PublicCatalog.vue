@@ -14,7 +14,7 @@ import apiClient from '../services/apiClient.js'
 
 // Estado
 const catalogConfig = ref({
-  template: 'visual-story',
+  template: 'speed-market', // Plantilla por defecto segura para todas las tiendas
   primary_color: '#10B981',
   logo_url: '',
   banner_url: '',
@@ -50,7 +50,7 @@ const loadCatalogConfig = async () => {
     if (response.data.success && response.data.data) {
       const data = response.data.data
       catalogConfig.value = {
-        template: data.template || 'visual-story',
+        template: data.template || 'speed-market', // Plantilla por defecto segura
         primary_color: data.primary_color || '#10B981',
         logo_url: data.logo_url || '',
         banner_url: data.banner_url || '',

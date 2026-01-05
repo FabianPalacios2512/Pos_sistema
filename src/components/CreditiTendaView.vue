@@ -1866,8 +1866,9 @@ const checkDocumentExists = async () => {
       customerExists.value = false
     }
   } catch (error) {
-    console.error('Error checking document:', error)
-    showError('Error al validar el documento')
+    // 🔍 Búsqueda opcional: No mostrar error si no encuentra el cliente
+    console.log('📝 Búsqueda de documento opcional (no se encontró cliente existente)')
+    customerExists.value = false
   } finally {
     checkingDocument.value = false
   }
@@ -1907,19 +1908,31 @@ const saveCustomerCredit = async () => {
       await loadCustomers()
     }
   } catch (error) {
-    console.error('Error saving customer:', error)
+    console.error('❌ Error al crear/actualizar cliente:', error)
+    console.error('📊 Respuesta del servidor:', error.response?.data)
+    console.error('📝 Datos enviados:', customerForm.value)
     
     if (error.response?.data?.errors) {
       const errors = error.response.data.errors
+      const firstError = Object.values(errors)[0]
+      
       if (errors.document_number) {
-        showError('Este número de documento ya está registrado')
+        showError('❌ Este número de documento ya está registrado')
       } else if (errors.email) {
-        showError('Este correo electrónico ya está registrado')
+        showError('❌ Este correo electrónico ya está registrado')
+      } else if (errors.name) {
+        showError('❌ El nombre del cliente es requerido')
       } else {
-        showError(error.response?.data?.message || 'Error al guardar el crédito')
+        showError(`❌ Error de validación: ${Array.isArray(firstError) ? firstError[0] : firstError}`)
       }
+    } else if (error.response?.data?.message) {
+      showError(`❌ Error: ${error.response.data.message}`)
+    } else if (error.response?.data?.error) {
+      showError(`❌ Error del servidor: ${error.response.data.error}`)
+    } else if (error.message) {
+      showError(`❌ Error al crear cliente: ${error.message}`)
     } else {
-      showError(error.response?.data?.message || 'Error al guardar el crédito')
+      showError('❌ Error desconocido al crear el cliente. Verifica la consola para más detalles.')
     }
   } finally {
     processing.value = false
