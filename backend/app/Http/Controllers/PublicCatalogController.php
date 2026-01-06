@@ -202,12 +202,12 @@ class PublicCatalogController extends Controller
             $config = $this->getCachedConfig();
 
             if (!$config) {
-                // Retornar configuración por defecto
+                // Retornar configuración por defecto (speed-market es segura para todas las tiendas)
                 return response()->json([
                     'success' => true,
                     'data' => [
                         'store_active' => true,
-                        'template' => 'visual-story',
+                        'template' => 'speed-market', // Plantilla B - Compatible con todas las tiendas
                         'primary_color' => '#10B981',
                         'logo_url' => '',
                         'banner_url' => '',

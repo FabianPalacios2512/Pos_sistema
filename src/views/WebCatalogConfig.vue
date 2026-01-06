@@ -694,6 +694,20 @@ const isFashionStore = computed(() => {
   return storedType === 'fashion'
 })
 
+// Función helper para obtener plantilla válida según tipo de tienda
+const getValidTemplate = (template) => {
+  // Si es fashion, puede usar cualquier plantilla
+  if (isFashionStore.value) {
+    return template || 'speed-market'
+  }
+  // Si NO es fashion, NUNCA puede ser visual-story
+  if (template === 'visual-story') {
+    console.warn('⚠️ Plantilla "visual-story" no disponible para tiendas no-fashion. Usando "speed-market"')
+    return 'speed-market'
+  }
+  return template || 'speed-market'
+}
+
 // Configuration Object (Reactive)
 const config = reactive({
   storeActive: true,
@@ -701,7 +715,7 @@ const config = reactive({
     logo: '', 
     banner: '',
     primaryColor: '#10B981', 
-    template: 'speed-market' // Plantilla por defecto (segura para todas las tiendas)
+    template: getValidTemplate('speed-market') // Plantilla por defecto validada
   },
   inventoryVisibility: {
     visibleCategories: [], 
@@ -740,11 +754,8 @@ onMounted(async () => {
   // Load existing configuration from backend
   await loadConfiguration()
   
-  // 🛡️ Si la plantilla es "visual-story" pero la tienda NO es fashion, cambiar a "speed-market"
-  if (config.brandIdentity.template === 'visual-story' && !isFashionStore.value) {
-    console.log('⚠️ Plantilla "visual-story" no disponible para tiendas no-fashion. Cambiando a "speed-market"')
-    config.brandIdentity.template = 'speed-market'
-  }
+  // 🛡️ Validación final: Asegurar que la plantilla sea válida
+  config.brandIdentity.template = getValidTemplate(config.brandIdentity.template)
   
   isLoading.value = false
 })
@@ -880,17 +891,9 @@ const loadConfiguration = async () => {
       config.brandIdentity.logo = data.logo_url || ''
       config.brandIdentity.banner = data.banner_url || ''
       config.brandIdentity.primaryColor = data.primary_color || '#10B981'
-      // 🛡️ Validar plantilla: si viene visual-story pero NO es fashion, usar speed-market
+      // 🛡️ Validar plantilla usando helper
       const loadedTemplate = data.template || 'speed-market'
-      const storeType = appStore.systemSettings?.store_type || localStorage.getItem('pending_store_type')
-      const isFashion = storeType === 'fashion'
-      
-      if (loadedTemplate === 'visual-story' && !isFashion) {
-        config.brandIdentity.template = 'speed-market'
-        console.log('⚠️ Plantilla visual-story no disponible para tiendas no-fashion. Usando speed-market')
-      } else {
-        config.brandIdentity.template = loadedTemplate
-      }
+      config.brandIdentity.template = getValidTemplate(loadedTemplate)
       
       const visibleCats = Array.isArray(data.visible_categories) ? data.visible_categories : []
       
@@ -916,6 +919,12 @@ const saveConfiguration = async () => {
   isSaving.value = true
   
   try {
+    // 🛡️ Validar plantilla antes de guardar
+    const validTemplate = getValidTemplate(config.brandIdentity.template)
+    if (validTemplate !== config.brandIdentity.template) {
+      config.brandIdentity.template = validTemplate
+    }
+    
     // Transformar estructura del frontend al formato que espera el backend
     const payload = {
       storeActive: config.storeActive,

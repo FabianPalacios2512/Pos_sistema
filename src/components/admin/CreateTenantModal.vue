@@ -212,18 +212,54 @@
             </div>
           </div>
 
-          <!-- Row 5: Plan -->
-          <div class="space-y-2">
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">Plan</label>
-            <select 
-              v-model="form.plan" 
-              class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-            >
-              <option value="free">🎁 Free Trial (7 días)</option>
-              <option value="basic">💼 Basic ($29/mes)</option>
-              <option value="premium">⭐ Premium ($79/mes)</option>
-              <option value="enterprise">🏢 Enterprise ($199/mes)</option>
-            </select>
+          <!-- Row 5: Plan y Duración -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">Plan</label>
+              <select 
+                v-model="form.plan" 
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+              >
+                <option value="free">🎁 Free Trial</option>
+                <option value="basic">💼 Basic ($29/mes)</option>
+                <option value="premium">⭐ Premium ($79/mes)</option>
+                <option value="enterprise">🏢 Enterprise ($199/mes)</option>
+              </select>
+            </div>
+
+            <div class="space-y-2">
+              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">Duración</label>
+              <select 
+                v-model="form.duration_months" 
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+              >
+                <option :value="0" v-if="form.plan === 'free'">7 días (Trial)</option>
+                <option :value="1">1 mes</option>
+                <option :value="3">3 meses (-5%)</option>
+                <option :value="6">6 meses (-10%)</option>
+                <option :value="12">12 meses (-15%)</option>
+                <option :value="24">24 meses (-20%)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Resumen de Precio -->
+          <div v-if="form.plan !== 'free'" class="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-bold text-blue-700 dark:text-blue-400">Resumen del Plan</p>
+                <p class="text-xs text-blue-600 dark:text-blue-500 mt-1">
+                  {{ getPlanName(form.plan) }} × {{ form.duration_months || 1 }} {{ form.duration_months === 1 ? 'mes' : 'meses' }}
+                  <span v-if="getDiscount(form.duration_months) > 0" class="text-emerald-600 dark:text-emerald-400 font-bold ml-1">
+                    ({{ getDiscount(form.duration_months) }}% OFF)
+                  </span>
+                </p>
+              </div>
+              <div class="text-right">
+                <p class="text-2xl font-bold text-blue-700 dark:text-blue-400">${{ calculateTotal() }}</p>
+                <p class="text-xs text-blue-500 dark:text-blue-500">Total a pagar</p>
+              </div>
+            </div>
           </div>
 
           <!-- Error Message -->
@@ -304,7 +340,8 @@ const form = ref({
   admin_email: '',
   admin_password: '',
   subdomain: '',
-  plan: 'basic'
+  plan: 'basic',
+  duration_months: 1
 })
 
 // UI states
@@ -435,6 +472,37 @@ const canCreate = computed(() => {
   )
 })
 
+// Plan pricing helpers
+const planPrices = {
+  free: 0,
+  basic: 29,
+  premium: 79,
+  enterprise: 199
+}
+
+const getPlanName = (plan) => {
+  const names = {
+    free: 'Free Trial',
+    basic: 'Plan Basic',
+    premium: 'Plan Premium',
+    enterprise: 'Plan Enterprise'
+  }
+  return names[plan] || plan
+}
+
+const getDiscount = (months) => {
+  const discounts = { 1: 0, 3: 5, 6: 10, 12: 15, 24: 20 }
+  return discounts[months] || 0
+}
+
+const calculateTotal = () => {
+  const basePrice = planPrices[form.value.plan] || 0
+  const months = form.value.duration_months || 1
+  const discount = getDiscount(months) / 100
+  const total = basePrice * months * (1 - discount)
+  return Math.round(total).toLocaleString('es-ES')
+}
+
 // Handle create tenant
 const handleCreate = async () => {
   if (!canCreate.value || isCreating.value) return
@@ -454,6 +522,7 @@ const handleCreate = async () => {
         business_name: form.value.business_name,
         subdomain: form.value.subdomain,
         plan: form.value.plan,
+        duration_months: form.value.duration_months || 1,
         admin_email: form.value.admin_email,
         admin_password: form.value.admin_password
       },

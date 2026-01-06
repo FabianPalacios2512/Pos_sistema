@@ -1,147 +1,312 @@
 <template>
-  <!-- Modal NO se puede cerrar - Bloquea TODO hasta renovar -->
-  <!-- 🔒 data-modal-subscription permite detectar si lo eliminan del DOM -->
+  <!-- Paywall - Pantalla completa con overlay -->
   <div 
     v-if="showModal"
     data-modal-subscription="active"
-    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md animate-fade-in"
+    class="fixed inset-0 z-[9999] overflow-y-auto"
     @click.prevent
     @contextmenu.prevent
   >
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-6xl w-full mx-4 overflow-hidden border border-gray-300 dark:border-zinc-800">
-      
-      <!-- Header Elegante -->
-      <div class="bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-950/30 dark:to-red-950/30 p-10 text-center border-b border-rose-200 dark:border-rose-900">
-        <div class="w-20 h-20 bg-rose-100 dark:bg-rose-900/50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-rose-200 dark:border-rose-800">
-          <svg class="w-10 h-10 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        </div>
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Tu Membresía ha Expirado</h2>
-        <p class="text-gray-600 dark:text-zinc-400 text-base">Renueva ahora para seguir usando el sistema</p>
-      </div>
-
-      <!-- Contenido -->
-      <div class="p-8">
+    <!-- Fondo con blur sobre la app -->
+    <div class="fixed inset-0 bg-gradient-to-br from-gray-900/80 via-gray-900/90 to-black/95 backdrop-blur-md"></div>
+    
+    <!-- Contenido centrado -->
+    <div class="relative min-h-screen flex items-center justify-center p-4 md:p-8">
+      <div class="w-full max-w-5xl animate-fade-in">
         
-        <!-- Mensaje de Alerta -->
-        <div class="bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl p-5 mb-8">
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        <!-- Header Section -->
+        <div class="text-center mb-8 md:mb-10">
+          <!-- Logo 105 POS -->
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-zinc-800 rounded-2xl shadow-xl shadow-black/20 mb-5 p-2">
+            <img src="/logo.png" alt="105 POS Pro" class="w-full h-full object-contain" />
+          </div>
+          
+          <h1 class="text-2xl md:text-3xl font-bold text-white mb-3">
+            Tu negocio no se detiene
+          </h1>
+          <p class="text-gray-400 text-base md:text-lg max-w-lg mx-auto">
+            Tu suscripción ha expirado. Renueva ahora para continuar disfrutando de todas las funciones de 
+            <span class="text-emerald-400 font-semibold">105 POS Pro</span>
+          </p>
+          
+          <!-- Badge de seguridad -->
+          <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
+            <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
-            <div class="flex-1">
-              <p class="text-sm font-bold text-rose-900 dark:text-rose-300 mb-1">
-                Acceso Bloqueado
-              </p>
-              <p class="text-sm text-rose-700 dark:text-rose-400">
-                Para continuar usando el sistema, necesitas renovar tu plan de suscripción.
-              </p>
-            </div>
+            <span class="text-sm text-gray-300">Tus datos están seguros y guardados</span>
           </div>
         </div>
 
-        <!-- Selector de Plan -->
-        <div v-if="!showPayment" class="space-y-6">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center">
-            Renueva tu Membresía
-          </h3>
+        <!-- Pricing Cards -->
+        <div v-if="!showPayment" class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-8">
           
-          <!-- NOTA: Mostramos solo el plan que funciona en ePayco -->
-          <div class="max-w-md mx-auto">
-            <!-- Alerta informativa -->
-            <div class="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6 text-center">
-              <p class="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                Plan disponible para renovación
-              </p>
+          <!-- Plan Básico -->
+          <button
+            @click="selectedPlan = 'basic'"
+            :class="[
+              'relative bg-white dark:bg-zinc-900 rounded-2xl p-6 text-left transition-all duration-300 group',
+              selectedPlan === 'basic' 
+                ? 'ring-2 ring-emerald-500 shadow-xl shadow-emerald-500/20' 
+                : 'ring-1 ring-gray-200 dark:ring-zinc-700 hover:ring-gray-300 dark:hover:ring-zinc-600 shadow-lg'
+            ]"
+          >
+            <!-- Indicador de selección -->
+            <div :class="[
+              'absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all',
+              selectedPlan === 'basic' 
+                ? 'border-emerald-500 bg-emerald-500' 
+                : 'border-gray-300 dark:border-zinc-600'
+            ]">
+              <svg v-if="selectedPlan === 'basic'" class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
             </div>
-          </div>
-
-          <!-- Solo Plan Corporativo (el único que funciona) -->
-          <div class="max-w-md mx-auto">
             
-            <!-- 🏢 PLAN CORPORATIVO - ÚNICO DISPONIBLE -->
-            <button
-              @click="selectedPlan = 'corporativo'"
-              class="w-full p-8 rounded-xl border-2 border-purple-500 dark:border-purple-400 bg-purple-50 dark:bg-purple-950/30 shadow-xl dark:shadow-black/50 text-left transition-all duration-200"
-            >
-              <div class="flex items-center justify-between mb-5">
-                <h4 class="text-2xl font-bold text-gray-900 dark:text-white">Plan Empresarial</h4>
-                <div class="w-8 h-8 bg-purple-600 dark:bg-purple-500 rounded-full flex items-center justify-center">
-                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                </div>
-              </div>
-              <p class="text-sm text-gray-600 dark:text-zinc-400 mb-5">Solución completa para tu negocio.</p>
-              <p class="text-5xl font-bold text-purple-600 dark:text-purple-400 mb-6">
-                $100.000<span class="text-lg font-normal text-gray-500 dark:text-zinc-400">/mes</span>
-              </p>
-              <ul class="space-y-3 text-sm text-gray-700 dark:text-zinc-200">
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="font-medium">Usuarios Ilimitados</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="font-medium">Multi-Sede / Multi-Caja</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="font-medium">Tienda Web + WhatsApp Automático</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="font-medium">Agente IA + Sistema CRM</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="font-medium">Soporte 24/7 Dedicado</span>
-                </li>
-                <li class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="font-medium">Integraciones Personalizadas</span>
-                </li>
-              </ul>
-            </button>
-          </div>
+            <div class="mb-4">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Básico</h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400">Para emprendedores</p>
+            </div>
+            
+            <div class="mb-5">
+              <span class="text-3xl font-bold text-gray-900 dark:text-white">$25.000</span>
+              <span class="text-gray-500 dark:text-zinc-400">/mes</span>
+            </div>
+            
+            <ul class="space-y-2.5 text-sm">
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                1 Usuario
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                1 Caja / 1 Sede
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Inventario básico
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Reportes esenciales
+              </li>
+            </ul>
+          </button>
 
-          <!-- Botón Continuar -->
+          <!-- Plan Premium (Destacado) -->
+          <button
+            @click="selectedPlan = 'premium'"
+            :class="[
+              'relative bg-white dark:bg-zinc-900 rounded-2xl p-6 text-left transition-all duration-300 group md:scale-105 md:-my-2',
+              selectedPlan === 'premium' 
+                ? 'ring-2 ring-emerald-500 shadow-2xl shadow-emerald-500/30' 
+                : 'ring-1 ring-emerald-200 dark:ring-emerald-900/50 hover:ring-emerald-300 shadow-xl'
+            ]"
+          >
+            <!-- Badge Recomendado -->
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+              <span class="px-3 py-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold rounded-full shadow-lg">
+                ⭐ RECOMENDADO
+              </span>
+            </div>
+            
+            <!-- Indicador de selección -->
+            <div :class="[
+              'absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all',
+              selectedPlan === 'premium' 
+                ? 'border-emerald-500 bg-emerald-500' 
+                : 'border-emerald-300 dark:border-emerald-700'
+            ]">
+              <svg v-if="selectedPlan === 'premium'" class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            
+            <div class="mb-4 mt-2">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Premium</h3>
+              <p class="text-sm text-emerald-600 dark:text-emerald-400 font-medium">El más elegido</p>
+            </div>
+            
+            <div class="mb-5">
+              <span class="text-3xl font-bold text-gray-900 dark:text-white">$60.000</span>
+              <span class="text-gray-500 dark:text-zinc-400">/mes</span>
+            </div>
+            
+            <ul class="space-y-2.5 text-sm">
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                5 Usuarios
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Multi-Caja / 2 Sedes
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Tienda Web + Catálogo
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                WhatsApp Automático
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Asistente IA
+              </li>
+            </ul>
+          </button>
+
+          <!-- Plan Empresarial -->
+          <button
+            @click="selectedPlan = 'corporativo'"
+            :class="[
+              'relative bg-white dark:bg-zinc-900 rounded-2xl p-6 text-left transition-all duration-300 group',
+              selectedPlan === 'corporativo' 
+                ? 'ring-2 ring-emerald-500 shadow-xl shadow-emerald-500/20' 
+                : 'ring-1 ring-gray-200 dark:ring-zinc-700 hover:ring-gray-300 dark:hover:ring-zinc-600 shadow-lg'
+            ]"
+          >
+            <!-- Indicador de selección -->
+            <div :class="[
+              'absolute top-4 right-4 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all',
+              selectedPlan === 'corporativo' 
+                ? 'border-emerald-500 bg-emerald-500' 
+                : 'border-gray-300 dark:border-zinc-600'
+            ]">
+              <svg v-if="selectedPlan === 'corporativo'" class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            
+            <div class="mb-4">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Empresarial</h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400">Para grandes negocios</p>
+            </div>
+            
+            <div class="mb-5">
+              <span class="text-3xl font-bold text-gray-900 dark:text-white">$100.000</span>
+              <span class="text-gray-500 dark:text-zinc-400">/mes</span>
+            </div>
+            
+            <ul class="space-y-2.5 text-sm">
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Usuarios ilimitados
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Multi-Sede ilimitado
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Agente IA Avanzado
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Soporte 24/7 dedicado
+              </li>
+              <li class="flex items-center gap-2 text-gray-600 dark:text-zinc-300">
+                <svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                Integraciones API
+              </li>
+            </ul>
+          </button>
+
+        </div>
+
+        <!-- Botón de Acción Principal -->
+        <div v-if="!showPayment" class="max-w-md mx-auto">
           <button
             @click="proceedToPayment"
             :disabled="!selectedPlan || isProcessing"
-            class="w-full py-4 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold text-base rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-base rounded-xl shadow-xl shadow-emerald-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
           >
-            {{ isProcessing ? 'Procesando...' : 'Continuar al Pago' }}
+            <svg v-if="isProcessing" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>{{ isProcessing ? 'Procesando...' : `Renovar Suscripción · ${getPlanPrice()}` }}</span>
+            <svg v-if="!isProcessing" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
           </button>
         </div>
 
-        <!-- Pasarela de Pago (ePayco) -->
-        <div v-else id="epayco-container" class="min-h-[400px]">
-          <!-- ePayco se monta aquí -->
+        <!-- Estado de Pago -->
+        <div v-else class="max-w-md mx-auto bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center">
+          <div class="w-12 h-12 border-3 border-emerald-200 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p class="text-gray-600 dark:text-zinc-300">Redirigiendo a pasarela de pago segura...</p>
+        </div>
+
+        <!-- Footer con badges de confianza -->
+        <div class="mt-8 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-sm text-gray-400">
+          <!-- Pago seguro -->
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <span>Pago 100% seguro</span>
+          </div>
+          
+          <!-- ePayco -->
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+            </svg>
+            <span>Procesado por ePayco</span>
+          </div>
+
+          <!-- Soporte -->
+          <div class="flex items-center gap-4">
+            <a 
+              href="https://wa.me/573001234567?text=Hola, necesito ayuda con mi suscripción de 105POS" 
+              target="_blank"
+              class="hover:text-emerald-400 transition-colors flex items-center gap-1.5"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              WhatsApp
+            </a>
+            <span class="text-gray-600">·</span>
+            <a 
+              href="mailto:soporte@105pos.pro?subject=Ayuda con renovación de suscripción" 
+              class="hover:text-blue-400 transition-colors"
+            >
+              soporte@105pos.pro
+            </a>
+          </div>
         </div>
 
       </div>
-
-      <!-- Footer -->
-      <div class="bg-gray-50 dark:bg-zinc-800 px-8 py-4 text-center border-t border-gray-200 dark:border-zinc-700">
-        <p class="text-sm text-gray-600 dark:text-zinc-400">
-          ¿Necesitas ayuda? <a href="mailto:soporte@105pos.pro" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">Contáctanos</a>
-        </p>
-      </div>
-
     </div>
   </div>
 </template>
@@ -152,10 +317,20 @@ import { appStore } from '../store/appStore'
 import apiClient from '../services/apiClient'
 
 const showModal = ref(false)
-const selectedPlan = ref('corporativo') // Único plan disponible
+const selectedPlan = ref('premium') // Plan más popular por defecto
 const showPayment = ref(false)
 const isProcessing = ref(false)
 const tenantId = ref(null)
+
+// Obtener precio del plan seleccionado
+const getPlanPrice = () => {
+  const prices = {
+    basic: '$25.000',
+    premium: '$60.000',
+    corporativo: '$100.000'
+  }
+  return prices[selectedPlan.value] || ''
+}
 
 // 🔐 Sistema de verificación seguro
 let verificationToken = null

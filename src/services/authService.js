@@ -76,8 +76,10 @@ const authService = {
         await mockAuthService.logout();
       } else {
         // Solo llamar logout API si NO es super admin
-        if (user?.role !== 'superadmin') {
+        if (user?.role !== 'superadmin' && !user?.is_super_admin) {
           await apiClient.post('/logout');
+        } else {
+          console.log('👑 [AuthService] Superadmin logout - Skip API call')
         }
       }
     } catch (error) {
@@ -97,7 +99,8 @@ const authService = {
       
       // 👑 Si es super admin, retornar datos de localStorage sin llamar API
       const localUser = this.getUser()
-      if (localUser?.role === 'superadmin') {
+      if (localUser?.role === 'superadmin' || localUser?.is_super_admin) {
+        console.log('👑 [AuthService] Superadmin detectado - NO llamando a /api/me')
         return {
           success: true,
           data: { user: localUser }
@@ -123,11 +126,18 @@ const authService = {
       // También proteger contra 401 si estamos en proceso de renovación
       if (error.response?.status === 401) {
         const currentPath = window.location.pathname
-        const allowedExpiredRoutes = ['/subscription-expired', '/select-plan', '/payment/success', '/payment/failure']
+        const allowedExpiredRoutes = ['/subscription-expired', '/select-plan', '/payment/success', '/payment/failure', '/admin/god-mode']
         if (allowedExpiredRoutes.includes(currentPath)) {
-          console.log('⛔ [AuthService] Error 401 en ruta de renovación - NO haciendo logout.')
+          console.log('⛔ [AuthService] Error 401 en ruta protegida - NO haciendo logout.')
           throw error
         }
+      }
+      
+      // 👑 PROTECCIÓN: No hacer logout si es superadmin y solo falló una llamada API
+      const localUser = this.getUser()
+      if (localUser?.role === 'superadmin' || localUser?.is_super_admin) {
+        console.warn('⚠️ [AuthService] Error en superadmin - NO haciendo logout')
+        throw error
       }
 
       this.logout();

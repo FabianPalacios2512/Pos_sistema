@@ -249,7 +249,7 @@
                 <p class="text-white/90 text-sm leading-relaxed italic">
                   "Desde que uso 105 POS, mis ventas son 30% más rápidas."
                 </p>
-                <p class="text-slate-400 text-sm mt-2 font-medium">Carlos R. — Dueño de Minimarket</p>
+                <p class="text-slate-400 text-sm mt-2 font-medium">María José G.B. — Dueña de Minimarket</p>
               </div>
             </div>
         </div>

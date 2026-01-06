@@ -262,6 +262,11 @@ const routes = [
       roles: ['admin', 'Administrador', 'superadmin'] // Super admins y admins pueden acceder
     }
   },
+  // Alias para /admin/god-mode/login (redirect automático)
+  {
+    path: '/admin/god-mode/login',
+    redirect: '/admin/god-mode'
+  },
 
   // Ruta de Upgrade (accesible siempre, incluso con trial expirado)
   {
@@ -349,8 +354,8 @@ router.beforeEach(async (to, from, next) => {
   if (authService.isAuthenticated()) {
     // ✅ EXCEPCIÓN: Super admins NO pasan por onboarding (no tienen tenant)
     const user = authService.getUser()
-    if (user?.role === 'superadmin') {
-      console.log('👑 Super Admin detectado - omitiendo validación de onboarding')
+    if (user?.role === 'superadmin' || user?.is_super_admin) {
+      console.log('👑 Super Admin detectado - omitiendo validación de onboarding y systemSettings')
       next()
       return
     }
@@ -360,10 +365,15 @@ router.beforeEach(async (to, from, next) => {
     
     // ⛔ NUEVO FLUJO: Ya NO bloquear rutas cuando la suscripción expira
     // El modal aparecerá automáticamente en el POS y bloqueará el acceso
-    // Solo cargar datos si no están cargados
+    // Solo cargar datos si no están cargados (SOLO para usuarios de tenants)
     if (!appStore.systemSettings || Object.keys(appStore.systemSettings).length === 0) {
-      await appStore.loadSystemSettings()
-      console.log('✅ SystemSettings cargados, isSubscriptionExpired:', appStore.isSubscriptionExpired)
+      try {
+        await appStore.loadSystemSettings()
+        console.log('✅ SystemSettings cargados, isSubscriptionExpired:', appStore.isSubscriptionExpired)
+      } catch (error) {
+        console.warn('⚠️ Error cargando systemSettings (puede ser superadmin):', error.message)
+        // Continuar navegación aunque falle (puede ser superadmin o admin central)
+      }
     }
     
     // 🔥 PRIORIDAD MÁXIMA: Si suscripción expirada, ir directo al POS

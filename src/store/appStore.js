@@ -262,7 +262,7 @@ export const appStore = reactive({
     
     // Verificar si es super admin
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user?.role === 'superadmin') {
+    if (user?.role === 'superadmin' || user?.is_super_admin) {
       console.log('👑 Super Admin detectado - omitiendo carga de datos de tenant');
       this.initialized = true;
       return;
@@ -271,7 +271,12 @@ export const appStore = reactive({
     console.log('🚀 Inicializando store global...')
     
     // PRIMERO: Cargar systemSettings para verificar estado de suscripción
-    await this.loadSystemSettings()
+    try {
+      await this.loadSystemSettings()
+    } catch (error) {
+      console.error('⚠️ Error cargando systemSettings:', error.message)
+      // Continuar aunque falle (puede ser superadmin sin tenant)
+    }
     
     // ⛔ Si la suscripción está expirada, NO cargar datos operacionales
     if (this.isSubscriptionExpired) {
