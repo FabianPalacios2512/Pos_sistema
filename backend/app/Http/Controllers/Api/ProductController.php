@@ -262,6 +262,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'product_type' => 'required|in:simple,variable',
+            'store_category' => 'nullable|in:general,fashion', // PROBLEMA 3: Campo para modal correcto
             'category_id' => 'required|exists:categories,id',
             // Validación condicional
             'sku' => 'required_if:product_type,simple|nullable|string|unique:products,sku',
@@ -284,10 +285,16 @@ class ProductController extends Controller
         return DB::transaction(function () use ($request) {
             // 2. Crear Producto Padre
             $productData = $request->only([
-                'name', 'product_type', 'category_id', 'description',
+                'name', 'product_type', 'store_category', 'category_id', 'description',
                 'brand_id', 'supplier_id', 'barcode', 'cost_price',
                 'min_stock', 'measurement_unit', 'allow_decimal', 'tax_rate'
             ]);
+
+            // PROBLEMA 3: Establecer store_category basado en system_settings si no viene
+            if (!isset($productData['store_category'])) {
+                $storeType = \DB::table('system_settings')->value('store_type');
+                $productData['store_category'] = ($storeType === 'fashion' || $storeType === 'moda') ? 'fashion' : 'general';
+            }
 
             // Si es simple, tomamos sku y precio del request.
             if ($request->product_type === 'simple') {
@@ -448,9 +455,21 @@ class ProductController extends Controller
         $product->load([
             'category',
             'supplier',
+            'warehouses' => function($q) {
+                $q->select('warehouses.id', 'warehouses.name', 'is_default')
+                  ->withPivot('stock');
+            },
             'options.values', // Opciones del producto con sus valores
             'variants', // Variantes sin eager loading de opciones
             'images'
+        ]);
+
+        // 🐛 DEBUG: Verificar store_category
+        \Log::info('🔍 [ProductController@show] Product Data:', [
+            'id' => $product->id,
+            'name' => $product->name,
+            'store_category' => $product->store_category,
+            'product_type' => $product->product_type
         ]);
 
         // Formatear las variantes para incluir options como array simple
@@ -521,6 +540,11 @@ class ProductController extends Controller
                 'cost_price' => $costPrice,
             ];
 
+            // PROBLEMA 3: Mantener store_category si viene en el request
+            if ($request->has('store_category')) {
+                $updateData['store_category'] = $request->input('store_category');
+            }
+
             // ✅ AGREGAR sale_price si es producto simple
             if ($newType === 'simple' && $request->has('sale_price')) {
                 $updateData['sale_price'] = $request->input('sale_price');
@@ -587,71 +611,68 @@ class ProductController extends Controller
 
             // 4. Manejar variantes y opciones
             if ($newType === 'simple') {
-                // PRODUCTO SIMPLE - debe tener exactamente 1 variante sin opciones
+                // PRODUCTO SIMPLE (TIENDA GENERAL) - NO debe tener variantes ni opciones
 
                 // Eliminar opciones del producto
                 $product->options()->delete();
 
-                // ✅ Obtener precio desde sale_price o desde variants[0].price
-                $salePrice = $request->input('sale_price') ?? $request->variants[0]['price'] ?? 0;
+                // Eliminar TODAS las variantes (productos simples NO tienen variantes)
+                $product->variants()->delete();
 
-                // ✅ Obtener costo desde múltiples fuentes posibles
-                $costPrice = $request->cost_price
-                    ?? $request->variants[0]['cost']
-                    ?? $request->variants[0]['cost_price']
-                    ?? 0;
+                // ✅ Obtener precio desde sale_price
+                $salePrice = $request->input('sale_price', 0);
+                $costPrice = $request->input('cost_price', 0);
 
-                \Log::info('💰 [ProductController] Precios detectados:', [
+                \Log::info('💰 [ProductController@update] Producto SIMPLE:', [
+                    'product_id' => $product->id,
                     'sale_price' => $salePrice,
                     'cost_price' => $costPrice,
-                    'request->cost_price' => $request->cost_price,
-                    'variants[0][cost]' => $request->variants[0]['cost'] ?? 'no existe',
-                    'variants[0][cost_price]' => $request->variants[0]['cost_price'] ?? 'no existe'
+                    'warehouse_stocks' => $request->warehouse_stocks
                 ]);
 
-                // Obtener o crear la variante simple
-                $variant = $product->variants()->first();
-                if (!$variant) {
-                    $variant = $product->variants()->create([
-                        'sku' => $request->sku ?? "SKU-{$product->id}",
-                        'price' => $salePrice,
-                        'cost_price' => $costPrice,
-                        'stock' => $request->variants[0]['stock'] ?? 0,
-                        'active' => true,
+                // ✅ Actualizar stock en warehouses SOLO si viene warehouse_stocks
+                if ($request->has('warehouse_stocks') && is_array($request->warehouse_stocks)) {
+                    // Primero eliminar stocks anteriores (sin variant_id para productos simples)
+                    DB::table('product_warehouse')
+                        ->where('product_id', $product->id)
+                        ->whereNull('product_variant_id')
+                        ->delete();
+
+                    $totalStock = 0;
+
+                    foreach ($request->warehouse_stocks as $warehouseId => $stock) {
+                        if ($stock > 0) {
+                            DB::table('product_warehouse')->insert([
+                                'product_id' => $product->id,
+                                'warehouse_id' => $warehouseId,
+                                'product_variant_id' => null, // NULL para productos simples
+                                'stock' => $stock,
+                                'created_at' => now(),
+                                'updated_at' => now()
+                            ]);
+                            $totalStock += $stock;
+                        }
+                    }
+
+                    // Actualizar stock total del producto
+                    $product->update([
+                        'current_stock' => $totalStock,
+                        'sale_price' => $salePrice,
+                        'image_url' => $request->input('image_url') // ✅ Guardar imagen
+                    ]);
+
+                    \Log::info('✅ [ProductController@update] Stock actualizado:', [
+                        'total_stock' => $totalStock,
+                        'warehouses' => count($request->warehouse_stocks)
                     ]);
                 } else {
-                    // Actualizar variante existente
-                    $variant->update([
-                        'sku' => $request->sku ?? $variant->sku,
-                        'price' => $salePrice,
-                        'cost_price' => $costPrice,
-                        'stock' => $request->variants[0]['stock'] ?? $variant->stock,
+                    // Fallback: Si no viene warehouse_stocks, actualizar precio e imagen
+                    $product->update([
+                        'sale_price' => $salePrice,
+                        'image_url' => $request->input('image_url')
                     ]);
+                    \Log::warning('⚠️ [ProductController@update] No se recibieron warehouse_stocks');
                 }
-
-                // ✅ Limpiar opciones del producto simple (no de las variantes)
-                // Los productos simples NO tienen opciones
-
-                // Eliminar otras variantes si existen
-                $product->variants()->where('id', '!=', $variant->id)->delete();
-
-                // Actualizar stock en warehouse (primera bodega disponible)
-                $warehouseId = $request->warehouse_id ?? Warehouse::first()->id ?? 1;
-                DB::table('product_warehouse')
-                    ->updateOrInsert(
-                        [
-                            'product_id' => $product->id,
-                            'product_variant_id' => $variant->id,
-                            'warehouse_id' => $warehouseId
-                        ],
-                        ['stock' => $variant->stock]
-                    );
-
-                // Actualizar stock total del producto y sale_price
-                $product->update([
-                    'current_stock' => $variant->stock,
-                    'sale_price' => $salePrice
-                ]);
 
             } else {
                 // PRODUCTO VARIABLE - puede tener múltiples variantes con opciones

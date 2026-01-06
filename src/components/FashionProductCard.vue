@@ -2,27 +2,31 @@
   <!-- Fashion Product Card - Digital Showroom Style -->
   <div class="group cursor-pointer">
     
-    <!-- Imagen Principal (Aspect Ratio 3:4 Portrait - 70% de la tarjeta) -->
-    <div class="relative aspect-[3/4] bg-gray-100 dark:bg-zinc-800 rounded-2xl overflow-hidden mb-3">
-      <img :src="getProductImage(product)" 
+    <!-- Imagen Principal (Aspect Ratio 3:4 Portrait) - MÁS PEQUEÑA -->
+    <div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-2.5 border border-gray-200 dark:border-zinc-700" 
+         :class="(product.image_url && product.image_url.length > 10) ? 'bg-white dark:bg-zinc-800' : 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-700 dark:to-zinc-800'">
+      <img v-if="product.image_url && product.image_url.length > 10"
+           :src="getProductImage(product)" 
            :alt="product.name" 
            @error="handleImageError"
            @click="$emit('view', product)"
-           class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out">
+           class="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-700 ease-out">
       
-      <!-- Badges Discretos -->
-      <div class="absolute top-3 left-3 flex flex-col gap-2">
-        <!-- Badge "Nuevo" si producto es reciente -->
-        <span v-if="isNewProduct" 
-              class="px-2 py-1 bg-white/90 dark:bg-black/60 backdrop-blur-sm text-gray-900 dark:text-white text-[10px] font-medium uppercase tracking-wider rounded-md">
-          Nuevo
-        </span>
-        
-        <!-- Punto Rojo para Stock Bajo -->
-        <div v-if="isLowStock" 
-             class="w-2 h-2 bg-red-500 rounded-full animate-pulse"
-             title="Stock bajo"></div>
+      <!-- Placeholder elegante cuando NO hay imagen -->
+      <div v-else 
+           @click="$emit('view', product)"
+           class="w-full h-full flex items-center justify-center cursor-pointer">
+        <div class="text-center">
+          <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+        </div>
       </div>
+      
+      <!-- Badge Stock Bajo -->
+      <div v-if="isLowStock" 
+           class="absolute top-3 left-3 w-2 h-2 bg-red-500 rounded-full animate-pulse"
+           title="Stock bajo"></div>
       
       <!-- Botón Editar (Solo visible en hover, flotante) -->
       <button @click.stop="$emit('edit', product)"
@@ -294,7 +298,7 @@ const getColorHex = (colorName) => {
 
 // 🖼️ Helper: Obtener imagen del producto
 const getProductImage = (product) => {
-  if (product.image_url) {
+  if (product.image_url && product.image_url.length > 10) {
     // Si es URL externa, devolverla directamente
     if (product.image_url.startsWith('http://') || product.image_url.startsWith('https://')) {
       return product.image_url
@@ -306,12 +310,13 @@ const getProductImage = (product) => {
     return `/storage/${product.image_url}`
   }
   
-  // Placeholder por defecto
-  return 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=400&fit=crop'
+  // Si no hay imagen, no devolver nada (se mostrará el placeholder)
+  return null
 }
 
 const handleImageError = (e) => {
-  e.target.src = 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=400&fit=crop'
+  // Si falla la imagen, ocultar el elemento para mostrar el placeholder
+  e.target.style.display = 'none'
 }
 
 // 💰 Helper: Formatear moneda

@@ -504,11 +504,15 @@
             <!-- Columna Producto (La Estrella) -->
             <td class="px-6 py-4">
               <div class="flex items-center gap-4">
-                <div class="relative w-12 h-12 flex-shrink-0">
-                  <img :src="getProductImage(product)" 
+                <div class="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden ring-1 ring-gray-200 dark:ring-zinc-700/50 group-hover:ring-gray-300 dark:group-hover:ring-zinc-600 transition-all" 
+                     :class="product?.image_url && product.image_url.length > 10 ? 'bg-white dark:bg-zinc-800' : 'bg-gray-100 dark:bg-zinc-800 flex items-center justify-center'">
+                  <img v-if="product?.image_url && product.image_url.length > 10"
+                       :src="getProductImage(product)" 
                        :alt="product.name" 
-                       @error="(e) => handleImageError(e, product)"
-                       class="w-full h-full object-cover rounded-lg ring-1 ring-gray-200 dark:ring-zinc-700/50 group-hover:ring-gray-300 dark:group-hover:ring-zinc-600 transition-all">
+                       class="w-full h-full object-cover">
+                  <svg v-else class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
+                  </svg>
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 mb-1">
@@ -1246,9 +1250,11 @@
                               <span class="text-sm font-bold text-gray-900 dark:text-white block truncate">
                                 {{ warehouse.name }}
                               </span>
-                              <span v-if="warehouse.is_default" class="text-xs font-semibold text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-zinc-700 px-2 py-0.5 rounded-full border border-gray-200 dark:border-zinc-600 inline-block mt-0.5">
-                                Principal
-                              </span>
+                              <div class="flex items-center gap-2 mt-0.5">
+                                <span v-if="warehouse.is_default" class="text-xs font-semibold text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-zinc-700 px-2 py-0.5 rounded-full border border-gray-200 dark:border-zinc-600 inline-block">
+                                  Principal
+                                </span>
+                              </div>
                               <span v-if="!productForm.warehouseEnabled[warehouse.id]" class="text-xs text-gray-400 dark:text-zinc-500 block mt-0.5">
                                 (No disponible)
                               </span>
@@ -1259,7 +1265,7 @@
                         <!-- Input de stock (solo si la sede está habilitada) -->
                         <div v-if="productForm.warehouseEnabled[warehouse.id]" class="space-y-2">
                           <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400">
-                            Stock inicial:
+                            Stock {{ isEditing ? 'actual' : 'inicial' }}:
                           </label>
                           <div class="relative">
                             <input 
@@ -2011,7 +2017,8 @@
 
     <!-- Modal: Crear Categoría -->
     <div v-if="showCategoryModal" 
-         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+         style="z-index: 100000"
          @click.self="showCategoryModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-lg w-full animate-fade-in">
         <!-- Header Simple -->
@@ -2088,7 +2095,8 @@
 
   <!-- Modal: Crear Proveedor Rápido -->
   <div v-if="showSupplierModal" 
-       class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+       class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+       style="z-index: 100000"
        @click.self="showSupplierModal = false">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full animate-fade-in">
       <!-- Header -->
@@ -2488,37 +2496,8 @@ const getProductImage = (product) => {
     return imageUrl
   }
   
-  // Generar avatar dinámico si no hay imagen
-  return generateDynamicAvatar(product?.name || 'Producto')
-}
-
-// Generar placeholder profesional SVG con icono de imagen
-const generateDynamicAvatar = (name) => {
-  // Placeholder neutro y profesional con icono de imagen
-  // Colores adaptados al modo claro/oscuro
-  const bgColor = '#F8FAFC' // Slate 50 (modo claro)
-  const iconColor = '#94A3B8' // Slate 400 (icono sutil)
-  const borderColor = '#E2E8F0' // Slate 200 (borde suave)
-  
-  return `data:image/svg+xml;base64,${btoa(`
-    <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Fondo suave -->
-      <rect width="200" height="200" fill="${bgColor}"/>
-      
-      <!-- Borde sutil -->
-      <rect x="0.5" y="0.5" width="199" height="199" stroke="${borderColor}" stroke-width="1" fill="none"/>
-      
-      <!-- Icono de imagen (shopping bag) centrado -->
-      <g transform="translate(100, 100)">
-        <path d="M -30 -20 L -30 30 L 30 30 L 30 -20 Z M -20 -30 L -20 -20 L 20 -20 L 20 -30 Q 20 -35 15 -35 Q 10 -40 0 -40 Q -10 -40 -15 -35 Q -20 -35 -20 -30 Z" 
-              fill="${iconColor}" 
-              opacity="0.4"/>
-      </g>
-      
-      <!-- Texto sutil debajo del icono -->
-      <text x="50%" y="140" fill="${iconColor}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="500" text-anchor="middle" opacity="0.5">Sin imagen</text>
-    </svg>
-  `)}`
+  // Retornar imagen por defecto si no hay imagen
+  return null
 }
 
 // 🚨 Manejar errores de carga de imagen
@@ -3661,6 +3640,28 @@ const editProduct = async (product) => {
   // Cerrar modal de detalles si está abierto
   showViewModal.value = false
   
+  try {
+    // 🔥 SIEMPRE obtener datos completos del producto desde el API
+    console.log('🔍 [editProduct] Obteniendo producto completo desde API:', product.id)
+    const response = await productsService.getById(product.id)
+    
+    if (!response.success || !response.data) {
+      throw new Error('No se pudieron obtener los datos del producto')
+    }
+    
+    // Usar el producto completo del API
+    product = response.data
+    console.log('✅ [editProduct] Producto completo obtenido:', product)
+  } catch (error) {
+    console.error('❌ Error obteniendo producto:', error)
+    showNotification(
+      'Error',
+      'No se pudieron cargar los datos del producto',
+      'error'
+    )
+    return
+  }
+  
   // Cargar bodegas para obtener todas las tiendas disponibles
   await loadWarehouses()
   
@@ -3675,43 +3676,55 @@ const editProduct = async (product) => {
   console.log('🔍 [editProduct] Producto recibido:', {
     id: product.id,
     name: product.name,
+    product_type: product.product_type,
     warehouses: product.warehouses,
-    warehouse_stock: product.warehouse_stock,
-    alternative_warehouses: product.alternative_warehouses
+    variants: product.variants?.length || 0
   })
   
-  // 🔥 CARGAR STOCK DESDE product.warehouses (viene del backend con la relación)
-  if (product.warehouses && Array.isArray(product.warehouses)) {
+  // 🎯 Detectar si es producto SIMPLE o VARIABLE
+  const isSimpleProduct = !product.product_type || product.product_type === 'simple'
+  const hasVariants = product.variants && product.variants.length > 0 && product.product_type === 'variable'
+  
+  console.log('🔍 [editProduct] Tipo de producto:', isSimpleProduct ? 'SIMPLE (stock por bodega)' : 'VARIABLE (stock en variantes)')
+  
+  // 🔥 CARGAR STOCK DESDE product.warehouses (SOLO para productos SIMPLES)
+  if (isSimpleProduct && product.warehouses && Array.isArray(product.warehouses)) {
+    // Agrupar por warehouse_id para evitar duplicados
+    const stockByWarehouse = new Map()
+    
     product.warehouses.forEach(warehouse => {
       if (warehouse.id) {
         const stock = warehouse.pivot?.stock || warehouse.stock || 0
-        warehouseStock[warehouse.id] = parseInt(stock)
-        warehouseEnabled[warehouse.id] = true
-        console.log(`✅ Cargando warehouse ${warehouse.id} (${warehouse.name}) con stock ${stock}`)
+        const parsedStock = parseInt(stock) || 0
+        
+        // Si ya existe, sumar el stock (por si hay duplicados)
+        const currentStock = stockByWarehouse.get(warehouse.id) || 0
+        stockByWarehouse.set(warehouse.id, Math.max(currentStock, parsedStock))
+      }
+    })
+    
+    // Aplicar el stock agrupado
+    stockByWarehouse.forEach((stock, warehouseId) => {
+      warehouseStock[warehouseId] = stock
+      if (stock > 0) {
+        warehouseEnabled[warehouseId] = true
+        console.log(`✅ Tienda ${warehouseId} con stock ${stock}`)
       }
     })
   }
   
-  // Fallback: Cargar desde alternative_warehouses si existe
-  if (product.alternative_warehouses && Array.isArray(product.alternative_warehouses)) {
-    product.alternative_warehouses.forEach(warehouse => {
-      if (warehouse.id && !warehouseEnabled[warehouse.id]) {
-        warehouseStock[warehouse.id] = parseInt(warehouse.stock || 0)
-        warehouseEnabled[warehouse.id] = true
-        console.log(`✅ Cargando desde alternative_warehouses ${warehouse.id} con stock ${warehouse.stock}`)
-      }
-    })
+  // Fallback: Si el producto tiene warehouse_id (tienda actual) - Solo para compatibilidad
+  if (product.warehouse_id && warehouseStock[product.warehouse_id] === 0) {
+    const parsedStock = parseInt(product.current_stock || product.stock || 0)
+    if (parsedStock > 0) {
+      warehouseStock[product.warehouse_id] = parsedStock
+      warehouseEnabled[product.warehouse_id] = true
+      console.log(`✅ Fallback: Tienda ${product.warehouse_id} con stock ${parsedStock}`)
+    }
   }
   
-  // Último fallback: Si el producto tiene warehouse_id (tienda actual)
-  if (product.warehouse_id && !warehouseEnabled[product.warehouse_id]) {
-    warehouseStock[product.warehouse_id] = parseInt(product.current_stock || product.stock || 0)
-    warehouseEnabled[product.warehouse_id] = true
-    console.log(`✅ Usando warehouse_id ${product.warehouse_id} con stock ${product.current_stock || product.stock}`)
-  }
-  
-  console.log('📦 [editProduct] warehouseStock final:', warehouseStock)
-  console.log('✅ [editProduct] warehouseEnabled final:', warehouseEnabled)
+  console.log('📦 [editProduct] warehouseStock final:', JSON.parse(JSON.stringify(warehouseStock)))
+  console.log('✅ [editProduct] warehouseEnabled final:', JSON.parse(JSON.stringify(warehouseEnabled)))
   
   isEditing.value = true
   
@@ -3779,7 +3792,6 @@ const editProduct = async (product) => {
 
 const viewProduct = async (product) => {
   selectedProduct.value = product
-  showViewModal.value = true
   variantChanges.value = {} // Limpiar cambios previos
   
   // Fetch full details including variants
@@ -3787,6 +3799,13 @@ const viewProduct = async (product) => {
     const response = await productsService.getById(product.id)
     if (response.success) {
       selectedProduct.value = response.data
+      
+      console.log('📦 DEBUG viewProduct:', {
+        id: selectedProduct.value.id,
+        name: selectedProduct.value.name,
+        store_category: selectedProduct.value.store_category,
+        product_type: selectedProduct.value.product_type
+      })
       
       // Inicializar campos editables para cada variante
       if (selectedProduct.value.variants) {
@@ -3796,9 +3815,13 @@ const viewProduct = async (product) => {
           variant.editableCost = variant.cost_price || 0
         })
       }
+      
+      // Siempre abrir modal de VISTA (solo lectura)
+      showViewModal.value = true
     }
   } catch (error) {
     console.error("Error fetching product details", error)
+    showViewModal.value = true // Abrir modal aunque falle la carga completa
   }
 }
 
@@ -4380,10 +4403,14 @@ const handleFashionSave = async (productData) => {
       const firstVariant = productData.variants && productData.variants[0]
       formData.append('cost_price', firstVariant?.cost || 0)
       
-      // ✅ AGREGAR sale_price si es producto simple
+      // ✅ AGREGAR sale_price y stock si es producto simple
       if (isSimpleProduct && firstVariant) {
         formData.append('sale_price', firstVariant.price || 0)
+        formData.append('current_stock', firstVariant.stock || 0)
       }
+      
+      // ✅ AGREGAR store_category para recordar que fue creado como moda
+      formData.append('store_category', 'fashion')
       
       // Options
       if (productData.options) {
@@ -4442,13 +4469,15 @@ const handleFashionSave = async (productData) => {
         description: productData.description || '',
         sku: productData.sku || `SKU-${Date.now()}`,
         cost_price: productData.variants?.[0]?.cost || 0,
+        store_category: 'fashion', // ✅ Recordar que fue creado como moda
         options: productData.options || [],
         variants: productData.variants || []
       }
       
-      // ✅ AGREGAR sale_price si es producto simple
+      // ✅ AGREGAR sale_price y stock si es producto simple
       if (isSimpleProduct && productData.variants?.[0]) {
         payload.sale_price = productData.variants[0].price || 0
+        payload.current_stock = productData.variants[0].stock || 0
       }
       
       // Detectar si es edición o creación
@@ -4538,7 +4567,7 @@ const saveProduct = async (skipValidation = false) => {
     const apiData = {
       name: productForm.value.name.trim(),
       description: productForm.value.description?.trim() || '',
-      product_type: 'simple', // 🆕 Campo requerido por el backend
+      product_type: 'simple', // � Productos generales son SIEMPRE 'simple'
       sku: productForm.value.sku?.trim() || `SKU-${Date.now()}`, // Generar SKU automático si está vacío
       barcode: productForm.value.barcode?.trim() || '',
       category_id: parseInt(productForm.value.category_id),
@@ -4568,7 +4597,8 @@ const saveProduct = async (skipValidation = false) => {
       }, {}),
       // 📏 Unidades de Medida (NUEVO)
       measurement_unit: productForm.value.measurement_unit || 'unit',
-      allow_decimal: productForm.value.allow_decimal || false
+      allow_decimal: productForm.value.allow_decimal || false,
+      // ⚠️ NO ENVIAR 'variants' para productos simples - esto causa que el backend cree variantes innecesarias
     }
 
     console.log('📦 Datos enviados a la API:', apiData)
@@ -4735,14 +4765,16 @@ onMounted(async () => {
   isFashionMode.value = storeType === 'fashion' || storeType === 'moda'
   console.log('🏪 Tipo de tienda detectado:', storeType, '| Fashion Mode:', isFashionMode.value)
   
-  // 🔧 Cargar preferencias del usuario primero
+  // 🔧 Cargar preferencias del usuario primero (PROBLEMA 1: Restaurar vista guardada)
   loadUserPreferences()
   
   // 🎨 VISTA POR DEFECTO INTELIGENTE: Grid para Fashion, Table para Retail
   // Solo establecer si no hay preferencia guardada
-  if (!localStorage.getItem('products_preferences')) {
+  if (!localStorage.getItem(USER_PREFERENCES_KEY)) {
     viewMode.value = isFashionStore.value ? 'grid' : 'table'
     console.log('📊 Vista por defecto establecida:', viewMode.value, '(basada en tipo de tienda:', appStore.systemSettings?.store_type, ')')
+  } else {
+    console.log('✅ Vista restaurada desde preferencias:', viewMode.value)
   }
   
   // Registrar listener ANTES del primer await

@@ -32,6 +32,7 @@ class Product extends Model
 
     protected $fillable = [
         'product_type',        // 🆕 Tipo de producto: 'simple' o 'variable'
+        'store_category',      // 🆕 PROBLEMA 3: Categoría de tienda: 'general' o 'fashion'
         'name',
         'description',
         'sku',

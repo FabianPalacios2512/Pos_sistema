@@ -1379,6 +1379,10 @@ export default {
 
         this.$toast?.info('Generando PDF...')
 
+        // Cargar configuración del sistema desde el backend
+        const settingsResponse = await apiCall('/system-settings')
+        const settings = settingsResponse.data || {}
+
         // Preparar datos para el PDF
         const orderData = {
           order_number: this.selectedOrder.order_number,
@@ -1389,9 +1393,9 @@ export default {
           supplier_phone: this.selectedOrder.supplier?.phone || '',
           warehouse_name: this.selectedOrder.warehouse?.name || '',
           items: (this.selectedOrder.items || []).map(item => ({
-            product_name: item.product_name || item.name,
-            quantity: item.quantity,
-            unit_cost: item.unit_cost
+            product_name: item.product?.name || item.product_name || 'Producto sin nombre',
+            quantity: item.quantity_ordered || item.quantity || 0,
+            unit_cost: item.unit_cost || 0
           })),
           subtotal: parseFloat(this.selectedOrder.subtotal || 0),
           tax: parseFloat(this.selectedOrder.tax || 0),
@@ -1400,13 +1404,13 @@ export default {
           status: this.selectedOrder.status
         }
 
-        // Configuración del sistema (por defecto)
+        // Configuración del sistema desde la base de datos
         const systemSettings = {
-          company_name: 'MI EMPRESA',
-          company_address: 'Dirección de la empresa',
-          company_phone: 'Teléfono',
-          company_email: 'email@empresa.com',
-          company_document: 'NIT'
+          company_name: settings.company_name || 'MI EMPRESA',
+          company_address: settings.company_address || '',
+          company_phone: settings.company_phone || '',
+          company_email: settings.company_email || '',
+          company_document: settings.company_document || ''
         }
 
         // Generar y descargar PDF
