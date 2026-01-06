@@ -346,60 +346,65 @@
         </h3>
 
         <!-- Tabla Limpia -->
-        <div class="overflow-x-auto border border-gray-200 dark:border-zinc-800 rounded-md">
+        <div class="overflow-x-auto border border-gray-200 dark:border-zinc-800 rounded-lg">
           <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
             <thead class="bg-gray-50 dark:bg-zinc-900">
               <tr>
-                <th scope="col" class="px-3 py-2 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase">Variante</th>
-                <th scope="col" class="px-3 py-2 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-32">SKU</th>
-                <th scope="col" class="px-3 py-2 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-24">Costo</th>
-                <th scope="col" class="px-3 py-2 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-24">Precio</th>
-                <th scope="col" class="px-3 py-2 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-20">Stock</th>
-                <th scope="col" class="px-3 py-2 text-center text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-12"></th>
+                <th scope="col" class="px-4 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase">Variante</th>
+                <th scope="col" class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-36">SKU</th>
+                <th scope="col" class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-36">Costo</th>
+                <th scope="col" class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-36">Precio</th>
+                <th scope="col" class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-28">Stock</th>
+                <th scope="col" class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-14"></th>
               </tr>
             </thead>
             <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
               <tr v-for="(variant, index) in form.variants" :key="index" class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors">
-                <td class="px-3 py-2">
-                  <span class="text-xs font-medium text-gray-900 dark:text-white">
+                <td class="px-4 py-3">
+                  <span class="text-sm font-medium text-gray-900 dark:text-white">
                     {{ getVariantName(variant) }}
                   </span>
                 </td>
-                <td class="px-3 py-1.5">
+                <td class="px-3 py-2">
                   <input 
                     v-model="variant.sku"
                     type="text" 
-                    class="w-full px-2 py-1 text-xs border border-gray-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                 </td>
-                <td class="px-3 py-1.5">
+                <td class="px-3 py-2">
                   <div class="relative">
-                    <span class="absolute left-2 top-1 text-[10px] text-gray-400">$</span>
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
                     <input 
                       v-model.number="variant.cost"
                       type="number"
-                      step="0.01"
+                      step="1"
                       min="0"
-                      placeholder="0.00"
-                      class="w-full pl-5 pr-2 py-1 text-xs border border-gray-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-gray-400"
+                      placeholder="0"
+                      class="w-full pl-7 pr-3 py-2.5 text-sm font-semibold border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tabular-nums"
                     >
                   </div>
                 </td>
-                <td class="px-3 py-1.5">
+                <td class="px-3 py-2">
                   <div class="relative">
-                    <span class="absolute left-2 top-1 text-[10px] text-gray-400">$</span>
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
                     <input 
                       v-model.number="variant.price"
                       type="number" 
-                      class="w-full pl-5 pr-2 py-1 text-xs border border-gray-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-gray-400"
+                      step="1"
+                      min="0"
+                      placeholder="0"
+                      class="w-full pl-7 pr-3 py-2.5 text-sm font-semibold border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tabular-nums"
                     >
                   </div>
                 </td>
-                <td class="px-3 py-1.5">
+                <td class="px-3 py-2">
                   <input 
                     v-model.number="variant.stock"
                     type="number" 
-                    class="w-full px-2 py-1 text-xs border border-gray-200 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    min="0"
+                    placeholder="0"
+                    class="w-full px-3 py-2.5 text-sm font-semibold border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tabular-nums"
                   >
                 </td>
                 <td class="px-3 py-2 text-center">
@@ -494,11 +499,29 @@ watch(() => props.editingProduct, (product) => {
     
     // Cargar opciones
     if (product.options && Array.isArray(product.options)) {
-      form.options = product.options.map(opt => ({
-        name: opt.name,
-        values: opt.values || [],
-        tempValue: ''
-      }))
+      form.options = product.options.map(opt => {
+        // 🛡️ Asegurar que values sea un array de strings, no objetos
+        let cleanValues = []
+        if (opt.values && Array.isArray(opt.values)) {
+          cleanValues = opt.values
+            .map(v => {
+              // Si v es string, usarlo directamente
+              if (typeof v === 'string') return v
+              // Si v es objeto con .value string, usar eso
+              if (v && typeof v.value === 'string') return v.value
+              // Si v es objeto, intentar JSON.stringify pero evitarlo
+              if (typeof v === 'object') return ''
+              return String(v)
+            })
+            .filter(v => v) // Filtrar vacíos
+        }
+        
+        return {
+          name: opt.name || '',
+          values: cleanValues,
+          tempValue: ''
+        }
+      })
     } else {
       // Reset a opciones por defecto si no hay
       form.options = [
@@ -509,14 +532,61 @@ watch(() => props.editingProduct, (product) => {
     
     // Cargar variantes
     if (product.variants && Array.isArray(product.variants)) {
-      form.variants = product.variants.map(variant => ({
-        sku: variant.sku,
-        price: parseFloat(variant.price || 0),
-        cost: parseFloat(variant.cost_price || variant.cost || 0),
-        stock: parseInt(variant.stock || 0),
-        active: variant.active !== false,
-        options: variant.options || []
-      }))
+      form.variants = product.variants.map(variant => {
+        // 🔧 Procesar options correctamente
+        let processedOptions = []
+        
+        if (variant.options) {
+          // Si options es un array de objetos con estructura {name, value}
+          if (Array.isArray(variant.options)) {
+            processedOptions = variant.options.map(opt => {
+              // Si el objeto tiene propiedades 'name' y 'value' como strings, úsalas
+              if (opt && typeof opt.name === 'string' && typeof opt.value === 'string') {
+                return { name: opt.name, value: opt.value }
+              }
+              // Si tiene value como string
+              if (opt && typeof opt.value === 'string') {
+                return { name: opt.name || '', value: opt.value }
+              }
+              // 🛡️ FIX: Si value es un objeto (viene del backend mal parseado), extraer solo el value interno
+              if (opt && typeof opt.value === 'object' && opt.value !== null) {
+                const innerValue = opt.value.value || ''
+                return { name: opt.name || '', value: typeof innerValue === 'string' ? innerValue : '' }
+              }
+              // Si el opt mismo es un string
+              if (typeof opt === 'string') {
+                return { name: '', value: opt }
+              }
+              // Fallback: devolver vacío para evitar [object Object]
+              return { name: '', value: '' }
+            }).filter(o => o.value) // Filtrar opciones vacías
+          }
+        }
+        
+        // Si options_summary existe y es string JSON, parsearlo
+        if (variant.options_summary) {
+          try {
+            const summary = typeof variant.options_summary === 'string' 
+              ? JSON.parse(variant.options_summary) 
+              : variant.options_summary
+              
+            if (Array.isArray(summary)) {
+              processedOptions = summary.map(s => ({ name: s.name, value: s.value }))
+            }
+          } catch (e) {
+            console.warn('Error parsing options_summary:', e)
+          }
+        }
+        
+        return {
+          sku: variant.sku,
+          price: parseFloat(variant.price || 0),
+          cost: parseFloat(variant.cost_price || variant.cost || 0),
+          stock: parseInt(variant.stock || 0),
+          active: variant.active !== false,
+          options: processedOptions
+        }
+      })
     } else {
       form.variants = []
     }
@@ -571,11 +641,27 @@ watch(() => props.editingProduct, (product) => {
       showSimpleForm.value = false
     }
     
-    // Cargar imágenes
+    // Cargar imágenes - Primero las de la galería, luego la principal
     form.images = []
-    if (product.image_url) {
+    
+    // 1. Cargar imágenes de la galería (product.images)
+    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+      product.images.forEach(img => {
+        const imageUrl = img.url || img.image_url
+        if (imageUrl) {
+          form.images.push({
+            preview: imageUrl.startsWith('http') ? imageUrl : (imageUrl.startsWith('/') ? imageUrl : `/storage/${imageUrl}`),
+            file: null,
+            id: img.id || null
+          })
+        }
+      })
+    }
+    
+    // 2. Si no hay imágenes en galería pero hay image_url principal, usarla
+    if (form.images.length === 0 && product.image_url) {
       form.images.push({
-        preview: product.image_url,
+        preview: product.image_url.startsWith('http') ? product.image_url : (product.image_url.startsWith('/') ? product.image_url : `/storage/${product.image_url}`),
         file: null
       })
     }
@@ -797,7 +883,14 @@ const removeVariant = (index) => {
 }
 
 const getVariantName = (variant) => {
-  return variant.options.map(o => o.value).join(' / ')
+  if (!variant.options || !Array.isArray(variant.options)) {
+    return variant.sku || 'Variante'
+  }
+  
+  return variant.options
+    .filter(o => o && o.value && typeof o.value === 'string')
+    .map(o => o.value)
+    .join(' / ') || variant.sku || 'Variante'
 }
 
 // --- Lógica de Imágenes ---
@@ -898,6 +991,7 @@ const handleSubmit = () => {
   const payload = {
     ...form,
     type: isSimpleProduct ? 'simple' : 'variable', // CRÍTICO: distinguir tipo
+    store_type: 'fashion', // ✅ SIEMPRE marcar como producto de moda
     // Limpiar campos temporales y solo enviar opciones que tengan valores
     options: form.options
       .filter(o => o.values && o.values.length > 0) // Solo opciones con valores

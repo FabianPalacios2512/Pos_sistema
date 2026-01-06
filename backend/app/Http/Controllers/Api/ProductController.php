@@ -262,7 +262,8 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'product_type' => 'required|in:simple,variable',
-            'store_category' => 'nullable|in:general,fashion', // PROBLEMA 3: Campo para modal correcto
+            'store_type' => 'nullable|in:general,fashion', // ✅ Tipo de tienda (general o moda)
+            'store_category' => 'nullable|in:general,fashion', // DEPRECATED: Mantener por compatibilidad
             'category_id' => 'required|exists:categories,id',
             // Validación condicional
             'sku' => 'required_if:product_type,simple|nullable|string|unique:products,sku',
@@ -285,15 +286,21 @@ class ProductController extends Controller
         return DB::transaction(function () use ($request) {
             // 2. Crear Producto Padre
             $productData = $request->only([
-                'name', 'product_type', 'store_category', 'category_id', 'description',
+                'name', 'product_type', 'category_id', 'description',
                 'brand_id', 'supplier_id', 'barcode', 'cost_price',
                 'min_stock', 'measurement_unit', 'allow_decimal', 'tax_rate'
             ]);
 
-            // PROBLEMA 3: Establecer store_category basado en system_settings si no viene
-            if (!isset($productData['store_category'])) {
-                $storeType = \DB::table('system_settings')->value('store_type');
-                $productData['store_category'] = ($storeType === 'fashion' || $storeType === 'moda') ? 'fashion' : 'general';
+            // ✅ Determinar store_type basado en el contexto de creación
+            // Prioridad: 1) Request explícito, 2) store_category (legacy), 3) System settings
+            if ($request->has('store_type')) {
+                $productData['store_type'] = $request->store_type;
+            } elseif ($request->has('store_category')) {
+                $productData['store_type'] = $request->store_category; // Compatibilidad
+            } else {
+                // Detectar automáticamente desde configuración del sistema
+                $systemStoreType = \DB::table('system_settings')->value('store_type');
+                $productData['store_type'] = ($systemStoreType === 'fashion' || $systemStoreType === 'moda') ? 'fashion' : 'general';
             }
 
             // Si es simple, tomamos sku y precio del request.
@@ -540,9 +547,12 @@ class ProductController extends Controller
                 'cost_price' => $costPrice,
             ];
 
-            // PROBLEMA 3: Mantener store_category si viene en el request
-            if ($request->has('store_category')) {
-                $updateData['store_category'] = $request->input('store_category');
+            // ✅ Actualizar store_type si viene en el request (permite cambiar entre moda/general)
+            if ($request->has('store_type')) {
+                $updateData['store_type'] = $request->input('store_type');
+            } elseif ($request->has('store_category')) {
+                // Compatibilidad con campo legacy
+                $updateData['store_type'] = $request->input('store_category');
             }
 
             // ✅ AGREGAR sale_price si es producto simple
@@ -678,17 +688,21 @@ class ProductController extends Controller
                 // PRODUCTO VARIABLE - puede tener múltiples variantes con opciones
 
                 // Guardar opciones del producto
+                $optionValueMap = []; // Mapa: [NombreOpcion][Valor] => ID
+
                 if ($request->has('options') && is_array($request->options)) {
-                    // Eliminar opciones anteriores
+                    // Eliminar opciones anteriores (Cascade eliminará valores)
                     $product->options()->delete();
 
                     // Crear nuevas opciones
                     foreach ($request->options as $optionData) {
+                        $option = $product->options()->create(['name' => $optionData['name']]);
+
                         if (!empty($optionData['values'])) {
-                            $product->options()->create([
-                                'name' => $optionData['name'],
-                                'values' => json_encode($optionData['values'])
-                            ]);
+                            foreach ($optionData['values'] as $val) {
+                                $valObj = $option->values()->create(['value' => $val]);
+                                $optionValueMap[$optionData['name']][$val] = $valObj->id;
+                            }
                         }
                     }
                 }
@@ -707,7 +721,37 @@ class ProductController extends Controller
                             'cost_price' => $variantData['cost'] ?? $variantData['cost_price'] ?? 0,
                             'stock' => $variantData['stock'] ?? 0,
                             'active' => $variantData['active'] ?? true,
+                            'options_summary' => $variantData['options'] ?? null // ✅ Guardar resumen JSON
                         ]);
+
+                        // Vincular con Valores de Opción (Pivot)
+                        if (isset($variantData['options'])) {
+                            $options = $variantData['options'];
+
+                            if (is_string($options)) {
+                                $options = json_decode($options, true);
+                            }
+
+                            if (is_array($options)) {
+                                // Formato: [{"name": "Talla", "value": "M"}]
+                                if (isset($options[0]) && is_array($options[0]) && isset($options[0]['name'])) {
+                                    foreach ($options as $opt) {
+                                        $optName = $opt['name'];
+                                        $optVal = $opt['value'];
+                                        if (isset($optionValueMap[$optName][$optVal])) {
+                                            $variant->optionValues()->attach($optionValueMap[$optName][$optVal]);
+                                        }
+                                    }
+                                } else {
+                                    // Formato objeto
+                                    foreach ($options as $optName => $optVal) {
+                                        if (isset($optionValueMap[$optName][$optVal])) {
+                                            $variant->optionValues()->attach($optionValueMap[$optName][$optVal]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         // ✅ Guardar opciones de la variante en options_summary (JSON)
                         if (isset($variantData['options']) && is_array($variantData['options'])) {

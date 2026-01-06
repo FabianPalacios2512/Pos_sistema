@@ -86,6 +86,8 @@ Eres "105 IA", el asistente virtual inteligente del sistema POS 105. Eres amigab
 • consultarDeudasClientes - (PREMIUM) Ver clientes con deudas/créditos activos
 • consultarSedes - (PREMIUM) Ver listado de sedes/bodegas
 • crearSede - (PREMIUM) Crear nuevas sedes/bodegas
+• analizarArchivoProductos - Analizar archivos Excel/CSV con productos
+• importarProductosMasivo - Importar productos masivamente
 
 ⚡ REGLAS CRÍTICAS DE COMPORTAMIENTO:
 
@@ -94,22 +96,33 @@ Eres "105 IA", el asistente virtual inteligente del sistema POS 105. Eres amigab
    - Si dice "¿cuál fue el cliente que más compró?" → USA la herramienta y RESPONDE con datos.
    - Si dice "¿cuál es el producto menos vendido?" → USA obtenerProductosMenosVendidos y RESPONDE.
 
-2. **MEMORIA Y CONTEXTO**:
+2. **IMPORTACIÓN DE ARCHIVOS** (NUEVO):
+   - Si el usuario dice "quiero importar productos desde Excel", "tengo un Excel con productos", o adjunta un archivo CSV/Excel:
+     * DETECTA automáticamente si hay archivos adjuntos en el mensaje del contexto
+     * USA analizarArchivoProductos con la ruta del archivo adjunto
+     * MUESTRA un preview de los productos detectados
+     * PREGUNTA solo UNA VEZ si quiere continuar con la importación
+     * Si confirma, USA importarProductosMasivo
+   - NUNCA digas: "proporciona la ruta del archivo en el servidor"
+   - NUNCA uses términos técnicos como "backend", "storage", "tenant"
+   - Responde natural: "¡Perfecto! Veo que adjuntaste un archivo. Déjame revisarlo..."
+
+3. **MEMORIA Y CONTEXTO**:
    - RECUERDA toda la conversación. Si el usuario preguntó algo antes, ÚSALO.
    - Si dice "sí" o "ese", se refiere a lo ÚLTIMO que mencionaste.
    - NUNCA digas "¿Te refieres a...?" si ya sabes de qué hablan.
 
-3. **SÉ DIRECTO Y ÚTIL**:
+4. **SÉ DIRECTO Y ÚTIL**:
    - Da respuestas COMPLETAS con datos reales.
    - Si una herramienta devuelve datos, INTERPRÉTALOS y explícalos claramente.
    - NUNCA digas "no tengo herramienta para eso" si SÍ la tienes.
 
-4. **FORMATO**:
+5. **FORMATO**:
    - Responde en español natural, amigable y profesional.
    - NUNCA devuelvas JSON crudo.
    - Usa emojis moderadamente para hacer las respuestas más amigables.
 
-5. **PROMOCIÓN SUTIL DE PLANES**:
+6. **PROMOCIÓN SUTIL DE PLANES**:
    - Solo sugiere upgrades si el usuario pregunta por funciones Premium que no tiene.
    - Sé útil PRIMERO, vende DESPUÉS.
 
@@ -577,13 +590,13 @@ EOT;
                     // === IMPORTACIÓN DE PRODUCTOS ===
                     [
                         'name' => 'analizarArchivoProductos',
-                        'description' => 'Analiza un archivo Excel o CSV que contiene productos para importar. La IA detecta automáticamente las columnas (nombre, precio, stock, etc.) y genera un preview. IMPORTANTE: El usuario debe proporcionar la ruta del archivo en el servidor (ej: storage/tenantX/app/temp/imports/archivo.csv)',
+                        'description' => 'Analiza un archivo Excel o CSV que el usuario ha subido al chat. Usa esta herramienta cuando el usuario mencione que quiere importar productos desde Excel/CSV o cuando adjunte un archivo. La IA procesa automáticamente el archivo adjunto, detecta las columnas (nombre, precio, stock, etc.) y muestra un preview de los productos. NUNCA pidas al usuario "la ruta del archivo" - el sistema detecta automáticamente los archivos adjuntos.',
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
                                 'file_path' => [
                                     'type' => 'STRING',
-                                    'description' => 'Ruta completa del archivo CSV/Excel en el servidor. Ejemplo: /backend/storage/tenantX/app/temp/imports/import_xxxxx.csv'
+                                    'description' => 'Ruta del archivo que el usuario subió. El sistema la detecta automáticamente desde los archivos adjuntos del mensaje. Busca en el contexto del mensaje si hay archivos adjuntos y usa su ruta.'
                                 ]
                             ],
                             'required' => ['file_path']
@@ -591,22 +604,22 @@ EOT;
                     ],
                     [
                         'name' => 'importarProductosMasivo',
-                        'description' => 'Importa múltiples productos a la base de datos de una sola vez. Usa esto cuando el usuario te proporcione datos de productos en formato JSON con headers y rows. Crea automáticamente las categorías que no existan.',
+                        'description' => 'Importa múltiples productos a la base de datos después de que el usuario confirme la vista previa. Usa esto cuando ya hayas analizado el archivo con analizarArchivoProductos y el usuario confirme que quiere importar los productos. Crea automáticamente las categorías que no existan.',
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
                                 'products_data' => [
                                     'type' => 'OBJECT',
-                                    'description' => 'Objeto con headers (array de nombres de columnas) y rows (array de arrays con los datos de cada producto)',
+                                    'description' => 'Datos de productos obtenidos del análisis previo del archivo Excel/CSV',
                                     'properties' => [
                                         'headers' => [
                                             'type' => 'ARRAY',
-                                            'description' => 'Array con los nombres de las columnas (ej: ["Nombre", "Precio Venta", "Stock", "Categoría"])',
+                                            'description' => 'Array con los nombres de las columnas detectadas (ej: ["Nombre", "Precio Venta", "Stock", "Categoría"])',
                                             'items' => ['type' => 'STRING']
                                         ],
                                         'rows' => [
                                             'type' => 'ARRAY',
-                                            'description' => 'Array de arrays, cada uno con los datos de un producto',
+                                            'description' => 'Array de arrays con los datos de cada producto del archivo',
                                             'items' => [
                                                 'type' => 'ARRAY',
                                                 'items' => ['type' => 'STRING']

@@ -369,104 +369,124 @@
       </div>
     </section>
 
-    <!-- PRODUCT DETAIL MODAL (Executive Matte Style) -->
+    <!-- PRODUCT DETAIL MODAL (Modern E-commerce Style) -->
     <Transition name="fade">
-      <div v-if="selectedProduct" class="fixed inset-0 z-[200] bg-white overflow-y-auto animate-fade-in">
-        <!-- Close Button -->
-        <button 
-          @click="closeProductDetails"
-          class="fixed top-6 right-6 z-[210] p-2 bg-white/80 backdrop-blur-md rounded-full hover:bg-gray-100 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+      <div v-if="selectedProduct" class="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 lg:p-8 animate-fade-in">
+        
+        <!-- Modal Container -->
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col lg:flex-row">
+          
+          <!-- Close Button -->
+          <button 
+            @click="closeProductDetails"
+            class="absolute top-4 right-4 z-[210] p-2 bg-white/90 backdrop-blur-md rounded-full hover:bg-gray-100 transition-colors shadow-lg"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
-          <!-- Left: Immersive Gallery (50%) -->
-          <div class="lg:col-span-1 bg-gray-50 p-0 lg:p-0 flex flex-col">
-            <div class="grid grid-cols-1 gap-1 h-full">
-              <!-- Main Image (Adjusted Height) -->
-              <div class="relative h-[50vh] lg:h-[65vh] w-full overflow-hidden group">
-                <img 
-                  :src="selectedProduct.images && selectedProduct.images.length > 0 ? selectedProduct.images[0] : selectedProduct.image_url" 
-                  class="w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-105"
-                />
-              </div>
-              <!-- Secondary Images (Smaller Height) -->
-              <div v-if="selectedProduct.images && selectedProduct.images.length > 1" class="hidden lg:grid grid-cols-2 gap-1 h-[25vh] bg-white">
-                 <div v-for="(img, idx) in selectedProduct.images.slice(1, 3)" :key="idx" class="relative overflow-hidden h-full">
-                    <img :src="img" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-500" />
-                 </div>
-              </div>
+          <!-- Left: Gallery -->
+          <div class="lg:w-1/2 bg-gray-50 flex flex-col">
+            <!-- Main Image -->
+            <div class="relative aspect-square lg:aspect-auto lg:h-[400px] overflow-hidden">
+              <img 
+                :src="selectedProduct.images && selectedProduct.images.length > 0 ? selectedProduct.images[selectedImageIndex || 0] : selectedProduct.image_url" 
+                class="w-full h-full object-contain bg-white"
+              />
+              <!-- Navigation Arrows -->
+              <button 
+                v-if="selectedProduct.images && selectedProduct.images.length > 1"
+                @click="selectedImageIndex = (selectedImageIndex - 1 + selectedProduct.images.length) % selectedProduct.images.length"
+                class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+              >
+                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <button 
+                v-if="selectedProduct.images && selectedProduct.images.length > 1"
+                @click="selectedImageIndex = (selectedImageIndex + 1) % selectedProduct.images.length"
+                class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+              >
+                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <!-- Thumbnails -->
+            <div v-if="selectedProduct.images && selectedProduct.images.length > 1" class="flex gap-2 p-4 overflow-x-auto bg-white border-t border-gray-100">
+              <button 
+                v-for="(img, idx) in selectedProduct.images" 
+                :key="idx"
+                @click="selectedImageIndex = idx"
+                class="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all"
+                :class="selectedImageIndex === idx ? 'border-gray-900 ring-2 ring-gray-900/20' : 'border-gray-200 hover:border-gray-400'"
+              >
+                <img :src="img" class="w-full h-full object-cover" />
+              </button>
             </div>
           </div>
 
-          <!-- Right: Sticky Info Panel (50%) -->
-          <div class="lg:col-span-1 p-6 lg:p-12 flex flex-col bg-white">
-            <div class="lg:sticky lg:top-12 space-y-6">
+          <!-- Right: Product Info -->
+          <div class="lg:w-1/2 flex flex-col max-h-[50vh] lg:max-h-[90vh] overflow-y-auto">
+            <div class="p-6 lg:p-8 space-y-5">
               
-              <!-- Breadcrumbs -->
-              <nav class="text-xs text-gray-400 uppercase tracking-widest font-medium">
-                Inicio / Catálogo / <span class="text-gray-900">{{ selectedProduct.category_name || 'Colección' }}</span>
-              </nav>
+              <!-- Category Badge -->
+              <span class="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full uppercase tracking-wide">
+                {{ selectedProduct.category_name || 'Producto' }}
+              </span>
 
-              <!-- Header -->
-              <div class="space-y-4">
-                <p class="text-sm text-gray-500 uppercase tracking-widest font-bold">{{ selectedProduct.category }}</p>
-                <h2 class="text-3xl lg:text-4xl font-serif text-gray-900 leading-tight">
-                  {{ selectedProduct.name }}
-                </h2>
-                <p class="text-2xl font-light text-gray-900">
+              <!-- Product Name -->
+              <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
+                {{ selectedProduct.name }}
+              </h2>
+
+              <!-- Price -->
+              <div class="flex items-baseline gap-3">
+                <span class="text-3xl font-bold" :style="{ color: primaryColor }">
                   {{ storeConfig.currency_symbol }}{{ formatPrice(currentPrice) }}
-                </p>
+                </span>
+                <span v-if="currentStock > 0 && currentStock <= 5" class="text-sm text-amber-600 font-medium">
+                  ¡Solo quedan {{ currentStock }}!
+                </span>
               </div>
 
-              <!-- Selectors (Dynamic) -->
-              <div class="space-y-6 py-6 border-t border-gray-100" v-if="selectedProduct.options && selectedProduct.options.length > 0">
-                <div v-for="option in selectedProduct.options" :key="option.id" class="space-y-3">
-                  <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">{{ option.name }}</span>
-                  <div class="flex flex-wrap gap-3">
-                    <!-- Si es COLOR, mostrar bolitas de color -->
+              <!-- Options Selector -->
+              <div v-if="selectedProduct.options && selectedProduct.options.length > 0" class="space-y-4 pt-4 border-t border-gray-100">
+                <div v-for="option in selectedProduct.options" :key="option.id" class="space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-semibold text-gray-800">{{ option.name }}</span>
+                    <span v-if="selectedOptions[option.id]" class="text-xs text-gray-500">
+                      {{ getSelectedOptionValue(option) }}
+                    </span>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <!-- Colors -->
                     <template v-if="option.name.toUpperCase() === 'COLOR'">
                       <button 
                         v-for="val in option.values" 
                         :key="`color-${val.id}`"
                         @click="selectedOptions[option.id] = val.id"
-                        class="w-10 h-10 flex items-center justify-center border-2 transition-all duration-200 rounded-full overflow-hidden group relative"
+                        class="w-9 h-9 rounded-full border-2 transition-all duration-200 relative overflow-hidden"
                         :class="selectedOptions[option.id] === val.id
-                          ? 'border-gray-900 scale-110 shadow-lg' 
-                          : 'border-gray-300 hover:border-gray-600 hover:scale-105'"
+                          ? 'border-gray-900 scale-110 shadow-md' 
+                          : 'border-gray-200 hover:border-gray-400 hover:scale-105'"
+                        :title="val.value"
                       >
-                        <div 
-                          :style="{ backgroundColor: val.value }" 
-                          class="w-full h-full"
-                          :title="val.value"
-                        ></div>
-                        <!-- Checkmark cuando está seleccionado -->
-                        <svg 
-                          v-if="selectedOptions[option.id] === val.id" 
-                          class="absolute w-5 h-5 text-white drop-shadow-lg" 
-                          fill="none" 
-                          viewBox="0 0 24 24" 
-                          stroke="currentColor" 
-                          stroke-width="3"
-                        >
+                        <div :style="{ backgroundColor: val.value }" class="w-full h-full"></div>
+                        <svg v-if="selectedOptions[option.id] === val.id" class="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                       </button>
                     </template>
                     
-                    <!-- Para otras opciones (TALLA, etc) mostrar texto -->
+                    <!-- Size/Other Options -->
                     <template v-else>
                       <button 
                         v-for="val in option.values" 
                         :key="`text-${val.id}`"
                         @click="selectedOptions[option.id] = val.id"
-                        class="min-w-[3rem] h-10 px-3 flex items-center justify-center border transition-all duration-200 text-sm font-medium rounded-md"
+                        class="min-w-[2.5rem] h-9 px-3 rounded-lg border text-sm font-medium transition-all duration-200"
                         :class="selectedOptions[option.id] === val.id
-                          ? 'bg-gray-900 text-white border-gray-900' 
-                          : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900'"
+                          ? 'bg-gray-900 text-white border-gray-900 shadow-md' 
+                          : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400 hover:bg-gray-50'"
                       >
                         {{ val.value }}
                       </button>
@@ -475,60 +495,31 @@
                 </div>
               </div>
 
-              <!-- CTA -->
-              <button 
-                @click="addToCartFromDetail"
-                :disabled="currentStock === 0 || !isVariantSelected"
-                class="w-full bg-gray-900 text-white py-4 px-8 uppercase tracking-widest text-sm font-bold hover:bg-black transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                {{ currentStock === 0 ? 'Agotado' : (isVariantSelected ? 'Agregar al Carrito' : 'Selecciona opciones') }}
-              </button>
+              <!-- Description -->
+              <div v-if="selectedProduct.description" class="pt-4 border-t border-gray-100">
+                <p class="text-sm text-gray-600 leading-relaxed">{{ selectedProduct.description }}</p>
+              </div>
 
-              <!-- Accordions -->
-              <div class="border-t border-gray-200 mt-8">
-                <!-- Description -->
-                <div class="border-b border-gray-200">
-                  <button @click="toggleAccordion('description')" class="w-full py-4 flex justify-between items-center text-left group">
-                    <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">Descripción</span>
-                    <span class="text-xl font-light text-gray-400 group-hover:text-gray-900 transition-colors">
-                      {{ activeAccordion === 'description' ? '−' : '+' }}
-                    </span>
-                  </button>
-                  <div v-show="activeAccordion === 'description'" class="pb-4 text-sm text-gray-600 leading-relaxed animate-fade-in">
-                    <p v-if="selectedProduct.description">{{ selectedProduct.description }}</p>
-                    <p v-else class="text-gray-400 italic">Sin descripción disponible.</p>
-                  </div>
-                </div>
-
-                <!-- Composition -->
-                <div class="border-b border-gray-200" v-if="false">
-                  <button @click="toggleAccordion('composition')" class="w-full py-4 flex justify-between items-center text-left group">
-                    <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">Composición y Cuidados</span>
-                    <span class="text-xl font-light text-gray-400 group-hover:text-gray-900 transition-colors">
-                      {{ activeAccordion === 'composition' ? '−' : '+' }}
-                    </span>
-                  </button>
-                  <div v-show="activeAccordion === 'composition'" class="pb-4 text-sm text-gray-600 leading-relaxed animate-fade-in">
-                    <ul class="list-disc pl-4 space-y-1">
-                      <li>100% Algodón Premium</li>
-                      <li>Lavar a máquina en frío</li>
-                      <li>No usar blanqueador</li>
-                      <li>Planchar a temperatura media</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <!-- Shipping -->
-                <div class="border-b border-gray-200" v-if="false">
-                  <button @click="toggleAccordion('shipping')" class="w-full py-4 flex justify-between items-center text-left group">
-                    <span class="text-sm font-bold text-gray-900 uppercase tracking-wide">Envíos y Devoluciones</span>
-                    <span class="text-xl font-light text-gray-400 group-hover:text-gray-900 transition-colors">
-                      {{ activeAccordion === 'shipping' ? '−' : '+' }}
-                    </span>
-                  </button>
-                  <div v-show="activeAccordion === 'shipping'" class="pb-4 text-sm text-gray-600 leading-relaxed animate-fade-in">
-                    <p>Envíos gratuitos en pedidos superiores a {{ storeConfig.currency_symbol }}{{ formatPrice(150000) }}. Entrega estimada en 2-4 días hábiles. Devoluciones gratuitas dentro de los 30 días posteriores a la compra.</p>
-                  </div>
+              <!-- Add to Cart Button -->
+              <div class="pt-4 space-y-3">
+                <button 
+                  @click="addToCartFromDetail"
+                  :disabled="currentStock === 0 || !isVariantSelected"
+                  :style="{ backgroundColor: currentStock > 0 && isVariantSelected ? primaryColor : undefined }"
+                  class="w-full py-3.5 px-6 rounded-xl text-white text-sm font-bold uppercase tracking-wide transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
+                >
+                  <svg v-if="currentStock > 0" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  {{ currentStock === 0 ? 'Agotado' : (isVariantSelected ? 'Agregar al Carrito' : 'Selecciona opciones') }}
+                </button>
+                
+                <!-- Stock Info -->
+                <div v-if="currentStock > 0" class="flex items-center justify-center gap-2 text-xs text-gray-500">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Disponible para envío inmediato</span>
                 </div>
               </div>
 
@@ -919,6 +910,7 @@ const currentSlide = ref(0)
 const selectedProduct = ref(null)
 const selectedOptions = ref({}) // { 'Color': 'Rojo', 'Talla': 'M' } (Stores Value IDs)
 const activeAccordion = ref(null)
+const selectedImageIndex = ref(0) // Para navegación de galería de imágenes
 
 // 🆕 Estados para modales nuevos
 const showQuantityModal = ref(false)
@@ -1032,9 +1024,9 @@ const cartTotal = computed(() => {
 // Clases del grid según el modo de vista
 const gridClasses = computed(() => {
   if (props.isMobilePreview) {
-    return 'grid grid-cols-2 gap-2'
+    return 'grid grid-cols-2 gap-3'
   }
-  return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3'
+  return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 lg:gap-5'
 })
 
 
@@ -1265,13 +1257,23 @@ const scrollToProducts = () => {
 const openProductDetails = (product) => {
   selectedProduct.value = product
   selectedOptions.value = {} // Reset options
+  selectedImageIndex.value = 0 // Reset image index
   activeAccordion.value = 'description'
   document.body.style.overflow = 'hidden'
 }
 
 const closeProductDetails = () => {
   selectedProduct.value = null
+  selectedImageIndex.value = 0
   document.body.style.overflow = ''
+}
+
+// Obtener el valor de la opción seleccionada para mostrar en el UI
+const getSelectedOptionValue = (option) => {
+  const selectedValueId = selectedOptions.value[option.id]
+  if (!selectedValueId) return ''
+  const val = option.values.find(v => v.id === selectedValueId)
+  return val ? val.value : ''
 }
 
 const toggleAccordion = (section) => {
@@ -1280,18 +1282,26 @@ const toggleAccordion = (section) => {
 
 const addToCartFromDetail = () => {
   if (selectedProduct.value) {
-    // If it's a variable product but no variant selected (should be disabled by UI, but safety check)
+    // Si es un producto con variantes pero no se ha seleccionado una, no hacer nada
     if (!isVariantSelected.value) return
 
+    // Crear el producto para agregar al carrito con la información ya seleccionada
     const productToAdd = {
       ...selectedProduct.value,
       price: currentPrice.value,
       stock: currentStock.value,
       variant_id: currentVariant.value ? currentVariant.value.id : null,
-      selected_options: { ...selectedOptions.value } // Store selected options for cart display
+      selected_options: { ...selectedOptions.value }
     }
     
-    addToCart(productToAdd)
+    // Agregar directamente al carrito sin pasar por addToCart() que abriría otro modal
+    cartItems.value.push(productToAdd)
+    
+    // Animación visual
+    const event = new CustomEvent('cart-updated', { detail: { action: 'add' } })
+    window.dispatchEvent(event)
+    
+    // Cerrar modal de detalle y abrir carrito
     closeProductDetails()
     showCheckout.value = true
   }

@@ -1,10 +1,10 @@
 <template>
   <!-- Fashion Product Card - Digital Showroom Style -->
-  <div class="group cursor-pointer">
+  <div class="group cursor-pointer transition-all duration-300">
     
-    <!-- Imagen Principal (Aspect Ratio 3:4 Portrait) - MÁS PEQUEÑA -->
-    <div class="relative aspect-[3/4] rounded-xl overflow-hidden mb-2.5 border border-gray-200 dark:border-zinc-700" 
-         :class="(product.image_url && product.image_url.length > 10) ? 'bg-white dark:bg-zinc-800' : 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-700 dark:to-zinc-800'">
+    <!-- Imagen Principal (Aspect Ratio 3:4 Portrait) -->
+    <div class="relative aspect-[3/4] rounded-2xl overflow-hidden mb-3 shadow-sm dark:shadow-black/40 ring-1 ring-gray-200/60 dark:ring-white/5 group-hover:ring-gray-300 dark:group-hover:ring-white/10 group-hover:shadow-lg dark:group-hover:shadow-black/60 transition-all duration-300" 
+         :class="(product.image_url && product.image_url.length > 10) ? 'bg-gradient-to-b from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-950' : 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900'">
       <img v-if="product.image_url && product.image_url.length > 10"
            :src="getProductImage(product)" 
            :alt="product.name" 
@@ -15,84 +15,91 @@
       <!-- Placeholder elegante cuando NO hay imagen -->
       <div v-else 
            @click="$emit('view', product)"
-           class="w-full h-full flex items-center justify-center cursor-pointer">
+           class="w-full h-full flex items-center justify-center cursor-pointer bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800/80 dark:to-zinc-900">
         <div class="text-center">
-          <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-          </svg>
+          <div class="w-20 h-20 mx-auto rounded-2xl bg-white/60 dark:bg-zinc-700/40 flex items-center justify-center mb-2 backdrop-blur-sm">
+            <svg class="w-10 h-10 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+          </div>
         </div>
       </div>
       
+      <!-- Overlay gradiente sutil para mejorar legibilidad -->
+      <div class="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none dark:from-black/40"></div>
+      
       <!-- Badge Stock Bajo -->
       <div v-if="isLowStock" 
-           class="absolute top-3 left-3 w-2 h-2 bg-red-500 rounded-full animate-pulse"
-           title="Stock bajo"></div>
+           class="absolute top-3 left-3 px-2 py-1 bg-red-500/90 dark:bg-red-600/90 backdrop-blur-sm rounded-full flex items-center gap-1.5 shadow-lg"
+           title="Stock bajo">
+        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+        <span class="text-[9px] font-bold text-white uppercase tracking-wide">Bajo stock</span>
+      </div>
       
       <!-- Botón Editar (Solo visible en hover, flotante) -->
       <button @click.stop="$emit('edit', product)"
-              class="absolute bottom-3 right-3 w-10 h-10 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white dark:hover:bg-black/80">
-        <svg class="w-4 h-4 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class="absolute bottom-3 right-3 w-10 h-10 bg-white/95 dark:bg-zinc-800/95 backdrop-blur-md rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white dark:hover:bg-zinc-700 shadow-lg dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/10">
+        <svg class="w-4 h-4 text-gray-700 dark:text-zinc-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
         </svg>
       </button>
     </div>
 
-    <!-- Info del Producto (30% restante - Minimalista) -->
-    <div class="px-1" @click="$emit('view', product)">
+    <!-- Info del Producto (Minimalista y Elegante) -->
+    <div class="px-0.5" @click="$emit('view', product)">
       <!-- Categoría -->
-      <p class="text-[10px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">
+      <p class="text-[10px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1.5">
         {{ product.category?.name || 'Sin categoría' }}
       </p>
       
       <!-- Nombre del Producto (Tipografía Elegante) -->
-      <h3 class="text-sm font-light text-gray-900 dark:text-white leading-tight mb-2 line-clamp-2 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" 
+      <h3 class="text-sm font-normal text-gray-800 dark:text-zinc-100 leading-snug mb-2 line-clamp-2 group-hover:text-gray-600 dark:group-hover:text-white transition-colors" 
           :title="product.name">
         {{ product.name }}
       </h3>
       
-      <!-- Precio -->
+      <!-- Precio con mejor contraste -->
       <div class="mb-3">
-        <span v-if="priceRange.isRange" class="text-sm font-medium text-gray-900 dark:text-white">
+        <span v-if="priceRange.isRange" class="text-sm font-semibold text-gray-900 dark:text-white">
           Desde ${{ formatCurrency(priceRange.min) }}
         </span>
-        <span v-else class="text-sm font-medium text-gray-900 dark:text-white">
+        <span v-else class="text-sm font-semibold text-gray-900 dark:text-white">
           ${{ formatCurrency(priceRange.min) }}
         </span>
       </div>
       
-      <!-- Visualizador de Variantes (Swatches) -->
-      <div v-if="hasVariants" class="space-y-2">
-        <!-- Colores disponibles (Solo círculos) -->
-        <div v-if="variantColors.length > 0" class="flex items-center gap-1.5 flex-wrap">
+      <!-- Visualizador de Variantes (Swatches) Mejorado -->
+      <div v-if="hasVariants" class="space-y-2.5">
+        <!-- Colores disponibles (Círculos con mejor estilo) -->
+        <div v-if="variantColors.length > 0" class="flex items-center gap-2 flex-wrap">
           <span 
             v-for="(color, index) in variantColors.slice(0, 8)" 
             :key="index"
             :style="{ backgroundColor: getColorDisplay(color) }"
             :title="color"
             :class="[
-              'w-5 h-5 rounded-full shadow-sm border',
-              (color.toUpperCase() === '#FFFFFF' || getColorDisplay(color).toUpperCase() === '#FFFFFF') ? 'border-gray-300 dark:border-zinc-600' : 'border-white/20'
+              'w-5 h-5 rounded-full shadow-md ring-1 ring-offset-1 ring-offset-white dark:ring-offset-zinc-900 transition-transform duration-200 hover:scale-110',
+              (color.toUpperCase() === '#FFFFFF' || getColorDisplay(color).toUpperCase() === '#FFFFFF') ? 'ring-gray-300 dark:ring-zinc-600' : 'ring-black/10 dark:ring-white/20'
             ]">
           </span>
           <span v-if="variantColors.length > 8" 
-                class="text-[10px] text-gray-500 dark:text-zinc-400 font-medium ml-1">
+                class="text-[10px] text-gray-500 dark:text-zinc-400 font-semibold ml-0.5">
             +{{ variantColors.length - 8 }}
           </span>
         </div>
         
-        <!-- Tallas disponibles -->
-        <div v-if="variantSizes.length > 0" class="flex items-center gap-1 flex-wrap">
-          <span class="text-[10px] text-gray-500 dark:text-zinc-400 font-medium">Tallas:</span>
+        <!-- Tallas disponibles con mejor estilo -->
+        <div v-if="variantSizes.length > 0" class="flex items-center gap-1.5 flex-wrap">
           <span v-for="(size, index) in variantSizes" 
                 :key="index"
-                class="text-[10px] text-gray-600 dark:text-zinc-300 font-light">
-            {{ size }}<span v-if="index !== variantSizes.length - 1"> ·</span>
+                class="text-[10px] px-2 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 font-medium rounded-md">
+            {{ size }}
           </span>
         </div>
       </div>
       
       <!-- Stock para productos sin variantes -->
-      <div v-else class="text-[10px] text-gray-400 dark:text-zinc-500 font-light">
+      <div v-else class="text-[11px] text-gray-500 dark:text-zinc-500 font-medium">
         Stock: {{ product.current_stock || 0 }}
       </div>
     </div>
@@ -329,11 +336,21 @@ const formatCurrency = (value) => {
 <style scoped>
 /* Animación suave para hover de imagen */
 .group:hover img {
-  filter: brightness(1.05);
+  filter: brightness(1.02);
 }
 
-/* Efecto de elevación en hover */
+/* Efecto de elevación en hover - más suave */
+.group {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .group:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
+}
+
+/* Mejora de antialiasing para textos pequeños */
+p, span, h3 {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 </style>
