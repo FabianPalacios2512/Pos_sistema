@@ -523,31 +523,77 @@ const greeting = computed(() => {
   return '🌙 Buenas noches'
 })
 
-// Logos de emisoras conocidas colombianas
+// Logos de emisoras conocidas colombianas - AMPLIADO
 const knownLogos = {
+  // 🔥 Principales Cadenas
   'la mega': 'https://cdn-profiles.tunein.com/s22867/images/logog.png',
-  'mega': 'https://cdn-profiles.tunein.com/s22867/images/logog.png',
+  'mega 90': 'https://cdn-profiles.tunein.com/s22867/images/logog.png',
+  'mega 92': 'https://cdn-profiles.tunein.com/s22867/images/logog.png',
   'olimpica': 'https://cdn-profiles.tunein.com/s13980/images/logog.png',
+  'olímpica': 'https://cdn-profiles.tunein.com/s13980/images/logog.png',
   'caracol': 'https://cdn-profiles.tunein.com/s2906/images/logog.png',
   'tropicana': 'https://cdn-profiles.tunein.com/s6556/images/logog.png',
   'w radio': 'https://cdn-profiles.tunein.com/s23177/images/logog.png',
   'la w': 'https://cdn-profiles.tunein.com/s23177/images/logog.png',
   'rcn': 'https://cdn-profiles.tunein.com/s2895/images/logog.png',
+  'rcn radio': 'https://cdn-profiles.tunein.com/s2895/images/logog.png',
+  
+  // 📻 Noticias y Talk
   'blu radio': 'https://cdn-profiles.tunein.com/s187198/images/logog.png',
   'blu': 'https://cdn-profiles.tunein.com/s187198/images/logog.png',
+  'la fm': 'https://cdn-profiles.tunein.com/s6500/images/logog.png',
+  
+  // 🎵 Música
   'los 40': 'https://cdn-profiles.tunein.com/s23013/images/logog.png',
   'los40': 'https://cdn-profiles.tunein.com/s23013/images/logog.png',
   'radio uno': 'https://cdn-profiles.tunein.com/s130293/images/logog.png',
-  'la fm': 'https://cdn-profiles.tunein.com/s6500/images/logog.png',
   'candela': 'https://cdn-profiles.tunein.com/s6635/images/logog.png',
   'oxigeno': 'https://cdn-profiles.tunein.com/s27347/images/logog.png',
+  'oxígeno': 'https://cdn-profiles.tunein.com/s27347/images/logog.png',
   'vibra': 'https://cdn-profiles.tunein.com/s197697/images/logog.png',
+  'vibra bogotá': 'https://cdn-profiles.tunein.com/s197697/images/logog.png',
   'radioacktiva': 'https://cdn-profiles.tunein.com/s6536/images/logog.png',
   'la x': 'https://cdn-profiles.tunein.com/s6525/images/logog.png',
   'bésame': 'https://cdn-profiles.tunein.com/s6565/images/logog.png',
   'besame': 'https://cdn-profiles.tunein.com/s6565/images/logog.png',
   'radio tiempo': 'https://cdn-profiles.tunein.com/s6574/images/logog.png',
   'la z': 'https://cdn-profiles.tunein.com/s133595/images/logog.png',
+  
+  // ☀️ El Sol y Mix
+  'el sol': 'https://cdn-profiles.tunein.com/s6578/images/logog.png',
+  'sol caracol': 'https://cdn-profiles.tunein.com/s6578/images/logog.png',
+  'mix': 'https://cdn-profiles.tunein.com/s6543/images/logog.png',
+  'la mix': 'https://cdn-profiles.tunein.com/s6543/images/logog.png',
+  
+  // 🎶 Vallenato y Popular
+  'radio cristal': 'https://cdn-profiles.tunein.com/s6591/images/logog.png',
+  'cristal': 'https://cdn-profiles.tunein.com/s6591/images/logog.png',
+  'vallenata': 'https://cdn-profiles.tunein.com/s127044/images/logog.png',
+  'la vallenata': 'https://cdn-profiles.tunein.com/s127044/images/logog.png',
+  'radio santa fe': 'https://cdn-profiles.tunein.com/s6511/images/logog.png',
+  'santa fe': 'https://cdn-profiles.tunein.com/s6511/images/logog.png',
+  'radio sutatenza': 'https://cdn-profiles.tunein.com/s6520/images/logog.png',
+  
+  // 🎸 Rock y Alternativa
+  'radio hit': 'https://cdn-profiles.tunein.com/s57314/images/logog.png',
+  'hit fm': 'https://cdn-profiles.tunein.com/s57314/images/logog.png',
+  'super radio': 'https://cdn-profiles.tunein.com/s7221/images/logog.png',
+  
+  // 🌴 Costa/Caribe
+  'radio libertad': 'https://cdn-profiles.tunein.com/s6584/images/logog.png',
+  'atlántico': 'https://cdn-profiles.tunein.com/s23212/images/logog.png',
+  'atlantico': 'https://cdn-profiles.tunein.com/s23212/images/logog.png',
+  
+  // 🏔️ Regionales
+  'ecos del combeima': 'https://cdn-profiles.tunein.com/s22869/images/logog.png',
+  'radio paisa': 'https://cdn-profiles.tunein.com/s6500/images/logog.png',
+  'minuto de dios': 'https://cdn-profiles.tunein.com/s22889/images/logog.png',
+  'emisora minuto': 'https://cdn-profiles.tunein.com/s22889/images/logog.png',
+  
+  // 🎧 Electrónica/Urbana  
+  'energia': 'https://cdn-profiles.tunein.com/s138085/images/logog.png',
+  'energía': 'https://cdn-profiles.tunein.com/s138085/images/logog.png',
+  'planet radio': 'https://cdn-profiles.tunein.com/s300013/images/logog.png',
 }
 
 // Función para obtener logo de la emisora
@@ -605,12 +651,28 @@ const handleImageError = (e) => {
   if (e.target && e.target.parentElement) {
     e.target.style.display = 'none'
     const parent = e.target.parentElement
-    parent.classList.add('flex', 'items-center', 'justify-center')
-    parent.classList.add(isDarkMode.value ? 'bg-zinc-800' : 'bg-gray-200')
+    
+    // Generar color basado en nombre de la estación
+    const colors = [
+      'from-emerald-500 to-teal-600',
+      'from-blue-500 to-indigo-600', 
+      'from-purple-500 to-pink-600',
+      'from-amber-500 to-orange-600'
+    ]
+    const stationName = radioStore.currentStation?.name || 'Radio'
+    const colorIndex = stationName.length % colors.length
+    
+    // Obtener iniciales
+    const initials = stationName
+      .split(' ')
+      .filter(word => word.length > 0)
+      .slice(0, 2)
+      .map(word => word[0].toUpperCase())
+      .join('')
+    
+    parent.classList.add('flex', 'items-center', 'justify-center', 'bg-gradient-to-br', ...colors[colorIndex].split(' '))
     parent.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-1/2 w-1/2 ${isDarkMode.value ? 'text-zinc-600' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-      </svg>
+      <span class="text-white font-bold text-lg drop-shadow-lg">${initials || '📻'}</span>
     `
   }
 }
@@ -631,58 +693,92 @@ onUnmounted(() => {
   window.removeEventListener('storage', handleStorageChange)
 })
 
-// Sub-component for Station Card - MEJORADO
+// Sub-component for Station Card - MEJORADO con más logos
 const StationCard = defineComponent({
   props: ['station', 'isDarkMode'],
   setup(props) {
     const store = useRadioStore()
     
-    // Logos conocidos inline
+    // Usar el mismo mapeo de logos que el componente padre
     const getCardLogo = (station) => {
-      const knownLogosMap = {
-        'la mega': 'https://cdn-profiles.tunein.com/s22867/images/logog.png',
-        'mega': 'https://cdn-profiles.tunein.com/s22867/images/logog.png',
-        'olimpica': 'https://cdn-profiles.tunein.com/s13980/images/logog.png',
-        'caracol': 'https://cdn-profiles.tunein.com/s2906/images/logog.png',
-        'tropicana': 'https://cdn-profiles.tunein.com/s6556/images/logog.png',
-        'w radio': 'https://cdn-profiles.tunein.com/s23177/images/logog.png',
-        'rcn': 'https://cdn-profiles.tunein.com/s2895/images/logog.png',
-        'blu radio': 'https://cdn-profiles.tunein.com/s187198/images/logog.png',
-        'blu': 'https://cdn-profiles.tunein.com/s187198/images/logog.png',
-        'los 40': 'https://cdn-profiles.tunein.com/s23013/images/logog.png',
-        'radio uno': 'https://cdn-profiles.tunein.com/s130293/images/logog.png',
-        'la fm': 'https://cdn-profiles.tunein.com/s6500/images/logog.png',
-        'candela': 'https://cdn-profiles.tunein.com/s6635/images/logog.png',
-        'oxigeno': 'https://cdn-profiles.tunein.com/s27347/images/logog.png',
-        'vibra': 'https://cdn-profiles.tunein.com/s197697/images/logog.png',
-        'radioacktiva': 'https://cdn-profiles.tunein.com/s6536/images/logog.png',
-        'la x': 'https://cdn-profiles.tunein.com/s6525/images/logog.png',
-        'bésame': 'https://cdn-profiles.tunein.com/s6565/images/logog.png',
-        'besame': 'https://cdn-profiles.tunein.com/s6565/images/logog.png',
-      }
-      
-      if (station.logo && !station.logo.includes('placeholder')) {
+      // Primero intentar con el logo de la API si es válido
+      if (station.logo && 
+          !station.logo.includes('placeholder') && 
+          station.logo.startsWith('http')) {
         return station.logo
       }
       
+      // Buscar en logos conocidos
       const nameLower = station.name.toLowerCase()
-      for (const [key, url] of Object.entries(knownLogosMap)) {
-        if (nameLower.includes(key)) return url
+      for (const [key, url] of Object.entries(knownLogos)) {
+        if (nameLower.includes(key)) {
+          return url
+        }
       }
       
-      return station.logo
+      // Si tiene logo de la API, usarlo como fallback
+      if (station.logo && station.logo.startsWith('http')) {
+        return station.logo
+      }
+      
+      return null
     }
     
     const handleCardImageError = (e) => {
        e.target.style.display = 'none'
        const parent = e.target.parentElement
-       parent.classList.add('flex', 'items-center', 'justify-center')
-       parent.classList.add(props.isDarkMode ? 'bg-zinc-800' : 'bg-gray-200')
+       
+       // Generar color de fondo basado en el nombre de la estación
+       const colors = [
+         'from-emerald-500 to-teal-600',
+         'from-blue-500 to-indigo-600', 
+         'from-purple-500 to-pink-600',
+         'from-amber-500 to-orange-600',
+         'from-rose-500 to-red-600',
+         'from-cyan-500 to-blue-600',
+         'from-violet-500 to-purple-600',
+         'from-fuchsia-500 to-pink-600'
+       ]
+       const colorIndex = props.station.name.length % colors.length
+       const gradientClass = colors[colorIndex]
+       
+       // Obtener iniciales (máximo 2 caracteres)
+       const initials = props.station.name
+         .split(' ')
+         .filter(word => word.length > 0)
+         .slice(0, 2)
+         .map(word => word[0].toUpperCase())
+         .join('')
+       
+       parent.classList.add('flex', 'items-center', 'justify-center', 'bg-gradient-to-br', ...gradientClass.split(' '))
        parent.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 ${props.isDarkMode ? 'text-zinc-600' : 'text-gray-400'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-        </svg>
+        <span class="text-white font-black text-2xl tracking-tight drop-shadow-lg">${initials || '📻'}</span>
       `
+    }
+
+    // Generar color basado en nombre
+    const getGradientColor = (name) => {
+      const colors = [
+        'bg-gradient-to-br from-emerald-500 to-teal-600',
+        'bg-gradient-to-br from-blue-500 to-indigo-600', 
+        'bg-gradient-to-br from-purple-500 to-pink-600',
+        'bg-gradient-to-br from-amber-500 to-orange-600',
+        'bg-gradient-to-br from-rose-500 to-red-600',
+        'bg-gradient-to-br from-cyan-500 to-blue-600',
+        'bg-gradient-to-br from-violet-500 to-purple-600',
+        'bg-gradient-to-br from-fuchsia-500 to-pink-600'
+      ]
+      return colors[name.length % colors.length]
+    }
+    
+    // Obtener iniciales
+    const getInitials = (name) => {
+      return name
+        .split(' ')
+        .filter(word => word.length > 0)
+        .slice(0, 2)
+        .map(word => word[0].toUpperCase())
+        .join('')
     }
 
     return () => h('div', {
@@ -703,21 +799,11 @@ const StationCard = defineComponent({
               onError: handleCardImageError
             })
           : h('div', { 
-              class: ['w-full h-full flex items-center justify-center', props.isDarkMode ? 'bg-zinc-800' : 'bg-gray-200'] 
+              class: ['w-full h-full flex items-center justify-center', getGradientColor(props.station.name)] 
             }, [
-              h('svg', { 
-                class: ['h-12 w-12', props.isDarkMode ? 'text-zinc-600' : 'text-gray-400'], 
-                fill: 'none', 
-                viewBox: '0 0 24 24', 
-                stroke: 'currentColor' 
-              }, [
-                h('path', { 
-                  'stroke-linecap': 'round', 
-                  'stroke-linejoin': 'round', 
-                  'stroke-width': '1', 
-                  d: 'M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z' 
-                })
-              ])
+              h('span', { 
+                class: 'text-white font-black text-2xl tracking-tight drop-shadow-lg'
+              }, getInitials(props.station.name) || '📻')
             ]),
         // Play Button Overlay
         h('div', { 
@@ -733,6 +819,33 @@ const StationCard = defineComponent({
               : h('svg', { class: 'h-5 w-5 text-black ml-0.5', viewBox: '0 0 24 24', fill: 'currentColor' }, [ 
                   h('path', { d: 'M8 5v14l11-7z' }) 
                 ])
+          ])
+        ]),
+        // Favorite Button (esquina superior derecha)
+        h('button', { 
+          class: [
+            'absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200',
+            store.isFavorite(props.station.id) 
+              ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/30' 
+              : 'bg-black/40 text-white/70 hover:bg-black/60 hover:text-white backdrop-blur-sm opacity-0 group-hover:opacity-100'
+          ],
+          onClick: (e) => {
+            e.stopPropagation()
+            store.toggleFavorite(props.station)
+          }
+        }, [
+          h('svg', { 
+            class: 'h-4 w-4', 
+            fill: store.isFavorite(props.station.id) ? 'currentColor' : 'none',
+            viewBox: '0 0 24 24', 
+            stroke: 'currentColor',
+            'stroke-width': '2'
+          }, [
+            h('path', { 
+              'stroke-linecap': 'round', 
+              'stroke-linejoin': 'round',
+              d: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'
+            })
           ])
         ]),
         // Live indicator if playing
