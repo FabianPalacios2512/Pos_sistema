@@ -13,9 +13,8 @@ Route::get('/', function () {
  * AUTENTICACIÓN DE SUPER ADMIN
  * ============================================
  */
-Route::post('/api/admin/login', [AuthController::class, 'login'])
-    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
-    ->name('admin.login');
+// ⚠️ ELIMINADO: Ruta duplicada movida a api.php con adminLogin()
+// La autenticación de super admin ahora se maneja en api.php
 
 /**
  * ============================================
@@ -39,6 +38,8 @@ Route::prefix('admin')->middleware('superadmin')->group(function () {
         Route::post('/tenants', [DashboardController::class, 'createTenant'])->name('admin.api.tenants.create');
         Route::get('/tenants/{id}', [DashboardController::class, 'getTenantDetails'])->name('admin.api.tenant.details');
         Route::put('/tenants/{id}', [DashboardController::class, 'updateTenant'])->name('admin.api.tenant.update');
+        Route::put('/tenants/{id}/subscription', [DashboardController::class, 'updateTenantSubscription'])->name('admin.api.tenant.subscription');
+        Route::put('/tenants/{id}/status', [DashboardController::class, 'updateTenantStatus'])->name('admin.api.tenant.status');
         Route::delete('/tenants/{id}', [DashboardController::class, 'deleteTenant'])->name('admin.api.tenant.delete');
 
         // Gestión de usuarios de tenants

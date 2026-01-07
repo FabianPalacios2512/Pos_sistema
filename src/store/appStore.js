@@ -37,7 +37,7 @@ export const appStore = reactive({
   
   // Estado de inicialización
   initialized: false,
-  isSubscriptionExpired: false, // Nuevo estado para controlar expiración
+  isSubscriptionExpired: false, // Estado para controlar expiración (lo maneja SubscriptionExpiredModal)
   
   // Métodos para cargar datos
   async loadProducts(warehouseId = null, searchScope = 'local') {
@@ -178,29 +178,22 @@ export const appStore = reactive({
         }
       }
     } catch (error) {
-  // console.error('❌ Error precargando configuración:', error)
-      // Detectar si el error es por suscripción expirada
-      if (error.response?.status === 403 && (
-          error.response?.data?.subscription_expired === true ||
-          error.response?.data?.message?.includes('suscripción ha finalizado') ||
-          error.response?.data?.message?.includes('suscripción ha expirado') || 
-          error.response?.data?.message?.includes('plan ha expirado')
-      )) {
-        console.log('⛔ [Store] Suscripción expirada detectada')
-        this.isSubscriptionExpired = true
+      // Los errores 403 por suscripción se manejan en SubscriptionExpiredModal
+      // NO bloquear aquí - solo establecer valores por defecto
+      if (error.response?.status === 403) {
+        console.log('⚠️ [Store] Error 403 - dejando que el modal maneje el bloqueo')
         
         // Establecer valores por defecto para evitar errores
         this.systemSettings = {
-          onboarding_completed: true, // Asumimos que si tiene cuenta, ya completó onboarding
+          onboarding_completed: true,
           business_name: 'Mi Negocio'
         }
         this.businessName = 'Mi Negocio'
         this.tenant = {
           id: error.response?.data?.tenant_id || 'unknown',
-          plan_type: 'expired',
-          subscription_status: 'expired'
+          plan_type: 'unknown',
+          subscription_status: 'unknown'
         }
-        // NO lanzar el error para permitir que el componente continúe
         return
       }
       // Para otros errores, sí lanzarlos
@@ -340,6 +333,7 @@ export const appStore = reactive({
         break
     }
   }
+  // El polling de suscripción ahora se maneja directamente en SubscriptionExpiredModal
 })
 
 // 🆕 Computed properties para acceso simplificado a datos del tenant

@@ -18,6 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'ai.limit' => \App\Http\Middleware\CheckAiUsageLimit::class,
             'trial' => \App\Http\Middleware\CheckTrialStatus::class,
         ]);
+
+        // Excluir rutas de admin de verificación CSRF
+        $middleware->validateCsrfTokens(except: [
+            'admin/api/*',
+            'api/admin/*',
+        ]);
+
+        // NOTA: SkipTenancyForAdminRoutes se registra en TenancyServiceProvider
+        // con máxima prioridad para ejecutarse antes que los middlewares de tenancy
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

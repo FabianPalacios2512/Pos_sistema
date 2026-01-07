@@ -21,7 +21,7 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 Route::middleware([
     'api',
     InitializeTenancyByDomain::class,
-    PreventAccessFromCentralDomains::class,
+    // PreventAccessFromCentralDomains::class,  // ELIMINADO para permitir rutas admin centrales
 ])->prefix('api')->group(function () {
     // Aquí cargaremos las rutas de la API del POS
     require __DIR__ . '/tenant_api.php';
@@ -30,7 +30,7 @@ Route::middleware([
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
-    PreventAccessFromCentralDomains::class,
+    // PreventAccessFromCentralDomains::class,  // ELIMINADO para permitir rutas admin centrales
 ])->group(function () {
     Route::get('/', function () {
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
@@ -59,7 +59,7 @@ Route::middleware([
 Route::middleware([
     'api',
     InitializeTenancyByDomain::class,
-    PreventAccessFromCentralDomains::class,
+    // PreventAccessFromCentralDomains::class,  // ELIMINADO para permitir rutas admin centrales
 ])->prefix('api/public')->group(function () {
     Route::get('/catalog', [App\Http\Controllers\PublicCatalogController::class, 'index']);
     Route::get('/catalog/categories', [App\Http\Controllers\PublicCatalogController::class, 'categories']);

@@ -46,17 +46,17 @@ Route::get('/tenant-info', function (Illuminate\Http\Request $request) {
     // Obtener el subdominio del request
     $host = $request->getHost();
     $subdomain = explode('.', $host)[0];
-    
+
     // Buscar el tenant por subdominio
     $tenant = \App\Models\Tenant::where('subdomain', $subdomain)->first();
-    
+
     if (!$tenant) {
         return response()->json([
             'success' => false,
             'message' => 'No tenant found for subdomain: ' . $subdomain
         ], 404);
     }
-    
+
     return response()->json([
         'success' => true,
         'tenant_id' => $tenant->id,
@@ -96,6 +96,62 @@ Route::get('/check-subscription', function () {
         'is_expiring_soon' => !$isExpired && $daysRemaining <= 7,
         'tenant_id' => $tenant->id, // 🔥 AGREGAR tenant_id para el modal
         '_subscription_expired' => $isExpired, // 🔥 Campo que detecta apiClient
+    ]);
+});
+
+/**
+ * 🔄 Endpoint para verificación automática de estado de suscripción (polling)
+ * Usado por el frontend para detectar cuando un pago ha sido procesado
+ * sin necesidad de recargar la página o cerrar sesión
+ */
+Route::get('/subscription/status', function () {
+    $tenant = tenant();
+
+    if (!$tenant) {
+        return response()->json([
+            'success' => false,
+            'active' => false,
+            'message' => 'Tenant no encontrado'
+        ]);
+    }
+
+    // Verificar en la columna subscription_ends_at (legacy)
+    $expiresAt = $tenant->subscription_ends_at;
+
+    // También verificar en el campo data JSON (nuevo sistema)
+    $subscriptionEnd = $tenant->subscription_end ?? null;
+    $status = $tenant->status ?? 'active';
+
+    // Usar la fecha más reciente entre ambas fuentes
+    if ($subscriptionEnd) {
+        $endDate = \Carbon\Carbon::parse($subscriptionEnd);
+    } elseif ($expiresAt) {
+        $endDate = \Carbon\Carbon::parse($expiresAt);
+    } else {
+        // Sin fecha de expiración = activo por defecto (free trial?)
+        $endDate = now()->addDays(30);
+    }
+
+    $now = now();
+    $isExpired = $now->isAfter($endDate);
+
+    // Si el status está en paused/suspended, considerar como no activo
+    if (in_array($status, ['paused', 'suspended'])) {
+        $isActive = false;
+    } else {
+        $isActive = !$isExpired;
+    }
+
+    return response()->json([
+        'success' => true,
+        'active' => $isActive,
+        'status' => $isActive ? 'active' : ($status === 'paused' ? 'paused' : ($isExpired ? 'expired' : $status)),
+        'tenant' => [
+            'id' => $tenant->id,
+            'plan_type' => $tenant->plan ?? 'free_trial',
+            'subscription_end_date' => $endDate->format('Y-m-d'),
+            'days_remaining' => $isExpired ? 0 : max(0, ceil($now->diffInDays($endDate, false)))
+        ]
     ]);
 });
 

@@ -40,8 +40,12 @@ const getWhatsAppClient = () => {
   if (tenantId) {
     // En producción usar /api/whatsapp/ (proxy Nginx)
     // En desarrollo usar puerto 3002 directo
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname.includes('.localhost')
+    
     const whatsappBaseURL = import.meta.env.VITE_WHATSAPP_URL || 
-                           (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                           (isLocalhost
                              ? 'http://localhost:3002' 
                              : `https://${tenantId}.105pos.pro/api/whatsapp`)
     

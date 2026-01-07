@@ -80,6 +80,7 @@ class DashboardController extends Controller
 
         // Enriquecer con datos adicionales
         $tenants->getCollection()->transform(function ($tenant) {
+            $data = $tenant->data ?? [];
             return [
                 'id' => $tenant->id,
                 'business_name' => $tenant->business_name ?? 'Sin Nombre',
@@ -88,6 +89,8 @@ class DashboardController extends Controller
                 'primary_domain' => $tenant->domains->first()?->domain ?? 'N/A',
                 'status' => $this->getTenantStatus($tenant),
                 'created_at' => $tenant->created_at,
+                'subscription_start' => $data['subscription_start'] ?? $tenant->created_at?->format('Y-m-d'),
+                'subscription_end' => $data['subscription_end'] ?? $tenant->subscription_ends_at,
                 'subscription_ends_at' => $tenant->subscription_ends_at,
                 'database_name' => $tenant->tenancy_db_name ?? "tenant_{$tenant->id}",
             ];
@@ -197,16 +200,20 @@ class DashboardController extends Controller
         $aiUsageService = app(AiUsageService::class);
         $aiUsageStats = $aiUsageService->getUsageStats($tenantId);
 
+        $data = $tenant->data ?? [];
+
         return response()->json([
             'success' => true,
             'data' => [
                 'id' => $tenant->id,
                 'business_name' => $tenant->business_name ?? 'Sin Nombre',
                 'plan' => $tenant->plan ?? 'free_trial',
-                'status' => $tenant->data['status'] ?? 'active',
+                'status' => $data['status'] ?? 'active',
                 'domains' => $tenant->domains->pluck('domain')->toArray(),
                 'primary_domain' => $tenant->domains->first()?->domain ?? 'N/A',
                 'created_at' => $tenant->created_at,
+                'subscription_start' => $data['subscription_start'] ?? $tenant->created_at?->format('Y-m-d'),
+                'subscription_end' => $data['subscription_end'] ?? $tenant->subscription_ends_at,
                 'subscription_ends_at' => $tenant->subscription_ends_at,
                 'stats' => $stats,
                 'ai_usage' => $aiUsageStats,
@@ -321,6 +328,96 @@ class DashboardController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar la tienda: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Actualizar fechas de suscripción del tenant
+     */
+    public function updateTenantSubscription(Request $request, $id)
+    {
+        $tenant = Tenant::find($id);
+
+        if (!$tenant) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tenant no encontrado'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'subscription_start' => 'nullable|date',
+            'subscription_end' => 'nullable|date',
+        ]);
+
+        try {
+            $data = $tenant->data ?? [];
+
+            if (isset($validated['subscription_start'])) {
+                $data['subscription_start'] = $validated['subscription_start'];
+            }
+
+            if (isset($validated['subscription_end'])) {
+                $data['subscription_end'] = $validated['subscription_end'];
+            }
+
+            $tenant->data = $data;
+            $tenant->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Fechas de suscripción actualizadas',
+                'data' => [
+                    'subscription_start' => $data['subscription_start'] ?? null,
+                    'subscription_end' => $data['subscription_end'] ?? null,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar suscripción: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Actualizar estado del tenant (pausar/activar)
+     */
+    public function updateTenantStatus(Request $request, $id)
+    {
+        $tenant = Tenant::find($id);
+
+        if (!$tenant) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tenant no encontrado'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:active,paused,suspended',
+        ]);
+
+        try {
+            $data = $tenant->data ?? [];
+            $data['status'] = $validated['status'];
+            $tenant->data = $data;
+            $tenant->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Estado actualizado a: ' . $validated['status'],
+                'data' => [
+                    'status' => $validated['status'],
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar estado: ' . $e->getMessage()
             ], 500);
         }
     }

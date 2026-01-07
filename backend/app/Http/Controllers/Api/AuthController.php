@@ -20,45 +20,52 @@ class AuthController extends Controller
         ]);
 
         // PRIMERO: Intentar autenticar como Super Admin (Base Central)
-        $centralUser = DB::connection('mysql')->table('central_users')
-            ->where('email', $request->email)
-            ->first();
+        // Wrap todo el bloque en try-catch para manejar errores de conexión
+        try {
+            $centralUser = DB::connection('mysql')->table('central_users')
+                ->where('email', $request->email)
+                ->first();
 
-        if ($centralUser && Hash::check($request->password, $centralUser->password)) {
-            if (!$centralUser->is_active) {
-                throw ValidationException::withMessages([
-                    'email' => ['Tu cuenta de super admin está desactivada.'],
+            if ($centralUser && Hash::check($request->password, $centralUser->password)) {
+                if (!$centralUser->is_active) {
+                    throw ValidationException::withMessages([
+                        'email' => ['Tu cuenta de super admin está desactivada.'],
+                    ]);
+                }
+
+                // Crear token para super admin (sin modelo Eloquent)
+                $token = bin2hex(random_bytes(40));
+
+                // Actualizar último login
+                DB::connection('mysql')->table('central_users')
+                    ->where('id', $centralUser->id)
+                    ->update(['updated_at' => now()]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Inicio de sesión exitoso como Super Admin',
+                    'data' => [
+                        'user' => [
+                            'id' => $centralUser->id,
+                            'name' => $centralUser->name,
+                            'email' => $centralUser->email,
+                            'phone' => null,
+                            'role' => [
+                                'id' => 0,
+                                'name' => $centralUser->role,
+                                'permissions' => ['*'] // Super admin tiene todos los permisos
+                            ],
+                            'is_super_admin' => true,
+                            'last_login' => now()
+                        ],
+                        'token' => $token
+                    ]
                 ]);
             }
-
-            // Crear token para super admin (sin modelo Eloquent)
-            $token = bin2hex(random_bytes(40));
-
-            // Actualizar último login
-            DB::connection('mysql')->table('central_users')
-                ->where('id', $centralUser->id)
-                ->update(['updated_at' => now()]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Inicio de sesión exitoso como Super Admin',
-                'data' => [
-                    'user' => [
-                        'id' => $centralUser->id,
-                        'name' => $centralUser->name,
-                        'email' => $centralUser->email,
-                        'phone' => null,
-                        'role' => [
-                            'id' => 0,
-                            'name' => $centralUser->role,
-                            'permissions' => ['*'] // Super admin tiene todos los permisos
-                        ],
-                        'is_super_admin' => true,
-                        'last_login' => now()
-                    ],
-                    'token' => $token
-                ]
-            ]);
+        } catch (\Exception $e) {
+            // Si falla la conexión a central_users, continuar con login de tenant
+            \Log::warning('Error en autenticación de super admin: ' . $e->getMessage());
+            // Continuar al login normal de tenant
         }
 
         // SEGUNDO: Si no es super admin, buscar en tenant
@@ -101,6 +108,78 @@ class AuthController extends Controller
                 'token' => $token
             ]
         ]);
+    }
+
+    /**
+     * Login específico para Super Admin (solo busca en central_users)
+     */
+    public function adminLogin(Request $request)
+    {
+        \Log::info('🔑 adminLogin: Inicio del método', [
+            'email' => $request->email,
+            'path' => $request->path(),
+            'host' => $request->getHost()
+        ]);
+
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        try {
+            // Buscar SOLO en la tabla central_users
+            $centralUser = DB::connection('mysql')->table('central_users')
+                ->where('email', $request->email)
+                ->first();
+
+            if (!$centralUser || !Hash::check($request->password, $centralUser->password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['Las credenciales de super admin son incorrectas.'],
+                ]);
+            }
+
+            if (!$centralUser->is_active) {
+                throw ValidationException::withMessages([
+                    'email' => ['Tu cuenta de super admin está desactivada.'],
+                ]);
+            }
+
+            // Crear token para super admin
+            $token = bin2hex(random_bytes(40));
+
+            // Actualizar último login
+            DB::connection('mysql')->table('central_users')
+                ->where('id', $centralUser->id)
+                ->update(['updated_at' => now()]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Inicio de sesión exitoso como Super Admin',
+                'data' => [
+                    'user' => [
+                        'id' => $centralUser->id,
+                        'name' => $centralUser->name,
+                        'email' => $centralUser->email,
+                        'phone' => null,
+                        'role' => [
+                            'id' => 0,
+                            'name' => $centralUser->role,
+                            'permissions' => ['*']
+                        ],
+                        'is_super_admin' => true,
+                        'last_login' => now()
+                    ],
+                    'token' => $token
+                ]
+            ]);
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            \Log::error('Error en login de super admin: ' . $e->getMessage());
+            throw ValidationException::withMessages([
+                'email' => ['Error al conectar con el sistema de autenticación de super admin.'],
+            ]);
+        }
     }
 
     public function logout(Request $request)

@@ -130,11 +130,23 @@ class TenancyServiceProvider extends ServiceProvider
 
     protected function makeTenancyMiddlewareHighestPriority()
     {
-        $tenancyMiddleware = [
-            // Even higher priority than the initialization middleware
-            Middleware\PreventAccessFromCentralDomains::class,
+        // PRIMERO: Agregar el middleware PreventTenancyInit con MÁXIMA prioridad
+        // Este middleware puede terminar tenancy para rutas específicas
+        $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority(
+            \App\Http\Middleware\PreventTenancyInit::class
+        );
 
-            Middleware\InitializeTenancyByDomain::class,
+        // SEGUNDO: Agregar el middleware de skip tenancy
+        $this->app[\Illuminate\Contracts\Http\Kernel::class]->prependToMiddlewarePriority(
+            \App\Http\Middleware\SkipTenancyForAdminRoutes::class
+        );
+
+        $tenancyMiddleware = [
+            // ⚠️ NO incluir PreventAccessFromCentralDomains - causa redirects en rutas admin
+            // PreventAccessFromCentralDomains::class,  // ELIMINADO
+
+            // Usar nuestro middleware personalizado que soporta rutas exempt
+            \App\Http\Middleware\InitializeTenancyByDomain::class,
             Middleware\InitializeTenancyBySubdomain::class,
             Middleware\InitializeTenancyByDomainOrSubdomain::class,
             Middleware\InitializeTenancyByPath::class,

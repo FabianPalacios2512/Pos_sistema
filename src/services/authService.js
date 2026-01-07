@@ -14,22 +14,33 @@ const authService = {
       if (USE_MOCK) {
         response = { data: await mockAuthService.login(credentials) };
       } else {
-        // Intentar primero como super admin
-        try {
-          response = await apiClient.post('/admin/login', {
-            email: credentials.email,
-            password: credentials.password
-          });
-          
-          // Si llegamos aquí, el login de super admin funcionó
-          if (response.data.success && response.data.data?.token) {
-            localStorage.setItem('authToken', response.data.data.token);
-            localStorage.setItem('user', JSON.stringify(response.data.data.user));
-            apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
-            return response.data.data;
+        // Detectar si estamos en el dominio central (105pos.pro) o en un subdominio de tenant
+        const hostname = window.location.hostname;
+        const isCentralDomain = hostname === '105pos.pro' || hostname === 'www.105pos.pro' || hostname === 'localhost';
+        
+        if (isCentralDomain) {
+          // En dominio central: intentar como super admin
+          try {
+            response = await apiClient.post('/admin/login', {
+              email: credentials.email,
+              password: credentials.password
+            });
+            
+            if (response.data.success && response.data.data?.token) {
+              localStorage.setItem('authToken', response.data.data.token);
+              localStorage.setItem('user', JSON.stringify(response.data.data.user));
+              apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
+              return response.data.data;
+            }
+          } catch (adminError) {
+            // Si falla admin, intentar login normal
+            response = await apiClient.post('/login', {
+              email: credentials.email,
+              password: credentials.password
+            });
           }
-        } catch (adminError) {
-          // Si falla el login de super admin, intentar como tenant normal
+        } else {
+          // En subdominio de tenant: usar login normal directamente
           response = await apiClient.post('/login', {
             email: credentials.email,
             password: credentials.password

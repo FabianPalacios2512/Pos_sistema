@@ -439,7 +439,7 @@
           </div>
 
           <!-- Tabla -->
-          <div class="overflow-x-auto">
+          <div class="overflow-visible">
             <table class="w-full">
               <thead class="bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-800">
                 <tr>
@@ -1296,221 +1296,256 @@ const generateCredentialsPDF = async (data) => {
 
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
+  const margin = 20
+  const contentWidth = pageWidth - (margin * 2)
   
   // Colores corporativos
-  const primaryColor = [15, 23, 42] // slate-900
-  const accentColor = [16, 185, 129] // emerald-500
-  const grayColor = [100, 116, 139] // slate-500
+  const darkSlate = [15, 23, 42]
+  const emerald = [16, 185, 129]
+  const blue = [59, 130, 246]
+  const gray = [100, 116, 139]
+  const lightGray = [248, 250, 252]
   
-  // Header con fondo
-  pdf.setFillColor(...primaryColor)
-  pdf.rect(0, 0, pageWidth, 45, 'F')
+  // ==================== HEADER ====================
+  pdf.setFillColor(...darkSlate)
+  pdf.rect(0, 0, pageWidth, 55, 'F')
   
-  // Logo/Título
+  // Línea de acento
+  pdf.setFillColor(...emerald)
+  pdf.rect(0, 55, pageWidth, 4, 'F')
+  
+  // Logo
   pdf.setTextColor(255, 255, 255)
-  pdf.setFontSize(26)
+  pdf.setFontSize(32)
   pdf.setFont('helvetica', 'bold')
-  pdf.text('105POS', pageWidth / 2, 20, { align: 'center' })
+  pdf.text('105POS', pageWidth / 2, 25, { align: 'center' })
   
-  pdf.setFontSize(14)
-  pdf.setFont('helvetica', 'normal')
-  pdf.text('Sistema de Punto de Venta en la Nube', pageWidth / 2, 28, { align: 'center' })
-  
-  // Subtítulo
   pdf.setFontSize(11)
-  pdf.text('Credenciales de Acceso', pageWidth / 2, 37, { align: 'center' })
+  pdf.setFont('helvetica', 'normal')
+  pdf.text('Sistema de Punto de Venta Profesional', pageWidth / 2, 35, { align: 'center' })
   
-  // Fecha de creación
   pdf.setFontSize(9)
-  pdf.setTextColor(...grayColor)
-  pdf.text(`Generado: ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}`, pageWidth / 2, 53, { align: 'center' })
+  pdf.setTextColor(148, 163, 184)
+  pdf.text('DOCUMENTO DE CREDENCIALES', pageWidth / 2, 47, { align: 'center' })
   
   let yPos = 70
   
   // ==================== INFORMACIÓN DEL CLIENTE ====================
-  pdf.setFillColor(247, 250, 252)
-  pdf.roundedRect(15, yPos, pageWidth - 30, 48, 3, 3, 'F')
+  // Card container
+  pdf.setFillColor(...lightGray)
+  pdf.roundedRect(margin, yPos, contentWidth, 50, 3, 3, 'F')
+  pdf.setDrawColor(226, 232, 240)
+  pdf.setLineWidth(0.3)
+  pdf.roundedRect(margin, yPos, contentWidth, 50, 3, 3, 'S')
   
-  yPos += 8
-  pdf.setTextColor(...primaryColor)
-  pdf.setFontSize(13)
+  // Título de sección
+  pdf.setFillColor(...blue)
+  pdf.rect(margin, yPos, 5, 50, 'F')
+  
+  yPos += 12
+  pdf.setTextColor(...blue)
+  pdf.setFontSize(12)
   pdf.setFont('helvetica', 'bold')
-  pdf.text('👤 Información del Cliente', 20, yPos)
+  pdf.text('DATOS DEL CLIENTE', margin + 12, yPos)
   
   yPos += 10
   pdf.setFontSize(10)
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...grayColor)
   
-  pdf.text('Propietario:', 20, yPos)
-  pdf.setTextColor(...primaryColor)
+  // Fila 1: Propietario y Cedula
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...gray)
+  pdf.text('Propietario:', margin + 12, yPos)
+  pdf.setTextColor(...darkSlate)
   pdf.setFont('helvetica', 'bold')
-  pdf.text(data.owner_name || 'N/A', 60, yPos)
+  pdf.text(data.owner_name || 'N/A', margin + 45, yPos)
   
-  yPos += 7
   pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...grayColor)
-  pdf.text('Cédula/NIT:', 20, yPos)
-  pdf.setTextColor(...primaryColor)
+  pdf.setTextColor(...gray)
+  pdf.text('Cedula:', margin + 100, yPos)
+  pdf.setTextColor(...darkSlate)
   pdf.setFont('helvetica', 'bold')
-  pdf.text(data.cedula || 'N/A', 60, yPos)
+  pdf.text(data.cedula || 'N/A', margin + 120, yPos)
   
-  yPos += 7
+  yPos += 8
+  // Fila 2: Negocio y ID
   pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...grayColor)
-  pdf.text('Negocio:', 20, yPos)
-  pdf.setTextColor(...primaryColor)
+  pdf.setTextColor(...gray)
+  pdf.text('Negocio:', margin + 12, yPos)
+  pdf.setTextColor(...darkSlate)
   pdf.setFont('helvetica', 'bold')
-  pdf.text(data.business_name || data.tenant_id, 60, yPos)
+  pdf.text(data.business_name || data.tenant_id, margin + 45, yPos)
   
-  yPos += 7
   pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...grayColor)
-  pdf.text('ID Tenant:', 20, yPos)
-  pdf.setTextColor(...primaryColor)
-  pdf.setFont('helvetica', 'mono')
-  pdf.text(data.tenant_id || 'N/A', 60, yPos)
+  pdf.setTextColor(...gray)
+  pdf.text('ID:', margin + 100, yPos)
+  pdf.setTextColor(...gray)
+  pdf.setFont('courier', 'normal')
+  pdf.setFontSize(9)
+  pdf.text(data.tenant_id || 'N/A', margin + 110, yPos)
   
-  yPos += 20
+  yPos += 25
   
-  // ==================== ACCESO AL SISTEMA ====================
+  // ==================== CREDENCIALES ====================
   pdf.setFillColor(254, 252, 232) // yellow-50
-  pdf.roundedRect(15, yPos, pageWidth - 30, 48, 3, 3, 'F')
+  pdf.roundedRect(margin, yPos, contentWidth, 55, 3, 3, 'F')
+  pdf.setDrawColor(253, 224, 71)
+  pdf.roundedRect(margin, yPos, contentWidth, 55, 3, 3, 'S')
   
-  yPos += 8
-  pdf.setTextColor(...primaryColor)
-  pdf.setFontSize(13)
+  // Borde izquierdo
+  pdf.setFillColor(234, 179, 8) // yellow-500
+  pdf.rect(margin, yPos, 5, 55, 'F')
+  
+  yPos += 12
+  pdf.setTextColor(161, 98, 7)
+  pdf.setFontSize(12)
   pdf.setFont('helvetica', 'bold')
-  pdf.text('🔐 Credenciales de Acceso', 20, yPos)
+  pdf.text('CREDENCIALES DE ACCESO', margin + 12, yPos)
   
-  yPos += 10
+  yPos += 12
   pdf.setFontSize(10)
   pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...grayColor)
+  pdf.setTextColor(...gray)
+  pdf.text('URL de Acceso:', margin + 12, yPos)
   
-  pdf.text('URL de Acceso:', 20, yPos)
-  pdf.setTextColor(37, 99, 235) // blue-600
+  const loginUrl = data.login_url || `https://${data.domain || data.tenant_id + '.105pos.pro'}/login`
+  pdf.setTextColor(37, 99, 235)
   pdf.setFont('helvetica', 'bold')
-  pdf.textWithLink(data.login_url || '', 60, yPos, { url: data.login_url })
-  
-  yPos += 10
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...grayColor)
-  pdf.text('Usuario (Email):', 20, yPos)
-  pdf.setTextColor(...primaryColor)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(data.credentials.email, 60, yPos)
+  pdf.textWithLink(loginUrl, margin + 50, yPos, { url: loginUrl })
   
   yPos += 10
   pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...grayColor)
-  pdf.text('Contraseña:', 20, yPos)
-  pdf.setTextColor(239, 68, 68) // red-500
+  pdf.setTextColor(...gray)
+  pdf.text('Usuario (Email):', margin + 12, yPos)
+  pdf.setTextColor(...darkSlate)
   pdf.setFont('helvetica', 'bold')
-  pdf.text(data.credentials.password, 60, yPos)
+  pdf.text(data.credentials.email, margin + 50, yPos)
+  
+  yPos += 10
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...gray)
+  pdf.text('Contrasena:', margin + 12, yPos)
+  pdf.setTextColor(220, 38, 38)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text(data.credentials.password, margin + 50, yPos)
   
   yPos += 20
   
-  // ==================== INFORMACIÓN DEL PLAN ====================
+  // ==================== PLAN ====================
   const planNames = {
-    free: '🆓 Plan Free',
-    basic: '💼 Plan Basic ($29/mes)',
-    premium: '⭐ Plan Premium ($59/mes)',
-    enterprise: '🏢 Plan Enterprise ($99/mes)'
+    free: 'Plan Free (Gratis)',
+    free_trial: 'Prueba Gratis 3 Dias',
+    basic: 'Plan Basic - $29/mes',
+    premium: 'Plan Premium - $59/mes',
+    enterprise: 'Plan Enterprise - $99/mes'
   }
   
   const planColors = {
-    free: [209, 213, 219],
+    free: [107, 114, 128],
+    free_trial: [16, 185, 129],
     basic: [59, 130, 246],
     premium: [168, 85, 247],
     enterprise: [245, 158, 11]
   }
   
   const planColor = planColors[data.plan] || planColors.basic
-  pdf.setFillColor(...planColor)
-  pdf.roundedRect(15, yPos, pageWidth - 30, 35, 3, 3, 'F')
   
-  yPos += 8
+  pdf.setFillColor(...planColor)
+  pdf.roundedRect(margin, yPos, contentWidth, 35, 3, 3, 'F')
+  
+  yPos += 14
   pdf.setTextColor(255, 255, 255)
-  pdf.setFontSize(13)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text('💳 Plan Contratado', 20, yPos)
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'normal')
+  pdf.text('PLAN CONTRATADO', margin + 12, yPos)
   
   yPos += 10
   pdf.setFontSize(16)
-  pdf.text(planNames[data.plan] || data.plan.toUpperCase(), 20, yPos)
-  
-  yPos += 9
-  pdf.setFontSize(9)
-  pdf.setFont('helvetica', 'normal')
-  pdf.text(`Válido hasta: ${new Date(data.subscription_end).toLocaleDateString('es-ES')}`, 20, yPos)
-  
-  yPos += 18
-  
-  // ==================== INSTRUCCIONES ====================
-  pdf.setFillColor(239, 246, 255) // blue-50
-  pdf.roundedRect(15, yPos, pageWidth - 30, 40, 3, 3, 'F')
-  
-  yPos += 8
-  pdf.setTextColor(...primaryColor)
-  pdf.setFontSize(12)
   pdf.setFont('helvetica', 'bold')
-  pdf.text('📋 Primeros Pasos', 20, yPos)
+  pdf.text(planNames[data.plan] || data.plan.toUpperCase(), margin + 12, yPos)
+  
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'normal')
+  const fechaVence = new Date(data.subscription_end).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
+  pdf.text(`Valido hasta: ${fechaVence}`, margin + 120, yPos)
+  
+  yPos += 20
+  
+  // ==================== PRIMEROS PASOS ====================
+  pdf.setFillColor(236, 253, 245) // emerald-50
+  pdf.roundedRect(margin, yPos, contentWidth, 42, 3, 3, 'F')
+  pdf.setDrawColor(167, 243, 208)
+  pdf.roundedRect(margin, yPos, contentWidth, 42, 3, 3, 'S')
+  
+  pdf.setFillColor(...emerald)
+  pdf.rect(margin, yPos, 5, 42, 'F')
+  
+  yPos += 10
+  pdf.setTextColor(4, 120, 87)
+  pdf.setFontSize(11)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text('PRIMEROS PASOS', margin + 12, yPos)
   
   yPos += 8
   pdf.setFontSize(9)
   pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...grayColor)
+  pdf.setTextColor(...gray)
   
   const steps = [
-    '1. Ingresa a la URL de acceso',
-    '2. Usa el email y contraseña proporcionados',
-    '3. Completa el asistente de configuración inicial',
-    '4. ¡Comienza a vender de inmediato!'
+    '1. Ingresa a la URL indicada arriba en tu navegador',
+    '2. Usa el email y contrasena proporcionados para iniciar sesion',
+    '3. Completa el asistente de configuracion inicial de tu negocio',
+    '4. Comienza a registrar productos y vender!'
   ]
   
   steps.forEach(step => {
-    pdf.text(step, 20, yPos)
+    pdf.text(step, margin + 12, yPos)
     yPos += 6
   })
   
-  yPos += 10
+  // ==================== FOOTER ====================
+  const footerY = pageHeight - 25
   
-  // ==================== SOPORTE ====================
-  pdf.setFillColor(254, 242, 242) // red-50
-  pdf.roundedRect(15, yPos, pageWidth - 30, 20, 3, 3, 'F')
+  pdf.setDrawColor(226, 232, 240)
+  pdf.setLineWidth(0.5)
+  pdf.line(margin, footerY, pageWidth - margin, footerY)
   
-  yPos += 7
-  pdf.setTextColor(...primaryColor)
-  pdf.setFontSize(10)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text('📞 ¿Necesitas ayuda?', 20, yPos)
-  
-  yPos += 7
+  pdf.setTextColor(...gray)
   pdf.setFontSize(8)
-  pdf.setFont('helvetica', 'normal')
-  pdf.text('Soporte técnico disponible 24/7 • WhatsApp: +57 300 123 4567 • Email: soporte@105pos.pro', 20, yPos)
-  
-  // Footer
-  pdf.setTextColor(...grayColor)
-  pdf.setFontSize(7)
   pdf.setFont('helvetica', 'italic')
-  pdf.text('Este documento contiene información confidencial. Mantenlo seguro.', pageWidth / 2, pageHeight - 10, { align: 'center' })
-  pdf.text('105POS © 2026 - Sistema de Punto de Venta Profesional', pageWidth / 2, pageHeight - 6, { align: 'center' })
+  pdf.text('Este documento contiene informacion confidencial. Mantenlo en un lugar seguro.', pageWidth / 2, footerY + 8, { align: 'center' })
   
-  // Descargar PDF
+  pdf.setFont('helvetica', 'normal')
+  pdf.setFontSize(7)
+  pdf.text(`105POS ${new Date().getFullYear()} - Sistema de Punto de Venta Profesional | Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2, footerY + 14, { align: 'center' })
+  
+  // Descargar
   const fileName = `105POS_Credenciales_${data.business_name.replace(/\s+/g, '_')}_${Date.now()}.pdf`
   pdf.save(fileName)
 }
 
-const openStoreConfig = (tenant) => {
-  selectedTenant.value = tenant
-  showConfigModal.value = true
+const openStoreConfig = async (tenant) => {
+  try {
+    // Cargar detalles completos del tenant incluyendo fechas de suscripción
+    const res = await axios.get(`/api/admin/tenants/${tenant.id}`)
+    if (res.data.success) {
+      selectedTenant.value = res.data.data
+      showConfigModal.value = true
+    } else {
+      // Fallback: usar datos de la lista
+      selectedTenant.value = tenant
+      showConfigModal.value = true
+    }
+  } catch (error) {
+    console.error('Error loading tenant details:', error)
+    // Fallback: usar datos de la lista
+    selectedTenant.value = tenant
+    showConfigModal.value = true
+  }
 }
 
 const viewTenantDetails = async (tenant) => {
   try {
-    const res = await axios.get(`/admin/api/tenants/${tenant.id}`)
+    const res = await axios.get(`/api/admin/tenants/${tenant.id}`)
     if (res.data.success) {
       selectedTenant.value = res.data.data
       showDetailsModal.value = true

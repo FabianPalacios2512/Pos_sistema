@@ -62,15 +62,8 @@ apiClient.interceptors.response.use(
   */
     }
     
-    // 🔥 DETECTAR SUSCRIPCIÓN EXPIRADA EN RESPUESTAS EXITOSAS
-    if (response.data?._subscription_expired === true) {
-      console.log('⛔ Suscripción expirada detectada - activando modal')
-      // Actualizar el store para mostrar el modal
-      import('@/stores/app').then(({ useAppStore }) => {
-        const appStore = useAppStore()
-        appStore.isSubscriptionExpired = true
-      })
-    }
+    // La verificación de suscripción se hace SOLO desde SubscriptionExpiredModal
+    // consultando directamente al backend - NO detectar automáticamente aquí
     
     return response
   },

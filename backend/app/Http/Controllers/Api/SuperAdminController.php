@@ -79,21 +79,30 @@ class SuperAdminController extends Controller
     {
         try {
             $tenants = Tenant::with('domains')->get()->map(function($tenant) {
-                // Convertir subscription_ends_at a Carbon si es string
-                $subscriptionEnd = $tenant->subscription_ends_at
-                    ? \Carbon\Carbon::parse($tenant->subscription_ends_at)
-                    : null;
+                // stancl/tenancy permite acceder a valores de JSON como propiedades directas
+                $subscriptionStart = $tenant->subscription_start ?? ($tenant->created_at ? $tenant->created_at->format('Y-m-d') : null);
+                $subscriptionEnd = $tenant->subscription_end ?? $tenant->subscription_ends_at;
 
-                $isActive = !$subscriptionEnd || $subscriptionEnd > now();
+                // Convertir a Carbon si es string
+                if ($subscriptionEnd && is_string($subscriptionEnd)) {
+                    $subscriptionEnd = \Carbon\Carbon::parse($subscriptionEnd);
+                }
+
+                // Determinar status: primero usar el guardado, luego calcular por fecha
+                $status = $tenant->status ?? 'active';
+                if ($subscriptionEnd && $subscriptionEnd < now() && $status === 'active') {
+                    $status = 'suspended'; // Expirado
+                }
 
                 return [
                     'id' => $tenant->id,
                     'name' => $tenant->business_name ?? $tenant->id,
                     'domain' => $tenant->domains->first()->domain ?? 'sin-dominio',
                     'plan' => $tenant->plan,
-                    'status' => $isActive ? 'active' : 'expired',
+                    'status' => $status,
                     'created_at' => $tenant->created_at->format('Y-m-d H:i:s'),
-                    'subscription_end' => $subscriptionEnd ? $subscriptionEnd->format('Y-m-d H:i:s') : null,
+                    'subscription_start' => $subscriptionStart,
+                    'subscription_end' => $subscriptionEnd ? (is_string($subscriptionEnd) ? $subscriptionEnd : $subscriptionEnd->format('Y-m-d')) : null,
                 ];
             });
 
@@ -129,26 +138,40 @@ class SuperAdminController extends Controller
 
             // Obtener estadísticas del tenant ejecutando consultas en su base de datos
             $stats = [];
-            $tenant->run(function() use (&$stats) {
-                $stats = [
-                    'users_count' => DB::table('users')->count(),
-                    'products_count' => DB::table('products')->count(),
-                    'sales_count' => DB::table('invoices')->where('type', 'sale')->count(),
-                    'total_revenue' => DB::table('invoices')
-                        ->where('type', 'sale')
-                        ->sum('total_amount')
-                ];
-            });
+            try {
+                $tenant->run(function() use (&$stats) {
+                    $stats = [
+                        'total_users' => DB::table('users')->count(),
+                        'total_products' => DB::table('products')->count(),
+                        'total_sales' => DB::table('sales')->count(),
+                        'total_customers' => DB::table('customers')->count(),
+                        'total_revenue' => DB::table('sales')->sum('total') ?? 0
+                    ];
+                });
+            } catch (\Exception $e) {
+                $stats = ['error' => 'No se pudo conectar a la base de datos del tenant'];
+            }
+
+            // stancl/tenancy permite acceder a valores de JSON como propiedades directas
+            $subscriptionStart = $tenant->subscription_start ?? ($tenant->created_at ? $tenant->created_at->format('Y-m-d') : null);
+            $subscriptionEnd = $tenant->subscription_end ?? $tenant->subscription_ends_at;
+
+            // Status guardado en el JSON
+            $status = $tenant->status ?? 'active';
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'id' => $tenant->id,
+                    'business_name' => $tenant->business_name ?? $tenant->id,
+                    'name' => $tenant->business_name ?? $tenant->id,
                     'domain' => $tenant->domains->first()->domain ?? 'sin-dominio',
-                    'plan' => $tenant->plan_type,
-                    'status' => $tenant->subscription_status,
+                    'primary_domain' => $tenant->domains->first()->domain ?? 'sin-dominio',
+                    'plan' => $tenant->plan ?? 'free_trial',
+                    'status' => $status,
                     'created_at' => $tenant->created_at->format('Y-m-d H:i:s'),
-                    'subscription_end' => $tenant->subscription_end_date,
+                    'subscription_start' => $subscriptionStart,
+                    'subscription_end' => $subscriptionEnd,
                     'stats' => $stats
                 ]
             ]);
@@ -191,10 +214,26 @@ class SuperAdminController extends Controller
                 'admin_password' => 'required|string|min:6'
             ]);
 
-            $fullDomain = $validated['subdomain'] . '.105pos.pro';
+            // 🌍 Determinar dominio base según el entorno
+            // Usar APP_ENV como fuente principal (más confiable que request()->getHost())
+            $appEnv = config('app.env');
+            $isProduction = $appEnv === 'production';
+
+            // Si hay CENTRAL_DOMAIN configurado, usarlo para determinar el dominio base
+            $centralDomain = env('CENTRAL_DOMAIN', '105pos.pro');
+            $baseDomain = $isProduction ? '.' . $centralDomain : '.localhost';
+            $checkDomain = $validated['subdomain'] . $baseDomain;
+
+            \Log::info('🌐 Determinando dominio', [
+                'app_env' => $appEnv,
+                'is_production' => $isProduction,
+                'central_domain' => $centralDomain,
+                'base_domain' => $baseDomain,
+                'check_domain' => $checkDomain
+            ]);
 
             // Validar que el dominio no exista
-            if (DB::table('domains')->where('domain', $fullDomain)->exists()) {
+            if (DB::table('domains')->where('domain', $checkDomain)->exists()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Este subdominio ya está ocupado. Por favor elige otro.',
@@ -245,8 +284,28 @@ class SuperAdminController extends Controller
                 $tenantId = $validated['subdomain'] . '_' . time();
             }
 
-            // Construir dominio completo
-            $fullDomain = $validated['subdomain'] . '.105pos.pro';
+            // 🌍 Construir dominio completo según el entorno
+            // Usar la misma lógica basada en APP_ENV
+            $domain = $isProduction
+                ? $validated['subdomain'] . '.' . $centralDomain
+                : $validated['subdomain'] . '.localhost';
+
+            \Log::info('🌐 Creando tenant', [
+                'subdomain' => $validated['subdomain'],
+                'domain' => $domain,
+                'is_production' => $isProduction,
+                'app_env' => $appEnv,
+                'central_domain' => $centralDomain
+            ]);
+
+            // Validar que el dominio final no exista
+            if (DB::table('domains')->where('domain', $domain)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este subdominio ya está ocupado. Por favor elige otro.',
+                    'field' => 'subdomain'
+                ], 422);
+            }
 
             // Crear el tenant
             $tenant = Tenant::create([
@@ -264,7 +323,7 @@ class SuperAdminController extends Controller
 
             // Crear el dominio
             $tenant->domains()->create([
-                'domain' => $fullDomain
+                'domain' => $domain  // ✅ Usar $domain en lugar de $fullDomain
             ]);
 
             // 🎯 PASO 1: Ejecutar seeder manualmente (como hace TenantRegisterController)
@@ -328,7 +387,7 @@ class SuperAdminController extends Controller
             \Log::info("✅ Tenant creado manualmente por super admin", [
                 'tenant_id' => $tenantId,
                 'business_name' => $validated['business_name'],
-                'domain' => $fullDomain,
+                'domain' => $domain,  // ✅ Usar $domain en lugar de $fullDomain
                 'plan' => $validated['plan'],
                 'owner' => $validated['owner_name'],
                 'cedula' => $validated['cedula']
@@ -342,10 +401,10 @@ class SuperAdminController extends Controller
                     'business_name' => $validated['business_name'],
                     'owner_name' => $validated['owner_name'],
                     'cedula' => $validated['cedula'],
-                    'domain' => $fullDomain,
+                    'domain' => $domain,
                     'plan' => $validated['plan'],
                     'subscription_end' => $tenant->subscription_ends_at->format('Y-m-d H:i:s'),
-                    'login_url' => 'https://' . $fullDomain . '/login',
+                    'login_url' => ($isProduction ? 'https://' : 'http://') . $domain . '/login',
                     'credentials' => [
                         'email' => $validated['admin_email'],
                         'password' => $validated['admin_password']
@@ -459,6 +518,152 @@ class SuperAdminController extends Controller
                 'available' => true, // Asumir disponible en caso de error
                 'error' => 'Error al verificar disponibilidad'
             ]);
+        }
+    }
+
+    /**
+     * Actualizar fechas de suscripción de un tenant
+     */
+    public function updateTenantSubscription(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'subscription_start' => 'required|date',
+                'subscription_end' => 'required|date'
+            ]);
+
+            $tenant = Tenant::find($id);
+            if (!$tenant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tenant no encontrado'
+                ], 404);
+            }
+
+            // stancl/tenancy permite asignar propiedades directamente y se guardan en el JSON data
+            $tenant->subscription_start = $validated['subscription_start'];
+            $tenant->subscription_end = $validated['subscription_end'];
+            $tenant->save();
+
+            \Log::info('✅ Fechas de suscripción actualizadas', [
+                'tenant_id' => $id,
+                'subscription_start' => $validated['subscription_start'],
+                'subscription_end' => $validated['subscription_end']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Fechas actualizadas correctamente',
+                'data' => [
+                    'subscription_start' => $validated['subscription_start'],
+                    'subscription_end' => $validated['subscription_end']
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('❌ Error actualizando suscripción:', [
+                'tenant_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar fechas: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Actualizar estado de un tenant (active, paused, suspended)
+     */
+    public function updateTenantStatus(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required|in:active,paused,suspended'
+            ]);
+
+            $tenant = Tenant::find($id);
+            if (!$tenant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tenant no encontrado'
+                ], 404);
+            }
+
+            // stancl/tenancy permite asignar propiedades directamente y se guardan en el JSON data
+            $tenant->status = $validated['status'];
+            $tenant->save();
+
+            \Log::info('✅ Estado de tenant actualizado', [
+                'tenant_id' => $id,
+                'new_status' => $validated['status']
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Estado actualizado correctamente',
+                'data' => [
+                    'status' => $validated['status']
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('❌ Error actualizando estado:', [
+                'tenant_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar estado: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * 🗑️ Eliminar un tenant y su base de datos
+     *
+     * DELETE /admin/api/tenants/{id}
+     */
+    public function deleteTenant($id)
+    {
+        try {
+            $tenant = Tenant::find($id);
+            if (!$tenant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tenant no encontrado'
+                ], 404);
+            }
+
+            $tenantDomain = $tenant->domains->first()->domain ?? 'unknown';
+            $tenantData = $tenant->data ?? [];
+
+            \Log::info('🗑️ Iniciando eliminación de tenant', [
+                'tenant_id' => $id,
+                'domain' => $tenantDomain,
+                'plan' => $tenant->plan ?? 'N/A'
+            ]);
+
+            // Eliminar el tenant (esto también elimina su base de datos gracias al paquete)
+            $tenant->delete();
+
+            \Log::info('✅ Tenant eliminado correctamente', [
+                'tenant_id' => $id,
+                'domain' => $tenantDomain
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tenant eliminado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('❌ Error eliminando tenant:', [
+                'tenant_id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar tenant: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

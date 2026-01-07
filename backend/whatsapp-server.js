@@ -52,10 +52,18 @@ async function connectToWhatsApp() {
         sock = makeWASocket({
             version,
             logger,
-            printQRInTerminal: false, // Deshabilitamos QR en terminal
+            printQRInTerminal: false,
             auth: state,
-            browser: ["Ubuntu", "Chrome", "20.0.04"],
+            browser: ["105POS", "Chrome", "1.0.0"],
             markOnlineOnConnect: false,
+            // Configuración optimizada para conexión más rápida
+            connectTimeoutMs: 60000, // 60 segundos de timeout
+            defaultQueryTimeoutMs: 60000,
+            keepAliveIntervalMs: 30000,
+            emitOwnEvents: false,
+            getMessage: async (key) => {
+                return { conversation: '' }
+            }
         });
 
         // Manejar actualizaciones de conexión
@@ -86,7 +94,7 @@ async function connectToWhatsApp() {
                 console.log('❌ Conexión cerrada. Código:', statusCode, 'Reconectando:', shouldReconnect);
                 isConnected = false;
 
-                // Limpiar sesión en casos específicos de error
+                // Limpiar sesión en casos específicos de error graves
                 if (statusCode === DisconnectReason.badSession ||
                     statusCode === DisconnectReason.forbidden ||
                     statusCode === DisconnectReason.unauthorized ||
@@ -94,14 +102,30 @@ async function connectToWhatsApp() {
 
                     console.log('🧹 Limpiando sesión por error de vinculación...');
                     cleanSession().catch(console.error);
+                    return; // No reconectar automáticamente después de limpiar
                 }
 
+                // Para errores 408, 428, 440, 515 (timeouts y conflictos), esperar más tiempo
                 if (shouldReconnect) {
-                    setTimeout(connectToWhatsApp, 3000);
+                    const retryDelay = (statusCode === 408 || statusCode === 428 || statusCode === 440 || statusCode === 515) ? 10000 : 3000;
+                    console.log(`⏳ Reintentando conexión en ${retryDelay/1000} segundos...`);
+                    setTimeout(connectToWhatsApp, retryDelay);
                 }
             } else if (connection === 'open') {
                 console.log('✅ WhatsApp conectado exitosamente!');
                 isConnected = true;
+
+                // Eliminar archivo QR cuando se conecte exitosamente
+                try {
+                    if (fs.existsSync('./whatsapp_qr.txt')) {
+                        fs.unlinkSync('./whatsapp_qr.txt');
+                        console.log('🧹 QR eliminado - conexión establecida');
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            } else if (connection === 'connecting') {
+                console.log('🔄 Conectando a WhatsApp...');
             }
         });
 
@@ -164,7 +188,7 @@ const server = http.createServer(async (req, res) => {
     // Configurar CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Tenant-Id');
 
     if (req.method === 'OPTIONS') {
         res.writeHead(200);

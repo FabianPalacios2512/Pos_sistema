@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 
 // Rutas públicas (sin autenticación)
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/admin/login', [AuthController::class, 'adminLogin'])
+    ->middleware(\App\Http\Middleware\PreventTenancyInit::class)
+    ->name('api.admin.login'); // Login específico para super admin
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/register-tenant', [TenantRegisterController::class, 'register']);
 Route::post('/update-tenant-plan', [\App\Http\Controllers\Api\TenantPlanController::class, 'updatePlan']);
@@ -65,13 +68,30 @@ Route::get('/central/check-email', [CentralLoginController::class, 'checkEmailEx
 Route::get('/central/check-document', [CentralLoginController::class, 'checkDocumentExists']);
 
 // ==================== SUPER ADMIN (GOD MODE) ====================
-Route::get('/admin/kpis', [SuperAdminController::class, 'getKPIs']);
-Route::get('/admin/tenants', [SuperAdminController::class, 'getTenants']);
-Route::get('/admin/tenants/{id}', [SuperAdminController::class, 'getTenantDetails']);
-Route::post('/admin/tenants', [SuperAdminController::class, 'createTenant']);
-Route::get('/check-domain/{domain}', [SuperAdminController::class, 'checkDomainAvailability']);
-Route::get('/check-cedula/{cedula}', [SuperAdminController::class, 'checkCedulaAvailability']);
-Route::get('/check-email/{email}', [SuperAdminController::class, 'checkEmailAvailability']);
+// TODAS las rutas de admin DEBEN evitar la inicialización de tenancy
+Route::middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(function () {
+    // Rutas con prefijo /api/admin/*
+    Route::get('/admin/kpis', [SuperAdminController::class, 'getKPIs']);
+    Route::get('/admin/tenants', [SuperAdminController::class, 'getTenants']);
+    Route::get('/admin/tenants/{id}', [SuperAdminController::class, 'getTenantDetails']);
+    Route::post('/admin/tenants', [SuperAdminController::class, 'createTenant']);
+    Route::put('/admin/tenants/{id}/subscription', [SuperAdminController::class, 'updateTenantSubscription']);
+    Route::put('/admin/tenants/{id}/status', [SuperAdminController::class, 'updateTenantStatus']);
+    Route::delete('/admin/tenants/{id}', [SuperAdminController::class, 'deleteTenant']);
+    Route::get('/check-domain/{domain}', [SuperAdminController::class, 'checkDomainAvailability']);
+    Route::get('/check-cedula/{cedula}', [SuperAdminController::class, 'checkCedulaAvailability']);
+    Route::get('/check-email/{email}', [SuperAdminController::class, 'checkEmailAvailability']);
+});
+
+// ==================== SUPER ADMIN (GOD MODE) - Prefijo /admin/api/* ====================
+// Duplicar rutas para compatibilidad con frontend (usa ambos prefijos)
+Route::prefix('admin/api')->middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(function () {
+    Route::delete('/tenants/{id}', [SuperAdminController::class, 'deleteTenant']);
+    Route::put('/tenants/{id}', [SuperAdminController::class, 'updateTenantSubscription']); // Para actualizar plan
+    Route::get('/tenants/{id}/users', [SuperAdminController::class, 'getTenantUsers']);
+    Route::get('/tenants/{id}/products', [SuperAdminController::class, 'getTenantProducts']);
+    Route::post('/tenants/{id}/users/{userId}/reset-password', [SuperAdminController::class, 'resetUserPassword']);
+});
 
 
 // ==================== PASSWORD RESET ROUTES ====================

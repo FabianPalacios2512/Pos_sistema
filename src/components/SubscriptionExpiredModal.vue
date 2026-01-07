@@ -338,6 +338,7 @@ let paymentReference = null
 let verificationInterval = null
 
 let modalCheckInterval = null
+let subscriptionPollingInterval = null
 
 const preventContextMenu = (e) => {
   if (showModal.value) {
@@ -357,55 +358,111 @@ const preventKeyboardShortcuts = (e) => {
   }
 }
 
-const checkSubscriptionStatus = async () => {
+/**
+ * 🔄 LÓGICA SIMPLIFICADA: Consultar backend y decidir
+ * - Si active === true → NO bloquear
+ * - Si active === false → bloquear
+ */
+const checkSubscriptionFromBackend = async () => {
   try {
-    const response = await apiClient.get('/check-subscription')
-    if (response.data._subscription_expired === true || response.data.is_expired === true) {
-      appStore.isSubscriptionExpired = true
-      showModal.value = true
-      activateAntiBypass()
-      tenantId.value = response.data._tenant_id || response.data.tenant_id
+    // Usar el endpoint que SIEMPRE consulta la base de datos
+    const response = await apiClient.get('/subscription/status')
+    
+    if (response.data.success) {
+      if (response.data.active === true) {
+        // ✅ Suscripción ACTIVA - no bloquear
+        console.log('✅ [Subscription] Backend dice: ACTIVO')
+        showModal.value = false
+        appStore.isSubscriptionExpired = false
+        stopAllIntervals()
+        return false // No expirada
+      } else {
+        // ⛔ Suscripción EXPIRADA - bloquear
+        console.log('⛔ [Subscription] Backend dice: EXPIRADO/SUSPENDIDO')
+        appStore.isSubscriptionExpired = true
+        showModal.value = true
+        tenantId.value = response.data.tenant?.id || ''
+        activateAntiBypass()
+        return true // Expirada
+      }
     }
   } catch (error) {
-    if (appStore.isSubscriptionExpired) {
-      showModal.value = true
-      activateAntiBypass()
+    console.error('Error verificando suscripción:', error)
+    // En caso de error, no cambiar el estado actual
+  }
+  return appStore.isSubscriptionExpired
+}
+
+/**
+ * 🔄 Iniciar polling para detectar cuando se paga
+ */
+const startSubscriptionPolling = () => {
+  if (subscriptionPollingInterval) return
+  
+  console.log('🔄 [Subscription] Iniciando polling cada 8 segundos...')
+  
+  subscriptionPollingInterval = setInterval(async () => {
+    const isExpired = await checkSubscriptionFromBackend()
+    
+    if (!isExpired) {
+      // ✅ Ya no está expirada - recargar página
+      console.log('✅ [Subscription] Suscripción reactivada! Recargando...')
+      stopAllIntervals()
+      setTimeout(() => window.location.reload(), 1000)
     }
+  }, 8000) // Cada 8 segundos
+}
+
+const stopAllIntervals = () => {
+  if (modalCheckInterval) {
+    clearInterval(modalCheckInterval)
+    modalCheckInterval = null
+  }
+  if (subscriptionPollingInterval) {
+    clearInterval(subscriptionPollingInterval)
+    subscriptionPollingInterval = null
   }
 }
 
 const activateAntiBypass = () => {
+  // Solo activar si no está ya activo
+  if (modalCheckInterval) return
+  
   modalCheckInterval = setInterval(() => {
+    // Solo forzar modal si está bloqueado
     if (appStore.isSubscriptionExpired && !showModal.value) {
       showModal.value = true
     }
-    const modalElement = document.querySelector('[data-modal-subscription]')
-    if (appStore.isSubscriptionExpired && !modalElement) {
-      window.location.reload()
-    }
-  }, 100)
+  }, 500)
   
   document.addEventListener('contextmenu', preventContextMenu)
   document.addEventListener('keydown', preventKeyboardShortcuts)
   document.body.style.userSelect = 'none'
+  
+  // Iniciar polling para detectar pago
+  startSubscriptionPolling()
 }
 
-onMounted(() => {
-  checkSubscriptionStatus()
+onMounted(async () => {
+  // Verificar estado real desde el backend
+  await checkSubscriptionFromBackend()
 })
 
 onUnmounted(() => {
-  if (modalCheckInterval) clearInterval(modalCheckInterval)
+  stopAllIntervals()
   if (verificationInterval) clearInterval(verificationInterval)
   document.removeEventListener('contextmenu', preventContextMenu)
   document.removeEventListener('keydown', preventKeyboardShortcuts)
   document.body.style.userSelect = ''
 })
 
-watch(() => appStore.isSubscriptionExpired, async (newVal) => {
+// Watch simplificado - solo para sincronizar el modal con el estado
+watch(() => appStore.isSubscriptionExpired, (newVal) => {
+  showModal.value = newVal
   if (newVal) {
-    showModal.value = true
     activateAntiBypass()
+  } else {
+    stopAllIntervals()
   }
 })
 
