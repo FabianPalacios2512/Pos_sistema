@@ -52,20 +52,18 @@ const authService = {
         // Guardar token en localStorage
         localStorage.setItem('authToken', response.data.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        // Guardar timestamp de inicio de sesión para evitar bucles de logout inmediato en errores 401
+        localStorage.setItem('loginTimestamp', Date.now());
         
         // Configurar token en el cliente API
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
         
         // 🚀 INICIALIZAR STORE GLOBAL DESPUÉS DEL LOGIN
-        console.log('🏪 Inicializando datos globales después del login...')
         try {
           await appStore.initialize()
         } catch (error) {
           console.warn('⚠️ Error inicializando store:', error)
         }
-        
-        // Verificar que se guardó correctamente
-        const savedToken = localStorage.getItem('authToken');
       }
       
       return response.data.data; // Retornar solo la data interna
@@ -99,6 +97,8 @@ const authService = {
       // Limpiar datos locales
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
+      localStorage.removeItem('onboarding_completed'); // 🔥 Limpiar flag de onboarding
+      localStorage.removeItem('welcome_seen'); // 🔥 Limpiar flag de welcome
       delete apiClient.defaults.headers.common['Authorization'];
     }
   },

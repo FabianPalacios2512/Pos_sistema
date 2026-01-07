@@ -192,7 +192,7 @@
               <h2 class="text-3xl xl:text-4xl font-bold text-white leading-tight">
                 Comienza tu prueba
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                  gratuita de 30 días
+                  gratuita de 3 días
                 </span>
               </h2>
               
@@ -325,7 +325,7 @@
                 Crea tu cuenta
               </h2>
               <p class="text-slate-500 mt-2">
-                Comienza tu prueba gratuita de 30 días
+                Comienza tu prueba gratuita de 3 días
               </p>
             </div>
 
@@ -761,7 +761,7 @@
                   <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                   </svg>
-                  <span>30 días gratis</span>
+                  <span>3 días gratis</span>
                 </div>
                 <div class="flex items-center gap-1.5 text-xs text-slate-400">
                   <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">

@@ -261,17 +261,17 @@ onMounted(() => {
 const selectStoreType = async (storeType) => {
   try {
     savingStoreType.value = true
-    console.log(`🏪 Guardando tipo de tienda en localStorage: ${storeType}`)
     
     // Guardar temporalmente en localStorage
     localStorage.setItem('pending_store_type', storeType)
+    
+    // ✅ Marcar welcome como visto para evitar bucle de redirección
+    localStorage.setItem('welcome_seen', 'true')
     
     // Actualizar el store local si existe
     if (appStore.systemSettings) {
       appStore.systemSettings.store_type = storeType
     }
-    
-    console.log('✅ Tipo de tienda guardado en localStorage')
     
     // Esperar un momento para el feedback visual
     setTimeout(() => {

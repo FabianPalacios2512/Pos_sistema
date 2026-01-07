@@ -923,6 +923,10 @@ const saveConfig = async () => {
 
 const finishOnboarding = async () => {
   try {
+    // 🔥 CRÍTICO: Marcar en localStorage INMEDIATAMENTE como respaldo
+    // Esto evita el bucle si el router guard se ejecuta antes de que BD responda
+    localStorage.setItem('onboarding_completed', 'true')
+    
     // Intentar guardar toda la configuración en una sola llamada
     try {
       await apiClient.put('/tenant/system-settings', {
@@ -939,13 +943,9 @@ const finishOnboarding = async () => {
         onboarding_completed: true
       })
       
-      console.log('✅ Onboarding guardado exitosamente en BD')
-      
       // ✅ CRÍTICO: Recargar systemSettings para actualizar appStore
       const { appStore } = await import('@/store/appStore.js')
       await appStore.loadSystemSettings(true) // force = true para recargar
-      
-      console.log('✅ AppStore actualizado con onboarding_completed = true')
       
       // ✅ SOLUCIÓN: Recargar página para que el router guard lea el valor fresco de BD
       // El navigation guard se ejecuta antes de que Vue procese la reactividad
@@ -955,7 +955,6 @@ const finishOnboarding = async () => {
       // Si hay error 404 o 401, es porque aún no estamos autenticados
       // Guardamos en localStorage y continuamos de todos modos
       if (error.response && (error.response.status === 404 || error.response.status === 401)) {
-        console.log('Configuración se guardará en el primer login')
         // Guardar en localStorage para aplicar después del login
         localStorage.setItem('pending_onboarding_config', JSON.stringify({
           company_name: config.storeName,
@@ -970,14 +969,16 @@ const finishOnboarding = async () => {
           whatsapp_business_number: config.whatsappNumber
         }))
         
-        // Redirigir al login para que se autentique en el tenant
-        router.push('/login')
+        // El flag de localStorage ya está puesto, redirigir al POS
+        window.location.href = '/pos'
       } else {
         throw error
       }
     }
   } catch (error) {
     console.error('Error finalizando onboarding:', error)
+    // 🔥 Revertir el flag si hay error real
+    localStorage.removeItem('onboarding_completed')
     alert('Error al guardar la configuración. Por favor intenta de nuevo.')
   }
 }

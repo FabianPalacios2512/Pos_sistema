@@ -22,7 +22,7 @@
         </div>
         <!-- Título Standard -->
         <div v-else>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Productos</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Product</h1>
           <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Manage your inventory and catalog</p>
         </div>
         
@@ -262,19 +262,19 @@
       </div>
 
       <!-- Empty State - Icono Limpio y Profesional -->
-      <div v-else-if="!loading && !paginatedProducts.length" class="flex justify-center items-center py-16">
+      <div v-else-if="!loading && !paginatedProducts.length" class="flex justify-center items-center py-20">
         <div class="flex flex-col items-center text-center max-w-md mx-auto">
           
           <!-- Icono de Caja/Paquete Profesional -->
-          <div class="w-24 h-24 mb-6 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-black/30">
+          <div class="w-24 h-24 mb-6 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-black/30 mx-auto">
             <svg class="w-12 h-12 text-slate-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
           </div>
           
           <!-- Texto -->
-          <div class="relative z-10">
-            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Tu inventario está vacío</h3>
+          <div class="relative z-10 text-center">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center">Tu inventario está vacío</h3>
             <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-1">
               {{ searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda' : 'Comienza agregando productos para gestionar tu catálogo' }}
             </p>
@@ -467,18 +467,18 @@
 
           <!-- Empty State - Icono Limpio y Profesional -->
           <tr v-else-if="!loading && !paginatedProducts.length">
-            <td :colspan="5 + availableWarehouses.length" class="px-4 py-12">
+            <td :colspan="6 + availableWarehouses.length" class="px-4 py-16">
               <div class="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
                 
                 <!-- Icono de Caja/Paquete Profesional -->
-                <div class="w-20 h-20 mb-5 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-black/30">
+                <div class="w-20 h-20 mb-5 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-black/30 mx-auto">
                   <svg class="w-10 h-10 text-slate-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                   </svg>
                 </div>
                 
-                <div class="relative z-10">
-                  <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Tu inventario está vacío</h3>
+                <div class="relative z-10 text-center">
+                  <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center">Tu inventario está vacío</h3>
                   <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed">
                     {{ searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda' : 'Comienza agregando productos para gestionar tu catálogo' }}
                   </p>

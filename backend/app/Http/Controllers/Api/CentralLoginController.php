@@ -85,9 +85,13 @@ class CentralLoginController extends Controller
             $tenantDomains = $this->findUserTenants($request->email);
 
             if (empty($tenantDomains)) {
-                throw ValidationException::withMessages([
-                    'email' => ['No encontramos una cuenta con este correo electrónico.'],
-                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No encontramos una cuenta asociada a este correo electrónico.',
+                    'errors' => [
+                        'email' => ['El correo electrónico no está registrado en ninguna tienda.']
+                    ]
+                ], 422);
             }
 
             // Si hay múltiples tenants, tomar el primero (puedes mejorar esto después)
@@ -97,9 +101,13 @@ class CentralLoginController extends Controller
             $authResult = $this->authenticateInTenant($tenantDomain['tenant_id'], $request->email, $request->password);
 
             if (!$authResult['success']) {
-                throw ValidationException::withMessages([
-                    'email' => [$authResult['message']],
-                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => $authResult['message'],
+                    'errors' => [
+                        'password' => [$authResult['message']]
+                    ]
+                ], 422);
             }
 
             // 🎯 PASO 3: Construir URL de redirección

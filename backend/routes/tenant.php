@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use App\Http\Middleware\InitializeTenancyByDomain; // ✅ Usar nuestro middleware personalizado
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 /*

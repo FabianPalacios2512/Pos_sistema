@@ -71,16 +71,34 @@ class AuthController extends Controller
         // SEGUNDO: Si no es super admin, buscar en tenant
         $user = User::with('role')->where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
-            ]);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No encontramos una cuenta con este correo electrónico.',
+                'errors' => [
+                    'email' => ['El correo electrónico no está registrado.']
+                ]
+            ], 422);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La contraseña es incorrecta.',
+                'errors' => [
+                    'password' => ['La contraseña ingresada no es correcta.']
+                ]
+            ], 422);
         }
 
         if (!$user->active) {
-            throw ValidationException::withMessages([
-                'email' => ['Tu cuenta está desactivada.'],
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Tu cuenta está desactivada. Contacta al administrador.',
+                'errors' => [
+                    'email' => ['Tu cuenta está desactivada.']
+                ]
+            ], 422);
         }
 
         // Actualizar último login

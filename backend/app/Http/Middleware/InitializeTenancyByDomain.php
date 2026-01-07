@@ -22,12 +22,10 @@ class InitializeTenancyByDomain extends BaseInitializeTenancyByDomain
     {
         // Si la ruta está marcada como exempt, saltar tenancy
         if ($request->attributes->get('tenancy_exempt')) {
-            \Log::info('InitializeTenancyByDomain: Skipping tenancy for exempt route', ['path' => $request->path()]);
             return $next($request);
         }
 
-        \Log::info('InitializeTenancyByDomain: Initializing tenancy', ['path' => $request->path()]);
-        // Caso contrario, ejecutar tenancy normalmente
+        // Ejecutar tenancy normalmente
         return parent::handle($request, $next);
     }
 }

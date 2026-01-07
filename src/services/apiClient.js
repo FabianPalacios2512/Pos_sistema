@@ -26,19 +26,16 @@ apiClient.interceptors.request.use(
       console.log('🔧 FormData detectado - Content-Type eliminado para boundary automático')
     }
     
-    // Log para debugging (solo en desarrollo)
+    // Log para debugging (solo en desarrollo) - DESACTIVADO
+    /*
     if (process.env.NODE_ENV === 'development') {
-  /*
-  console.log('API Request:', {
-    method: config.method?.toUpperCase(),
-    url: config.url,
-    data: config.data,
-    headers: config.headers,
-    hasToken: !!token,
-    tokenPreview: token ? token.substring(0, 20) + '...' : 'NO TOKEN'
-  })
-  */
+      console.log(`🌐 API Request [${config.method?.toUpperCase()}] ${config.url}`, {
+        hasToken: !!token,
+        tokenSent: config.headers.Authorization ? 'YES' : 'NO',
+        tokenPreview: token ? token.substring(0, 10) + '...' : 'NONE'
+      })
     }
+    */
     
     return config
   },
@@ -85,24 +82,53 @@ apiClient.interceptors.response.use(
       switch (status) {
         case 401:
           // Token expirado o inválido
-          console.log('🔒 Token expirado o inválido detectado')
+          console.log('🔒 Error 401 detectado')
           
-          // 🔥 NO hacer logout si estamos en rutas relacionadas con suscripción expirada
-          const allowedExpiredRoutes = ['/subscription-expired', '/select-plan', '/payment/success', '/payment/failure', '/payment/pending']
           const currentPath = window.location.pathname
           
-          if (allowedExpiredRoutes.includes(currentPath)) {
-            console.log('⚠️ Error 401 en ruta de renovación - NO haciendo logout')
+          // 🔥 CRÍTICO: NO hacer logout si estamos en /login (proceso de login en curso)
+          if (currentPath === '/login') {
+            console.log('⚠️ Error 401 durante login - NO eliminar token (puede ser error de multitenancy en local)')
             break
           }
-          
-          localStorage.removeItem('authToken')
-          localStorage.removeItem('user')
-          
-          // Solo redirigir si no estamos ya en login
-          if (currentPath !== '/login') {
-            // Redirigir con información de expiración
+
+          // ✅ CHECK PRIORITARIO: Si el backend dice explícitamente "Unauthenticated", el token es inválido.
+          // Debemos limpiar y redirigir, SIN IMPORTAR en qué ruta estemos.
+          if (data?.message === 'Unauthenticated.' || data?.message?.includes('Unauthenticated') || data?.message?.includes('Token')) {
+            // 🛡️ PROTECCIÓN ANTI-BUCLE: Si acabamos de loguearnos (< 10 segundos), NO hacer logout
+            const loginTimestamp = localStorage.getItem('loginTimestamp')
+            const now = Date.now()
+            
+            if (loginTimestamp && (now - parseInt(loginTimestamp)) < 10000) {
+                console.warn('🛡️ 401 recibido inmediatamente después de login (<10s) - Ignorando logout forzado para evitar bucle.')
+                console.warn('⚠️ Posible problema de configuración backend o latencia de replicación DB.')
+                break
+            }
+
+            console.log('🚪 Token inválido (Unauthenticated) - Forzando logout')
+            localStorage.removeItem('authToken')
+            localStorage.removeItem('user')
             window.location.href = '/login?reason=expired&message=Tu sesión ha expirado'
+            return Promise.reject(error)
+          }
+          
+          // 🔥 NO hacer logout si estamos en rutas protegidas o especiales
+          const allowedExpiredRoutes = [
+            '/subscription-expired', 
+            '/select-plan', 
+            '/payment/success', 
+            '/payment/failure', 
+            '/payment/pending',
+            '/admin/god-mode',
+            '/pos', // No cerrar sesión si estamos en POS
+            '/dashboard', // No cerrar sesión si estamos en dashboard
+            '/welcome', // Onboarding
+            '/onboarding' // Configuración inicial
+          ]
+          
+          if (allowedExpiredRoutes.includes(currentPath) || currentPath.startsWith('/payment/')) {
+            console.log('⚠️ Error 401 en ruta protegida - NO haciendo logout automático')
+            break
           }
           break
           

@@ -406,13 +406,16 @@ const loginWithGoogle = async () => {
 onMounted(async () => {
   // 🎯 AUTO-LOGIN desde dominio central (SILENCIOSO - sin mostrar pantalla de login)
   const autoLoginCreds = sessionStorage.getItem('auto_login_credentials')
+  
   if (autoLoginCreds) {
     try {
+      console.log('✅ Iniciando auto-login...')
       loading.value = true
       message.text = 'Ingresando a tu cuenta...'
       message.type = 'info'
       
       const creds = JSON.parse(autoLoginCreds)
+      console.log('📧 Email auto-login:', creds.email)
       
       // Limpiar credenciales temporales ANTES de hacer el login
       sessionStorage.removeItem('auto_login_credentials')
@@ -583,14 +586,14 @@ const handleLogin = async () => {
       // ============================================
       // 🚀 LOGIN CENTRALIZADO (Smart Login)
       // ============================================
-      console.log('🎯 Login centralizado detectado en dominio principal')
       
       const response = await axios.post('/api/central/login', {
         email: credentials.email.trim(),
         password: credentials.password
       })
 
-      if (response.data.success) {
+      // Manejar respuesta del login centralizado
+      if (response.data && response.data.success) {
         message.text = '✅ Accediendo a tu cuenta...'
         message.type = 'success'
         
@@ -600,7 +603,12 @@ const handleLogin = async () => {
           password: credentials.password
         }))
         
-        // Redirigir inmediatamente al tenant (el auto-login será transparente)
+        // 🔥 CRÍTICO: Limpiar tokens viejos ANTES de redirigir
+        // Los tokens de Sanctum NO funcionan entre dominios
+        localStorage.removeItem('sanctum_token')
+        localStorage.removeItem('user')
+        
+        // Redirigir al subdominio del tenant
         setTimeout(() => {
           window.location.href = response.data.data.redirect_url + '/login'
         }, 800)
@@ -629,7 +637,6 @@ const handleLogin = async () => {
         config.onboarding_completed = true
         await axios.put('/api/tenant/system-settings', config)
         localStorage.removeItem('pending_onboarding_config')
-        console.log('✅ Configuración de onboarding aplicada exitosamente con onboarding_completed = true')
       } catch (error) {
         console.error('Error aplicando configuración pendiente:', error)
       }
@@ -645,9 +652,18 @@ const handleLogin = async () => {
       if (data.subdomain) {
         localStorage.removeItem('registration_success')
         
+        // 🔥 FIX: En local (puerto 3000 o 5173), NO redirigir a subdominio
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        
         // Esperar un momento para mostrar el mensaje
         setTimeout(() => {
-          window.location.href = data.subdomain + '/pos'
+          if (isLocal) {
+            // En local, quedarse en localhost sin subdominios
+            router.push('/pos')
+          } else {
+            // En producción, usar el subdominio del tenant
+            window.location.href = data.subdomain + '/pos'
+          }
         }, 1000)
         return
       }
@@ -700,17 +716,36 @@ const handleLogin = async () => {
   } catch (error) {
     console.error('Error en login:', error)
     
-    if (error.errors) {
-      // Errores de validación del servidor
+    // Manejar respuestas 422 (Unprocessable Entity) del backend
+    if (error.response?.status === 422) {
+      const errorData = error.response.data
+      
+      // Mostrar errores específicos por campo
+      if (errorData.errors) {
+        if (errorData.errors.email) {
+          errors.email = errorData.errors.email[0]
+        }
+        if (errorData.errors.password) {
+          errors.password = errorData.errors.password[0]
+        }
+      }
+      
+      // Mostrar mensaje general
+      message.text = errorData.message || 'Credenciales incorrectas'
+      message.type = 'error'
+    } else if (error.errors) {
+      // Errores de validación del servidor (formato antiguo)
       if (error.errors.email) {
         errors.email = error.errors.email[0]
       }
       if (error.errors.password) {
         errors.password = error.errors.password[0]
       }
+      message.text = 'Por favor verifica los datos ingresados'
+      message.type = 'error'
     } else {
       // Error general
-      message.text = error.message || 'Credenciales incorrectas'
+      message.text = error.response?.data?.message || error.message || 'Error al iniciar sesión. Intenta de nuevo.'
       message.type = 'error'
     }
   } finally {

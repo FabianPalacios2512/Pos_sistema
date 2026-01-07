@@ -39,18 +39,17 @@ const actions = {
         state.user = user
         state.isAuthenticated = true
         
-        // Verificar que el token sigue siendo válido
-        try {
-          const currentUser = await authService.getCurrentUser()
-          state.user = currentUser
-        } catch (error) {
-          // Token inválido, limpiar estado
-          await this.logout()
-        }
+        // ✅ FIX: NO verificar token con /me en cada recarga
+        // Solo confiar en token de localStorage
+        // La verificación real se hará cuando el usuario interactúe con el backend
       }
     } catch (error) {
       console.error('Error al inicializar autenticación:', error)
-      await this.logout()
+      // ⚠️ NO hacer logout si solo falló la inicialización
+      // Solo limpiar estado
+      state.user = null
+      state.token = null
+      state.isAuthenticated = false
     } finally {
       state.loading = false
     }
@@ -99,7 +98,6 @@ const actions = {
       // ✅ LIMPIAR APPSTORE AL HACER LOGOUT
       appStore.initialized = false
       appStore.cashSession.initialized = false
-      console.log('🧹 AppStore limpiado después del logout')
     }
   },
 

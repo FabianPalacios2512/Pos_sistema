@@ -360,18 +360,13 @@ router.beforeEach(async (to, from, next) => {
       return
     }
     
-    console.log('🔍 Router Guard - Navegando de', from.path, 'a', to.path)
-    console.log('🔍 Router Guard - isSubscriptionExpired:', appStore.isSubscriptionExpired)
-    
     // ⛔ NUEVO FLUJO: Ya NO bloquear rutas cuando la suscripción expira
     // El modal aparecerá automáticamente en el POS y bloqueará el acceso
     // Solo cargar datos si no están cargados (SOLO para usuarios de tenants)
     if (!appStore.systemSettings || Object.keys(appStore.systemSettings).length === 0) {
       try {
         await appStore.loadSystemSettings()
-        console.log('✅ SystemSettings cargados, isSubscriptionExpired:', appStore.isSubscriptionExpired)
       } catch (error) {
-        console.warn('⚠️ Error cargando systemSettings (puede ser superadmin):', error.message)
         // Continuar navegación aunque falle (puede ser superadmin o admin central)
       }
     }
@@ -379,7 +374,6 @@ router.beforeEach(async (to, from, next) => {
     // 🔥 PRIORIDAD MÁXIMA: Si suscripción expirada, ir directo al POS
     // El modal se encargará de bloquear todo
     if (appStore.isSubscriptionExpired) {
-      console.log('🔥 Suscripción expirada - Forzando acceso a /pos para mostrar modal')
       if (to.path !== '/pos' && !to.path.startsWith('/payment/')) {
         next('/pos')
         return
@@ -390,13 +384,14 @@ router.beforeEach(async (to, from, next) => {
     
     // Permitir navegación normal - el modal se encargará de bloquear si es necesario
 
-    const onboardingCompleted = appStore.systemSettings.onboarding_completed || false
+    // 🔥 PRIORIDAD: Verificar localStorage primero (más rápido y evita race conditions)
+    const localOnboardingCompleted = localStorage.getItem('onboarding_completed') === 'true'
+    const onboardingCompleted = localOnboardingCompleted || appStore.systemSettings.onboarding_completed || false
 
-    // 🎯 REGLA PRINCIPAL: Si ya completó onboarding en BD, permitir acceso normal
+    // 🎯 REGLA PRINCIPAL: Si ya completó onboarding (en BD o localStorage), permitir acceso normal
     if (onboardingCompleted) {
       // Si completó onboarding pero está intentando acceder a /welcome o /onboarding, redirigir a /pos
       if (to.path === '/welcome' || to.path === '/onboarding') {
-        console.log('✅ Onboarding ya completado - redirigiendo a /pos')
         next('/pos')
         return
       }
@@ -407,7 +402,6 @@ router.beforeEach(async (to, from, next) => {
 
     // 🚨 CRÍTICO: Si NO ha completado onboarding, FORZAR completarlo
     // No importa si ya vio welcome o no - DEBE completar configuración
-    console.log('⚠️ Onboarding incompleto - usuario DEBE configurar el sistema')
     
     // Permitir acceso SOLO a /welcome y /onboarding
     const allowedRoutes = ['/welcome', '/onboarding']
@@ -415,13 +409,11 @@ router.beforeEach(async (to, from, next) => {
       // Si no ha visto welcome, mandarlo ahí primero
       const welcomeSeen = localStorage.getItem('welcome_seen')
       if (!welcomeSeen) {
-        console.log('🎯 Primera vez - redirigiendo a welcome')
         next('/welcome')
         return
       }
       
       // Si ya vio welcome, mandarlo a onboarding
-      console.log('🎯 FORZANDO configuración - redirigiendo a onboarding')
       next('/onboarding')
       return
     }
@@ -442,10 +434,6 @@ router.beforeEach((to, from, next) => {
   if (to.meta.roles && authService.isAuthenticated()) {
     const user = authService.getUser()
     const userRole = user.role?.name || user.role // Soportar tanto objeto como string
-
-    console.log('🔍 [Router Guard] Verificando acceso a:', to.path)
-    console.log('👤 [Router Guard] Usuario:', user.name, '| Rol:', userRole)
-    console.log('🎯 [Router Guard] Roles permitidos:', to.meta.roles)
 
     // Normalizar roles para comparación flexible
     const normalizedUserRole = userRole?.toLowerCase()
@@ -469,7 +457,6 @@ router.beforeEach((to, from, next) => {
     }
 
     if (!hasAccess) {
-      console.log('❌ [Router Guard] Acceso denegado - redirigiendo...')
       // Redirigir según el rol del usuario
       if (normalizedUserRole === 'admin' || normalizedUserRole === 'administrador') {
         next('/dashboard')
@@ -478,8 +465,6 @@ router.beforeEach((to, from, next) => {
       }
       return
     }
-
-    console.log('✅ [Router Guard] Acceso permitido')
   }
 
   next()
