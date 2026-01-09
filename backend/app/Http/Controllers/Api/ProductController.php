@@ -511,6 +511,19 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        // 🔄 ACTUALIZACIÓN SIMPLE: Solo cambio de estado activo/inactivo
+        if ($request->has('active') && !$request->has('name')) {
+            $product->update([
+                'active' => $request->input('active')
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Estado del producto actualizado',
+                'data' => $product->fresh()
+            ]);
+        }
+        
         \Log::info('🔄 [ProductController@update] Actualizando producto:', [
             'product_id' => $product->id,
             'current_type' => $product->product_type,
