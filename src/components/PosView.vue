@@ -3,7 +3,7 @@
     
     <!-- 🎯 Modal de Bienvenida Primera Vez - DISEÑO LIMPIO CON ELEVACIÓN POR LUMINOSIDAD -->
     <Teleport to="body">
-      <div v-if="showWelcomeModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
+      <div v-if="showWelcomeModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80  animate-fade-in">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-scale-in border border-gray-200 dark:border dark:border-white/10">
           
           <!-- Icono Hero Centrado -->
@@ -95,7 +95,7 @@
     />
     
     <!-- BARRA DE HERRAMIENTAS EMPRESARIAL -->
-    <div class="sticky top-0 z-30 backdrop-blur-xl transition-all duration-300">
+    <div class="sticky top-0 z-30  transition-all duration-300">
     
     <div class="px-4 lg:px-6 py-4">
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -321,7 +321,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="showMobileCart" class="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" @click="showMobileCart = false"></div>
+        <div v-if="showMobileCart" class="lg:hidden fixed inset-0 z-50 bg-black/60 " @click="showMobileCart = false"></div>
       </Transition>
       
       <Transition
@@ -501,7 +501,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="showMobilePaymentSelector" class="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" @click="showMobilePaymentSelector = false"></div>
+        <div v-if="showMobilePaymentSelector" class="lg:hidden fixed inset-0 z-50 bg-black/60 " @click="showMobilePaymentSelector = false"></div>
       </Transition>
       
       <Transition
@@ -576,7 +576,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="showMobileCashInput" class="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" @click="showMobileCashInput = false"></div>
+        <div v-if="showMobileCashInput" class="lg:hidden fixed inset-0 z-50 bg-black/60 " @click="showMobileCashInput = false"></div>
       </Transition>
       
       <Transition
@@ -658,9 +658,9 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5 pb-6" style="flex: 1; min-height: 0; height: 100%; max-height: 100%; overflow: hidden;">
   <!-- Panel Izquierdo: Catálogo de Productos - Full en móvil, 70% Fashion (8/12) | 50% General (6/12) en desktop -->
   <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="col-span-1 lg:col-span-auto overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
-    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 flex flex-col overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
+    <div class="bg-white dark:bg-zinc-900  rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
       
-      <div class="p-3 overflow-y-auto bg-slate-100/80 dark:bg-zinc-950/50 backdrop-blur-sm" style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+      <div class="p-3 overflow-y-auto bg-slate-100 dark:bg-zinc-950 " style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
         <!-- Loading skeleton - Modo oscuro mejorado -->
       <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -890,7 +890,7 @@
         <div
           v-for="product in filteredProducts"
           :key="product.id"
-          class="group bg-white dark:bg-zinc-900/80 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] border border-gray-200 dark:border-zinc-800/40 hover:ring-2 hover:ring-emerald-500/70 dark:hover:ring-emerald-400/50 hover:border-transparent shadow-sm hover:shadow-lg dark:shadow-black/30"
+          class="group bg-white dark:bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] border border-gray-200 dark:border-zinc-800 hover:ring-2 hover:ring-emerald-500/70 dark:hover:ring-emerald-400/50 hover:border-transparent shadow-sm hover:shadow-lg dark:shadow-black/30"
           @click="addToCart(product)"
         >
           
@@ -957,7 +957,7 @@
 
 <!-- Panel Derecho: Carrito/Ticket - OCULTO EN MÓVIL -->
 <div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block overflow-hidden transition-all duration-300" style="max-height: 100%;">
-  <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200/50 dark:border-zinc-800/40 flex flex-col overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
+  <div class="bg-white dark:bg-zinc-900  rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
     
     <div class="p-4 flex-shrink-0">
       <div class="flex items-center justify-between mb-3">
@@ -1134,10 +1134,10 @@
     </div>
     
     <!-- 👗 SECCIÓN DE PAGO INTEGRADA - Solo en modo Fashion -->
-    <div v-if="isFashionStore" class="flex-shrink-0 border-t border-gray-200 dark:border-zinc-800/40 bg-gray-50 dark:bg-zinc-900/30">
+    <div v-if="isFashionStore" class="flex-shrink-0 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/30">
       
       <!-- Total compacto -->
-      <div class="px-2.5 py-2 border-b border-gray-100 dark:border-zinc-800/40">
+      <div class="px-2.5 py-2 border-b border-gray-100 dark:border-zinc-800">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-[8px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total</p>
@@ -1240,10 +1240,10 @@
 <!-- Panel de Pagos - Solo visible en modo General (3/12) - Se oculta en Fashion - OCULTO EN MÓVIL -->
 <div v-if="!isFashionStore" id="tour-pos-cart" class="hidden lg:block lg:col-span-3 h-full overflow-hidden">
   
-  <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-zinc-800/40 h-full flex flex-col justify-between shadow-lg dark:shadow-2xl dark:shadow-black/40 transition-all duration-300">
+  <div class="bg-white dark:bg-zinc-900  rounded-2xl border border-gray-200 dark:border-zinc-800 h-full flex flex-col justify-between shadow-lg dark:shadow-2xl dark:shadow-black/40 transition-all duration-300">
     
     <!-- 💰 HEADER COMPACTO: Total Protagonista -->
-    <div class="p-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800/40">
+    <div class="p-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800">
       <div class="flex items-end justify-between">
         <div>
           <p class="text-[9px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total a Pagar</p>
@@ -1546,7 +1546,7 @@
     />
 
     <!-- Modal de Cantidad con Unidades de Medida -->
-    <div v-if="showQuantityModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div v-if="showQuantityModal" class="fixed inset-0 bg-black/60  flex items-center justify-center z-50 p-4">
       <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl max-w-md w-full">
         <!-- Header -->
         <div class="bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 px-6 py-4">
@@ -1694,7 +1694,7 @@
     <!-- Modal: Se requiere cliente para vender -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="showRequireCustomerModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+        <div v-if="showRequireCustomerModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4">
           <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-300 dark:border-zinc-800">
             <!-- Header con icono -->
             <div class="p-6 pb-4">

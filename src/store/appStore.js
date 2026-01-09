@@ -40,8 +40,8 @@ export const appStore = reactive({
   isSubscriptionExpired: false, // Estado para controlar expiración (lo maneja SubscriptionExpiredModal)
   
   // Métodos para cargar datos
-  async loadProducts(warehouseId = null, searchScope = 'local') {
-    if (this.loading.products) return // Evitar cargas duplicadas
+  async loadProducts(warehouseId = null, searchScope = 'local', force = false) {
+    if (this.loading.products && !force) return // Evitar cargas duplicadas
 
     try {
       this.loading.products = true
@@ -103,8 +103,8 @@ export const appStore = reactive({
     }
   },
   
-  async loadCustomers() {
-    if (this.loading.customers) return
+  async loadCustomers(force = false) {
+    if (this.loading.customers && !force) return
     
     try {
       this.loading.customers = true
@@ -121,8 +121,8 @@ export const appStore = reactive({
     }
   },
 
-  async loadPaymentMethods() {
-    if (this.loading.paymentMethods) return
+  async loadPaymentMethods(force = false) {
+    if (this.loading.paymentMethods && !force) return
     
     try {
       this.loading.paymentMethods = true
