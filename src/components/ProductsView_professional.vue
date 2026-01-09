@@ -2497,7 +2497,6 @@ const getProductImage = (product) => {
       const imageUrl = primaryImage.image_url
       // Si la imagen es base64, devolverla directamente
       if (imageUrl.startsWith('data:image')) {
-        console.log('✅ Imagen base64 encontrada en galería para:', product.name)
         return imageUrl
       }
       // Fix relative URLs for tenant backend
@@ -2520,13 +2519,11 @@ const getProductImage = (product) => {
   const imageUrl = product?.image_url || product?.image || product?.img || product?.photo
   
   if (!imageUrl) {
-    console.log('⚠️ No se encontró imagen para:', product.name)
     return null
   }
   
   // Si la imagen es base64 (data:image), devolverla directamente
   if (imageUrl.startsWith('data:image')) {
-    console.log('✅ Imagen base64 encontrada para:', product.name)
     return imageUrl
   }
   
@@ -4171,9 +4168,8 @@ const confirmStatusChange = async () => {
     
     const { product, newStatus } = pendingStatusChange.value
     
+    // ✅ SOLO enviar campos necesarios (NO todo el objeto)
     await productsService.update(product.id, { 
-      ...product, 
-      is_active: newStatus,
       active: newStatus 
     })
     
