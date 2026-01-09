@@ -1663,8 +1663,12 @@ const processStockAdjustment = async () => {
     if (response && response.success) {
       console.log('Ajuste registrado exitosamente en la BD')
       
-      // Recargar productos para obtener datos actualizados
+      // ✅ RECARGAR PRODUCTOS PARA ACTUALIZAR LA VISTA
       await loadProducts()
+      
+      // 🔥 FORZAR ACTUALIZACIÓN EN EL STORE GLOBAL (para POS y ProductsView)
+      console.log('🔄 Actualizando store global después del ajuste...')
+      await appStore.loadProducts(selectedWarehouse.value, 'general', true)
       
       // 🔥 ACTUALIZAR NOTIFICACIONES AUTOMÁTICAMENTE
       console.log('Actualizando notificaciones después del ajuste...')
