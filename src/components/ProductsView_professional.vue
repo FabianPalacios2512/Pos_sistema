@@ -3653,21 +3653,10 @@ const getWarehouseStock = (product, warehouseId) => {
 
 // 🏢 Helper: Obtener stock total de un producto
 const getTotalStock = (product) => {
-  if (!product.warehouses || product.warehouses.length === 0) {
-    return product.current_stock || 0
-  }
-  
-  const totalFromWarehouses = product.warehouses.reduce((total, warehouse) => {
-    const stock = warehouse.pivot?.stock || warehouse.stock || 0
-    return total + stock
-  }, 0)
-  
-  // 🔧 FALLBACK: Si warehouses suma 0 pero current_stock tiene valor, usar current_stock
-  if (totalFromWarehouses === 0 && product.current_stock > 0) {
-    return product.current_stock
-  }
-  
-  return totalFromWarehouses
+  // ✅ SIEMPRE usar current_stock como fuente de verdad
+  // Este campo se actualiza automáticamente en el backend cuando se ajusta stock
+  // en cualquier bodega (ver Product::updateStock y Product::updateStockInWarehouse)
+  return product.current_stock || 0
 }
 
 // 🏢 Cargar bodegas disponibles
