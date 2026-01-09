@@ -712,52 +712,77 @@
     </div>
 
     <!-- Modal de Confirmación para Cambio de Estado -->
-    <div v-if="showStatusConfirmModal" 
-         class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-         @click.self="showStatusConfirmModal = false">
-      <div class="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
-          <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-              </svg>
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showStatusConfirmModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <!-- Overlay -->
+          <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showStatusConfirmModal = false"></div>
+          
+          <!-- Modal -->
+          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-md w-full overflow-hidden border border-gray-200 dark:border-zinc-800">
+            <!-- Icon + Title -->
+            <div class="px-6 pt-6 pb-4">
+              <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                     :class="pendingStatusChange?.newStatus 
+                       ? 'bg-emerald-100 dark:bg-emerald-950' 
+                       : 'bg-amber-100 dark:bg-amber-950'">
+                  <svg v-if="pendingStatusChange?.newStatus" class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <svg v-else class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                    {{ pendingStatusChange?.newStatus ? 'Habilitar Producto' : 'Deshabilitar Producto' }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">
+                    Esta acción modificará el estado del producto
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 class="text-lg font-bold text-white">Confirmar Cambio de Estado</h3>
-              <p class="text-sm text-white/80">Esta acción modificará el estado del producto</p>
+
+            <!-- Content -->
+            <div class="px-6 pb-6">
+              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
+                <p class="font-semibold text-gray-900 dark:text-white">{{ pendingStatusChange?.product?.name }}</p>
+                <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">SKU: {{ pendingStatusChange?.product?.sku || 'N/A' }}</p>
+              </div>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-4">
+                {{ pendingStatusChange?.newStatus 
+                  ? 'El producto estará disponible para la venta.' 
+                  : 'El producto no estará disponible para la venta.' }}
+              </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="bg-gray-50 dark:bg-zinc-900 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-zinc-800">
+              <button @click="showStatusConfirmModal = false" 
+                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
+                Cancelar
+              </button>
+              <button @click="confirmStatusChange" 
+                      :class="pendingStatusChange?.newStatus 
+                        ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700' 
+                        : 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700'"
+                      class="px-6 py-2.5 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-200">
+                Confirmar
+              </button>
             </div>
           </div>
         </div>
-
-        <!-- Content -->
-        <div class="p-6">
-          <p class="text-slate-700 dark:text-zinc-300 mb-4">
-            ¿Estás seguro que deseas <span class="font-bold">{{ pendingStatusChange?.newStatus ? 'habilitar' : 'deshabilitar' }}</span> el producto:
-          </p>
-          <div class="bg-slate-50 dark:bg-zinc-800 rounded-lg p-4 border border-slate-200 dark:border-zinc-700 mb-6">
-            <p class="font-bold text-slate-900 dark:text-white">{{ pendingStatusChange?.product?.name }}</p>
-            <p class="text-sm text-slate-500 dark:text-zinc-400 mt-1">SKU: {{ pendingStatusChange?.product?.sku || 'N/A' }}</p>
-          </div>
-          <p class="text-sm text-slate-600 dark:text-zinc-400">
-            {{ pendingStatusChange?.newStatus ? 'El producto estará disponible para la venta.' : 'El producto no estará disponible para la venta.' }}
-          </p>
-        </div>
-
-        <!-- Actions -->
-        <div class="bg-slate-50 dark:bg-zinc-800 px-6 py-4 flex items-center justify-end space-x-3">
-          <button @click="showStatusConfirmModal = false" 
-                  class="px-4 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 text-slate-700 dark:text-zinc-200 rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-600 transition-colors font-medium">
-            Cancelar
-          </button>
-          <button @click="confirmStatusChange" 
-                  class="px-4 py-2 bg-gradient-to-r from-lime-400 to-green-400 hover:from-lime-500 hover:to-green-500 text-white rounded-lg transition-colors font-medium">
-            Confirmar
-          </button>
-        </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
 
     <!-- Modal de Categoría Inactiva -->
     <div v-if="showCategoryInactiveModal" 

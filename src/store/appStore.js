@@ -65,7 +65,8 @@ export const appStore = reactive({
             return {
               ...product,
               variants: product.variants || [],
-              stock: product.stock || 0,
+              current_stock: product.current_stock || 0, // ✅ Campo real de la BD
+              stock: product.current_stock || 0, // Alias para compatibilidad
               warehouses: product.warehouse_stock || [],
               is_remote: product.is_remote || false,
               alternative_warehouses: product.alternative_warehouses || [],

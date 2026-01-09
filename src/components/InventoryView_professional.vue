@@ -1309,8 +1309,8 @@ const loadProducts = async () => {
     products.value = productsList.map(product => ({
       ...product,
       category: product.category ? product.category.name : 'Sin categoría',
-      current_stock: product.current_stock || product.stock || 0,
-      stock: product.current_stock || product.stock || 0,
+      current_stock: product.current_stock || 0, // campo real de la BD
+      stock: product.current_stock || 0, // alias para compatibilidad
       min_stock: product.min_stock || 10,
       barcode: product.barcode || `BAR${product.id}${Date.now().toString().slice(-4)}`,
       price: parseFloat(product.sale_price || product.price || 0),
