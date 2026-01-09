@@ -1619,14 +1619,26 @@ export default {
         if (order.supplier?.phone) doc.text(`Tel: ${order.supplier.phone}`, 20, startY + 12)
         if (order.supplier?.email) doc.text(`Email: ${order.supplier.email}`, 20, startY + 18)
         
-        // Datos de la orden
+        // Datos de la orden (SIN bodega destino - es información interna)
         doc.setFont('helvetica', 'bold')
-        doc.text('DATOS DE LA ORDEN:', 120, startY)
+        doc.text('Fecha Orden:', 120, startY)
         doc.setFont('helvetica', 'normal')
-        doc.text(`Fecha: ${this.formatDate(order.order_date)}`, 120, startY + 6)
-        if (order.expected_date) doc.text(`Esperada: ${this.formatDate(order.expected_date)}`, 120, startY + 12)
-        if (order.reference) doc.text(`Ref: ${order.reference}`, 120, startY + 18)
-        doc.text(`Estado: ${this.getOrderStatusText(order.status)}`, 120, startY + 24)
+        doc.text(this.formatDate(order.order_date), 120, startY + 6)
+        if (order.expected_date) {
+          doc.setFont('helvetica', 'bold')
+          doc.text('Fecha Esperada:', 120, startY + 12)
+          doc.setFont('helvetica', 'normal')
+          doc.text(this.formatDate(order.expected_date), 120, startY + 18)
+        }
+        if (order.reference) {
+          doc.text(`Ref: ${order.reference}`, 120, startY + 24)
+        }
+        doc.setFont('helvetica', 'bold')
+        doc.setFontSize(11)
+        doc.setTextColor(0, 102, 204)
+        doc.text(this.getOrderStatusText(order.status), 120, startY + 30)
+        doc.setTextColor(0, 0, 0)
+        doc.setFontSize(10)
         
         // Tabla de productos
         const tableData = order.items.map(item => [

@@ -121,7 +121,8 @@ class ProductController extends Controller
 
         $query = Product::select([
                 'id', 'name', 'sku', 'barcode', 'sale_price as price',
-                'current_stock as stock', 'category_id', 'image_url as image',
+                'current_stock', // ✅ Mantener current_stock sin alias
+                'category_id', 'image_url as image',
                 'active', 'manage_stock', 'product_type',
                 'measurement_unit', 'allow_decimal'  // 📏 Incluir unidades de medida
             ])
@@ -190,7 +191,14 @@ class ProductController extends Controller
                 $localStock = 0;
                 $alternativeWarehouses = [];
 
-                if ($warehouseId && $product->warehouses) {
+                // ✅ CAMBIO CRÍTICO: Si solo hay 1 bodega, usar current_stock directamente
+                $totalWarehouses = \App\Models\Warehouse::count();
+
+                if ($totalWarehouses === 1) {
+                    // 🏪 MODO TIENDA ÚNICA: current_stock es la fuente única de verdad
+                    $localStock = (int) $product->current_stock;
+                } else if ($warehouseId && $product->warehouses) {
+                    // 🏢 MODO MULTI-TIENDA: Usar stock de bodega específica
                     $currentWarehouse = $product->warehouses->firstWhere('id', $warehouseId);
 
                     if ($currentWarehouse) {
@@ -212,6 +220,7 @@ class ProductController extends Controller
                 }
 
                 $product->stock = $localStock;
+                $product->current_stock = $product->current_stock; // ✅ Mantener current_stock (stock total)
                 $product->is_remote = $searchScope === 'global' && $localStock === 0 && count($alternativeWarehouses) > 0;
                 $product->alternative_warehouses = $alternativeWarehouses;
 
@@ -516,14 +525,14 @@ class ProductController extends Controller
             $product->update([
                 'active' => $request->input('active')
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Estado del producto actualizado',
                 'data' => $product->fresh()
             ]);
         }
-        
+
         \Log::info('🔄 [ProductController@update] Actualizando producto:', [
             'product_id' => $product->id,
             'current_type' => $product->product_type,
@@ -560,12 +569,12 @@ class ProductController extends Controller
                 'cost_price' => $costPrice,
             ];
 
-            // ✅ Actualizar store_type si viene en el request (permite cambiar entre moda/general)
-            if ($request->has('store_type')) {
-                $updateData['store_type'] = $request->input('store_type');
-            } elseif ($request->has('store_category')) {
+            // ✅ Actualizar store_category si viene en el request (permite cambiar entre moda/general)
+            if ($request->has('store_category')) {
+                $updateData['store_category'] = $request->input('store_category');
+            } elseif ($request->has('store_type')) {
                 // Compatibilidad con campo legacy
-                $updateData['store_type'] = $request->input('store_category');
+                $updateData['store_category'] = $request->input('store_type');
             }
 
             // ✅ AGREGAR sale_price si es producto simple

@@ -625,7 +625,7 @@
                   <p v-if="orderErrors.supplier_id" class="mt-1 text-xs text-red-500 dark:text-red-400">{{ orderErrors.supplier_id }}</p>
                 </div>
 
-                <div>
+                <div v-if="shouldShowWarehouseSelector">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Tienda/Sede *</label>
                   <select v-model="orderForm.warehouse_id" class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl border border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all">
                     <option value="">Seleccionar tienda/sede...</option>
@@ -1019,8 +1019,11 @@ export default {
       return filtered
     },
     shouldShowWarehouseSelector() {
-      // Mostrar selector cuando hay más de 1 tienda/sede registrada
-      return this.warehouses.length > 1
+      // ✅ Solo mostrar si el usuario tiene plan Premium/Enterprise Y hay más de 1 bodega
+      const hasMultiSedesPlan = ['premium', 'enterprise'].includes(this.tenantPlan)
+      const hasMultipleWarehouses = this.warehouses.length > 1
+      
+      return hasMultiSedesPlan && hasMultipleWarehouses
     }
   },
   mounted() {

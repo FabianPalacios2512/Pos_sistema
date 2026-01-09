@@ -556,12 +556,6 @@
             >
               Cerrar Sesión
             </button>
-            <button
-              @click="generateReport(selectedSession)"
-              class="px-4 py-2 bg-emerald-600 dark:bg-emerald-700 text-white rounded-lg hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-colors text-sm font-medium"
-            >
-              Generar Reporte
-            </button>
           </div>
         </div>
       </div>
@@ -831,6 +825,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { apiCall } from '../services/api.js'
 import { useToast } from '../composables/useToast.js'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
 
 // Toast system
 const { showSuccess, showError, showInfo, showWarning } = useToast()
@@ -1053,8 +1049,8 @@ const getSessionDuration = (session) => {
 }
 
 const viewSessionDetails = (session) => {
+  // Mostrar detalles sin mensaje informativo en UI/console
   selectedSession.value = session
-  showInfo(`👁️ Detalles cargados - Mostrando información completa de la sesión #${session.id}`)
 }
 
 // Métodos para cálculos de cierre
@@ -1241,13 +1237,162 @@ const closeSessionWithDetails = async () => {
   }
 }
 
-const generateReport = (session) => {
-  showInfo(`📊 Generando reporte... - Creando reporte detallado para ${session.user?.name}`)
-  
-  // Simulate report generation
-  setTimeout(() => {
-    showSuccess('✅ Reporte generado - El reporte se ha creado exitosamente')
-  }, 1500)
+const generateReport = async (session) => {
+  try {
+    showInfo(`📊 Generando reporte de sesión #${session.id}...`)
+    
+    const doc = new jsPDF()
+    
+    // Título principal
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(18)
+    doc.text('REPORTE DE SESIÓN DE CAJA', 105, 20, { align: 'center' })
+    
+    // ID y Estado
+    doc.setFontSize(12)
+    doc.setTextColor(100, 100, 100)
+    doc.text(`Sesión #${session.id}`, 105, 28, { align: 'center' })
+    
+    // Resetear color
+    doc.setTextColor(0, 0, 0)
+    
+    let y = 45
+    
+    // === INFORMACIÓN DEL USUARIO ===
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(11)
+    doc.setFillColor(240, 240, 240)
+    doc.rect(20, y - 5, 170, 8, 'F')
+    doc.text('RESPONSABLE', 22, y)
+    y += 10
+    
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.text(`Nombre: ${session.user?.name || 'N/A'}`, 22, y)
+    y += 6
+    if (session.user?.email) {
+      doc.text(`Email: ${session.user.email}`, 22, y)
+      y += 6
+    }
+    if (session.user?.cc) {
+      doc.text(`CC: ${session.user.cc}`, 22, y)
+      y += 6
+    }
+    
+    y += 5
+    
+    // === INFORMACIÓN DE LA SESIÓN ===
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(11)
+    doc.setFillColor(240, 240, 240)
+    doc.rect(20, y - 5, 170, 8, 'F')
+    doc.text('DETALLES DE LA SESIÓN', 22, y)
+    y += 10
+    
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    
+    const estadoTexto = session.status === 'open' ? 'ACTIVA' : 'CERRADA'
+    const estadoColor = session.status === 'open' ? [34, 197, 94] : [239, 68, 68]
+    doc.setTextColor(...estadoColor)
+    doc.text(`Estado: ${estadoTexto}`, 22, y)
+    doc.setTextColor(0, 0, 0)
+    y += 6
+    
+    doc.text(`Fecha Apertura: ${formatDate(session.opening_date)}`, 22, y)
+    y += 6
+    doc.text(`Hora Apertura: ${session.opening_time || 'N/A'}`, 22, y)
+    y += 6
+    
+    if (session.closing_date) {
+      doc.text(`Fecha Cierre: ${formatDate(session.closing_date)}`, 22, y)
+      y += 6
+    }
+    
+    if (session.duration) {
+      doc.text(`Duración: ${session.duration}`, 22, y)
+      y += 6
+    }
+    
+    y += 5
+    
+    // === RESUMEN FINANCIERO ===
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(11)
+    doc.setFillColor(240, 240, 240)
+    doc.rect(20, y - 5, 170, 8, 'F')
+    doc.text('RESUMEN FINANCIERO', 22, y)
+    y += 10
+    
+    const financialData = [
+      ['Monto Inicial', `$${parseFloat(session.opening_amount || 0).toLocaleString()}`],
+      ['Total Ventas', `$${parseFloat(session.total_sales || 0).toLocaleString()}`],
+      ['Ventas en Efectivo', `$${parseFloat(session.cash_sales || 0).toLocaleString()}`],
+      ['Efectivo Esperado', `$${(parseFloat(session.opening_amount || 0) + parseFloat(session.cash_sales || 0)).toLocaleString()}`]
+    ]
+    
+    if (session.status === 'closed') {
+      financialData.push(['Efectivo Contado', `$${parseFloat(session.closing_amount || 0).toLocaleString()}`])
+      const diferencia = parseFloat(session.closing_amount || 0) - (parseFloat(session.opening_amount || 0) + parseFloat(session.cash_sales || 0))
+      financialData.push(['Diferencia', `$${diferencia.toLocaleString()}`])
+    }
+    
+    doc.autoTable({
+      startY: y,
+      body: financialData,
+      theme: 'plain',
+      styles: { fontSize: 10, cellPadding: 3 },
+      columnStyles: {
+        0: { fontStyle: 'bold', cellWidth: 80 },
+        1: { halign: 'right', cellWidth: 90 }
+      }
+    })
+    
+    y = doc.lastAutoTable.finalY + 10
+    
+    // === NOTAS ===
+    if (session.opening_notes) {
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.setFillColor(255, 250, 200)
+      doc.rect(20, y - 5, 170, 8, 'F')
+      doc.text('NOTAS DE APERTURA', 22, y)
+      y += 10
+      
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(9)
+      const splitNotes = doc.splitTextToSize(session.opening_notes, 166)
+      doc.text(splitNotes, 22, y)
+      y += splitNotes.length * 5 + 5
+    }
+    
+    if (session.closing_notes) {
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(11)
+      doc.setFillColor(255, 250, 200)
+      doc.rect(20, y - 5, 170, 8, 'F')
+      doc.text('NOTAS DE CIERRE', 22, y)
+      y += 10
+      
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(9)
+      const splitNotes = doc.splitTextToSize(session.closing_notes, 166)
+      doc.text(splitNotes, 22, y)
+    }
+    
+    // Footer
+    doc.setFontSize(8)
+    doc.setTextColor(150, 150, 150)
+    doc.text(`Generado el ${new Date().toLocaleString('es-CO')}`, 105, 280, { align: 'center' })
+    
+    // Descargar
+    doc.save(`Sesion_Caja_${session.id}_${new Date().toISOString().split('T')[0]}.pdf`)
+    showSuccess('✅ Reporte generado exitosamente')
+    
+  } catch (error) {
+    console.error('Error generando reporte:', error)
+    showError('Error al generar el reporte')
+  }
 }
 
 // Lifecycle

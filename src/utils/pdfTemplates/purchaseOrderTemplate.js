@@ -153,22 +153,16 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
       rightYPos += 5
     }
 
-    if (warehouse_name) {
-      pdf.setFont('helvetica', 'bold')
-      pdf.text('Bodega Destino:', rightMargin - 60, rightYPos, { align: 'left' })
-      pdf.setFont('helvetica', 'normal')
-      pdf.text(warehouse_name, rightMargin, rightYPos, { align: 'right' })
-    }
+    // ✅ Bodega Destino removida - información interna del sistema
 
     yPos = Math.max(yPos, rightYPos) + 10
 
     // ==================== TABLA DE PRODUCTOS ====================
-    const tableHeaders = [['PRODUCTO', 'CANTIDAD', 'COSTO UNIT.', 'SUBTOTAL']]
+    // ✅ Solo producto y cantidad - NO mostrar precios (información interna)
+    const tableHeaders = [['PRODUCTO', 'CANTIDAD']]
     const tableData = items.map(item => [
       item.product_name || item.name || '',
-      String(item.quantity || 0),
-      `$${formatNumber(item.unit_cost || 0)}`,
-      `$${formatNumber((item.quantity || 0) * (item.unit_cost || 0))}`
+      `${item.quantity || 0} ${item.unit || 'und'}`
     ])
 
     pdf.autoTable({
@@ -179,63 +173,29 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
       headStyles: {
         fillColor: [30, 58, 138], // Blue-900
         textColor: [255, 255, 255],
-        fontSize: 9,
+        fontSize: 10,
         fontStyle: 'bold',
         halign: 'center'
       },
       bodyStyles: {
-        fontSize: 9,
+        fontSize: 10,
         textColor: [55, 65, 81]
       },
       alternateRowStyles: {
         fillColor: [249, 250, 251]
       },
       columnStyles: {
-        0: { cellWidth: 85 }, // Producto
-        1: { cellWidth: 25, halign: 'center' }, // Cantidad
-        2: { cellWidth: 35, halign: 'right' }, // Costo Unit
-        3: { cellWidth: 35, halign: 'right' } // Subtotal
+        0: { cellWidth: 130 }, // Producto (más ancho)
+        1: { cellWidth: 40, halign: 'center' } // Cantidad
       },
       margin: { left: leftMargin, right: leftMargin }
     })
 
     yPos = pdf.lastAutoTable.finalY + 10
 
-    // ==================== TOTALES ====================
-    const totalsX = rightMargin - 70
-    
-    // Subtotal
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(10)
-    pdf.setTextColor(107, 114, 128)
-    pdf.text('Subtotal:', totalsX, yPos)
-    pdf.setFont('helvetica', 'bold')
-    pdf.setTextColor(17, 24, 39)
-    pdf.text(`$${formatNumber(subtotal)}`, rightMargin, yPos, { align: 'right' })
-    yPos += 6
-
-    // IVA/Impuesto
-    if (tax > 0) {
-      pdf.setFont('helvetica', 'normal')
-      pdf.setTextColor(107, 114, 128)
-      pdf.text('IVA:', totalsX, yPos)
-      pdf.setFont('helvetica', 'bold')
-      pdf.setTextColor(17, 24, 39)
-      pdf.text(`$${formatNumber(tax)}`, rightMargin, yPos, { align: 'right' })
-      yPos += 6
-    }
-
-    // Total (destacado)
-    pdf.setFillColor(30, 58, 138)
-    pdf.roundedRect(totalsX - 5, yPos - 5, 75, 10, 2, 2, 'F')
-    
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(12)
-    pdf.setTextColor(255, 255, 255)
-    pdf.text('TOTAL:', totalsX, yPos + 2)
-    pdf.text(`$${formatNumber(total)}`, rightMargin - 5, yPos + 2, { align: 'right' })
-    
-    yPos += 15
+    // ==================== SIN TOTALES ====================
+    // ✅ Precios y totales removidos - son información interna del sistema
+    // El proveedor solo necesita ver qué productos y cantidades solicitar
 
     // ==================== NOTAS ====================
     if (notes) {

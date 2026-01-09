@@ -3861,30 +3861,41 @@ const editProduct = async (product) => {
   
   console.log('🔍 [editProduct] Tipo de producto:', isSimpleProduct ? 'SIMPLE (stock por bodega)' : 'VARIABLE (stock en variantes)')
   
-  // 🔥 CARGAR STOCK DESDE product.warehouses (SOLO para productos SIMPLES)
-  if (isSimpleProduct && product.warehouses && Array.isArray(product.warehouses)) {
-    // Agrupar por warehouse_id para evitar duplicados
-    const stockByWarehouse = new Map()
+  // 🔥 CARGAR STOCK DESDE product.current_stock (SOLO para productos SIMPLES)
+  // ✅ Usar current_stock como fuente única de verdad
+  if (isSimpleProduct) {
+    const totalStock = parseInt(product.current_stock || 0) || 0
     
-    product.warehouses.forEach(warehouse => {
-      if (warehouse.id) {
-        const stock = warehouse.pivot?.stock || warehouse.stock || 0
-        const parsedStock = parseInt(stock) || 0
-        
-        // Si ya existe, sumar el stock (por si hay duplicados)
-        const currentStock = stockByWarehouse.get(warehouse.id) || 0
-        stockByWarehouse.set(warehouse.id, Math.max(currentStock, parsedStock))
-      }
-    })
-    
-    // Aplicar el stock agrupado
-    stockByWarehouse.forEach((stock, warehouseId) => {
-      warehouseStock[warehouseId] = stock
-      if (stock > 0) {
-        warehouseEnabled[warehouseId] = true
-        console.log(`✅ Tienda ${warehouseId} con stock ${stock}`)
-      }
-    })
+    // Si hay solo 1 bodega, asignar todo el stock a esa bodega
+    if (warehouses.value.length === 1 && warehouses.value[0]) {
+      const warehouseId = warehouses.value[0].id
+      warehouseStock[warehouseId] = totalStock
+      warehouseEnabled[warehouseId] = true
+      console.log(`✅ Bodega única (${warehouseId}): Stock ${totalStock} desde current_stock`)
+    } 
+    // Si hay múltiples bodegas, intentar leer desde product.warehouses
+    else if (product.warehouses && Array.isArray(product.warehouses)) {
+      const stockByWarehouse = new Map()
+      
+      product.warehouses.forEach(warehouse => {
+        if (warehouse.id) {
+          const stock = warehouse.pivot?.stock || warehouse.stock || 0
+          const parsedStock = parseInt(stock) || 0
+          
+          const currentStock = stockByWarehouse.get(warehouse.id) || 0
+          stockByWarehouse.set(warehouse.id, Math.max(currentStock, parsedStock))
+        }
+      })
+      
+      // Aplicar el stock agrupado
+      stockByWarehouse.forEach((stock, warehouseId) => {
+        warehouseStock[warehouseId] = stock
+        if (stock > 0) {
+          warehouseEnabled[warehouseId] = true
+          console.log(`✅ Tienda ${warehouseId} con stock ${stock}`)
+        }
+      })
+    }
   }
   
   // Fallback: Si el producto tiene warehouse_id (tienda actual) - Solo para compatibilidad
@@ -4752,7 +4763,7 @@ const saveProduct = async (skipValidation = false) => {
       name: productForm.value.name.trim(),
       description: productForm.value.description?.trim() || '',
       product_type: 'simple', // ✅ Productos generales son SIEMPRE 'simple'
-      store_type: 'general', // ✅ Marcar como producto general (tienda normal)
+      store_category: 'general', // ✅ Marcar como producto general (tienda normal)
       sku: productForm.value.sku?.trim() || `SKU-${Date.now()}`, // Generar SKU automático si está vacío
       barcode: productForm.value.barcode?.trim() || '',
       category_id: parseInt(productForm.value.category_id),

@@ -57,45 +57,87 @@
                 <div class="px-4 py-3 border-b border-gray-50 dark:border-zinc-700/40">
                   <div class="flex items-center justify-between">
                     <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Notificaciones</h3>
-                    <!-- Toggle Silenciar -->
-                    <button
-                      @click="toggleNotificationsSilent"
-                      class="flex items-center space-x-1 px-2 py-1 text-xs rounded-md transition-all duration-200"
-                      :class="notificationsSilent 
-                        ? 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900' 
-                        : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'"
-                      :title="notificationsSilent ? 'Reactivar notificaciones' : 'Silenciar notificaciones'"
-                    >
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path v-if="notificationsSilent" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 5.586a2 2 0 002.828 0L12 2l3.586 3.586a2 2 0 002.828 0l1.414 1.414a2 2 0 000 2.828L16.242 12l3.586 3.586a2 2 0 000 2.828L18.414 20l-3.586-3.586a2 2 0 00-2.828 0L12 20l-3.586-3.586a2 2 0 00-2.828 0L4.172 15l3.586-3.586a2 2 0 000-2.828L4.172 9l1.414-1.414z" />
-                        <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                      </svg>
-                      <span>{{ notificationsSilent ? 'Silenciadas' : 'Silenciar' }}</span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                      <!-- Botón Limpiar -->
+                      <button
+                        v-if="notificationCount > 0"
+                        @click="clearNotifications"
+                        class="flex items-center space-x-1 px-2 py-1 text-xs rounded-md transition-all duration-200 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:text-gray-900 dark:hover:text-white"
+                        title="Limpiar todas"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        <span>Limpiar</span>
+                      </button>
+                      <!-- Toggle Silenciar -->
+                      <button
+                        @click="toggleNotificationsSilent"
+                        class="flex items-center space-x-1 px-2 py-1 text-xs rounded-md transition-all duration-200"
+                        :class="notificationsSilent 
+                          ? 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900' 
+                          : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'"
+                        :title="notificationsSilent ? 'Reactivar notificaciones' : 'Silenciar notificaciones'"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path v-if="notificationsSilent" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 5.586a2 2 0 002.828 0L12 2l3.586 3.586a2 2 0 002.828 0l1.414 1.414a2 2 0 000 2.828L16.242 12l3.586 3.586a2 2 0 000 2.828L18.414 20l-3.586-3.586a2 2 0 00-2.828 0L12 20l-3.586-3.586a2 2 0 00-2.828 0L4.172 15l3.586-3.586a2 2 0 000-2.828L4.172 9l1.414-1.414z" />
+                          <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <span>{{ notificationsSilent ? 'Silenciadas' : 'Silenciar' }}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div class="max-h-64 overflow-y-auto">
-                  <div v-if="notificationCount === 0" class="px-4 py-6 text-center text-gray-500 text-sm">
-                    No hay notificaciones nuevas
+                <div class="max-h-96 overflow-y-auto">
+                  <div v-if="notificationCount === 0" class="px-4 py-6 text-center text-gray-500 dark:text-zinc-400 text-sm">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                    <p>No hay notificaciones nuevas</p>
+                    <p class="text-xs mt-1">Los movimientos de inventario aparecerán aquí</p>
                   </div>
-                  <div v-else-if="notificationsSilent" class="px-4 py-6 text-center text-gray-500 text-sm">
+                  <div v-else-if="notificationsSilent" class="px-4 py-6 text-center text-gray-500 dark:text-zinc-400 text-sm">
                     <div class="flex flex-col items-center space-y-2">
                       <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 5.586a2 2 0 002.828 0L12 2l3.586 3.586a2 2 0 002.828 0l1.414 1.414a2 2 0 000 2.828L16.242 12l3.586 3.586a2 2 0 000 2.828L18.414 20l-3.586-3.586a2 2 0 00-2.828 0L12 20l-3.586-3.586a2 2 0 00-2.828 0L4.172 15l3.586-3.586a2 2 0 000-2.828L4.172 9l1.414-1.414z" />
                       </svg>
                       <p class="text-sm">Notificaciones silenciadas</p>
-                      <p class="text-xs">Las alertas del dashboard están desactivadas</p>
+                      <p class="text-xs">Los movimientos no se mostrarán</p>
                     </div>
                   </div>
                   <div v-else class="py-2">
-                    <!-- Ejemplo de notificaciones -->
-                    <div class="px-4 py-2 hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer">
-                      <p class="text-sm text-gray-900 dark:text-white">Stock bajo en productos</p>
-                      <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">5 productos requieren reabastecimiento</p>
+                    <!-- Notificaciones reales de movimientos -->
+                    <div 
+                      v-for="notification in notifications" 
+                      :key="notification.id"
+                      class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors duration-200 border-b border-gray-50 dark:border-zinc-800/30 last:border-b-0"
+                    >
+                      <div class="flex items-start gap-3">
+                        <!-- Icono según tipo de movimiento -->
+                        <div 
+                          class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+                          :class="getNotificationBgClass(notification.color)"
+                        >
+                          <svg class="w-4 h-4" :class="getNotificationTextClass(notification.color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path v-if="notification.type === 'in'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                          </svg>
+                        </div>
+                        
+                        <!-- Contenido -->
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium text-gray-900 dark:text-white">{{ notification.title }}</p>
+                          <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ notification.description }}</p>
+                          <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1">{{ notification.formatted_date }}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div class="px-4 py-2 hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer">
-                      <p class="text-sm text-gray-900 dark:text-white">Venta completada</p>
-                      <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Nueva venta por $150,000</p>
+                    
+                    <!-- Botón ver más -->
+                    <div class="px-4 py-2 text-center border-t border-gray-100 dark:border-zinc-800">
+                      <button class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+                        Ver todos los movimientos
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -113,18 +155,6 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </button>
-          
-          <!-- Ayuda -->
-          <button
-            id="tour-help-button"
-            @click="showHelp"
-            class="hidden md:flex p-2 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors duration-200"
-            title="Ayuda"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </button>
           
@@ -515,6 +545,7 @@ import AI105Chat from './AI105Chat.vue'
 import { useRadioState } from '../composables/useRadioState'
 import { appStore } from '../store/appStore.js'
 import { warehouseService } from '../services/warehouseService.js'
+import apiClient from '../services/apiClient.js'
 
 const router = useRouter()
 
@@ -583,10 +614,12 @@ const userDropdownOpen = ref(false)
 const notificationsOpen = ref(false)
 const showLogoutModal = ref(false)
 const videoModalOpen = ref(false)
-const notificationCount = ref(3) // Ejemplo: 3 notificaciones
+const notifications = ref([]) // Notificaciones reales
+const notificationCount = computed(() => notifications.value.length)
 const notificationsSilent = ref(false) // Estado del silenciador
 const aiChatOpen = ref(false) // Estado del chat IA
 const currentTheme = ref('system') // Estado del tema actual (light, dark, system)
+const isLoadingNotifications = ref(false)
 
 // Videos por módulo/sección (URLs de ejemplo - reemplazar con videos reales)
 const videoUrls = {
@@ -668,11 +701,15 @@ const toggleUserDropdown = () => {
 }
 
 // Manejar toggle de notificaciones
-const toggleNotifications = () => {
+const toggleNotifications = async () => {
   notificationsOpen.value = !notificationsOpen.value
   // Cerrar dropdown de usuario si está abierto
   if (userDropdownOpen.value) {
     userDropdownOpen.value = false
+  }
+  // Cargar notificaciones al abrir
+  if (notificationsOpen.value && notifications.value.length === 0) {
+    await loadNotifications()
   }
 }
 
@@ -687,6 +724,12 @@ const toggleNotificationsSilent = () => {
   } else {
     console.log('🔔 Notificaciones reactivadas - Las alertas del dashboard volverán a mostrarse')
   }
+}
+
+// Limpiar todas las notificaciones
+const clearNotifications = () => {
+  notifications.value = []
+  console.log('🗑️ Notificaciones limpiadas')
 }
 
 // Toggle del chat IA
@@ -790,9 +833,50 @@ const cancelLogout = () => {
   showLogoutModal.value = false
 }
 
-// Mostrar ayuda
-const showHelp = () => {
-  emit('show-help')
+// Cargar notificaciones desde el backend
+const loadNotifications = async () => {
+  if (isLoadingNotifications.value) return
+  
+  try {
+    isLoadingNotifications.value = true
+    const response = await apiClient.get('/inventory/notifications', {
+      params: {
+        hours: 24, // Últimas 24 horas
+        limit: 15  // Máximo 15 notificaciones
+      }
+    })
+    
+    if (response.data.success) {
+      notifications.value = response.data.data.notifications || []
+    }
+  } catch (error) {
+    console.error('❌ Error al cargar notificaciones:', error)
+    notifications.value = []
+  } finally {
+    isLoadingNotifications.value = false
+  }
+}
+
+// Obtener clase de fondo para notificación según color
+const getNotificationBgClass = (color) => {
+  const classes = {
+    emerald: 'bg-emerald-50 dark:bg-emerald-950',
+    blue: 'bg-blue-50 dark:bg-blue-950',
+    amber: 'bg-amber-50 dark:bg-amber-950',
+    red: 'bg-red-50 dark:bg-red-950'
+  }
+  return classes[color] || 'bg-gray-50 dark:bg-zinc-800'
+}
+
+// Obtener clase de texto para notificación según color
+const getNotificationTextClass = (color) => {
+  const classes = {
+    emerald: 'text-emerald-600 dark:text-emerald-400',
+    blue: 'text-blue-600 dark:text-blue-400',
+    amber: 'text-amber-600 dark:text-amber-400',
+    red: 'text-red-600 dark:text-red-400'
+  }
+  return classes[color] || 'text-gray-600 dark:text-zinc-400'
 }
 
 // Cerrar dropdown al hacer clic fuera
@@ -857,6 +941,16 @@ onMounted(() => {
   // Cargar warehouses al iniciar
   loadWarehouses()
   
+  // Cargar notificaciones inicialmente
+  loadNotifications()
+  
+  // Recargar notificaciones cada 2 minutos
+  const notificationInterval = setInterval(() => {
+    if (!notificationsSilent.value) {
+      loadNotifications()
+    }
+  }, 120000) // 2 minutos
+  
   // Cargar preferencia de tema al montar
   loadThemePreference()
   
@@ -875,6 +969,7 @@ onMounted(() => {
   
   // Cleanup al desmontar
   onUnmounted(() => {
+    if (notificationInterval) clearInterval(notificationInterval)
     mediaQuery.removeEventListener('change', handleSystemThemeChange)
     document.removeEventListener('click', handleClickOutside)
     document.removeEventListener('keydown', handleEscape)

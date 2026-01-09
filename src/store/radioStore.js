@@ -55,7 +55,13 @@ export const useRadioStore = defineStore('radio', {
             try {
                 const saved = localStorage.getItem('radio-favorites')
                 if (saved) {
-                    this.favorites = JSON.parse(saved)
+                    const parsed = JSON.parse(saved)
+                    // Validar que sea un array
+                    if (Array.isArray(parsed)) {
+                        this.favorites = parsed
+                    } else {
+                        this.favorites = []
+                    }
                 }
             } catch (e) {
                 this.favorites = []
@@ -80,6 +86,7 @@ export const useRadioStore = defineStore('radio', {
                     name: station.name,
                     url: station.url,
                     logo: station.logo,
+                    favicon: station.favicon || station.logo, // Para compatibilidad
                     state: station.state,
                     country: station.country
                 })
@@ -267,6 +274,7 @@ export const useRadioStore = defineStore('radio', {
                 name: station.name.trim(),
                 url: station.url_resolved || station.url,
                 logo: station.favicon || null,
+                favicon: station.favicon || null, // Para compatibilidad
                 tags: station.tags,
                 country: station.country,
                 state: station.state,

@@ -254,6 +254,9 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
 
+    // 🔔 Notificaciones de Movimientos de Inventario
+    Route::get('/inventory/notifications', [InventoryController::class, 'notifications']);
+
     // Información del Tenant (Plan y Suscripción)
     Route::get('/tenant-info', function() {
         $tenant = tenant();

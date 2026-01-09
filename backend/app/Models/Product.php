@@ -249,6 +249,18 @@ class Product extends Model
 
         $this->save();
 
+        // ✅ SINCRONIZAR product_warehouse cuando hay 1 sola bodega
+        $totalWarehouses = \App\Models\Warehouse::count();
+        if ($totalWarehouses === 1) {
+            $warehouse = \App\Models\Warehouse::first();
+            if ($warehouse) {
+                // Actualizar o crear el registro en product_warehouse
+                $this->warehouses()->syncWithoutDetaching([
+                    $warehouse->id => ['stock' => $this->current_stock]
+                ]);
+            }
+        }
+
         // Registrar movimiento de inventario con la estructura correcta
         InventoryMovement::create([
             'product_id' => $this->id,

@@ -659,4 +659,135 @@ class InventoryController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * NOTIFICACIONES DE MOVIMIENTOS
+     * Obtener movimientos recientes para notificaciones en el header
+     */
+    public function notifications(Request $request)
+    {
+        try {
+            // Obtener los últimos movimientos (últimas 24 horas por defecto)
+            $hours = $request->get('hours', 24);
+            $limit = $request->get('limit', 15);
+
+            $movements = InventoryMovement::with(['product:id,name,sku', 'user:id,name'])
+                ->where('movement_date', '>=', Carbon::now()->subHours($hours))
+                ->orderBy('movement_date', 'desc')
+                ->limit($limit)
+                ->get()
+                ->map(function($movement) {
+                    // Formatear para notificaciones
+                    return [
+                        'id' => $movement->id,
+                        'type' => $movement->type,
+                        'reason' => $movement->reason,
+                        'product_name' => $movement->product->name ?? 'Producto desconocido',
+                        'product_sku' => $movement->product->sku ?? '',
+                        'quantity' => abs($movement->quantity),
+                        'user_name' => $movement->user->name ?? 'Sistema',
+                        'movement_date' => $movement->movement_date->format('Y-m-d H:i:s'),
+                        'formatted_date' => $movement->movement_date->diffForHumans(),
+                        'icon_type' => $this->getIconType($movement->type, $movement->reason),
+                        'color' => $this->getColorType($movement->type, $movement->reason),
+                        'title' => $this->getNotificationTitle($movement),
+                        'description' => $this->getNotificationDescription($movement)
+                    ];
+                });
+
+            // Contar movimientos no leídos (todos los recientes)
+            $unreadCount = $movements->count();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'notifications' => $movements,
+                    'unread_count' => $unreadCount,
+                    'last_check' => now()->toIso8601String()
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener notificaciones',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener el tipo de icono para la notificación
+     */
+    private function getIconType($type, $reason)
+    {
+        if ($type === 'in') {
+            return match($reason) {
+                'purchase' => 'box-in',
+                'adjustment_positive' => 'plus',
+                'returned' => 'return',
+                default => 'arrow-up'
+            };
+        } else {
+            return match($reason) {
+                'sale' => 'shopping-cart',
+                'adjustment_negative' => 'minus',
+                'loss' => 'alert',
+                'expired' => 'warning',
+                'damaged' => 'x-circle',
+                default => 'arrow-down'
+            };
+        }
+    }
+
+    /**
+     * Obtener el color para la notificación
+     */
+    private function getColorType($type, $reason)
+    {
+        if ($type === 'in') {
+            return 'emerald'; // Verde para entradas
+        } else {
+            return match($reason) {
+                'sale' => 'blue',
+                'loss', 'expired', 'damaged' => 'red',
+                default => 'amber'
+            };
+        }
+    }
+
+    /**
+     * Generar título de notificación
+     */
+    private function getNotificationTitle($movement)
+    {
+        $type = $movement->type === 'in' ? 'Entrada' : 'Salida';
+
+        return match($movement->reason) {
+            'sale' => 'Venta realizada',
+            'purchase' => 'Compra registrada',
+            'adjustment_positive' => 'Ajuste positivo',
+            'adjustment_negative' => 'Ajuste negativo',
+            'loss' => 'Pérdida registrada',
+            'expired' => 'Producto vencido',
+            'damaged' => 'Producto dañado',
+            'returned' => 'Devolución',
+            'transfer' => 'Transferencia',
+            default => $type . ' de inventario'
+        };
+    }
+
+    /**
+     * Generar descripción de notificación
+     */
+    private function getNotificationDescription($movement)
+    {
+        $quantity = abs($movement->quantity);
+        $productName = $movement->product->name ?? 'Producto';
+
+        if ($movement->type === 'in') {
+            return "+{$quantity} unidades de {$productName}";
+        } else {
+            return "-{$quantity} unidades de {$productName}";
+        }
+    }
 }
