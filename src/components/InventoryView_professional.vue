@@ -1661,17 +1661,30 @@ const processStockAdjustment = async () => {
     )
     
     if (response && response.success) {
-      console.log('Ajuste registrado exitosamente en la BD')
+      console.log('✅ Ajuste de stock registrado exitosamente en la BD')
       
-      // ✅ RECARGAR PRODUCTOS PARA ACTUALIZAR LA VISTA
+      // ⏱️ Pequeño delay para asegurar que el backend termine de actualizar
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      // ✅ RECARGAR PRODUCTOS PARA ACTUALIZAR LA VISTA LOCAL
       await loadProducts()
       
-      // 🔥 FORZAR ACTUALIZACIÓN EN EL STORE GLOBAL (para POS y ProductsView)
+      // 🔥 FORZAR ACTUALIZACIÓN EN EL STORE GLOBAL (para POS)
       console.log('🔄 Actualizando store global después del ajuste...')
       await appStore.loadProducts(selectedWarehouse.value, 'general', true)
       
+      // 🔥 EMITIR EVENTO GLOBAL para que ProductsView recargue
+      console.log('📢 Emitiendo evento global para recargar productos en todos los módulos...')
+      window.dispatchEvent(new CustomEvent('products-updated', { 
+        detail: { 
+          source: 'inventory-adjustment',
+          productId: adjustForm.value.product_id,
+          newStock: newStock
+        } 
+      }))
+      
       // 🔥 ACTUALIZAR NOTIFICACIONES AUTOMÁTICAMENTE
-      console.log('Actualizando notificaciones después del ajuste...')
+      console.log('📬 Actualizando notificaciones después del ajuste...')
       await notificationStore.loadNotifications()
       
       // Agregar movimiento a la vista local
