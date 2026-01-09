@@ -3523,7 +3523,9 @@ const loadProducts = async () => {
     loading.value = true
     
     // Preparar parámetros de consulta
-    const params = {}
+    const params = {
+      _t: Date.now() // ✅ Cache busting para forzar recarga real
+    }
     
     // Determinar el estado a consultar
     if (statusFilter.value === 'active') {
@@ -3539,8 +3541,9 @@ const loadProducts = async () => {
     // Obtener TODOS los productos sin paginación del servidor
     params.per_page = 1000 // Obtener un número alto para evitar paginación del servidor
     
+    console.log('📦 Cargando productos con params:', params)
     const response = await productsService.getAll(params)
-    console.log('Respuesta productos:', response)
+    console.log('✅ Respuesta productos:', response)
     
     // La API devuelve datos paginados, extraer el array de productos
     if (response.data && response.data.data) {
@@ -4936,8 +4939,9 @@ watch(() => props.queryParams, async (newParams) => {
 
 // 🔄 Configurar listener de eventos global ANTES de onMounted (para evitar warning)
 const handleProductsUpdate = (event) => {
-  console.log('🔄 Evento products-updated recibido:', event.detail)
-  // Recargar productos automáticamente cuando se reciba mercancía
+  console.log('🔄 Evento products-updated recibido en ProductsView:', event.detail)
+  console.log('🔄 Recargando productos para sincronizar stock...')
+  // Recargar productos automáticamente cuando se reciba el evento
   loadProducts()
 }
 
