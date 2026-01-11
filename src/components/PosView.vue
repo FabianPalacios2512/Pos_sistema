@@ -3,7 +3,7 @@
     
     <!-- 🎯 Modal de Bienvenida Primera Vez - DISEÑO LIMPIO CON ELEVACIÓN POR LUMINOSIDAD -->
     <Teleport to="body">
-      <div v-if="showWelcomeModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80  animate-fade-in">
+      <div v-if="showWelcomeModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 animate-fade-in">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-scale-in border border-gray-200 dark:border dark:border-white/10">
           
           <!-- Icono Hero Centrado -->
@@ -95,7 +95,7 @@
     />
     
     <!-- BARRA DE HERRAMIENTAS EMPRESARIAL -->
-    <div class="sticky top-0 z-30  transition-all duration-300">
+    <div class="sticky top-0 z-30 bg-gray-50/95 dark:bg-slate-900/95">
     
     <div class="px-4 lg:px-6 py-4">
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -130,7 +130,7 @@
               v-model="searchTerm"
               type="text"
               placeholder="Buscar productos, SKU o escanear..."
-              class="block w-full h-10 pl-12 pr-32 text-sm font-semibold bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-zinc-400 rounded-xl shadow-md focus:border-slate-600 dark:focus:border-slate-500 focus:ring-4 focus:ring-slate-500/30 dark:focus:ring-slate-400/30 transition-all duration-200 hover:border-slate-500 dark:hover:border-zinc-600"
+              class="block w-full h-10 pl-12 pr-32 text-sm font-semibold bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-zinc-400 rounded-xl shadow-md focus:border-slate-600 dark:focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20 dark:focus:ring-slate-400/20"
               @keydown.escape="clearSearch"
               @keydown.enter.prevent="handleSearchEnter"
               @input="handleBarcodeInput"
@@ -147,7 +147,7 @@
               
               <button
                 @click="startQRScanner"
-                class="p-2 text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-xl transition-all duration-200"
+                class="p-2 text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/30 rounded-xl transition-colors"
                 title="Escanear código QR"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,7 +158,7 @@
               <button
                 v-if="searchTerm"
                 @click="clearSearch"
-                class="p-2 text-slate-400 dark:text-zinc-500 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-all duration-200"
+                class="p-2 text-slate-400 dark:text-zinc-500 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors"
                 title="Limpiar búsqueda"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,7 +178,7 @@
           <button
             v-if="shouldShowMultiWarehouseFeatures"
             @click="toggleGlobalSearch"
-            class="flex items-center gap-2 px-3 h-10 rounded-xl border-2 transition-all duration-200 font-bold text-xs shadow-sm hover:shadow-md"
+            class="flex items-center gap-2 px-3 h-10 rounded-xl border-2 font-bold text-xs shadow-sm"
             :class="globalSearch 
               ? 'bg-blue-600 dark:bg-blue-700 border-blue-600 dark:border-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600' 
               : 'bg-emerald-600 dark:bg-emerald-700 border-emerald-600 dark:border-emerald-700 text-white hover:bg-emerald-700 dark:hover:bg-emerald-600'"
@@ -201,7 +201,7 @@
           <button
             v-if="canUseWebOrders"
             @click="showLoadWebOrderModal = true" 
-            class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm"
+            class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border group bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm"
             title="Cargar pedido web"
           >
             <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300">
@@ -218,7 +218,7 @@
             id="tour-pos-returns"
             @click="showReturnsModal = true"
             :disabled="quotationMode"
-            class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group"
+            class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border group"
             :class="quotationMode ? 'bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-600' : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm'"
           >
             <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700"
@@ -237,7 +237,7 @@
           <button 
             id="tour-pos-cash-btn"
             @click="hasOpenSession ? showCloseCashModal() : showOpenCashModal()"
-            class="hidden sm:flex relative items-center gap-2 pl-1 pr-3 h-10 rounded-full border transition-all duration-300 group"
+            class="hidden sm:flex relative items-center gap-2 pl-1 pr-3 h-10 rounded-full border group"
             :class="hasOpenSession 
               ? 'bg-white dark:bg-zinc-900 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 shadow-sm' 
               : 'bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900 hover:border-rose-300 dark:hover:border-rose-700'"
@@ -267,7 +267,7 @@
         <div class="flex items-center gap-1.5 min-w-max">
             <button 
                 @click="selectedCategory = null"
-                class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 flex items-center gap-2 hover:scale-105 active:scale-95"
+                class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 flex items-center gap-2 hover:scale-105"
                 :class="!selectedCategory 
                     ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-800 dark:border-slate-700 shadow-lg shadow-slate-500/30' 
                     : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 shadow-sm'"
@@ -321,7 +321,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="showMobileCart" class="lg:hidden fixed inset-0 z-50 bg-black/60 " @click="showMobileCart = false"></div>
+        <div v-if="showMobileCart" class="lg:hidden fixed inset-0 z-50 bg-black/70" @click="showMobileCart = false"></div>
       </Transition>
       
       <Transition
@@ -501,7 +501,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="showMobilePaymentSelector" class="lg:hidden fixed inset-0 z-50 bg-black/60 " @click="showMobilePaymentSelector = false"></div>
+        <div v-if="showMobilePaymentSelector" class="lg:hidden fixed inset-0 z-50 bg-black/70" @click="showMobilePaymentSelector = false"></div>
       </Transition>
       
       <Transition
@@ -576,7 +576,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="showMobileCashInput" class="lg:hidden fixed inset-0 z-50 bg-black/60 " @click="showMobileCashInput = false"></div>
+        <div v-if="showMobileCashInput" class="lg:hidden fixed inset-0 z-50 bg-black/70" @click="showMobileCashInput = false"></div>
       </Transition>
       
       <Transition
@@ -657,10 +657,10 @@
     
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5 pb-6" style="flex: 1; min-height: 0; height: 100%; max-height: 100%; overflow: hidden;">
   <!-- Panel Izquierdo: Catálogo de Productos - Full en móvil, 70% Fashion (8/12) | 50% General (6/12) en desktop -->
-  <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="col-span-1 lg:col-span-auto overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
-    <div class="bg-white dark:bg-zinc-900  rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
+  <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="col-span-1 lg:col-span-auto overflow-hidden" style="height: 100%; max-height: 100%;">
+    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden" style="height: 100%; max-height: 100%;">
       
-      <div class="p-3 overflow-y-auto bg-slate-100 dark:bg-zinc-950 " style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+      <div class="p-3 overflow-y-auto bg-slate-100 dark:bg-zinc-950" style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
         <!-- Loading skeleton - Modo oscuro mejorado -->
       <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -782,7 +782,7 @@
                   v-if="product.image_url || product.image"
                   :src="getProductImage(product)"
                   :alt="product.name"
-                  class="w-full h-full object-cover rounded-xl transition-all duration-700 ease-out group-hover:scale-105 opacity-0 animate-image-load"
+                  class="w-full h-full object-cover rounded-xl opacity-0 animate-image-load"
                   :loading="index < 15 ? 'eager' : 'lazy'"
                   @load="(e) => e.target.classList.add('opacity-100')"
                   @error="(e) => handleImageError(e, product)"
@@ -798,7 +798,7 @@
                 </div>
                 
                 <!-- Overlay con botón de agregar (aparece en hover) -->
-                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100">
                   <button class="px-4 py-2 bg-white dark:bg-black text-black dark:text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-gray-100 dark:hover:bg-zinc-800">
                     + Agregar
                   </button>
@@ -836,7 +836,7 @@
           <div
             v-for="product in filteredProducts"
             :key="product.id"
-            class="group flex gap-4 p-3 bg-white dark:bg-zinc-800/50 rounded-2xl border border-gray-200 dark:border-zinc-700/50 hover:border-gray-300 dark:hover:border-zinc-600 hover:shadow-lg transition-all duration-300 cursor-pointer"
+            class="group flex gap-4 p-3 bg-white dark:bg-zinc-800/50 rounded-2xl border border-gray-200 dark:border-zinc-700/50 hover:border-gray-300 dark:hover:border-zinc-600 cursor-pointer"
             @click="addToCart(product)"
           >
             <!-- Imagen -->
@@ -890,7 +890,7 @@
         <div
           v-for="product in filteredProducts"
           :key="product.id"
-          class="group bg-white dark:bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 active:scale-[0.98] border border-gray-200 dark:border-zinc-800 hover:ring-2 hover:ring-emerald-500/70 dark:hover:ring-emerald-400/50 hover:border-transparent shadow-sm hover:shadow-lg dark:shadow-black/30"
+          class="group bg-white dark:bg-zinc-900/80 rounded-xl overflow-hidden cursor-pointer border border-gray-200 dark:border-zinc-800/40 hover:ring-2 hover:ring-emerald-500/70 dark:hover:ring-emerald-400/50 hover:border-transparent shadow-sm hover:shadow-lg dark:shadow-black/30"
           @click="addToCart(product)"
         >
           
@@ -956,8 +956,8 @@
 <!-- bloque de ventas - 30% Fashion (4/12) | Panel Central General (3/12) -->
 
 <!-- Panel Derecho: Carrito/Ticket - OCULTO EN MÓVIL -->
-<div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block overflow-hidden transition-all duration-300" style="max-height: 100%;">
-  <div class="bg-white dark:bg-zinc-900  rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden transition-all duration-300" style="height: 100%; max-height: 100%;">
+<div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block overflow-hidden" style="max-height: 100%;">
+  <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden" style="height: 100%; max-height: 100%;">
     
     <div class="p-4 flex-shrink-0">
       <div class="flex items-center justify-between mb-3">
@@ -1134,10 +1134,10 @@
     </div>
     
     <!-- 👗 SECCIÓN DE PAGO INTEGRADA - Solo en modo Fashion -->
-    <div v-if="isFashionStore" class="flex-shrink-0 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/30">
+    <div v-if="isFashionStore" class="flex-shrink-0 border-t border-gray-200 dark:border-zinc-800/40 bg-gray-50 dark:bg-zinc-900/30">
       
       <!-- Total compacto -->
-      <div class="px-2.5 py-2 border-b border-gray-100 dark:border-zinc-800">
+      <div class="px-2.5 py-2 border-b border-gray-100 dark:border-zinc-800/40">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-[8px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total</p>
@@ -1166,9 +1166,9 @@
         </div>
         
         <!-- Métodos de Pago -->
-        <div class="grid gap-1" :class="paymentMethods.length <= 3 ? 'grid-cols-3' : 'grid-cols-4'">
+        <div class="grid grid-cols-3 gap-1">
           <button 
-            v-for="method in paymentMethods.slice(0, 4)" 
+            v-for="method in paymentMethods.slice(0, 3)" 
             :key="method.id"
             @click="selectedPaymentMethod = method.id"
             class="px-1.5 py-2 rounded-md text-[9px] font-bold uppercase transition-all flex flex-col items-center justify-center gap-0.5 border"
@@ -1176,9 +1176,8 @@
               ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white shadow-md' 
               : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500'"
           >
-            <svg v-if="method.id === 'efectivo' || method.id === 'cash'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg v-if="method.id === 'efectivo'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             <svg v-else-if="method.id === 'tarjeta' || method.id === 'card'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-            <svg v-else-if="method.id === 'credit' || method.name.toLowerCase().includes('credit')" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             <span class="leading-none">{{ method.name.split(' ')[0] }}</span>
           </button>
@@ -1240,10 +1239,10 @@
 <!-- Panel de Pagos - Solo visible en modo General (3/12) - Se oculta en Fashion - OCULTO EN MÓVIL -->
 <div v-if="!isFashionStore" id="tour-pos-cart" class="hidden lg:block lg:col-span-3 h-full overflow-hidden">
   
-  <div class="bg-white dark:bg-zinc-900  rounded-2xl border border-gray-200 dark:border-zinc-800 h-full flex flex-col justify-between shadow-lg dark:shadow-2xl dark:shadow-black/40 transition-all duration-300">
+  <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 h-full flex flex-col justify-between shadow-lg dark:shadow-2xl dark:shadow-black/40">
     
     <!-- 💰 HEADER COMPACTO: Total Protagonista -->
-    <div class="p-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800">
+    <div class="p-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800/40">
       <div class="flex items-end justify-between">
         <div>
           <p class="text-[9px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total a Pagar</p>
@@ -1487,7 +1486,7 @@
        <button
           @click="handleCobrarClick"
           :disabled="!canShowPaymentModal || quotationMode || (selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))"
-          class="w-full h-16 rounded-2xl font-black text-lg shadow-2xl transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 group relative overflow-hidden"
+          class="w-full h-16 rounded-2xl font-black text-lg shadow-2xl flex items-center justify-center gap-3 group relative overflow-hidden"
           :class="[
             (!canShowPaymentModal || quotationMode)
               ? 'bg-slate-300 dark:bg-zinc-700 text-slate-500 dark:text-zinc-400 cursor-not-allowed shadow-none'
@@ -1545,95 +1544,146 @@
       @close="showCustomerSelector = false; startCustomerCreation = false"
     />
 
-    <!-- Modal de Cantidad con Unidades de Medida -->
-    <div v-if="showQuantityModal" class="fixed inset-0 bg-black/60  flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl max-w-md w-full">
-        <!-- Header -->
-        <div class="bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 px-6 py-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Ingresa la Cantidad</h3>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">{{ selectedProductForQuantity?.name }}</p>
+    <!-- Modal de Cantidad - Diseño Limpio y Profesional -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showQuantityModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4">
+          <Transition
+            enter-active-class="transition ease-out duration-300"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-200"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+          >
+            <div v-if="showQuantityModal" class="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+              
+              <!-- Header Simple -->
+              <div class="px-6 pt-6 pb-5">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Ingresa la Cantidad</h3>
+                    <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1.5">{{ selectedProductForQuantity?.name }}</p>
+                  </div>
+                  <button @click="showQuantityModal = false" 
+                          class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Body -->
+              <div class="px-6 pb-6 space-y-5">
+                
+                <!-- Toggle de unidad minimalista -->
+                <div v-if="['kg', 'g', 'l', 'ml'].includes(selectedProductForQuantity?.measurement_unit)" 
+                     class="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-zinc-800/50 rounded-xl border border-gray-100 dark:border-zinc-800">
+                  <div class="flex items-center gap-2.5">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                    </svg>
+                    <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">
+                      Ingresar en {{ getUnitText(getAlternativeUnit(selectedProductForQuantity?.measurement_unit)) }}
+                    </span>
+                  </div>
+                  <button 
+                    @click="useAlternativeUnit = !useAlternativeUnit"
+                    :class="[
+                      'relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200',
+                      useAlternativeUnit ? 'bg-blue-600' : 'bg-gray-300 dark:bg-zinc-700'
+                    ]">
+                    <span :class="[
+                      'inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200',
+                      useAlternativeUnit ? 'translate-x-6' : 'translate-x-1'
+                    ]" />
+                  </button>
+                </div>
+
+                <!-- Input limpio -->
+                <div>
+                  <label class="block text-sm font-semibold text-gray-900 dark:text-white mb-2.5">
+                    Cantidad en {{ getUnitText(getInputUnit(selectedProductForQuantity?.measurement_unit)) }}
+                  </label>
+                  <div class="relative">
+                    <input 
+                      v-model="customQuantity" 
+                      type="number" 
+                      step="0.01"
+                      min="0.01"
+                      @keyup.enter="addToCartWithQuantity"
+                      class="w-full pl-11 pr-16 py-3.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 text-base font-medium placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
+                      :placeholder="useAlternativeUnit && selectedProductForQuantity?.measurement_unit === 'kg' ? 'Ej: 0.5' : 'Ej: 0.5'"
+                      autofocus>
+                    <div class="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                      </svg>
+                    </div>
+                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <span class="text-sm font-medium text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-700/50 px-2.5 py-1 rounded-md">
+                        {{ getUnitText(getInputUnit(selectedProductForQuantity?.measurement_unit)) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stock disponible limpio -->
+                <div class="flex items-center justify-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl border border-emerald-100 dark:border-emerald-900/20">
+                  <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <p class="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                    Stock disponible: {{ getTotalStock(selectedProductForQuantity) }} {{ getUnitText(selectedProductForQuantity?.measurement_unit) }}
+                  </p>
+                </div>
+
+                <!-- Botones rápidos limpios -->
+                <div>
+                  <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-3">Cantidades Rápidas</p>
+                  <div class="grid grid-cols-4 gap-2.5">
+                    <button 
+                      v-for="quick in (useAlternativeUnit && ['kg', 'l'].includes(selectedProductForQuantity?.measurement_unit) ? [250, 500, 1000, 2000] : [0.25, 0.5, 1, 2])" 
+                      :key="quick"
+                      @click="customQuantity = quick"
+                      :class="[
+                        'px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 border',
+                        customQuantity == quick 
+                          ? 'bg-slate-600 dark:bg-slate-700 border-slate-600 dark:border-slate-700 text-white shadow-sm' 
+                          : 'bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700'
+                      ]">
+                      {{ quick }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer con botones -->
+              <div class="px-6 pb-6 flex gap-3">
+                <button @click="showQuantityModal = false" 
+                        class="flex-1 px-4 py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl font-medium transition-all duration-200 shadow-sm">
+                  Cancelar
+                </button>
+                <button @click="addToCartWithQuantity" 
+                        :disabled="!customQuantity || parseFloat(customQuantity) <= 0"
+                        class="flex-1 px-4 py-3 bg-slate-600 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:text-gray-500 text-white rounded-xl font-medium transition-all duration-200 shadow-sm">
+                  Agregar al Carrito
+                </button>
+              </div>
+              
             </div>
-            <button @click="showQuantityModal = false" 
-                    class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-lg transition-colors">
-              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
+          </Transition>
         </div>
-
-        <!-- Body -->
-        <div class="p-6 space-y-4">
-          <!-- Toggle de unidad (solo para kg/g y L/ml) -->
-          <div v-if="['kg', 'g', 'l', 'ml'].includes(selectedProductForQuantity?.measurement_unit)" 
-               class="flex items-center justify-between p-3 bg-gray-50 dark:bg-zinc-700 rounded-lg">
-            <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">
-              Ingresar en {{ getUnitText(getAlternativeUnit(selectedProductForQuantity?.measurement_unit)) }}
-            </span>
-            <button 
-              @click="useAlternativeUnit = !useAlternativeUnit"
-              :class="[
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                useAlternativeUnit ? 'bg-blue-600' : 'bg-gray-300 dark:bg-zinc-600'
-              ]">
-              <span :class="[
-                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
-                useAlternativeUnit ? 'translate-x-6' : 'translate-x-1'
-              ]" />
-            </button>
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-              Cantidad en {{ getUnitText(getInputUnit(selectedProductForQuantity?.measurement_unit)) }}
-            </label>
-            <div class="relative">
-              <input 
-                v-model="customQuantity" 
-                type="number" 
-                step="0.01"
-                min="0.01"
-                @keyup.enter="addToCartWithQuantity"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg font-semibold"
-                :placeholder="useAlternativeUnit && selectedProductForQuantity?.measurement_unit === 'kg' ? 'Ej: 450, 500, 1000' : 'Ej: 0.5, 1.25, 2.75'"
-                autofocus>
-              <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm font-semibold text-gray-500 dark:text-zinc-400">
-                {{ getUnitText(getInputUnit(selectedProductForQuantity?.measurement_unit)) }}
-              </span>
-            </div>
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-2">
-              Stock disponible: {{ getTotalStock(selectedProductForQuantity) }} {{ getUnitText(selectedProductForQuantity?.measurement_unit) }}
-            </p>
-          </div>
-
-          <!-- Botones rápidos (ajustados según la unidad) -->
-          <div class="grid grid-cols-4 gap-2">
-            <button 
-              v-for="quick in (useAlternativeUnit && ['kg', 'l'].includes(selectedProductForQuantity?.measurement_unit) ? [250, 500, 1000, 2000] : [0.25, 0.5, 1, 2])" 
-              :key="quick"
-              @click="customQuantity = quick"
-              class="px-3 py-2 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 text-gray-700 dark:text-zinc-300 rounded-lg text-sm font-semibold transition-colors">
-              {{ quick }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-700 px-6 py-4 flex gap-3">
-          <button @click="showQuantityModal = false" 
-                  class="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-600 text-gray-700 dark:text-zinc-300 rounded-lg font-semibold transition-colors border border-gray-300 dark:border-zinc-600">
-            Cancelar
-          </button>
-          <button @click="addToCartWithQuantity" 
-                  :disabled="!customQuantity || parseFloat(customQuantity) <= 0"
-                  class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
-            Agregar al Carrito
-          </button>
-        </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
 
     <!-- Modal de Historial de Cliente -->
     <CustomerHistoryModal
@@ -1694,7 +1744,7 @@
     <!-- Modal: Se requiere cliente para vender -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="showRequireCustomerModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4">
+        <div v-if="showRequireCustomerModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4">
           <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-300 dark:border-zinc-800">
             <!-- Header con icono -->
             <div class="p-6 pb-4">
@@ -1739,6 +1789,58 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
                 Agregar Cliente
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Modal de Confirmación de Cierre de Venta -->
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="showCloseTabModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4">
+          <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-300 dark:border-zinc-800">
+            <!-- Header con icono -->
+            <div class="p-6 pb-4">
+              <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-xl bg-amber-50 dark:bg-amber-950/50 mb-4 border border-amber-100 dark:border-amber-900/50">
+                  <svg class="h-7 w-7 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¿Cerrar "{{ closeTabData.tabName }}"?</h3>
+                <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+                  Esta acción no se puede deshacer. Todos los productos en el carrito se perderán.
+                </p>
+              </div>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 pb-6">
+              <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl p-4 mb-4">
+                <p class="text-sm text-amber-800 dark:text-amber-400 text-center font-medium">
+                  ⚠️ Los productos en el carrito se eliminarán permanentemente
+                </p>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 pb-6 flex gap-3">
+              <button 
+                @click="cancelCloseTab"
+                class="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 rounded-xl font-semibold border border-gray-200 dark:border-zinc-700 transition-all duration-200"
+              >
+                Cancelar
+              </button>
+              <button 
+                @click="confirmCloseTab"
+                class="flex-1 px-4 py-2.5 bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white rounded-xl font-bold shadow-lg shadow-red-400/40 dark:shadow-red-900/50 transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Cerrar Venta
               </button>
             </div>
           </div>
@@ -2352,7 +2454,8 @@ const posTourSteps = ref([
   }
 ])
 
-// 🎉 Función para crear efecto de confeti ÉPICO
+// 🎉 Función para crear efecto de confeti ÉPICO - COMENTADO POR PERFORMANCE
+/*
 const triggerConfetti = () => {
   const duration = 3000
   const animationEnd = Date.now() + duration
@@ -2409,6 +2512,7 @@ const triggerConfetti = () => {
     }, 250)
   }
 }
+*/
 
 // Handlers del tour
 const handlePosTourComplete = () => {
@@ -2417,8 +2521,8 @@ const handlePosTourComplete = () => {
     isFirstVisit.value = false
   }
   
-  // 🎉 EFECTO DE CONFETI AL COMPLETAR EL TOUR
-  triggerConfetti()
+  // 🎉 EFECTO DE CONFETI AL COMPLETAR EL TOUR - COMENTADO POR PERFORMANCE
+  // triggerConfetti()
   
   showSuccess('¡Felicidades! Ya dominas el POS como un profesional 🎉')
 }
@@ -2639,44 +2743,8 @@ const getUserIdentifier = () => {
     sessionId = `browser_session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     localStorage.setItem('pos_session_id', sessionId)
   }
-  
+
   return sessionId
-}
-
-// 🚨 Manejar errores de carga de imagen
-const handleImageError = (event, product) => {
-  // Evitar bucle infinito si ya se aplicó el fallback
-  if (event.target.getAttribute('data-fallback-applied')) return
-  
-  event.target.setAttribute('data-fallback-applied', 'true')
-  
-  // Cambiar a object-fit cover para que el SVG llene el espacio
-  event.target.style.objectFit = 'cover'
-  event.target.style.padding = '0'
-  
-  // Generar y aplicar el SVG placeholder
-  const name = product?.name || 'Producto'
-  event.target.src = generateAvatarSVG(name)
-  
-  // Forzar recarga de la imagen
-  event.target.onerror = null
-}
-
-// 🔄 Función para refrescar datos después de una venta
-const refreshPosData = async () => {
-  
-  // 🏢 Mantener el filtro Global/Local al refrescar
-  if (currentSession.value?.warehouse_id) {
-    const scope = globalSearch.value ? 'global' : 'local'
-    await appStore.loadProducts(currentSession.value.warehouse_id, scope)
-  } else {
-    // Si no hay sesión, refrescar normalmente
-    await appStore.refresh('products')
-  }
-  
-  // Opcional: refrescar todo si es necesario
-  // await appStore.refresh('all')
-  
 }
 
 const loadDiscounts = async () => {
@@ -2822,6 +2890,10 @@ const quotationMode = ref(false)
 
 // Estado del modal de devoluciones
 const showReturnsModal = ref(false)
+
+// Estado del modal de confirmación de cierre de venta
+const showCloseTabModal = ref(false)
+const closeTabData = ref({ tabId: null, tabName: '' })
 
 // Estado del modal de cargar pedido web
 const showLoadWebOrderModal = ref(false)
@@ -3209,7 +3281,6 @@ const isFashionStore = computed(() => {
   // Si hay configuración explícita, respetarla siempre
   if (storeType) {
     const isFashion = storeType === 'fashion'
-    console.log(`${isFashion ? '🎨' : '🏪'} Modo ${isFashion ? 'Fashion' : 'General'}: Configurado manualmente como "${storeType}"`)
     return isFashion
   }
   
@@ -3242,7 +3313,6 @@ const isFashionStore = computed(() => {
   // Verificar categorías (solo necesita 2+ categorías de moda)
   const cats = appStore.categories || []
   if (!Array.isArray(cats) || cats.length === 0) {
-    console.log('🏪 General Mode: Sin categorías')
     return false
   }
   
@@ -3254,11 +3324,9 @@ const isFashionStore = computed(() => {
   const fashionCount = matchedCategories.length
   
   if (fashionCount >= 2) {
-    console.log('🎨 Fashion Mode: Auto-detectado por categorías:', matchedCategories.map(c => c.name).join(', '))
     return true
   }
   
-  console.log('🏪 General Mode: Menos de 2 categorías de moda (' + fashionCount + '/' + cats.length + ')')
   return false
 })
 
@@ -3344,12 +3412,9 @@ const categories = computed(() => {
 })
 
 const subtotal = computed(() => {
-  const total = cart.items.reduce((total, item) => total + (item.price * item.quantity), 0)
-  // Recalcular descuento cuando cambie el subtotal
-  if (appliedDiscount.value) {
-    calculateDiscount()
-  }
-  return total
+  // OPTIMIZADO: No llamar calculateDiscount() aquí, causa re-renders infinitos
+  // El watcher se encarga de recalcular el descuento cuando cambia el subtotal
+  return cart.items.reduce((total, item) => total + (item.price * item.quantity), 0)
 })
 
 // Toggle solo stock
@@ -3602,31 +3667,37 @@ const removeDiscount = () => {
   showPromoCodeInput.value = false
 }
 
-// Watcher para limpiar descuento cuando el carrito queda vacío
+// Watcher para limpiar descuento cuando el carrito queda vacío - OPTIMIZADO
 watch(() => cart.items.length, (newLength) => {
   if (newLength === 0) {
     removeDiscount()
   }
-})
+}, { flush: 'post' }) // Ejecutar después del render para evitar bloqueos
 
-// Watcher para recalcular descuento cuando cambia el subtotal (nuevos productos agregados)
+// Watcher para recalcular descuento cuando cambia el subtotal - OPTIMIZADO CON DEBOUNCE
+let subtotalWatcherTimeout = null
 watch(() => subtotal.value, (newSubtotal) => {
-  if (appliedDiscount.value && newSubtotal > 0) {
-    // Recalcular descuento basado en el nuevo subtotal
-    if (appliedDiscount.value.type === 'percentage') {
-      const calculatedDiscount = Math.round(newSubtotal * (appliedDiscount.value.value / 100))
-      // Aplicar límite máximo de descuento si existe
-      if (appliedDiscount.value.maximum_discount) {
-        discount.value = Math.min(calculatedDiscount, appliedDiscount.value.maximum_discount)
-      } else {
-        discount.value = calculatedDiscount
+  // Debounce para evitar cálculos excesivos
+  if (subtotalWatcherTimeout) clearTimeout(subtotalWatcherTimeout)
+  
+  subtotalWatcherTimeout = setTimeout(() => {
+    if (appliedDiscount.value && newSubtotal > 0) {
+      // Recalcular descuento basado en el nuevo subtotal
+      if (appliedDiscount.value.type === 'percentage') {
+        const calculatedDiscount = Math.round(newSubtotal * (appliedDiscount.value.value / 100))
+        // Aplicar límite máximo de descuento si existe
+        if (appliedDiscount.value.maximum_discount) {
+          discount.value = Math.min(calculatedDiscount, appliedDiscount.value.maximum_discount)
+        } else {
+          discount.value = calculatedDiscount
+        }
+      } else if (appliedDiscount.value.type === 'fixed') {
+        // Descuento fijo no puede ser mayor al subtotal
+        discount.value = Math.min(appliedDiscount.value.value, newSubtotal)
       }
-    } else if (appliedDiscount.value.type === 'fixed') {
-      // Descuento fijo no puede ser mayor al subtotal
-      discount.value = Math.min(appliedDiscount.value.value, newSubtotal)
     }
-  }
-})
+  }, 100) // Esperar 100ms antes de recalcular
+}, { flush: 'post' })
 
 // Helper para obtener cantidad de producto en carrito
 const getProductQuantityInCart = (productId) => {
@@ -3636,37 +3707,12 @@ const getProductQuantityInCart = (productId) => {
 
 // 🏢 Función helper para calcular stock total de todas las bodegas
 const getTotalStock = (product) => {
-  // 🔍 En modo LOCAL: Solo mostrar stock de la bodega actual
-  if (!globalSearch.value && currentSession.value?.warehouse_id) {
-    const currentWarehouseId = currentSession.value.warehouse_id
-    
-    // Buscar en warehouses
-    if (product.warehouses && Array.isArray(product.warehouses)) {
-      const currentWh = product.warehouses.find(w => w.warehouse_id === currentWarehouseId)
-      return currentWh ? (parseInt(currentWh.stock) || 0) : 0
-    }
-    
-    // Buscar en alternative_warehouses
-    if (product.alternative_warehouses && Array.isArray(product.alternative_warehouses)) {
-      const currentWh = product.alternative_warehouses.find(w => w.warehouse_id === currentWarehouseId)
-      return currentWh ? (parseInt(currentWh.stock) || 0) : 0
-    }
-    
-    // Si no hay info de bodegas, retornar 0 en modo local
-    return 0
-  }
-  
-  // 🌍 En modo GLOBAL: Sumar stock de TODAS las bodegas
-  if (product.warehouses && Array.isArray(product.warehouses)) {
-    return product.warehouses.reduce((sum, w) => sum + (parseInt(w.stock) || 0), 0)
-  }
-  
-  if (product.alternative_warehouses && Array.isArray(product.alternative_warehouses)) {
-    return product.alternative_warehouses.reduce((sum, w) => sum + (parseInt(w.stock) || 0), 0)
-  }
-  
-  // Fallback al stock general
-  return product.stock || 0
+  // ✅ SIEMPRE usar current_stock como fuente de verdad
+  // Este campo se actualiza automáticamente en el backend cuando se ajusta stock
+  // en cualquier bodega (ver Product::updateStock y Product::updateStockInWarehouse)
+  // 
+  // IMPORTANTE: No sumar warehouses manualmente, el backend ya lo hace
+  return product.current_stock || 0
 }
 
 // Métodos
@@ -4084,20 +4130,32 @@ const closeTab = async (tabId) => {
   
   // Si tiene items, confirmar
   if (tab && tab.cart && tab.cart.length > 0) {
-    if (!confirm(`¿Cerrar "${getTabDisplayName(tab)}"? Los productos se perderán.`)) {
-      return
+    // Mostrar modal de confirmación
+    closeTabData.value = {
+      tabId: tabId,
+      tabName: getTabDisplayName(tab)
     }
-    
-    // Eliminar draft de BD si existe
-    try {
-      const response = await invoicesService.getAll()
-      const draft = response.data?.find(inv => inv.tab_id === tabId && inv.status === 'draft')
-      if (draft) {
-        await invoicesService.delete(draft.id)
-      }
-    } catch (error) {
-      console.error('Error eliminando draft:', error)
+    showCloseTabModal.value = true
+    return
+  }
+  
+  // Si no tiene items, cerrar directamente
+  await performCloseTab(tabId)
+}
+
+// Función auxiliar para ejecutar el cierre de la pestaña
+const performCloseTab = async (tabId) => {
+  const tab = salesTabs.value.find(t => t.id === tabId)
+  
+  // Eliminar draft de BD si existe
+  try {
+    const response = await invoicesService.getAll()
+    const draft = response.data?.find(inv => inv.tab_id === tabId && inv.status === 'draft')
+    if (draft) {
+      await invoicesService.delete(draft.id)
     }
+  } catch (error) {
+    console.error('Error eliminando draft:', error)
   }
   
   // Liberar el número para reutilización
@@ -4124,6 +4182,22 @@ const closeTab = async (tabId) => {
   }
   
   showSuccess('Venta cerrada')
+}
+
+// Confirmar cierre de venta desde el modal
+const confirmCloseTab = async () => {
+  const tabId = closeTabData.value.tabId
+  showCloseTabModal.value = false
+  
+  if (tabId) {
+    await performCloseTab(tabId)
+  }
+}
+
+// Cancelar cierre de venta
+const cancelCloseTab = () => {
+  showCloseTabModal.value = false
+  closeTabData.value = { tabId: null, tabName: '' }
 }
 
 // Helper para calcular subtotal
@@ -4456,8 +4530,8 @@ const handlePaymentConfirmed = async (paymentData) => {
     return
   }
   
-  // 🔄 Refrescar datos inmediatamente después de la venta para actualizar stock
-  await refreshPosData()
+  // 🔄 Refrescar solo productos para actualizar stock sin borrar todo
+  await refreshData('products')
   
   // Procesar la venta en el backend y actualizar el número de factura
   try {
@@ -4557,8 +4631,8 @@ const startNewSale = async () => {
   showReceiptModal.value = false
   showAfterPaymentModal.value = false
   
-  // 🔄 Refrescar datos del POS para obtener stock actualizado
-  await refreshPosData()
+  // 🔄 Refrescar solo productos para obtener stock actualizado
+  await refreshData('products')
   
   // El carrito ya se limpió después del pago confirmado
   // Solo restablecer estado para nueva venta
@@ -5343,13 +5417,13 @@ const toggleGlobalSearch = async () => {
   }
 }
 
-// Aplicar el filtro global al cargar productos inicialmente
+// Aplicar el filtro global al cargar productos inicialmente - OPTIMIZADO
 watch(() => currentSession.value?.warehouse_id, async (warehouseId) => {
   if (warehouseId) {
     const scope = globalSearch.value ? 'global' : 'local'
     await appStore.loadProducts(warehouseId, scope)
   }
-}, { immediate: false })
+}, { immediate: false, flush: 'post' }) // Post flush para no bloquear UI
 
 const focusFirstProduct = () => {
   if (filteredProducts.value.length > 0) {
@@ -5897,11 +5971,20 @@ const showLoadedQuotationDetails = () => {
 // Lifecycle hooks
 onMounted(async () => {
   try {
-    // 🔄 AUTO-REFRESH: Recargar productos si es necesario
-    // Si el store ya tiene productos, esto será rápido (o podemos forzar recarga)
+    // ✅ ESPERAR a que la sesión esté inicializada
+    if (appStore.cashSession.initialized) {
+      hasOpenSession.value = appStore.cashSession.hasOpenSession
+      currentSession.value = appStore.cashSession.current
+    }
+    
+    // 🔄 AUTO-REFRESH FORZADO: Recargar productos SIEMPRE al entrar al POS
     if (currentSession.value?.warehouse_id) {
-      console.log('🔄 [PosView] Auto-refreshing products...')
-      await appStore.loadProducts(currentSession.value.warehouse_id)
+      const scope = globalSearch.value ? 'global' : 'local'
+      await appStore.loadProducts(currentSession.value.warehouse_id, scope, true) // force = true
+      await appStore.loadCustomers(true) // force = true
+      await appStore.loadPaymentMethods(true) // force = true
+    } else {
+      console.warn('⚠️ [PosView] No hay warehouse_id disponible para cargar productos')
     }
 
     // Configurar interfaz inmediatamente
@@ -5947,16 +6030,7 @@ onMounted(async () => {
     // 🎯 Cargar drafts existentes de la base de datos
     await loadSalesDrafts()
     
-    // 🛍️ Debug: Verificar productos con variantes
-    // 👗 Debug variantes en consola
-    setTimeout(() => {
-      const productsWithVariants = products.value.filter(p => p.variants && p.variants.length > 0)
-      if (productsWithVariants.length > 0) {
-        console.log('✅ Productos con variantes cargados:', productsWithVariants.length)
-      } else {
-        console.log('⚠️ No hay productos con variantes en el catálogo')
-      }
-    }, 2000)
+    // Verificar productos con variantes para UI
     
     // Emitir estado inicial del carrito
     emit('cart-status-changed', cart.items.length > 0)
@@ -5966,12 +6040,41 @@ onMounted(async () => {
   }
 })
 
+// 🔄 Listener para actualización de productos desde otros módulos
+const handleProductsUpdate = async (event) => {
+  // Recargar productos del store global
+  if (currentSession.value?.warehouse_id) {
+    const scope = globalSearch.value ? 'global' : 'local'
+    await appStore.loadProducts(currentSession.value.warehouse_id, scope, true) // force = true
+  }
+}
+
+// Registrar listener al montar
+window.addEventListener('products-updated', handleProductsUpdate)
+
 // 🔄 AUTO-REFRESH al reactivar el componente (si se usa KeepAlive)
 onActivated(async () => {
-  if (currentSession.value?.warehouse_id) {
-    console.log('🔄 [PosView] Component activated - Refreshing products...')
-    // Forzar recarga silenciosa para asegurar datos frescos
-    await appStore.loadProducts(currentSession.value.warehouse_id)
+  try {
+    // 1️⃣ Recargar productos (respetando filtro Global/Local) - FORZADO
+    if (currentSession.value?.warehouse_id) {
+      const scope = globalSearch.value ? 'global' : 'local'
+      await appStore.loadProducts(currentSession.value.warehouse_id, scope, true) // force = true
+    }
+    
+    // 2️⃣ Recargar clientes (desde appStore global) - FORZADO
+    await appStore.loadCustomers(true)
+    
+    // 3️⃣ Recargar métodos de pago (desde appStore global) - FORZADO
+    await appStore.loadPaymentMethods(true)
+    
+    // 4️⃣ Recargar descuentos (local del POS)
+    await loadDiscounts()
+    
+    // 5️⃣ Actualizar número de factura
+    await fetchNextInvoiceNumber()
+  } catch (error) {
+    console.error('⚠️ [PosView] Error en auto-refresh:', error)
+    // No mostrar error al usuario - es refresh silencioso
   }
 })
 
@@ -5998,6 +6101,7 @@ watch(() => paymentMethods.value.length, (newLength) => {
 onUnmounted(() => {
   // Limpiar listeners
   document.removeEventListener('keydown', handleKeyboard)
+  window.removeEventListener('products-updated', handleProductsUpdate)
 })
 
 // Funciones del modal de cotizaciones
@@ -6804,8 +6908,8 @@ const handleReturnSuccess = async (returnData) => {
     // Cerrar el modal
     showReturnsModal.value = false
     
-    // Refrescar datos del POS para actualizar inventario
-    await refreshPosData()
+    // Refrescar solo productos para actualizar inventario
+    await refreshData('products')
     
   } catch (error) {
     console.error('Error al procesar el éxito de la devolución:', error)

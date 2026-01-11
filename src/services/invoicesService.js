@@ -1,6 +1,5 @@
 // invoicesService.js
-import { apiCall } from './api.js'
-import api from './api.js'
+import { apiCall, API_CONFIG, getTenantId } from './api.js'
 
 export const invoicesService = {
   // Obtener todas las facturas
@@ -108,10 +107,13 @@ export const invoicesService = {
   // Crear nueva cotización
   async createQuote(data) {
     try {
-      const response = await api.post('/pos/invoices', {
-        ...data,
-        type: 'quote',
-        status: 'quotation'
+      const response = await apiCall('/pos/invoices', {
+        method: 'POST',
+        body: JSON.stringify({
+          ...data,
+          type: 'quote',
+          status: 'quotation'
+        })
       })
       
       return response
@@ -125,7 +127,7 @@ export const invoicesService = {
   async searchQuote(quoteCode) {
     try {
       // Usar directamente la ruta pública que busca en ambas tablas (sales e invoices)
-      const publicResponse = await api.get(`/quotes/search/${quoteCode}`)
+      const publicResponse = await apiCall(`/quotes/search/${quoteCode}`)
       
       if (publicResponse.success && publicResponse.data) {
         return {
@@ -192,8 +194,11 @@ export const invoicesService = {
           
           // Cancelar la cotización original cambiando su status
           try {
-            await api.patch(`/invoices/${quotation.id}`, {
-              status: 'cancelled'
+            await apiCall(`/invoices/${quotation.id}`, {
+              method: 'PATCH',
+              body: JSON.stringify({
+                status: 'cancelled'
+              })
             })
             console.log('✅ Cotización cancelada automáticamente')
           } catch (updateError) {
@@ -220,7 +225,7 @@ export const invoicesService = {
   // Obtener todas las cotizaciones (desde invoices)
   async getQuotes() {
     try {
-      const response = await api.get('/invoices?type=quote')
+      const response = await apiCall('/invoices?type=quote')
       return response
     } catch (error) {
       console.error('Error getting quotes:', error)
@@ -278,6 +283,58 @@ export const invoicesService = {
       return response.next_number
     } catch (error) {
       console.error('Error al obtener próximo número:', error)
+      throw error
+    }
+  },
+
+  // Enviar factura o cotización por email
+  async sendInvoiceEmail(invoiceId, email, pdfBlob, isQuote = false, documentNumber = null) {
+    try {
+      const docType = isQuote ? 'cotización' : 'factura'
+      const docTypeCapitalized = isQuote ? 'Cotización' : 'Factura'
+      const docNumber = documentNumber || invoiceId
+      
+      // Mensaje amigable según el tipo de documento
+      const message = isQuote 
+        ? `<p>Estimado cliente,</p>
+           <p>Adjunto encontrará la <strong>cotización ${docNumber}</strong> solicitada.</p>
+           <p>Si tiene alguna pregunta o desea proceder con la compra, no dude en contactarnos.</p>
+           <p>Quedamos atentos a sus comentarios.</p>
+           <p><br>Saludos cordiales,<br>Equipo de Ventas</p>`
+        : `<p>Estimado cliente,</p>
+           <p>Adjunto encontrará su <strong>factura ${docNumber}</strong>.</p>
+           <p>Agradecemos su preferencia y confianza en nosotros.</p>
+           <p>Si tiene alguna consulta, estamos a su disposición.</p>
+           <p><br>Saludos cordiales,<br>Equipo de Atención al Cliente</p>`
+      
+      const formData = new FormData()
+      formData.append('email', email)
+      formData.append('pdf', pdfBlob, `${docType}-${docNumber}.pdf`)
+      formData.append('subject', `${docTypeCapitalized} #${docNumber}`)
+      formData.append('message', message)
+
+      // Construir URL completa
+      const baseUrl = window.location.origin
+      const apiPath = API_CONFIG.BASE_URL
+      const url = `${baseUrl}${apiPath}/email/send-invoice`
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
+          'X-Tenant': getTenantId() || localStorage.getItem('tenantId')
+        },
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al enviar email')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error al enviar email:', error)
       throw error
     }
   }

@@ -371,14 +371,12 @@ const checkSubscriptionFromBackend = async () => {
     if (response.data.success) {
       if (response.data.active === true) {
         // ✅ Suscripción ACTIVA - no bloquear
-        console.log('✅ [Subscription] Backend dice: ACTIVO')
         showModal.value = false
         appStore.isSubscriptionExpired = false
         stopAllIntervals()
         return false // No expirada
       } else {
         // ⛔ Suscripción EXPIRADA - bloquear
-        console.log('⛔ [Subscription] Backend dice: EXPIRADO/SUSPENDIDO')
         appStore.isSubscriptionExpired = true
         showModal.value = true
         tenantId.value = response.data.tenant?.id || ''

@@ -559,6 +559,72 @@
     @cancel="handlePhoneCancel"
   />
 
+  <!-- Modal para solicitar Email -->
+  <Teleport to="body">
+    <Transition name="modal-fade">
+      <div v-if="showEmailModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-300 dark:border-zinc-800">
+          <!-- Header con icono -->
+          <div class="p-6 pb-4">
+            <div class="text-center">
+              <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-xl bg-blue-50 dark:bg-blue-950/50 mb-4 border border-blue-100 dark:border-blue-900/50">
+                <svg class="h-7 w-7 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Email del Cliente</h3>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+                El cliente no tiene un email registrado. Por favor ingrese el email donde desea enviar la factura.
+              </p>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="px-6 pb-6">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">
+                Email
+              </label>
+              <input
+                v-model="emailInput"
+                type="email"
+                placeholder="cliente@ejemplo.com"
+                class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                @keyup.enter="confirmEmail"
+                autofocus
+              >
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 pb-6 flex gap-3">
+            <button 
+              @click="cancelEmail"
+              :disabled="sendingEmail"
+              class="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 rounded-xl font-semibold border border-gray-200 dark:border-zinc-700 transition-all duration-200 disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button 
+              @click="confirmEmail"
+              :disabled="sendingEmail || !emailInput"
+              class="flex-1 px-4 py-2.5 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-xl font-bold shadow-lg shadow-blue-400/40 dark:shadow-blue-900/50 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg v-if="!sendingEmail" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <svg v-else class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ sendingEmail ? 'Enviando...' : 'Enviar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
   <!-- Modal de Recibo para Facturas Normales -->
   <ReceiptModal
     v-if="showReceiptModal"
@@ -601,8 +667,9 @@ import QuotationModal from './QuotationModal.vue'
 import PhoneInputModal from './PhoneInputModal.vue'
 import ReceiptModal from './ReceiptModal.vue'
 import { invoiceService } from '../services/invoiceService.js'
+import { invoicesService } from '../services/invoicesService.js'
 import { formatInvoiceDate } from '@/utils/dateFormatter.js'
-import { generateInvoicePDF, downloadPDF as downloadPDFHelper, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
+import { generateInvoicePDF, generateQuotationPDF, downloadPDF as downloadPDFHelper, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
 import { whatsappService } from '../services/whatsappService.js'
 
 // Props
@@ -660,6 +727,10 @@ const showReceiptModal = ref(false)
 const showPhoneModal = ref(false)
 const phoneModalMessage = ref('')
 const phoneModalResolve = ref(null)
+const showEmailModal = ref(false)
+const emailInput = ref('')
+const emailModalResolve = ref(null)
+const sendingEmail = ref(false)
 
 // Computed
 const filteredInvoices = computed(() => {
@@ -986,9 +1057,11 @@ const downloadPDF = async (invoice) => {
 
     const invoiceData = {
       invoice_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      quotation_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
       date: invoice.date || new Date(),
       created_at: invoice.created_at || invoice.date || new Date(),
       customer_name: invoice.customer_name || invoice.customer || 'Cliente General',
+      customer: invoice.customer_name || invoice.customer || 'Cliente General',
       cashier: invoice.seller_name || 'Vendedor',
       items: items,
       subtotal: parseFloat(invoice.subtotal || 0),
@@ -1001,11 +1074,14 @@ const downloadPDF = async (invoice) => {
         amount: parseFloat(invoice.total || 0)
       }],
       change: 0,
-      notes: invoice.notes || ''
+      notes: invoice.notes || '',
+      validity_days: 15 // Para cotizaciones
     }
 
-    // Generar PDF usando plantilla centralizada
-    const pdf = await generateInvoicePDF(invoiceData, appStore.systemSettings)
+    // Generar PDF usando la plantilla correcta según el tipo de documento
+    const pdf = isQuote 
+      ? await generateQuotationPDF(invoiceData, appStore.systemSettings)
+      : await generateInvoicePDF(invoiceData, appStore.systemSettings)
     
     // Descargar
     const filename = `factura-${invoiceData.invoice_number}.pdf`
@@ -1018,8 +1094,123 @@ const downloadPDF = async (invoice) => {
   }
 }
 
-const sendByEmail = (invoice) => {
-  showToast('Envío por email próximamente', 'info')
+const sendByEmail = async (invoice) => {
+  try {
+    // Determinar tipo de documento
+    const isQuote = invoice.type === 'quote' || invoice.status === 'quotation'
+    const docType = isQuote ? 'cotización' : 'factura'
+    const docTypeCapitalized = isQuote ? 'Cotización' : 'Factura'
+    
+    // Verificar si el cliente tiene email (probar múltiples campos)
+    let email = invoice.customer_email || invoice.customer?.customer_email || invoice.customer?.email || invoice.email
+    
+    // Si no tiene email, pedirlo con el modal
+    if (!email || email.trim() === '') {
+      email = await requestEmail()
+      if (!email) {
+        return // Usuario canceló
+      }
+    }
+    
+    sendingEmail.value = true
+    showToast(`Generando y enviando ${docType}...`, 'info')
+    
+    // Preparar datos de la factura (igual que downloadPDF)
+    let items = []
+    try {
+      if (invoice.items) {
+        items = typeof invoice.items === 'string' 
+          ? JSON.parse(invoice.items)
+          : invoice.items
+      }
+    } catch (error) {
+      console.error('Error parseando items:', error)
+      items = []
+    }
+
+    const invoiceData = {
+      invoice_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      quotation_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      date: invoice.date || new Date(),
+      created_at: invoice.created_at || invoice.date || new Date(),
+      customer_name: invoice.customer_name || invoice.customer || 'Cliente General',
+      customer: invoice.customer_name || invoice.customer || 'Cliente General',
+      cashier: invoice.seller_name || 'Vendedor',
+      items: items,
+      subtotal: parseFloat(invoice.subtotal || 0),
+      discount: parseFloat(invoice.discount_amount || 0),
+      tax: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      tax_amount: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      total: parseFloat(invoice.total || 0),
+      payments: invoice.payments || [{
+        method: invoice.payment_method || 'efectivo',
+        amount: parseFloat(invoice.total || 0)
+      }],
+      change: 0,
+      notes: invoice.notes || '',
+      validity_days: 15 // Para cotizaciones
+    }
+
+    // Generar PDF usando la plantilla correcta según el tipo de documento
+    const pdf = isQuote 
+      ? await generateQuotationPDF(invoiceData, appStore.systemSettings)
+      : await generateInvoicePDF(invoiceData, appStore.systemSettings)
+    
+    // Obtener blob del PDF
+    const pdfBlob = await getPDFBlob(pdf)
+    
+    // Enviar email con tipo de documento correcto
+    await invoicesService.sendInvoiceEmail(
+      invoice.id, 
+      email, 
+      pdfBlob, 
+      isQuote,
+      invoice.number || invoice.invoiceNumber || `DOC-${invoice.id}`
+    )
+    
+    showToast(`✅ ${docTypeCapitalized} enviada exitosamente a ${email}`, 'success')
+  } catch (error) {
+    console.error('Error enviando email:', error)
+    showToast(`Error al enviar la ${docType}`, 'error')
+  } finally {
+    sendingEmail.value = false
+  }
+}
+
+// Solicitar email mediante modal
+const requestEmail = () => {
+  return new Promise((resolve) => {
+    emailInput.value = ''
+    emailModalResolve.value = resolve
+    showEmailModal.value = true
+  })
+}
+
+// Confirmar email del modal
+const confirmEmail = () => {
+  const email = emailInput.value.trim()
+  
+  // Validar formato de email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) {
+    showToast('Email inválido', 'error')
+    return
+  }
+  
+  showEmailModal.value = false
+  if (emailModalResolve.value) {
+    emailModalResolve.value(email)
+    emailModalResolve.value = null
+  }
+}
+
+// Cancelar modal de email
+const cancelEmail = () => {
+  showEmailModal.value = false
+  if (emailModalResolve.value) {
+    emailModalResolve.value(null)
+    emailModalResolve.value = null
+  }
 }
 
 const editInvoice = (invoice) => {

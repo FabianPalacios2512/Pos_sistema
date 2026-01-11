@@ -72,7 +72,6 @@ class CustomerController extends Controller
                 'city' => 'nullable|string|max:255',
                 'credit_limit' => 'nullable|numeric|min:0',
                 'credit_active' => 'nullable|boolean',
-                'credit_photo' => 'nullable|string',
                 'active' => 'nullable|boolean'
             ]);
 
@@ -84,7 +83,18 @@ class CustomerController extends Controller
                 ], 422);
             }
 
-            $customer = Customer::create($request->all());
+            // Preparar datos para creación
+            $customerData = $request->all();
+            
+            // Asegurar valores por defecto
+            $customerData['active'] = $customerData['active'] ?? true;
+            $customerData['credit_limit'] = $customerData['credit_limit'] ?? 0;
+            $customerData['current_debt'] = 0;
+            $customerData['total_purchases'] = 0;
+            $customerData['total_orders'] = 0;
+            $customerData['loyalty_points'] = 0;
+
+            $customer = Customer::create($customerData);
 
             return response()->json([
                 'success' => true,
@@ -92,11 +102,16 @@ class CustomerController extends Controller
                 'data' => $customer
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating customer: ' . $e->getMessage());
+            Log::error('Error creating customer', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Error al crear cliente',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'details' => config('app.debug') ? $e->getTraceAsString() : null
             ], 500);
         }
     }

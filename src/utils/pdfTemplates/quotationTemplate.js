@@ -52,12 +52,17 @@ export const createQuotationTemplate = async (quotationData, systemSettings = {}
       color: { dark: '#000000', light: '#FFFFFF' }
     })
 
-    // Calcular altura dinámica según items
-    const baseHeight = 120
-    const itemHeight = 4
+    // Calcular altura dinámica ajustada al contenido
+    const baseHeight = 65 // Header empresa + título cotización + cliente
+    const itemHeight = 4.5 // Altura por cada producto
     const itemCount = items.length
-    const qrSectionHeight = 60
-    const dynamicHeight = Math.max(200, baseHeight + (itemCount * itemHeight) + qrSectionHeight)
+    const totalsHeight = 28 // Subtotal + descuento + IVA + total
+    const notesHeight = notes && notes.trim() ? 20 : 0 // Observaciones (solo si existen)
+    const messageHeight = 15 // Mensaje "no válida como factura"
+    const qrSectionHeight = 53     // QR (25mm) + código (3mm) + contacto (12mm) + espacios (3mm)
+    const extraPadding = 5 // Margen mínimo de seguridad
+    
+    const dynamicHeight = baseHeight + (itemCount * itemHeight) + totalsHeight + notesHeight + messageHeight + qrSectionHeight + extraPadding
 
     // Crear PDF con formato ticket (80mm ancho, altura dinámica)
     const pdf = new jsPDF({

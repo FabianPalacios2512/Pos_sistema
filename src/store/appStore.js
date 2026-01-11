@@ -261,8 +261,6 @@ export const appStore = reactive({
       this.initialized = true;
       return;
     }
-  
-    console.log('🚀 Inicializando store global...')
     
     // PRIMERO: Cargar systemSettings para verificar estado de suscripción
     try {

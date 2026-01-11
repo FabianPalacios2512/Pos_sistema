@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class InvoiceController extends Controller
 {
@@ -1651,9 +1652,35 @@ class InvoiceController extends Controller
             $message = $request->input('message');
             $pdfFile = $request->file('pdf');
 
-            // TODO: Implementar envío real de email con Laravel Mail
-            // Por ahora simular envío exitoso
-            sleep(1); // Simular tiempo de procesamiento
+            // Obtener el nombre de la empresa PRIMERO desde system_settings
+            $businessName = 'Mi Tienda';
+            $systemSettings = DB::table('system_settings')->first();
+            
+            if ($systemSettings && !empty($systemSettings->company_name)) {
+                $businessName = $systemSettings->company_name;
+            } else {
+                // Si no hay nombre en system_settings, usar el del tenant como fallback
+                $tenant = tenant();
+                if ($tenant && !empty($tenant->business_name)) {
+                    $businessName = $tenant->business_name;
+                }
+            }
+
+            // Configurar remitente desde .env
+            $from = config('mail.from.address', 'noreply@105pos.com');
+            $fromName = $businessName; // Usar el nombre de la empresa
+
+            // Enviar email con Laravel Mail (método correcto)
+            Mail::send([], [], function ($m) use ($email, $subject, $message, $pdfFile, $from, $fromName) {
+                $m->to($email)
+                  ->from($from, $fromName)
+                  ->subject($subject)
+                  ->html($message) // Usar html() en lugar de setBody()
+                  ->attach($pdfFile->getRealPath(), [
+                      'as' => $pdfFile->getClientOriginalName(),
+                      'mime' => 'application/pdf'
+                  ]);
+            });
 
             return response()->json([
                 'success' => true,
@@ -1663,6 +1690,11 @@ class InvoiceController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Error enviando email de factura:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Error enviando email',
