@@ -395,5 +395,81 @@ export const whatsappService = {
         message: error.response?.data?.message || error.message
       }
     }
+  },
+
+  // Función genérica para enviar documentos por WhatsApp (facturas, cotizaciones, órdenes de compra)
+  async sendDocumentByWhatsApp(phone, pdfBlob, documentNumber, documentType = 'invoice') {
+    try {
+      // Validar y formatear el número de teléfono
+      let formattedPhone = phone.replace(/[\s\-\(\)]/g, '')
+      
+      if (!formattedPhone.startsWith('+57')) {
+        if (formattedPhone.startsWith('57')) {
+          formattedPhone = '+' + formattedPhone
+        } else if (formattedPhone.startsWith('3')) {
+          formattedPhone = '+57' + formattedPhone
+        }
+      }
+
+      // Generar mensaje según el tipo de documento
+      const messages = {
+        invoice: `📄 *Factura ${documentNumber}*\n\nAdjunto encontrará su factura. ¡Gracias por su compra!`,
+        quotation: `📋 *Cotización ${documentNumber}*\n\nAdjunto encontrará la cotización solicitada. Quedamos atentos a sus comentarios.`,
+        purchase_order: `📦 *Orden de Compra ${documentNumber}*\n\nAdjunto encontrará la orden de compra. Por favor confirmar recepción y disponibilidad de productos. ¡Gracias!`
+      }
+
+      const fileNames = {
+        invoice: `factura-${documentNumber}.pdf`,
+        quotation: `cotizacion-${documentNumber}.pdf`,
+        purchase_order: `orden-compra-${documentNumber}.pdf`
+      }
+
+      const message = messages[documentType] || messages.invoice
+      const fileName = fileNames[documentType] || fileNames.invoice
+
+      const { isDirect, client } = getWhatsAppClient()
+      
+      if (isDirect) {
+        // Modo directo: Convertir PDF Blob a base64 y enviar al servidor Node.js
+        const reader = new FileReader()
+        const base64Promise = new Promise((resolve, reject) => {
+          reader.onloadend = () => resolve(reader.result)
+          reader.onerror = reject
+          reader.readAsDataURL(pdfBlob)
+        })
+        
+        const base64Data = await base64Promise
+        
+        // Enviar al servidor multi-tenant
+        const response = await client.post('/send', {
+          phone: formattedPhone,
+          message: message,
+          pdfBase64: base64Data,
+          fileName: fileName
+        })
+        
+        return response.data
+      } else {
+        // Modo Laravel (fallback)
+        const formData = new FormData()
+        formData.append('phone', formattedPhone)
+        formData.append('message', message)
+        formData.append('pdf', pdfBlob, fileName)
+
+        const response = await client.post('/whatsapp/send-pdf', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          timeout: 60000
+        })
+        return response.data
+      }
+    } catch (error) {
+      console.error('Error enviando documento por WhatsApp:', error)
+      return {
+        success: false,
+        message: error.message
+      }
+    }
   }
 }

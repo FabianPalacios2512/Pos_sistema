@@ -85,7 +85,7 @@ class CustomerController extends Controller
 
             // Preparar datos para creación
             $customerData = $request->all();
-            
+
             // Asegurar valores por defecto
             $customerData['active'] = $customerData['active'] ?? true;
             $customerData['credit_limit'] = $customerData['credit_limit'] ?? 0;

@@ -403,14 +403,14 @@ class DiscountsController extends Controller
             // Obtener contadores actualizados
             $usagesRemaining = null;
             if ($discount->usage_limit) {
-                $usagesRemaining = $discount->usage_limit - $discount->fresh()->used_count;
+                $usagesRemaining = $discount->usage_limit - $discount->fresh()->times_used;
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Uso de descuento registrado correctamente',
                 'data' => [
-                    'used_count' => $discount->fresh()->used_count,
+                    'times_used' => $discount->fresh()->times_used,
                     'usage_limit' => $discount->usage_limit,
                     'usages_remaining' => $usagesRemaining,
                     'user_usage_count' => $discount->getUsageCountBy($userIdentifier, $customerEmail, $customerPhone)

@@ -23,15 +23,8 @@ class SystemSettingsController extends Controller
                 ->select('id', 'business_name', 'plan', 'subscription_ends_at', 'created_at')
                 ->first();
 
-            $tenantPlan = $tenantData->plan ?? 'free';
-
-            // 🔒 SEGURIDAD: Forzar desactivación de funciones premium según plan
-            $allowedPlansForPremiumFeatures = ['premium', 'enterprise'];
-
-            if (!in_array($tenantPlan, $allowedPlansForPremiumFeatures)) {
-                $settings->creditienda_enabled = false;
-                $settings->enable_loyalty_system = false;
-            }
+            // Obtener el plan de la BD
+            $tenantPlanRaw = $tenantData->plan ?? 'free';
 
             // 🆕 Preparar datos del tenant para el frontend
             $tenant = null;
@@ -40,9 +33,20 @@ class SystemSettingsController extends Controller
                 $planNames = [
                     'free' => 'free_trial',
                     'basic' => 'basic',
-                    'premium' => 'pro',
+                    'premium' => 'premium',
                     'enterprise' => 'enterprise'
                 ];
+
+                // Usar el nombre mapeado
+                $tenantPlan = $planNames[$tenantPlanRaw] ?? 'free_trial';
+
+                // 🔒 SEGURIDAD: Forzar desactivación de funciones premium según plan
+                $allowedPlansForPremiumFeatures = ['premium', 'enterprise'];
+
+                if (!in_array($tenantPlanRaw, $allowedPlansForPremiumFeatures)) {
+                    $settings->creditienda_enabled = false;
+                    $settings->enable_loyalty_system = false;
+                }
 
                 // Calcular max_users según el plan
                 $maxUsers = [
@@ -55,14 +59,17 @@ class SystemSettingsController extends Controller
                 $tenant = [
                     'id' => $tenantData->id,
                     'business_name' => $tenantData->business_name,
-                    'plan_type' => $planNames[$tenantData->plan] ?? 'free_trial',
+                    'plan_type' => $tenantPlan, // Ya viene mapeado arriba
                     'subscription_status' => 'active', // Por ahora siempre activo
                     'subscription_start_date' => $tenantData->created_at,
                     'subscription_end_date' => $tenantData->subscription_ends_at,
-                    'max_users' => $maxUsers[$tenantData->plan] ?? 2,
+                    'max_users' => $maxUsers[$tenantPlanRaw] ?? 2,
                     'max_products' => null, // ilimitado para todos los planes
                     'max_invoices' => null  // ilimitado para todos los planes
                 ];
+            } else {
+                // Si no hay datos del tenant, usar valor por defecto
+                $tenantPlan = 'free_trial';
             }
 
             return response()->json([

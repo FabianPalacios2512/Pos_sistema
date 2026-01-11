@@ -17,13 +17,14 @@ class Invoice extends Model
         'due_date',
         'subtotal',
         'tax_amount',
+        'discount_amount',
         'total',
         'payment_method',
         'surcharge_amount',
         'status',
         'return_reference',
         'notes',
-        'seller_name', // ✅ Added seller_name to fillable
+        'seller_name',
         'items'
     ];
 
@@ -32,6 +33,7 @@ class Invoice extends Model
         'due_date' => 'date',
         'subtotal' => 'decimal:2',
         'tax_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'total' => 'decimal:2',
         'surcharge_amount' => 'decimal:2',
         'items' => 'array' // Auto-convierte entre array y JSON

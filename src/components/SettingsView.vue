@@ -1879,7 +1879,26 @@ onMounted(async () => {
   await loadSystemSettings()
   await loadDiscounts()
   await loadPaymentMethods()
+  
+  // Si viene con query param section=plans, ir directo a Mi Plan y abrir modal
+  if (props.queryParams?.section === 'plans') {
+    activeSection.value = 'plan'
+    // Pequeño delay para que se renderice la sección primero
+    setTimeout(() => {
+      showUpgradeModal.value = true
+    }, 300)
+  }
 })
+
+// Watch para cuando cambian los queryParams (navegación desde otros módulos)
+watch(() => props.queryParams, (newParams) => {
+  if (newParams?.section === 'plans') {
+    activeSection.value = 'plan'
+    setTimeout(() => {
+      showUpgradeModal.value = true
+    }, 300)
+  }
+}, { deep: true })
 </script>
 
 <style scoped>

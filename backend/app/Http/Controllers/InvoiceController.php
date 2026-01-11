@@ -103,6 +103,7 @@ class InvoiceController extends Controller
                         'due_date' => $invoice->due_date?->format('Y-m-d'),
                         'subtotal' => (float) $invoice->subtotal,
                         'tax' => (float) $invoice->tax_amount,
+                        'discount_amount' => (float) ($invoice->discount_amount ?? 0),
                         'total' => (float) $invoice->total,
                         'status' => $invoice->status,
                         'payment_method' => $invoice->payment_method,
@@ -1184,7 +1185,7 @@ class InvoiceController extends Controller
                             'customer_email' => $customerEmail,
                             'customer_phone' => $customerPhone,
                             'discount_amount' => $discountData['amount'] ?? 0,
-                            'before_used_count' => $discount->used_count
+                            'before_times_used' => $discount->times_used
                         ]);
 
                         try {
@@ -1204,7 +1205,7 @@ class InvoiceController extends Controller
 
                             \Log::info('✅ Uso del descuento registrado exitosamente', [
                                 'discount_code' => $discount->code,
-                                'after_used_count' => $discount->fresh()->used_count
+                                'after_times_used' => $discount->fresh()->times_used
                             ]);
 
                             // Crear registro en applied_discounts
@@ -1655,7 +1656,7 @@ class InvoiceController extends Controller
             // Obtener el nombre de la empresa PRIMERO desde system_settings
             $businessName = 'Mi Tienda';
             $systemSettings = DB::table('system_settings')->first();
-            
+
             if ($systemSettings && !empty($systemSettings->company_name)) {
                 $businessName = $systemSettings->company_name;
             } else {
@@ -1694,7 +1695,7 @@ class InvoiceController extends Controller
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error enviando email',

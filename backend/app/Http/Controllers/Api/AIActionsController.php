@@ -77,7 +77,7 @@ class AIActionsController extends Controller
                 'minimum_amount' => $validated['minimum_amount'] ?? 0,
                 'maximum_discount' => null,
                 'usage_limit' => $validated['usage_limit'] ?? null,
-                'used_count' => 0,
+                'times_used' => 0,
                 'starts_at' => $starts_at,
                 'expires_at' => $expires_at,
                 'active' => true,

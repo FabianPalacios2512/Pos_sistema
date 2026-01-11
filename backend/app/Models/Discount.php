@@ -191,7 +191,7 @@ class Discount extends Model
      */
     public function apply()
     {
-        $this->increment('used_count');
+        $this->increment('times_used');
     }
 
     /**
@@ -211,7 +211,7 @@ class Discount extends Model
         ]);
 
         // Incrementar contador general
-        $this->increment('used_count');
+        $this->increment('times_used');
     }
 
     /**
@@ -260,7 +260,7 @@ class Discount extends Model
                     })
                     ->where(function ($q) {
                         $q->whereNull('usage_limit')
-                          ->orWhereRaw('used_count < usage_limit');
+                          ->orWhereRaw('times_used < usage_limit');
                     });
     }
 }

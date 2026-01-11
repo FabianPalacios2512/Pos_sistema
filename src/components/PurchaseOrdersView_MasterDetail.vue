@@ -445,6 +445,7 @@
                 </button>
                 
                 <button
+                  v-if="selectedOrder.status === 'pending'"
                   @click="sendOrderByEmail"
                   class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 border border-transparent hover:border-gray-200 dark:hover:border-zinc-700"
                   title="Enviar por Email">
@@ -455,6 +456,7 @@
                 </button>
                 
                 <button
+                  v-if="selectedOrder.status === 'pending'"
                   @click="sendOrderByWhatsApp"
                   class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 border border-transparent hover:border-gray-200 dark:hover:border-zinc-700"
                   title="Enviar por WhatsApp">
@@ -735,8 +737,8 @@
             <button @click="saveOrderAsDraft" :disabled="savingOrder" class="px-4 py-2 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200">
               {{ savingOrder ? 'Guardando...' : 'Guardar Borrador' }}
             </button>
-            <button @click="saveOrderAsPending" :disabled="savingOrder" class="px-5 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-sm font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300">
-              {{ savingOrder ? 'Enviando...' : 'Enviar Orden' }}
+            <button @click="saveAndShowSendOptions" :disabled="savingOrder" class="px-5 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-sm font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300">
+              {{ savingOrder ? 'Guardando...' : 'Crear Orden' }}
             </button>
           </div>
         </div>
@@ -894,13 +896,217 @@
       </div>
       <!-- Fin TAB: ÓRDENES DE COMPRA -->
 
+    <!-- Modal Premium Feature -->
+    <Teleport to="body">
+      <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+          
+          <!-- Contenido -->
+          <div class="p-8 text-center">
+            <!-- Icono Premium -->
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              </svg>
+            </div>
+
+            <!-- Título -->
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¡Mejora tu Plan!</h3>
+            
+            <!-- Mensaje -->
+            <p class="text-base text-gray-600 dark:text-zinc-400 mb-6 leading-relaxed">
+              <span class="font-semibold text-blue-600 dark:text-blue-400">{{ premiumFeatureName }}</span> está disponible en nuestros planes premium.
+            </p>
+            
+            <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
+              💡 Desbloquea todas las funciones premium para potenciar tu negocio
+            </p>
+
+            <!-- Botones -->
+            <div class="flex gap-3">
+              <button
+                @click="showPremiumModal = false"
+                class="flex-1 py-3 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-base font-semibold rounded-xl border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+              >
+                Cerrar
+              </button>
+              <button
+                @click="navigateToPlans"
+                class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-base font-semibold rounded-xl transition-colors duration-200 shadow-lg"
+              >
+                Ver Planes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <!-- Modal Solicitar Email -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showEmailModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="cancelEmail"></div>
+          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Ingresar Email
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">El proveedor no tiene email registrado</p>
+            </div>
+            <div class="px-6 py-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Email del proveedor</label>
+              <input 
+                v-model="emailInput"
+                type="email"
+                placeholder="ejemplo@proveedor.com"
+                class="w-full px-4 py-3 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-xl border border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all"
+                @keyup.enter="confirmEmail"
+              />
+            </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-800/50 flex items-center justify-end gap-3">
+              <button @click="cancelEmail" class="px-4 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">
+                Cancelar
+              </button>
+              <button @click="confirmEmail" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all">
+                Enviar
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Modal Solicitar Teléfono -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showPhoneModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="cancelPhone"></div>
+          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                Ingresar Teléfono
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">El proveedor no tiene teléfono registrado</p>
+            </div>
+            <div class="px-6 py-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Teléfono del proveedor</label>
+              <input 
+                v-model="phoneInput"
+                type="tel"
+                placeholder="3001234567"
+                class="w-full px-4 py-3 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-xl border border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-transparent transition-all"
+                @keyup.enter="confirmPhone"
+              />
+            </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-800/50 flex items-center justify-end gap-3">
+              <button @click="cancelPhone" class="px-4 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">
+                Cancelar
+              </button>
+              <button @click="confirmPhone" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all">
+                Enviar
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Modal: ¿Cómo deseas enviar la orden? -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showSendOptionsModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeSendOptionsModal"></div>
+          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 overflow-hidden animate-scale-in">
+            <!-- Header -->
+            <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-700 text-center">
+              <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">¡Orden Creada!</h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">¿Cómo deseas enviarla al proveedor?</p>
+            </div>
+            
+            <!-- Opciones de envío -->
+            <div class="px-6 py-5 space-y-3">
+              <!-- Enviar por Email -->
+              <button 
+                @click="sendNewOrderByEmail"
+                class="w-full flex items-center gap-4 p-4 bg-gray-50 dark:bg-zinc-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl border border-gray-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-800 transition-all duration-200 group"
+              >
+                <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <div class="text-left flex-1">
+                  <p class="font-semibold text-gray-900 dark:text-white">Enviar por Email</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-400">Se enviará un PDF al correo del proveedor</p>
+                </div>
+                <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+
+              <!-- Enviar por WhatsApp -->
+              <button 
+                @click="sendNewOrderByWhatsApp"
+                class="w-full flex items-center gap-4 p-4 bg-gray-50 dark:bg-zinc-800/50 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl border border-gray-200 dark:border-zinc-700 hover:border-emerald-300 dark:hover:border-emerald-800 transition-all duration-200 group"
+              >
+                <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                  </svg>
+                </div>
+                <div class="text-left flex-1">
+                  <p class="font-semibold text-gray-900 dark:text-white">Enviar por WhatsApp</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-400">Se abrirá WhatsApp con el PDF adjunto</p>
+                </div>
+                <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-700">
+              <button 
+                @click="closeSendOptionsModal"
+                class="w-full py-3 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Enviar después
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
   </div>
 </template>
 
 <script>
 import { apiCall } from '../services/api.js'
-import { generatePurchaseOrderPDF, downloadPDF } from '../utils/pdfTemplates/pdfGenerator'
+import { generatePurchaseOrderPDF, downloadPDF, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator'
 import SuppliersViewMasterDetail from './SuppliersView_MasterDetail.vue'
+import { appStore } from '../store/appStore.js'
+import { invoicesService } from '../services/invoicesService.js'
+import { whatsappService } from '../services/whatsappService.js'
+import { useModuleNavigation } from '../composables/useModuleNavigation.js'
+
+// Obtener función de navegación
+const { navigateToModule } = useModuleNavigation()
 
 export default {
   name: 'PurchaseOrdersViewMasterDetail',
@@ -916,6 +1122,21 @@ export default {
       filterStatus: 'all',
       warehouses: [],
       viewMode: 'list', // 'list' | 'create' | 'create-supplier'
+      
+      // Premium/Email/WhatsApp Modals
+      showPremiumModal: false,
+      premiumFeatureName: '',
+      showEmailModal: false,
+      emailInput: '',
+      emailModalResolve: null,
+      showPhoneModal: false,
+      phoneInput: '',
+      phoneModalResolve: null,
+      sendingEmail: false,
+      
+      // Modal de opciones de envío después de crear orden
+      showSendOptionsModal: false,
+      pendingOrderToSend: null,
       
       // Receive Modal
       showReceiveModal: false,
@@ -1256,8 +1477,14 @@ export default {
     },
 
     loadTenantPlan() {
-      // Cargar plan del tenant desde appStore o configuración
-      this.tenantPlan = 'free_trial' // Por defecto
+      // Cargar plan del tenant desde appStore
+      const plan = appStore.tenantPlan || appStore.systemSettings?.tenant_plan || 'free_trial'
+      this.tenantPlan = plan
+    },
+
+    isBasicPlan() {
+      const basicPlans = ['free_trial', 'free', 'basic']
+      return basicPlans.includes(this.tenantPlan)
     },
 
     addProductToOrder(product) {
@@ -1314,23 +1541,23 @@ export default {
       await this.saveOrder('pending')
     },
 
-    async saveOrder(status) {
+    async saveOrder(status, returnOrder = false) {
       this.orderErrors = {}
       
       // Validaciones
       if (!this.orderForm.supplier_id) {
         this.orderErrors.supplier_id = 'Selecciona un proveedor'
-        return
+        return null
       }
       
       if (!this.orderForm.order_date) {
         this.orderErrors.order_date = 'La fecha de orden es requerida'
-        return
+        return null
       }
       
       if (this.orderForm.items.length === 0) {
         this.orderErrors.items = 'Agrega al menos un producto'
-        return
+        return null
       }
       
       this.savingOrder = true
@@ -1359,17 +1586,75 @@ export default {
             })
           }
           
+          // Si queremos retornar la orden para enviarla
+          if (returnOrder) {
+            await this.loadOrders()
+            // Buscar la orden recién creada
+            const createdOrder = this.orders.find(o => o.id === response.data.id)
+            return createdOrder || response.data
+          }
+          
           this.$toast?.success(response.message || 'Orden guardada exitosamente')
           this.viewMode = 'list'
           this.resetOrderForm()
           await this.loadOrders()
+          return response.data
         }
+        return null
       } catch (error) {
         console.error('Error guardando orden:', error)
         this.$toast?.error(error.message || 'Error al guardar orden')
+        return null
       } finally {
         this.savingOrder = false
       }
+    },
+
+    // Guardar orden y mostrar opciones de envío
+    async saveAndShowSendOptions() {
+      const savedOrder = await this.saveOrder('pending', true)
+      if (savedOrder) {
+        this.pendingOrderToSend = savedOrder
+        this.viewMode = 'list'
+        this.resetOrderForm()
+        this.showSendOptionsModal = true
+      }
+    },
+
+    closeSendOptionsModal() {
+      this.showSendOptionsModal = false
+      this.pendingOrderToSend = null
+      this.$toast?.success('Orden creada exitosamente')
+    },
+
+    async sendNewOrderByEmail() {
+      if (!this.pendingOrderToSend) return
+      
+      // Primero cerrar modal y seleccionar la orden
+      this.showSendOptionsModal = false
+      this.selectedOrder = this.pendingOrderToSend
+      this.pendingOrderToSend = null
+      
+      // Esperar un tick para que se actualice la UI
+      await this.$nextTick()
+      
+      // Llamar la función existente de envío por email
+      await this.sendOrderByEmail()
+    },
+
+    async sendNewOrderByWhatsApp() {
+      if (!this.pendingOrderToSend) return
+      
+      // Primero cerrar modal y seleccionar la orden
+      this.showSendOptionsModal = false
+      this.selectedOrder = this.pendingOrderToSend
+      this.pendingOrderToSend = null
+      
+      // Esperar un tick para que se actualice la UI
+      await this.$nextTick()
+      
+      // Llamar la función existente de envío por WhatsApp
+      await this.sendOrderByWhatsApp()
     },
 
     // ========== FUNCIONES DE ACCIONES ==========
@@ -1430,55 +1715,242 @@ export default {
 
     async sendOrderByEmail() {
       try {
+        // Verificar plan antes de procesar
+        if (this.isBasicPlan()) {
+          this.premiumFeatureName = 'Envío por Email'
+          this.showPremiumModal = true
+          return
+        }
+
         if (!this.selectedOrder) {
           this.$toast?.warning('Selecciona una orden primero')
           return
         }
 
-        const supplierEmail = this.selectedOrder.supplier?.email
-        if (!supplierEmail) {
-          this.$toast?.warning('El proveedor no tiene email registrado')
-          return
+        let supplierEmail = this.selectedOrder.supplier?.email
+        
+        // Si no tiene email, pedirlo con el modal
+        if (!supplierEmail || supplierEmail.trim() === '') {
+          supplierEmail = await this.requestEmail()
+          if (!supplierEmail) {
+            return // Usuario canceló
+          }
         }
 
-        this.$toast?.info('Enviando email...')
+        this.sendingEmail = true
+        this.$toast?.info('Generando y enviando orden de compra...')
 
-        // TODO: Implementar envío por email
-        console.log('📧 Enviar a:', supplierEmail)
-        this.$toast?.success('Función de envío por email en desarrollo')
+        // Preparar datos de la orden
+        const settings = appStore.systemSettings || {}
+        const orderData = {
+          order_number: this.selectedOrder.order_number,
+          order_date: this.formatDate(this.selectedOrder.order_date),
+          expected_date: this.selectedOrder.expected_date ? this.formatDate(this.selectedOrder.expected_date) : null,
+          supplier: {
+            name: this.selectedOrder.supplier?.name || 'Proveedor',
+            email: supplierEmail,
+            phone: this.selectedOrder.supplier?.phone || '',
+            document: this.selectedOrder.supplier?.document || '',
+            address: this.selectedOrder.supplier?.address || ''
+          },
+          items: (this.selectedOrder.items || []).map(item => ({
+            name: item.product?.name || item.product_name || 'Producto',
+            sku: item.product?.sku || '',
+            quantity: item.quantity_ordered || item.quantity || 0,
+            unit_cost: item.unit_cost || 0
+          })),
+          subtotal: parseFloat(this.selectedOrder.subtotal || 0),
+          tax: parseFloat(this.selectedOrder.tax || 0),
+          total: parseFloat(this.selectedOrder.total || 0),
+          notes: this.selectedOrder.notes || '',
+          status: this.selectedOrder.status
+        }
+
+        const systemSettings = {
+          company_name: settings.company_name || 'MI EMPRESA',
+          company_address: settings.company_address || '',
+          company_phone: settings.company_phone || '',
+          company_email: settings.company_email || '',
+          company_document: settings.company_document || ''
+        }
+
+        // Generar PDF
+        const pdf = generatePurchaseOrderPDF(orderData, systemSettings)
+        const pdfBlob = await getPDFBlob(pdf)
+
+        // Enviar email usando el servicio de facturas (reutilizamos la lógica)
+        await invoicesService.sendPurchaseOrderEmail(
+          this.selectedOrder.id,
+          supplierEmail,
+          pdfBlob,
+          this.selectedOrder.order_number
+        )
+        
+        this.$toast?.success(`✅ Orden enviada exitosamente a ${supplierEmail}`)
         
       } catch (error) {
         console.error('Error enviando email:', error)
         this.$toast?.error('Error al enviar email')
+      } finally {
+        this.sendingEmail = false
       }
     },
 
     async sendOrderByWhatsApp() {
       try {
+        // Verificar plan antes de procesar
+        if (this.isBasicPlan()) {
+          this.premiumFeatureName = 'Envío por WhatsApp'
+          this.showPremiumModal = true
+          return
+        }
+
         if (!this.selectedOrder) {
           this.$toast?.warning('Selecciona una orden primero')
           return
         }
 
-        const supplierPhone = this.selectedOrder.supplier?.phone
-        if (!supplierPhone) {
-          this.$toast?.warning('El proveedor no tiene teléfono registrado')
-          return
+        let supplierPhone = this.selectedOrder.supplier?.phone
+        
+        // Si no tiene teléfono, pedirlo con el modal
+        if (!supplierPhone || supplierPhone.trim() === '') {
+          supplierPhone = await this.requestPhone()
+          if (!supplierPhone) {
+            return // Usuario canceló
+          }
         }
 
         this.$toast?.info('Preparando WhatsApp...')
 
-        // TODO: Implementar envío por WhatsApp similar a facturas
-        const message = `Hola! Te enviamos la orden de compra ${this.selectedOrder.order_number}. Total: $${this.formatCurrency(this.selectedOrder.total)}. ¡Gracias! 🙏`
+        // Preparar datos de la orden
+        const settings = appStore.systemSettings || {}
+        const orderData = {
+          order_number: this.selectedOrder.order_number,
+          order_date: this.formatDate(this.selectedOrder.order_date),
+          expected_date: this.selectedOrder.expected_date ? this.formatDate(this.selectedOrder.expected_date) : null,
+          supplier: {
+            name: this.selectedOrder.supplier?.name || 'Proveedor',
+            email: this.selectedOrder.supplier?.email || '',
+            phone: supplierPhone,
+            document: this.selectedOrder.supplier?.document || '',
+            address: this.selectedOrder.supplier?.address || ''
+          },
+          items: (this.selectedOrder.items || []).map(item => ({
+            name: item.product?.name || item.product_name || 'Producto',
+            sku: item.product?.sku || '',
+            quantity: item.quantity_ordered || item.quantity || 0,
+            unit_cost: item.unit_cost || 0
+          })),
+          subtotal: parseFloat(this.selectedOrder.subtotal || 0),
+          tax: parseFloat(this.selectedOrder.tax || 0),
+          total: parseFloat(this.selectedOrder.total || 0),
+          notes: this.selectedOrder.notes || '',
+          status: this.selectedOrder.status
+        }
+
+        const systemSettings = {
+          company_name: settings.company_name || 'MI EMPRESA',
+          company_address: settings.company_address || '',
+          company_phone: settings.company_phone || '',
+          company_email: settings.company_email || '',
+          company_document: settings.company_document || ''
+        }
+
+        // Generar PDF
+        const pdf = generatePurchaseOrderPDF(orderData, systemSettings)
+        const pdfBlob = await getPDFBlob(pdf)
+
+        // Enviar por WhatsApp
+        await whatsappService.sendDocumentByWhatsApp(
+          supplierPhone, 
+          pdfBlob, 
+          this.selectedOrder.order_number, 
+          'purchase_order'
+        )
         
-        console.log('📱 Enviar a:', supplierPhone)
-        console.log('💬 Mensaje:', message)
-        this.$toast?.success('Función de WhatsApp en desarrollo')
+        this.$toast?.success('✅ Orden enviada por WhatsApp exitosamente')
         
       } catch (error) {
         console.error('Error enviando WhatsApp:', error)
         this.$toast?.error('Error al enviar por WhatsApp')
       }
+    },
+
+    // Solicitar email mediante modal
+    requestEmail() {
+      return new Promise((resolve) => {
+        this.emailInput = ''
+        this.emailModalResolve = resolve
+        this.showEmailModal = true
+      })
+    },
+
+    // Confirmar email del modal
+    confirmEmail() {
+      const email = this.emailInput.trim()
+      
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) {
+        this.$toast?.warning('Email inválido')
+        return
+      }
+      
+      this.showEmailModal = false
+      if (this.emailModalResolve) {
+        this.emailModalResolve(email)
+        this.emailModalResolve = null
+      }
+    },
+
+    // Cancelar modal de email
+    cancelEmail() {
+      this.showEmailModal = false
+      if (this.emailModalResolve) {
+        this.emailModalResolve(null)
+        this.emailModalResolve = null
+      }
+    },
+
+    // Solicitar teléfono mediante modal
+    requestPhone() {
+      return new Promise((resolve) => {
+        this.phoneInput = ''
+        this.phoneModalResolve = resolve
+        this.showPhoneModal = true
+      })
+    },
+
+    // Confirmar teléfono del modal
+    confirmPhone() {
+      const phone = this.phoneInput.trim()
+      
+      if (phone.length < 7) {
+        this.$toast?.warning('Número de teléfono inválido')
+        return
+      }
+      
+      this.showPhoneModal = false
+      if (this.phoneModalResolve) {
+        this.phoneModalResolve(phone)
+        this.phoneModalResolve = null
+      }
+    },
+
+    // Cancelar modal de teléfono
+    cancelPhone() {
+      this.showPhoneModal = false
+      if (this.phoneModalResolve) {
+        this.phoneModalResolve(null)
+        this.phoneModalResolve = null
+      }
+    },
+
+    // Navegar a configuración de planes
+    navigateToPlans() {
+      this.showPremiumModal = false
+      // Usar el composable de navegación
+      navigateToModule('settings', { section: 'plans' })
     },
 
     async markOrderAsPaid() {

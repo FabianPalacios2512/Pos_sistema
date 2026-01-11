@@ -377,6 +377,16 @@
                     Email
                   </button>
                   
+                  <button
+                    @click="sendByWhatsApp(selectedInvoice)"
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-gray-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    WhatsApp
+                  </button>
+                  
                   <!-- Menú de más acciones -->
                   <div class="relative" @click.stop="">
                     <button
@@ -656,10 +666,57 @@
       </button>
     </div>
   </div>
+
+  <!-- Modal de Función Premium -->
+  <Teleport to="body">
+    <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+        
+        <!-- Contenido -->
+        <div class="p-8 text-center">
+          <!-- Icono Premium -->
+          <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+          </div>
+
+          <!-- Título -->
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¡Mejora tu Plan!</h3>
+          
+          <!-- Mensaje -->
+          <p class="text-base text-gray-600 dark:text-zinc-400 mb-6 leading-relaxed">
+            <span class="font-semibold text-blue-600 dark:text-blue-400">{{ premiumFeatureName }}</span> está disponible en nuestros planes premium.
+          </p>
+          
+          <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
+            💡 Desbloquea todas las funciones premium para potenciar tu negocio
+          </p>
+
+          <!-- Botones -->
+          <div class="flex gap-3">
+            <button
+              @click="showPremiumModal = false"
+              class="flex-1 py-3 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-base font-semibold rounded-xl border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+            >
+              Cerrar
+            </button>
+            <button
+              @click="goToPlans"
+              class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-base font-semibold rounded-xl transition-colors duration-200 shadow-lg"
+            >
+              Ver Planes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useModuleNavigation } from '../composables/useModuleNavigation.js'
 import { useToast } from '../composables/useToast.js'
 import { useAuth } from '../store/auth.js'
 import { appStore } from '../store/appStore.js'
@@ -667,6 +724,8 @@ import QuotationModal from './QuotationModal.vue'
 import PhoneInputModal from './PhoneInputModal.vue'
 import ReceiptModal from './ReceiptModal.vue'
 import { invoiceService } from '../services/invoiceService.js'
+
+const { navigateToModule } = useModuleNavigation()
 import { invoicesService } from '../services/invoicesService.js'
 import { formatInvoiceDate } from '@/utils/dateFormatter.js'
 import { generateInvoicePDF, generateQuotationPDF, downloadPDF as downloadPDFHelper, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
@@ -731,6 +790,21 @@ const showEmailModal = ref(false)
 const emailInput = ref('')
 const emailModalResolve = ref(null)
 const sendingEmail = ref(false)
+const showPremiumModal = ref(false)
+const premiumFeatureName = ref('')
+
+// Función para verificar si el usuario tiene un plan básico
+const isBasicPlan = () => {
+  const plan = (appStore.tenantPlan || 'free_trial').toLowerCase()
+  const isBasic = plan === 'free_trial' || plan === 'free' || plan === 'basic'
+  console.log('📊 [InvoicesView] Plan detectado:', plan, '| Es plan básico:', isBasic)
+  return isBasic
+}
+
+const goToPlans = () => {
+  showPremiumModal.value = false
+  navigateToModule('settings', { section: 'plans' })
+}
 
 // Computed
 const filteredInvoices = computed(() => {
@@ -1035,13 +1109,70 @@ const openInPos = (invoice) => {
   emit('changeModule', 'pos')
 }
 
-const viewAndPrintInvoice = (invoice) => {
-  selectedInvoice.value = invoice
-  showReceiptModal.value = true
+const viewAndPrintInvoice = async (invoice) => {
+  try {
+    // Determinar tipo de documento
+    const isQuote = invoice.type === 'quote' || invoice.status === 'quotation'
+    const docType = isQuote ? 'cotización' : 'factura'
+    
+    // Preparar datos del documento
+    let items = []
+    try {
+      if (invoice.items) {
+        items = typeof invoice.items === 'string' 
+          ? JSON.parse(invoice.items)
+          : invoice.items
+      }
+    } catch (error) {
+      console.error('Error parseando items:', error)
+      items = []
+    }
+
+    const invoiceData = {
+      invoice_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      quotation_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      date: invoice.date || new Date(),
+      created_at: invoice.created_at || invoice.date || new Date(),
+      customer_name: invoice.customer_name || invoice.customer || 'Cliente General',
+      customer: invoice.customer_name || invoice.customer || 'Cliente General',
+      cashier: invoice.seller_name || 'Vendedor',
+      items: items,
+      subtotal: parseFloat(invoice.subtotal || 0),
+      discount: parseFloat(invoice.discount_amount || 0),
+      tax: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      tax_amount: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      total: parseFloat(invoice.total || 0),
+      payments: invoice.payments || [{
+        method: invoice.payment_method || 'efectivo',
+        amount: parseFloat(invoice.total || 0)
+      }],
+      change: 0,
+      notes: invoice.notes || '',
+      validity_days: 15
+    }
+
+    // Generar PDF usando la plantilla correcta
+    const pdf = isQuote 
+      ? await generateQuotationPDF(invoiceData, appStore.systemSettings)
+      : await generateInvoicePDF(invoiceData, appStore.systemSettings)
+    
+    // Imprimir directamente
+    pdf.autoPrint()
+    window.open(pdf.output('bloburl'), '_blank')
+    
+    showToast(`Preparando impresión de ${docType}...`, 'success')
+  } catch (error) {
+    console.error('Error al imprimir:', error)
+    showToast('Error al preparar la impresión', 'error')
+  }
 }
 
 const downloadPDF = async (invoice) => {
   try {
+    // Determinar tipo de documento
+    const isQuote = invoice.type === 'quote' || invoice.status === 'quotation'
+    const docType = isQuote ? 'cotización' : 'factura'
+    
     // Preparar datos de la factura
     let items = []
     try {
@@ -1083,19 +1214,28 @@ const downloadPDF = async (invoice) => {
       ? await generateQuotationPDF(invoiceData, appStore.systemSettings)
       : await generateInvoicePDF(invoiceData, appStore.systemSettings)
     
-    // Descargar
-    const filename = `factura-${invoiceData.invoice_number}.pdf`
+    // Descargar con nombre apropiado
+    const filename = isQuote 
+      ? `cotizacion-${invoiceData.quotation_number}.pdf`
+      : `factura-${invoiceData.invoice_number}.pdf`
     downloadPDFHelper(pdf, filename)
     
-    showToast('PDF descargado correctamente', 'success')
+    showToast(`PDF de ${docType} descargado correctamente`, 'success')
   } catch (error) {
     console.error('Error descargando PDF:', error)
-    showToast('Error al descargar el PDF', 'error')
+    showToast(`Error al descargar el PDF de ${docType || 'documento'}`, 'error')
   }
 }
 
 const sendByEmail = async (invoice) => {
   try {
+    // Verificar plan antes de procesar
+    if (isBasicPlan()) {
+      premiumFeatureName.value = 'Envío por Email'
+      showPremiumModal.value = true
+      return
+    }
+    
     // Determinar tipo de documento
     const isQuote = invoice.type === 'quote' || invoice.status === 'quotation'
     const docType = isQuote ? 'cotización' : 'factura'
@@ -1177,6 +1317,82 @@ const sendByEmail = async (invoice) => {
   }
 }
 
+const sendByWhatsApp = async (invoice) => {
+  try {
+    // Verificar plan antes de procesar
+    if (isBasicPlan()) {
+      premiumFeatureName.value = 'Envío por WhatsApp'
+      showPremiumModal.value = true
+      return
+    }
+    
+    // Determinar tipo de documento
+    const isQuote = invoice.type === 'quote' || invoice.status === 'quotation'
+    const docType = isQuote ? 'cotización' : 'factura'
+    
+    // Verificar si el cliente tiene teléfono
+    const phone = invoice.customer_phone || invoice.customer?.phone || invoice.customer?.customer_phone
+    
+    if (!phone || phone.trim() === '') {
+      showToast('El cliente no tiene número de teléfono registrado', 'error')
+      return
+    }
+    
+    // Preparar datos del documento
+    let items = []
+    try {
+      if (invoice.items) {
+        items = typeof invoice.items === 'string' 
+          ? JSON.parse(invoice.items)
+          : invoice.items
+      }
+    } catch (error) {
+      console.error('Error parseando items:', error)
+      items = []
+    }
+
+    const documentData = {
+      invoice_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      quotation_number: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      code: invoice.number || invoice.invoiceNumber || `FV-${invoice.id}`,
+      date: invoice.date || new Date(),
+      created_at: invoice.created_at || invoice.date || new Date(),
+      customer_name: invoice.customer_name || invoice.customer || 'Cliente General',
+      customer: invoice.customer_name || invoice.customer || 'Cliente General',
+      cashier: invoice.seller_name || 'Vendedor',
+      items: items,
+      subtotal: parseFloat(invoice.subtotal || 0),
+      discount: parseFloat(invoice.discount_amount || 0),
+      tax: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      tax_amount: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      total: parseFloat(invoice.total || 0),
+      payments: invoice.payments || [{
+        method: invoice.payment_method || 'efectivo',
+        amount: parseFloat(invoice.total || 0)
+      }],
+      change: 0,
+      notes: invoice.notes || '',
+      validity_days: 15
+    }
+
+    // Generar PDF usando la plantilla correcta
+    const pdf = isQuote 
+      ? await generateQuotationPDF(documentData, appStore.systemSettings)
+      : await generateInvoicePDF(documentData, appStore.systemSettings)
+    
+    const pdfBlob = await getPDFBlob(pdf)
+    
+    // Enviar por WhatsApp
+    showToast(`Enviando ${docType} por WhatsApp...`, 'info')
+    await whatsappService.sendDocumentByWhatsApp(phone, pdfBlob, documentData.code || documentData.invoice_number, isQuote ? 'quotation' : 'invoice')
+    
+    showToast(`✅ ${docType} enviada por WhatsApp exitosamente`, 'success')
+  } catch (error) {
+    console.error('Error enviando por WhatsApp:', error)
+    showToast('Error al enviar por WhatsApp', 'error')
+  }
+}
+
 // Solicitar email mediante modal
 const requestEmail = () => {
   return new Promise((resolve) => {
@@ -1247,6 +1463,13 @@ const handleNewSale = () => {
 
 const handleSendWhatsApp = async () => {
   try {
+    // Verificar plan antes de procesar
+    if (isBasicPlan()) {
+      premiumFeatureName.value = 'Envío por WhatsApp'
+      showPremiumModal.value = true
+      return
+    }
+    
     if (!selectedInvoice.value) {
       showToast('Seleccione una factura primero', 'warning')
       return
@@ -1319,8 +1542,229 @@ const handleCloseQuotationModal = () => {
   showQuotationModal.value = false
 }
 
-const handlePrintQuotation = () => {
-  showToast('Impresión próximamente', 'info')
+const handlePrintQuotation = async () => {
+  try {
+    if (!selectedInvoice.value) {
+      showToast('⚠️ No hay cotización seleccionada', 'warning')
+      return
+    }
+
+    const quotationData = selectedInvoice.value
+
+    // Generar el QR como imagen base64
+    const QRCode = await import('qrcode')
+    const qrDataURL = await QRCode.default.toDataURL(quotationData.invoice_number, {
+      width: 150,
+      height: 150,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    })
+
+    // Función para formatear moneda
+    const formatCurrencyForPrint = (amount) => {
+      return new Intl.NumberFormat('es-CO').format(amount)
+    }
+
+    // Crear contenido HTML del ticket
+    const ticketContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        @media print {
+          body { margin: 0; }
+          .no-print { display: none; }
+        }
+        body {
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          line-height: 1.2;
+          max-width: 300px;
+          margin: 0 auto;
+          padding: 10px;
+        }
+        .header {
+          text-align: center;
+          border-bottom: 2px solid #000;
+          padding-bottom: 10px;
+          margin-bottom: 15px;
+        }
+        .company-name {
+          font-size: 16px;
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+        .ticket-type {
+          font-size: 14px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        .section {
+          margin-bottom: 15px;
+        }
+        .section-title {
+          font-weight: bold;
+          border-bottom: 1px solid #000;
+          margin-bottom: 5px;
+        }
+        .code-section {
+          text-align: center;
+          border: 2px solid #000;
+          padding: 10px;
+          margin: 15px 0;
+        }
+        .quotation-code {
+          font-size: 16px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        .qr-code {
+          margin: 10px 0;
+        }
+        .qr-instructions {
+          font-size: 10px;
+          text-align: center;
+          margin-top: 5px;
+        }
+        .products-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 10px;
+        }
+        .products-table th,
+        .products-table td {
+          border: 1px solid #000;
+          padding: 3px;
+          text-align: left;
+          font-size: 10px;
+        }
+        .products-table th {
+          background-color: #f0f0f0;
+          font-weight: bold;
+        }
+        .total-section {
+          border-top: 2px solid #000;
+          padding-top: 10px;
+          text-align: right;
+        }
+        .total-amount {
+          font-size: 16px;
+          font-weight: bold;
+        }
+        .footer {
+          text-align: center;
+          border-top: 1px solid #000;
+          padding-top: 10px;
+          margin-top: 15px;
+          font-size: 10px;
+        }
+        .print-button {
+          text-align: center;
+          margin: 20px 0;
+        }
+        .print-btn {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="company-name">SISTEMA POS</div>
+        <div class="ticket-type">COTIZACIÓN</div>
+        <div>Fecha: ${new Date(quotationData.date).toLocaleDateString('es-CO')}</div>
+        <div>Hora: ${new Date(quotationData.date).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true })}</div>
+        <div>Atendido por: ${quotationData.cashier || 'Vendedor'}</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">CLIENTE</div>
+        <div><strong>${quotationData.customer || 'Cliente General'}</strong></div>
+      </div>
+
+      <div class="code-section">
+        <div class="quotation-code">CÓDIGO: ${quotationData.invoice_number}</div>
+        <div class="qr-code">
+          <img src="${qrDataURL}" alt="QR Code" style="width: 120px; height: 120px;">
+        </div>
+        <div class="qr-instructions">
+          📱 Escanee para cargar automáticamente
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">PRODUCTOS COTIZADOS</div>
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cant.</th>
+              <th>Precio</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${quotationData.items?.map(item => `
+              <tr>
+                <td>${item.product_name || item.name || 'Producto'}</td>
+                <td>${item.quantity || 1}</td>
+                <td>$${formatCurrencyForPrint(item.price || 0)}</td>
+                <td>$${formatCurrencyForPrint((item.quantity || 1) * (item.price || 0))}</td>
+              </tr>
+            `).join('') || '<tr><td colspan="4">No hay productos</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="total-section">
+        <div class="total-amount">
+          TOTAL: $${formatCurrencyForPrint(quotationData.total || 0)}
+        </div>
+      </div>
+
+      <div class="footer">
+        <div>El cliente puede usar este código para</div>
+        <div>realizar la compra posteriormente.</div>
+        <div style="margin-top: 10px;">
+          <strong>¡Gracias por su preferencia!</strong>
+        </div>
+      </div>
+
+      <div class="print-button no-print">
+        <button class="print-btn" onclick="window.print();">
+          🖨️ Imprimir Ticket
+        </button>
+      </div>
+    </body>
+    </html>
+    `
+
+    // Abrir ventana de impresión
+    const printWindow = window.open('', '_blank', 'width=400,height=600')
+    if (printWindow) {
+      printWindow.document.write(ticketContent)
+      printWindow.document.close()
+      printWindow.focus()
+      
+      // Auto-imprimir después de un delay
+      setTimeout(() => {
+        printWindow.print()
+      }, 250)
+    }
+
+  } catch (error) {
+    console.error('❌ Error al imprimir cotización:', error)
+    showToast('❌ Error al imprimir cotización', 'error')
+  }
 }
 
 const handleSendQuotationWhatsApp = () => {

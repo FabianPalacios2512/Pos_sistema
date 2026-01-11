@@ -1404,22 +1404,17 @@ const navigateToPlans = () => {
   showPremiumModal.value = false
   navigateToModule('settings', { section: 'plan' })
 }
-// 📷 Funciones para manejo de foto del cliente
-const photoInput = ref(null)
 
-const triggerPhotoUpload = () => {
-  // Validar plan ANTES de abrir el selector de archivos
+// �📷 Funciones para manejo de foto del cliente
+const handlePhotoUpload = (event) => {
+  // Validar plan antes de permitir subir foto
   if (isBasicPlan()) {
     premiumFeatureName.value = 'Subir Foto del Cliente'
     showPremiumModal.value = true
+    event.target.value = '' // Limpiar el input
     return
   }
   
-  // Si el plan es premium, abrir el selector
-  photoInput.value?.click()
-}
-
-const handlePhotoUpload = (event) => {
   const file = event.target.files[0]
   if (!file) return
   

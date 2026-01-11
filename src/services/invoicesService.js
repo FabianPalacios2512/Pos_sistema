@@ -337,5 +337,48 @@ export const invoicesService = {
       console.error('Error al enviar email:', error)
       throw error
     }
+  },
+
+  // Enviar orden de compra por email
+  async sendPurchaseOrderEmail(orderId, email, pdfBlob, orderNumber = null) {
+    try {
+      const docNumber = orderNumber || orderId
+      
+      const message = `<p>Estimado proveedor,</p>
+        <p>Adjunto encontrará la <strong>Orden de Compra ${docNumber}</strong>.</p>
+        <p>Por favor confirmar la recepción y disponibilidad de los productos solicitados.</p>
+        <p>Quedamos atentos a su confirmación.</p>
+        <p><br>Saludos cordiales,<br>Departamento de Compras</p>`
+      
+      const formData = new FormData()
+      formData.append('email', email)
+      formData.append('pdf', pdfBlob, `orden-compra-${docNumber}.pdf`)
+      formData.append('subject', `Orden de Compra #${docNumber}`)
+      formData.append('message', message)
+
+      // Construir URL completa
+      const baseUrl = window.location.origin
+      const apiPath = API_CONFIG.BASE_URL
+      const url = `${baseUrl}${apiPath}/email/send-invoice`
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`,
+          'X-Tenant': getTenantId() || localStorage.getItem('tenantId')
+        },
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Error al enviar email')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error al enviar email de orden de compra:', error)
+      throw error
+    }
   }
 }
