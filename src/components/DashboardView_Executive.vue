@@ -21,7 +21,7 @@
           <button 
             @click="refreshData" 
             :disabled="loading"
-            class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-zinc-200 bg-white/80 dark:bg-zinc-800/80 backdrop-blur-sm rounded-xl hover:bg-white dark:hover:bg-zinc-700 transition-all shadow-lg shadow-gray-200/50 dark:shadow-black/20"
+            class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors shadow-sm dark:shadow-black/20"
           >
             <svg :class="['w-4 h-4', loading ? 'animate-spin' : '']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -31,7 +31,7 @@
           
           <button 
             @click="handleNewSale"
-            class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-slate-900 dark:bg-slate-700 rounded-xl hover:bg-black dark:hover:bg-slate-600 transition-all shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50"
+            class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-slate-900 dark:bg-slate-700 rounded-xl hover:bg-black dark:hover:bg-slate-600 transition-colors shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -45,10 +45,10 @@
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         
         <!-- 1. Estado de Caja -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 group">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105"
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center"
                    :class="hasOpenSession ? 'bg-emerald-50 dark:bg-emerald-950/50' : 'bg-gray-100 dark:bg-zinc-800'">
                 <svg class="w-5 h-5" :class="hasOpenSession ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path v-if="hasOpenSession" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -79,10 +79,10 @@
         </div>
 
         <!-- 2. Ventas Hoy -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 group">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
+              <div class="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
                 <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
@@ -115,10 +115,10 @@
         </div>
 
         <!-- 3. Transacciones -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 group">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
+              <div class="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center">
                 <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
@@ -140,10 +140,10 @@
         </div>
 
         <!-- 4. Alertas/Stock -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 group">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105"
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center"
                    :class="lowStockCount > 0 ? 'bg-amber-50 dark:bg-amber-950/50' : 'bg-gray-100 dark:bg-zinc-800'">
                 <svg class="w-5 h-5" :class="lowStockCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
@@ -168,7 +168,7 @@
             
             <button 
               @click="handleGoToInventory"
-              class="w-full py-2.5 px-4 text-sm font-medium bg-white/80 dark:bg-zinc-800/80 text-gray-700 dark:text-zinc-200 rounded-xl hover:bg-white dark:hover:bg-zinc-700 transition-all shadow-sm hover:shadow"
+              class="w-full py-2.5 px-4 text-sm font-medium bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
             >
               Ver Inventario
             </button>
@@ -180,7 +180,7 @@
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         
         <!-- Gráfico de Ingresos (Area Chart Mejorado) -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
           <div class="flex items-center justify-between mb-6">
             <div>
               <h3 class="text-base font-bold text-slate-900 dark:text-white">Análisis de Ingresos</h3>
@@ -188,12 +188,12 @@
             </div>
             
             <!-- Tabs de período -->
-            <div class="inline-flex items-center gap-1 p-1 bg-gray-100/80 dark:bg-zinc-800/80 rounded-xl backdrop-blur-sm">
+            <div class="inline-flex items-center gap-1 p-1 bg-gray-100 dark:bg-zinc-800 rounded-xl">
               <button 
                 v-for="period in periods" 
                 :key="period.value"
                 @click="selectedPeriod = period.value"
-                class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all"
+                class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
                 :class="selectedPeriod === period.value 
                   ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
                   : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200'"
@@ -203,13 +203,13 @@
             </div>
           </div>
           
-          <div class="h-[300px] flex items-center justify-center transition-opacity duration-300" :class="loading ? 'opacity-50' : 'opacity-100'">
+          <div class="h-[300px] flex items-center justify-center" :class="loading ? 'opacity-50' : 'opacity-100'">
             <Line :data="chartData" :options="chartOptions" />
           </div>
         </div>
 
         <!-- Gráfico de Top Productos (Doughnut Mejorado) -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
           <div class="mb-6">
             <h3 class="text-base font-bold text-slate-900 dark:text-white">Top Productos</h3>
             <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Distribución de ingresos</p>
@@ -227,7 +227,7 @@
             
             <!-- Leyenda mejorada -->
             <div class="flex-1 space-y-3">
-              <div v-for="(product, index) in topProducts.slice(0, 5)" :key="index" class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
+              <div v-for="(product, index) in topProducts.slice(0, 5)" :key="index" class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
                 <div class="flex items-center gap-2.5 min-w-0 flex-1">
                   <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{ backgroundColor: productColors[index] }"></div>
                   <span class="text-sm text-gray-700 dark:text-zinc-300 truncate">{{ product.name }}</span>
@@ -240,7 +240,7 @@
       </div>
 
       <!-- Últimas Transacciones -->
-      <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
         <div class="mb-6">
           <h3 class="text-base font-bold text-gray-900 dark:text-white">Últimas Transacciones</h3>
           <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Actividad reciente del sistema</p>
@@ -249,7 +249,7 @@
         <div class="space-y-2">
           <div v-if="recentSalesComputed && recentSalesComputed.length > 0">
             <div v-for="sale in recentSalesComputed.slice(0, 5)" :key="sale.id" 
-                 class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50/50 dark:bg-zinc-800/30 hover:bg-gray-100/50 dark:hover:bg-zinc-800/50 transition-all">
+                 class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
               <div class="flex items-center gap-4 min-w-0 flex-1">
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
                   <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -769,11 +769,6 @@ const loadDashboardData = async (period = '24H') => {
   }
 }
 
-// Watchers
-watch(selectedPeriod, async (newPeriod) => {
-  await loadDashboardData(newPeriod)
-})
-
 // Handlers
 const refreshData = async () => {
   loading.value = true
@@ -806,7 +801,7 @@ const handleGoToInventory = () => {
   emit('change-module', 'stock')
 }
 
-// Watch para cambios en período
+// Watchers (solo uno)
 watch(selectedPeriod, async (newPeriod) => {
   await loadDashboardData(newPeriod)
 })

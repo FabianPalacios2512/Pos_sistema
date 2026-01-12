@@ -1,426 +1,435 @@
 <template>
-  <!-- Contenido del formulario sin header ni footer -->
-  <div class="space-y-6">
+  <!-- Contenido del formulario - Diseño Profesional SaaS -->
+  <div class="space-y-5">
     
-    <!-- Grid 2 Columnas: Izquierda (Info) | Derecha (Multimedia) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-      <!-- COLUMNA IZQUIERDA: Información del Producto (2/3) -->
-      <div class="lg:col-span-2 space-y-6">
-        
-        <!-- Información Básica -->
-        <div class="space-y-4">
-            <!-- Nombre -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">
-                Nombre del Producto <span class="text-red-500">*</span>
-              </label>
-              <input 
-                v-model="form.name"
-                type="text" 
-                required
-                placeholder="Ej: Camiseta Polo Premium"
-                class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-zinc-600 focus:border-gray-400 dark:focus:border-zinc-600 transition-all"
-              >
-            </div>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECCIÓN 1: INFORMACIÓN BÁSICA (Compacta) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="space-y-4">
+      
+      <!-- Nombre del Producto -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+          Nombre del Producto <span class="text-rose-500">*</span>
+        </label>
+        <input 
+          v-model="form.name"
+          type="text" 
+          required
+          placeholder="Ej: Camiseta Polo Premium"
+          class="w-full px-4 py-2.5 bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 focus:border-transparent transition-all"
+        >
+      </div>
 
-            <!-- Categoría y SKU en fila -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Categoría *</label>
-                <select 
-                  v-model="form.category_id"
-                  @change="handleCategoryChange"
-                  class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-zinc-600"
-                >
-                  <option value="" disabled>Seleccionar...</option>
-                  <option value="__new__" class="font-medium">+ Nueva Categoría</option>
-                  <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">SKU (Opcional)</label>
-                <input 
-                  v-model="form.sku"
-                  type="text" 
-                  placeholder="Auto"
-                  class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-zinc-600"
-                >
-              </div>
-            </div>
-
-            <!-- Proveedor -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Proveedor (Opcional)</label>
-              <select 
-                v-model="form.supplier_id"
-                @change="handleSupplierChange"
-                class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-zinc-600"
-              >
-                <option :value="null">Sin proveedor</option>
-                <option value="__new__" class="font-medium">+ Nuevo Proveedor</option>
-                <option v-for="sup in suppliers" :key="sup.id" :value="sup.id">{{ sup.name }}</option>
-              </select>
-            </div>
-
-            <!-- Descripción -->
-            <div>
-              <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Descripción</label>
-              <textarea 
-                v-model="form.description"
-                rows="3"
-                placeholder="Detalles del material, ajuste, etc."
-                class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 resize-none focus:outline-none focus:ring-1 focus:ring-gray-400 dark:focus:ring-zinc-600"
-              ></textarea>
-            </div>
-          </div>
-        </div>
-        
-        <!-- COLUMNA DERECHA: Multimedia (1/3) -->
-        <div class="lg:col-span-1">
-          <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-2">Imágenes</label>
-          
-          <!-- Dropzone Minimalista -->
-          <div 
-            @click="triggerFileInput"
-            @dragover.prevent="isDragging = true"
-            @dragleave.prevent="isDragging = false"
-            @drop.prevent="handleDrop"
-            :class="[
-              'border border-dashed rounded-md p-6 text-center transition-all cursor-pointer h-[200px] flex flex-col items-center justify-center gap-2',
-              isDragging 
-                ? 'border-gray-400 bg-gray-50 dark:bg-zinc-800' 
-                : 'border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800/50'
-            ]"
+      <!-- Fila Compacta: Categoría + SKU + Proveedor -->
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Categoría *</label>
+          <select 
+            v-model="form.category_id"
+            @change="handleCategoryChange"
+            class="w-full px-3 py-2.5 bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500"
           >
-            <input 
-              type="file" 
-              ref="fileInput" 
-              class="hidden" 
-              multiple 
-              accept="image/*"
-              @change="handleFileChange"
-            >
-            
-            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            
-            <div>
-              <p class="text-xs text-gray-600 dark:text-zinc-400">Arrastra o haz click</p>
-              <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">JPG, PNG • Máx 5</p>
+            <option value="" disabled>Seleccionar</option>
+            <option value="__new__" class="font-medium text-blue-600">＋ Nueva</option>
+            <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">SKU</label>
+          <input 
+            v-model="form.sku"
+            type="text" 
+            placeholder="Auto-generado"
+            class="w-full px-3 py-2.5 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-600 dark:text-zinc-400 font-mono placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Proveedor</label>
+          <select 
+            v-model="form.supplier_id"
+            @change="handleSupplierChange"
+            class="w-full px-3 py-2.5 bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500"
+          >
+            <option :value="null">Sin proveedor</option>
+            <option value="__new__" class="font-medium text-blue-600">＋ Nuevo</option>
+            <option v-for="sup in suppliers" :key="sup.id" :value="sup.id">{{ sup.name }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECCIÓN 2: MULTIMEDIA + DESCRIPCIÓN (Grid 2 columnas) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      
+      <!-- Área de Imágenes -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Imágenes del Producto</label>
+        
+        <!-- Dropzone Compacto -->
+        <div 
+          @click="triggerFileInput"
+          @dragover.prevent="isDragging = true"
+          @dragleave.prevent="isDragging = false"
+          @drop.prevent="handleDrop"
+          :class="[
+            'relative border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer',
+            isDragging 
+              ? 'border-slate-400 bg-slate-50 dark:bg-zinc-800' 
+              : 'border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 hover:bg-gray-50/50 dark:hover:bg-zinc-800/30'
+          ]"
+        >
+          <input 
+            type="file" 
+            ref="fileInput" 
+            class="hidden" 
+            multiple 
+            accept="image/*"
+            @change="handleFileChange"
+          >
+          
+          <!-- Sin imágenes -->
+          <div v-if="form.images.length === 0" class="py-4">
+            <div class="w-12 h-12 mx-auto rounded-xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center mb-2">
+              <svg class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
             </div>
+            <p class="text-sm font-medium text-gray-600 dark:text-zinc-400">Arrastra imágenes aquí</p>
+            <p class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">o haz clic para seleccionar • Máx 5 fotos</p>
           </div>
 
-          <!-- Grid de Imágenes -->
-          <div v-if="form.images.length > 0" class="grid grid-cols-3 gap-2 mt-3">
-            <div v-for="(img, index) in form.images" :key="index" class="relative group aspect-square bg-gray-100 dark:bg-zinc-800 rounded overflow-hidden border border-gray-200 dark:border-zinc-700">
+          <!-- Con imágenes - Grid de miniaturas -->
+          <div v-else class="grid grid-cols-5 gap-2">
+            <div v-for="(img, index) in form.images" :key="index" 
+                 class="relative group aspect-square bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-hidden border border-gray-200 dark:border-zinc-700">
               <img :src="img.preview" class="w-full h-full object-cover">
               <button 
                 type="button"
                 @click.stop="removeImage(index)"
-                class="absolute top-1 right-1 w-5 h-5 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                class="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
+              <span v-if="index === 0" class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[8px] font-bold text-center py-0.5">PRINCIPAL</span>
+            </div>
+            <!-- Slot para agregar más -->
+            <div v-if="form.images.length < 5" 
+                 class="aspect-square rounded-lg border-2 border-dashed border-gray-200 dark:border-zinc-700 flex items-center justify-center text-gray-400 dark:text-zinc-600 hover:border-gray-300 dark:hover:border-zinc-600 transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             </div>
           </div>
-        </div>
-    </div>
-    <!-- FIN Grid 2 Columnas -->
-
-    <!-- Variantes (Fuera del Grid) -->
-    <div class="space-y-4">
-        <div class="space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Atributos del Producto</h3>
-            <button 
-              type="button"
-              @click="addOption"
-              class="text-xs font-medium text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white flex items-center gap-1"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-              Añadir Atributo
-            </button>
-          </div>
-
-          <!-- Lista de Atributos -->
-          <div v-if="form.options.length === 0" class="text-center py-8 text-gray-400 dark:text-zinc-500 text-xs flex flex-col items-center gap-2 bg-gray-50 dark:bg-zinc-900/50 rounded-lg border border-dashed border-gray-200 dark:border-zinc-800">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-            <span>No hay atributos. Agrega "Talla" o "Color"</span>
-          </div>
-
-          <div v-for="(option, index) in form.options" :key="index" class="bg-white dark:bg-zinc-900 p-4 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm">
-            <div class="flex items-start gap-3">
-              <!-- Nombre del Atributo - MÁS GRANDE -->
-              <div class="w-36 flex-shrink-0">
-                <input 
-                  v-model="option.name"
-                  type="text" 
-                  placeholder="Talla / Color"
-                  class="w-full px-3 py-3 bg-gray-50 dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 rounded-lg text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-600 focus:border-slate-400 dark:focus:border-slate-600 outline-none transition-all"
-                >
-              </div>
-
-              <!-- Valores - Color Picker o Input Normal -->
-              <div class="flex-1">
-                <!-- Si es "Color" mostrar picker directo + círculos -->
-                <div v-if="isColorOption(option.name)" class="space-y-2">
-                  <!-- Input oculto + botón visual -->
-                  <div class="relative">
-                    <input 
-                      :ref="el => colorInputRefs[index] = el"
-                      type="color"
-                      @change="addColorFromPicker(index, $event)"
-                      class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    >
-                    <button
-                      type="button"
-                      @click="triggerColorPicker(index)"
-                      class="w-full px-3 py-2 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 rounded-md flex items-center justify-center gap-2 transition-all group"
-                    >
-                      <div class="w-7 h-7 rounded-md bg-gray-900 dark:bg-gray-700 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                        <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-                      </div>
-                      <span class="text-xs font-medium text-gray-600 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-white">Seleccionar Color</span>
-                    </button>
-                  </div>
-                  
-                  <!-- Colores seleccionados - Solo círculos -->
-                  <div v-if="option.values.length > 0" class="flex flex-wrap gap-1.5">
-                    <button
-                      type="button"
-                      v-for="val in option.values" 
-                      :key="val"
-                      @click="removeColorValue(index, val)"
-                      :style="{ backgroundColor: val }"
-                      class="w-9 h-9 rounded-md border border-gray-200 dark:border-zinc-700 shadow-sm hover:shadow-md hover:scale-110 transition-all group relative"
-                      :title="val"
-                    >
-                      <!-- X para eliminar al hover -->
-                      <div class="absolute inset-0 bg-black/60 rounded-md opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Si NO es "Color" mostrar input tradicional - MÁS GRANDE -->
-                <div v-else class="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 rounded-lg min-h-[48px]">
-                  <span 
-                    v-for="(val, vIndex) in option.values" 
-                    :key="vIndex"
-                    class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-white dark:bg-zinc-700 text-gray-900 dark:text-zinc-200 border-2 border-gray-300 dark:border-zinc-600 shadow-sm"
-                  >
-                    {{ val }}
-                    <button type="button" @click="removeValue(index, vIndex)" class="ml-2 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 text-lg font-bold">×</button>
-                  </span>
-                  <input 
-                    type="text"
-                    v-model="option.tempValue"
-                    @keydown.enter.prevent="addOptionValue(index)"
-                    @keydown.backspace="handleBackspace(index)"
-                    placeholder="Escribe y Enter..."
-                    class="flex-1 bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-900 dark:text-white min-w-[120px] p-1"
-                  >
-                </div>
-              </div>
-
-              <!-- Botón Eliminar -->
-              <button 
-                type="button" 
-                @click="removeOption(index)"
-                class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Botón Dinámico: Continuar o Generar Variantes -->
-        <div class="space-y-2">
-          <button 
-            type="button"
-            ref="generateButton"
-            @click="handleContinueOrGenerate"
-            class="w-full py-4 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-base font-black rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <svg v-if="!hasValidOptions" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-            <span class="uppercase tracking-wide">{{ buttonText }}</span>
-          </button>
-          <p class="text-center text-xs text-gray-500 dark:text-zinc-400">
-            <span v-if="!hasValidOptions">
-              💡 Sin atributos, el producto se creará como <span class="font-medium">simple</span>
-            </span>
-            <span v-else>
-              🎯 Genera la matriz de variantes para configurar precios y stock
-            </span>
-          </p>
         </div>
       </div>
 
-      <!-- ✅ Formulario Simple (para productos sin variantes) -->
-      <section v-if="showSimpleForm" ref="simpleFormSection" class="space-y-4 animate-fade-in">
-        <div class="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30 rounded-xl p-4">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
+      <!-- Descripción -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Descripción</label>
+        <textarea 
+          v-model="form.description"
+          rows="5"
+          placeholder="Describe el material, ajuste, instrucciones de cuidado..."
+          class="w-full px-4 py-3 bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 resize-none focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 h-[130px]"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECCIÓN 3: VARIANTES (Atributos + Generación) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="border-t border-gray-100 dark:border-zinc-800 pt-5">
+      
+      <!-- Header de Atributos -->
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 class="text-sm font-bold text-gray-900 dark:text-white">Atributos y Variantes</h3>
+          <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Define tallas, colores u otras opciones</p>
+        </div>
+        <button 
+          type="button"
+          @click="addOption"
+          class="px-3 py-1.5 text-xs font-semibold text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg flex items-center gap-1.5 transition-all"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Añadir Atributo
+        </button>
+      </div>
+
+      <!-- Estado Vacío -->
+      <div v-if="form.options.length === 0" 
+           class="text-center py-8 bg-gray-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-gray-200 dark:border-zinc-800">
+        <svg class="w-8 h-8 mx-auto text-gray-300 dark:text-zinc-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+        </svg>
+        <p class="text-xs text-gray-400 dark:text-zinc-500">Sin atributos configurados</p>
+        <p class="text-[10px] text-gray-400 dark:text-zinc-600 mt-0.5">El producto se guardará como simple</p>
+      </div>
+
+      <!-- Lista de Atributos -->
+      <div v-else class="space-y-3">
+        <div v-for="(option, index) in form.options" :key="index" 
+             class="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900/60 rounded-xl border border-gray-100 dark:border-zinc-800">
+          
+          <!-- Nombre del Atributo -->
+          <input 
+            v-model="option.name"
+            type="text" 
+            placeholder="Nombre"
+            class="w-28 px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm font-semibold text-gray-900 dark:text-white text-center focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-600 focus:border-transparent outline-none transition-all"
+          >
+
+          <!-- Valores - Color Picker Compacto o Input Tags -->
+          <div class="flex-1">
+            <!-- Si es "Color" - Picker Inline Compacto -->
+            <div v-if="isColorOption(option.name)" class="flex items-center gap-2 flex-wrap">
+              <!-- Colores seleccionados -->
+              <button
+                type="button"
+                v-for="val in option.values" 
+                :key="val"
+                @click="removeColorValue(index, val)"
+                :style="{ backgroundColor: val }"
+                class="w-8 h-8 rounded-lg border-2 border-white dark:border-zinc-800 shadow-md hover:scale-110 transition-transform relative group"
+                :title="`Quitar ${val}`"
+              >
+                <div class="absolute inset-0 bg-black/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                </div>
+              </button>
+              
+              <!-- Botón Agregar Color -->
+              <label class="w-8 h-8 rounded-lg bg-gradient-to-br from-red-400 via-green-400 to-blue-400 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-md border-2 border-white dark:border-zinc-800">
+                <input 
+                  type="color"
+                  @change="addColorFromPicker(index, $event)"
+                  class="sr-only"
+                >
+                <svg class="w-4 h-4 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+              </label>
             </div>
-            <div class="flex-1">
-              <h3 class="text-sm font-bold text-blue-900 dark:text-blue-300 mb-1">Producto Simple</h3>
-              <p class="text-xs text-blue-700 dark:text-blue-400">Configura el precio, costo y stock para este producto sin variantes</p>
+
+            <!-- Si NO es "Color" - Input con Tags -->
+            <div v-else class="flex flex-wrap items-center gap-1.5 p-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg min-h-[40px]">
+              <span 
+                v-for="(val, vIndex) in option.values" 
+                :key="vIndex"
+                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-white dark:bg-zinc-700 text-gray-700 dark:text-zinc-200 border border-gray-200 dark:border-zinc-600 shadow-sm"
+              >
+                {{ val }}
+                <button type="button" @click="removeValue(index, vIndex)" class="ml-1.5 text-gray-400 hover:text-red-500 transition-colors">×</button>
+              </span>
+              <input 
+                type="text"
+                v-model="option.tempValue"
+                @keydown.enter.prevent="addOptionValue(index)"
+                @keydown.backspace="handleBackspace(index)"
+                placeholder="Escribir y Enter"
+                class="flex-1 min-w-[100px] bg-transparent border-none focus:ring-0 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 p-0"
+              >
             </div>
+          </div>
+
+          <!-- Botón Eliminar Atributo -->
+          <button 
+            type="button" 
+            @click="removeOption(index)"
+            class="p-2 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón Generar / Continuar -->
+      <div class="mt-4">
+        <button 
+          type="button"
+          ref="generateButton"
+          @click="handleContinueOrGenerate"
+          :class="[
+            'w-full py-3 rounded-xl text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2',
+            hasValidOptions 
+              ? 'bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 text-white' 
+              : 'bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
+          ]"
+        >
+          <svg v-if="!hasValidOptions" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          <span>{{ buttonText }}</span>
+        </button>
+        <p class="text-center text-[11px] text-gray-400 dark:text-zinc-500 mt-2">
+          {{ !hasValidOptions ? '💡 Sin atributos = Producto simple' : '🎯 Genera la matriz para asignar precios y stock' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECCIÓN 4: FORMULARIO SIMPLE (Sin Variantes) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section v-if="showSimpleForm" ref="simpleFormSection" class="animate-fade-in">
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-100 dark:border-blue-900/30 rounded-xl p-4 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-blue-900 dark:text-blue-300">Producto Simple</h3>
+            <p class="text-xs text-blue-600 dark:text-blue-400/80">Sin variantes de talla o color</p>
           </div>
         </div>
+      </div>
 
-        <div class="grid grid-cols-3 gap-4">
-          <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">
-              Costo <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <span class="absolute left-3 top-2.5 text-gray-400 dark:text-zinc-500">$</span>
-              <input 
-                v-model.number="simpleProduct.cost"
-                type="number"
-                step="0.01"
-                min="0"
-                required
-                class="w-full pl-7 pr-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="0.00"
-              >
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">
-              Precio de Venta <span class="text-red-500">*</span>
-            </label>
-            <div class="relative">
-              <span class="absolute left-3 top-2.5 text-gray-400 dark:text-zinc-500">$</span>
-              <input 
-                v-model.number="simpleProduct.price"
-                type="number"
-                step="0.01"
-                min="0"
-                required
-                class="w-full pl-7 pr-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="0.00"
-              >
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">
-              Stock Inicial <span class="text-red-500">*</span>
-            </label>
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+            Costo <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
             <input 
-              v-model.number="simpleProduct.stock"
+              v-model.number="simpleProduct.cost"
               type="number"
+              step="0.01"
               min="0"
               required
-              class="w-full px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-md text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              class="w-full pl-8 pr-3 py-2.5 bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent tabular-nums"
               placeholder="0"
             >
           </div>
         </div>
 
-        <!-- Cálculo de Margen -->
-        <div v-if="simpleProduct.cost > 0 && simpleProduct.price > 0" class="bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-3 flex items-center justify-between">
-          <span class="text-xs font-medium text-gray-600 dark:text-zinc-400">Margen de Ganancia:</span>
-          <span class="text-sm font-bold" :class="profitMargin >= 20 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'">
-            {{ profitMargin }}%
-          </span>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+            Precio Venta <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
+            <input 
+              v-model.number="simpleProduct.price"
+              type="number"
+              step="0.01"
+              min="0"
+              required
+              class="w-full pl-8 pr-3 py-2.5 bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm font-semibold text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent tabular-nums"
+              placeholder="0"
+            >
+          </div>
         </div>
-      </section>
 
-      <!-- Matriz de Variantes Generadas -->
-      <section v-if="form.variants.length > 0 && !showSimpleForm" ref="variantsSection" class="px-6 pb-6 space-y-3 animate-fade-in">
-        <h3 class="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
-          Variantes Generadas <span class="text-gray-400">({{ form.variants.length }})</span>
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+            Stock <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            v-model.number="simpleProduct.stock"
+            type="number"
+            min="0"
+            required
+            class="w-full px-3 py-2.5 bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm font-semibold text-gray-900 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent tabular-nums"
+            placeholder="0"
+          >
+        </div>
+      </div>
+
+      <!-- Indicador de Margen -->
+      <div v-if="simpleProduct.cost > 0 && simpleProduct.price > 0" 
+           class="mt-3 flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-zinc-800/50 rounded-lg">
+        <span class="text-xs text-gray-500 dark:text-zinc-400">Margen de Ganancia</span>
+        <span class="text-sm font-bold" :class="profitMargin >= 20 ? 'text-emerald-600 dark:text-emerald-400' : profitMargin >= 10 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'">
+          {{ profitMargin }}%
+        </span>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECCIÓN 5: TABLA DE VARIANTES (Generada) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <section v-if="form.variants.length > 0 && !showSimpleForm" ref="variantsSection" class="animate-fade-in">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          Variantes
+          <span class="text-xs font-normal text-gray-400 dark:text-zinc-500">({{ form.variants.length }} combinaciones)</span>
         </h3>
+      </div>
 
-        <!-- Tabla Limpia -->
-        <div class="overflow-x-auto border border-gray-200 dark:border-zinc-800 rounded-lg">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-            <thead class="bg-gray-50 dark:bg-zinc-900">
-              <tr>
-                <th scope="col" class="px-4 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase">Variante</th>
-                <th scope="col" class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-36">SKU</th>
-                <th scope="col" class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-36">Costo</th>
-                <th scope="col" class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-36">Precio</th>
-                <th scope="col" class="px-3 py-3 text-left text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-28">Stock</th>
-                <th scope="col" class="px-3 py-3 text-center text-[10px] font-semibold text-gray-600 dark:text-zinc-400 uppercase w-14"></th>
-              </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
-              <tr v-for="(variant, index) in form.variants" :key="index" class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors">
-                <td class="px-4 py-3">
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ getVariantName(variant) }}
-                  </span>
-                </td>
-                <td class="px-3 py-2">
+      <!-- Tabla Compacta -->
+      <div class="overflow-hidden border border-gray-200 dark:border-zinc-800 rounded-xl">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
+          <thead class="bg-gray-50 dark:bg-zinc-900/80">
+            <tr>
+              <th class="px-3 py-2.5 text-left text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Variante</th>
+              <th class="px-3 py-2.5 text-left text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-32">SKU</th>
+              <th class="px-3 py-2.5 text-center text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-28">Costo</th>
+              <th class="px-3 py-2.5 text-center text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-28">Precio</th>
+              <th class="px-3 py-2.5 text-center text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-20">Stock</th>
+              <th class="px-2 py-2.5 w-10"></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-zinc-900/40 divide-y divide-gray-100 dark:divide-zinc-800/50">
+            <tr v-for="(variant, index) in form.variants" :key="index" class="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
+              <td class="px-3 py-2">
+                <span class="text-sm font-medium text-gray-900 dark:text-white">{{ getVariantName(variant) }}</span>
+              </td>
+              <td class="px-3 py-1.5">
+                <input 
+                  v-model="variant.sku"
+                  type="text" 
+                  class="w-full px-2 py-1.5 text-xs font-mono border border-gray-200 dark:border-zinc-700 rounded-lg bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
+                >
+              </td>
+              <td class="px-3 py-1.5">
+                <div class="relative">
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">$</span>
                   <input 
-                    v-model="variant.sku"
-                    type="text" 
-                    class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                </td>
-                <td class="px-3 py-2">
-                  <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
-                    <input 
-                      v-model.number="variant.cost"
-                      type="number"
-                      step="1"
-                      min="0"
-                      placeholder="0"
-                      class="w-full pl-7 pr-3 py-2.5 text-sm font-semibold border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tabular-nums"
-                    >
-                  </div>
-                </td>
-                <td class="px-3 py-2">
-                  <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
-                    <input 
-                      v-model.number="variant.price"
-                      type="number" 
-                      step="1"
-                      min="0"
-                      placeholder="0"
-                      class="w-full pl-7 pr-3 py-2.5 text-sm font-semibold border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tabular-nums"
-                    >
-                  </div>
-                </td>
-                <td class="px-3 py-2">
-                  <input 
-                    v-model.number="variant.stock"
-                    type="number" 
+                    v-model.number="variant.cost_price"
+                    type="number"
+                    step="1"
                     min="0"
-                    placeholder="0"
-                    class="w-full px-3 py-2.5 text-sm font-semibold border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tabular-nums"
+                    class="w-full pl-5 pr-2 py-1.5 text-sm font-semibold text-center border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-slate-400 tabular-nums"
                   >
-                </td>
-                <td class="px-3 py-2 text-center">
-                  <button 
-                    type="button" 
-                    @click="removeVariant(index)"
-                    class="text-gray-400 hover:text-red-500 transition-colors"
+                </div>
+              </td>
+              <td class="px-3 py-1.5">
+                <div class="relative">
+                  <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">$</span>
+                  <input 
+                    v-model.number="variant.price"
+                    type="number" 
+                    step="1"
+                    min="0"
+                    class="w-full pl-5 pr-2 py-1.5 text-sm font-semibold text-center border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 focus:outline-none focus:ring-1 focus:ring-slate-400 tabular-nums"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-2.002-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+                </div>
+              </td>
+              <td class="px-3 py-1.5">
+                <input 
+                  v-model.number="variant.stock"
+                  type="number" 
+                  min="0"
+                  class="w-full px-2 py-1.5 text-sm font-semibold border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-center focus:outline-none focus:ring-1 focus:ring-slate-400 tabular-nums"
+                >
+              </td>
+              <td class="px-2 py-1.5 text-center">
+                <button 
+                  type="button" 
+                  @click="removeVariant(index)"
+                  class="p-1 text-gray-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
   <!-- FIN contenedor principal -->
 </template>
@@ -488,8 +497,6 @@ const form = reactive({
 // 🔄 Cargar datos cuando se edita un producto
 watch(() => props.editingProduct, (product) => {
   if (product) {
-    console.log('📝 [FashionForm] Producto recibido para editar:', product)
-    
     form.id = product.id || null
     form.name = product.name || ''
     form.sku = product.sku || ''
@@ -581,7 +588,7 @@ watch(() => props.editingProduct, (product) => {
         return {
           sku: variant.sku,
           price: parseFloat(variant.price || 0),
-          cost: parseFloat(variant.cost_price || variant.cost || 0),
+          cost_price: parseFloat(variant.cost_price || variant.cost || 0),
           stock: parseInt(variant.stock || 0),
           active: variant.active !== false,
           options: processedOptions
@@ -597,18 +604,13 @@ watch(() => props.editingProduct, (product) => {
                            (!form.variants[0].options || form.variants[0].options.length === 0)
     
     if (isSimpleProduct) {
-      // ✅ Es un producto simple - cargar datos en el formulario simple
-      simpleProduct.cost = form.variants[0].cost || form.variants[0].cost_price || 0
-      simpleProduct.price = form.variants[0].price
-      simpleProduct.stock = form.variants[0].stock
-      showSimpleForm.value = true
+      // Es un producto simple - cargar datos en el formulario simple
+      const variant = form.variants[0]
       
-      console.log('📦 [FashionForm] Producto simple detectado al editar:', {
-        cost: simpleProduct.cost,
-        price: simpleProduct.price,
-        stock: simpleProduct.stock,
-        variant_original: form.variants[0]
-      })
+      simpleProduct.cost = variant.cost_price || variant.cost || 0
+      simpleProduct.price = variant.price
+      simpleProduct.stock = variant.stock
+      showSimpleForm.value = true
       
       // Limpiar las opciones (no tiene atributos)
       form.options = [
@@ -616,13 +618,7 @@ watch(() => props.editingProduct, (product) => {
         { name: 'Color', values: [], tempValue: '' }
       ]
     } else if (hasNoVariants) {
-      // ✅ No tiene variantes - intentar cargar desde product padre
-      console.log('📦 [FashionForm] Producto sin variantes, cargando desde padre:', {
-        sale_price: product.sale_price,
-        cost_price: product.cost_price,
-        current_stock: product.current_stock
-      })
-      
+      // No tiene variantes - intentar cargar desde product padre
       simpleProduct.cost = parseFloat(product.cost_price || 0)
       simpleProduct.price = parseFloat(product.sale_price || product.price || 0)
       simpleProduct.stock = parseInt(product.current_stock || product.stock || 0)
@@ -783,9 +779,9 @@ const hasValidOptions = computed(() => {
 // Computed: Texto dinámico del botón
 const buttonText = computed(() => {
   if (!hasValidOptions.value) {
-    return 'Continuar sin Variantes'
+    return 'Continuar como Producto Simple'
   }
-  return form.variants.length > 0 ? 'Regenerar Variantes' : 'Generar Variantes'
+  return form.variants.length > 0 ? 'Regenerar Tabla de Variantes' : 'Generar Tabla de Variantes'
 })
 
 const generateVariants = () => {
@@ -833,7 +829,7 @@ const generateVariants = () => {
     return {
       options: combo, // Guardar la combinación exacta
       sku: `${baseSku}-${skuSuffix}`,
-      cost: 0,
+      cost_price: 0,
       price: 0,
       stock: 0,
       active: true
@@ -962,13 +958,11 @@ const handleSubmit = () => {
     form.variants = [{
       sku: form.sku || `SKU-${Date.now()}`,
       price: simpleProduct.price,
-      cost: simpleProduct.cost,
+      cost_price: simpleProduct.cost,
       stock: simpleProduct.stock,
       active: true,
       options: []
     }]
-    
-    console.log('📦 [FashionForm] Variante simple creada/actualizada:', form.variants[0])
   }
   
   // Si no hay variantes ni formulario simple mostrado, crear variante por defecto
@@ -976,7 +970,7 @@ const handleSubmit = () => {
     form.variants = [{
       sku: form.sku || `SKU-${Date.now()}`,
       price: 0,
-      cost: 0,
+      cost_price: 0,
       stock: 0,
       active: true,
       options: []

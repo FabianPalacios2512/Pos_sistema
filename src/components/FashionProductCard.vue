@@ -4,8 +4,8 @@
     
     <!-- Imagen Principal (Aspect Ratio 3:4 Portrait) -->
     <div class="relative aspect-[3/4] rounded-2xl overflow-hidden mb-3 shadow-sm dark:shadow-black/40 ring-1 ring-gray-200/60 dark:ring-white/5 group-hover:ring-gray-300 dark:group-hover:ring-white/10 group-hover:shadow-lg dark:group-hover:shadow-black/60 transition-all duration-300" 
-         :class="(product.image_url && product.image_url.length > 10) ? 'bg-gradient-to-b from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-950' : 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900'">
-      <img v-if="product.image_url && product.image_url.length > 10"
+         :class="getProductImage(product) ? 'bg-gradient-to-b from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-950' : 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900'">
+      <img v-if="getProductImage(product)"
            :src="getProductImage(product)" 
            :alt="product.name" 
            @error="handleImageError"
@@ -305,20 +305,55 @@ const getColorHex = (colorName) => {
 
 // 🖼️ Helper: Obtener imagen del producto
 const getProductImage = (product) => {
+  // 1. Primero verificar si hay imágenes en la galería (relación images)
+  if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+    const primaryImage = product.images.find(img => img.is_primary) || product.images[0]
+    const imageUrl = primaryImage?.image_url || primaryImage?.url
+    if (imageUrl) {
+      return processImageUrl(imageUrl)
+    }
+  }
+  
+  // 2. Verificar image_url del producto
   if (product.image_url && product.image_url.length > 10) {
-    // Si es URL externa, devolverla directamente
-    if (product.image_url.startsWith('http://') || product.image_url.startsWith('https://')) {
-      return product.image_url
-    }
-    // Si es ruta del servidor, asegurar que esté correcta
-    if (product.image_url.startsWith('/storage/')) {
-      return product.image_url
-    }
-    return `/storage/${product.image_url}`
+    return processImageUrl(product.image_url)
   }
   
   // Si no hay imagen, no devolver nada (se mostrará el placeholder)
   return null
+}
+
+// 📸 Helper: Procesar URL de imagen para el backend
+const processImageUrl = (url) => {
+  if (!url || typeof url !== 'string') return null
+  
+  const trimmedUrl = url.trim()
+  
+  // Si ya es URL completa, devolverla
+  if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+    return trimmedUrl
+  }
+  
+  // Si es data URI
+  if (trimmedUrl.startsWith('data:image')) {
+    return trimmedUrl
+  }
+  
+  // Si es ruta de storage, construir URL completa al backend
+  if (trimmedUrl.startsWith('/storage')) {
+    const backendUrl = `http://${window.location.hostname}:8000`
+    return `${backendUrl}${trimmedUrl}`
+  }
+  
+  // Si no empieza con /, agregar /storage/ y construir URL
+  if (!trimmedUrl.startsWith('/')) {
+    const backendUrl = `http://${window.location.hostname}:8000`
+    return `${backendUrl}/storage/${trimmedUrl}`
+  }
+  
+  // Ruta relativa genérica
+  const backendUrl = `http://${window.location.hostname}:8000`
+  return `${backendUrl}${trimmedUrl}`
 }
 
 const handleImageError = (e) => {

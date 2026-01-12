@@ -339,7 +339,14 @@ class ProductController extends Controller
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $index => $file) {
                     $path = $file->store('products', 'public');
-                    $url = Storage::url($path);
+
+                    // Para multi-tenancy: construir URL con tenant
+                    $tenantId = tenant('id');
+                    if ($tenantId) {
+                        $url = "/storage/tenants/{$tenantId}/{$path}";
+                    } else {
+                        $url = Storage::url($path);
+                    }
 
                     $product->images()->create([
                         'image_url' => $url,
@@ -358,14 +365,54 @@ class ProductController extends Controller
             $warehouseId = $request->warehouse_id ?? 1; // Default warehouse
 
             if ($request->product_type === 'simple') {
-                // --- LÓGICA SIMPLE (LEGACY) ---
-                $stock = $request->current_stock ?? 0;
+                // --- LÓGICA SIMPLE ---
 
-                // Guardar en product_warehouse
-                $product->warehouses()->attach($warehouseId, [
-                    'stock' => $stock,
-                    'product_variant_id' => null
-                ]);
+                // ✅ Si se enviaron variantes (productos de moda), crear la variante
+                if ($request->has('variants') && is_array($request->variants) && count($request->variants) > 0) {
+                    \Log::info('✅ [ProductController@store] Producto simple CON variante explícita');
+
+                    $variantData = $request->variants[0]; // Tomar la primera variante
+                    $costPrice = $variantData['cost_price'] ?? $variantData['cost'] ?? 0;
+
+                    \Log::info('🐛 [ProductController@store] Variant Data:', [
+                        'sku' => $variantData['sku'] ?? null,
+                        'price' => $variantData['price'] ?? null,
+                        'cost_price' => $costPrice,
+                        'stock' => $variantData['stock'] ?? 0
+                    ]);
+
+                    // Crear variante
+                    $variant = $product->variants()->create([
+                        'sku' => $variantData['sku'] ?? $product->sku,
+                        'price' => $variantData['price'],
+                        'cost_price' => $costPrice,
+                        'stock' => $variantData['stock'] ?? 0,
+                        'active' => true,
+                        'options_summary' => null
+                    ]);
+
+                    \Log::info('✅ [ProductController@store] Variant Created:', [
+                        'id' => $variant->id,
+                        'cost_price' => $variant->cost_price
+                    ]);
+
+                    // Guardar stock en bodega vinculado a la variante
+                    $product->warehouses()->attach($warehouseId, [
+                        'stock' => $variantData['stock'] ?? 0,
+                        'product_variant_id' => $variant->id
+                    ]);
+                } else {
+                    // LÓGICA LEGACY: Sin variantes explícitas
+                    \Log::info('⚠️ [ProductController@store] Producto simple SIN variante (legacy)');
+
+                    $stock = $request->current_stock ?? 0;
+
+                    // Guardar en product_warehouse
+                    $product->warehouses()->attach($warehouseId, [
+                        'stock' => $stock,
+                        'product_variant_id' => null
+                    ]);
+                }
 
                 // Soporte para warehouse_stocks (Multi-sede explícito)
                 if ($request->has('warehouse_stocks') && is_array($request->warehouse_stocks)) {
@@ -399,14 +446,49 @@ class ProductController extends Controller
                 // b. Iterar Variantes
                 $totalStock = 0;
 
-                if ($request->has('variants') && is_array($request->variants)) {
-                    foreach ($request->variants as $variantData) {
+                // ✅ Si no hay variantes o el array está vacío, crear variante por defecto
+                $variants = $request->variants ?? [];
+                if (empty($variants)) {
+                    \Log::info('⚠️ [ProductController@store] No variants provided, creating default variant');
+                    $variants = [[
+                        'sku' => $request->sku ?? 'SKU-' . time(),
+                        'price' => $request->sale_price ?? $request->price ?? 0,
+                        'cost_price' => $request->cost_price ?? 0,
+                        'stock' => $request->current_stock ?? $request->stock ?? 0,
+                        'options' => []
+                    ]];
+                }
+
+                if (is_array($variants)) {
+                    foreach ($variants as $variantData) {
+                        // 🐛 DEBUG: Ver qué datos llegan para la variante
+                        \Log::info('🐛 [ProductController@store] Variant Data Received:', [
+                            'sku' => $variantData['sku'] ?? null,
+                            'price' => $variantData['price'] ?? null,
+                            'cost' => $variantData['cost'] ?? null,
+                            'cost_price' => $variantData['cost_price'] ?? null,
+                            'stock' => $variantData['stock'] ?? null,
+                            'all_data' => $variantData
+                        ]);
+
+                        $costPrice = $variantData['cost'] ?? $variantData['cost_price'] ?? 0;
+
+                        \Log::info('🐛 [ProductController@store] Cost Price Calculated:', [
+                            'cost_price' => $costPrice
+                        ]);
+
                         // Crear Variante
                         $variant = $product->variants()->create([
                             'sku' => $variantData['sku'],
                             'price' => $variantData['price'],
+                            'cost_price' => $costPrice,
                             'stock' => $variantData['stock'] ?? 0,
                             'options_summary' => $variantData['options'] ?? null // JSON
+                        ]);
+
+                        \Log::info('🐛 [ProductController@store] Variant Created:', [
+                            'id' => $variant->id,
+                            'cost_price' => $variant->cost_price
                         ]);
 
                         $totalStock += ($variantData['stock'] ?? 0);
@@ -499,6 +581,15 @@ class ProductController extends Controller
                 } else {
                     $variant->options = [];
                 }
+
+                // 🐛 DEBUG: Verificar que cost_price venga en la variante
+                \Log::info('🐛 [ProductController@show] Variant Data:', [
+                    'id' => $variant->id,
+                    'sku' => $variant->sku,
+                    'price' => $variant->price,
+                    'cost_price' => $variant->cost_price,
+                    'stock' => $variant->stock
+                ]);
             });
         }
 
@@ -613,7 +704,7 @@ class ProductController extends Controller
                         // Para multi-tenancy: construir URL con tenant
                         $tenantId = tenant('id');
                         if ($tenantId) {
-                            $url = "/storage{$tenantId}/{$path}";
+                            $url = "/storage/tenants/{$tenantId}/{$path}";
                         } else {
                             $url = Storage::url($path);
                         }
@@ -643,27 +734,75 @@ class ProductController extends Controller
 
             // 4. Manejar variantes y opciones
             if ($newType === 'simple') {
-                // PRODUCTO SIMPLE (TIENDA GENERAL) - NO debe tener variantes ni opciones
+                // PRODUCTO SIMPLE
 
                 // Eliminar opciones del producto
                 $product->options()->delete();
 
-                // Eliminar TODAS las variantes (productos simples NO tienen variantes)
-                $product->variants()->delete();
+                // ✅ Si se enviaron variantes (productos de moda), actualizar/crear la variante
+                if ($request->has('variants') && is_array($request->variants) && count($request->variants) > 0) {
+                    \Log::info('✅ [ProductController@update] Producto simple CON variante explícita');
 
-                // ✅ Obtener precio desde sale_price
-                $salePrice = $request->input('sale_price', 0);
-                $costPrice = $request->input('cost_price', 0);
+                    // Eliminar variantes anteriores
+                    $product->variants()->delete();
 
-                \Log::info('💰 [ProductController@update] Producto SIMPLE:', [
-                    'product_id' => $product->id,
-                    'sale_price' => $salePrice,
-                    'cost_price' => $costPrice,
-                    'warehouse_stocks' => $request->warehouse_stocks
-                ]);
+                    $variantData = $request->variants[0]; // Tomar la primera variante
+                    $costPrice = $variantData['cost_price'] ?? $variantData['cost'] ?? 0;
 
-                // ✅ Actualizar stock en warehouses SOLO si viene warehouse_stocks
-                if ($request->has('warehouse_stocks') && is_array($request->warehouse_stocks)) {
+                    \Log::info('🐛 [ProductController@update] Variant Data:', [
+                        'sku' => $variantData['sku'] ?? null,
+                        'price' => $variantData['price'] ?? null,
+                        'cost_price' => $costPrice,
+                        'stock' => $variantData['stock'] ?? 0
+                    ]);
+
+                    // Crear/actualizar variante
+                    $variant = $product->variants()->create([
+                        'sku' => $variantData['sku'] ?? $product->sku,
+                        'price' => $variantData['price'],
+                        'cost_price' => $costPrice,
+                        'stock' => $variantData['stock'] ?? 0,
+                        'active' => true,
+                        'options_summary' => null
+                    ]);
+
+                    \Log::info('✅ [ProductController@update] Variant Updated:', [
+                        'id' => $variant->id,
+                        'cost_price' => $variant->cost_price
+                    ]);
+
+                    // Actualizar stock en bodega vinculado a la variante
+                    DB::table('product_warehouse')
+                        ->where('product_id', $product->id)
+                        ->delete();
+
+                    $warehouseId = $request->warehouse_id ?? Warehouse::first()->id ?? 1;
+                    $product->warehouses()->attach($warehouseId, [
+                        'stock' => $variantData['stock'] ?? 0,
+                        'product_variant_id' => $variant->id
+                    ]);
+
+                    // Actualizar stock total
+                    $product->update(['current_stock' => $variantData['stock'] ?? 0]);
+                } else {
+                    // LÓGICA LEGACY: Sin variantes explícitas, eliminar variantes
+                    \Log::info('⚠️ [ProductController@update] Producto simple SIN variante (legacy)');
+
+                    $product->variants()->delete();
+
+                    // ✅ Obtener precio desde sale_price
+                    $salePrice = $request->input('sale_price', 0);
+                    $costPrice = $request->input('cost_price', 0);
+
+                    \Log::info('💰 [ProductController@update] Producto SIMPLE (legacy):', [
+                        'product_id' => $product->id,
+                        'sale_price' => $salePrice,
+                        'cost_price' => $costPrice,
+                        'warehouse_stocks' => $request->warehouse_stocks
+                    ]);
+
+                    // ✅ Actualizar stock en warehouses SOLO si viene warehouse_stocks
+                    if ($request->has('warehouse_stocks') && is_array($request->warehouse_stocks)) {
                     // Primero eliminar stocks anteriores (sin variant_id para productos simples)
                     DB::table('product_warehouse')
                         ->where('product_id', $product->id)
@@ -697,13 +836,14 @@ class ProductController extends Controller
                         'total_stock' => $totalStock,
                         'warehouses' => count($request->warehouse_stocks)
                     ]);
-                } else {
-                    // Fallback: Si no viene warehouse_stocks, actualizar precio e imagen
-                    $product->update([
-                        'sale_price' => $salePrice,
-                        'image_url' => $request->input('image_url')
-                    ]);
-                    \Log::warning('⚠️ [ProductController@update] No se recibieron warehouse_stocks');
+                    } else {
+                        // Fallback: Si no viene warehouse_stocks, actualizar precio e imagen
+                        $product->update([
+                            'sale_price' => $salePrice,
+                            'image_url' => $request->input('image_url')
+                        ]);
+                        \Log::warning('⚠️ [ProductController@update] No se recibieron warehouse_stocks');
+                    }
                 }
 
             } else {
@@ -730,20 +870,54 @@ class ProductController extends Controller
                 }
 
                 // Actualizar o crear variantes
-                if ($request->has('variants') && is_array($request->variants)) {
+                // ✅ Si no hay variantes o el array está vacío, crear variante por defecto
+                $variants = $request->variants ?? [];
+                if (empty($variants)) {
+                    \Log::info('⚠️ [ProductController@update] No variants provided, creating default variant');
+                    $variants = [[
+                        'sku' => $request->sku ?? $product->sku ?? 'SKU-' . time(),
+                        'price' => $request->sale_price ?? $request->price ?? $product->sale_price ?? 0,
+                        'cost_price' => $request->cost_price ?? 0,
+                        'stock' => $request->current_stock ?? $request->stock ?? $product->current_stock ?? 0,
+                        'options' => []
+                    ]];
+                }
+
+                if (is_array($variants)) {
                     // Eliminar variantes anteriores
                     $product->variants()->delete();
 
                     $warehouseId = $request->warehouse_id ?? Warehouse::first()->id ?? 1;
 
-                    foreach ($request->variants as $variantData) {
+                    foreach ($variants as $variantData) {
+                        // 🐛 DEBUG: Ver qué datos llegan para actualizar la variante
+                        \Log::info('🐛 [ProductController@update] Variant Data Received:', [
+                            'sku' => $variantData['sku'] ?? null,
+                            'price' => $variantData['price'] ?? null,
+                            'cost' => $variantData['cost'] ?? null,
+                            'cost_price' => $variantData['cost_price'] ?? null,
+                            'stock' => $variantData['stock'] ?? null,
+                            'all_data' => $variantData
+                        ]);
+
+                        $costPrice = $variantData['cost'] ?? $variantData['cost_price'] ?? 0;
+
+                        \Log::info('🐛 [ProductController@update] Cost Price Calculated:', [
+                            'cost_price' => $costPrice
+                        ]);
+
                         $variant = $product->variants()->create([
                             'sku' => $variantData['sku'],
                             'price' => $variantData['price'],
-                            'cost_price' => $variantData['cost'] ?? $variantData['cost_price'] ?? 0,
+                            'cost_price' => $costPrice,
                             'stock' => $variantData['stock'] ?? 0,
                             'active' => $variantData['active'] ?? true,
                             'options_summary' => $variantData['options'] ?? null // ✅ Guardar resumen JSON
+                        ]);
+
+                        \Log::info('🐛 [ProductController@update] Variant Updated:', [
+                            'id' => $variant->id,
+                            'cost_price' => $variant->cost_price
                         ]);
 
                         // Vincular con Valores de Opción (Pivot)

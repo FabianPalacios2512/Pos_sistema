@@ -158,30 +158,88 @@
             </svg>
           </button>
           
-          <!-- Botón Radio - 100% Ghost -->
-          <button
-            id="tour-voice-button"
-            @click="$emit('toggle-radio')"
-            class="hidden md:flex items-center space-x-1.5 px-3 py-2 rounded-lg transition-all duration-200 relative bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-400"
-            :title="isRadioActive ? `Reproduciendo: ${currentRadioName}` : 'Radio'"
-          >
-            <!-- Punto indicador (SOLO cuando está reproduciendo) -->
-            <span 
-              v-if="isRadioActive"
-              class="absolute -top-1 -right-1 flex h-2.5 w-2.5"
+          <!-- Mini Player Radio - Inteligente -->
+          <div class="hidden md:block">
+            <!-- Estado INACTIVO: Botón simple -->
+            <button
+              v-if="!isRadioActive"
+              id="tour-voice-button"
+              @click="$emit('toggle-radio')"
+              class="flex items-center space-x-1.5 px-3 py-2 rounded-lg transition-all duration-200 bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-400"
+              title="Abrir Radio"
             >
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
+              <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+              </svg>
+              <span class="text-sm font-medium">Radio</span>
+            </button>
 
-            <!-- Icono de Radio -->
-            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
-            
-            <!-- Texto -->
-            <span class="text-sm font-medium">Radio</span>
-          </button>
+            <!-- Estado ACTIVO: Mini Player con controles -->
+            <div
+              v-else
+              class="flex items-center gap-1.5 px-2 py-1.5 rounded-xl transition-all duration-200 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30"
+            >
+              <!-- Visualizador de ondas -->
+              <div class="flex items-end gap-0.5 h-4 w-4 flex-shrink-0">
+                <div class="w-0.5 bg-emerald-500 rounded-full animate-music-bar-1"></div>
+                <div class="w-0.5 bg-emerald-500 rounded-full animate-music-bar-2"></div>
+                <div class="w-0.5 bg-emerald-500 rounded-full animate-music-bar-3"></div>
+              </div>
+
+              <!-- Info de la emisora -->
+              <button
+                @click="$emit('toggle-radio')"
+                class="flex flex-col min-w-0 hover:opacity-80 transition-opacity px-1"
+                title="Cambiar emisora"
+              >
+                <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider leading-none">
+                  En vivo
+                </span>
+                <span class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate max-w-[100px] leading-tight mt-0.5">
+                  {{ currentRadioName || 'Radio 105' }}
+                </span>
+              </button>
+
+              <!-- Controles de reproducción -->
+              <div class="flex items-center gap-0.5 flex-shrink-0">
+                <!-- Anterior -->
+                <button
+                  @click.stop="radioStore.playPrevious()"
+                  class="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors text-emerald-600 dark:text-emerald-400"
+                  title="Anterior"
+                >
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                  </svg>
+                </button>
+
+                <!-- Play/Pause -->
+                <button
+                  @click.stop="toggleRadioPlayback"
+                  class="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors text-emerald-600 dark:text-emerald-400"
+                  :title="isPlaying ? 'Pausar' : 'Reproducir'"
+                >
+                  <svg v-if="isPlaying" class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                  </svg>
+                  <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+
+                <!-- Siguiente -->
+                <button
+                  @click.stop="radioStore.playNext()"
+                  class="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors text-emerald-600 dark:text-emerald-400"
+                  title="Siguiente"
+                >
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
 
           <!-- Botón 105 IA - 100% Ghost (ya corregido previamente) -->
           <button
@@ -542,15 +600,18 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AI105Chat from './AI105Chat.vue'
-import { useRadioState } from '../composables/useRadioState'
+import { useRadioStore } from '../store/radioStore'
 import { appStore } from '../store/appStore.js'
 import { warehouseService } from '../services/warehouseService.js'
 import apiClient from '../services/apiClient.js'
 
 const router = useRouter()
+const radioStore = useRadioStore()
 
-// Composable de estado de radio - Destructurado para reactividad correcta
-const { isPlaying, currentRadioName, currentRadioId, isRadioActive, radioStatus } = useRadioState()
+// Estados de radio desde el store directamente
+const isPlaying = computed(() => radioStore.isPlaying)
+const currentRadioName = computed(() => radioStore.currentStation?.name || '')
+const isRadioActive = computed(() => radioStore.isPlaying && radioStore.currentStation !== null)
 
 // 🏢 Warehouses para validar si mostrar sede
 const warehouses = ref([])
@@ -833,6 +894,11 @@ const cancelLogout = () => {
   showLogoutModal.value = false
 }
 
+// 🎵 Control de reproducción de radio
+const toggleRadioPlayback = () => {
+  radioStore.togglePlay()
+}
+
 // Cargar notificaciones desde el backend
 const loadNotifications = async () => {
   if (isLoadingNotifications.value) return
@@ -990,5 +1056,26 @@ onMounted(() => {
 
 .animate-sound-bar {
   animation: sound-bar 0.6s ease-in-out infinite;
+}
+
+/* Animación de barras musicales del mini player */
+@keyframes music-bar {
+  0%, 100% { height: 3px; }
+  50% { height: 12px; }
+}
+
+.animate-music-bar-1 { 
+  animation: music-bar 0.9s ease-in-out infinite; 
+  animation-delay: 0s; 
+}
+
+.animate-music-bar-2 { 
+  animation: music-bar 0.9s ease-in-out infinite; 
+  animation-delay: 0.3s; 
+}
+
+.animate-music-bar-3 { 
+  animation: music-bar 0.9s ease-in-out infinite; 
+  animation-delay: 0.6s; 
 }
 </style>

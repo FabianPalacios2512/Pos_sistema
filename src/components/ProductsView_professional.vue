@@ -315,7 +315,7 @@
           
             <!-- Imagen del producto con overlay en hover -->
             <div class="relative aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
-              <img :src="getProductImage(product)" 
+              <img :src="getProductImage(product) || generateDynamicAvatar(product.name)" 
                    :alt="product.name" 
                    @error="(e) => handleImageError(e, product)"
                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
@@ -876,7 +876,7 @@
 
         <div class="flex flex-1 overflow-hidden">
           <!-- Formulario Principal -->
-          <div class="flex-1 overflow-y-auto" :class="isFashionMode ? 'bg-white dark:bg-zinc-900 p-8' : 'bg-gray-50 dark:bg-zinc-950 p-8'">
+          <div class="flex-1 overflow-y-auto" :class="isFashionMode ? 'bg-white dark:bg-zinc-900 p-8' : 'bg-gray-50 dark:bg-zinc-950 p-6'">
             
             <!-- 👗 Formulario Fashion (integrado sin header ni footer propio) -->
             <div v-if="isFashionMode">
@@ -892,619 +892,413 @@
               />
             </div>
 
-            <form v-else @submit.prevent="saveProduct" class="space-y-6">
+            <form v-else @submit.prevent="saveProduct" class="space-y-5">
               
-              <!-- Información Básica -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-300 dark:border-zinc-800">
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center">
-                  <div class="w-7 h-7 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center mr-2.5 border border-gray-200 dark:border-zinc-700">
-                    <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                  </div>
-                  Información Básica
-                </h4>
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <!-- SECCIÓN 1: INFORMACIÓN BÁSICA (Compacta) -->
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
                 
-                <div class="grid grid-cols-2 gap-3">
+                <!-- Nombre del Producto (Full width) -->
+                <div class="mb-4">
+                  <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                    Nombre del Producto <span class="text-rose-500">*</span>
+                  </label>
+                  <input v-model="productForm.name" 
+                         type="text" 
+                         required
+                         class="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 focus:border-transparent text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
+                         placeholder="Ej: iPhone 13 Pro Max">
+                </div>
+
+                <!-- Fila 1: Categoría + SKU + Código de Barras -->
+                <div class="grid grid-cols-3 gap-3 mb-4">
                   <div>
-                    <label class="block text-xs font-bold text-gray-900 dark:text-white mb-1.5">Nombre del Producto *</label>
-                    <input v-model="productForm.name" 
-                           type="text" 
-                           required
-                           class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all bg-white dark:bg-zinc-800 text-gray-900 dark:text-white font-medium"
-                           placeholder="Ej: iPhone 13 Pro Max">
-                  </div>
-                  
-                  <div>
-                    <label class="block text-xs font-bold text-gray-900 dark:text-white mb-1.5">Categoría *</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Categoría *</label>
                     <select v-model="productForm.category_id" 
                             required
                             @change="handleCategoryChange"
-                            class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white font-medium transition-all">
-                      <option value="">Seleccionar categoría</option>
+                            class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white transition-all">
+                      <option value="">Seleccionar</option>
                       <option v-for="category in categories" :key="category.id" :value="category.id">
                         {{ category.name }}
                       </option>
-                      <option value="__new__" style="color: #10b981; font-weight: 600;">+ Nueva categoría</option>
+                      <option value="__new__" class="font-medium text-blue-600">＋ Nueva</option>
                     </select>
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-gray-900 dark:text-white mb-1.5">
-                      Proveedor <span class="text-gray-500 dark:text-zinc-500 font-normal text-[10px]">(opcional)</span>
-                    </label>
-                    <select v-model="productForm.supplier_id" 
-                            @change="handleSupplierChange"
-                            class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white font-medium transition-all">
-                      <option :value="null">Sin proveedor asignado</option>
-                      <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">
-                        {{ supplier.name }}
-                      </option>
-                      <option value="__new__" style="color: #10b981; font-weight: 600;">+ Nuevo proveedor</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label class="block text-xs font-bold text-gray-900 dark:text-white mb-1.5">SKU (Código Único)</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">SKU</label>
                     <input v-model="productForm.sku" 
                            type="text" 
-                           class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all bg-white dark:bg-zinc-800 text-gray-900 dark:text-white font-medium"
-                           placeholder="Ej: IP13-PRO-256">
+                           class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm bg-gray-50 dark:bg-zinc-800/50 text-gray-600 dark:text-zinc-400 font-mono placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 transition-all"
+                           placeholder="Auto-generado">
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1.5">Código de Barras</label>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Código de Barras</label>
                     <div class="relative">
                       <input v-model="productForm.barcode" 
                              type="text" 
-                             class="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-gray-400 dark:focus:ring-blue-600 focus:border-transparent text-sm transition-all bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                             placeholder="Escanear o generar código">
+                             class="w-full px-3 pr-9 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 transition-all"
+                             placeholder="Escanear o generar">
                       <button type="button" 
                               @click="generateBarcode"
-                              title="Generar código de barras"
-                              class="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded transition-all">
+                              title="Generar código"
+                              class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
                       </button>
                     </div>
                   </div>
+                </div>
+
+                <!-- Fila 2: Proveedor + Descripción -->
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Proveedor</label>
+                    <select v-model="productForm.supplier_id" 
+                            @change="handleSupplierChange"
+                            class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 transition-all">
+                      <option :value="null">Sin proveedor</option>
+                      <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">
+                        {{ supplier.name }}
+                      </option>
+                      <option value="__new__" class="font-medium text-blue-600">＋ Nuevo</option>
+                    </select>
+                  </div>
                   
-                  <div class="col-span-2 mt-3">
-                    <label class="block text-xs font-bold text-gray-900 dark:text-white mb-1.5">Descripción <span class="text-gray-500 dark:text-zinc-500 font-normal text-[10px]">(opcional)</span></label>
-                    <textarea v-model="productForm.description" 
-                              rows="2"
-                              class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition-all resize-none bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                              placeholder="Descripción breve del producto">
-                    </textarea>
+                  <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Descripción</label>
+                    <input v-model="productForm.description" 
+                           type="text"
+                           class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 transition-all"
+                           placeholder="Descripción breve del producto">
                   </div>
                 </div>
               </div>
 
-              <!-- PASO 1: UNIDAD DE MEDIDA (LO PRIMERO) -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-300 dark:border-zinc-800">
-                <div class="flex items-center justify-between mb-5">
-                  <h4 class="text-base font-bold text-gray-900 dark:text-white flex items-center">
-                    <div class="w-10 h-10 bg-gray-50 dark:bg-zinc-800 rounded-xl flex items-center justify-center mr-3 border border-gray-200 dark:border-zinc-700">
-                      <svg class="w-6 h-6 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
-                      </svg>
-                    </div>
-                    PASO 1: ¿Cómo se vende este producto?
-                  </h4>
-                  <span class="px-3 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-bold rounded-full">Requerido</span>
-                </div>
-                
-                <select
-                  v-model="productForm.measurement_unit"
-                  @change="updateAllowDecimal"
-                  class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-lg focus:ring-2 focus:ring-gray-400 dark:focus:ring-blue-600 focus:border-gray-400 dark:focus:border-blue-600 text-sm font-medium transition-all text-gray-900 dark:text-white"
-                >
-                  <option value="unit">Unidades (und) - ej: celular, TV</option>
-                  <option value="kg">Kilogramos (kg) - ej: carne, papas</option>
-                  <option value="g">Gramos (g) - ej: especias, café</option>
-                  <option value="m">Metros (m) - ej: tela, cable</option>
-                  <option value="cm">Centímetros (cm) - ej: cinta, hilo</option>
-                  <option value="l">Litros (L) - ej: gasolina, leche</option>
-                  <option value="ml">Mililitros (ml) - ej: perfume, jarabe</option>
-                </select>
-                
-                <div class="mt-4 p-4 bg-gray-50 dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-zinc-700">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                      </svg>
-                      <span class="text-sm font-bold text-gray-900 dark:text-white">Cantidades Decimales</span>
-                      <span class="px-2 py-0.5 bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-full">Auto</span>
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <!-- SECCIÓN 2: UNIDAD DE MEDIDA (Compacta) -->
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
+                <div class="flex items-center gap-4">
+                  <div class="flex-1">
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                      ¿Cómo se vende? <span class="text-rose-500">*</span>
+                    </label>
+                    <select
+                      v-model="productForm.measurement_unit"
+                      @change="updateAllowDecimal"
+                      class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm text-gray-900 dark:text-white transition-all"
+                    >
+                      <option value="unit">Unidades (und) - celular, TV</option>
+                      <option value="kg">Kilogramos (kg) - carne, papas</option>
+                      <option value="g">Gramos (g) - especias, café</option>
+                      <option value="m">Metros (m) - tela, cable</option>
+                      <option value="cm">Centímetros (cm) - cinta</option>
+                      <option value="l">Litros (L) - gasolina, leche</option>
+                      <option value="ml">Mililitros (ml) - perfume</option>
+                    </select>
+                  </div>
+                  
+                  <!-- Toggle Decimales -->
+                  <div class="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-zinc-700">
+                    <div>
+                      <span class="text-xs font-semibold text-gray-700 dark:text-zinc-300 block">Decimales</span>
+                      <span class="text-[10px] text-gray-500 dark:text-zinc-500">{{ productForm.allow_decimal ? '0.5, 1.25...' : '1, 2, 3...' }}</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        v-model="productForm.allow_decimal"
-                        class="sr-only peer"
-                      />
-                      <div class="w-11 h-6 bg-gray-300 dark:bg-zinc-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300/30 dark:peer-focus:ring-blue-600/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:after:border-zinc-700 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-indigo-600 shadow-inner"></div>
-                      <span class="ml-3 text-sm font-semibold" :class="productForm.allow_decimal ? 'text-slate-900 dark:text-white' : 'text-gray-600 dark:text-zinc-400'">
-                        {{ productForm.allow_decimal ? 'Activado' : 'Desactivado' }}
-                      </span>
+                      <input type="checkbox" v-model="productForm.allow_decimal" class="sr-only peer">
+                      <div class="w-10 h-5 bg-gray-300 dark:bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate-700 dark:peer-checked:bg-slate-600"></div>
                     </label>
                   </div>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400 mt-3 flex items-start">
-                    <svg class="w-3.5 h-3.5 mr-1.5 mt-0.5 flex-shrink-0" :class="productForm.allow_decimal ? 'text-slate-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    {{ productForm.allow_decimal ? 'Permite cantidades como 0.5, 1.25, 2.75, etc.' : 'Solo números enteros: 1, 2, 3, 4...' }}
-                  </p>
                 </div>
               </div>
 
-              <!-- PASO 2: PRECIOS (DINÁMICO CON UNIDAD) -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-300 dark:border-zinc-800">
-                <h4 class="text-base font-bold text-gray-900 dark:text-white mb-5 flex items-center">
-                  <div class="w-10 h-10 bg-gray-50 dark:bg-zinc-800 rounded-xl flex items-center justify-center mr-3 border border-gray-200 dark:border-zinc-700">
-                    <svg class="w-6 h-6 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                    </svg>
-                  </div>
-                  PASO 2: Precios por {{ getUnitAbbreviation(productForm.measurement_unit) }}
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <!-- SECCIÓN 3: PRECIOS + STOCK (Todo en uno) -->
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                  </svg>
+                  Precios y Stock
                 </h4>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="grid grid-cols-4 gap-3">
+                  <!-- Costo -->
                   <div>
-                    <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-                      Precio de Costo *
-                      <span class="text-gray-500 dark:text-zinc-400 font-normal ml-1">(por {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                      Costo <span class="text-rose-500">*</span>
                     </label>
                     <div class="relative">
-                      <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-zinc-400 text-sm font-bold">$</span>
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
                       <input v-model="productForm.cost" 
                              type="number" 
                              step="0.01"
                              min="0"
                              required
-                             class="w-full pl-9 pr-16 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-sky-500 dark:focus:ring-blue-600 focus:border-transparent text-sm transition-all bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                             placeholder="0.00">
-                      <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sky-600 dark:text-blue-400 text-xs font-bold bg-sky-50 dark:bg-blue-950 px-2 py-1 rounded">
-                        / {{ getUnitAbbreviation(productForm.measurement_unit) }}
-                      </span>
+                             class="w-full pl-8 pr-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white tabular-nums transition-all"
+                             placeholder="0">
                     </div>
                   </div>
                   
+                  <!-- Precio de Venta -->
                   <div>
-                    <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-                      Precio de Venta *
-                      <span class="text-gray-500 dark:text-zinc-400 font-normal ml-1">(por {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                      Precio Venta <span class="text-rose-500">*</span>
                     </label>
                     <div class="relative">
-                      <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-zinc-400 text-sm font-bold">$</span>
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
                       <input v-model="productForm.price" 
                              type="number" 
                              step="0.01"
                              min="0"
                              required
-                             class="w-full pl-9 pr-16 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-sky-500 dark:focus:ring-blue-600 focus:border-transparent text-sm transition-all bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                             placeholder="0.00">
-                      <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-sky-600 dark:text-blue-400 text-xs font-bold bg-sky-50 dark:bg-blue-950 px-2 py-1 rounded">
-                        / {{ getUnitAbbreviation(productForm.measurement_unit) }}
-                      </span>
+                             class="w-full pl-8 pr-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums transition-all"
+                             placeholder="0">
                     </div>
                   </div>
                   
+                  <!-- Margen -->
                   <div>
-                    <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Margen de Ganancia</label>
-                    <div class="px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm font-bold text-gray-700 dark:text-zinc-300 flex items-center justify-center">
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Margen</label>
+                    <div class="px-3 py-2.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm font-bold text-center tabular-nums"
+                         :class="productForm.price && productForm.cost && ((productForm.price - productForm.cost) / productForm.cost * 100) >= 20 
+                           ? 'text-emerald-600 dark:text-emerald-400' 
+                           : productForm.price && productForm.cost && ((productForm.price - productForm.cost) / productForm.cost * 100) >= 10 
+                             ? 'text-amber-600 dark:text-amber-400' 
+                             : 'text-gray-600 dark:text-zinc-400'">
                       {{ productForm.price && productForm.cost ? 
-                        (((productForm.price - productForm.cost) / productForm.cost) * 100).toFixed(1) + '%' : 
+                        (((productForm.price - productForm.cost) / productForm.cost) * 100).toFixed(0) + '%' : 
                         '0%' }}
                     </div>
                   </div>
-                </div>
 
-                <!-- Información Visual de Precio con Unidad -->
-                <div v-if="productForm.price" class="mt-5 p-5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <p class="text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Vista Previa del POS</p>
-                        <p class="text-xs text-gray-600 dark:text-zinc-400">Así se mostrará al vender</p>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <p class="text-2xl font-black text-gray-900 dark:text-white">
-                        ${{ productForm.price.toLocaleString() }}
-                      </p>
-                      <p class="text-sm font-bold text-gray-600 dark:text-zinc-400">
-                        por {{ getUnitAbbreviation(productForm.measurement_unit) }}
-                      </p>
+                  <!-- Stock Inicial (Solo si hay 1 bodega) -->
+                  <div v-if="availableWarehouses.length === 1">
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                      Stock <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                      <input v-model="productForm.stock" 
+                             type="number" 
+                             :step="productForm.allow_decimal ? '0.01' : '1'"
+                             min="0"
+                             class="w-full px-3 pr-12 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-center font-semibold tabular-nums transition-all"
+                             :placeholder="productForm.allow_decimal ? '0.00' : '0'">
+                      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-zinc-500 font-medium">
+                        {{ getUnitAbbreviation(productForm.measurement_unit) }}
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- PASO 3: INVENTARIO (DINÁMICO CON UNIDAD) -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-300 dark:border-zinc-800">
-                <h4 class="text-base font-bold text-gray-900 dark:text-white mb-5 flex items-center">
-                  <div class="w-10 h-10 bg-gray-50 dark:bg-zinc-800 rounded-xl flex items-center justify-center mr-3 border border-gray-200 dark:border-zinc-700">
-                    <svg class="w-6 h-6 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <!-- SECCIÓN 4: STOCK MULTI-BODEGA (Solo si hay 2+ bodegas) -->
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <div v-if="availableWarehouses.length >= 2" class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
-                  </div>
-                  PASO 3: ¿Cuánto tienes en inventario?
-                  <span class="ml-3 text-sm font-normal text-gray-500 dark:text-zinc-400">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
-                </h4>
-
-                <div class="grid grid-cols-1 gap-5">
-                  <!-- Stock Inicial (Solo si hay 1 bodega disponible según plan) -->
-                  <div v-if="availableWarehouses.length === 1" class="grid grid-cols-3 gap-5">
-                    <div>
-                      <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-                        Stock Inicial
-                        <span class="text-gray-500 dark:text-zinc-400 font-normal ml-1">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
-                      </label>
+                    Stock por Sede
+                    <span class="text-xs font-normal text-gray-400 dark:text-zinc-500">({{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                  </h4>
+                  <span class="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-lg">
+                    Total: {{ calculateTotalStock() }} {{ getUnitAbbreviation(productForm.measurement_unit) }}
+                  </span>
+                </div>
+                    
+                <!-- Grid de Sedes -->
+                <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div v-for="warehouse in availableWarehouses" :key="warehouse.id"
+                       class="p-3 rounded-xl border-2 transition-all"
+                       :class="productForm.warehouseEnabled[warehouse.id] 
+                         ? 'border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-950/30' 
+                         : 'border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800/50'">
+                    
+                    <!-- Checkbox + Nombre -->
+                    <label class="flex items-center gap-2 cursor-pointer mb-2">
+                      <input 
+                        v-model="productForm.warehouseEnabled[warehouse.id]"
+                        type="checkbox"
+                        class="w-4 h-4 text-blue-600 bg-white dark:bg-zinc-700 border-gray-300 dark:border-zinc-600 rounded focus:ring-blue-500"
+                      />
+                      <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ warehouse.name }}</span>
+                      <span v-if="warehouse.is_default" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-1.5 py-0.5 rounded">PRINCIPAL</span>
+                    </label>
+                    
+                    <!-- Input Stock -->
+                    <div v-if="productForm.warehouseEnabled[warehouse.id]">
                       <div class="relative">
-                        <input v-model="productForm.stock" 
-                               type="number" 
-                               :step="productForm.allow_decimal ? '0.01' : '1'"
-                               min="0"
-                               class="w-full px-4 pr-16 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-gray-400 dark:focus:ring-blue-600 focus:border-transparent text-sm transition-all bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                               :placeholder="productForm.allow_decimal ? '0.00' : '0'">
-                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-zinc-400 text-xs font-medium bg-gray-100 dark:bg-zinc-700 px-2 py-1 rounded">
+                        <input 
+                          v-model.number="productForm.warehouseStock[warehouse.id]"
+                          type="number" 
+                          :step="productForm.allow_decimal ? '0.01' : '1'"
+                          min="0"
+                          :placeholder="productForm.allow_decimal ? '0.00' : '0'"
+                          class="w-full px-3 pr-10 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm font-semibold text-center bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-400 transition-all"
+                        />
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-zinc-500">
                           {{ getUnitAbbreviation(productForm.measurement_unit) }}
                         </span>
                       </div>
-                      <p class="text-xs text-gray-500 dark:text-zinc-400 mt-2">Cantidad actual que tienes</p>
                     </div>
-                    
-                    <div>
-                      <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-                        Stock Mínimo
-                        <span class="text-gray-500 dark:text-zinc-400 font-normal ml-1">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
-                      </label>
-                      <div class="relative">
-                        <input v-model="productForm.min_stock" 
-                               type="number" 
-                               :step="productForm.allow_decimal ? '0.01' : '1'"
-                               min="0"
-                               class="w-full px-4 pr-16 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-gray-400 dark:focus:ring-blue-600 focus:border-transparent text-sm transition-all bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                               :placeholder="productForm.allow_decimal ? '5.00' : '5'">
-                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-zinc-400 text-xs font-medium bg-gray-100 dark:bg-zinc-700 px-2 py-1 rounded">
-                          {{ getUnitAbbreviation(productForm.measurement_unit) }}
-                        </span>
-                      </div>
-                      <p class="text-xs text-gray-600 dark:text-zinc-400 mt-2">Alerta cuando baje de este valor</p>
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-                        Stock Máximo
-                        <span class="text-gray-500 dark:text-zinc-400 font-normal ml-1">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
-                      </label>
-                      <div class="relative">
-                        <input v-model="productForm.max_stock" 
-                               type="number" 
-                               :step="productForm.allow_decimal ? '0.01' : '1'"
-                               min="0"
-                               class="w-full px-4 pr-16 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-gray-400 dark:focus:ring-blue-600 focus:border-transparent text-sm transition-all bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                               :placeholder="productForm.allow_decimal ? '100.00' : '100'">
-                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-zinc-400 text-xs font-medium bg-gray-100 dark:bg-zinc-700 px-2 py-1 rounded">
-                          {{ getUnitAbbreviation(productForm.measurement_unit) }}
-                        </span>
-                      </div>
-                      <p class="text-xs text-gray-600 dark:text-zinc-400 mt-2">Capacidad máxima de almacenamiento</p>
-                    </div>
-                  </div>
-                  
-                  <!-- Stock por Tienda (Solo si hay 2+ bodegas disponibles según el plan) -->
-                  <div v-if="availableWarehouses.length >= 2" class="col-span-full">
-                    <div class="flex items-center justify-between mb-4">
-                      <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                        Stock por Tienda *
-                        <span class="ml-2 text-sm font-normal text-gray-500 dark:text-zinc-400">(en {{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
-                      </label>
-                      <button type="button"
-                              @click="showStockHelp = !showStockHelp"
-                              class="px-3 py-1.5 bg-blue-100 dark:bg-blue-950 hover:bg-blue-200 dark:hover:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-semibold transition-all">
-                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        {{ showStockHelp ? 'Ocultar' : 'Ayuda' }}
-                      </button>
-                    </div>
-                    
-                    <!-- Ayuda -->
-                    <div v-if="showStockHelp" class="mb-4 p-4 bg-gradient-to-r from-blue-50 dark:from-blue-950/50 to-indigo-50 dark:to-indigo-950/50 border-2 border-blue-200 dark:border-blue-800 rounded-xl">
-                      <p class="font-bold mb-2 text-blue-900 dark:text-blue-300 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                        </svg>
-                        ¿Cómo funciona el stock multi-tienda?
-                      </p>
-                      <ul class="space-y-2 text-sm text-blue-800 dark:text-blue-300">
-                        <li class="flex items-start">
-                          <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                          </svg>
-                          Asigna <strong>diferente stock a cada sede</strong> según tu inventario real
-                        </li>
-                        <li class="flex items-start">
-                          <svg class="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                          </svg>
-                          Ejemplo: <strong>20 {{ getUnitAbbreviation(productForm.measurement_unit) }}</strong> en Sede Principal, <strong>5 {{ getUnitAbbreviation(productForm.measurement_unit) }}</strong> en Sucursal Norte
-                        </li>
-                        <li class="flex items-start">
-                          <svg class="w-5 h-5 mr-2 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                          </svg>
-                          Si dejas <strong>0</strong>, el producto NO estará disponible en esa tienda
-                        </li>
-                      </ul>
-                    </div>
-                    
-                    <!-- Sedes con checkbox + input condicional -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div v-for="warehouse in availableWarehouses" :key="warehouse.id"
-                           class="p-4 bg-white dark:bg-zinc-800 rounded-xl border-2 transition-all"
-                           :class="productForm.warehouseEnabled[warehouse.id] ? 'border-blue-400 dark:border-blue-600 shadow-sm' : 'border-gray-200 dark:border-zinc-700'">
-                        
-                        <!-- Checkbox para habilitar/deshabilitar sede -->
-                        <div class="flex items-center gap-3 mb-3">
-                          <input 
-                            :id="`warehouse-check-${warehouse.id}`"
-                            v-model="productForm.warehouseEnabled[warehouse.id]"
-                            type="checkbox"
-                            class="w-5 h-5 text-blue-600 bg-gray-100 dark:bg-zinc-700 border-gray-300 dark:border-zinc-600 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
-                          />
-                          <label 
-                            :for="`warehouse-check-${warehouse.id}`"
-                            class="flex items-center gap-2 flex-1 cursor-pointer"
-                          >
-                            <div class="w-8 h-8 bg-gray-50 dark:bg-zinc-700 rounded-lg flex items-center justify-center flex-shrink-0 border border-gray-200 dark:border-zinc-600">
-                              <svg class="w-4 h-4 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                              </svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                              <span class="text-sm font-bold text-gray-900 dark:text-white block truncate">
-                                {{ warehouse.name }}
-                              </span>
-                              <div class="flex items-center gap-2 mt-0.5">
-                                <span v-if="warehouse.is_default" class="text-xs font-semibold text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-zinc-700 px-2 py-0.5 rounded-full border border-gray-200 dark:border-zinc-600 inline-block">
-                                  Principal
-                                </span>
-                              </div>
-                              <span v-if="!productForm.warehouseEnabled[warehouse.id]" class="text-xs text-gray-400 dark:text-zinc-500 block mt-0.5">
-                                (No disponible)
-                              </span>
-                            </div>
-                          </label>
-                        </div>
-                        
-                        <!-- Input de stock (solo si la sede está habilitada) -->
-                        <div v-if="productForm.warehouseEnabled[warehouse.id]" class="space-y-2">
-                          <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400">
-                            Stock {{ isEditing ? 'actual' : 'inicial' }}:
-                          </label>
-                          <div class="relative">
-                            <input 
-                              v-model.number="productForm.warehouseStock[warehouse.id]"
-                              type="number" 
-                              :step="productForm.allow_decimal ? '0.01' : '1'"
-                              min="0"
-                              :placeholder="productForm.allow_decimal ? '0.00' : '0'"
-                              class="w-full px-4 pr-14 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-blue-500 dark:focus:border-blue-600 text-sm font-bold text-center bg-white dark:bg-zinc-800 text-gray-900 dark:text-white transition-all"
-                            />
-                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-zinc-400 text-xs font-medium bg-gray-100 dark:bg-zinc-700 px-2 py-1 rounded">
-                              {{ getUnitAbbreviation(productForm.measurement_unit) }}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <!-- Mensaje cuando no está habilitada -->
-                        <div v-else class="p-3 bg-gray-50 dark:bg-zinc-900/50 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700">
-                          <p class="text-xs text-gray-500 dark:text-zinc-500 text-center font-medium">
-                            Producto no disponible en esta sede
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <!-- Stock Total -->
-                    <div class="mt-4 p-5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl">
-                      <div class="flex justify-between items-center">
-                        <div class="flex items-center space-x-3">
-                          <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-700 rounded-xl flex items-center justify-center border border-gray-200 dark:border-zinc-600">
-                            <svg class="w-7 h-7 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                            </svg>
-                          </div>
-                          <div>
-                            <span class="text-sm font-bold text-gray-900 dark:text-white block">Stock Total del Producto</span>
-                            <span class="text-xs text-gray-600 dark:text-zinc-400 font-medium">(suma de todas las sedes)</span>
-                          </div>
-                        </div>
-                        <div class="text-right">
-                          <span class="text-4xl font-black text-gray-900 dark:text-white block">
-                            {{ calculateTotalStock() }}
-                          </span>
-                          <span class="text-sm font-bold text-gray-600 dark:text-zinc-400">
-                            {{ getUnitAbbreviation(productForm.measurement_unit) }} totales
-                          </span>
-                        </div>
-                      </div>
+                    <div v-else class="text-center py-2">
+                      <span class="text-xs text-gray-400 dark:text-zinc-500">No disponible</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Estado Activo -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 shadow-sm border border-gray-300 dark:border-zinc-800">
-                <div class="flex items-center space-x-4">
-                  <div class="flex-shrink-0">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input v-model="productForm.active" 
-                             type="checkbox" 
-                             class="sr-only peer">
-                      <div class="w-14 h-7 bg-gray-300 dark:bg-zinc-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300/30 dark:peer-focus:ring-blue-600/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:after:border-zinc-700 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-indigo-600 shadow-inner"></div>
-                    </label>
-                  </div>
-                  <div class="flex-1">
-                    <label class="text-base font-bold text-gray-900 dark:text-white flex items-center">
-                      <svg class="w-5 h-5 mr-2" :class="productForm.active ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-zinc-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                      </svg>
-                      Producto {{ productForm.active ? 'Activo' : 'Inactivo' }}
-                    </label>
-                    <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">
-                      {{ productForm.active ? 'El producto está disponible para la venta' : 'El producto NO aparecerá en el sistema de ventas' }}
-                    </p>
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <!-- SECCIÓN 5: ESTADO (Inline compacto) -->
+              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-zinc-800">
+                <div class="flex items-center gap-3">
+                  <svg class="w-5 h-5" :class="productForm.active ? 'text-emerald-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <div>
+                    <span class="text-sm font-bold text-gray-900 dark:text-white">Producto {{ productForm.active ? 'Activo' : 'Inactivo' }}</span>
+                    <p class="text-xs text-gray-500 dark:text-zinc-400">{{ productForm.active ? 'Disponible para la venta' : 'No aparecerá en el POS' }}</p>
                   </div>
                 </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input v-model="productForm.active" type="checkbox" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-300 dark:bg-zinc-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
               </div>
             </form>
           </div>
           
-          <!-- Sidebar para Imagen -->
-          <div v-if="!isFashionMode" class="w-80 bg-gray-50 dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 p-6">
-            <div class="mb-5">
-              <div class="flex items-center space-x-3 mb-2">
-                <div class="w-9 h-9 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center border border-gray-200 dark:border-zinc-700">
-                  <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4 class="text-lg font-bold text-gray-900 dark:text-white">Imagen del Producto</h4>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400">Añade una foto atractiva</p>
-                </div>
+          <!-- Sidebar para Imagen (Compacto) -->
+          <div v-if="!isFashionMode" class="w-72 bg-gray-50 dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 p-5 flex flex-col">
+            
+            <!-- Header -->
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center border border-gray-200 dark:border-zinc-700">
+                <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white">Imagen</h4>
+                <p class="text-[10px] text-gray-500 dark:text-zinc-400">Foto del producto</p>
               </div>
             </div>
             
-            <!-- Selector de método -->
-            <div class="flex bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-1 mb-4 border border-gray-200 dark:border-zinc-700">
+            <!-- Toggle URL/Archivo -->
+            <div class="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 mb-3 border border-gray-200 dark:border-zinc-700">
               <button type="button"
                       @click="imageUploadMethod = 'url'"
                       :class="[
-                        'flex-1 px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center justify-center space-x-1.5',
+                        'flex-1 px-2 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1',
                         imageUploadMethod === 'url' 
-                          ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-md' 
-                          : 'text-gray-600 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-700'
+                          ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
+                          : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
                       ]">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                 </svg>
-                URL Web
+                URL
               </button>
               <button type="button"
                       @click="imageUploadMethod = 'file'"
                       :class="[
-                        'flex-1 px-3 py-2 rounded-md text-xs font-semibold transition-all flex items-center justify-center space-x-1.5',
+                        'flex-1 px-2 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1',
                         imageUploadMethod === 'file' 
-                          ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-md' 
-                          : 'text-gray-600 dark:text-zinc-400 hover:bg-white dark:hover:bg-zinc-700'
+                          ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
+                          : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
                       ]">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                 </svg>
-                Subir Archivo
+                Archivo
               </button>
             </div>
             
-            <!-- Subida de archivo -->
-            <div v-if="imageUploadMethod === 'file'" class="space-y-3">
-              <div @click="$refs.fileInput?.click()" 
-                   class="border-2 border-dashed border-gray-300 dark:border-zinc-700 rounded-lg p-5 text-center cursor-pointer hover:border-gray-400 dark:hover:border-zinc-600 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all">
-                
-                <input type="file" 
-                       ref="fileInput"
-                       @change="handleFileUpload"
-                       accept="image/*"
-                       class="hidden">
-                
-                <div v-if="!previewImage">
-                  <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center mx-auto mb-2 border border-gray-200 dark:border-zinc-700">
-                    <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
+            <!-- Área de Subida -->
+            <div class="flex-1">
+              <!-- Subida de archivo -->
+              <div v-if="imageUploadMethod === 'file'">
+                <div @click="$refs.fileInput?.click()" 
+                     class="border-2 border-dashed border-gray-300 dark:border-zinc-700 rounded-xl p-4 text-center cursor-pointer hover:border-gray-400 dark:hover:border-zinc-600 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all">
+                  
+                  <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" class="hidden">
+                  
+                  <div v-if="!previewImage">
+                    <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center mx-auto mb-2">
+                      <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                    </div>
+                    <p class="text-xs font-medium text-gray-600 dark:text-zinc-400">Haz clic o arrastra</p>
+                    <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">PNG, JPG hasta 5MB</p>
                   </div>
-                  <h5 class="font-semibold text-gray-900 dark:text-white mb-1 text-xs">Subir Imagen</h5>
-                  <p class="text-gray-600 dark:text-zinc-400 text-xs mb-0.5">
-                    <span class="font-semibold text-gray-900 dark:text-white">Haz clic aquí</span> o arrastra una imagen
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500">PNG, JPG hasta 5MB</p>
-                </div>
-                
-                <!-- Preview de imagen -->
-                <div v-else class="relative">
-                  <img :src="previewImage" class="max-h-28 mx-auto rounded-lg shadow-sm">
-                  <button type="button" 
-                          @click.stop="clearImageUpload"
-                          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors shadow-sm">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                  </button>
+                  
+                  <!-- Preview -->
+                  <div v-else class="relative inline-block">
+                    <img :src="previewImage" class="max-h-24 rounded-lg shadow-sm mx-auto">
+                    <button type="button" @click.stop="clearImageUpload"
+                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600 transition-colors shadow">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <!-- URL web -->
-            <div v-if="imageUploadMethod === 'url'" class="space-y-3">
-              <input v-model="productForm.image" 
-                     type="url" 
-                     class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-gray-400 dark:focus:ring-blue-600 focus:border-transparent text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                     placeholder="https://ejemplo.com/imagen.jpg">
               
-              <!-- Preview de URL -->
-              <div v-if="productForm.image && isValidUrl(productForm.image)" class="text-center">
-                <div class="inline-block relative">
-                  <img :src="getProductImage(productForm)" 
-                       @error="(e) => { handleImageError(e); imageLoadError = true; }"
-                       @load="() => imageLoadError = false"
-                       class="max-h-24 rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm"
-                       alt="Preview">
-                  <div v-if="imageLoadError" class="absolute inset-0 bg-red-50 dark:bg-red-950 rounded-lg flex items-center justify-center">
-                    <div class="text-center">
-                      <svg class="w-4 h-4 text-red-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <!-- URL web -->
+              <div v-if="imageUploadMethod === 'url'" class="space-y-3">
+                <input v-model="productForm.image" 
+                       type="url" 
+                       class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500"
+                       placeholder="https://ejemplo.com/imagen.jpg">
+                
+                <!-- Preview de URL -->
+                <div v-if="productForm.image && isValidUrl(productForm.image)" class="text-center">
+                  <div class="inline-block relative">
+                    <img :src="productForm.image" 
+                         @error="imageLoadError = true"
+                         @load="imageLoadError = false"
+                         class="max-h-20 rounded-lg border border-gray-200 dark:border-zinc-700 shadow-sm"
+                         alt="Preview">
+                    <div v-if="imageLoadError" class="absolute inset-0 bg-red-50 dark:bg-red-950 rounded-lg flex items-center justify-center">
+                      <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"/>
                       </svg>
-                      <p class="text-xs text-red-600 dark:text-red-400 font-medium">Error</p>
                     </div>
                   </div>
                 </div>
-                <p v-if="imageLoadError" class="text-xs text-red-500 dark:text-red-400 mt-1">No se pudo cargar la imagen</p>
               </div>
             </div>
 
             <!-- Botones de acción -->
-            <div class="mt-6 space-y-2.5">
-              <button type="button" 
-                      v-if="isFashionMode"
+            <div class="mt-4 space-y-2">
+              <button v-if="isFashionMode" type="button"
                       @click="saveFashionProduct"
                       :disabled="loading"
-                      class="w-full px-5 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-lg font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                      class="w-full px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-bold text-sm shadow-lg transition-all disabled:opacity-50">
                 {{ loading ? 'Guardando...' : 'Crear Producto' }}
               </button>
               
               <button v-else type="button" 
                       @click="saveProduct"
                       :disabled="loading"
-                      class="w-full px-5 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-lg font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                {{ loading ? 'Guardando...' : (isEditing ? 'Actualizar Producto' : 'Crear Producto') }}
+                      class="w-full px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-bold text-sm shadow-lg transition-all disabled:opacity-50">
+                {{ loading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear Producto') }}
               </button>
               
-              <button type="button" 
-                      @click="showProductModal = false"
-                      class="w-full px-5 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-lg font-semibold transition-colors border border-gray-300 dark:border-zinc-700">
+              <button type="button" @click="showProductModal = false"
+                      class="w-full px-4 py-2 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 rounded-xl font-medium text-sm transition-colors border border-gray-200 dark:border-zinc-700">
                 Cancelar
               </button>
             </div>
@@ -1682,10 +1476,23 @@
               <div class="bg-white dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-3 border border-gray-200 dark:border-zinc-800 shadow-sm">
                 <!-- Imagen Principal -->
                 <div class="relative aspect-square rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900">
-                  <img :src="selectedProductMainImage" 
+                  <!-- Si hay imágenes reales, mostrar con <img> -->
+                  <img v-if="selectedProductImages.length > 0" 
+                       :src="selectedProductMainImage" 
                        @error="handleImageError" 
                        :alt="selectedProduct.name" 
                        class="w-full h-full object-contain">
+                  <!-- Si NO hay imágenes, mostrar placeholder elegante -->
+                  <div v-else class="w-full h-full flex items-center justify-center">
+                    <div class="text-center">
+                      <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-950/50 dark:to-purple-900/30 flex items-center justify-center mb-2">
+                        <span class="text-3xl font-black text-purple-600 dark:text-purple-400">
+                          {{ (selectedProduct.name || 'P').substring(0, 2).toUpperCase() }}
+                        </span>
+                      </div>
+                      <p class="text-xs text-gray-400 dark:text-zinc-500">Sin imagen</p>
+                    </div>
+                  </div>
                 </div>
                 <!-- Thumbnails Reales -->
                 <div v-if="selectedProductImages.length > 1" class="grid grid-cols-4 gap-2">
@@ -1698,10 +1505,11 @@
                               ? 'border-purple-500 ring-2 ring-purple-500/30' 
                               : 'border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 opacity-70 hover:opacity-100'
                           ]">
-                    <img :src="img" class="w-full h-full object-cover">
+                    <img :src="img" class="w-full h-full object-cover" @error="handleImageError">
                   </button>
                 </div>
-                <div v-else class="grid grid-cols-4 gap-2">
+                <!-- Placeholders solo cuando tiene exactamente 1 imagen -->
+                <div v-else-if="selectedProductImages.length === 1" class="grid grid-cols-4 gap-2">
                   <div v-for="i in 4" :key="i" 
                        class="aspect-square bg-gray-100 dark:bg-zinc-800/50 rounded-lg flex items-center justify-center">
                     <svg class="w-4 h-4 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1709,6 +1517,7 @@
                     </svg>
                   </div>
                 </div>
+                <!-- NO mostrar nada si no hay imágenes (selectedProductImages.length === 0) -->
               </div>
             </div>
             
@@ -1795,15 +1604,24 @@
                     <!-- Variante (Combinación) -->
                     <td class="px-5 py-3">
                       <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-hidden flex-shrink-0 ring-1 ring-gray-200 dark:ring-zinc-700">
+                        <!-- Thumbnail o placeholder -->
+                        <div v-if="getProductImage(selectedProduct)" 
+                             class="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-hidden flex-shrink-0 ring-1 ring-gray-200 dark:ring-zinc-700">
                           <img :src="getProductImage(selectedProduct)" 
+                               @error="(e) => e.target.style.display = 'none'"
                                class="w-full h-full object-cover">
+                        </div>
+                        <div v-else 
+                             class="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-950/50 dark:to-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <span class="text-xs font-black text-purple-600 dark:text-purple-400">
+                            {{ (selectedProduct.name || 'P').substring(0, 2).toUpperCase() }}
+                          </span>
                         </div>
                         <p class="text-sm font-medium text-gray-900 dark:text-white">
                           <span v-if="variant.options_summary">
                             {{ formatVariantOptions(variant.options_summary) }}
                           </span>
-                          <span v-else>Variante #{{ variant.id }}</span>
+                          <span v-else>{{ selectedProduct.name }}</span>
                         </p>
                       </div>
                     </td>
@@ -2529,15 +2347,12 @@ const getProductImage = (product) => {
       // Fix relative URLs for tenant backend
       if (imageUrl.startsWith('/storage')) {
         const fullUrl = `http://${window.location.hostname}:8000${imageUrl}`
-        console.log('✅ Imagen storage encontrada en galería para:', product.name, fullUrl)
         return fullUrl
       }
       // URL externa completa
       if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        console.log('✅ URL externa encontrada en galería para:', product.name, imageUrl)
         return imageUrl
       }
-      console.log('✅ Imagen en galería para:', product.name, imageUrl)
       return imageUrl
     }
   }
@@ -2559,20 +2374,49 @@ const getProductImage = (product) => {
     // Fix relative URLs for tenant backend
     if (imageUrl.startsWith('/storage')) {
       const fullUrl = `http://${window.location.hostname}:8000${imageUrl}`
-      console.log('✅ Imagen storage encontrada para:', product.name, fullUrl)
       return fullUrl
     }
     // URL externa completa
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      console.log('✅ URL externa encontrada para:', product.name, imageUrl)
       return imageUrl
     }
-    console.log('✅ Imagen encontrada para:', product.name, imageUrl)
     return imageUrl
   }
   
-  console.log('⚠️ Imagen no válida para:', product.name, imageUrl)
   return null
+}
+
+// 🎨 Generar avatar dinámico SVG con iniciales del producto
+const generateDynamicAvatar = (name) => {
+  // Obtener las primeras 2 letras del nombre
+  const initials = (name || 'P')
+    .split(' ')
+    .map(word => word.charAt(0))
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || 'P'
+  
+  // Generar un color único basado en el nombre
+  let hash = 0
+  for (let i = 0; i < (name || '').length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  
+  // Usar hue del hash para generar color HSL (sin rojo ni rosa)
+  const hue = Math.abs(hash % 220) + 140 // Rango 140-360 (evita rojos y rosas)
+  const saturation = 70 // Saturación moderada
+  const lightness = 35 // Oscuridad adecuada para buen contraste
+  
+  // Crear SVG inline
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+      <rect width="80" height="80" rx="12" fill="hsl(${hue}, ${saturation}%, ${lightness}%)"/>
+      <text x="40" y="46" font-size="28" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Inter, system-ui, sans-serif">${initials}</text>
+    </svg>
+  `
+  
+  // Retornar como data URI
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
 
 // 🚨 Manejar errores de carga de imagen
@@ -3066,7 +2910,6 @@ const changesCount = computed(() => Object.keys(variantChanges.value).length)
 // 🏪 Computed: Detectar si la tienda es de tipo Fashion (para vista de tarjetas)
 const isFashionStore = computed(() => {
   const storeType = appStore.systemSettings?.store_type
-  console.log('🏪 Tipo de tienda detectado:', storeType)
   return storeType === 'fashion' || storeType === 'moda'
 })
 
@@ -3375,33 +3218,65 @@ const formatVariantOptions = (optionsSummary) => {
 // 🖼️ Índice de imagen seleccionada para galería
 const selectedImageIndex = ref(0)
 
+// 📸 Helper: Convertir URL de imagen a URL completa del backend
+const processImageUrl = (url) => {
+  if (!url || typeof url !== 'string' || !url.trim()) return null
+  
+  const trimmedUrl = url.trim()
+  
+  // Si ya es una URL HTTP completa, devolverla
+  if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+    return trimmedUrl
+  }
+  
+  // Si es data URI (base64), devolverla
+  if (trimmedUrl.startsWith('data:image')) {
+    return trimmedUrl
+  }
+  
+  // Si es ruta relativa de Laravel Storage, convertir a URL absoluta
+  if (trimmedUrl.startsWith('/storage')) {
+    const backendUrl = `http://${window.location.hostname}:8000`
+    return `${backendUrl}${trimmedUrl}`
+  }
+  
+  // Si no empieza con /, agregar /storage/
+  if (!trimmedUrl.startsWith('/')) {
+    const backendUrl = `http://${window.location.hostname}:8000`
+    return `${backendUrl}/storage/${trimmedUrl}`
+  }
+  
+  // Ruta relativa genérica
+  const backendUrl = `http://${window.location.hostname}:8000`
+  return `${backendUrl}${trimmedUrl}`
+}
+
 // 📸 Computed: Lista de imágenes del producto seleccionado
 const selectedProductImages = computed(() => {
   if (!selectedProduct.value) return []
   
   const images = []
   
-  // 1. Cargar imágenes de la galería
+  // 1. Cargar imágenes de la galería (product_images)
   if (selectedProduct.value.images && Array.isArray(selectedProduct.value.images)) {
     selectedProduct.value.images.forEach(img => {
       const url = img.url || img.image_url
-      if (url) {
-        images.push(url.startsWith('http') ? url : (url.startsWith('/') ? url : `/storage/${url}`))
+      const processedUrl = processImageUrl(url)
+      if (processedUrl) {
+        images.push(processedUrl)
       }
     })
   }
   
   // 2. Si no hay galería, usar image_url principal
   if (images.length === 0 && selectedProduct.value.image_url) {
-    const url = selectedProduct.value.image_url
-    images.push(url.startsWith('http') ? url : (url.startsWith('/') ? url : `/storage/${url}`))
+    const processedUrl = processImageUrl(selectedProduct.value.image_url)
+    if (processedUrl) {
+      images.push(processedUrl)
+    }
   }
   
-  // 3. Fallback a imagen por defecto
-  if (images.length === 0) {
-    images.push('/images/no-image.png')
-  }
-  
+  // 3. NO usar fallback de imagen rota - dejamos array vacío para mostrar placeholder elegante
   return images
 })
 
@@ -3409,7 +3284,11 @@ const selectedProductImages = computed(() => {
 const selectedProductMainImage = computed(() => {
   const images = selectedProductImages.value
   const index = selectedImageIndex.value
-  return images[index] || images[0] || '/images/no-image.png'
+  // Si no hay imágenes, usar función getProductImage que genera placeholder elegante
+  if (images.length === 0) {
+    return getProductImage(selectedProduct.value)
+  }
+  return images[index] || images[0]
 })
 
 // 👗 Helpers para productos con variantes (FASHION)
@@ -3541,9 +3420,7 @@ const loadProducts = async () => {
     // Obtener TODOS los productos sin paginación del servidor
     params.per_page = 1000 // Obtener un número alto para evitar paginación del servidor
     
-    console.log('📦 Cargando productos con params:', params)
     const response = await productsService.getAll(params)
-    console.log('✅ Respuesta productos:', response)
     
     // La API devuelve datos paginados, extraer el array de productos
     if (response.data && response.data.data) {
@@ -3551,8 +3428,6 @@ const loadProducts = async () => {
     } else {
       products.value = response.data || []
     }
-    
-    console.log('Productos cargados:', products.value.length)
   } catch (error) {
     console.error('Error cargando productos:', error)
     showNotification(
@@ -3569,7 +3444,6 @@ const loadCategories = async () => {
   try {
     const response = await categoriesService.getAll()
     categories.value = response.data || []
-    console.log('Categorías cargadas:', categories.value.length)
   } catch (error) {
     console.error('Error cargando categorías:', error)
   }
@@ -3716,7 +3590,6 @@ const hideStockTooltip = () => {
 }
 
 const refreshProducts = async () => {
-  console.log('Refrescando productos...')
   await loadProducts()
 }
 
@@ -4624,7 +4497,7 @@ const handleFashionSave = async (productData) => {
         productData.variants.forEach((variant, index) => {
           formData.append(`variants[${index}][sku]`, variant.sku)
           formData.append(`variants[${index}][price]`, variant.price)
-          formData.append(`variants[${index}][cost_price]`, variant.cost || 0)
+          formData.append(`variants[${index}][cost_price]`, variant.cost_price || variant.cost || 0)
           formData.append(`variants[${index}][stock]`, variant.stock)
           formData.append(`variants[${index}][active]`, variant.active ? 1 : 0)
           
@@ -4772,8 +4645,8 @@ const saveProduct = async (skipValidation = false) => {
       sale_price: parseFloat(productForm.value.price),
       wholesale_price: null,
       current_stock: totalStock, // 🏢 Stock total calculado de todas las tiendas
-      min_stock: productForm.value.min_stock ? parseInt(productForm.value.min_stock) : 0,
-      max_stock: productForm.value.max_stock ? parseInt(productForm.value.max_stock) : totalStock * 3,
+      min_stock: 5, // Default: alerta de stock bajo
+      max_stock: 100, // Default: máximo sugerido
       unit: productForm.value.unit?.trim() || 'unidad',
       manage_stock: true,
       active: productForm.value.active !== false,
@@ -4785,9 +4658,6 @@ const saveProduct = async (skipValidation = false) => {
         // Solo incluir la sede si está habilitada en el checkbox
         if (productForm.value.warehouseEnabled[warehouseId]) {
           acc[warehouseId] = productForm.value.warehouseStock[warehouseId]
-          console.log(`✅ Incluyendo sede ${warehouseId} con stock ${productForm.value.warehouseStock[warehouseId]}`)
-        } else {
-          console.log(`❌ Excluyendo sede ${warehouseId} (checkbox no marcado)`)
         }
         return acc
       }, {}),
@@ -4796,10 +4666,6 @@ const saveProduct = async (skipValidation = false) => {
       allow_decimal: productForm.value.allow_decimal || false,
       // ⚠️ NO ENVIAR 'variants' para productos simples - esto causa que el backend cree variantes innecesarias
     }
-
-    console.log('📦 Datos enviados a la API:', apiData)
-    console.log('🏭 warehouse_stocks FILTRADO que se envía:', JSON.stringify(apiData.warehouse_stocks, null, 2))
-    console.log('🔢 Cantidad de sedes en warehouse_stocks:', Object.keys(apiData.warehouse_stocks).length)
     
     if (isEditing.value) {
       await productsService.update(productForm.value.id, apiData)
