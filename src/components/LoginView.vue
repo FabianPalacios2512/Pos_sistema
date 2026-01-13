@@ -464,6 +464,21 @@ onMounted(async () => {
   // 🎯 Verificar si hay un token de login con Google en la URL
   const urlParams = new URLSearchParams(window.location.search)
   const googleLoginToken = urlParams.get('google_login_token')
+  
+  // 🚨 Verificar si hay un mensaje de error de tenant
+  const reason = urlParams.get('reason')
+  const errorMsg = urlParams.get('message')
+  
+  if (reason === 'tenant-error' && errorMsg) {
+    message.text = errorMsg
+    message.type = 'error'
+    // Limpiar URL
+    window.history.replaceState({}, document.title, '/login')
+  } else if (reason === 'expired') {
+    message.text = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'
+    message.type = 'error'
+    window.history.replaceState({}, document.title, '/login')
+  }
 
   if (googleLoginToken) {
     try {

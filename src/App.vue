@@ -75,6 +75,9 @@ onMounted(async () => {
     await appStore.initialize()
   }
   
+  // 🔧 TODO: Re-habilitar health-check cuando se arregle correctamente con tenancy
+  // El problema era que intentaba acceder a la DB del tenant sin middleware de tenancy
+  
   // ✅ OCULTAR SPLASH SOLO DESPUÉS DE QUE TODO ESTÉ LISTO
   // Garantizar mínimo 1.2 segundos para que se vea la animación completa
   const elapsedTime = Date.now() - startTime

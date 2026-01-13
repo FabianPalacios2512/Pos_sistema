@@ -1071,14 +1071,16 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de inicio</label>
-              <input v-model="discountForm.starts_at" type="datetime-local"
+              <input v-model="discountForm.starts_at" type="date"
                      class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <p class="text-xs text-gray-500 mt-1">La promoción inicia a las 00:00 de este día</p>
             </div>
             
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de expiración</label>
-              <input v-model="discountForm.expires_at" type="datetime-local"
+              <input v-model="discountForm.expires_at" type="date"
                      class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <p class="text-xs text-gray-500 mt-1">La promoción termina a las 23:59 de este día</p>
             </div>
           </div>
 
@@ -1638,11 +1640,24 @@ const generateCode = async () => {
 const saveDiscount = async () => {
   loading.value = true
   try {
+    // Preparar datos con fechas convertidas a datetime
+    const dataToSend = { ...discountForm.value }
+    
+    // Si hay fecha de inicio, agregar hora 00:00:00
+    if (dataToSend.starts_at && !dataToSend.starts_at.includes('T')) {
+      dataToSend.starts_at = `${dataToSend.starts_at}T00:00:00`
+    }
+    
+    // Si hay fecha de expiración, agregar hora 23:59:59
+    if (dataToSend.expires_at && !dataToSend.expires_at.includes('T')) {
+      dataToSend.expires_at = `${dataToSend.expires_at}T23:59:59`
+    }
+    
     let response
     if (editingDiscount.value) {
-      response = await axiosInstance.put(`/discounts/${editingDiscount.value.id}`, discountForm.value)
+      response = await axiosInstance.put(`/discounts/${editingDiscount.value.id}`, dataToSend)
     } else {
-      response = await axiosInstance.post('/discounts', discountForm.value)
+      response = await axiosInstance.post('/discounts', dataToSend)
     }
     
     if (response.data.success) {
@@ -1660,7 +1675,19 @@ const saveDiscount = async () => {
 
 const editDiscount = (discount) => {
   editingDiscount.value = discount
-  Object.assign(discountForm.value, discount)
+  
+  // Copiar datos del descuento
+  const discountCopy = { ...discount }
+  
+  // Convertir fechas datetime a date para el input type="date"
+  if (discountCopy.starts_at) {
+    discountCopy.starts_at = discountCopy.starts_at.split('T')[0]
+  }
+  if (discountCopy.expires_at) {
+    discountCopy.expires_at = discountCopy.expires_at.split('T')[0]
+  }
+  
+  Object.assign(discountForm.value, discountCopy)
   showAddDiscountModal.value = true
 }
 

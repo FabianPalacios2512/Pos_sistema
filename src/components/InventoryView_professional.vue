@@ -606,191 +606,250 @@
 
     <!-- Modal Ajustar Stock -->
     <div v-if="showAdjustModal" 
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+         class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
          @click.self="showAdjustModal = false">
-      <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl border border-slate-200">
-        <!-- Header del Modal -->
-        <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-6">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-5xl shadow-2xl border border-gray-200 dark:border-zinc-800 flex flex-col max-h-[90vh] animate-scale-in">
+        
+        <!-- Header Mejorado -->
+        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-8 py-5 flex-shrink-0">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center border border-gray-200 dark:border-zinc-700">
+                <svg class="w-6 h-6 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Ajustar Stock</h3>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Modifica la cantidad en inventario</p>
+              </div>
+            </div>
+            <button @click="showAdjustModal = false" 
+                    class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all">
+              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Ajustar Stock</h3>
-              <p class="text-xs text-slate-600">Modifica la cantidad en inventario</p>
-            </div>
+            </button>
           </div>
-          <button @click="showAdjustModal = false" 
-                  class="text-slate-400 hover:text-slate-600 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
         </div>
         
-        <div v-if="selectedProductForAdjust" class="space-y-6">
+        <!-- Contenido del Modal -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-zinc-950 p-6" v-if="selectedProductForAdjust">
+          
           <!-- Información del Producto -->
-          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100">
+          <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800 mb-5">
             <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center border border-gray-200 dark:border-zinc-700 flex-shrink-0">
                 <span class="text-base font-bold text-blue-600 dark:text-blue-400">{{ selectedProductForAdjust.name.charAt(0) }}</span>
               </div>
               <div class="flex-1">
-                <h4 class="text-base font-bold text-gray-900">{{ selectedProductForAdjust.name }}</h4>
-                <p class="text-sm text-gray-600">{{ selectedProductForAdjust.category }}</p>
-                <div class="flex items-center space-x-4 mt-2">
-                  <div class="flex items-center space-x-2">
-                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Stock Actual:</span>
-                    <span class="text-sm font-bold text-blue-700">{{ selectedProductForAdjust.current_stock || 0 }} uds</span>
-                  </div>
-                  <div class="flex items-center space-x-2">
-                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Mínimo:</span>
-                    <span class="text-sm font-semibold text-gray-700">{{ selectedProductForAdjust.min_stock || 10 }} uds</span>
+                <h4 class="text-base font-bold text-gray-900 dark:text-white">{{ selectedProductForAdjust.name }}</h4>
+                <div class="flex items-center gap-3 mt-1">
+                  <span class="text-xs text-gray-600 dark:text-zinc-400">{{ selectedProductForAdjust.category }}</span>
+                  <span v-if="productVariants.length > 0" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+                    👗 MODA/VARIANTES
+                  </span>
+                  <div v-else class="flex items-center gap-3">
+                    <span class="text-xs text-gray-500 dark:text-zinc-500">Stock:</span>
+                    <span class="text-sm font-bold text-blue-700 dark:text-blue-400">{{ selectedProductForAdjust.current_stock || 0 }} uds</span>
+                    <span class="text-xs text-gray-400 dark:text-zinc-600">|</span>
+                    <span class="text-xs text-gray-500 dark:text-zinc-500">Mínimo:</span>
+                    <span class="text-sm font-semibold text-gray-700 dark:text-zinc-300">{{ selectedProductForAdjust.min_stock || 10 }} uds</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Tipo de Ajuste -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-3">Tipo de Ajuste</label>
-            <div class="grid grid-cols-2 gap-4">
-              <button @click="setQuickAdjustment('restock')"
-                      :class="['p-4 rounded-xl border-2 transition-all', 
-                               adjustForm.adjustmentType === 'restock' 
-                                 ? 'border-green-500 bg-green-50 text-green-700' 
-                                 : 'border-gray-200 hover:border-green-300 text-gray-700']">
-                <div class="flex items-center justify-center space-x-2">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                  </svg>
-                  <span class="font-semibold">Restock</span>
+          <!-- Grid de Formulario -->
+          <div class="grid grid-cols-12 gap-5">
+            
+            <!-- Columna Izquierda: Variantes (si existen) -->
+            <div v-if="productVariants.length > 0" class="col-span-5 space-y-5">
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Selecciona la Variante</h4>
+                <div class="space-y-2 max-h-[320px] overflow-y-auto">
+                  <button
+                    v-for="variant in productVariants"
+                    :key="variant.id"
+                    @click="selectVariant(variant)"
+                    type="button"
+                    :class="[
+                      'w-full p-3 rounded-lg border-2 transition-all text-left',
+                      selectedVariant?.id === variant.id
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-950/30'
+                        : 'border-gray-200 dark:border-zinc-700 hover:border-purple-300 dark:hover:border-purple-700'
+                    ]"
+                  >
+                    <div class="flex items-start gap-2">
+                      <svg v-if="selectedVariant?.id === variant.id" class="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                      </svg>
+                      <div class="flex-1 min-w-0">
+                        <p class="font-bold text-gray-900 dark:text-white text-sm mb-1">
+                          {{ (typeof variant.options_summary === 'string' ? JSON.parse(variant.options_summary) : variant.options_summary).map(opt => `${opt.name}: ${opt.value}`).join(' | ') }}
+                        </p>
+                        <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-zinc-400">
+                          <span>{{ variant.sku }}</span>
+                          <span class="text-gray-300 dark:text-zinc-700">|</span>
+                          <span class="font-bold text-blue-700 dark:text-blue-400">{{ variant.stock || 0 }} uds</span>
+                          <span class="text-gray-300 dark:text-zinc-700">|</span>
+                          <span>${{ Number(variant.price || 0).toLocaleString('es-CO') }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
                 </div>
-              </button>
-              <button @click="setQuickAdjustment('correction')"
-                      :class="['p-4 rounded-xl border-2 transition-all', 
-                               adjustForm.adjustmentType === 'correction' 
-                                 ? 'border-orange-500 bg-orange-50 text-orange-700' 
-                                 : 'border-gray-200 hover:border-orange-300 text-gray-700']">
-                <div class="flex items-center justify-center space-x-2">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                <p v-if="adjustForm.errors.variant" class="text-red-600 dark:text-red-400 text-xs mt-2 flex items-center">
+                  <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
                   </svg>
-                  <span class="font-semibold">Corrección</span>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <!-- Nuevo Stock -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Nuevo Stock</label>
-            <div class="relative">
-              <input v-model="adjustForm.new_stock" 
-                     type="number" 
-                     min="0"
-                     step="1"
-                     :class="['w-full px-4 py-3 pr-12 border-2 rounded-xl transition-colors focus:outline-none',
-                              adjustForm.errors.new_stock 
-                                ? 'border-red-300 focus:border-red-500 bg-red-50' 
-                                : 'border-gray-200 focus:border-blue-500 focus:bg-blue-50']"
-                     placeholder="Ingresa la cantidad nueva"
-                     @input="validateNewStock">
-              <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                <span class="text-gray-400 text-sm">uds</span>
+                  {{ adjustForm.errors.variant }}
+                </p>
               </div>
             </div>
-            <p v-if="adjustForm.errors.new_stock" class="text-red-600 text-sm mt-1 flex items-center">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
-              {{ adjustForm.errors.new_stock }}
-            </p>
+
+            <!-- Columna Derecha: Formulario de Ajuste -->
+            <div :class="productVariants.length > 0 ? 'col-span-7' : 'col-span-12'">
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800 space-y-4">
+                
+                <!-- Tipo de Ajuste -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Tipo de Ajuste</label>
+                  <div class="grid grid-cols-2 gap-3">
+                    <button type="button" @click="setQuickAdjustment('restock')"
+                            :class="['p-3 rounded-xl border-2 transition-all', 
+                                     adjustForm.adjustmentType === 'restock' 
+                                       ? 'border-green-500 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400' 
+                                       : 'border-gray-200 dark:border-zinc-700 hover:border-green-300 dark:hover:border-green-700 text-gray-700 dark:text-zinc-400']">
+                      <div class="flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span class="font-semibold text-sm">Restock</span>
+                      </div>
+                    </button>
+                    <button type="button" @click="setQuickAdjustment('correction')"
+                            :class="['p-3 rounded-xl border-2 transition-all', 
+                                     adjustForm.adjustmentType === 'correction' 
+                                       ? 'border-orange-500 bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400' 
+                                       : 'border-gray-200 dark:border-zinc-700 hover:border-orange-300 dark:hover:border-orange-700 text-gray-700 dark:text-zinc-400']">
+                      <div class="flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        <span class="font-semibold text-sm">Corrección</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Nuevo Stock -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Nuevo Stock</label>
+                  <div class="relative">
+                    <input v-model="adjustForm.new_stock" 
+                           type="number" 
+                           min="0"
+                           step="1"
+                           :class="['w-full px-4 py-3 pr-12 border-2 rounded-xl transition-all focus:outline-none text-sm',
+                                    adjustForm.errors.new_stock 
+                                      ? 'border-red-300 focus:border-red-500 bg-red-50 dark:bg-red-950/20' 
+                                      : 'border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white']"
+                           placeholder="Ingresa la cantidad nueva"
+                           @blur="validateNewStock">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">uds</span>
+                  </div>
+                  <p v-if="adjustForm.errors.new_stock" class="text-red-600 dark:text-red-400 text-xs mt-1.5 flex items-center">
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    {{ adjustForm.errors.new_stock }}
+                  </p>
+                </div>
+                
+                <!-- Motivo -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Motivo del Ajuste</label>
+                  <select v-model="adjustForm.reason" 
+                          :class="['w-full px-4 py-3 border-2 rounded-xl transition-all focus:outline-none text-sm',
+                                   adjustForm.errors.reason 
+                                     ? 'border-red-300 focus:border-red-500 bg-red-50 dark:bg-red-950/20' 
+                                     : 'border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white']"
+                          @change="validateReason">
+                    <option value="">Selecciona un motivo...</option>
+                    <option value="Reposición de inventario">Reposición de inventario</option>
+                    <option value="Conteo físico">Conteo físico</option>
+                    <option value="Producto dañado">Producto dañado</option>
+                    <option value="Producto vencido">Producto vencido</option>
+                    <option value="Corrección de error">Corrección de error</option>
+                    <option value="Merma">Merma</option>
+                    <option value="Devolución proveedor">Devolución proveedor</option>
+                    <option value="Otro">Otro motivo</option>
+                  </select>
+                  <input v-if="adjustForm.reason === 'Otro'" 
+                         v-model="adjustForm.customReason"
+                         type="text" 
+                         class="w-full px-4 py-3 border-2 border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-sm mt-2"
+                         placeholder="Especifica el motivo...">
+                  <p v-if="adjustForm.errors.reason" class="text-red-600 dark:text-red-400 text-xs mt-1.5 flex items-center">
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    {{ adjustForm.errors.reason }}
+                  </p>
+                </div>
+
+              </div>
+
+              <!-- Resumen del Cambio -->
+              <div v-if="adjustForm.new_stock !== '' && !isNaN(adjustForm.new_stock)" 
+                   class="col-span-12 relative overflow-hidden rounded-xl border-2 transition-all"
+                   :class="stockDifferenceColor">
+                <div class="p-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center"
+                           :class="stockDifferenceIconBg">
+                        <svg class="w-5 h-5" :class="stockDifferenceIconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                :d="stockDifference >= 0 ? 'M12 6v6m0 0v6m0-6h6m-6 0H6' : 'M18 12H6'"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="font-bold text-lg" :class="stockDifferenceTextColor">
+                          {{ stockDifference >= 0 ? '+' : '' }}{{ stockDifference }} unidades
+                        </p>
+                        <p class="text-sm opacity-75">
+                          {{ selectedVariant ? selectedVariant.stock : selectedProductForAdjust.current_stock || 0 }} → {{ adjustForm.new_stock }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="text-right">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                            :class="stockDifference >= 0 ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'">
+                        {{ stockDifference >= 0 ? '📦 Entrada' : '📤 Salida' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <!-- Motivo -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Motivo del Ajuste</label>
-            <div class="space-y-2">
-              <select v-model="adjustForm.reason" 
-                      :class="['w-full px-4 py-3 border-2 rounded-xl transition-colors focus:outline-none',
-                               adjustForm.errors.reason 
-                                 ? 'border-red-300 focus:border-red-500 bg-red-50' 
-                                 : 'border-gray-200 focus:border-blue-500 focus:bg-blue-50']"
-                      @change="validateReason">
-                <option value="">Selecciona un motivo...</option>
-                <option value="Reposición de inventario">Reposición de inventario</option>
-                <option value="Conteo físico">Conteo físico</option>
-                <option value="Producto dañado">Producto dañado</option>
-                <option value="Producto vencido">Producto vencido</option>
-                <option value="Corrección de error">Corrección de error</option>
-                <option value="Merma">Merma</option>
-                <option value="Devolución proveedor">Devolución proveedor</option>
-                <option value="Otro">Otro motivo</option>
-              </select>
-              <input v-if="adjustForm.reason === 'Otro'" 
-                     v-model="adjustForm.customReason"
-                     type="text" 
-                     class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:bg-blue-50"
-                     placeholder="Especifica el motivo...">
-            </div>
-            <p v-if="adjustForm.errors.reason" class="text-red-600 text-sm mt-1 flex items-center">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
-              {{ adjustForm.errors.reason }}
-            </p>
+          <!-- Footer: Botones de Acción -->
+          <div class="bg-gray-50 dark:bg-zinc-900/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 -mx-6 -mb-6 flex justify-end gap-3">
+            <button @click="showAdjustModal = false" 
+                    class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200">
+              Cancelar
+            </button>
+            <button @click="processStockAdjustment" 
+                    :disabled="!isFormValid"
+                    class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50">
+              {{ adjustmentLoading ? 'Procesando...' : 'Confirmar Ajuste' }}
+            </button>
           </div>
-
-          <!-- Resumen del Cambio -->
-          <div v-if="adjustForm.new_stock !== '' && !isNaN(adjustForm.new_stock)" 
-               class="relative overflow-hidden rounded-xl border-2 transition-all"
-               :class="stockDifferenceColor">
-            <div class="p-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                  <div class="w-10 h-10 rounded-full flex items-center justify-center"
-                       :class="stockDifferenceIconBg">
-                    <svg class="w-5 h-5" :class="stockDifferenceIconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            :d="stockDifference >= 0 ? 'M12 6v6m0 0v6m0-6h6m-6 0H6' : 'M18 12H6'"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-bold text-lg" :class="stockDifferenceTextColor">
-                      {{ stockDifference >= 0 ? '+' : '' }}{{ stockDifference }} unidades
-                    </p>
-                    <p class="text-sm opacity-75">
-                      {{ selectedProductForAdjust.current_stock || 0 }} → {{ adjustForm.new_stock }}
-                    </p>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-                        :class="stockDifference >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                    {{ stockDifference >= 0 ? '📦 Entrada' : '📤 Salida' }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Botones de Acción -->
-        <div class="bg-slate-50 border-t border-slate-200 px-6 py-4 -mx-6 -mb-6 mt-6 flex justify-end gap-3">
-          <button @click="showAdjustModal = false" 
-                  class="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-600 text-sm font-semibold rounded-xl border border-slate-300 transition-all duration-200">
-            Cancelar
-          </button>
-          <button @click="processStockAdjustment" 
-                  :disabled="!isFormValid"
-                  class="px-5 py-2.5 bg-black hover:bg-slate-900 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg text-sm font-bold transition-all duration-200 shadow-sm">
-            {{ adjustmentLoading ? 'Procesando...' : 'Confirmar Ajuste' }}
-          </button>
         </div>
       </div>
     </div>
@@ -1035,16 +1094,20 @@ const modalProductInput = ref(null)
 const showAdjustModal = ref(false)
 const adjustForm = ref({
   product_id: '',
+  variant_id: null, // 👗 NUEVO: Para productos fashion
   new_stock: '',
   reason: '',
   customReason: '',
   adjustmentType: '',
   errors: {
     new_stock: '',
-    reason: ''
+    reason: '',
+    variant: '' // 👗 Error de variante
   }
 })
 const selectedProductForAdjust = ref(null)
+const productVariants = ref([]) // 👗 NUEVO: Lista de variantes
+const selectedVariant = ref(null) // 👗 NUEVO: Variante seleccionada
 const adjustmentLoading = ref(false)
 
 // Variables para el modal de historial
@@ -1133,35 +1196,41 @@ const stockDifference = computed(() => {
   if (!selectedProductForAdjust.value || adjustForm.value.new_stock === '' || isNaN(adjustForm.value.new_stock)) {
     return 0
   }
-  return parseInt(adjustForm.value.new_stock) - (selectedProductForAdjust.value.current_stock || 0)
+  
+  // Si hay variante seleccionada, usar su stock; si no, usar el del producto
+  const currentStock = selectedVariant.value 
+    ? selectedVariant.value.stock 
+    : (selectedProductForAdjust.value.current_stock || 0)
+    
+  return parseInt(adjustForm.value.new_stock) - currentStock
 })
 
 const stockDifferenceColor = computed(() => {
   const diff = stockDifference.value
-  if (diff > 0) return 'border-green-200 bg-green-50'
-  if (diff < 0) return 'border-red-200 bg-red-50'
-  return 'border-gray-200 bg-gray-50'
+  if (diff > 0) return 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/30'
+  if (diff < 0) return 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30'
+  return 'border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800'
 })
 
 const stockDifferenceIconBg = computed(() => {
   const diff = stockDifference.value
-  if (diff > 0) return 'bg-green-100'
-  if (diff < 0) return 'bg-red-100'
-  return 'bg-gray-100'
+  if (diff > 0) return 'bg-green-100 dark:bg-green-900'
+  if (diff < 0) return 'bg-red-100 dark:bg-red-900'
+  return 'bg-gray-100 dark:bg-zinc-800'
 })
 
 const stockDifferenceIconColor = computed(() => {
   const diff = stockDifference.value
-  if (diff > 0) return 'text-green-600'
-  if (diff < 0) return 'text-red-600'
-  return 'text-gray-600'
+  if (diff > 0) return 'text-green-600 dark:text-green-400'
+  if (diff < 0) return 'text-red-600 dark:text-red-400'
+  return 'text-gray-600 dark:text-zinc-400'
 })
 
 const stockDifferenceTextColor = computed(() => {
   const diff = stockDifference.value
-  if (diff > 0) return 'text-green-800'
-  if (diff < 0) return 'text-red-800'
-  return 'text-gray-800'
+  if (diff > 0) return 'text-green-800 dark:text-green-400'
+  if (diff < 0) return 'text-red-800 dark:text-red-400'
+  return 'text-gray-800 dark:text-zinc-300'
 })
 
 const isFormValid = computed(() => {
@@ -1308,6 +1377,7 @@ const loadProducts = async () => {
 
     products.value = productsList.map(product => ({
       ...product,
+      type: product.type || 'simple', // 👗 IMPORTANTE: Incluir tipo de producto
       category: product.category ? product.category.name : 'Sin categoría',
       current_stock: product.current_stock || 0, // campo real de la BD
       stock: product.current_stock || 0, // alias para compatibilidad
@@ -1600,23 +1670,59 @@ const setQuickAdjustment = (type) => {
 const adjustStock = async (product) => {
   // Abrir modal de ajuste en lugar de prompt
   selectedProductForAdjust.value = product
+  productVariants.value = []
+  selectedVariant.value = null
+  
   adjustForm.value = {
     product_id: product.id,
+    variant_id: null,
     new_stock: '', // Dejar vacío para que el usuario ingrese la cantidad que desee
     reason: '',
     customReason: '',
     adjustmentType: '',
     errors: {
       new_stock: '',
-      reason: ''
+      reason: '',
+      variant: ''
     }
   }
+  
+  // 👗 Si el producto es tipo "variable" (fashion), cargar variantes
+  if (product.type === 'variable') {
+    try {
+      const response = await api.get(`/products/${product.id}`)
+      if (response.data && response.data.variants) {
+        productVariants.value = response.data.variants
+        console.log('👗 Variantes cargadas:', productVariants.value)
+      }
+    } catch (error) {
+      console.error('Error cargando variantes:', error)
+      showWarning('Error al cargar las variantes del producto')
+    }
+  }
+  
   showAdjustModal.value = true
+}
+
+// 👗 Función para seleccionar una variante
+const selectVariant = (variant) => {
+  selectedVariant.value = variant
+  adjustForm.value.variant_id = variant.id
+  adjustForm.value.new_stock = '' // Resetear el input cuando se cambia de variante
+  adjustForm.value.errors.variant = ''
+  console.log('👗 Variante seleccionada:', variant)
 }
 
 // Nueva función para procesar el ajuste con la API
 const processStockAdjustment = async () => {
   try {
+    // 👗 Validar que se haya seleccionado variante si es producto fashion
+    if (productVariants.value.length > 0 && !selectedVariant.value) {
+      adjustForm.value.errors.variant = 'Debes seleccionar una variante para ajustar'
+      showWarning('Por favor selecciona una variante')
+      return
+    }
+    
     // Validar formulario antes de enviar
     validateNewStock()
     validateReason()
@@ -1629,7 +1735,10 @@ const processStockAdjustment = async () => {
     adjustmentLoading.value = true
     
     const newStock = parseInt(adjustForm.value.new_stock)
-    const currentStock = selectedProductForAdjust.value.current_stock || 0
+    // 👗 Si es producto con variantes, usar el stock de la variante seleccionada
+    const currentStock = selectedVariant.value 
+      ? (selectedVariant.value.stock || 0)
+      : (selectedProductForAdjust.value.current_stock || 0)
     const difference = newStock - currentStock
     
     if (difference === 0) {
@@ -1645,19 +1754,22 @@ const processStockAdjustment = async () => {
     
     console.log('Enviando ajuste a la API:', { 
       product: selectedProductForAdjust.value.name,
+      variant_id: adjustForm.value.variant_id, // 👗 Incluir variant_id
+      variant: selectedVariant.value ? (typeof selectedVariant.value.options_summary === 'string' ? JSON.parse(selectedVariant.value.options_summary) : selectedVariant.value.options_summary) : null,
       from: currentStock,
       to: newStock,
       difference,
       reason: finalReason,
-      warehouse_id: selectedWarehouse.value // NUEVO: mostrar en log
+      warehouse_id: selectedWarehouse.value
     })
     
-    // 🏢 NUEVO: Incluir warehouse_id si está disponible
+    // 🏢 Incluir warehouse_id y variant_id si está disponible
     const response = await inventoryService.adjustStock(
       adjustForm.value.product_id, 
       newStock, 
       finalReason,
-      selectedWarehouse.value // NUEVO: pasar warehouse_id
+      selectedWarehouse.value,
+      adjustForm.value.variant_id // 👗 NUEVO: pasar variant_id
     )
     
     if (response && response.success) {

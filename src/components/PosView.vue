@@ -656,11 +656,11 @@
     </Teleport>
     
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 px-4 lg:px-6 py-2.5 pb-6" style="flex: 1; min-height: 0; height: 100%; max-height: 100%; overflow: hidden;">
-  <!-- Panel Izquierdo: Catálogo de Productos - Full en móvil, 70% Fashion (8/12) | 50% General (6/12) en desktop -->
+  <!-- Panel Izquierdo: Catálogo de Productos - Full en móvil, 66% Fashion (8/12) | 50% General (6/12) en desktop -->
   <div :class="isFashionStore ? 'lg:col-span-8' : 'lg:col-span-6'" class="col-span-1 lg:col-span-auto overflow-hidden" style="height: 100%; max-height: 100%;">
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden" style="height: 100%; max-height: 100%;">
+    <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg dark:shadow-xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden" style="height: 100%; max-height: 100%;">
       
-      <div class="p-3 overflow-y-auto bg-slate-100 dark:bg-zinc-950" style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+      <div class="p-3 overflow-y-auto bg-gray-100/80 dark:bg-zinc-800/40" style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
         <!-- Loading skeleton - Modo oscuro mejorado -->
       <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
@@ -760,11 +760,11 @@
             :style="{ animationDelay: `${Math.min(index * 30, 300)}ms` }"
             @click="addToCart(product)"
           >
-            <!-- Card Minimalista Fashion - SIN fondo en contenedor principal -->
-            <div class="relative overflow-hidden rounded-xl mb-2">
+            <!-- Card Fashion Profesional - Con borde y elevación -->
+            <div class="relative overflow-hidden rounded-xl mb-2 border border-gray-200 dark:border-zinc-700/60 bg-white dark:bg-zinc-900 shadow-md dark:shadow-lg dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-300">
               
-              <!-- Aspect ratio para fotos de moda - Fondo solo cuando NO hay imagen -->
-              <div class="aspect-[4/5] relative" :class="(product.image_url || product.image) ? '' : 'bg-gray-100 dark:bg-zinc-900'">
+              <!-- Aspect ratio para fotos de moda - Fondo contenido -->
+              <div class="aspect-[4/5] relative bg-gray-50 dark:bg-zinc-800/50">
                 
                 <!-- Badge NUEVO (para productos recientes) -->
                 <div v-if="isNewProduct(product)" class="absolute top-2 left-2 z-20 px-2 py-0.5 bg-black dark:bg-white text-white dark:text-black text-[8px] font-bold uppercase tracking-wider rounded-full shadow-lg">
@@ -788,12 +788,13 @@
                   @error="(e) => handleImageError(e, product)"
                 />
                 
-                <!-- Placeholder FASHION MEJORADO - Icono de prenda más sutil -->
-                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800/80 dark:to-zinc-900">
-                  <div class="text-center">
-                    <svg class="w-12 h-12 mx-auto text-gray-200 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                <!-- Placeholder FASHION MEJORADO - Icono visible y elegante -->
+                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900">
+                  <div class="text-center space-y-2">
+                    <svg class="w-14 h-14 mx-auto text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
+                    <p class="text-[9px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Sin imagen</p>
                   </div>
                 </div>
                 
@@ -804,28 +805,55 @@
                   </button>
                 </div>
               </div>
-            </div>
-            
-            <!-- Info del producto - Estilo minimalista -->
-            <div class="space-y-0.5 px-0.5">
-              <!-- Categoría -->
-              <p class="text-[8px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500 truncate">
-                {{ product.category_name || 'Sin categoría' }}
-              </p>
               
-              <!-- Nombre -->
-              <h3 class="text-xs font-medium text-gray-900 dark:text-white leading-tight line-clamp-1">
-                {{ product.name }}
-              </h3>
-              
-              <!-- Precio y Stock -->
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-bold text-gray-900 dark:text-white">
-                  ${{ product.price.toLocaleString() }}
-                </span>
-                <span v-if="getTotalStock(product) <= 5" class="text-[8px] font-semibold text-rose-500 dark:text-rose-400">
-                  ¡{{ getTotalStock(product) }}!
-                </span>
+              <!-- Info del producto - DENTRO del card para mejor integración -->
+              <div class="p-2.5 space-y-1.5 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800/50">
+                <!-- Categoría -->
+                <p class="text-[8px] font-semibold uppercase tracking-wider text-gray-500 dark:text-zinc-400 truncate">
+                  {{ product.category_name || 'Sin categoría' }}
+                </p>
+                
+                <!-- Nombre -->
+                <h3 class="text-xs font-semibold text-gray-900 dark:text-white leading-tight line-clamp-1">
+                  {{ product.name }}
+                </h3>
+                
+                <!-- 🎨 Indicadores de Variantes (Colores/Tallas disponibles) -->
+                <div v-if="product.variants && product.variants.length > 1" class="flex items-center gap-2">
+                  <!-- Colores disponibles -->
+                  <div v-if="getProductColors(product).length > 0" class="flex items-center gap-0.5">
+                    <div 
+                      v-for="(color, idx) in getProductColors(product).slice(0, 4)" 
+                      :key="idx"
+                      class="w-3 h-3 rounded-full border border-white dark:border-zinc-700 shadow-sm ring-1 ring-gray-200 dark:ring-zinc-600"
+                      :style="{ backgroundColor: color }"
+                    ></div>
+                    <span v-if="getProductColors(product).length > 4" class="text-[8px] text-gray-400 dark:text-zinc-500 font-medium ml-0.5">
+                      +{{ getProductColors(product).length - 4 }}
+                    </span>
+                  </div>
+                  
+                  <!-- Separador -->
+                  <span v-if="getProductColors(product).length > 0 && getProductSizes(product).length > 0" class="text-gray-300 dark:text-zinc-600">•</span>
+                  
+                  <!-- Tallas disponibles -->
+                  <div v-if="getProductSizes(product).length > 0" class="flex items-center gap-0.5">
+                    <span class="text-[8px] font-bold text-gray-500 dark:text-zinc-400 uppercase">
+                      {{ getProductSizes(product).slice(0, 3).join(', ') }}
+                      <span v-if="getProductSizes(product).length > 3" class="text-gray-400">...</span>
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Precio y Stock -->
+                <div class="flex items-center justify-between pt-0.5">
+                  <span class="text-sm font-bold text-gray-900 dark:text-white">
+                    ${{ product.price.toLocaleString() }}
+                  </span>
+                  <span v-if="getTotalStock(product) <= 5" class="text-[9px] font-bold text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-950 px-1.5 py-0.5 rounded">
+                    ¡{{ getTotalStock(product) }}!
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -848,8 +876,8 @@
                 class="w-full h-full object-cover"
                 loading="lazy"
               />
-              <div v-else class="w-full h-full flex items-center justify-center">
-                <svg class="w-10 h-10 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+              <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900">
+                <svg class="w-10 h-10 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
               </div>
@@ -953,82 +981,96 @@
 </div>
     
 
-<!-- bloque de ventas - 30% Fashion (4/12) | Panel Central General (3/12) -->
+<!-- bloque de ventas - 33% Fashion (4/12) | Panel Central General (3/12) -->
 
-<!-- Panel Derecho: Carrito/Ticket - OCULTO EN MÓVIL -->
+<!-- Panel Derecho: Carrito/Ticket - OCULTO EN MÓVIL - 4 columnas (33%) -->
 <div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block overflow-hidden" style="max-height: 100%;">
-  <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg dark:shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden" style="height: 100%; max-height: 100%;">
+  <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg dark:shadow-xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden" style="height: 100%; max-height: 100%;">
     
-    <div class="p-4 flex-shrink-0">
+    <!-- 🏷️ HEADER TICKET -->
+    <div class="px-4 py-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-xs font-black text-slate-800 dark:text-zinc-200 uppercase tracking-widest flex items-center gap-2">
-          <span class="w-1.5 h-5 bg-indigo-600 dark:bg-indigo-500 rounded-full"></span>
-          {{ loadedQuotation ? 'Cotización #' + loadedQuotation.code : quotationMode ? 'Nueva Cotización' : 'Ticket de Venta' }}
-        </h2>
+        <div class="flex items-center gap-2">
+          <div class="w-1 h-5 bg-teal-500 dark:bg-teal-400 rounded-full"></div>
+          <h2 class="text-xs font-bold text-slate-700 dark:text-zinc-300 uppercase tracking-wider">
+            {{ loadedQuotation ? 'Cotización #' + loadedQuotation.code : quotationMode ? 'Nueva Cotización' : 'TICKET DE VENTA' }}
+          </h2>
+        </div>
         
-        <span v-if="loadedQuotation || quotationMode" class="px-2 py-1 rounded text-[9px] font-bold uppercase bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-800 tracking-wide">
-          Modo Edición
+        <span v-if="loadedQuotation || quotationMode" class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400">
+          Editando
         </span>
       </div>
 
-      <!-- Botón Cliente (COMPLETO - Modo General) -->
+      <!-- 👤 CLIENTE -->
       <button
         id="tour-customer-btn"
         @click="showCustomerSelector = true"
-        class="w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 group active:scale-[0.99] border-2 border-dashed"
-        :class="selectedCustomer 
-          ? 'bg-white dark:bg-zinc-800 border-indigo-100 dark:border-indigo-800 hover:border-indigo-300 dark:hover:border-indigo-600 shadow-sm border-solid' 
-          : 'bg-slate-50 dark:bg-zinc-800/50 border-slate-300 dark:border-zinc-700 hover:border-indigo-400 dark:hover:border-indigo-600 hover:bg-indigo-50/30 dark:hover:bg-indigo-950/30'"
+        class="w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group active:scale-[0.99] border bg-white dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700/50 hover:border-gray-300 dark:hover:border-zinc-600"
       >
-        <div class="flex items-center gap-3 overflow-hidden">
-          <!-- Icono Dinámico -->
-          <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors shadow-sm"
-               :class="selectedCustomer 
-                 ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800' 
-                 : 'bg-white dark:bg-zinc-800 text-slate-400 dark:text-zinc-500 border border-slate-300 dark:border-zinc-700 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 group-hover:border-indigo-300 dark:group-hover:border-indigo-700'">
-            
-            <!-- Icono Usuario (Selected) -->
-            <svg v-if="selectedCustomer" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            
-            <!-- Icono Agregar (Empty) -->
-            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-          </div>
+        <!-- Avatar -->
+        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+             :class="selectedCustomer 
+               ? 'bg-slate-700 dark:bg-zinc-600 text-white' 
+               : 'bg-gray-100 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500'">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        </div>
 
-          <div class="flex flex-col text-left overflow-hidden flex-1">
-             <span class="text-[10px] font-bold uppercase tracking-wider"
-                   :class="selectedCustomer ? 'text-indigo-500 dark:text-indigo-400' : 'text-slate-500 dark:text-zinc-500'">
-               {{ selectedCustomer ? 'Cliente Asignado' : 'Asignar Cliente' }}
-             </span>
-             <span class="text-sm font-bold truncate transition-colors"
-                   :class="selectedCustomer ? 'text-slate-900 dark:text-zinc-100' : 'text-slate-400 dark:text-zinc-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'">
-               {{ selectedCustomer ? selectedCustomer.name : 'Seleccionar o Crear...' }}
-             </span>
-             
-             <!-- 🎁 Badge de Puntos de Fidelización -->
-             <div v-if="selectedCustomer && loyaltyEnabled && (selectedCustomer.loyalty_points || 0) > 0" 
-                  class="flex items-center gap-1.5 mt-1">
-               <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 text-[10px] font-bold rounded-full border border-amber-200">
-                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                 </svg>
-                 {{ selectedCustomer.loyalty_points }}
-               </span>
-               <span class="text-[9px] text-amber-600 font-semibold">
-                 {{ formatPointsAsMoney(selectedCustomer.loyalty_points) }}
-               </span>
-             </div>
-          </div>
+        <div class="flex-1 min-w-0 text-left">
+          <span class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 block uppercase tracking-wider">
+            {{ selectedCustomer ? 'Cliente' : 'ASIGNAR CLIENTE' }}
+          </span>
+          <span class="text-sm font-medium block leading-tight truncate"
+                :class="selectedCustomer ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500'">
+            {{ selectedCustomer ? selectedCustomer.name : 'Seleccionar o Crear...' }}
+          </span>
+          <!-- Badge de Puntos -->
+          <span v-if="selectedCustomer && loyaltyEnabled && (selectedCustomer.loyalty_points || 0) > 0" 
+                class="inline-flex items-center gap-1 text-[8px] font-bold text-amber-600 dark:text-amber-400 mt-0.5">
+            <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {{ selectedCustomer.loyalty_points }} pts
+          </span>
         </div>
-        
-        <!-- Flecha o Plus -->
-        <div class="text-slate-300 dark:text-zinc-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-transform group-hover:translate-x-1">
-           <svg v-if="selectedCustomer" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-           <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <!-- Icono + o flecha -->
+        <div v-if="!selectedCustomer" class="w-6 h-6 rounded-full bg-gray-100 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
+          <svg class="w-3.5 h-3.5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
         </div>
+        <svg v-else class="w-4 h-4 text-gray-400 dark:text-zinc-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
       </button>
+      
+      <!-- Input Cupón Expandible (aparece debajo cuando se activa) -->
+      <div v-if="showPromoCodeInput && discount === 0" class="mt-2 animate-fade-in">
+        <div class="flex gap-2">
+          <input
+            v-model="promoCode"
+            type="text"
+            placeholder="Código promocional"
+            class="flex-1 px-3 py-2 text-sm border rounded-lg bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none uppercase tracking-wide font-medium"
+            @keyup.enter="applyPromoCode"
+          />
+          <button
+            @click="applyPromoCode"
+            :disabled="!promoCode.trim()"
+            class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-xs font-bold rounded-lg transition-all"
+          >Aplicar</button>
+          <button 
+            @click="showPromoCodeInput = false; promoCode = ''; promoError = ''" 
+            class="px-2 text-slate-400 dark:text-zinc-500 hover:text-rose-500 dark:hover:text-rose-400 rounded-lg transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        <p v-if="promoError" class="text-xs text-rose-500 mt-1.5">{{ promoError }}</p>
+      </div>
+      
+      <!-- Descuento Aplicado -->
+      <div v-if="isFashionStore && discount > 0" class="mt-2.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg px-3 py-2 flex items-center justify-between border border-emerald-100 dark:border-emerald-800/50">
+        <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Descuento aplicado</span>
+        <span class="text-sm font-bold text-emerald-700 dark:text-emerald-400">-${{ discount.toLocaleString() }}</span>
+      </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900/50 relative" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
+    <div class="flex-1 overflow-y-auto pb-32 bg-white dark:bg-zinc-900 relative" style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
       
       <div v-if="cart.items.length === 0" class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
         
@@ -1106,19 +1148,23 @@
             </p>
           </div>
 
-          <!-- 🎛️ STEPPER - Control de cantidad táctil -->
-          <div class="flex items-center border border-gray-200 dark:border-zinc-700/40 rounded-lg overflow-hidden bg-white dark:bg-zinc-800/50 shadow-sm flex-shrink-0">
+          <!-- 🎛️ STEPPER - Control de cantidad minimalista -->
+          <div class="flex items-center gap-0.5 flex-shrink-0">
             <button 
               @click.stop="updateQuantity(item.id, item.quantity - 1)" 
-              class="w-8 h-8 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700/50 hover:text-rose-600 dark:hover:text-rose-400 transition-colors font-medium text-lg"
-            >−</button>
-            <span class="w-8 h-8 flex items-center justify-center text-sm font-bold text-slate-900 dark:text-white bg-gray-50 dark:bg-zinc-900/50 tabular-nums select-none border-x border-gray-200 dark:border-zinc-700/40">
+              class="w-6 h-6 flex items-center justify-center text-slate-400 dark:text-zinc-500 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded transition-colors"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
+            </button>
+            <span class="w-7 text-center text-sm font-bold text-slate-800 dark:text-white tabular-nums select-none">
               {{ item.quantity % 1 === 0 ? item.quantity : item.quantity.toFixed(1) }}
             </span>
             <button 
               @click.stop="updateQuantity(item.id, item.quantity + 1)" 
-              class="w-8 h-8 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors font-medium text-lg"
-            >+</button>
+              class="w-6 h-6 flex items-center justify-center text-slate-400 dark:text-zinc-500 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded transition-colors"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            </button>
           </div>
 
           <!-- ❌ Botón eliminar (aparece en hover) -->
@@ -1133,99 +1179,88 @@
       </div>
     </div>
     
-    <!-- 👗 SECCIÓN DE PAGO INTEGRADA - Solo en modo Fashion -->
-    <div v-if="isFashionStore" class="flex-shrink-0 border-t border-gray-200 dark:border-zinc-800/40 bg-gray-50 dark:bg-zinc-900/30">
+    <!-- 👗 SECCIÓN DE PAGO - Diseño Profesional Unificado -->
+    <div v-if="isFashionStore" class="flex-shrink-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800">
       
-      <!-- Total compacto -->
-      <div class="px-2.5 py-2 border-b border-gray-100 dark:border-zinc-800/40">
+      <!-- 💰 TOTAL -->
+      <div class="px-4 py-3 border-b border-gray-100 dark:border-zinc-800">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-[8px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total</p>
-            <h3 class="text-xl font-black text-slate-900 dark:text-white">${{ total.toLocaleString() }}</h3>
-            <p class="text-[9px] text-slate-400 dark:text-zinc-500">
-              Sub: ${{ subtotal.toLocaleString() }} • {{ systemSettings.iva_display_name || 'IVA' }}: ${{ tax.toLocaleString() }}
-            </p>
+            <p class="text-[10px] font-semibold text-slate-500 dark:text-zinc-500 uppercase tracking-wide">Total</p>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">${{ total.toLocaleString() }}</h2>
           </div>
           <div class="text-right">
-            <span class="text-2xl font-black text-slate-300 dark:text-zinc-600">{{ totalItems }}</span>
-            <p class="text-[8px] text-slate-400 dark:text-zinc-500 uppercase">items</p>
+            <p class="text-xs text-slate-400 dark:text-zinc-500">{{ totalItems }} items</p>
+            <p class="text-[10px] text-slate-400 dark:text-zinc-500 tabular-nums">
+              Sub: ${{ subtotal.toLocaleString() }} + {{ systemSettings.iva_display_name || 'IVA' }}: ${{ tax.toLocaleString() }}
+            </p>
           </div>
         </div>
       </div>
       
-      <!-- Métodos de pago compactos -->
-      <div class="px-2.5 py-2 space-y-1.5">
-        
-        <!-- Descuento Aplicado -->
-        <div v-if="discount > 0" class="bg-emerald-50 dark:bg-emerald-950/30 rounded-md px-2 py-1.5 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between">
-          <span class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-            Descuento
-          </span>
-          <span class="text-xs font-black text-emerald-700 dark:text-emerald-400">-${{ discount.toLocaleString() }}</span>
-        </div>
-        
-        <!-- Métodos de Pago -->
-        <div class="grid grid-cols-3 gap-1">
+      <!-- 💳 MÉTODOS DE PAGO -->
+      <div class="px-4 py-2.5">
+        <div class="flex gap-2">
           <button 
-            v-for="method in paymentMethods.slice(0, 3)" 
+            v-for="method in paymentMethods.slice(0, 4)" 
             :key="method.id"
             @click="selectedPaymentMethod = method.id"
-            class="px-1.5 py-2 rounded-md text-[9px] font-bold uppercase transition-all flex flex-col items-center justify-center gap-0.5 border"
+            class="flex-1 py-2.5 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 border"
             :class="selectedPaymentMethod === method.id 
-              ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white shadow-md' 
-              : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500'"
+              ? 'bg-slate-800 dark:bg-zinc-700 text-white border-slate-800 dark:border-zinc-600' 
+              : 'bg-gray-50 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 border-gray-200 dark:border-zinc-700 hover:border-slate-400 dark:hover:border-zinc-500'"
           >
-            <svg v-if="method.id === 'efectivo'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <svg v-else-if="method.id === 'tarjeta' || method.id === 'card'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-            <span class="leading-none">{{ method.name.split(' ')[0] }}</span>
+            <svg v-if="method.id === 'efectivo'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg v-else-if="method.id === 'tarjeta' || method.id === 'card'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+            {{ method.name.split(' ')[0] }}
           </button>
         </div>
+      </div>
+      
+      <!-- Acciones: Puntos y Cupón -->
+      <div v-if="canUseLoyaltyPoints" class="px-4 pb-2">
+        <button
+          @click="usePoints = !usePoints"
+          class="w-full py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 border"
+          :class="usePoints 
+            ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400' 
+            : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:border-amber-400'"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          Usar Puntos
+        </button>
+      </div>
+      
+      <!-- 🎯 BOTÓN COBRAR -->
+      <div class="px-4 pb-4">
+        <button
+          @click="handleCobrarClick"
+          :disabled="!canShowPaymentModal || quotationMode"
+          class="w-full py-3.5 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2.5"
+          :class="canShowPaymentModal && !quotationMode
+            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/30 active:scale-[0.99]'
+            : 'bg-gray-200 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 cursor-not-allowed'"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Cobrar ${{ total.toLocaleString() }}
+        </button>
         
-        <!-- Puntos de Fidelización -->
-        <div v-if="canUseLoyaltyPoints" class="mb-1.5">
-          <button
-            @click="usePoints = !usePoints"
-            class="w-full text-xs font-bold flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border transition-all"
-            :class="usePoints ? 'bg-amber-500 text-white border-amber-500 shadow-md' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-zinc-400 hover:border-amber-400 dark:hover:border-amber-600'"
-          >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-            </svg>
-            <span>Usar Puntos de Fidelización</span>
-          </button>
-        </div>
-        
-        <!-- Botones de acción -->
-        <div class="flex gap-2 pt-0.5">
+        <!-- Botones secundarios -->
+        <div class="flex gap-2 mt-2">
           <button 
             @click="showConfirmClearCart" 
             :disabled="cart.items.length === 0"
-            class="px-4 py-2.5 text-sm font-bold bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 rounded-lg border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
-          >
-            Cancelar
-          </button>
+            class="flex-1 py-2.5 text-xs font-semibold text-slate-500 dark:text-zinc-400 rounded-lg border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          >Cancelar</button>
           
           <button 
             @click="printQuote" 
             :disabled="!canCreateQuotation"
-            class="px-4 py-2.5 text-sm font-bold bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 rounded-lg border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5 shadow-sm"
+            class="flex-1 py-2.5 text-xs font-semibold text-slate-500 dark:text-zinc-400 rounded-lg border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-slate-700 dark:hover:text-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-1.5"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <span>Cotizar</span>
-          </button>
-          
-          <button
-            @click="handleCobrarClick"
-            :disabled="!canShowPaymentModal || quotationMode"
-            class="flex-1 py-4 rounded-xl font-black text-lg transition-all flex items-center justify-center gap-2.5 shadow-lg"
-            :class="canShowPaymentModal && !quotationMode
-              ? 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-emerald-600/40 hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]'
-              : 'bg-gray-200 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500 cursor-not-allowed shadow-none'"
-          >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span class="font-black">Cobrar ${{ total.toLocaleString() }}</span>
+            Cotizar
           </button>
         </div>
       </div>
@@ -1263,7 +1298,7 @@
     </div>
     
     <!-- 📦 ÁREA DE CONTENIDO CENTRAL con scroll optimizado -->
-    <div class="flex-1 overflow-y-auto px-3 py-2 space-y-2 bg-gray-50/50 dark:bg-zinc-900/30"
+    <div class="flex-1 overflow-y-auto px-3 py-2 pb-32 space-y-2 bg-gray-50/50 dark:bg-zinc-900/30"
          style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
 
         <!-- 🎯 CONFIGURACIÓN DE PAGO - Solo visible cuando hay items en el carrito -->
@@ -1465,7 +1500,7 @@
     </div>
 
     <!-- FOOTER DE ACCIÓN -->
-    <div class="p-2.5 bg-gray-50 dark:bg-zinc-800 border-t border-gray-100 dark:border-zinc-700 flex-shrink-0 space-y-2 mt-auto">
+    <div class="p-4 bg-gray-50 dark:bg-zinc-800 border-t border-gray-100 dark:border-zinc-700 flex-shrink-0 space-y-2 mt-auto">
        
        <!-- Botones Secundarios - NEUTROS -->
        <div class="flex gap-2">
@@ -1895,6 +1930,52 @@
           </div>
         </div>
       </Transition>
+    </Teleport>
+
+    <!-- 🚫 Modal: Límite de Facturas del Plan Gratuito Alcanzado -->
+    <Teleport to="body">
+      <div v-if="showFreePlanLimitModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+          
+          <!-- Contenido -->
+          <div class="p-8 text-center">
+            <!-- Icono -->
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              </svg>
+            </div>
+
+            <!-- Título -->
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¡Límite de Prueba Alcanzado!</h3>
+            
+            <!-- Mensaje -->
+            <p class="text-base text-gray-600 dark:text-zinc-400 mb-6 leading-relaxed">
+              Has completado <span class="font-semibold text-blue-600 dark:text-blue-400">{{ freePlanLimitData.maxInvoices }} facturas</span> en tu periodo de prueba gratuita.
+            </p>
+            
+            <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
+              💡 Actualiza tu plan para seguir vendiendo sin límites
+            </p>
+
+            <!-- Botones -->
+            <div class="flex gap-3">
+              <button
+                @click="showFreePlanLimitModal = false"
+                class="flex-1 py-3 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-base font-semibold rounded-xl border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+              >
+                Cerrar
+              </button>
+              <button
+                @click="goToSelectPlan"
+                class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-base font-semibold rounded-xl transition-colors duration-200 shadow-lg"
+              >
+                Ver Planes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </Teleport>
 
     <!-- Modal de Confirmación de Cierre de Venta -->
@@ -2409,6 +2490,7 @@ import ContextualTour from './ContextualTour.vue'
 import LoadWebOrderModal from './pos/LoadWebOrderModal.vue'
 import ConfirmCustomerModal from './pos/ConfirmCustomerModal.vue'
 import POSVariantSelector from './POSVariantSelector.vue'
+import { useModuleNavigation } from '../composables/useModuleNavigation.js'
 
 // Switch para tipo de método de pago
 const paymentType = ref('contado')
@@ -2416,6 +2498,7 @@ const paymentType = ref('contado')
 // Composables
 const { showSuccess, showError, showWarning, showInfo } = useToast()
 const { user } = useAuth()
+const { navigateToModule } = useModuleNavigation()
 const { 
   loyaltySettings, 
   isEnabled: loyaltyEnabled, 
@@ -2557,8 +2640,7 @@ const posTourSteps = ref([
   }
 ])
 
-// 🎉 Función para crear efecto de confeti ÉPICO - COMENTADO POR PERFORMANCE
-/*
+// 🎉 Función para crear efecto de confeti ÉPICO
 const triggerConfetti = () => {
   const duration = 3000
   const animationEnd = Date.now() + duration
@@ -2615,7 +2697,6 @@ const triggerConfetti = () => {
     }, 250)
   }
 }
-*/
 
 // Handlers del tour
 const handlePosTourComplete = () => {
@@ -2624,8 +2705,8 @@ const handlePosTourComplete = () => {
     isFirstVisit.value = false
   }
   
-  // 🎉 EFECTO DE CONFETI AL COMPLETAR EL TOUR - COMENTADO POR PERFORMANCE
-  // triggerConfetti()
+  // 🎉 EFECTO DE CONFETI AL COMPLETAR EL TOUR
+  triggerConfetti()
   
   showSuccess('¡Felicidades! Ya dominas el POS como un profesional 🎉')
 }
@@ -2967,6 +3048,13 @@ const showPaymentModal = ref(false)
 const showAfterPaymentModal = ref(false)
 const showReceiptModal = ref(false)
 const showRequireCustomerModal = ref(false)
+
+// 🚫 Estado para modal de límite de facturas alcanzado (plan gratuito)
+const showFreePlanLimitModal = ref(false)
+const freePlanLimitData = ref({
+  invoiceCount: 0,
+  maxInvoices: 10
+})
 
 // Estados para modales de email y premium
 const showEmailModal = ref(false)
@@ -3825,6 +3913,53 @@ const getTotalStock = (product) => {
   return product.current_stock || 0
 }
 
+// 🎨 Obtener colores únicos disponibles de las variantes del producto
+const getProductColors = (product) => {
+  if (!product.variants || product.variants.length <= 1) return []
+  
+  const colors = new Set()
+  product.variants.forEach(variant => {
+    if (variant.options && Array.isArray(variant.options)) {
+      variant.options.forEach(opt => {
+        // Buscar opciones de tipo COLOR
+        if (opt.type === 'COLOR' && opt.value) {
+          colors.add(opt.value)
+        }
+      })
+    }
+  })
+  return Array.from(colors)
+}
+
+// 📏 Obtener tallas únicas disponibles de las variantes del producto
+const getProductSizes = (product) => {
+  if (!product.variants || product.variants.length <= 1) return []
+  
+  const sizes = new Set()
+  const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '2XL', '3XL']
+  
+  product.variants.forEach(variant => {
+    if (variant.options && Array.isArray(variant.options)) {
+      variant.options.forEach(opt => {
+        // Buscar opciones de tipo TALLA o SIZE
+        if ((opt.type === 'SIZE' || opt.type === 'TALLA') && opt.value) {
+          sizes.add(opt.value.toUpperCase())
+        }
+      })
+    }
+  })
+  
+  // Ordenar tallas por orden lógico
+  return Array.from(sizes).sort((a, b) => {
+    const idxA = sizeOrder.indexOf(a)
+    const idxB = sizeOrder.indexOf(b)
+    if (idxA >= 0 && idxB >= 0) return idxA - idxB
+    if (idxA >= 0) return -1
+    if (idxB >= 0) return 1
+    return a.localeCompare(b)
+  })
+}
+
 // Métodos
 const addToCart = (product) => {
   // 👗 INTERCEPTAR: Si el producto tiene variantes REALES (no productos simples)
@@ -3864,9 +3999,6 @@ const addToCart = (product) => {
   if (hasRealVariants) {
     selectedProductForVariants.value = product
     showVariantSelector.value = true
-    
-    // Notificación visual en el POS
-    showInfo(`Abriendo selector de variantes para: ${product.name}`)
     
     return
   }
@@ -4717,7 +4849,22 @@ const handlePaymentConfirmed = async (paymentData) => {
   } catch (error) {
     console.error('❌ Error procesando venta en backend:', error)
     
-    // 🚨 MOSTRAR ERROR AL USUARIO Y NO CONTINUAR
+    // � Detectar si es error de límite de facturas del plan gratuito
+    if (error.response?.data?.error_code === 'FREE_PLAN_LIMIT_REACHED') {
+      // Guardar datos del límite para mostrar en el modal
+      freePlanLimitData.value = {
+        invoiceCount: error.response.data.invoice_count || 10,
+        maxInvoices: error.response.data.max_invoices || 10
+      }
+      
+      // Cerrar modal de pago y mostrar modal de upgrade
+      showPaymentModal.value = false
+      showFreePlanLimitModal.value = true
+      
+      return // No continuar
+    }
+    
+    // �🚨 MOSTRAR ERROR AL USUARIO Y NO CONTINUAR
     showError(`No se pudo crear la factura: ${error.message || 'Error desconocido'}`)
     
     // Cerrar modal de confirmación de pago
@@ -4793,6 +4940,13 @@ const showPremiumFeaturePOS = (featureName) => {
 // Cerrar modal premium
 const closePremiumModalPOS = () => {
   showPremiumModalPOS.value = false
+}
+
+// 🚫 Ir a selección de plan (desde modal de límite alcanzado)
+const goToSelectPlan = () => {
+  showFreePlanLimitModal.value = false
+  // Navegar a configuración -> sección de planes
+  navigateToModule('settings', { section: 'plans' })
 }
 
 const handlePrintInvoice = async () => {
@@ -6151,21 +6305,39 @@ const showLoadedQuotationDetails = () => {
 // Lifecycle hooks
 onMounted(async () => {
   try {
-    // ✅ ESPERAR a que la sesión esté inicializada
-    if (appStore.cashSession.initialized) {
-      hasOpenSession.value = appStore.cashSession.hasOpenSession
-      currentSession.value = appStore.cashSession.current
+    console.log('🚀 [PosView] Iniciando montaje del componente...')
+    
+    // ✅ SINCRONIZAR sesión desde el store (evitar referencias viejas)
+    // Si no está inicializada, forzar carga para asegurar datos frescos
+    if (!appStore.cashSession.initialized) {
+      console.log('🔄 [PosView] Inicializando sesión de caja...')
+      await appStore.loadCashSession()
     }
     
+    // Actualizar refs locales
+    hasOpenSession.value = appStore.cashSession.hasOpenSession
+    currentSession.value = appStore.cashSession.current
+    
+    console.log('📋 [PosView] Estado de sesión:', { 
+      hasSession: hasOpenSession.value, 
+      warehouseId: currentSession.value?.warehouse_id 
+    })
+    
     // 🔄 AUTO-REFRESH FORZADO: Recargar productos SIEMPRE al entrar al POS
-    if (currentSession.value?.warehouse_id) {
-      const scope = globalSearch.value ? 'global' : 'local'
-      await appStore.loadProducts(currentSession.value.warehouse_id, scope, true) // force = true
-      await appStore.loadCustomers(true) // force = true
-      await appStore.loadPaymentMethods(true) // force = true
-    } else {
-      console.warn('⚠️ [PosView] No hay warehouse_id disponible para cargar productos')
-    }
+    const warehouseId = currentSession.value?.warehouse_id
+    const scope = globalSearch.value ? 'global' : 'local'
+    
+    console.log('🔄 [PosView] Refrescando datos al montar...', { warehouseId, scope })
+    
+    // Ejecutar cargas en paralelo para mayor velocidad
+    // IMPORTANTE: Cargar productos incluso sin warehouse_id (usará el default)
+    await Promise.all([
+      appStore.loadProducts(warehouseId, scope, true), // force = true
+      appStore.loadCustomers(true), // force = true
+      appStore.loadPaymentMethods(true) // force = true
+    ])
+    
+    console.log('✅ [PosView] Datos cargados. Productos:', appStore.products.length)
 
     // Configurar interfaz inmediatamente
     setTimeout(() => {
@@ -6189,17 +6361,9 @@ onMounted(async () => {
     // Cargar configuración de loyalty points
     await loadLoyaltySettings()
     
-    // ✅ USAR ESTADO GLOBAL DE SESIÓN DE CAJA (ya inicializado por App.vue)
-    // El appStore.initialize() ya se ejecutó en el splash screen
-    if (appStore.cashSession.initialized) {
-      // Usar el estado ya cargado del appStore
-      hasOpenSession.value = appStore.cashSession.hasOpenSession
-      currentSession.value = appStore.cashSession.current
-      
-      // Emitir warehouse actual al parent
-      if (currentSession.value?.warehouse) {
-        emit('warehouse-changed', currentSession.value.warehouse)
-      }
+    // Emitir warehouse actual al parent (si existe sesión)
+    if (currentSession.value?.warehouse) {
+      emit('warehouse-changed', currentSession.value.warehouse)
     }
     
     // Verificar si hay una cotización pendiente de cargar
@@ -6214,6 +6378,8 @@ onMounted(async () => {
     
     // Emitir estado inicial del carrito
     emit('cart-status-changed', cart.items.length > 0)
+    
+    console.log('✅ [PosView] Inicialización completada. Productos:', appStore.products.length)
     
   } catch (error) {
     console.error('Error en inicialización de PosView:', error)
@@ -6235,6 +6401,18 @@ window.addEventListener('products-updated', handleProductsUpdate)
 // 🔄 AUTO-REFRESH al reactivar el componente (si se usa KeepAlive)
 onActivated(async () => {
   try {
+    console.log('🔄 [PosView] Reactivado - Verificando frescura de datos...')
+
+    // 0️⃣ Sincronizar sesión (CRÍTICO para evitar usar sesión stale)
+    if (appStore.cashSession.initialized) {
+        currentSession.value = appStore.cashSession.current
+        hasOpenSession.value = appStore.cashSession.hasOpenSession
+    } else {
+        await appStore.loadCashSession()
+        currentSession.value = appStore.cashSession.current
+        hasOpenSession.value = appStore.cashSession.hasOpenSession
+    }
+
     // 1️⃣ Recargar productos (respetando filtro Global/Local) - FORZADO
     if (currentSession.value?.warehouse_id) {
       const scope = globalSearch.value ? 'global' : 'local'

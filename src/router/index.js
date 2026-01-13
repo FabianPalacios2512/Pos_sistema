@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { requireAuth, redirectIfAuth, requireRole } from '../middleware/auth.js'
 import authService from '../services/authService.js'
 import { appStore } from '../store/appStore.js'
+import axios from 'axios'
 
 // Componentes
 const LoginView = () => import('../components/LoginView.vue')
@@ -314,6 +315,46 @@ const router = createRouter({
       return { top: 0 }
     }
   }
+})
+
+// 🔑 GUARD PRIORITARIO: Capturar token de URL (para cross-domain auth)
+router.beforeEach((to, from, next) => {
+  const authToken = to.query.auth_token
+  const userData = to.query.user_data
+  
+  if (authToken) {
+    console.log('🔑 Token detectado en URL - guardando en localStorage')
+    
+    // Decodificar y guardar token
+    const decodedToken = decodeURIComponent(authToken)
+    localStorage.setItem('authToken', decodedToken)
+    localStorage.setItem('loginTimestamp', Date.now().toString())
+    
+    // Guardar usuario si viene
+    if (userData) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userData))
+        localStorage.setItem('user', JSON.stringify(user))
+        console.log('👤 Usuario guardado:', user.name || user.email)
+      } catch (e) {
+        console.warn('⚠️ No se pudo parsear user_data')
+      }
+    }
+    
+    // Configurar axios con el token (axios ya está importado arriba)
+    axios.defaults.headers.common['Authorization'] = `Bearer ${decodedToken}`
+    
+    // Limpiar URL quitando los params de auth (mantener otros params si existen)
+    const cleanQuery = { ...to.query }
+    delete cleanQuery.auth_token
+    delete cleanQuery.user_data
+    
+    // Redirigir a la misma ruta pero sin los params de auth
+    next({ path: to.path, query: cleanQuery, replace: true })
+    return
+  }
+  
+  next()
 })
 
 // Guard global para títulos

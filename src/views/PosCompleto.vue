@@ -62,6 +62,7 @@
         <!-- Punto de Venta -->
         <div v-if="currentModule === 'pos'" style="height: 100%;">
           <PosView 
+            :key="posRefreshKey"
             ref="posViewRef"
             @sale-completed="handleSaleCompleted" 
             @create-invoice="handleCreateQuote"
@@ -281,6 +282,7 @@ const cartHasItems = ref(false) // Estado del carrito
 // Referencias a componentes
 const posViewRef = ref(null)
 const pendingPosAction = ref(null) // Acción pendiente para ejecutar cuando PosView se monte
+const posRefreshKey = ref(Date.now()) // 🔄 Key para forzar recreación del POS
 
 // Notificaciones del sistema
 const notifications = ref([
@@ -1179,7 +1181,13 @@ const setCurrentModule = (module, options = {}) => {
 
   currentModule.value = module
   
-  // 📱 Cerrar sidebar en móvil al cambiar de módulo
+  // � Si volvemos al POS, forzar recreación del componente para refrescar datos
+  if (module === 'pos') {
+    posRefreshKey.value = Date.now()
+    console.log('🔄 [PosCompleto] Forzando refresh del POS con key:', posRefreshKey.value)
+  }
+  
+  // �📱 Cerrar sidebar en móvil al cambiar de módulo
   sidebarOpen.value = false
   
   // 🔄 PERSISTIR el módulo actual en localStorage
@@ -1512,6 +1520,24 @@ watch(posViewRef, async (newRef) => {
       await triggerPosAction(pendingPosAction.value)
       pendingPosAction.value = null // Limpiar acción pendiente
     }, 50)
+  }
+})
+
+// 🔄 Watcher para AUTO-REFRESH cuando entras al módulo POS
+watch(() => currentModule.value, async (newModule, oldModule) => {
+  if (newModule === 'pos' && oldModule !== 'pos') {
+    // Acabas de entrar al POS desde otro módulo
+    try {
+      // Forzar recarga de productos, clientes y métodos de pago
+      if (appStore.cashSession.current?.warehouse_id) {
+        const scope = 'local' // Puedes ajustar según tu lógica
+        await appStore.loadProducts(appStore.cashSession.current.warehouse_id, scope, true)
+        await appStore.loadCustomers(true)
+        await appStore.loadPaymentMethods(true)
+      }
+    } catch (error) {
+      console.error('⚠️ Error en auto-refresh al entrar al POS:', error)
+    }
   }
 })
 

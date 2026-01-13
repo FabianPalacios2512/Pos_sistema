@@ -105,38 +105,37 @@
                       <p class="text-xs">Los movimientos no se mostrarán</p>
                     </div>
                   </div>
-                  <div v-else class="py-2">
-                    <!-- Notificaciones reales de movimientos -->
+                  <div v-else class="divide-y divide-gray-100 dark:divide-zinc-800/50">
+                    <!-- Notificaciones empresariales minimalistas -->
                     <div 
                       v-for="notification in notifications" 
                       :key="notification.id"
-                      class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors duration-200 border-b border-gray-50 dark:border-zinc-800/30 last:border-b-0"
+                      class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors duration-150 cursor-default"
                     >
-                      <div class="flex items-start gap-3">
-                        <!-- Icono según tipo de movimiento -->
+                      <div class="flex items-center gap-3">
+                        <!-- Indicador mínimo -->
                         <div 
-                          class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
-                          :class="getNotificationBgClass(notification.color)"
-                        >
-                          <svg class="w-4 h-4" :class="getNotificationTextClass(notification.color)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path v-if="notification.type === 'in'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-                            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
-                          </svg>
-                        </div>
+                          class="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          :class="notification.type === 'in' ? 'bg-emerald-500' : 'bg-slate-400 dark:bg-zinc-500'"
+                        ></div>
                         
-                        <!-- Contenido -->
+                        <!-- Contenido compacto -->
                         <div class="flex-1 min-w-0">
-                          <p class="text-sm font-medium text-gray-900 dark:text-white">{{ notification.title }}</p>
-                          <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ notification.description }}</p>
-                          <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1">{{ notification.formatted_date }}</p>
+                          <div class="flex items-center justify-between gap-2">
+                            <p class="text-sm text-gray-900 dark:text-white truncate">
+                              <span class="font-medium">{{ notification.title }}</span>
+                              <span class="text-gray-500 dark:text-zinc-400 font-normal"> · {{ notification.description }}</span>
+                            </p>
+                          </div>
+                          <p class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">{{ notification.formatted_date }}</p>
                         </div>
                       </div>
                     </div>
                     
-                    <!-- Botón ver más -->
-                    <div class="px-4 py-2 text-center border-t border-gray-100 dark:border-zinc-800">
-                      <button class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
-                        Ver todos los movimientos
+                    <!-- Footer minimalista -->
+                    <div class="px-4 py-2.5">
+                      <button class="text-xs font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors">
+                        Ver historial completo
                       </button>
                     </div>
                   </div>
@@ -943,6 +942,57 @@ const getNotificationTextClass = (color) => {
     red: 'text-red-600 dark:text-red-400'
   }
   return classes[color] || 'text-gray-600 dark:text-zinc-400'
+}
+
+// Nuevas funciones para estilos mejorados
+const getNotificationContainerClass = (color) => {
+  const classes = {
+    emerald: 'bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 hover:bg-emerald-50 dark:hover:bg-emerald-950/50',
+    blue: 'bg-blue-50/50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/30 hover:bg-blue-50 dark:hover:bg-blue-950/50',
+    amber: 'bg-amber-50/50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 hover:bg-amber-50 dark:hover:bg-amber-950/50',
+    red: 'bg-red-50/50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-950/50'
+  }
+  return classes[color] || 'bg-gray-50/50 dark:bg-zinc-800/30 border border-gray-100 dark:border-zinc-700/30 hover:bg-gray-50 dark:hover:bg-zinc-800/50'
+}
+
+const getNotificationIconClass = (color) => {
+  const classes = {
+    emerald: 'bg-emerald-100 dark:bg-emerald-900/50 border-emerald-200 dark:border-emerald-800',
+    blue: 'bg-blue-100 dark:bg-blue-900/50 border-blue-200 dark:border-blue-800',
+    amber: 'bg-amber-100 dark:bg-amber-900/50 border-amber-200 dark:border-amber-800',
+    red: 'bg-red-100 dark:bg-red-900/50 border-red-200 dark:border-red-800'
+  }
+  return classes[color] || 'bg-gray-100 dark:bg-zinc-700 border-gray-200 dark:border-zinc-600'
+}
+
+const getNotificationBadgeClass = (color) => {
+  const classes = {
+    emerald: 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+    blue: 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+    amber: 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+    red: 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+  }
+  return classes[color] || 'bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-600'
+}
+
+const getNotificationDescriptionClass = (color) => {
+  const classes = {
+    emerald: 'text-emerald-700 dark:text-emerald-300',
+    blue: 'text-blue-700 dark:text-blue-300',
+    amber: 'text-amber-700 dark:text-amber-300',
+    red: 'text-red-700 dark:text-red-300'
+  }
+  return classes[color] || 'text-gray-600 dark:text-zinc-400'
+}
+
+const getNotificationTypeName = (type) => {
+  const names = {
+    in: 'Entrada',
+    out: 'Salida',
+    adjustment: 'Ajuste',
+    sale: 'Venta'
+  }
+  return names[type] || 'Evento'
 }
 
 // Cerrar dropdown al hacer clic fuera

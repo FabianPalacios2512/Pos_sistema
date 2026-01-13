@@ -49,10 +49,19 @@ class SystemSettingsController extends Controller
                 }
 
                 // Calcular max_users según el plan
+                // Free/Trial: 1 usuario, Basic: 1 usuario, Premium: 3 usuarios, Enterprise: ilimitado
                 $maxUsers = [
-                    'free' => 2,
-                    'basic' => 5,
-                    'premium' => 20,
+                    'free' => 1,
+                    'basic' => 1,
+                    'premium' => 3,
+                    'enterprise' => null // null = ilimitado
+                ];
+
+                // Calcular max_warehouses según el plan
+                $maxWarehouses = [
+                    'free' => 1,
+                    'basic' => 1,
+                    'premium' => 3,
                     'enterprise' => null // null = ilimitado
                 ];
 
@@ -63,7 +72,8 @@ class SystemSettingsController extends Controller
                     'subscription_status' => 'active', // Por ahora siempre activo
                     'subscription_start_date' => $tenantData->created_at,
                     'subscription_end_date' => $tenantData->subscription_ends_at,
-                    'max_users' => $maxUsers[$tenantPlanRaw] ?? 2,
+                    'max_users' => $maxUsers[$tenantPlanRaw] ?? 1,
+                    'max_warehouses' => $maxWarehouses[$tenantPlanRaw] ?? 1,
                     'max_products' => null, // ilimitado para todos los planes
                     'max_invoices' => null  // ilimitado para todos los planes
                 ];

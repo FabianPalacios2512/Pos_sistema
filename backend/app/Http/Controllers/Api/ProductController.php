@@ -12,9 +12,49 @@ use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
+    /**
+     * ✅ Asegura que el symlink del tenant exista para servir archivos públicos
+     * Crea: public/storage/tenants/{tenant_id} -> storage/tenant{tenant_id}/app/public
+     */
+    private function ensureTenantStorageLink()
+    {
+        $tenantId = tenant('id');
+        if (!$tenantId) {
+            return; // No es multi-tenant
+        }
+
+        $symlinkPath = public_path("storage/tenants/{$tenantId}");
+        $targetPath = storage_path('app/public');
+
+        // Si el symlink ya existe, no hacer nada
+        if (is_link($symlinkPath)) {
+            return;
+        }
+
+        // Crear directorio padre si no existe
+        $parentDir = dirname($symlinkPath);
+        if (!File::isDirectory($parentDir)) {
+            File::makeDirectory($parentDir, 0755, true);
+        }
+
+        // Crear el symlink
+        try {
+            symlink($targetPath, $symlinkPath);
+            \Log::info("✅ [Storage] Symlink creado para tenant: {$tenantId}", [
+                'symlink' => $symlinkPath,
+                'target' => $targetPath
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("❌ [Storage] Error creando symlink para tenant: {$tenantId}", [
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function index(Request $request)
     {
         $query = Product::with([
@@ -337,6 +377,9 @@ class ProductController extends Controller
 
             // 3. Manejo de Imágenes (Galería)
             if ($request->hasFile('images')) {
+                // ✅ Asegurar que el symlink existe antes de guardar imágenes
+                $this->ensureTenantStorageLink();
+
                 foreach ($request->file('images') as $index => $file) {
                     $path = $file->store('products', 'public');
 
@@ -677,6 +720,9 @@ class ProductController extends Controller
 
             // 3. Manejo de Imágenes
             if ($request->hasFile('images')) {
+                // ✅ Asegurar que el symlink existe antes de guardar imágenes
+                $this->ensureTenantStorageLink();
+
                 \Log::info('📸 [ProductController@update] Procesando imágenes', [
                     'product_id' => $product->id,
                     'num_files' => count($request->file('images'))
@@ -1016,33 +1062,102 @@ class ProductController extends Controller
         $request->validate([
             'quantity' => 'required|integer',
             'type' => 'required|in:purchase,sale,adjustment,return,transfer',
-            'warehouse_id' => 'nullable|exists:warehouses,id' // NUEVO: validar warehouse_id
+            'warehouse_id' => 'nullable|exists:warehouses,id',
+            'variant_id' => 'nullable|integer|exists:product_variants,id' // 👗 NUEVO: para productos fashion
         ]);
 
         $warehouseId = $request->warehouse_id;
+        $variantId = $request->variant_id;
 
-        // Si se proporciona warehouse_id, usar método multi-sede
-        if ($warehouseId) {
-            $product->updateStockInWarehouse(
-                $warehouseId,
-                $request->quantity,
-                $request->type,
-                $request->reference ?? 'Manual',
-                auth()->id() ?? 1
-            );
+        // 👗 Si se proporciona variant_id, actualizar stock de variante específica
+        if ($variantId) {
+            $variant = \App\Models\ProductVariant::find($variantId);
+
+            if (!$variant || $variant->product_id !== $product->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Variante no encontrada o no pertenece al producto'
+                ], 404);
+            }
+
+            // Actualizar stock en product_variants
+            $currentVariantStock = $variant->stock ?? 0;
+            $newVariantStock = $currentVariantStock + $request->quantity;
+            $variant->stock = max(0, $newVariantStock);
+            $variant->save();
+
+            // Actualizar stock en product_warehouse
+            $warehouseId = $warehouseId ?? 1; // Warehouse por defecto
+            $pivotExists = DB::table('product_warehouse')
+                ->where('product_id', $product->id)
+                ->where('product_variant_id', $variantId)
+                ->where('warehouse_id', $warehouseId)
+                ->exists();
+
+            if ($pivotExists) {
+                DB::table('product_warehouse')
+                    ->where('product_id', $product->id)
+                    ->where('product_variant_id', $variantId)
+                    ->where('warehouse_id', $warehouseId)
+                    ->increment('stock', $request->quantity);
+            } else {
+                DB::table('product_warehouse')->insert([
+                    'product_id' => $product->id,
+                    'product_variant_id' => $variantId,
+                    'warehouse_id' => $warehouseId,
+                    'stock' => max(0, $request->quantity),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+
+            // Recalcular stock total del producto (suma de todas las variantes)
+            $totalStock = DB::table('product_warehouse')
+                ->where('product_id', $product->id)
+                ->whereNotNull('product_variant_id')
+                ->sum('stock');
+
+            $product->current_stock = $totalStock;
+            $product->save();
+
+            // Crear movimiento de inventario
+            \App\Models\InventoryMovement::create([
+                'product_id' => $product->id,
+                'type' => $request->type === 'purchase' || $request->type === 'adjustment' ? 'in' : 'out',
+                'quantity' => $request->quantity,
+                'previous_stock' => $currentVariantStock,
+                'new_stock' => $variant->stock,
+                'unit_cost' => $product->cost_price ?? 0,
+                'reference' => $request->reference ?? 'Ajuste de variante',
+                'notes' => "Variante ID: {$variantId}",
+                'user_id' => auth()->id() ?? 1,
+                'movement_date' => now()
+            ]);
+
         } else {
-            // Si no hay warehouse_id, usar método tradicional (sede por defecto)
-            $product->updateStock(
-                $request->quantity,
-                $request->type,
-                $request->reference ?? 'Manual',
-                auth()->id() ?? 1
-            );
+            // Si se proporciona warehouse_id, usar método multi-sede
+            if ($warehouseId) {
+                $product->updateStockInWarehouse(
+                    $warehouseId,
+                    $request->quantity,
+                    $request->type,
+                    $request->reference ?? 'Manual',
+                    auth()->id() ?? 1
+                );
+            } else {
+                // Si no hay warehouse_id, usar método tradicional (sede por defecto)
+                $product->updateStock(
+                    $request->quantity,
+                    $request->type,
+                    $request->reference ?? 'Manual',
+                    auth()->id() ?? 1
+                );
+            }
         }
 
         return response()->json([
             'success' => true,
-            'data' => $product->fresh(),
+            'data' => $product->fresh(['variants']),
             'message' => 'Stock actualizado exitosamente'
         ]);
     }
@@ -1152,6 +1267,94 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al actualizar las variantes: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * ✅ Eliminar imagen de producto - borra de BD y del sistema de archivos
+     * DELETE /api/products/images/{imageId}
+     */
+    public function deleteImage($imageId)
+    {
+        try {
+            $image = ProductImage::findOrFail($imageId);
+
+            \Log::info('🗑️ [ProductController@deleteImage] Eliminando imagen', [
+                'image_id' => $imageId,
+                'image_url' => $image->image_url,
+                'product_id' => $image->product_id
+            ]);
+
+            // Extraer la ruta del archivo desde la URL
+            $imageUrl = $image->image_url;
+            $filePath = null;
+
+            // Si es una URL relativa tipo /storage/tenants/{tenant}/products/...
+            if (preg_match('/\/storage\/tenants\/[^\/]+\/(.+)$/', $imageUrl, $matches)) {
+                $filePath = $matches[1]; // products/xxxxx.jpg
+            }
+            // Si es una URL relativa tipo /storage/products/...
+            elseif (preg_match('/\/storage\/(.+)$/', $imageUrl, $matches)) {
+                $filePath = $matches[1]; // products/xxxxx.jpg
+            }
+
+            // Eliminar archivo físico si existe
+            if ($filePath) {
+                if (Storage::disk('public')->exists($filePath)) {
+                    Storage::disk('public')->delete($filePath);
+                    \Log::info('✅ [ProductController@deleteImage] Archivo físico eliminado', [
+                        'path' => $filePath
+                    ]);
+                } else {
+                    \Log::warning('⚠️ [ProductController@deleteImage] Archivo físico no encontrado', [
+                        'path' => $filePath
+                    ]);
+                }
+            }
+
+            // Obtener el producto para actualizar la imagen principal si es necesario
+            $product = Product::find($image->product_id);
+            $wasPrimary = $image->is_primary;
+
+            // Eliminar registro de la base de datos
+            $image->delete();
+
+            // Si era la imagen principal, actualizar la siguiente imagen como principal
+            if ($wasPrimary && $product) {
+                $nextImage = ProductImage::where('product_id', $product->id)
+                    ->orderBy('order')
+                    ->first();
+
+                if ($nextImage) {
+                    $nextImage->update(['is_primary' => true]);
+                    $product->update(['image_url' => $nextImage->image_url]);
+                } else {
+                    // No hay más imágenes, limpiar image_url del producto
+                    $product->update(['image_url' => null]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Imagen eliminada correctamente'
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Imagen no encontrada'
+            ], 404);
+
+        } catch (\Exception $e) {
+            \Log::error('❌ [ProductController@deleteImage] Error', [
+                'image_id' => $imageId,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar la imagen: ' . $e->getMessage()
             ], 500);
         }
     }

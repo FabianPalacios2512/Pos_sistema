@@ -50,10 +50,10 @@
 
             <!-- Botón -->
             <button
-              @click="redirectToLogin"
+              @click="performAutoLogin"
               class="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all duration-200"
             >
-              Ir al Login
+              Comenzar Ahora
             </button>
 
             <p class="text-xs text-gray-500 text-center mt-4">
@@ -364,7 +364,7 @@
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                 </svg>
-                <span>3 Usuarios / 2 Bodegas</span>
+                <span>3 Usuarios / 3 Bodegas</span>
               </div>
               <div class="flex items-center gap-2.5 text-slate-600">
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -538,6 +538,7 @@ const tenantId = ref(null)
 const redirectUrl = ref('')
 const showTrialSuccessModal = ref(false)
 const countdownSeconds = ref(5)
+const isRenewalMode = ref(false) // Para ocultar trial en renovaciones
 
 // Detectar ambiente de desarrollo
 const isDevelopment = ref(
@@ -753,8 +754,8 @@ const updateTenantPlan = async (plan) => {
 
     console.log('Plan activado:', response.data)
 
-    // Limpiar localStorage
-    localStorage.removeItem('registration_data')
+    // ⚠️ NO limpiar registration_data aquí - se necesita para auto-login
+    // Se limpiará después del auto-login exitoso
 
     // Si es trial, mostrar modal de éxito
     if (plan === 'trial_express') {
@@ -766,16 +767,9 @@ const updateTenantPlan = async (plan) => {
         countdownSeconds.value--
         if (countdownSeconds.value <= 0) {
           clearInterval(countdownInterval)
-          redirectToLogin()
+          performAutoLogin()
         }
       }, 1000)
-      
-      // Guardar mensaje de éxito para después
-      localStorage.setItem('registration_success', JSON.stringify({
-        message: 'Trial activado. Inicia sesión para comenzar.',
-        companyName: companyName.value,
-        subdomain: redirectUrl.value
-      }))
     } else {
       // Para planes de pago, redirigir al tenant directamente
       if (redirectUrl.value) {
@@ -820,4 +814,169 @@ const redirectToLogin = () => {
     window.location.href = '/login'
   }
 }
+
+// 🔑 Función para hacer auto-login después de seleccionar plan
+const performAutoLogin = async () => {
+  try {
+    console.log('🔐 Iniciando auto-login...')
+    
+    // ✅ PRIORIDAD 1: Si ya hay token guardado, redirigir directamente
+    const existingToken = localStorage.getItem('authToken')
+    const existingUser = localStorage.getItem('user')
+    
+    if (existingToken) {
+      console.log('✅ Token existente encontrado - redirigiendo a welcome')
+      
+      // Obtener subdomain
+      const urlParams = new URLSearchParams(window.location.search)
+      let subdomain = urlParams.get('subdomain') || urlParams.get('tenant_id')
+      
+      if (!subdomain) {
+        const regData = localStorage.getItem('registration_data')
+        if (regData) {
+          const parsed = JSON.parse(regData)
+          subdomain = parsed.subdomain || parsed.tenant_id
+        }
+      }
+      
+      // Limpiar datos de registro temporales
+      localStorage.removeItem('registration_data')
+      
+      // 🔑 CRÍTICO: Pasar token como query param porque localStorage NO se comparte entre subdominios
+      const tokenParam = encodeURIComponent(existingToken)
+      const userParam = existingUser ? encodeURIComponent(existingUser) : ''
+      
+      // Redirigir al welcome del tenant CON el token
+      let targetUrl
+      if (subdomain) {
+        const baseUrl = window.location.hostname === 'localhost' 
+          ? `http://${subdomain}.localhost:3000`
+          : `https://${subdomain}.105pos.pro`
+        targetUrl = `${baseUrl}/welcome?auth_token=${tokenParam}&user_data=${userParam}`
+      } else {
+        targetUrl = `/welcome?auth_token=${tokenParam}&user_data=${userParam}`
+      }
+      
+      console.log('🚀 Redirigiendo a:', targetUrl.substring(0, 100) + '...')
+      window.location.href = targetUrl
+      return
+    }
+    
+    // Obtener credenciales guardadas temporalmente
+    const registrationData = localStorage.getItem('registration_data')
+    if (!registrationData) {
+      console.warn('⚠️ No hay datos de registro - redirigiendo al login manual')
+      redirectToLogin()
+      return
+    }
+
+    const data = JSON.parse(registrationData)
+    const { email, temp_password, is_google, subdomain, authenticated } = data
+
+    // ✅ Si el usuario ya está autenticado desde el registro, redirigir directamente
+    if (authenticated) {
+      console.log('✅ Usuario marcado como autenticado - redirigiendo a welcome')
+      
+      // Limpiar datos de registro temporales
+      localStorage.removeItem('registration_data')
+      
+      // Redirigir al welcome del tenant
+      const targetUrl = subdomain 
+        ? (window.location.hostname === 'localhost' 
+            ? `http://${subdomain}.localhost:3000/welcome` 
+            : `https://${subdomain}.105pos.pro/welcome`)
+        : '/welcome'
+      
+      console.log('🚀 Redirigiendo a:', targetUrl)
+      window.location.href = targetUrl
+      return
+    }
+
+    // Si es registro con Google, redirigir al welcome directamente (ya tiene sesión de Google)
+    if (is_google) {
+      console.log('✅ Usuario registrado con Google - redirigiendo a welcome')
+      const targetUrl = subdomain 
+        ? (window.location.hostname === 'localhost' 
+            ? `http://${subdomain}.localhost:3000/welcome` 
+            : `https://${subdomain}.105pos.pro/welcome`)
+        : '/welcome'
+      
+      // Limpiar credenciales temporales
+      delete data.temp_password
+      delete data.is_google
+      localStorage.setItem('registration_data', JSON.stringify(data))
+      
+      window.location.href = targetUrl
+      return
+    }
+
+    // Para registro con email/password, hacer login
+    if (!temp_password) {
+      console.warn('⚠️ No hay password temporal - redirigiendo al login manual')
+      redirectToLogin()
+      return
+    }
+
+    // Determinar API URL según el entorno
+    const apiUrl = subdomain
+      ? (window.location.hostname === 'localhost'
+          ? `http://${subdomain}.localhost:3000/api`
+          : `https://${subdomain}.105pos.pro/api`)
+      : '/api'
+
+    console.log('📤 Haciendo login automático en:', apiUrl)
+
+    // Hacer login
+    const response = await axios.post(`${apiUrl}/login`, {
+      email: email,
+      password: temp_password
+    })
+
+    console.log('✅ Login exitoso:', response.data)
+
+    // Guardar token y usuario
+    if (response.data.success && response.data.data?.token) {
+      const { token, user } = response.data.data
+      
+      localStorage.setItem('authToken', token)
+      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('loginTimestamp', Date.now())
+      
+      // Configurar axios con el token
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      
+      // Limpiar credenciales temporales
+      localStorage.removeItem('registration_data')
+      
+      // Redirigir al welcome del tenant
+      const targetUrl = subdomain 
+        ? (window.location.hostname === 'localhost' 
+            ? `http://${subdomain}.localhost:3000/welcome` 
+            : `https://${subdomain}.105pos.pro/welcome`)
+        : '/welcome'
+      
+      console.log('🚀 Redirigiendo a:', targetUrl)
+      window.location.href = targetUrl
+    } else {
+      throw new Error('No se recibió token de autenticación')
+    }
+
+  } catch (error) {
+    console.error('❌ Error en auto-login:', error)
+    console.error('Detalles:', error.response?.data)
+    
+    // Si falla el auto-login, limpiar credenciales y redirigir al login manual
+    const registrationData = localStorage.getItem('registration_data')
+    if (registrationData) {
+      const data = JSON.parse(registrationData)
+      delete data.temp_password
+      delete data.is_google
+      localStorage.setItem('registration_data', JSON.stringify(data))
+    }
+    
+    alert('No se pudo iniciar sesión automáticamente. Por favor, inicia sesión manualmente.')
+    redirectToLogin()
+  }
+}
+
 </script>

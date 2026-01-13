@@ -159,9 +159,52 @@ apiClient.interceptors.response.use(
           // Errores de validación
           // console.warn('Errores de validación:', data.errors)
           break
+        
+        case 404:
+          // Recurso no encontrado
+          // Detectar si es error de tenant/tienda no encontrada
+          if (data?.message && (
+            data.message.toLowerCase().includes('tenant') ||
+            data.message.toLowerCase().includes('tienda') ||
+            data.message.toLowerCase().includes('warehouse')
+          )) {
+            console.error('🔥 Error: Recurso del tenant no encontrado')
+            console.error('Detalles:', data.message)
+            
+            // Si es el health-check o recursos críticos, cerrar sesión
+            if (error.config?.url?.includes('health-check') || 
+                error.config?.url?.includes('warehouses')) {
+              localStorage.clear()
+              window.location.href = '/login?reason=tenant-error&message=Tu cuenta no está disponible. Por favor, contacta al soporte.'
+              return Promise.reject(error)
+            }
+          }
+          break
           
         case 500:
           // Error del servidor
+          // Detectar si es error de base de datos/tenant inexistente
+          if (data?.message && (
+            data.message.includes('database') ||
+            data.message.includes('Database') ||
+            data.message.includes('Connection refused') ||
+            data.message.includes('SQLSTATE') ||
+            data.message.includes('Unknown database') ||
+            data.message.includes('tenant') && data.message.includes('not found')
+          )) {
+            console.error('🔥 Error crítico: Base de datos o tenant no existe')
+            console.error('Detalles:', data.message)
+            
+            // Limpiar sesión y redirigir al login
+            localStorage.removeItem('authToken')
+            localStorage.removeItem('user')
+            localStorage.removeItem('loginTimestamp')
+            localStorage.clear() // Limpiar todo el localStorage
+            
+            // Redirigir al login con mensaje
+            window.location.href = '/login?reason=tenant-error&message=Tu cuenta no está disponible. Por favor, contacta al soporte.'
+            return Promise.reject(error)
+          }
           // console.error('Error interno del servidor')
           break
           

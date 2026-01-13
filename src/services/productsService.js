@@ -11,8 +11,11 @@ export const productsService = {
 
   // Obtener productos optimizados para POS (sin paginación, campos mínimos)
   async getForPos(params = {}) {
-    const queryString = new URLSearchParams(params).toString()
-    const url = queryString ? `/products-pos?${queryString}` : '/products-pos'
+    // Agregar timestamp para evitar caché del navegador
+    const cacheBuster = Date.now()
+    const allParams = { ...params, _t: cacheBuster }
+    const queryString = new URLSearchParams(allParams).toString()
+    const url = `/products-pos?${queryString}`
     return await apiCall(url)
   },
 

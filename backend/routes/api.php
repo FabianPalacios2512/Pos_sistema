@@ -99,6 +99,51 @@ Route::post('/password/forgot', [PasswordResetController::class, 'forgotPassword
 
 // ==================== RUTAS AUTENTICADAS ====================
 Route::middleware(['auth:sanctum'])->group(function () {
+    // ✅ Health check - Solo verificar que el tenant existe en la tabla central
+    // NO intenta acceder a la DB del tenant (eso requiere middleware de tenancy)
+    Route::get('/health-check', function () {
+        try {
+            $user = request()->user();
+
+            // Verificar que el usuario tiene tenant_id
+            if (!$user || !$user->tenant_id) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No tenant associated with user'
+                ], 404);
+            }
+
+            // Verificar que el tenant existe en la base de datos central
+            $tenant = \DB::connection('mysql')->table('tenants')
+                ->where('id', $user->tenant_id)
+                ->first();
+
+            if (!$tenant) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Tenant not found in central database'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'tenant' => $user->tenant_id,
+                'plan' => $tenant->plan ?? 'unknown',
+                'timestamp' => now()->toIso8601String()
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('❌ Health check failed', [
+                'error' => $e->getMessage(),
+                'user' => request()->user()?->email
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Health check failed'
+            ], 500);
+        }
+    });
+
     // Plan upgrades para tenants existentes (AUTENTICADO)
     Route::post('/upgrade-plan', [PlanUpgradeController::class, 'upgrade']);
 });

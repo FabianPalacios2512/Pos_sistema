@@ -41,10 +41,18 @@ export const appStore = reactive({
   
   // Métodos para cargar datos
   async loadProducts(warehouseId = null, searchScope = 'local', force = false) {
-    if (this.loading.products && !force) return // Evitar cargas duplicadas
+    // Si force=true, SIEMPRE recarga sin importar el estado de loading
+    if (!force && this.loading.products) return // Evitar cargas duplicadas solo si NO es force
+
+    // 🔄 Si force=true, resetear el estado de loading por si quedó bloqueado
+    if (force) {
+      this.loading.products = false
+    }
 
     try {
       this.loading.products = true
+      
+      console.log('🔄 [appStore] Cargando productos...', { warehouseId, searchScope, force })
       
       // 🏪 Si no se pasa warehouse_id, intentar usar el de la sesión activa
       const targetWarehouseId = warehouseId || this.cashSession.current?.warehouse_id
@@ -78,6 +86,9 @@ export const appStore = reactive({
           })
         
         this.products = productsFormatted
+        console.log(`✅ [appStore] Productos cargados: ${productsFormatted.length} productos activos`)
+      } else {
+        console.warn('⚠️ [appStore] Respuesta sin datos de productos:', response)
       }
     } catch (error) {
       console.error('❌ Error precargando productos:', error)
@@ -105,7 +116,8 @@ export const appStore = reactive({
   },
   
   async loadCustomers(force = false) {
-    if (this.loading.customers && !force) return
+    // Si force=true, SIEMPRE recarga sin importar el estado de loading
+    if (!force && this.loading.customers) return
     
     try {
       this.loading.customers = true
@@ -123,7 +135,8 @@ export const appStore = reactive({
   },
 
   async loadPaymentMethods(force = false) {
-    if (this.loading.paymentMethods && !force) return
+    // Si force=true, SIEMPRE recarga sin importar el estado de loading
+    if (!force && this.loading.paymentMethods) return
     
     try {
       this.loading.paymentMethods = true
@@ -173,7 +186,7 @@ export const appStore = reactive({
             subscription_status: 'active',
             subscription_start_date: new Date().toISOString().split('T')[0],
             subscription_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            max_users: 5,
+            max_users: 1, // Default para free/basic
             max_products: null, // null = ilimitado
             max_invoices: null // null = ilimitado
           }
@@ -254,6 +267,21 @@ export const appStore = reactive({
   // Inicializar todos los datos
   async initialize() {
     if (this.initialized) return
+    
+    // 🚫 NO inicializar en rutas públicas sin subdominio (registro, login, select-plan)
+    const publicRoutes = ['/register', '/login', '/select-plan', '/payment/success', '/payment/failed']
+    const currentPath = window.location.pathname
+    const hostname = window.location.hostname
+    
+    // Verificar si estamos en localhost/127.0.0.1 SIN subdominio
+    const isMainDomainLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
+    const isPublicRoute = publicRoutes.some(route => currentPath.startsWith(route))
+    
+    if (isMainDomainLocalhost && isPublicRoute) {
+      console.log('🚫 Ruta pública sin subdominio - omitiendo inicialización del store')
+      this.initialized = true
+      return
+    }
     
     // Verificar si es super admin
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -339,4 +367,4 @@ export const appStore = reactive({
 // 🆕 Computed properties para acceso simplificado a datos del tenant
 export const subscriptionEndDate = computed(() => appStore.tenant?.subscription_end_date || null)
 export const subscriptionStatus = computed(() => appStore.tenant?.subscription_status || 'unknown')
-export const maxUsers = computed(() => appStore.tenant?.max_users || 2)
+export const maxUsers = computed(() => appStore.tenant?.max_users || 1)

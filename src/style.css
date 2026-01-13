@@ -83,9 +83,36 @@ html, body {
   line-height: 1.2;
 }
 
-/* Transiciones suaves globales */
-* {
+/* Transiciones suaves globales - EXCEPTO selects para evitar flash */
+*:not(select):not(option) {
   transition: all 0.2s ease-in-out;
+}
+
+/* 🔧 FIX: Selects SIN transición para evitar flash negro */
+select,
+select *,
+option {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Forzar colores de fondo inmediatos en selects */
+select {
+  background-color: white !important;
+}
+
+select option {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+.dark select {
+  background-color: #27272a !important;
+}
+
+.dark select option {
+  background-color: #27272a !important;
+  color: #fafafa !important;
 }
 
 /* Botones con efectos hover mejorados */

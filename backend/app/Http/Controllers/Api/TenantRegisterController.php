@@ -13,7 +13,15 @@ class TenantRegisterController extends Controller
 {
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        // 🔐 Validación condicional: Si viene de Google, password no es requerido
+        $isGoogleAuth = $request->has('google_id') && !empty($request->google_id);
+
+        // Si viene de Google y no hay owner_name, usar google_name
+        if ($isGoogleAuth && empty($request->owner_name) && $request->has('google_name')) {
+            $request->merge(['owner_name' => $request->google_name]);
+        }
+
+        $validationRules = [
             'company_name' => 'required|string|max:255',
             'owner_name' => 'required|string|max:255',
             'cedula' => 'required|string|max:20',
@@ -29,10 +37,20 @@ class TenantRegisterController extends Controller
                 }),
             ],
             'email' => 'required|email|max:255',
-            'password' => 'required|string|min:8',
             'token' => 'nullable|string', // Token opcional para plan preseleccionado
             'plan' => 'nullable|string|in:pending,trial_express,emprendedor,negocio_pro,premium,enterprise', // Plan seleccionado (puede ser 'pending')
-        ]);
+            'google_id' => 'nullable|string', // ID de Google para OAuth
+            'google_name' => 'nullable|string', // Nombre de Google
+        ];
+
+        // Password solo requerido si NO es Google Auth
+        if ($isGoogleAuth) {
+            $validationRules['password'] = 'nullable|string|min:8';
+        } else {
+            $validationRules['password'] = 'required|string|min:8';
+        }
+
+        $validator = Validator::make($request->all(), $validationRules);
 
         // 🆔 VALIDACIÓN: Verificar si el NIT/CC ya existe en otro tenant
         $cedula = $request->cedula;
@@ -191,15 +209,21 @@ class TenantRegisterController extends Controller
             // NOTA: El seeder ahora se ejecuta manualmente en el PASO 3.5
             // Esto crea roles, usuarios admin, categorías, etc.
             // Aquí actualizamos los datos del usuario admin con la info del registro
-            $tenant->run(function () use ($request) {
+            $authToken = null;
+            $adminUserData = null;
+
+            $tenant->run(function () use ($request, &$authToken, &$adminUserData) {
                 try {
                     // El seeder ya creó un usuario admin con role_id 1
                     // Vamos a actualizarlo con los datos del registro
                     $adminUser = \App\Models\User::where('role_id', 1)->first();
 
                     if ($adminUser) {
+                        // 🔐 Usar owner_name o google_name como fallback
+                        $ownerName = $request->owner_name ?: $request->google_name ?: $request->email;
+
                         $updateData = [
-                            'name' => $request->owner_name,
+                            'name' => $ownerName,
                             'email' => $request->email,
                             'cc' => $request->cedula,
                         ];
@@ -211,7 +235,8 @@ class TenantRegisterController extends Controller
 
                             \Log::info('🔐 Registro con Google OAuth detectado', [
                                 'google_id' => $request->google_id,
-                                'email' => $request->email
+                                'email' => $request->email,
+                                'name' => $ownerName
                             ]);
                         } else {
                             // Registro normal con email/password
@@ -220,10 +245,29 @@ class TenantRegisterController extends Controller
 
                         $adminUser->update($updateData);
 
+                        // 🔑 GENERAR TOKEN AUTOMÁTICAMENTE - Usuario queda logueado al registrarse
+                        $authToken = $adminUser->createToken('api-token')->plainTextToken;
+
+                        // Obtener datos del usuario con rol para respuesta
+                        $adminUser->load('role');
+                        $adminUserData = [
+                            'id' => $adminUser->id,
+                            'name' => $adminUser->name,
+                            'email' => $adminUser->email,
+                            'phone' => $adminUser->phone,
+                            'role' => [
+                                'id' => $adminUser->role->id,
+                                'name' => $adminUser->role->name,
+                                'permissions' => $adminUser->role->permissions ?? [] // permissions es un campo JSON, no relación
+                            ],
+                            'is_super_admin' => $adminUser->is_super_admin ?? false
+                        ];
+
                         \Log::info('✅ Usuario admin actualizado con datos del registro', [
                             'name' => $request->owner_name,
                             'email' => $request->email,
-                            'cc' => $request->cedula
+                            'cc' => $request->cedula,
+                            'token_generated' => true
                         ]);
                     }
 
@@ -271,7 +315,8 @@ class TenantRegisterController extends Controller
             \Log::info('✅ Tenant registrado exitosamente', [
                 'tenant_id' => $tenant->id,
                 'domain' => $domainToCreate,
-                'redirect_url' => $redirectUrl
+                'redirect_url' => $redirectUrl,
+                'token_generated' => $authToken ? true : false
             ]);
 
             // 📧 NO ENVIAR EMAIL AQUÍ - Se enviará después de seleccionar plan
@@ -281,13 +326,25 @@ class TenantRegisterController extends Controller
                 'tenant_id' => $tenant->id
             ]);
 
-            return response()->json([
+            // 🔑 Preparar respuesta con token de autenticación
+            $response = [
                 'success' => true,
                 'message' => 'Tienda creada exitosamente',
                 'redirect_url' => $redirectUrl,
                 'tenant_id' => $tenant->id,
                 'domain' => $domainToCreate
-            ], 201);
+            ];
+
+            // Agregar datos de autenticación si se generó el token
+            if ($authToken && $adminUserData) {
+                $response['data'] = [
+                    'user' => $adminUserData,
+                    'token' => $authToken
+                ];
+                \Log::info('✅ Token incluido en respuesta de registro - Usuario autenticado automáticamente');
+            }
+
+            return response()->json($response, 201);
 
         } catch (\Exception $e) {
             // 🧹 LIMPIEZA AGRESIVA: Eliminar TODA huella del tenant fallido

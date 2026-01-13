@@ -1258,6 +1258,23 @@ const registerTenant = async () => {
       clearInterval(messageInterval)
       isSubmitting.value = false
       
+      // 🔑 GUARDAR TOKEN DE AUTENTICACIÓN si viene en la respuesta
+      if (response.data.data && response.data.data.token) {
+        const token = response.data.data.token
+        const user = response.data.data.user
+        
+        // Guardar en localStorage
+        localStorage.setItem('authToken', token)
+        localStorage.setItem('user', JSON.stringify(user))
+        localStorage.setItem('loginTimestamp', Date.now().toString())
+        
+        // Configurar axios para futuras peticiones
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        
+        console.log('✅ Usuario autenticado automáticamente después del registro')
+        console.log('🔑 Token guardado:', token.substring(0, 20) + '...')
+      }
+      
       // ✅ GUARDAR DATOS DEL REGISTRO EN LOCALSTORAGE para proceso de pago
       const registrationData = {
         company_name: form.company_name,
@@ -1267,7 +1284,13 @@ const registerTenant = async () => {
         subdomain: form.subdomain,
         cedula: form.cedula,
         tenant_id: response.data.tenant_id,
-        redirect_url: response.data.redirect_url
+        redirect_url: response.data.redirect_url,
+        // 🔑 Ya NO necesitamos temp_password porque el usuario ya está autenticado
+        // temp_password: form.password, // ELIMINADO
+        // Si es Google, marcar para auto-login sin password
+        is_google: googleUserData.value ? true : false,
+        // Marcar que ya tiene token activo
+        authenticated: response.data.data && response.data.data.token ? true : false
       }
       localStorage.setItem('registration_data', JSON.stringify(registrationData))
       

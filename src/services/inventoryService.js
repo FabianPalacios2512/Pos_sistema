@@ -34,11 +34,22 @@ export const inventoryService = {
   },
 
   // Ajustar stock directamente (para la función ajustar)
-  adjustStock: async (productId, newStock, reason = 'Ajuste manual', warehouseId = null) => {
+  adjustStock: async (productId, newStock, reason = 'Ajuste manual', warehouseId = null, variantId = null) => {
     try {
-      // Primero obtenemos el stock actual del producto
-      const productsResponse = await api.get(`/products/${productId}`)
-      const currentStock = productsResponse.data.current_stock || 0
+      // 👗 Si es un producto con variante, obtenemos el stock de la variante específica
+      let currentStock = 0
+      
+      if (variantId) {
+        // Para variantes, obtener stock de la variante específica
+        const productsResponse = await api.get(`/products/${productId}`)
+        const variant = productsResponse.data.variants?.find(v => v.id === variantId)
+        currentStock = variant ? (variant.stock || 0) : 0
+        console.log('👗 Stock actual de variante:', { variantId, currentStock })
+      } else {
+        // Para productos normales
+        const productsResponse = await api.get(`/products/${productId}`)
+        currentStock = productsResponse.data.current_stock || 0
+      }
 
       // Calculamos la diferencia (lo que necesitamos sumar o restar)
       const difference = parseInt(newStock) - currentStock
@@ -47,11 +58,13 @@ export const inventoryService = {
         quantity: difference, // Enviamos la diferencia, no el valor absoluto
         type: 'adjustment',
         reference: reason,
-        warehouse_id: warehouseId // NUEVO: incluir warehouse_id si se proporciona
+        warehouse_id: warehouseId, // incluir warehouse_id si se proporciona
+        variant_id: variantId // 👗 NUEVO: incluir variant_id para productos fashion
       }
 
       console.log('Ajustando stock:', {
         productId,
+        variantId,
         currentStock,
         newStock: parseInt(newStock),
         difference,

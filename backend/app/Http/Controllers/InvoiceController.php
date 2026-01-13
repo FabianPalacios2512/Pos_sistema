@@ -136,7 +136,7 @@ class InvoiceController extends Controller
         try {
             // 🚀 VALIDACIÓN: Plan gratuito limitado a 10 facturas
             $tenant = tenant();
-            if ($tenant && in_array($tenant->plan, ['trial_express', 'free_trial'])) {
+            if ($tenant && in_array($tenant->plan, ['free', 'trial_express', 'free_trial'])) {
                 $invoiceCount = Invoice::where('type', 'invoice')
                     ->whereIn('status', ['completed', 'paid', 'partial'])
                     ->count();
@@ -144,7 +144,7 @@ class InvoiceController extends Controller
                 if ($invoiceCount >= 10) {
                     return response()->json([
                         'success' => false,
-                        'message' => '🚫 Has alcanzado el límite de 10 facturas del plan gratuito. ¡Actualiza tu plan para continuar vendiendo!',
+                        'message' => '🚫 Has alcanzado el límite de 10 facturas del plan de prueba gratuita. ¡Actualiza tu plan para seguir vendiendo sin límites!',
                         'error_code' => 'FREE_PLAN_LIMIT_REACHED',
                         'invoice_count' => $invoiceCount,
                         'max_invoices' => 10,
@@ -160,6 +160,7 @@ class InvoiceController extends Controller
                 'due_date' => 'nullable|date|after_or_equal:date',
                 'items' => 'required|array',
                 'items.*.product_id' => 'required|integer',
+                'items.*.variant_id' => 'nullable|integer', // 👗 ID de variante para productos fashion
                 'items.*.product_name' => 'required|string',
                 'items.*.product_sku' => 'nullable|string',
                 'items.*.quantity' => 'required|numeric|min:0.01',
@@ -217,6 +218,10 @@ class InvoiceController extends Controller
                     if ($product) {
                         $previousStock = $product->current_stock;
 
+                        // 👗 SOPORTE PARA VARIANTES: Determinar si es un producto con variante
+                        $variantId = $item['variant_id'] ?? null;
+                        $isVariantProduct = !empty($variantId);
+
                         // 🏢 LÓGICA INTELIGENTE MULTI-BODEGA
                         $warehouseId = null;
                         $preferredWarehouseId = null;
@@ -229,21 +234,34 @@ class InvoiceController extends Controller
                             }
                         }
 
+                        // 👗 Construir query base según si es variante o no
+                        $buildStockQuery = function($productId, $warehouseId, $variantId) {
+                            $query = DB::table('product_warehouse')
+                                ->where('product_id', $productId)
+                                ->where('warehouse_id', $warehouseId);
+
+                            if ($variantId) {
+                                // Para variantes: buscar específicamente por variant_id
+                                $query->where('product_variant_id', $variantId);
+                            } else {
+                                // Para productos normales: sin variante
+                                $query->whereNull('product_variant_id');
+                            }
+
+                            return $query;
+                        };
+
                         // Intentar descontar de la bodega preferida SOLO si tiene stock suficiente
                         if ($preferredWarehouseId) {
-                            $preferredStock = DB::table('product_warehouse')
-                                ->where('product_id', $item['product_id'])
-                                ->where('warehouse_id', $preferredWarehouseId)
+                            $preferredStock = $buildStockQuery($item['product_id'], $preferredWarehouseId, $variantId)
                                 ->lockForUpdate() // 🔒 LOCK para evitar race condition
                                 ->value('stock');
 
                             if ($preferredStock && $preferredStock >= $item['quantity']) {
                                 // ✅ HAY STOCK en la bodega preferida, descontar de ahí
-                                $affected = DB::table('product_warehouse')
-                                    ->where('product_id', $item['product_id'])
-                                    ->where('warehouse_id', $preferredWarehouseId)
-                                    ->where('stock', '>=', $item['quantity']) // 🔒 Validación atómica
-                                    ->decrement('stock', $item['quantity']);
+                                $decrementQuery = $buildStockQuery($item['product_id'], $preferredWarehouseId, $variantId)
+                                    ->where('stock', '>=', $item['quantity']); // 🔒 Validación atómica
+                                $affected = $decrementQuery->decrement('stock', $item['quantity']);
 
                                 if ($affected === 0) {
                                     throw new \Exception("Stock insuficiente en bodega {$preferredWarehouseId} (race condition detectada)");
@@ -254,6 +272,7 @@ class InvoiceController extends Controller
 
                                 \Log::info('✅ Stock descontado de bodega preferida (store)', [
                                     'product_id' => $item['product_id'],
+                                    'variant_id' => $variantId,
                                     'product_name' => $product->name,
                                     'warehouse_id' => $warehouseId,
                                     'stock_anterior' => $preferredStock,
@@ -264,6 +283,7 @@ class InvoiceController extends Controller
                                 // ⚠️ NO HAY STOCK suficiente en bodega preferida, buscar en otras bodegas
                                 \Log::warning('⚠️ Stock insuficiente en bodega preferida, buscando en otras (store)', [
                                     'product_id' => $item['product_id'],
+                                    'variant_id' => $variantId,
                                     'product_name' => $product->name,
                                     'preferred_warehouse_id' => $preferredWarehouseId,
                                     'stock_disponible' => $preferredStock ?? 0,
@@ -274,17 +294,24 @@ class InvoiceController extends Controller
 
                         // Si no se pudo descontar de la bodega preferida, buscar en cualquier bodega con stock
                         if (!$warehouseId) {
-                            $availableWarehouse = DB::table('product_warehouse')
+                            // 👗 Construir query para buscar bodega alternativa
+                            $altQuery = DB::table('product_warehouse')
                                 ->where('product_id', $item['product_id'])
-                                ->where('stock', '>=', $item['quantity']) // Stock suficiente
+                                ->where('stock', '>=', $item['quantity']); // Stock suficiente
+
+                            if ($variantId) {
+                                $altQuery->where('product_variant_id', $variantId);
+                            } else {
+                                $altQuery->whereNull('product_variant_id');
+                            }
+
+                            $availableWarehouse = $altQuery
                                 ->lockForUpdate() // 🔒 LOCK para evitar race condition
                                 ->orderBy('stock', 'desc') // Priorizar bodega con más stock
                                 ->first();
 
                             if ($availableWarehouse) {
-                                $affected = DB::table('product_warehouse')
-                                    ->where('product_id', $item['product_id'])
-                                    ->where('warehouse_id', $availableWarehouse->warehouse_id)
+                                $affected = $buildStockQuery($item['product_id'], $availableWarehouse->warehouse_id, $variantId)
                                     ->where('stock', '>=', $item['quantity']) // 🔒 Validación atómica
                                     ->decrement('stock', $item['quantity']);
 
@@ -297,6 +324,7 @@ class InvoiceController extends Controller
 
                                 \Log::info('✅ Stock descontado de bodega alternativa (store)', [
                                     'product_id' => $item['product_id'],
+                                    'variant_id' => $variantId,
                                     'product_name' => $product->name,
                                     'warehouse_id' => $warehouseId,
                                     'stock_anterior' => $availableWarehouse->stock,
@@ -307,16 +335,40 @@ class InvoiceController extends Controller
                                 // ❌ NO HAY STOCK en ninguna bodega (esto no debería pasar si el frontend valida correctamente)
                                 \Log::error('❌ ERROR: No hay stock disponible en ninguna bodega (store)', [
                                     'product_id' => $item['product_id'],
+                                    'variant_id' => $variantId,
                                     'product_name' => $product->name,
                                     'cantidad_requerida' => $item['quantity']
                                 ]);
                             }
                         }
 
-                        // Recalcular current_stock total sumando todos los almacenes
-                        $totalStock = DB::table('product_warehouse')
-                            ->where('product_id', $item['product_id'])
-                            ->sum('stock');
+                        // 👗 Recalcular current_stock total sumando todos los almacenes
+                        // Para productos con variantes: sumar TODAS las variantes
+                        // Para productos normales: sumar solo registros sin variante
+                        if ($product->isVariable()) {
+                            // Producto con variantes: sumar stock de todas las variantes
+                            $totalStock = DB::table('product_warehouse')
+                                ->where('product_id', $item['product_id'])
+                                ->whereNotNull('product_variant_id')
+                                ->sum('stock');
+
+                            // 👗 IMPORTANTE: También actualizar stock en product_variants
+                            if ($variantId) {
+                                $variantStock = DB::table('product_warehouse')
+                                    ->where('product_id', $item['product_id'])
+                                    ->where('product_variant_id', $variantId)
+                                    ->sum('stock');
+                                DB::table('product_variants')
+                                    ->where('id', $variantId)
+                                    ->update(['stock' => $variantStock]);
+                            }
+                        } else {
+                            // Producto normal: sumar solo registros sin variante
+                            $totalStock = DB::table('product_warehouse')
+                                ->where('product_id', $item['product_id'])
+                                ->whereNull('product_variant_id')
+                                ->sum('stock');
+                        }
 
                         $product->current_stock = $totalStock;
                         $newStock = $totalStock;
@@ -636,6 +688,31 @@ class InvoiceController extends Controller
     public function createPosInvoice(Request $request): JsonResponse
     {
         try {
+            // 🚀 VALIDACIÓN: Plan gratuito limitado a 10 facturas
+            $tenant = tenant();
+            if ($tenant && in_array($tenant->plan, ['free', 'trial_express', 'free_trial'])) {
+                $invoiceCount = Invoice::where('type', 'invoice')
+                    ->whereIn('status', ['completed', 'paid', 'partial'])
+                    ->count();
+
+                if ($invoiceCount >= 10) {
+                    \Log::warning('🚫 Límite de facturas alcanzado para plan gratuito', [
+                        'tenant' => $tenant->id,
+                        'plan' => $tenant->plan,
+                        'invoice_count' => $invoiceCount
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => '🚫 Has alcanzado el límite de 10 facturas del plan de prueba gratuita. ¡Actualiza tu plan para seguir vendiendo sin límites!',
+                        'error_code' => 'FREE_PLAN_LIMIT_REACHED',
+                        'invoice_count' => $invoiceCount,
+                        'max_invoices' => 10,
+                        'plan' => $tenant->plan
+                    ], 403);
+                }
+            }
+
             // Log para debug
             \Log::info('POS Invoice Request Data:', $request->all());
 
@@ -677,6 +754,7 @@ class InvoiceController extends Controller
                 'surcharge_amount' => 'nullable|numeric|min:0',
                 'items' => 'required|array',
                 'items.*.product_id' => 'required|integer',
+                'items.*.variant_id' => 'nullable|integer', // 👗 ID de variante para productos fashion
                 'items.*.product_name' => 'required|string',
                 'items.*.quantity' => 'required|numeric|min:0.01',
                 'items.*.unit_price' => 'required|numeric|min:0',
@@ -981,6 +1059,9 @@ class InvoiceController extends Controller
                     if ($product) {
                         $previousStock = $product->current_stock;
 
+                        // 👗 SOPORTE PARA VARIANTES: Determinar si es un producto con variante
+                        $variantId = $item['variant_id'] ?? null;
+
                         // 🏢 LÓGICA INTELIGENTE MULTI-BODEGA
                         $warehouseId = null;
                         $preferredWarehouseId = null;
@@ -993,21 +1074,34 @@ class InvoiceController extends Controller
                             }
                         }
 
+                        // 👗 Construir query base según si es variante o no
+                        $buildStockQuery = function($productId, $warehouseId, $variantId) {
+                            $query = DB::table('product_warehouse')
+                                ->where('product_id', $productId)
+                                ->where('warehouse_id', $warehouseId);
+
+                            if ($variantId) {
+                                // Para variantes: buscar específicamente por variant_id
+                                $query->where('product_variant_id', $variantId);
+                            } else {
+                                // Para productos normales: sin variante
+                                $query->whereNull('product_variant_id');
+                            }
+
+                            return $query;
+                        };
+
                         // Intentar descontar de la bodega preferida SOLO si tiene stock suficiente
                         if ($preferredWarehouseId) {
-                            $preferredStock = DB::table('product_warehouse')
-                                ->where('product_id', $item['product_id'])
-                                ->where('warehouse_id', $preferredWarehouseId)
+                            $preferredStock = $buildStockQuery($item['product_id'], $preferredWarehouseId, $variantId)
                                 ->lockForUpdate() // 🔒 LOCK para evitar race condition
                                 ->value('stock');
 
                             if ($preferredStock && $preferredStock >= $item['quantity']) {
                                 // ✅ HAY STOCK en la bodega preferida, descontar de ahí
-                                $affected = DB::table('product_warehouse')
-                                    ->where('product_id', $item['product_id'])
-                                    ->where('warehouse_id', $preferredWarehouseId)
-                                    ->where('stock', '>=', $item['quantity']) // 🔒 Validación atómica
-                                    ->decrement('stock', $item['quantity']);
+                                $decrementQuery = $buildStockQuery($item['product_id'], $preferredWarehouseId, $variantId)
+                                    ->where('stock', '>=', $item['quantity']); // 🔒 Validación atómica
+                                $affected = $decrementQuery->decrement('stock', $item['quantity']);
 
                                 if ($affected === 0) {
                                     throw new \Exception("Stock insuficiente en bodega {$preferredWarehouseId} (race condition detectada)");
@@ -1018,6 +1112,7 @@ class InvoiceController extends Controller
 
                                 \Log::info('✅ Stock descontado de bodega preferida (createPosInvoice)', [
                                     'product_id' => $item['product_id'],
+                                    'variant_id' => $variantId,
                                     'product_name' => $product->name,
                                     'warehouse_id' => $warehouseId,
                                     'stock_anterior' => $preferredStock,
@@ -1028,6 +1123,7 @@ class InvoiceController extends Controller
                                 // ⚠️ NO HAY STOCK suficiente en bodega preferida, buscar en otras bodegas
                                 \Log::warning('⚠️ Stock insuficiente en bodega preferida, buscando en otras (createPosInvoice)', [
                                     'product_id' => $item['product_id'],
+                                    'variant_id' => $variantId,
                                     'product_name' => $product->name,
                                     'preferred_warehouse_id' => $preferredWarehouseId,
                                     'stock_disponible' => $preferredStock ?? 0,
@@ -1038,17 +1134,24 @@ class InvoiceController extends Controller
 
                         // Si no se pudo descontar de la bodega preferida, buscar en cualquier bodega con stock
                         if (!$warehouseId) {
-                            $availableWarehouse = DB::table('product_warehouse')
+                            // 👗 Construir query para buscar bodega alternativa
+                            $altQuery = DB::table('product_warehouse')
                                 ->where('product_id', $item['product_id'])
-                                ->where('stock', '>=', $item['quantity']) // Stock suficiente
+                                ->where('stock', '>=', $item['quantity']); // Stock suficiente
+
+                            if ($variantId) {
+                                $altQuery->where('product_variant_id', $variantId);
+                            } else {
+                                $altQuery->whereNull('product_variant_id');
+                            }
+
+                            $availableWarehouse = $altQuery
                                 ->lockForUpdate() // 🔒 LOCK para evitar race condition
                                 ->orderBy('stock', 'desc') // Priorizar bodega con más stock
                                 ->first();
 
                             if ($availableWarehouse) {
-                                $affected = DB::table('product_warehouse')
-                                    ->where('product_id', $item['product_id'])
-                                    ->where('warehouse_id', $availableWarehouse->warehouse_id)
+                                $affected = $buildStockQuery($item['product_id'], $availableWarehouse->warehouse_id, $variantId)
                                     ->where('stock', '>=', $item['quantity']) // 🔒 Validación atómica
                                     ->decrement('stock', $item['quantity']);
 
@@ -1061,6 +1164,7 @@ class InvoiceController extends Controller
 
                                 \Log::info('✅ Stock descontado de bodega alternativa (createPosInvoice)', [
                                     'product_id' => $item['product_id'],
+                                    'variant_id' => $variantId,
                                     'product_name' => $product->name,
                                     'warehouse_id' => $warehouseId,
                                     'stock_anterior' => $availableWarehouse->stock,
@@ -1071,16 +1175,40 @@ class InvoiceController extends Controller
                                 // ❌ NO HAY STOCK en ninguna bodega (esto no debería pasar si el frontend valida correctamente)
                                 \Log::error('❌ ERROR: No hay stock disponible en ninguna bodega (createPosInvoice)', [
                                     'product_id' => $item['product_id'],
+                                    'variant_id' => $variantId,
                                     'product_name' => $product->name,
                                     'cantidad_requerida' => $item['quantity']
                                 ]);
                             }
                         }
 
-                        // Recalcular current_stock total sumando todos los almacenes
-                        $totalStock = DB::table('product_warehouse')
-                            ->where('product_id', $item['product_id'])
-                            ->sum('stock');
+                        // 👗 Recalcular current_stock total sumando todos los almacenes
+                        // Para productos con variantes: sumar TODAS las variantes
+                        // Para productos normales: sumar solo registros sin variante
+                        if ($product->isVariable()) {
+                            // Producto con variantes: sumar stock de todas las variantes
+                            $totalStock = DB::table('product_warehouse')
+                                ->where('product_id', $item['product_id'])
+                                ->whereNotNull('product_variant_id')
+                                ->sum('stock');
+
+                            // 👗 IMPORTANTE: También actualizar stock en product_variants
+                            if ($variantId) {
+                                $variantStock = DB::table('product_warehouse')
+                                    ->where('product_id', $item['product_id'])
+                                    ->where('product_variant_id', $variantId)
+                                    ->sum('stock');
+                                DB::table('product_variants')
+                                    ->where('id', $variantId)
+                                    ->update(['stock' => $variantStock]);
+                            }
+                        } else {
+                            // Producto normal: sumar solo registros sin variante
+                            $totalStock = DB::table('product_warehouse')
+                                ->where('product_id', $item['product_id'])
+                                ->whereNull('product_variant_id')
+                                ->sum('stock');
+                        }
 
                         $product->current_stock = $totalStock;
                         $newStock = $totalStock;
@@ -1088,6 +1216,8 @@ class InvoiceController extends Controller
 
                         \Log::info('✅ Stock total actualizado', [
                             'product_id' => $item['product_id'],
+                            'variant_id' => $variantId,
+                            'is_variable' => $product->isVariable(),
                             'previous_total' => $previousStock,
                             'new_total' => $newStock,
                             'quantity_sold' => $item['quantity']

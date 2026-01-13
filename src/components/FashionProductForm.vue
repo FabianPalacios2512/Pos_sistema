@@ -107,11 +107,24 @@
           <div v-else class="grid grid-cols-5 gap-2">
             <div v-for="(img, index) in form.images" :key="index" 
                  class="relative group aspect-square bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-hidden border border-gray-200 dark:border-zinc-700">
-              <img :src="img.preview" class="w-full h-full object-cover">
+              <img :src="img.preview" class="w-full h-full object-cover" :class="{ 'opacity-50': deletingImageIndex === index }">
+              
+              <!-- Overlay de eliminación en progreso -->
+              <div v-if="deletingImageIndex === index" 
+                   class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <svg class="w-6 h-6 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+              
+              <!-- Botón eliminar (solo visible si no está eliminando) -->
               <button 
+                v-if="deletingImageIndex !== index"
                 type="button"
                 @click.stop="removeImage(index)"
                 class="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                :disabled="deletingImageIndex !== null"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
@@ -437,8 +450,9 @@
 <script setup>
 import { reactive, computed, ref, watch } from 'vue'
 import { useToast } from '../composables/useToast'
+import api from '../services/api'
 
-const { showWarning } = useToast()
+const { showWarning, showSuccess, showError } = useToast()
 
 const props = defineProps({
   categories: {
@@ -640,13 +654,25 @@ watch(() => props.editingProduct, (product) => {
     // Cargar imágenes - Primero las de la galería, luego la principal
     form.images = []
     
+    // Helper para construir URL de imagen correctamente
+    const buildImageUrl = (url) => {
+      if (!url) return null
+      if (url.startsWith('data:image')) return url
+      if (url.startsWith('http://') || url.startsWith('https://')) return url
+      // URLs relativas - agregar origen del navegador
+      if (url.startsWith('/storage')) {
+        return `${window.location.origin}${url}`
+      }
+      return `${window.location.origin}/storage/${url}`
+    }
+    
     // 1. Cargar imágenes de la galería (product.images)
     if (product.images && Array.isArray(product.images) && product.images.length > 0) {
       product.images.forEach(img => {
         const imageUrl = img.url || img.image_url
         if (imageUrl) {
           form.images.push({
-            preview: imageUrl.startsWith('http') ? imageUrl : (imageUrl.startsWith('/') ? imageUrl : `/storage/${imageUrl}`),
+            preview: buildImageUrl(imageUrl),
             file: null,
             id: img.id || null
           })
@@ -657,7 +683,7 @@ watch(() => props.editingProduct, (product) => {
     // 2. Si no hay imágenes en galería pero hay image_url principal, usarla
     if (form.images.length === 0 && product.image_url) {
       form.images.push({
-        preview: product.image_url.startsWith('http') ? product.image_url : (product.image_url.startsWith('/') ? product.image_url : `/storage/${product.image_url}`),
+        preview: buildImageUrl(product.image_url),
         file: null
       })
     }
@@ -923,8 +949,36 @@ const processFiles = (files) => {
   })
 }
 
-const removeImage = (index) => {
-  form.images.splice(index, 1)
+// Estado para tracking de eliminación
+const deletingImageIndex = ref(null)
+
+const removeImage = async (index) => {
+  const image = form.images[index]
+  
+  // Si la imagen tiene ID (existe en el servidor), eliminarla del backend
+  if (image && image.id) {
+    deletingImageIndex.value = index
+    
+    try {
+      const data = await api.delete(`/products/images/${image.id}`)
+      
+      if (data.success) {
+        // Eliminar del array local
+        form.images.splice(index, 1)
+        showSuccess('✅ Imagen eliminada correctamente')
+      } else {
+        showError(data.message || 'Error al eliminar la imagen')
+      }
+    } catch (error) {
+      console.error('Error eliminando imagen:', error)
+      showError(error.message || 'Error al eliminar la imagen del servidor')
+    } finally {
+      deletingImageIndex.value = null
+    }
+  } else {
+    // Si es una imagen nueva (solo local), simplemente eliminarla del array
+    form.images.splice(index, 1)
+  }
 }
 
 // --- Submit ---

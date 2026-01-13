@@ -672,7 +672,7 @@
     <!-- Fin Contenedor Tour -->
 
     <!-- Sistema de Notificaciones Toast -->
-    <div class="fixed top-4 right-4 z-[9999] space-y-2" v-if="notifications.length > 0">
+    <div class="fixed top-4 right-4 space-y-2" style="z-index: 2147483647;" v-if="notifications.length > 0">
       <div v-for="notification in notifications" 
            :key="notification.id"
            class="bg-white dark:bg-zinc-900 rounded-lg shadow-lg border-l-4 p-4 max-w-sm transform transition-all duration-300 ease-in-out"
@@ -842,8 +842,8 @@
     <!-- Modal Crear/Editar Producto -->
     <Teleport to="body">
       <div v-if="showProductModal" 
-           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50"
-           style="z-index: 99999"
+           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center"
+           style="z-index: 50000"
            @click.self="showProductModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden border border-gray-300 dark:border-zinc-800 mx-4 flex flex-col">
         
@@ -1433,8 +1433,8 @@
     <!-- Modal Ver Producto AVANZADO (Fashion/Variantes) -->
     <Teleport to="body">
       <div v-if="showViewModal" 
-           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
-           style="z-index: 99999"
+           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+           style="z-index: 50000"
            @click.self="showViewModal = false">
       <!-- Modal Full Width para productos FASHION (con o sin variantes) -->
       <div v-if="selectedProduct && isFashionProduct(selectedProduct)" 
@@ -1857,119 +1857,13 @@
       </div>
     </Teleport>
 
-    <!-- Modal: No hay categorías -->
-    <div v-if="showNoCategoriesModal" 
-         class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-         @click.self="showNoCategoriesModal = false">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full p-6 animate-fade-in">
-        <div class="text-center">
-          <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No hay categorías disponibles</h3>
-          <p class="text-gray-700 dark:text-zinc-300 mb-6">Antes de crear un producto, debes crear al menos una categoría para organizarlo correctamente.</p>
-          
-          <div class="flex flex-col space-y-3">
-            <button @click="openCategoryModal" 
-                    class="w-full px-4 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-200 flex items-center justify-center space-x-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              <span>Crear Categoría</span>
-            </button>
-            <button @click="showNoCategoriesModal = false" 
-                    class="w-full px-4 py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-lg transition-colors">
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal: Crear Categoría -->
-    <div v-if="showCategoryModal" 
-         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-         style="z-index: 100000"
-         @click.self="showCategoryModal = false">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-lg w-full animate-fade-in">
-        <!-- Header Simple -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-              </svg>
-            </div>
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Nueva Categoría</h2>
-          </div>
-          <button @click="showCategoryModal = false" 
-                  class="text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-
-        <form @submit.prevent="saveCategory" class="p-6 space-y-4">
-          <div>
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Nombre de la Categoría *</label>
-            <input v-model="categoryForm.name" 
-                   type="text" 
-                   required
-                   class="w-full px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                   placeholder="Ej: Electrónica, Ropa, Alimentos">
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Descripción</label>
-            <textarea v-model="categoryForm.description" 
-                      rows="2"
-                      class="w-full px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Descripción opcional de la categoría">
-            </textarea>
-          </div>
-
-          <!-- Selector de Color -->
-          <div>
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Color de la Categoría</label>
-            <div class="flex items-center gap-3">
-              <input 
-                v-model="categoryForm.color" 
-                type="color"
-                class="w-16 h-10 rounded-xl border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 cursor-pointer"
-              />
-              <input 
-                v-model="categoryForm.color" 
-                type="text"
-                class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="#3b82f6"
-              />
-            </div>
-          </div>
-
-          <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-zinc-800">
-            <button type="button" 
-                    @click="showCategoryModal = false"
-                    class="px-4 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium rounded-lg border border-gray-300 dark:border-zinc-700 transition-colors">
-              Cancelar
-            </button>
-            <button type="submit" 
-                    :disabled="!categoryForm.name"
-                    class="px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-              Crear Categoría
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
   </div>
 
   <!-- Modal: Crear Proveedor Rápido -->
   <div v-if="showSupplierModal" 
        class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-       style="z-index: 100000"
+       style="z-index: 60000"
        @click.self="showSupplierModal = false">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full animate-fade-in">
       <!-- Header -->
@@ -2169,7 +2063,7 @@
       leave-from-class="opacity-100 scale-100"
       leave-to-class="opacity-0 scale-95"
     >
-      <div v-if="showFinalModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div v-if="showFinalModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-md w-full overflow-hidden border border-gray-300 dark:border-zinc-800">
           <!-- Header con diseño profesional y gradiente -->
           <div class="bg-gradient-to-br from-slate-800 via-slate-900 to-black dark:from-zinc-800 dark:via-zinc-900 dark:to-black px-8 py-8 text-center border-b border-slate-700 dark:border-zinc-700 relative overflow-hidden">
@@ -2268,13 +2162,125 @@
     </div>
   </Teleport>
 
+  <!-- Modal: No hay categorías (Teleport para escapar del contenedor) -->
+  <Teleport to="body">
+    <div v-if="showNoCategoriesModal" 
+         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+         style="z-index: 50000; margin: 0 !important;"
+         @click.self="showNoCategoriesModal = false">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full p-6 animate-fade-in">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No hay categorías disponibles</h3>
+          <p class="text-gray-700 dark:text-zinc-300 mb-6">Antes de crear un producto, debes crear al menos una categoría para organizarlo correctamente.</p>
+          
+          <div class="flex flex-col space-y-3">
+            <button @click="openCategoryModal" 
+                    class="w-full px-4 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-200 flex items-center justify-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              <span>Crear Categoría</span>
+            </button>
+            <button @click="showNoCategoriesModal = false" 
+                    class="w-full px-4 py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-lg transition-colors">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+
+  <!-- Modal: Crear Categoría (Teleport para escapar del contenedor) -->
+  <Teleport to="body">
+    <div v-if="showCategoryModal" 
+         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+         style="z-index: 60000; margin: 0 !important;"
+         @click.self="showCategoryModal = false">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-lg w-full animate-fade-in">
+        <!-- Header Simple -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Nueva Categoría</h2>
+          </div>
+          <button @click="showCategoryModal = false" 
+                  class="text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form @submit.prevent="saveCategory" class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Nombre de la Categoría *</label>
+            <input v-model="categoryForm.name" 
+                   type="text" 
+                   required
+                   class="w-full px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   placeholder="Ej: Electrónica, Ropa, Alimentos">
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Descripción</label>
+            <textarea v-model="categoryForm.description" 
+                      rows="2"
+                      class="w-full px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Descripción opcional de la categoría">
+            </textarea>
+          </div>
+
+          <!-- Selector de Color -->
+          <div>
+            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Color de la Categoría</label>
+            <div class="flex items-center gap-3">
+              <input 
+                v-model="categoryForm.color" 
+                type="color"
+                class="w-16 h-10 rounded-xl border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 cursor-pointer"
+              />
+              <input 
+                v-model="categoryForm.color" 
+                type="text"
+                class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="#3b82f6"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-zinc-800">
+            <button type="button" 
+                    @click="showCategoryModal = false"
+                    class="px-4 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium rounded-lg border border-gray-300 dark:border-zinc-700 transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" 
+                    :disabled="!categoryForm.name"
+                    class="px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              Crear Categoría
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </Teleport>
+
   <!-- Excel Import Modal -->
   <ExcelImportModal 
     :is-open="showExcelImportModal" 
     @close="showExcelImportModal = false"
     @imported="handleExcelImported"
   />
-  </div>
  
 </template>
 
@@ -2335,6 +2341,9 @@ const router = useRouter()
 
 // 🖼️ Función utilitaria para manejo inteligente de imágenes
 const getProductImage = (product) => {
+  // Usar el origen actual (mismo puerto que el frontend/proxy)
+  const baseUrl = window.location.origin
+  
   // 1. Intentar con el array de imágenes (relación images)
   if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
     const primaryImage = product.images.find(img => img.is_primary) || product.images[0]
@@ -2344,10 +2353,9 @@ const getProductImage = (product) => {
       if (imageUrl.startsWith('data:image')) {
         return imageUrl
       }
-      // Fix relative URLs for tenant backend
+      // Fix relative URLs for tenant backend - usar el mismo origen
       if (imageUrl.startsWith('/storage')) {
-        const fullUrl = `http://${window.location.hostname}:8000${imageUrl}`
-        return fullUrl
+        return `${baseUrl}${imageUrl}`
       }
       // URL externa completa
       if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
@@ -2371,10 +2379,9 @@ const getProductImage = (product) => {
   
   // Si hay imagen URL, procesarla
   if (imageUrl.length > 5) {
-    // Fix relative URLs for tenant backend
+    // Fix relative URLs for tenant backend - usar el mismo origen
     if (imageUrl.startsWith('/storage')) {
-      const fullUrl = `http://${window.location.hostname}:8000${imageUrl}`
-      return fullUrl
+      return `${baseUrl}${imageUrl}`
     }
     // URL externa completa
     if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
@@ -3070,6 +3077,7 @@ const productForm = ref({
   warehouseStock: {}, // 🏢 Stock por cada tienda { warehouse_id: cantidad }
   warehouseEnabled: {}, // ✅ Control de qué sedes tendrán el producto { warehouse_id: boolean }
   image: '',
+  imageFile: null, // 📸 Archivo de imagen para subir
   active: true,
   measurement_unit: 'unit', // 📏 Unidad de medida (unit, kg, g, m, cm, l, ml)
   allow_decimal: false // 🔢 Permite cantidades decimales (0.5, 1.25, etc)
@@ -3234,20 +3242,20 @@ const processImageUrl = (url) => {
     return trimmedUrl
   }
   
+  // Usar el origen actual (mismo puerto que el frontend/proxy)
+  const backendUrl = window.location.origin
+  
   // Si es ruta relativa de Laravel Storage, convertir a URL absoluta
   if (trimmedUrl.startsWith('/storage')) {
-    const backendUrl = `http://${window.location.hostname}:8000`
     return `${backendUrl}${trimmedUrl}`
   }
   
   // Si no empieza con /, agregar /storage/
   if (!trimmedUrl.startsWith('/')) {
-    const backendUrl = `http://${window.location.hostname}:8000`
     return `${backendUrl}/storage/${trimmedUrl}`
   }
   
   // Ruta relativa genérica
-  const backendUrl = `http://${window.location.hostname}:8000`
   return `${backendUrl}${trimmedUrl}`
 }
 
@@ -4210,11 +4218,14 @@ const handleFileUpload = (event) => {
     return
   }
   
+  // ✅ Guardar el archivo para enviarlo al backend
+  productForm.value.imageFile = file
+  
   // Crear preview
   const reader = new FileReader()
   reader.onload = (e) => {
     previewImage.value = e.target.result
-    // Asignar al formulario (base64 para offline o procesamiento posterior)
+    // Guardar preview para mostrar (NO enviar esto al backend)
     productForm.value.image = e.target.result
   }
   reader.readAsDataURL(file)
@@ -4223,6 +4234,7 @@ const handleFileUpload = (event) => {
 const clearImageUpload = () => {
   previewImage.value = null
   productForm.value.image = ''
+  productForm.value.imageFile = null // ✅ Limpiar también el archivo
   // Limpiar el input file
   const fileInput = document.querySelector('input[type="file"]')
   if (fileInput) fileInput.value = ''
@@ -4299,11 +4311,12 @@ const saveCategory = async () => {
       showCategoryModal.value = false
       
       // Seleccionar automáticamente la nueva categoría
-      if (response.category?.id) {
+      const newCategoryId = response.data?.id
+      if (newCategoryId) {
         if (isFashionMode.value && fashionFormRef.value) {
-          fashionFormRef.value.setCategory(response.category.id)
+          fashionFormRef.value.setCategory(newCategoryId)
         } else {
-          productForm.value.category_id = response.category.id
+          productForm.value.category_id = newCategoryId
         }
       }
     } else {
@@ -4345,8 +4358,9 @@ const saveSupplier = async () => {
       showSupplierModal.value = false
       
       // Seleccionar automáticamente el nuevo proveedor
-      if (response.data.supplier?.id) {
-        productForm.value.supplier_id = response.data.supplier.id
+      const newSupplierId = response.data.data?.id
+      if (newSupplierId) {
+        productForm.value.supplier_id = newSupplierId
       }
       
       // Limpiar formulario
@@ -4631,57 +4645,103 @@ const saveProduct = async (skipValidation = false) => {
     console.log('📦 Total stock calculado:', totalStock)
     console.log('✅ Bodegas disponibles:', availableWarehouses.value.map(w => ({ id: w.id, name: w.name })))
     
-    // Transformar los datos para que coincidan con los campos esperados por la API
-    const apiData = {
-      name: productForm.value.name.trim(),
-      description: productForm.value.description?.trim() || '',
-      product_type: 'simple', // ✅ Productos generales son SIEMPRE 'simple'
-      store_category: 'general', // ✅ Marcar como producto general (tienda normal)
-      sku: productForm.value.sku?.trim() || `SKU-${Date.now()}`, // Generar SKU automático si está vacío
-      barcode: productForm.value.barcode?.trim() || '',
-      category_id: parseInt(productForm.value.category_id),
-      supplier_id: productForm.value.supplier_id ? parseInt(productForm.value.supplier_id) : null,
-      cost_price: parseFloat(productForm.value.cost),
-      sale_price: parseFloat(productForm.value.price),
-      wholesale_price: null,
-      current_stock: totalStock, // 🏢 Stock total calculado de todas las tiendas
-      min_stock: 5, // Default: alerta de stock bajo
-      max_stock: 100, // Default: máximo sugerido
-      unit: productForm.value.unit?.trim() || 'unidad',
-      manage_stock: true,
-      active: productForm.value.active !== false,
-      // Manejo inteligente de imágenes: URLs normales o base64 (archivos subidos)
-      image_url: productForm.value.image ? productForm.value.image.trim() : null,
-      tags: null,
-      // 🏢 Stock por cada tienda - SOLO enviar las sedes habilitadas (con checkbox marcado)
-      warehouse_stocks: Object.keys(productForm.value.warehouseStock || {}).reduce((acc, warehouseId) => {
-        // Solo incluir la sede si está habilitada en el checkbox
+    // ✅ Detectar si hay un archivo de imagen para subir
+    const hasImageFile = productForm.value.imageFile instanceof File
+    
+    // ✅ Detectar si es una URL externa (no base64)
+    const isExternalUrl = productForm.value.image && 
+                          !productForm.value.image.startsWith('data:') && 
+                          (productForm.value.image.startsWith('http://') || 
+                           productForm.value.image.startsWith('https://') ||
+                           productForm.value.image.startsWith('/storage'))
+    
+    let response
+    
+    if (hasImageFile) {
+      // ===== USAR FORMDATA SI HAY ARCHIVO DE IMAGEN =====
+      const formData = new FormData()
+      formData.append('name', productForm.value.name.trim())
+      formData.append('description', productForm.value.description?.trim() || '')
+      formData.append('product_type', 'simple')
+      formData.append('store_category', 'general')
+      formData.append('sku', productForm.value.sku?.trim() || `SKU-${Date.now()}`)
+      formData.append('barcode', productForm.value.barcode?.trim() || '')
+      formData.append('category_id', parseInt(productForm.value.category_id))
+      if (productForm.value.supplier_id) {
+        formData.append('supplier_id', parseInt(productForm.value.supplier_id))
+      }
+      formData.append('cost_price', parseFloat(productForm.value.cost))
+      formData.append('sale_price', parseFloat(productForm.value.price))
+      formData.append('current_stock', totalStock)
+      formData.append('min_stock', 5)
+      formData.append('max_stock', 100)
+      formData.append('unit', productForm.value.unit?.trim() || 'unidad')
+      formData.append('manage_stock', true)
+      formData.append('active', productForm.value.active !== false ? 1 : 0)
+      formData.append('measurement_unit', productForm.value.measurement_unit || 'unit')
+      formData.append('allow_decimal', productForm.value.allow_decimal ? 1 : 0)
+      
+      // 📷 Agregar la imagen como archivo
+      formData.append('images[]', productForm.value.imageFile)
+      
+      // 🏢 Stock por bodegas
+      Object.keys(productForm.value.warehouseStock || {}).forEach(warehouseId => {
         if (productForm.value.warehouseEnabled[warehouseId]) {
-          acc[warehouseId] = productForm.value.warehouseStock[warehouseId]
+          formData.append(`warehouse_stocks[${warehouseId}]`, productForm.value.warehouseStock[warehouseId])
         }
-        return acc
-      }, {}),
-      // 📏 Unidades de Medida (NUEVO)
-      measurement_unit: productForm.value.measurement_unit || 'unit',
-      allow_decimal: productForm.value.allow_decimal || false,
-      // ⚠️ NO ENVIAR 'variants' para productos simples - esto causa que el backend cree variantes innecesarias
+      })
+      
+      if (isEditing.value) {
+        formData.append('_method', 'PUT')
+        response = await productsService.update(productForm.value.id, formData)
+      } else {
+        response = await productsService.create(formData)
+      }
+    } else {
+      // ===== USAR JSON SI NO HAY ARCHIVO (solo URL o sin imagen) =====
+      const apiData = {
+        name: productForm.value.name.trim(),
+        description: productForm.value.description?.trim() || '',
+        product_type: 'simple',
+        store_category: 'general',
+        sku: productForm.value.sku?.trim() || `SKU-${Date.now()}`,
+        barcode: productForm.value.barcode?.trim() || '',
+        category_id: parseInt(productForm.value.category_id),
+        supplier_id: productForm.value.supplier_id ? parseInt(productForm.value.supplier_id) : null,
+        cost_price: parseFloat(productForm.value.cost),
+        sale_price: parseFloat(productForm.value.price),
+        wholesale_price: null,
+        current_stock: totalStock,
+        min_stock: 5,
+        max_stock: 100,
+        unit: productForm.value.unit?.trim() || 'unidad',
+        manage_stock: true,
+        active: productForm.value.active !== false,
+        // Solo enviar image_url si es una URL externa válida
+        image_url: isExternalUrl ? productForm.value.image.trim() : null,
+        tags: null,
+        warehouse_stocks: Object.keys(productForm.value.warehouseStock || {}).reduce((acc, warehouseId) => {
+          if (productForm.value.warehouseEnabled[warehouseId]) {
+            acc[warehouseId] = productForm.value.warehouseStock[warehouseId]
+          }
+          return acc
+        }, {}),
+        measurement_unit: productForm.value.measurement_unit || 'unit',
+        allow_decimal: productForm.value.allow_decimal || false,
+      }
+      
+      if (isEditing.value) {
+        response = await productsService.update(productForm.value.id, apiData)
+      } else {
+        response = await productsService.create(apiData)
+      }
     }
     
-    if (isEditing.value) {
-      await productsService.update(productForm.value.id, apiData)
-      showNotification(
-        'Producto actualizado',
-        `El producto "${apiData.name}" se ha actualizado exitosamente`,
-        'success'
-      )
-    } else {
-      await productsService.create(apiData)
-      showNotification(
-        'Producto creado',
-        `El producto "${apiData.name}" se ha creado exitosamente`,
-        'success'
-      )
-    }
+    showNotification(
+      isEditing.value ? 'Producto actualizado' : 'Producto creado',
+      `El producto "${productForm.value.name}" se ha ${isEditing.value ? 'actualizado' : 'creado'} exitosamente`,
+      'success'
+    )
     
     await loadProducts()
     showProductModal.value = false

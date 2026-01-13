@@ -252,30 +252,135 @@ const redirectToDashboard = () => {
   
   if (registrationData) {
     const data = JSON.parse(registrationData)
-    const tenantSubdomain = data.subdomain || ''
     
-    // Limpiar datos de registro y pago
-    localStorage.removeItem('registration_data')
+    // Limpiar datos de pago
     localStorage.removeItem('pending_payment')
     
-    // Guardar mensaje de éxito
-    localStorage.setItem('payment_success', JSON.stringify({
-      message: '¡Pago exitoso! Inicia sesión para acceder.',
-      plan: planName.value
-    }))
-    
-    // 🔥 Redirigir al subdominio correcto del tenant
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      // Local: redirigir a subdomain.localhost:3000/login
-      window.location.href = `http://${tenantSubdomain}.localhost:3000/login`
-    } else {
-      // Producción: redirigir a subdomain.105pos.pro/login
-      window.location.href = `https://${tenantSubdomain}.105pos.pro/login`
-    }
+    // 🔐 Hacer auto-login en lugar de redirigir al login
+    await performAutoLogin()
   } else {
     window.location.href = '/login'
   }
 }
+
+// 🔑 Función para hacer auto-login después del pago exitoso
+const performAutoLogin = async () => {
+  try {
+    console.log('🔐 Iniciando auto-login después del pago...')
+    
+    // Obtener credenciales guardadas temporalmente
+    const registrationData = localStorage.getItem('registration_data')
+    if (!registrationData) {
+      console.warn('⚠️ No hay datos de registro - redirigiendo al login manual')
+      window.location.href = '/login'
+      return
+    }
+
+    const data = JSON.parse(registrationData)
+    const { email, temp_password, is_google, subdomain } = data
+
+    // Si es registro con Google, redirigir al welcome directamente
+    if (is_google) {
+      console.log('✅ Usuario registrado con Google - redirigiendo a welcome')
+      const targetUrl = subdomain 
+        ? (window.location.hostname === 'localhost' 
+            ? `http://${subdomain}.localhost:3000/welcome` 
+            : `https://${subdomain}.105pos.pro/welcome`)
+        : '/welcome'
+      
+      // Limpiar credenciales temporales
+      localStorage.removeItem('registration_data')
+      
+      window.location.href = targetUrl
+      return
+    }
+
+    // Para registro con email/password, hacer login
+    if (!temp_password) {
+      console.warn('⚠️ No hay password temporal - redirigiendo al login manual')
+      const targetUrl = subdomain 
+        ? (window.location.hostname === 'localhost' 
+            ? `http://${subdomain}.localhost:3000/login` 
+            : `https://${subdomain}.105pos.pro/login`)
+        : '/login'
+      window.location.href = targetUrl
+      return
+    }
+
+    // Determinar API URL según el entorno
+    const apiUrl = subdomain
+      ? (window.location.hostname === 'localhost'
+          ? `http://${subdomain}.localhost:3000/api`
+          : `https://${subdomain}.105pos.pro/api`)
+      : '/api'
+
+    console.log('📤 Haciendo login automático en:', apiUrl)
+
+    // Hacer login
+    const response = await axios.post(`${apiUrl}/login`, {
+      email: email,
+      password: temp_password
+    })
+
+    console.log('✅ Login exitoso:', response.data)
+
+    // Guardar token y usuario
+    if (response.data.success && response.data.data?.token) {
+      const { token, user } = response.data.data
+      
+      localStorage.setItem('authToken', token)
+      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('loginTimestamp', Date.now())
+      
+      // Configurar axios con el token
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      
+      // Limpiar credenciales temporales y datos de registro
+      localStorage.removeItem('registration_data')
+      
+      // Redirigir al welcome del tenant
+      const targetUrl = subdomain 
+        ? (window.location.hostname === 'localhost' 
+            ? `http://${subdomain}.localhost:3000/welcome` 
+            : `https://${subdomain}.105pos.pro/welcome`)
+        : '/welcome'
+      
+      console.log('🚀 Redirigiendo a:', targetUrl)
+      window.location.href = targetUrl
+    } else {
+      throw new Error('No se recibió token de autenticación')
+    }
+
+  } catch (error) {
+    console.error('❌ Error en auto-login:', error)
+    console.error('Detalles:', error.response?.data)
+    
+    // Si falla el auto-login, limpiar credenciales y redirigir al login manual
+    const registrationData = localStorage.getItem('registration_data')
+    if (registrationData) {
+      const data = JSON.parse(registrationData)
+      const subdomain = data.subdomain
+      localStorage.removeItem('registration_data')
+      
+      // Guardar mensaje para mostrar en el login
+      localStorage.setItem('payment_success', JSON.stringify({
+        message: '¡Pago exitoso! Por favor, inicia sesión para continuar.',
+        plan: planName.value
+      }))
+      
+      const targetUrl = subdomain 
+        ? (window.location.hostname === 'localhost' 
+            ? `http://${subdomain}.localhost:3000/login` 
+            : `https://${subdomain}.105pos.pro/login`)
+        : '/login'
+      
+      window.location.href = targetUrl
+    } else {
+      window.location.href = '/login'
+    }
+  }
+}
+
 </script>
 
 <style scoped>

@@ -1,12 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 flex items-center justify-center p-4 font-sans overflow-hidden relative">
+  <div class="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100 flex items-center justify-center p-4 font-sans overflow-hidden relative">
     
-    <!-- Patrón de fondo premium -->
-    <div class="absolute inset-0 bg-[radial-gradient(#94a3b8_0.5px,transparent_0.5px)] [background-size:24px_24px] opacity-30"></div>
-    
-    <!-- Círculos decorativos flotantes -->
-    <div class="absolute top-20 left-20 w-72 h-72 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+    <!-- Patrón de cuadrícula sutil -->
+    <div class="absolute inset-0 bg-[linear-gradient(rgba(148,163,184,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
     
     <!-- Contenedor centrado absoluto para evitar desplazamientos -->
     <div class="absolute inset-0 flex items-center justify-center p-4">
@@ -16,7 +12,7 @@
         <div v-if="loadingPhase === 0" key="store-type" class="text-center space-y-8 max-w-4xl w-full relative z-10">
           <!-- Título -->
           <div class="space-y-3">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-slate-200 shadow-sm mb-4">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full border border-slate-200 mb-4">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span class="text-xs font-bold text-slate-600 uppercase tracking-wide">Paso Final</span>
             </div>
@@ -35,7 +31,7 @@
             <button 
               @click="selectStoreType('general')"
               :disabled="savingStoreType"
-              class="group relative bg-white rounded-2xl p-8 border-2 border-slate-200 hover:border-slate-900 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-300 text-left transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="group relative bg-white rounded-2xl p-8 border-2 border-slate-200 hover:border-slate-400 hover:shadow-xl transition-all duration-300 text-left transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div class="flex flex-col items-center space-y-4">
                 <!-- Icono con gradiente -->
@@ -64,7 +60,7 @@
             <button 
               @click="selectStoreType('fashion')"
               :disabled="savingStoreType"
-              class="group relative bg-white rounded-2xl p-8 border-2 border-slate-200 hover:border-slate-900 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-300 text-left transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="group relative bg-white rounded-2xl p-8 border-2 border-slate-200 hover:border-slate-400 hover:shadow-xl transition-all duration-300 text-left transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div class="flex flex-col items-center space-y-4">
                 <!-- Icono con gradiente -->
@@ -113,14 +109,9 @@
 
         <!-- FASE 2: Saludo personalizado -->
         <div v-else-if="loadingPhase === 2" key="greeting" class="text-center space-y-6 max-w-lg relative z-10">
-          <!-- Icono de bienvenida animado -->
-          <div class="flex justify-center mb-2">
-            <div class="relative">
-              <div class="absolute inset-0 w-24 h-24 bg-gradient-to-br from-slate-900 to-slate-700 rounded-2xl transform rotate-6 opacity-20"></div>
-              <div class="relative w-24 h-24 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center shadow-2xl shadow-slate-900/30">
-                <span class="text-4xl">👋</span>
-              </div>
-            </div>
+          <!-- Emoji saludando -->
+          <div class="flex justify-center mb-4">
+            <div class="text-8xl animate-wave-slow">👋</div>
           </div>
           <div class="space-y-3">
             <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
@@ -136,8 +127,8 @@
         <div v-else-if="loadingPhase === 3" key="preparing" class="text-center space-y-8 max-w-lg relative z-10">
           <div class="flex justify-center">
             <div class="relative">
-              <div class="absolute -inset-4 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-xl animate-pulse"></div>
-              <div class="relative w-28 h-28 bg-white rounded-3xl flex items-center justify-center shadow-2xl border border-slate-100">
+              <div class="absolute -inset-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-xl animate-pulse"></div>
+              <div class="relative w-28 h-28 bg-white rounded-3xl flex items-center justify-center shadow-xl border border-slate-200">
                 <svg class="w-14 h-14 text-slate-900 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -165,13 +156,13 @@
         <div v-else-if="loadingPhase === 4" key="content" class="relative z-10 max-w-xl w-full text-center space-y-8">
           
           <!-- Card principal premium -->
-          <div class="bg-white/80 backdrop-blur-xl rounded-3xl p-10 shadow-2xl shadow-slate-900/10 border border-white">
+          <div class="bg-white rounded-3xl p-10 shadow-xl border border-slate-200">
             
             <!-- Icono de éxito animado -->
             <div class="flex justify-center mb-6">
               <div class="relative">
-                <div class="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-2xl blur-lg opacity-30 animate-pulse"></div>
-                <div class="relative w-20 h-20 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center shadow-xl">
+                <div class="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-2xl blur-lg opacity-20 animate-pulse"></div>
+                <div class="relative w-20 h-20 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-xl">
                   <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                   </svg>
@@ -187,8 +178,8 @@
               <p class="text-lg font-semibold text-slate-600">
                 Tu sistema POS está preparado
               </p>
-              <p class="text-sm text-slate-400 max-w-sm mx-auto">
-                Configuremos tu tienda en <strong class="text-slate-600">3 pasos sencillos</strong>. 
+              <p class="text-sm text-slate-500 max-w-sm mx-auto">
+                Configuremos tu tienda en <strong class="text-slate-700">3 pasos sencillos</strong>. 
                 En menos de 2 minutos estarás listo para vender.
               </p>
             </div>
@@ -196,7 +187,7 @@
             <!-- CTA Button premium -->
             <button 
               @click="startOnboarding"
-              class="group relative inline-flex items-center justify-center px-10 py-4 text-base font-bold text-white bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black rounded-xl shadow-lg shadow-slate-900/25 hover:shadow-xl hover:shadow-slate-900/30 transition-all duration-300 transform hover:scale-105 active:scale-95"
+              class="group relative inline-flex items-center justify-center px-10 py-4 text-base font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl shadow-lg shadow-slate-900/20 hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
             >
               <span class="flex items-center gap-3">
                 <span>Comenzar Configuración</span>
@@ -296,15 +287,15 @@ const startWelcomeSequence = () => {
     loadingPhase.value = 2 // Saludo
   }, 2500)
 
-  // Fase 2: Saludo (3.5s de duración)
+  // Fase 2: Saludo (4.5s de duración - +1 segundo más)
   setTimeout(() => {
     loadingPhase.value = 3 // Preparando sistema
-  }, 6000)
+  }, 7000)
 
   // Fase 3: Preparando (4s de duración)
   setTimeout(() => {
     loadingPhase.value = 0 // Mostrar selección de tipo de tienda
-  }, 10000)
+  }, 11000)
 }
 
 const startOnboarding = () => {
@@ -367,5 +358,47 @@ const startOnboarding = () => {
 
 .animate-spin-slow {
   animation: spin-slow 3s linear infinite;
+}
+
+/* Animación de saludo con la mano */
+@keyframes wave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-15deg);
+  }
+  75% {
+    transform: rotate(15deg);
+  }
+}
+
+.animate-wave {
+  animation: wave 1s ease-in-out infinite;
+}
+
+/* Animación más suave para el emoji */
+@keyframes wave-slow {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-10deg);
+  }
+  40% {
+    transform: rotate(12deg);
+  }
+  60% {
+    transform: rotate(-10deg);
+  }
+  80% {
+    transform: rotate(8deg);
+  }
+}
+
+.animate-wave-slow {
+  display: inline-block;
+  animation: wave-slow 2.5s ease-in-out infinite;
+  transform-origin: 70% 70%;
 }
 </style>
