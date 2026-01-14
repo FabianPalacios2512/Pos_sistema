@@ -6,7 +6,7 @@
       <div class="bg-gray-50 dark:bg-zinc-900 shadow-sm border-b border-gray-200 dark:border-zinc-800 p-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Devolucio</h1>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Devoluciones</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Procesar devoluciones de productos vendidos
             </p>
@@ -262,83 +262,86 @@
         </div>
       </div>
 
-      <!-- Paso 3: Confirmar Devolución -->
-      <div v-if="currentStep === 3" class="max-w-2xl mx-auto space-y-6">
-        <!-- Resumen de devolución -->
+      <!-- Paso 3: Confirmar Devolución - Diseño Compacto Horizontal -->
+      <div v-if="currentStep === 3" class="max-w-5xl mx-auto">
         <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-700 p-6">
           <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">
             Confirmar Devolución
           </h2>
 
-          <!-- Detalles de productos seleccionados -->
-          <div class="mb-6">
-            <h3 class="text-base font-bold text-gray-900 dark:text-white mb-4">Productos a Devolver</h3>
-            <div class="space-y-2">
-              <div v-for="item in selectedReturnItems" :key="item.product_id" 
-                   class="flex justify-between items-center py-3 px-4 bg-gradient-to-r from-gray-50 to-blue-50 dark:from-zinc-900 dark:to-blue-950/30 rounded-xl border border-gray-200 dark:border-zinc-700">
-                <div>
-                  <span class="font-semibold text-gray-900 dark:text-white">{{ item.product.name }}</span>
-                  <span class="text-sm text-blue-600 dark:text-blue-400 ml-3 font-medium">x{{ item.quantity }}</span>
+          <!-- Grid de 2 columnas: Izquierda (Productos) | Derecha (Formulario) -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Columna Izquierda: Productos a Devolver -->
+            <div>
+              <h3 class="text-sm font-bold text-gray-700 dark:text-zinc-300 mb-3 uppercase tracking-wide">Productos a Devolver</h3>
+              <div class="space-y-2 max-h-[280px] overflow-y-auto pr-2">
+                <div v-for="item in selectedReturnItems" :key="item.product_id" 
+                     class="flex justify-between items-center py-2.5 px-3 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-700">
+                  <div class="flex-1 min-w-0">
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white block truncate">{{ item.product.name }}</span>
+                    <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">x{{ item.quantity }}</span>
+                  </div>
+                  <span class="text-sm font-bold text-gray-900 dark:text-white ml-3">
+                    ${{ formatCurrency(item.quantity * item.unit_price) }}
+                  </span>
                 </div>
-                <span class="font-bold text-gray-900 dark:text-white">
-                  ${{ formatCurrency(item.quantity * item.unit_price) }}
-                </span>
+              </div>
+              
+              <!-- Total destacado -->
+              <div class="mt-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl p-4 border border-blue-200 dark:border-blue-900">
+                <div class="flex items-center justify-between">
+                  <p class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">Total a Reembolsar</p>
+                  <p class="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                    ${{ formatCurrency(returnTotals.total) }}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Información de devolución -->
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-                Motivo de la Devolución *
-              </label>
-              <textarea
-                v-model="returnReason"
-                rows="3"
-                placeholder="Describe el motivo de la devolución..."
-                class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all"
-                required
-              ></textarea>
-            </div>
+            <!-- Columna Derecha: Formulario de Devolución -->
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wide">
+                  Motivo de la Devolución *
+                </label>
+                <textarea
+                  v-model="returnReason"
+                  rows="3"
+                  placeholder="Describe el motivo de la devolución..."
+                  class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all"
+                  required
+                ></textarea>
+              </div>
 
-            <div>
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-                Método de Reembolso *
-              </label>
-              <select
-                v-model="refundMethod"
-                class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all font-semibold"
-                required
-              >
-                <option value="">Seleccionar método</option>
-                <option value="cash">Efectivo</option>
-                <option value="card">Tarjeta</option>
-                <option value="transfer">Transferencia</option>
-                <option value="store_credit">Crédito en Tienda</option>
-              </select>
-            </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wide">
+                  Método de Reembolso *
+                </label>
+                <select
+                  v-model="refundMethod"
+                  class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all font-medium"
+                  required
+                >
+                  <option value="">Seleccionar método</option>
+                  <option value="cash">Efectivo</option>
+                  <option value="card">Tarjeta</option>
+                  <option value="transfer">Transferencia</option>
+                  <option value="store_credit">Crédito en Tienda</option>
+                </select>
+              </div>
 
-            <div>
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-                Notas Adicionales
-              </label>
-              <textarea
-                v-model="additionalNotes"
-                rows="2"
-                placeholder="Notas adicionales (opcional)..."
-                class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all"
-              ></textarea>
-            </div>
-          </div>
-
-          <!-- Total final -->
-          <div class="mt-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/40 dark:via-indigo-950/40 dark:to-purple-950/40 rounded-2xl p-6 border-2 border-blue-200 dark:border-blue-900">
-            <div class="text-center">
-              <p class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-2">Total a Reembolsar</p>
-              <p class="text-3xl font-bold text-blue-700 dark:text-blue-300">
-                ${{ formatCurrency(returnTotals.total) }}
-              </p>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wide">
+                  Notas Adicionales
+                </label>
+                <textarea
+                  v-model="additionalNotes"
+                  rows="2"
+                  placeholder="Notas adicionales (opcional)..."
+                  class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all"
+                ></textarea>
+              </div>
             </div>
           </div>
 
@@ -363,9 +366,9 @@
       </div>
     </div>
 
-    <!-- Modal de éxito -->
+    <!-- Modal de éxito con acciones -->
     <div v-if="showSuccessModal" class="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 border border-gray-200 dark:border-zinc-700 transform scale-100 animate-scale-in">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 border border-gray-200 dark:border-zinc-700 transform scale-100 animate-scale-in">
         <div class="text-center">
           <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 dark:from-green-500 dark:to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
@@ -373,17 +376,119 @@
             </svg>
           </div>
           <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¡Devolución Procesada!</h3>
-          <p class="text-gray-600 dark:text-zinc-400 mb-8 leading-relaxed">
-            La devolución {{ processedReturn?.number || 'sin número' }} ha sido procesada exitosamente.
+          <p class="text-gray-600 dark:text-zinc-400 mb-6 leading-relaxed">
+            La devolución <strong class="text-gray-900 dark:text-white">{{ processedReturn?.number || 'sin número' }}</strong> ha sido procesada exitosamente.
           </p>
-          <div class="flex space-x-3">
+          
+          <!-- Botones de acción -->
+          <div class="grid grid-cols-2 gap-3 mb-4">
             <button
-              @click="closeModalAndReset"
-              class="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-bold shadow-lg transition-all hover:scale-105"
+              @click="printReturn"
+              class="px-4 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
             >
-              Aceptar
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+              </svg>
+              Imprimir
+            </button>
+            
+            <button
+              @click="downloadReturn"
+              class="px-4 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              Descargar
+            </button>
+            
+            <button
+              @click="requestPhone"
+              class="px-4 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              WhatsApp
+            </button>
+            
+            <button
+              @click="requestEmail"
+              class="px-4 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              Email
             </button>
           </div>
+          
+          <button
+            @click="closeModalAndReset"
+            class="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl font-bold shadow-lg transition-all hover:scale-105"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal solicitar teléfono -->
+    <div v-if="showPhoneModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-zinc-800">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Enviar por WhatsApp</h3>
+        <p class="text-sm text-gray-600 dark:text-zinc-400 mb-4">Ingresa el número de teléfono del cliente:</p>
+        <input
+          v-model="phoneNumber"
+          type="tel"
+          placeholder="Ej: +57 300 1234567"
+          class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 mb-4"
+          @keyup.enter="sendByWhatsApp"
+        />
+        <div class="flex gap-3">
+          <button
+            @click="showPhoneModal = false; phoneNumber = ''"
+            class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl font-semibold transition-all"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="sendByWhatsApp"
+            :disabled="!phoneNumber.trim()"
+            class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all"
+          >
+            Enviar
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal solicitar email -->
+    <div v-if="showEmailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-zinc-800">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Enviar por Email</h3>
+        <p class="text-sm text-gray-600 dark:text-zinc-400 mb-4">Ingresa el correo electrónico del cliente:</p>
+        <input
+          v-model="emailAddress"
+          type="email"
+          placeholder="cliente@ejemplo.com"
+          class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 mb-4"
+          @keyup.enter="sendByEmail"
+        />
+        <div class="flex gap-3">
+          <button
+            @click="showEmailModal = false; emailAddress = ''"
+            class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl font-semibold transition-all"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="sendByEmail"
+            :disabled="!emailAddress.trim()"
+            class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all"
+          >
+            Enviar
+          </button>
         </div>
       </div>
     </div>
@@ -395,12 +500,19 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useToast } from '../composables/useToast.js'
 import returnsService from '../services/returnsService.js'
+import { generateReturnPDF, downloadPDF as downloadPDFHelper, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
+import { whatsappService } from '../services/whatsappService.js'
+import { useAppStore } from '../stores/app.js'
 
 // Props
 const props = defineProps({
   show: {
     type: Boolean,
     default: false
+  },
+  preloadInvoiceNumber: {
+    type: String,
+    default: ''
   }
 })
 
@@ -408,6 +520,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'success'])
 
 const { showSuccess, showError, showInfo } = useToast()
+const appStore = useAppStore()
 
 // Estados reactivos
 const currentStep = ref(1)
@@ -418,6 +531,48 @@ const returnReason = ref('')
 const refundMethod = ref('')
 const additionalNotes = ref('')
 const showSuccessModal = ref(false)
+
+// Estados para modales de envío
+const showPhoneModal = ref(false)
+const showEmailModal = ref(false)
+const phoneNumber = ref('')
+const emailAddress = ref('')
+
+// Watcher para precargar número de factura
+watch(() => props.preloadInvoiceNumber, (newValue) => {
+  if (newValue && props.show) {
+    searchInvoiceNumber.value = newValue
+    // Buscar automáticamente después de un pequeño delay
+    nextTick(() => {
+      setTimeout(() => {
+        searchInvoice()
+      }, 500)
+    })
+  }
+}, { immediate: true })
+
+// También resetear cuando se cierra el modal
+watch(() => props.show, (newValue) => {
+  if (!newValue) {
+    // Limpiar datos cuando se cierra
+    setTimeout(() => {
+      currentStep.value = 1
+      searchInvoiceNumber.value = ''
+      invoiceData.value = null
+      returnReason.value = ''
+      refundMethod.value = ''
+      additionalNotes.value = ''
+    }, 300)
+  } else if (props.preloadInvoiceNumber) {
+    // Precargar cuando se abre con número
+    searchInvoiceNumber.value = props.preloadInvoiceNumber
+    nextTick(() => {
+      setTimeout(() => {
+        searchInvoice()
+      }, 500)
+    })
+  }
+})
 const processedReturn = ref(null)
 
 // Variables para escáner QR
@@ -470,7 +625,7 @@ const searchInvoice = async () => {
     })
     
     currentStep.value = 2
-    showSuccess('Factura encontrada exitosamente')
+    // showSuccess('Factura encontrada exitosamente') // Solo mostrar mensajes de error
   } catch (error) {
     showError(error.message)
   } finally {
@@ -586,9 +741,168 @@ const processReturn = async () => {
   }
 }
 
-const printReturn = () => {
-  // TODO: Implementar impresión de devolución
-  showInfo('Función de impresión en desarrollo')
+const printReturn = async () => {
+  try {
+    if (!processedReturn.value) {
+      showError('No hay datos de devolución para imprimir')
+      return
+    }
+
+    showInfo('Generando PDF para imprimir...')
+    
+    // Generar el PDF con los datos del sistema
+    const pdfDoc = await generateReturnPDF(processedReturn.value, appStore.systemSettings)
+    const pdfBlob = await getPDFBlob(pdfDoc)
+    
+    // Crear URL del blob y abrir ventana de impresión
+    const blobUrl = URL.createObjectURL(pdfBlob)
+    const printWindow = window.open(blobUrl, '_blank')
+    
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print()
+        URL.revokeObjectURL(blobUrl)
+      }
+      showSuccess('Documento preparado para imprimir')
+    } else {
+      showError('No se pudo abrir la ventana de impresión. Verifica los permisos del navegador.')
+    }
+  } catch (error) {
+    console.error('Error al imprimir devolución:', error)
+    showError('Error al preparar el documento para imprimir')
+  }
+}
+
+const downloadReturn = async () => {
+  try {
+    if (!processedReturn.value) {
+      showError('No hay datos de devolución para descargar')
+      return
+    }
+
+    showInfo('Generando PDF...')
+    
+    const pdfDoc = await generateReturnPDF(processedReturn.value, appStore.systemSettings)
+    const fileName = `Devolucion_${processedReturn.value.number || 'SN'}.pdf`
+    
+    await downloadPDFHelper(pdfDoc, fileName)
+    showSuccess('PDF descargado exitosamente')
+  } catch (error) {
+    console.error('Error al descargar devolución:', error)
+    showError('Error al generar el PDF')
+  }
+}
+
+const requestPhone = () => {
+  // Pre-cargar teléfono del cliente si existe
+  if (invoiceData.value?.customer?.phone) {
+    phoneNumber.value = invoiceData.value.customer.phone
+  }
+  showPhoneModal.value = true
+}
+
+const sendByWhatsApp = async () => {
+  try {
+    if (!phoneNumber.value.trim()) {
+      showError('Por favor ingresa un número de teléfono')
+      return
+    }
+
+    if (!processedReturn.value) {
+      showError('No hay datos de devolución para enviar')
+      return
+    }
+
+    showInfo('Generando PDF y enviando por WhatsApp...')
+    showPhoneModal.value = false
+    
+    // Generar PDF
+    const pdfDoc = await generateReturnPDF(processedReturn.value, appStore.systemSettings)
+    const pdfBlob = await getPDFBlob(pdfDoc)
+    
+    // Enviar por WhatsApp
+    const docNumber = processedReturn.value.number || 'SN'
+    await whatsappService.sendDocumentByWhatsApp(
+      phoneNumber.value,
+      pdfBlob,
+      docNumber,
+      'devolucion'
+    )
+    
+    showSuccess('Devolución enviada por WhatsApp exitosamente')
+    phoneNumber.value = ''
+  } catch (error) {
+    console.error('Error al enviar por WhatsApp:', error)
+    showError(error.message || 'Error al enviar por WhatsApp')
+  }
+}
+
+const requestEmail = () => {
+  // Pre-cargar email del cliente si existe
+  if (invoiceData.value?.customer?.email) {
+    emailAddress.value = invoiceData.value.customer.email
+  }
+  showEmailModal.value = true
+}
+
+const sendByEmail = async () => {
+  try {
+    if (!emailAddress.value.trim()) {
+      showError('Por favor ingresa un correo electrónico')
+      return
+    }
+
+    if (!processedReturn.value) {
+      showError('No hay datos de devolución para enviar')
+      return
+    }
+
+    showInfo('Enviando devolución por email...')
+    showEmailModal.value = false
+    
+    // Generar PDF
+    const pdfDoc = await generateReturnPDF(processedReturn.value, appStore.systemSettings)
+    const pdfBlob = await getPDFBlob(pdfDoc)
+    
+    const returnNumber = processedReturn.value.number || 'SN'
+    
+    // Crear FormData para enviar
+    const formData = new FormData()
+    formData.append('email', emailAddress.value)
+    formData.append('subject', `Nota de Devolución #${returnNumber}`)
+    formData.append('message', `
+      <h2>Nota de Devolución #${returnNumber}</h2>
+      <p>Estimado cliente,</p>
+      <p>Adjunto encontrarás el comprobante de tu devolución.</p>
+      <p><strong>Total reembolsado:</strong> $${parseFloat(processedReturn.value.total || 0).toLocaleString('es-CO')}</p>
+      <p><strong>Método de reembolso:</strong> ${processedReturn.value.refund_method || 'Efectivo'}</p>
+      <br>
+      <p>Gracias por tu confianza.</p>
+    `)
+    formData.append('pdf', pdfBlob, `Devolucion_${returnNumber}.pdf`)
+    
+    // Enviar por email usando el endpoint de Laravel
+    const response = await fetch('/api/email/send-invoice', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: formData
+    })
+    
+    const result = await response.json()
+    
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Error al enviar el email')
+    }
+    
+    showSuccess('Devolución enviada por email exitosamente')
+    emailAddress.value = ''
+  } catch (error) {
+    console.error('Error al enviar por email:', error)
+    showError(error.message || 'Error al enviar por email')
+  }
 }
 
 const startNewReturn = () => {

@@ -628,12 +628,18 @@
     </div>
 
     <!-- Modal Ver Productos de Categoría -->
-    <div
-      v-if="showProductsModal"
-      class="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-200/50 dark:border-zinc-800">
-        <!-- Header -->
-        <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
+    <Teleport to="body">
+      <div
+        v-if="showProductsModal"
+        @click.self="showProductsModal = false"
+        class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+        style="pointer-events: auto;">
+        <div 
+          @click.stop
+          class="bg-white dark:bg-zinc-900 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-w-6xl w-full max-h-[95vh] overflow-hidden border border-gray-200/50 dark:border-zinc-800"
+          style="pointer-events: auto;">
+          <!-- Header -->
+          <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center">
@@ -725,8 +731,9 @@
             Cerrar
           </button>
         </div>
+        </div>
       </div>
-    </div>
+    </Teleport>
     </div>
   </div>
 </template>
@@ -736,6 +743,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useToast } from '../composables/useToast.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { productsService } from '../services/productsService.js'
+import { appStore } from '../store/appStore.js'
 import TablePaginator from './TablePaginator.vue'
 
 // Props y Emits
@@ -973,11 +981,19 @@ const viewCategoryProducts = async (category) => {
   loadingProducts.value = true
   
   try {
-    const response = await productsService.getAll()
-    const allProducts = response.data?.data || response.data || []
+    // Usar productos del appStore (ya tiene todos los productos cargados)
+    // Si no hay productos en el store, cargarlos
+    if (!appStore.products || appStore.products.length === 0) {
+      await appStore.loadProducts({ force: true })
+    }
+    
+    const allProducts = appStore.products || []
+    
+    // Convertir IDs a número para comparación consistente
+    const categoryId = parseInt(category.id)
     
     categoryProducts.value = allProducts
-      .filter(product => product.category_id === category.id)
+      .filter(product => parseInt(product.category_id) === categoryId)
       .map(product => ({
         ...product,
         price: parseFloat(product.sale_price || product.price || 0),

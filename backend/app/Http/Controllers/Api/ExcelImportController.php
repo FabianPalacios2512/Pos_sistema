@@ -351,12 +351,62 @@ class ExcelImportController extends Controller
             }
         }
 
+        // Si no hay categoría, usar o crear "General" por defecto
+        if (!$categoryId) {
+            $defaultCategory = Category::firstOrCreate(
+                ['name' => 'General'],
+                ['description' => 'Categoría por defecto para importaciones', 'active' => true]
+            );
+            $categoryId = $defaultCategory->id;
+        }
+
+        // Generar SKU automático si no viene en el Excel
+        $sku = !empty($data['sku']) ? trim($data['sku']) : $this->generateAutoSku($data['name']);
+
+        // Manejar proveedor (puede ser nombre o ID)
+        $supplierId = null;
+        if (!empty($data['supplier'])) {
+            $supplierName = is_string($data['supplier']) ? trim($data['supplier']) : (string)$data['supplier'];
+
+            if (is_numeric($supplierName)) {
+                // Verificar si existe el proveedor con ese ID
+                $existingSupplier = \App\Models\Supplier::find((int)$supplierName);
+                if ($existingSupplier) {
+                    $supplierId = $existingSupplier->id;
+                }
+            }
+
+            // Si no es ID o no existe, buscar/crear por nombre
+            if (!$supplierId && !empty($supplierName)) {
+                // Buscar primero por nombre
+                $supplier = \App\Models\Supplier::where('name', $supplierName)->first();
+
+                if (!$supplier) {
+                    // Generar documento único temporal (IMP-XXXXXX)
+                    $tempDocument = 'IMP-' . strtoupper(substr(md5($supplierName . time()), 0, 8));
+
+                    $supplier = \App\Models\Supplier::create([
+                        'name' => $supplierName,
+                        'document' => $tempDocument,
+                        'contact_person' => null,
+                        'email' => null,
+                        'phone' => null,
+                        'address' => null,
+                        'active' => true,
+                        'notes' => 'Importado automáticamente desde Excel - Actualizar documento real'
+                    ]);
+                }
+                $supplierId = $supplier->id;
+            }
+        }
+
         return [
             'name' => trim($data['name']),
             'description' => $data['description'] ?? null,
-            'sku' => !empty($data['sku']) ? trim($data['sku']) : null,
+            'sku' => $sku,
             'barcode' => !empty($data['barcode']) ? trim($data['barcode']) : null,
             'category_id' => $categoryId,
+            'supplier_id' => $supplierId,
             'cost_price' => floatval($data['cost_price'] ?? 0),
             'sale_price' => floatval($data['sale_price']),
             'wholesale_price' => floatval($data['wholesale_price'] ?? 0),
@@ -364,10 +414,28 @@ class ExcelImportController extends Controller
             'min_stock' => intval($data['min_stock'] ?? 5),
             'max_stock' => intval($data['max_stock'] ?? 100),
             'unit' => $data['unit'] ?? 'unidad',
-            'image_url' => $data['image_url'] ?? null, // Soporte para URL de imagen
+            'image_url' => $data['image_url'] ?? null,
             'manage_stock' => true,
             'active' => true,
         ];
+    }
+
+    /**
+     * Generar SKU automático basado en el nombre del producto
+     */
+    private function generateAutoSku(string $productName): string
+    {
+        // Tomar las primeras 3 letras del nombre (mayúsculas, sin acentos)
+        $prefix = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', iconv('UTF-8', 'ASCII//TRANSLIT', $productName)), 0, 3));
+        if (empty($prefix)) {
+            $prefix = 'PRD';
+        }
+
+        // Agregar timestamp para hacerlo único
+        $timestamp = substr(time(), -6);
+        $random = rand(100, 999);
+
+        return $prefix . '-' . $timestamp . $random;
     }
 
     /**

@@ -12,6 +12,8 @@ class PurchaseOrderItem extends Model
     protected $fillable = [
         'purchase_order_id',
         'product_id',
+        'variant_id',           // 👗 NUEVO: para productos moda con variantes
+        'variant_options',      // 👗 NUEVO: resumen de opciones (talla, color, etc.)
         'quantity_ordered',
         'quantity_received',
         'unit',
@@ -30,7 +32,8 @@ class PurchaseOrderItem extends Model
         'subtotal' => 'decimal:2',
         'tax_amount' => 'decimal:2',
         'total' => 'decimal:2',
-        'received' => 'boolean'
+        'received' => 'boolean',
+        'variant_options' => 'array'  // 👗 NUEVO: cast a array
     ];
 
     // Relaciones
@@ -42,6 +45,31 @@ class PurchaseOrderItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * 👗 NUEVO: Relación con la variante del producto (para tiendas de moda)
+     */
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
+    }
+
+    /**
+     * 👗 Helper para obtener nombre completo del producto con variante
+     */
+    public function getFullProductNameAttribute()
+    {
+        $name = $this->product->name ?? 'Producto';
+
+        if ($this->variant_options && is_array($this->variant_options)) {
+            $options = collect($this->variant_options)
+                ->map(fn($opt) => "{$opt['name']}: {$opt['value']}")
+                ->join(' | ');
+            return "{$name} ({$options})";
+        }
+
+        return $name;
     }
 
     // Métodos auxiliares

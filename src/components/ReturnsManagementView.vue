@@ -328,6 +328,16 @@
                     </svg>
                     Email
                   </button>
+                  
+                  <button
+                    @click="requestPhone"
+                    class="px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-transparent hover:border-emerald-200 dark:hover:border-emerald-800/30"
+                  >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    WhatsApp
+                  </button>
                 </div>
               </div>
             </div>
@@ -445,13 +455,127 @@
         </div>
       </div>
     </div>
+    
+    <!-- Modal solicitar teléfono para WhatsApp -->
+    <Teleport to="body">
+      <div v-if="showPhoneModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-zinc-800 animate-scale-in">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Enviar por WhatsApp</h3>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mb-4">Ingresa el número de teléfono del cliente:</p>
+          <input
+            v-model="phoneNumber"
+            type="tel"
+            placeholder="Ej: +57 300 1234567"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 mb-4"
+            @keyup.enter="sendByWhatsApp"
+          />
+          <div class="flex gap-3">
+            <button
+              @click="showPhoneModal = false; phoneNumber = ''"
+              class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl font-semibold transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              @click="sendByWhatsApp"
+              :disabled="!phoneNumber.trim()"
+              class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+    
+    <!-- Modal solicitar email -->
+    <Teleport to="body">
+      <div v-if="showEmailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-zinc-800 animate-scale-in">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Enviar por Email</h3>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mb-4">Ingresa el correo electrónico del cliente:</p>
+          <input
+            v-model="emailAddress"
+            type="email"
+            placeholder="cliente@ejemplo.com"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 mb-4"
+            @keyup.enter="confirmSendByEmail"
+          />
+          <div class="flex gap-3">
+            <button
+              @click="showEmailModal = false; emailAddress = ''"
+              class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl font-semibold transition-all"
+            >
+              Cancelar
+            </button>
+            <button
+              @click="confirmSendByEmail"
+              :disabled="!emailAddress.trim()"
+              class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+    
+    <!-- Modal Premium - Bloqueo de plan básico -->
+    <Teleport to="body">
+      <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+          
+          <!-- Contenido -->
+          <div class="p-8 text-center">
+            <!-- Icono Premium -->
+            <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              </svg>
+            </div>
+
+            <!-- Título -->
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¡Mejora tu Plan!</h3>
+            
+            <!-- Mensaje -->
+            <p class="text-base text-gray-600 dark:text-zinc-400 mb-6 leading-relaxed">
+              <span class="font-semibold text-blue-600 dark:text-blue-400">{{ premiumFeatureName }}</span> está disponible en nuestros planes premium.
+            </p>
+            
+            <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
+              💡 Desbloquea todas las funciones premium para potenciar tu negocio
+            </p>
+
+            <!-- Botones -->
+            <div class="flex gap-3">
+              <button
+                @click="showPremiumModal = false"
+                class="flex-1 py-3 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-base font-semibold rounded-xl border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+              >
+                Cerrar
+              </button>
+              <button
+                @click="goToSelectPlan"
+                class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-base font-semibold rounded-xl transition-colors duration-200 shadow-lg"
+              >
+                Ver Planes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useToast } from '../composables/useToast.js'
+import { useModuleNavigation } from '../composables/useModuleNavigation.js'
+import { appStore } from '../store/appStore.js'
 import returnsService from '../services/returnsService.js'
+
+const { navigateToModule } = useModuleNavigation()
 
 // Emit para comunicarse con el padre
 const emit = defineEmits(['change-module'])
@@ -468,6 +592,16 @@ const statusFilter = ref('')
 const refundMethodFilter = ref('')
 const dateFrom = ref('')
 const dateTo = ref('')
+
+// Estados para modales de envío
+const showPhoneModal = ref(false)
+const showEmailModal = ref(false)
+const phoneNumber = ref('')
+const emailAddress = ref('')
+
+// Estados para modal premium (bloqueo de plan básico)
+const showPremiumModal = ref(false)
+const premiumFeatureName = ref('')
 
 // Métodos
 const loadReturns = async () => {
@@ -519,7 +653,7 @@ const loadReturns = async () => {
     // NO auto-seleccionar - el usuario debe elegir manualmente
     // selectedReturn.value permanece null hasta que el usuario haga clic
     
-    showToast('Devoluciones cargadas exitosamente', 'success')
+    // showToast('Devoluciones cargadas exitosamente', 'success') // Mensaje innecesario
   } catch (error) {
     console.error('Error loading returns:', error)
     showToast(error.message || 'Error al cargar devoluciones', 'error')
@@ -642,14 +776,226 @@ const navigateToNewReturn = () => {
   emit('change-module', 'pos', { openReturnsModal: true })
 }
 
-const printReturn = () => {
-  if (!selectedReturn.value) return
-  showToast('Función de impresión en desarrollo', 'info')
+const printReturn = async () => {
+  try {
+    if (!selectedReturn.value) {
+      showToast('Por favor selecciona una devolución primero', 'error')
+      return
+    }
+
+    showToast('Generando PDF para imprimir...', 'info')
+    
+    // Generar el PDF
+    const { generateReturnPDF, getPDFBlob } = await import('../utils/pdfTemplates/pdfGenerator.js')
+    const systemSettings = appStore.systemSettings || {}
+    
+    const pdfDoc = await generateReturnPDF(selectedReturn.value, systemSettings)
+    const pdfBlob = await getPDFBlob(pdfDoc)
+    
+    // Crear URL del blob y abrir ventana de impresión
+    const blobUrl = URL.createObjectURL(pdfBlob)
+    const printWindow = window.open(blobUrl, '_blank')
+    
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print()
+        URL.revokeObjectURL(blobUrl)
+      }
+      showToast('Documento preparado para imprimir', 'success')
+    } else {
+      showToast('No se pudo abrir la ventana de impresión', 'error')
+    }
+  } catch (error) {
+    console.error('Error al imprimir:', error)
+    showToast('Error al preparar el documento', 'error')
+  }
 }
 
+const downloadReturn = async () => {
+  try {
+    if (!selectedReturn.value) {
+      showToast('Por favor selecciona una devolución primero', 'error')
+      return
+    }
+
+    showToast('Generando PDF...', 'info')
+    
+    const { generateReturnPDF, downloadPDF } = await import('../utils/pdfTemplates/pdfGenerator.js')
+    const systemSettings = appStore.systemSettings || {}
+    
+    const pdfDoc = await generateReturnPDF(selectedReturn.value, systemSettings)
+    const fileName = `Devolucion_${selectedReturn.value.number || 'SN'}.pdf`
+    
+    await downloadPDF(pdfDoc, fileName)
+    showToast('PDF descargado exitosamente', 'success')
+  } catch (error) {
+    console.error('Error al descargar:', error)
+    showToast('Error al generar el PDF', 'error')
+  }
+}
+
+// Verificar si el usuario tiene plan básico (free_trial, free, basic)
+const isBasicPlan = () => {
+  const plan = (appStore.tenantPlan || 'free_trial').toLowerCase()
+  return plan === 'free_trial' || plan === 'free' || plan === 'basic'
+}
+
+// Mostrar modal premium
+const showPremiumFeature = (featureName) => {
+  premiumFeatureName.value = featureName
+  showPremiumModal.value = true
+}
+
+// Ir a selección de plan
+const goToSelectPlan = () => {
+  showPremiumModal.value = false
+  navigateToModule('settings', { section: 'plans' })
+}
+
+// Solicitar email (abre modal)
+const requestEmail = () => {
+  if (!selectedReturn.value) {
+    showToast('Por favor selecciona una devolución primero', 'error')
+    return
+  }
+  
+  // Verificar plan básico
+  if (isBasicPlan()) {
+    showPremiumFeature('Envío por Email')
+    return
+  }
+  
+  // Pre-cargar email del cliente si existe
+  if (selectedReturn.value.customer?.email) {
+    emailAddress.value = selectedReturn.value.customer.email
+  }
+  showEmailModal.value = true
+}
+
+// Confirmar envío por email (desde modal)
+const confirmSendByEmail = async () => {
+  try {
+    if (!emailAddress.value.trim()) {
+      showToast('Por favor ingresa un correo electrónico', 'error')
+      return
+    }
+
+    if (!selectedReturn.value) {
+      showToast('No hay datos de devolución para enviar', 'error')
+      return
+    }
+
+    showToast('Enviando devolución por email...', 'info')
+    showEmailModal.value = false
+    
+    const { generateReturnPDF, getPDFBlob } = await import('../utils/pdfTemplates/pdfGenerator.js')
+    const systemSettings = appStore.systemSettings || {}
+    
+    const pdfDoc = await generateReturnPDF(selectedReturn.value, systemSettings)
+    const pdfBlob = await getPDFBlob(pdfDoc)
+    
+    const returnNumber = selectedReturn.value.number || 'SN'
+    const refundMethodLabel = getRefundMethodLabel(selectedReturn.value.refund_method)
+    
+    const formData = new FormData()
+    formData.append('email', emailAddress.value.trim())
+    formData.append('subject', `Nota de Devolución #${returnNumber}`)
+    formData.append('message', `
+      <h2>Nota de Devolución #${returnNumber}</h2>
+      <p>Estimado cliente,</p>
+      <p>Adjunto encontrarás el comprobante de tu devolución.</p>
+      <p><strong>Total reembolsado:</strong> $${formatCurrency(selectedReturn.value.total || 0)}</p>
+      <p><strong>Método de reembolso:</strong> ${refundMethodLabel}</p>
+      <br>
+      <p>Gracias por tu confianza.</p>
+    `)
+    formData.append('pdf', pdfBlob, `Devolucion_${returnNumber}.pdf`)
+    
+    const response = await fetch('/api/email/send-invoice', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: formData
+    })
+    
+    const result = await response.json()
+    
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Error al enviar el email')
+    }
+    
+    showToast('Devolución enviada por email exitosamente', 'success')
+    emailAddress.value = ''
+  } catch (error) {
+    console.error('Error al enviar email:', error)
+    showToast(error.message || 'Error al enviar por email', 'error')
+  }
+}
+
+// Solicitar teléfono (abre modal)
+const requestPhone = () => {
+  if (!selectedReturn.value) {
+    showToast('Por favor selecciona una devolución primero', 'error')
+    return
+  }
+  
+  // Verificar plan básico
+  if (isBasicPlan()) {
+    showPremiumFeature('Envío por WhatsApp')
+    return
+  }
+  
+  // Pre-cargar teléfono del cliente si existe
+  if (selectedReturn.value.customer?.phone) {
+    phoneNumber.value = selectedReturn.value.customer.phone
+  }
+  showPhoneModal.value = true
+}
+
+// Enviar por WhatsApp (desde modal)
+const sendByWhatsApp = async () => {
+  try {
+    if (!phoneNumber.value.trim()) {
+      showToast('Por favor ingresa un número de teléfono', 'error')
+      return
+    }
+
+    if (!selectedReturn.value) {
+      showToast('No hay datos de devolución para enviar', 'error')
+      return
+    }
+
+    showToast('Generando PDF y enviando por WhatsApp...', 'info')
+    showPhoneModal.value = false
+    
+    const { generateReturnPDF, getPDFBlob } = await import('../utils/pdfTemplates/pdfGenerator.js')
+    const { whatsappService } = await import('../services/whatsappService.js')
+    const systemSettings = appStore.systemSettings || {}
+    
+    const pdfDoc = await generateReturnPDF(selectedReturn.value, systemSettings)
+    const pdfBlob = await getPDFBlob(pdfDoc)
+    
+    const docNumber = selectedReturn.value.number || 'SN'
+    await whatsappService.sendDocumentByWhatsApp(
+      phoneNumber.value,
+      pdfBlob,
+      docNumber,
+      'devolucion'
+    )
+    
+    showToast('Devolución enviada por WhatsApp exitosamente', 'success')
+    phoneNumber.value = ''
+  } catch (error) {
+    console.error('Error al enviar por WhatsApp:', error)
+    showToast(error.message || 'Error al enviar por WhatsApp', 'error')
+  }
+}
+
+// Función legacy para compatibilidad (usa el modal ahora)
 const sendByEmail = () => {
-  if (!selectedReturn.value) return
-  showToast('Función de envío por email en desarrollo', 'info')
+  requestEmail()
 }
 
 // Formateo

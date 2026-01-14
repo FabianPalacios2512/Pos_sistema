@@ -301,7 +301,8 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::get('/products/low-stock', [ProductController::class, 'lowStock']);
     Route::post('/products/{product}/update-stock', [ProductController::class, 'updateStock']);
     Route::put('/products/variants/bulk-update', [ProductController::class, 'bulkUpdateVariants']); // Actualización masiva de variantes
-    Route::delete('/products/images/{imageId}', [ProductController::class, 'deleteImage']); // ✅ Eliminar imagen de producto
+    Route::delete('/products/images/{imageId}', [ProductController::class, 'deleteImage']); // ✅ Eliminar UNA imagen específica
+    Route::delete('/products/{product}/delete-image', [ProductController::class, 'deleteProductImage']); // 🗑️ Eliminar TODAS las imágenes del producto
     Route::apiResource('products', ProductController::class);
 
     // NOTA: Las rutas de excel-import están fuera del middleware auth para funcionar en onboarding
@@ -323,6 +324,7 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::apiResource('permissions', PermissionController::class);
 
     // Clientes
+    Route::get('/customers/{customer}/invoices', [CustomerController::class, 'getInvoices']); // 🛡️ Obtener facturas del cliente (ANTES del apiResource)
     Route::post('/customers/check-document', [CustomerController::class, 'checkDocument']); // 🎯 CreditiTenda: Validar documento
     Route::apiResource('customers', CustomerController::class);
 

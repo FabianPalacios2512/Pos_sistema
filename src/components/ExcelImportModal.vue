@@ -257,6 +257,7 @@
                           <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-zinc-400">Stock</th>
                           <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-zinc-400">SKU</th>
                           <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-zinc-400">Categoría</th>
+                          <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-zinc-400">Proveedor</th>
                           <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600 dark:text-zinc-400 w-10"></th>
                         </tr>
                       </thead>
@@ -337,6 +338,11 @@
                           <td class="px-3 py-2">
                             <input v-model="product.mapped_data.category" type="text"
                                    class="w-28 px-2 py-1 text-sm bg-transparent border border-transparent hover:border-gray-300 dark:hover:border-zinc-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded text-gray-900 dark:text-white" />
+                          </td>
+                          <td class="px-3 py-2">
+                            <input v-model="product.mapped_data.supplier" type="text"
+                                   class="w-28 px-2 py-1 text-sm bg-transparent border border-transparent hover:border-gray-300 dark:hover:border-zinc-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded text-gray-900 dark:text-white" 
+                                   placeholder="Sin proveedor" />
                           </td>
                           <td class="px-3 py-2">
                             <button @click="removeProduct(index)" class="p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded transition-colors">
@@ -549,10 +555,12 @@ const systemFields = [
   { key: 'sku', label: 'Código SKU', required: false },
   { key: 'barcode', label: 'Código de barras', required: false },
   { key: 'category', label: 'Categoría', required: false },
+  { key: 'supplier', label: 'Proveedor', required: false },
   { key: 'description', label: 'Descripción', required: false },
   { key: 'min_stock', label: 'Stock mínimo', required: false },
   { key: 'wholesale_price', label: 'Precio mayorista', required: false },
   { key: 'image_url', label: 'URL de imagen', required: false },
+  { key: 'unit', label: 'Unidad de medida', required: false },
 ]
 
 // Estado para modal de imagen
@@ -895,6 +903,14 @@ const importProducts = async () => {
     
     const response = await fetchResponse.json()
     console.log('Import response:', response)
+    
+    // Debug: Mostrar errores detallados si existen
+    if (response.errors && response.errors.length > 0) {
+      console.log('ERRORES DE IMPORTACIÓN:', response.errors)
+      response.errors.forEach((err, idx) => {
+        console.log(`Error fila ${idx + 1}:`, err)
+      })
+    }
 
     importResult.value = response
     emit('imported', response)

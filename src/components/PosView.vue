@@ -131,9 +131,11 @@
               type="text"
               placeholder="Buscar productos, SKU o escanear..."
               class="block w-full h-10 pl-12 pr-32 text-sm font-semibold bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-zinc-400 rounded-xl shadow-md focus:border-slate-600 dark:focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20 dark:focus:ring-slate-400/20"
+              :tabindex="showCustomerSelector ? -1 : 0"
               @keydown.escape="clearSearch"
               @keydown.enter.prevent="handleSearchEnter"
               @input="handleBarcodeInput"
+              @focus="handleSearchInputFocus"
             />
             
             <div class="absolute inset-y-0 right-0 flex items-center pr-2 space-x-1">
@@ -277,7 +279,7 @@
             </button>
 
             <button 
-                v-for="cat in categories" 
+                v-for="cat in visibleCategories" 
                 :key="cat.id"
                 @click="selectedCategory = cat.id"
                 class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 whitespace-nowrap hover:scale-105 active:scale-95"
@@ -286,6 +288,22 @@
                     : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 shadow-sm'"
             >
                 {{ capitalizeText(cat.name) }}
+            </button>
+
+            <!-- Botón "Ver más" categorías -->
+            <button 
+                v-if="hiddenCategoriesCount > 0"
+                @click="showAllCategories = !showAllCategories"
+                class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 whitespace-nowrap hover:scale-105 active:scale-95 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-300 dark:border-indigo-700 hover:border-indigo-400 dark:hover:border-indigo-600 shadow-sm"
+            >
+                <span v-if="!showAllCategories" class="flex items-center gap-1">
+                    +{{ hiddenCategoriesCount }} más
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </span>
+                <span v-else class="flex items-center gap-1">
+                    Menos
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                </span>
             </button>
         </div>
     </div>
@@ -754,7 +772,7 @@
         <!-- 🎨 GRID FASHION - Estilo Lookbook (más columnas gracias al 70% de espacio) -->
         <div v-if="fashionViewMode === 'grid'" class="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 pb-20 content-start">
           <div
-            v-for="(product, index) in filteredProducts"
+            v-for="(product, index) in paginatedProducts"
             :key="product.id"
             class="group cursor-pointer animate-fade-in-up"
             :style="{ animationDelay: `${Math.min(index * 30, 300)}ms` }"
@@ -862,7 +880,7 @@
         <!-- 📋 LISTA FASHION - Vista detallada -->
         <div v-else class="space-y-3 pb-20">
           <div
-            v-for="product in filteredProducts"
+            v-for="product in paginatedProducts"
             :key="product.id"
             class="group flex gap-4 p-3 bg-white dark:bg-zinc-800/50 rounded-2xl border border-gray-200 dark:border-zinc-700/50 hover:border-gray-300 dark:hover:border-zinc-600 cursor-pointer"
             @click="addToCart(product)"
@@ -916,7 +934,7 @@
       <!-- 📦 GRID MODO GENERAL - Compacto y funcional (DISEÑO ACTUAL) -->
       <div v-else class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3 pb-20 min-h-[600px] content-start">
         <div
-          v-for="product in filteredProducts"
+          v-for="product in paginatedProducts"
           :key="product.id"
           class="group bg-white dark:bg-zinc-900/80 rounded-xl overflow-hidden cursor-pointer border border-gray-200 dark:border-zinc-800/40 hover:ring-2 hover:ring-emerald-500/70 dark:hover:ring-emerald-400/50 hover:border-transparent shadow-sm hover:shadow-lg dark:shadow-black/30"
           @click="addToCart(product)"
@@ -974,6 +992,20 @@
             </span>
           </div>
         </div>
+      </div>
+
+      <!-- 📄 BOTÓN CARGAR MÁS PRODUCTOS -->
+      <div v-if="remainingProductsCount > 0" class="flex justify-center pb-20 pt-4">
+        <button 
+          @click="loadMoreProducts"
+          class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 rounded-xl font-semibold text-sm hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 shadow-sm hover:shadow-md"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+          Cargar más productos
+          <span class="text-xs text-gray-400 dark:text-zinc-500">({{ remainingProductsCount }} restantes)</span>
+        </button>
       </div>
 
     </div>
@@ -1218,18 +1250,67 @@
         </div>
       </div>
       
-      <!-- Acciones: Puntos y Cupón -->
-      <div v-if="canUseLoyaltyPoints" class="px-4 pb-2">
-        <button
-          @click="usePoints = !usePoints"
-          class="w-full py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 border"
-          :class="usePoints 
-            ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400' 
-            : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:border-amber-400'"
-        >
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          Usar Puntos
-        </button>
+      <!-- Acciones: Puntos y Descuento (80/20) -->
+      <div class="px-4 pb-2">
+        <div class="flex gap-2">
+          <!-- Botón Usar Puntos (80%) -->
+          <button
+            v-if="canUseLoyaltyPoints"
+            @click="usePoints = !usePoints"
+            class="flex-[4] py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 border"
+            :class="usePoints 
+              ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400' 
+              : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:border-amber-400'"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            Usar Puntos
+          </button>
+          
+          <!-- Botón Descuento/Cupón (20%) -->
+          <button
+            @click="showPromoCodeInput = !showPromoCodeInput"
+            class="py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 border"
+            :class="[
+              canUseLoyaltyPoints ? 'flex-1' : 'flex-[4]',
+              showPromoCodeInput 
+                ? 'bg-slate-700 dark:bg-slate-600 text-white border-slate-700' 
+                : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:border-slate-400 dark:hover:border-zinc-500'
+            ]"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+            <span v-if="!canUseLoyaltyPoints">Cupón</span>
+          </button>
+        </div>
+        
+        <!-- Input expandible para cupón -->
+        <div v-if="showPromoCodeInput" class="mt-2 animate-fade-in">
+          <div class="flex gap-1.5">
+            <input
+              v-model="promoCode"
+              type="text"
+              placeholder="CÓDIGO PROMOCIONAL"
+              class="flex-1 px-3 py-2.5 text-sm font-bold border rounded-lg uppercase bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none tracking-wide"
+              @keyup.enter="applyPromoCode"
+            />
+            <button
+              @click="applyPromoCode"
+              :disabled="!promoCode.trim()"
+              class="px-4 py-2.5 bg-slate-700 dark:bg-zinc-700 hover:bg-slate-800 disabled:bg-slate-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-xs font-bold rounded-lg transition-all"
+            >
+              Aplicar
+            </button>
+            <button 
+              @click="showPromoCodeInput = false; promoCode = ''; promoError = ''" 
+              class="px-2 text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-300 rounded-lg transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+          <p v-if="promoError" class="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-semibold">⚠️ {{ promoError }}</p>
+          <p v-if="discount > 0 && !promoError" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 font-semibold">✓ Código aplicado: -${{ discount.toLocaleString() }}</p>
+        </div>
       </div>
       
       <!-- 🎯 BOTÓN COBRAR -->
@@ -2347,7 +2428,8 @@
   <!-- Modal de Devoluciones -->
   <ReturnsView
     :show="showReturnsModal"
-    @close="showReturnsModal = false"
+    :preload-invoice-number="preloadInvoiceNumber"
+    @close="showReturnsModal = false; preloadInvoiceNumber = ''"
     @success="handleReturnSuccess"
   />
 
@@ -3088,6 +3170,7 @@ const quotationMode = ref(false)
 
 // Estado del modal de devoluciones
 const showReturnsModal = ref(false)
+const preloadInvoiceNumber = ref('')
 
 // Estado del modal de confirmación de cierre de venta
 const showCloseTabModal = ref(false)
@@ -3569,12 +3652,19 @@ const paymentMethods = computed(() => {
 
 const onlyStock = ref(false)
 
+// 🎯 Control de visualización - Límites para mejor rendimiento
+const MAX_VISIBLE_CATEGORIES = 10 // Máximo de categorías visibles inicialmente
+const PRODUCTS_PER_PAGE = 60 // Productos por página
+const showAllCategories = ref(false) // Toggle para mostrar todas las categorías
+const currentProductPage = ref(1) // Página actual de productos
+
 const filteredProducts = computed(() => {
   let filtered = products.value
 
-  // Filtrar por categoría
+  // Filtrar por categoría (comparar como números para evitar problemas de tipos)
   if (selectedCategory.value) {
-    filtered = filtered.filter(product => product.category_id === selectedCategory.value)
+    const catId = parseInt(selectedCategory.value)
+    filtered = filtered.filter(product => parseInt(product.category_id) === catId)
   }
 
   // Filtrar por término de búsqueda (incluye código de barras)
@@ -3607,6 +3697,40 @@ const categories = computed(() => {
   } catch (e) {
     return cats
   }
+})
+
+// 🎯 Categorías visibles (con límite)
+const visibleCategories = computed(() => {
+  if (showAllCategories.value) {
+    return categories.value
+  }
+  return categories.value.slice(0, MAX_VISIBLE_CATEGORIES)
+})
+
+// Cantidad de categorías ocultas
+const hiddenCategoriesCount = computed(() => {
+  return Math.max(0, categories.value.length - MAX_VISIBLE_CATEGORIES)
+})
+
+// 🎯 Productos paginados (60 por página)
+const paginatedProducts = computed(() => {
+  const endIndex = currentProductPage.value * PRODUCTS_PER_PAGE
+  return filteredProducts.value.slice(0, endIndex)
+})
+
+// Total de productos restantes
+const remainingProductsCount = computed(() => {
+  return Math.max(0, filteredProducts.value.length - paginatedProducts.value.length)
+})
+
+// Función para cargar más productos
+const loadMoreProducts = () => {
+  currentProductPage.value++
+}
+
+// Reset de paginación cuando cambia categoría o búsqueda
+watch([selectedCategory, searchTerm], () => {
+  currentProductPage.value = 1
 })
 
 const subtotal = computed(() => {
@@ -4646,6 +4770,12 @@ const handleCobrarClick = async () => {
   showPaymentModal.value = true
 }
 
+// 🛡️ Helper: Obtener ID del Consumidor Final dinámicamente
+const getConsumidorFinalId = () => {
+  const consumidorFinal = appStore.customers.find(c => c.document_number === '222222222222')
+  return consumidorFinal?.id || null
+}
+
 const handlePaymentConfirmed = async (paymentData) => {
   // ⚠️ VALIDACIÓN: Si la configuración requiere cliente, validar antes de procesar (segunda barrera de seguridad)
   if (systemSettings.value.require_customer && (!selectedCustomer.value || selectedCustomer.value.name === 'Cliente Final')) {
@@ -4700,7 +4830,7 @@ const handlePaymentConfirmed = async (paymentData) => {
           invoiceNumber: result.data.custom_number || result.data.number || `FV-${result.data.id}`,
           date: toMySQLDateTime(),
           due_date: toMySQLDateTime(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
-          customer_id: selectedCustomer.value?.id || null,
+          customer_id: selectedCustomer.value?.id || getConsumidorFinalId(),
           customer: selectedCustomer.value?.name || 'Cliente Final',
           cashier: getCurrentSeller(),
           companyInfo: {
@@ -4740,7 +4870,7 @@ const handlePaymentConfirmed = async (paymentData) => {
         invoiceNumber: 'Generando...', // Placeholder temporal hasta crear en backend
         date: toMySQLDateTime(currentDate),
         due_date: toMySQLDateTime(dueDate),
-        customer_id: selectedCustomer.value?.id || 1, // Cliente Final por defecto (ID 1)
+        customer_id: selectedCustomer.value?.id || getConsumidorFinalId(), // Consumidor Final por defecto
         customer: selectedCustomer.value?.name || 'Cliente Final',
         cashier: getCurrentSeller(),
         companyInfo: {
@@ -5589,7 +5719,7 @@ const confirmQuotation = async () => {
     // Preparar datos de la cotización
     const quoteData = {
       type: 'quote', // Campo requerido
-      customer_id: selectedCustomer.value?.id || 1, // Usar cliente por defecto ID=1 (Cliente Final) si no hay seleccionado
+      customer_id: selectedCustomer.value?.id || getConsumidorFinalId(), // Usar Consumidor Final si no hay seleccionado
       date: new Date().toISOString().split('T')[0], // Campo requerido formato YYYY-MM-DD
       subtotal: subtotal.value,
       tax_amount: tax.value,
@@ -5763,6 +5893,16 @@ const focusFirstProduct = () => {
   if (filteredProducts.value.length > 0) {
     addToCart(filteredProducts.value[0])
     clearSearch()
+  }
+}
+
+// 🎯 Manejar foco del input de búsqueda (prevenir escritura cuando modal de clientes está abierto)
+const handleSearchInputFocus = () => {
+  if (showCustomerSelector.value) {
+    // Si el modal de clientes está abierto, quitar el foco del input del POS
+    if (searchInput.value) {
+      searchInput.value.blur()
+    }
   }
 }
 
@@ -7178,6 +7318,7 @@ const handleReturnSuccess = async (returnData) => {
     
     // Cerrar el modal
     showReturnsModal.value = false
+    preloadInvoiceNumber.value = ''
     
     // Refrescar solo productos para actualizar inventario
     await refreshData('products')
@@ -7186,6 +7327,14 @@ const handleReturnSuccess = async (returnData) => {
     console.error('Error al procesar el éxito de la devolución:', error)
     showError('Error al actualizar los datos después de la devolución')
   }
+}
+
+/**
+ * Abrir modal de devoluciones con número de factura precargado
+ */
+const openReturnsModalWithInvoice = (invoiceNumber) => {
+  preloadInvoiceNumber.value = invoiceNumber
+  showReturnsModal.value = true
 }
 
 // ==================== FIN FUNCIONES DE DEVOLUCIONES ====================
@@ -7342,7 +7491,8 @@ defineExpose({
   openCloseCashModal: showCloseCashModal,
   showOpenCashModal,
   openOpenCashModal: showOpenCashModal,
-  showReturnsModal
+  showReturnsModal,
+  openReturnsModalWithInvoice
 })
 </script>
 

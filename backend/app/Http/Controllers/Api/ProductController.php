@@ -1358,4 +1358,82 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Eliminar TODAS las imágenes de un producto
+     * DELETE /products/{productId}/delete-image
+     */
+    public function deleteProductImage($productId)
+    {
+        try {
+            $product = Product::findOrFail($productId);
+
+            \Log::info('🗑️ [ProductController@deleteProductImage] Eliminando todas las imágenes del producto', [
+                'product_id' => $productId,
+                'product_name' => $product->name
+            ]);
+
+            // Obtener todas las imágenes del producto
+            $images = ProductImage::where('product_id', $productId)->get();
+
+            $deletedCount = 0;
+            foreach ($images as $image) {
+                // Extraer la ruta del archivo desde la URL
+                $imageUrl = $image->image_url;
+                $filePath = null;
+
+                // Si es una URL relativa tipo /storage/tenants/{tenant}/products/...
+                if (preg_match('/\/storage\/tenants\/[^\/]+\/(.+)$/', $imageUrl, $matches)) {
+                    $filePath = $matches[1]; // products/xxxxx.jpg
+                }
+                // Si es una URL relativa tipo /storage/products/...
+                elseif (preg_match('/\/storage\/(.+)$/', $imageUrl, $matches)) {
+                    $filePath = $matches[1]; // products/xxxxx.jpg
+                }
+
+                // Eliminar archivo físico si existe
+                if ($filePath) {
+                    if (Storage::disk('public')->exists($filePath)) {
+                        Storage::disk('public')->delete($filePath);
+                        \Log::info('✅ [ProductController@deleteProductImage] Archivo físico eliminado', [
+                            'path' => $filePath
+                        ]);
+                    }
+                }
+
+                // Eliminar registro de la base de datos
+                $image->delete();
+                $deletedCount++;
+            }
+
+            // Limpiar image_url del producto
+            $product->update(['image_url' => null]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $deletedCount > 0
+                    ? "Se eliminaron $deletedCount imagen(es) correctamente"
+                    : 'No había imágenes para eliminar',
+                'deleted_count' => $deletedCount
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Producto no encontrado'
+            ], 404);
+
+        } catch (\Exception $e) {
+            \Log::error('❌ [ProductController@deleteProductImage] Error', [
+                'product_id' => $productId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar las imágenes: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

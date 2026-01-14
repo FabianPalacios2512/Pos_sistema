@@ -80,6 +80,7 @@
             v-bind="getModuleProps()"
             @change-module="setCurrentModule"
             @open-quotation-in-pos="handleOpenQuotationInPos"
+            @open-return-in-pos="handleOpenReturnInPos"
             @refresh="loadInvoices"
           />
         </div>
@@ -712,6 +713,30 @@ const handleOpenQuotationInPos = (quotationData) => {
     // El PosView debe tener un método para cargar una cotización específica
     // Podemos usar un ref o store compartido para pasar los datos
     window.quotationToLoad = quotationData
+  })
+}
+
+// Manejar apertura de devolución desde módulo de facturas
+const handleOpenReturnInPos = (invoiceNumber) => {
+  
+  // Cambiar al módulo POS
+  setCurrentModule('pos')
+  
+  // Esperar a que el POS esté montado y abrir el modal de devoluciones con el número de factura
+  nextTick(() => {
+    setTimeout(() => {
+      if (posViewRef.value && posViewRef.value.openReturnsModalWithInvoice) {
+        posViewRef.value.openReturnsModalWithInvoice(invoiceNumber)
+      } else {
+        // Si no está disponible, intentar de nuevo en un momento
+        pendingPosAction.value = () => {
+          if (posViewRef.value?.openReturnsModalWithInvoice) {
+            posViewRef.value.openReturnsModalWithInvoice(invoiceNumber)
+            pendingPosAction.value = null
+          }
+        }
+      }
+    }, 300)
   })
 }
 
@@ -1517,7 +1542,13 @@ watch(posViewRef, async (newRef) => {
     console.log('🔄 PosView montado, ejecutando acción pendiente:', pendingPosAction.value)
     // Ejecutar acción pendiente con un pequeño delay para asegurar que esté completamente inicializado
     setTimeout(async () => {
-      await triggerPosAction(pendingPosAction.value)
+      // Si pendingPosAction es una función, ejecutarla directamente
+      if (typeof pendingPosAction.value === 'function') {
+        await pendingPosAction.value()
+      } else {
+        // Si es un string, usar triggerPosAction
+        await triggerPosAction(pendingPosAction.value)
+      }
       pendingPosAction.value = null // Limpiar acción pendiente
     }, 50)
   }

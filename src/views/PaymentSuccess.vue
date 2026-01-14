@@ -234,7 +234,7 @@ onMounted(async () => {
   }, 1000)
 })
 
-const redirectToDashboard = () => {
+const redirectToDashboard = async () => {
   // Verificar si es renovación
   const isRenewal = route.query.renewal === 'true'
   

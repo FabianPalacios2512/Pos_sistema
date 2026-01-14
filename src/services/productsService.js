@@ -69,6 +69,13 @@ export const productsService = {
       method: 'POST',
       body: JSON.stringify(stockData)
     })
+  },
+
+  // Eliminar imagen de un producto
+  async deleteImage(id) {
+    return await apiCall(`/products/${id}/delete-image`, {
+      method: 'DELETE'
+    })
   }
 }
 

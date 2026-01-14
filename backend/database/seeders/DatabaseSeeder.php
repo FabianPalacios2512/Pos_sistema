@@ -197,6 +197,30 @@ class DatabaseSeeder extends Seeder
             \Log::info('✅ DatabaseSeeder: Categorías de gastos creadas');
         }
 
+        // ✅ Verificar si ya existe el cliente "Consumidor Final" (normativa DIAN Colombia)
+        $existingConsumidorFinal = DB::table('customers')->where('document_number', '222222222222')->first();
+
+        if (!$existingConsumidorFinal) {
+            // Crear consumidor final según normativa DIAN
+            DB::table('customers')->insert([
+                'name' => 'Consumidor Final',
+                'document_type' => 'NIT',
+                'document_number' => '222222222222', // NIT genérico DIAN
+                'email' => 'consumidor@sistema.local',
+                'phone' => '000-000-0000',
+                'address' => 'Dirección General',
+                'city' => 'No registrada',
+                'credit_limit' => 0.00,
+                'current_debt' => 0.00,
+                'total_purchases' => 0.00,
+                'total_orders' => 0,
+                'active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            \Log::info('✅ DatabaseSeeder: Consumidor Final creado (NIT: 222222222222)');
+        }
+
         // ✅ COMENTADO: Los echo contaminan la respuesta HTTP JSON durante registro de tenants
         // Estos mensajes son útiles solo cuando se ejecuta desde CLI con php artisan db:seed
         // echo "\n✅ Base de datos inicializada correctamente\n";

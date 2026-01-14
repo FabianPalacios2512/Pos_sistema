@@ -7,6 +7,7 @@
 import { createInvoiceTemplate } from './invoiceTemplate'
 import { createQuotationTemplate } from './quotationTemplate'
 import { createPurchaseOrderTemplate } from './purchaseOrderTemplate'
+import { createReturnTemplate } from './returnTemplate'
 
 /**
  * Generar PDF de factura
@@ -49,6 +50,21 @@ export const generatePurchaseOrderPDF = (orderData, systemSettings = {}) => {
     return createPurchaseOrderTemplate(orderData, systemSettings)
   } catch (error) {
     console.error('Error en generatePurchaseOrderPDF:', error)
+    throw error
+  }
+}
+
+/**
+ * Generar PDF de devolución
+ * @param {Object} returnData - Datos de la devolución
+ * @param {Object} systemSettings - Configuración del sistema
+ * @returns {Promise<jsPDF>} PDF generado
+ */
+export const generateReturnPDF = async (returnData, systemSettings = {}) => {
+  try {
+    return await createReturnTemplate(returnData, systemSettings)
+  } catch (error) {
+    console.error('Error en generateReturnPDF:', error)
     throw error
   }
 }
@@ -98,6 +114,8 @@ export const getPDFDataURL = (pdf) => {
 export default {
   generateInvoicePDF,
   generateQuotationPDF,
+  generatePurchaseOrderPDF,
+  generateReturnPDF,
   downloadPDF,
   getPDFBlob,
   getPDFDataURL

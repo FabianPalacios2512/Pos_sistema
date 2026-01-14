@@ -7,7 +7,7 @@
             
             <!-- Título y Subtítulo -->
             <div>
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Factur</h1>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Facturas</h1>
               <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestión y control de documentos fiscales</p>
             </div>
         
@@ -408,13 +408,6 @@
                         </svg>
                         <span>Editar</span>
                       </button>
-                      <button @click="confirmDeleteInvoice(selectedInvoice); closeActionsMenu()" 
-                              class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                        <span>Anular</span>
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -645,16 +638,76 @@
     @send-whatsapp="handleSendWhatsApp"
   />
 
-  <!-- Modal de Edición (simplificado) -->
-  <div v-if="showEditModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6">
-      <h3 class="text-lg font-bold text-gray-900 mb-4">Editar Documento</h3>
-      <p class="text-sm text-gray-600">Funcionalidad de edición próximamente...</p>
-      <button @click="showEditModal = false" class="mt-4 px-4 py-2 bg-gray-200 rounded-lg">
-        Cerrar
-      </button>
-    </div>
-  </div>
+  <!-- Modal de Edición Bloqueada - Profesional y Limpio -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="showEditModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+        <Transition
+          enter-active-class="transition ease-out duration-300"
+          enter-from-class="opacity-0 scale-95"
+          enter-to-class="opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-200"
+          leave-from-class="opacity-100 scale-100"
+          leave-to-class="opacity-0 scale-95"
+        >
+          <div v-if="showEditModal" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800" @click.stop>
+            
+            <!-- Contenido del Modal -->
+            <div class="p-8 text-center">
+              <!-- Icono de Información -->
+              <div class="w-16 h-16 bg-blue-50 dark:bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              
+              <!-- Título -->
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Edición No Disponible
+              </h3>
+              
+              <!-- Mensaje -->
+              <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed mb-6">
+                Por razones de <strong class="text-gray-900 dark:text-white">seguridad y auditoría</strong>, las facturas no pueden ser modificadas una vez emitidas.
+              </p>
+              
+              <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed mb-8">
+                Si necesitas corregir un error, puedes <strong class="text-gray-900 dark:text-white">procesar una devolución</strong> del documento.
+              </p>
+              
+              <!-- Botones -->
+              <div class="flex gap-3">
+                <button
+                  @click="showEditModal = false"
+                  class="flex-1 px-4 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 transition-all duration-200"
+                >
+                  Aceptar
+                </button>
+                
+                <button
+                  @click="handleReturnFromModal"
+                  class="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                  </svg>
+                  Hacer Devolución
+                </button>
+              </div>
+            </div>
+            
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+  </Teleport>
 
   <!-- Modal de Nueva Factura (simplificado) -->
   <div v-if="showNewInvoiceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -757,7 +810,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['changeModule', 'open-quotation-in-pos', 'navigate', 'refresh'])
+const emit = defineEmits(['changeModule', 'open-quotation-in-pos', 'navigate', 'refresh', 'open-return-in-pos'])
 
 // Composables
 const { showToast, showSuccess, showError } = useToast()
@@ -1431,6 +1484,15 @@ const cancelEmail = () => {
 
 const editInvoice = (invoice) => {
   showEditModal.value = true
+}
+
+const handleReturnFromModal = () => {
+  showEditModal.value = false
+  // Emitir evento para abrir devoluciones en POS con el número de factura precargado
+  if (selectedInvoice.value) {
+    const invoiceNumber = selectedInvoice.value.invoiceNumber || selectedInvoice.value.number || selectedInvoice.value.invoice_number || ''
+    emit('open-return-in-pos', invoiceNumber)
+  }
 }
 
 const confirmDeleteInvoice = (invoice) => {

@@ -189,6 +189,30 @@ class CustomerController extends Controller
     {
         try {
             $customer = Customer::findOrFail($id);
+
+            // 🛡️ PROTECCIÓN: No permitir eliminar al Consumidor Final (NIT DIAN)
+            if ($customer->document_number === '222222222222') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar al Consumidor Final. Este es un cliente especial del sistema requerido por la normativa DIAN.',
+                    'is_system_customer' => true
+                ], 403);
+            }
+
+            // Verificar si el cliente tiene facturas asociadas
+            $invoicesCount = DB::table('invoices')
+                ->where('customer_id', $id)
+                ->count();
+
+            if ($invoicesCount > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar el cliente porque tiene facturas asociadas',
+                    'has_invoices' => true,
+                    'invoices_count' => $invoicesCount
+                ], 400);
+            }
+
             $customer->delete();
 
             return response()->json([
@@ -200,6 +224,32 @@ class CustomerController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar cliente',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get customer invoices
+     */
+    public function getInvoices($customer)
+    {
+        try {
+            $invoices = DB::table('invoices')
+                ->where('customer_id', $customer)
+                ->select('id', 'number', 'date', 'total', 'status')
+                ->orderBy('date', 'desc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $invoices
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error getting customer invoices: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener facturas del cliente',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -1,6 +1,6 @@
 <template>
   <!-- Executive Dashboard - Estilo Linear/Raycast/Shadcn -->
-  <div class="min-h-screen bg-gradient-to-b from-gray-50 via-gray-100/50 to-gray-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] font-sans antialiased">
+  <div class="min-h-screen bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] font-sans antialiased">
     
     <!-- Container Principal con más whitespace -->
     <div class="max-w-[1600px] mx-auto px-6 lg:px-12 py-8 space-y-8">

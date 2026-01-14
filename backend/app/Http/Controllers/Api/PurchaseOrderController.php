@@ -22,7 +22,7 @@ class PurchaseOrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = PurchaseOrder::with(['supplier', 'warehouse', 'items.product', 'creator'])
+            $query = PurchaseOrder::with(['supplier', 'warehouse', 'items.product', 'items.variant', 'creator'])
                 ->orderBy('order_date', 'desc');
 
             // Filtros
@@ -86,6 +86,8 @@ class PurchaseOrderController extends Controller
                 'reference' => 'nullable|string|max:255',
                 'items' => 'required|array|min:1',
                 'items.*.product_id' => 'required|exists:products,id',
+                'items.*.variant_id' => 'nullable|exists:product_variants,id',  // 👗 NUEVO: para moda
+                'items.*.variant_options' => 'nullable|array',                   // 👗 NUEVO: opciones de variante
                 'items.*.quantity' => 'required|numeric|min:0.01',
                 'items.*.unit_cost' => 'required|numeric|min:0'
             ]);
@@ -117,6 +119,8 @@ class PurchaseOrderController extends Controller
                 PurchaseOrderItem::create([
                     'purchase_order_id' => $order->id,
                     'product_id' => $item['product_id'],
+                    'variant_id' => $item['variant_id'] ?? null,           // 👗 NUEVO
+                    'variant_options' => $item['variant_options'] ?? null, // 👗 NUEVO
                     'quantity_ordered' => $item['quantity'],
                     'unit' => $product->measurement_unit ?? 'unit',
                     'unit_cost' => $item['unit_cost'],
@@ -139,8 +143,8 @@ class PurchaseOrderController extends Controller
 
             DB::commit();
 
-            // Recargar con relaciones
-            $order->load(['supplier', 'items.product', 'creator']);
+            // Recargar con relaciones (incluir variante)
+            $order->load(['supplier', 'items.product', 'items.variant', 'creator']);
 
             return response()->json([
                 'success' => true,
@@ -170,7 +174,7 @@ class PurchaseOrderController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $order = PurchaseOrder::with(['supplier', 'warehouse', 'items.product', 'creator', 'receiver'])
+            $order = PurchaseOrder::with(['supplier', 'warehouse', 'items.product', 'items.variant', 'creator', 'receiver'])
                 ->findOrFail($id);
 
             return response()->json([
@@ -303,11 +307,12 @@ class PurchaseOrderController extends Controller
 
     /**
      * Recibir mercancía (actualizar inventario)
+     * 👗 Actualizado para soportar variantes de producto (moda)
      */
     public function receive(Request $request, $id): JsonResponse
     {
         try {
-            $order = PurchaseOrder::with('items.product')->findOrFail($id);
+            $order = PurchaseOrder::with(['items.product', 'items.variant'])->findOrFail($id);
 
             if (!in_array($order->status, ['pending', 'partial'])) {
                 return response()->json([
@@ -331,72 +336,145 @@ class PurchaseOrderController extends Controller
             DB::beginTransaction();
 
             foreach ($validated['received_items'] as $receivedItem) {
-                $item = PurchaseOrderItem::findOrFail($receivedItem['item_id']);
+                $item = PurchaseOrderItem::with(['product', 'variant'])->findOrFail($receivedItem['item_id']);
                 $quantityToReceive = $receivedItem['quantity'];
+
+                if ($quantityToReceive <= 0) continue;
 
                 // Actualizar cantidad recibida
                 $item->quantity_received += $quantityToReceive;
                 $item->received = $item->quantity_received >= $item->quantity_ordered;
                 $item->save();
 
-                // Actualizar inventario del producto
                 $product = $item->product;
-                $previousStock = $product->current_stock; // Guardar stock anterior
-                $product->current_stock += $quantityToReceive;
-                $product->save();
+                $previousStock = $product->current_stock;
 
-                // También actualizar stock en product_warehouse (tabla pivot correcta)
-                if ($order->warehouse_id && Schema::hasTable('product_warehouse')) {
-                    try {
-                        $warehouseProduct = DB::table('product_warehouse')
-                            ->where('product_id', $product->id)
-                            ->where('warehouse_id', $order->warehouse_id)
-                            ->first();
+                // 👗 MODA: Si tiene variant_id, actualizar stock de la variante
+                if ($item->variant_id && $item->variant) {
+                    $variant = $item->variant;
+                    $previousVariantStock = $variant->stock ?? 0;
 
-                        if ($warehouseProduct) {
-                            // Si existe, actualizar (incrementar stock)
-                            DB::table('product_warehouse')
+                    // Actualizar stock en product_variants
+                    $variant->stock = ($variant->stock ?? 0) + $quantityToReceive;
+                    $variant->save();
+
+                    // Actualizar stock en product_warehouse para la variante
+                    if ($order->warehouse_id && Schema::hasTable('product_warehouse')) {
+                        try {
+                            $warehouseVariant = DB::table('product_warehouse')
+                                ->where('product_id', $product->id)
+                                ->where('product_variant_id', $variant->id)
+                                ->where('warehouse_id', $order->warehouse_id)
+                                ->first();
+
+                            if ($warehouseVariant) {
+                                DB::table('product_warehouse')
+                                    ->where('product_id', $product->id)
+                                    ->where('product_variant_id', $variant->id)
+                                    ->where('warehouse_id', $order->warehouse_id)
+                                    ->increment('stock', $quantityToReceive);
+                            } else {
+                                DB::table('product_warehouse')->insert([
+                                    'product_id' => $product->id,
+                                    'product_variant_id' => $variant->id,
+                                    'warehouse_id' => $order->warehouse_id,
+                                    'stock' => $quantityToReceive,
+                                    'created_at' => now(),
+                                    'updated_at' => now()
+                                ]);
+                            }
+                        } catch (\Exception $e) {
+                            \Log::warning('No se pudo actualizar product_warehouse para variante: ' . $e->getMessage());
+                        }
+                    }
+
+                    // Recalcular stock total del producto (suma de todas las variantes)
+                    $totalStock = DB::table('product_variants')
+                        ->where('product_id', $product->id)
+                        ->sum('stock');
+                    $product->current_stock = $totalStock;
+                    $product->save();
+
+                    // Crear movimiento de inventario con referencia a variante
+                    $variantInfo = $item->variant_options
+                        ? collect($item->variant_options)->map(fn($o) => "{$o['name']}: {$o['value']}")->join(', ')
+                        : "Variante #{$variant->id}";
+
+                    InventoryMovement::create([
+                        'product_id' => $product->id,
+                        'supplier_id' => $order->supplier_id,
+                        'type' => 'in',
+                        'reason' => 'purchase',
+                        'quantity' => $quantityToReceive,
+                        'previous_stock' => $previousVariantStock,
+                        'new_stock' => $variant->stock,
+                        'unit_cost' => $item->unit_cost,
+                        'total_cost' => $quantityToReceive * $item->unit_cost,
+                        'unit_price' => $item->unit_cost,
+                        'total_value' => $quantityToReceive * $item->unit_cost,
+                        'reference' => 'PO-' . $order->order_number,
+                        'notes' => "Recepción OC #{$order->order_number} - {$product->name} ({$variantInfo})",
+                        'movement_date' => now(),
+                        'user_id' => Auth::id()
+                    ]);
+
+                } else {
+                    // Producto simple (sin variantes)
+                    $product->current_stock += $quantityToReceive;
+                    $product->save();
+
+                    // Actualizar stock en product_warehouse
+                    if ($order->warehouse_id && Schema::hasTable('product_warehouse')) {
+                        try {
+                            $warehouseProduct = DB::table('product_warehouse')
                                 ->where('product_id', $product->id)
                                 ->where('warehouse_id', $order->warehouse_id)
-                                ->increment('stock', $quantityToReceive);
-                        } else {
-                            // Si no existe, crear nuevo registro
-                            DB::table('product_warehouse')->insert([
-                                'product_id' => $product->id,
-                                'warehouse_id' => $order->warehouse_id,
-                                'stock' => $quantityToReceive,
-                                'created_at' => now(),
-                                'updated_at' => now()
-                            ]);
-                        }
-                    } catch (\Exception $e) {
-                        // Si hay error, continuar sin fallar
-                        \Log::warning('No se pudo actualizar product_warehouse: ' . $e->getMessage());
-                    }
-                }
+                                ->whereNull('product_variant_id')
+                                ->first();
 
-                // Crear movimiento de inventario
-                InventoryMovement::create([
-                    'product_id' => $product->id,
-                    'supplier_id' => $order->supplier_id,
-                    'type' => 'in',                    // Entrada de inventario
-                    'reason' => 'purchase',            // Razón: compra
-                    'quantity' => $quantityToReceive,
-                    'previous_stock' => $previousStock,
-                    'new_stock' => $product->current_stock,
-                    'unit_cost' => $item->unit_cost,   // Costo unitario
-                    'total_cost' => $quantityToReceive * $item->unit_cost,
-                    'unit_price' => $item->unit_cost,  // También guardar en unit_price
-                    'total_value' => $quantityToReceive * $item->unit_cost,
-                    'reference' => 'PO-' . $order->order_number, // Referencia
-                    'notes' => "Recepción de orden de compra #" . $order->order_number,
-                    'movement_date' => now(),
-                    'user_id' => Auth::id()
-                ]);
+                            if ($warehouseProduct) {
+                                DB::table('product_warehouse')
+                                    ->where('product_id', $product->id)
+                                    ->where('warehouse_id', $order->warehouse_id)
+                                    ->whereNull('product_variant_id')
+                                    ->increment('stock', $quantityToReceive);
+                            } else {
+                                DB::table('product_warehouse')->insert([
+                                    'product_id' => $product->id,
+                                    'warehouse_id' => $order->warehouse_id,
+                                    'stock' => $quantityToReceive,
+                                    'created_at' => now(),
+                                    'updated_at' => now()
+                                ]);
+                            }
+                        } catch (\Exception $e) {
+                            \Log::warning('No se pudo actualizar product_warehouse: ' . $e->getMessage());
+                        }
+                    }
+
+                    // Crear movimiento de inventario
+                    InventoryMovement::create([
+                        'product_id' => $product->id,
+                        'supplier_id' => $order->supplier_id,
+                        'type' => 'in',
+                        'reason' => 'purchase',
+                        'quantity' => $quantityToReceive,
+                        'previous_stock' => $previousStock,
+                        'new_stock' => $product->current_stock,
+                        'unit_cost' => $item->unit_cost,
+                        'total_cost' => $quantityToReceive * $item->unit_cost,
+                        'unit_price' => $item->unit_cost,
+                        'total_value' => $quantityToReceive * $item->unit_cost,
+                        'reference' => 'PO-' . $order->order_number,
+                        'notes' => "Recepción de orden de compra #{$order->order_number}",
+                        'movement_date' => now(),
+                        'user_id' => Auth::id()
+                    ]);
+                }
             }
 
             // 🔄 Recargar items para asegurar que quantity_received esté actualizado
-            $order->load('items');
+            $order->load(['items', 'items.variant']);
 
             // Actualizar estado de la orden
             if ($order->isFullyReceived()) {
@@ -411,7 +489,7 @@ class PurchaseOrderController extends Controller
 
             DB::commit();
 
-            $order->load(['items.product', 'supplier']);
+            $order->load(['items.product', 'items.variant', 'supplier']);
 
             return response()->json([
                 'success' => true,

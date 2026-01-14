@@ -218,7 +218,9 @@
                     Editar
                   </button>
                   
+                  <!-- 🛡️ No mostrar botón eliminar para Consumidor Final (NIT DIAN) -->
                   <button
+                    v-if="selectedCustomer?.document_number !== '222222222222'"
                     @click="deleteCustomer(selectedCustomer)"
                     class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-rose-100 hover:bg-rose-200 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50"
                   >
@@ -1008,6 +1010,94 @@
       </div>
     </Transition>
   </Teleport>
+  
+  <!-- Modal: Confirmar Eliminación (cuando NO tiene facturas) -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="showDeleteConfirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+          
+          <!-- Contenido -->
+          <div class="p-8 text-center">
+            <!-- Icono Advertencia -->
+            <div class="w-20 h-20 bg-amber-50 dark:bg-amber-950/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-200 dark:border-amber-900/50">
+              <svg class="w-10 h-10 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+
+            <!-- Título -->
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¿Eliminar Cliente?</h3>
+            
+            <!-- Mensaje -->
+            <p class="text-base text-gray-600 dark:text-zinc-400 mb-2 leading-relaxed">
+              ¿Estás seguro de eliminar el cliente <span class="font-semibold text-gray-900 dark:text-white">"{{ customerToDelete?.name }}"</span>?
+            </p>
+            
+            <p class="text-sm text-red-600 dark:text-red-400 mb-8">
+              Esta acción no se puede deshacer.
+            </p>
+
+            <!-- Botones -->
+            <div class="flex gap-3">
+              <button
+                @click="cancelDeleteCustomer"
+                class="flex-1 py-3 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-base font-semibold rounded-xl border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                @click="confirmDeleteCustomer"
+                class="flex-1 py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white text-base font-semibold rounded-xl transition-colors duration-200 shadow-lg"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+  
+  <!-- Modal: No se puede eliminar (tiene facturas asociadas) -->
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="showCannotDeleteModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+          
+          <!-- Contenido -->
+          <div class="p-8 text-center">
+            <!-- Icono Error -->
+            <div class="w-20 h-20 bg-red-50 dark:bg-red-950/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-200 dark:border-red-900/50">
+              <svg class="w-10 h-10 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+
+            <!-- Título -->
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">No se puede eliminar</h3>
+            
+            <!-- Mensaje -->
+            <p class="text-base text-gray-600 dark:text-zinc-400 mb-2 leading-relaxed">
+              El cliente <span class="font-semibold text-gray-900 dark:text-white">"{{ customerToDelete?.name }}"</span> tiene facturas asociadas.
+            </p>
+            
+            <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
+              Para mantener la integridad de tus registros contables, no es posible eliminar clientes con historial de compras.
+            </p>
+
+            <!-- Botón -->
+            <button
+              @click="cancelDeleteCustomer"
+              class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-base font-semibold rounded-xl transition-colors duration-200 shadow-lg"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup>
@@ -1029,7 +1119,7 @@ const props = defineProps({
   customers: Array
 })
 
-const emit = defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'refresh'])
+const emit = defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'openReturnInPos', 'refresh'])
 
 // Sistema de toasts
 const { showSuccess, showError, showWarning, showInfo } = useToast()
@@ -1071,6 +1161,11 @@ const previewPhotoName = ref('')
 // Modal Premium
 const showPremiumModal = ref(false)
 const premiumFeatureName = ref('')
+
+// Modales de eliminación de cliente
+const showDeleteConfirmModal = ref(false)
+const showCannotDeleteModal = ref(false)
+const customerToDelete = ref(null)
 
 // Historial inline del cliente
 const historyLoading = ref(false)
@@ -1249,7 +1344,8 @@ const validateForm = () => {
 
 // Computed properties
 const filteredCustomers = computed(() => {
-  let filtered = customers.value
+  // 🛡️ Filtrar el Consumidor Final (cliente del sistema) - No debe mostrarse en la lista
+  let filtered = customers.value.filter(c => c.document_number !== '222222222222')
 
   if (searchTerm.value) {
     const term = searchTerm.value.toLowerCase()
@@ -1609,19 +1705,61 @@ const saveCustomer = async () => {
 }
 
 const deleteCustomer = async (customer) => {
-  if (!confirm(`¿Estás seguro de eliminar el cliente "${customer.name}"?`)) return
+  customerToDelete.value = customer
+  loading.value = true
+  
+  try {
+    // Verificar PRIMERO si tiene facturas antes de mostrar cualquier modal
+    const response = await customersService.getCustomerInvoices(customer.id)
+    const hasInvoices = response?.data && Array.isArray(response.data) && response.data.length > 0
+    
+    loading.value = false
+    
+    if (hasInvoices) {
+      // Tiene facturas → Mostrar modal rojo directamente
+      showCannotDeleteModal.value = true
+    } else {
+      // No tiene facturas → Mostrar modal de confirmación amarillo
+      showDeleteConfirmModal.value = true
+    }
+  } catch (error) {
+    loading.value = false
+    // Si hay error verificando, mostrar modal de confirmación y dejar que el backend valide
+    showDeleteConfirmModal.value = true
+  }
+}
+
+// Confirmar eliminación del cliente
+const confirmDeleteCustomer = async () => {
+  if (!customerToDelete.value) return
   
   try {
     loading.value = true
-    await customersService.delete(customer.id)
+    showDeleteConfirmModal.value = false
+    
+    await customersService.delete(customerToDelete.value.id)
     showSuccess('Cliente eliminado exitosamente')
     await loadCustomers()
+    customerToDelete.value = null
   } catch (error) {
-    console.error('Error eliminando cliente:', error)
-    showError('Error al eliminar el cliente')
+    // Si el backend dice que tiene facturas (doble validación por seguridad)
+    if (error.response?.status === 400 && error.response?.data?.has_invoices) {
+      showCannotDeleteModal.value = true
+    } else if (error.message?.includes('facturas asociadas')) {
+      showCannotDeleteModal.value = true
+    } else {
+      showError(error.response?.data?.message || 'Error al eliminar el cliente')
+    }
   } finally {
     loading.value = false
   }
+}
+
+// Cancelar eliminación
+const cancelDeleteCustomer = () => {
+  showDeleteConfirmModal.value = false
+  showCannotDeleteModal.value = false
+  customerToDelete.value = null
 }
 
 const getCustomerColor = (name) => {

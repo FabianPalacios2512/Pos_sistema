@@ -507,8 +507,20 @@
                       <tr v-for="item in selectedOrder.items" :key="item.id"
                           class="hover:bg-slate-50 dark:hover:bg-zinc-800/50 hover:shadow-sm transition-colors">
                         <td class="px-4 py-3">
-                          <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.product?.name || 'Producto sin nombre' }}</p>
-                          <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">{{ item.product?.sku || 'Sin SKU' }}</p>
+                          <div class="flex items-center gap-2">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.product?.name || 'Producto sin nombre' }}</p>
+                            <!-- 👗 Badge de variante -->
+                            <span v-if="item.variant_id" class="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-800">
+                              👗
+                            </span>
+                          </div>
+                          <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
+                            {{ item.product?.sku || 'Sin SKU' }}
+                            <!-- 👗 Mostrar variante -->
+                            <span v-if="item.variant_options" class="ml-1 text-purple-600 dark:text-purple-400">
+                              • {{ formatVariantOptions(item.variant_options) }}
+                            </span>
+                          </p>
                         </td>
                         <td class="px-4 py-3 text-center">
                           <span class="inline-flex items-center justify-center w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-lg">
@@ -679,8 +691,17 @@
                 <div v-for="(item, index) in orderForm.items" :key="index" class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-2.5 flex items-center gap-2.5">
                   <div class="flex-1 grid grid-cols-12 gap-3 items-center">
                     <div class="col-span-4">
-                      <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.product?.name || 'Producto' }}</p>
-                      <p class="text-xs text-gray-500 dark:text-zinc-500">SKU: {{ item.product?.sku || 'N/A' }}</p>
+                      <div class="flex items-center gap-2">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.product?.name || 'Producto' }}</p>
+                        <!-- 👗 Badge de variante -->
+                        <span v-if="item.variant_id" class="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-800">
+                          👗
+                        </span>
+                      </div>
+                      <p class="text-xs text-gray-500 dark:text-zinc-500">
+                        SKU: {{ item.product?.sku || 'N/A' }}
+                        <span v-if="item.variant_name" class="ml-1 text-purple-600 dark:text-purple-400">• {{ item.variant_name }}</span>
+                      </p>
                     </div>
                     <div class="col-span-3">
                       <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Cantidad</label>
@@ -770,7 +791,13 @@
                 <button v-for="product in filteredProducts" :key="product.id" @click="addProductToOrder(product)" class="w-full text-left p-3 bg-gray-50 dark:bg-zinc-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl border border-transparent hover:border-blue-200 dark:hover:border-blue-800 transition-all duration-200">
                   <div class="flex items-center justify-between">
                     <div class="flex-1">
-                      <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ product.name }}</p>
+                      <div class="flex items-center gap-2">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ product.name }}</p>
+                        <!-- 👗 Badge para productos con variantes -->
+                        <span v-if="product.product_type === 'variable'" class="px-2 py-0.5 text-[10px] font-bold uppercase bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-400 rounded-full border border-purple-200 dark:border-purple-800">
+                          Variantes
+                        </span>
+                      </div>
                       <p class="text-xs text-gray-500 dark:text-zinc-500">SKU: {{ product.sku }} | Stock: {{ product.current_stock }}</p>
                     </div>
                     <div class="text-right">
@@ -780,6 +807,82 @@
                   </div>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- 👗 Modal: Selector de Variantes (para productos moda) -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showVariantSelector" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-[70] p-4" @click.self="closeVariantSelector">
+          <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 max-w-2xl w-full max-h-[80vh] overflow-auto">
+            <!-- Header -->
+            <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4 sticky top-0 bg-white dark:bg-zinc-900 z-10">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-lg font-bold text-gray-900 dark:text-white">Seleccionar Variante</h3>
+                  <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">
+                    {{ selectedProductForVariant?.name }}
+                  </p>
+                </div>
+                <button @click="closeVariantSelector" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Loading -->
+            <div v-if="loadingVariants" class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 dark:border-zinc-700 border-t-purple-600 dark:border-t-purple-400"></div>
+            </div>
+
+            <!-- Lista de Variantes -->
+            <div v-else class="p-4 space-y-2">
+              <div class="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-lg p-3 mb-4">
+                <p class="text-sm text-purple-800 dark:text-purple-200">
+                  <strong>👗 Producto con variantes:</strong> Selecciona la talla/color específico que deseas ordenar.
+                </p>
+              </div>
+
+              <button 
+                v-for="variant in productVariants" 
+                :key="variant.id" 
+                @click="addVariantToOrder(variant)"
+                class="w-full text-left p-4 bg-gray-50 dark:bg-zinc-800/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl border-2 border-transparent hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-200"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <p class="text-sm font-bold text-gray-900 dark:text-white">
+                      {{ formatVariantOptions(variant.options_summary) }}
+                    </p>
+                    <div class="flex items-center gap-3 mt-1">
+                      <span class="text-xs text-gray-500 dark:text-zinc-500">SKU: {{ variant.sku }}</span>
+                      <span class="text-xs font-bold" :class="(variant.stock || 0) > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
+                        Stock: {{ variant.stock || 0 }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-bold text-gray-900 dark:text-white">${{ formatNumber(variant.cost_price || selectedProductForVariant?.cost_price || 0) }}</p>
+                    <p class="text-xs text-gray-500 dark:text-zinc-500">Costo</p>
+                  </div>
+                </div>
+              </button>
+
+              <div v-if="productVariants.length === 0" class="text-center py-8">
+                <p class="text-gray-500 dark:text-zinc-400">No hay variantes disponibles</p>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t border-gray-200 dark:border-zinc-800 px-6 py-3 bg-gray-50 dark:bg-zinc-900 sticky bottom-0">
+              <button @click="closeVariantSelector" class="w-full px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 transition-all">
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
@@ -840,8 +943,20 @@
                     <!-- Product Info -->
                     <div class="flex-1 min-w-0">
                       <label :for="`check-${item.item_id}`" class="block">
-                        <p class="text-sm font-bold text-gray-900 dark:text-white">{{ item.product_name }}</p>
-                        <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Ordenado: {{ item.quantity_ordered }} unidades</p>
+                        <div class="flex items-center gap-2">
+                          <p class="text-sm font-bold text-gray-900 dark:text-white">{{ item.product_name }}</p>
+                          <!-- 👗 Badge de variante -->
+                          <span v-if="item.variant_id" class="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-400 rounded border border-purple-200 dark:border-purple-800">
+                            👗
+                          </span>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
+                          Ordenado: {{ item.quantity_ordered }} unidades
+                          <!-- 👗 Mostrar variante -->
+                          <span v-if="item.variant_options" class="ml-1 text-purple-600 dark:text-purple-400">
+                            • {{ typeof item.variant_options === 'string' ? formatVariantOptions(item.variant_options) : formatVariantOptions(item.variant_options) }}
+                          </span>
+                        </p>
                       </label>
 
                       <!-- Quantity Input -->
@@ -1152,6 +1267,13 @@ export default {
       showProductSelector: false,
       productSearch: '',
       savingOrder: false,
+      
+      // 👗 NUEVO: Selector de variantes para productos moda
+      showVariantSelector: false,
+      selectedProductForVariant: null,
+      productVariants: [],
+      loadingVariants: false,
+      
       orderForm: {
         supplier_id: '',
         warehouse_id: '',
@@ -1341,6 +1463,8 @@ export default {
       this.receiveForm.items = this.selectedOrder.items.map(item => ({
         item_id: item.id,
         product_name: item.product?.name || 'Producto',
+        variant_id: item.variant_id || null,           // 👗 NUEVO
+        variant_options: item.variant_options || null, // 👗 NUEVO
         quantity_ordered: item.quantity_ordered,
         quantity_received: item.quantity_received || 0,
         quantity_to_receive: 0,
@@ -1487,8 +1611,40 @@ export default {
       return basicPlans.includes(this.tenantPlan)
     },
 
-    addProductToOrder(product) {
-      const exists = this.orderForm.items.find(i => i.product_id === product.id)
+    // 👗 NUEVO: Detectar si producto tiene variantes y mostrar selector
+    async addProductToOrder(product) {
+      // Si es producto con variantes (tipo moda), cargar variantes primero
+      if (product.product_type === 'variable' || product.type === 'variable') {
+        this.selectedProductForVariant = product
+        this.loadingVariants = true
+        this.showProductSelector = false
+        
+        try {
+          const response = await apiCall(`/products/${product.id}`)
+          if (response.data && response.data.variants && response.data.variants.length > 0) {
+            this.productVariants = response.data.variants
+            this.showVariantSelector = true
+          } else {
+            // No tiene variantes a pesar de ser variable, agregar como producto simple
+            this.addSimpleProductToOrder(product)
+          }
+        } catch (error) {
+          console.error('Error cargando variantes:', error)
+          this.$toast?.error('Error al cargar las variantes del producto')
+          this.addSimpleProductToOrder(product)
+        } finally {
+          this.loadingVariants = false
+        }
+        return
+      }
+      
+      // Producto simple (sin variantes)
+      this.addSimpleProductToOrder(product)
+    },
+
+    // 👗 Agregar producto simple (sin variantes)
+    addSimpleProductToOrder(product) {
+      const exists = this.orderForm.items.find(i => i.product_id === product.id && !i.variant_id)
       if (exists) {
         this.$toast?.warning('Este producto ya está en la orden')
         return
@@ -1496,6 +1652,8 @@ export default {
       
       this.orderForm.items.push({
         product_id: product.id,
+        variant_id: null,
+        variant_options: null,
         product: product,
         quantity: 1,
         unit_cost: product.cost_price || 0,
@@ -1504,6 +1662,63 @@ export default {
       
       this.showProductSelector = false
       this.productSearch = ''
+    },
+
+    // 👗 NUEVO: Agregar variante específica a la orden
+    addVariantToOrder(variant) {
+      const product = this.selectedProductForVariant
+      
+      // Verificar si ya existe esta variante en la orden
+      const exists = this.orderForm.items.find(
+        i => i.product_id === product.id && i.variant_id === variant.id
+      )
+      if (exists) {
+        this.$toast?.warning('Esta variante ya está en la orden')
+        return
+      }
+      
+      // Parsear options_summary si es string
+      const optionsSummary = typeof variant.options_summary === 'string' 
+        ? JSON.parse(variant.options_summary) 
+        : variant.options_summary
+      
+      // Crear nombre legible de la variante
+      const variantName = optionsSummary
+        .map(opt => `${opt.name}: ${opt.value}`)
+        .join(' | ')
+      
+      this.orderForm.items.push({
+        product_id: product.id,
+        variant_id: variant.id,
+        variant_options: optionsSummary,
+        variant_name: variantName,  // Para mostrar en la UI
+        product: {
+          ...product,
+          name: `${product.name} (${variantName})`  // Nombre compuesto
+        },
+        quantity: 1,
+        unit_cost: variant.cost_price || product.cost_price || 0,
+        notes: ''
+      })
+      
+      this.showVariantSelector = false
+      this.selectedProductForVariant = null
+      this.productVariants = []
+      this.productSearch = ''
+    },
+
+    // 👗 Cerrar selector de variantes
+    closeVariantSelector() {
+      this.showVariantSelector = false
+      this.selectedProductForVariant = null
+      this.productVariants = []
+    },
+
+    // 👗 Helper para formatear opciones de variante
+    formatVariantOptions(options) {
+      if (!options) return ''
+      const parsed = typeof options === 'string' ? JSON.parse(options) : options
+      return parsed.map(opt => `${opt.name}: ${opt.value}`).join(' | ')
     },
 
     removeOrderItem(index) {
@@ -1566,6 +1781,8 @@ export default {
           ...this.orderForm,
           items: this.orderForm.items.map(item => ({
             product_id: item.product_id,
+            variant_id: item.variant_id || null,           // 👗 NUEVO
+            variant_options: item.variant_options || null, // 👗 NUEVO
             quantity: item.quantity,
             unit_cost: item.unit_cost,
             notes: item.notes

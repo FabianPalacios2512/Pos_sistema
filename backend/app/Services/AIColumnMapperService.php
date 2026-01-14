@@ -77,6 +77,24 @@ class AIColumnMapperService
             'required' => false,
             'type' => 'string',
             'synonyms' => ['unidad', 'unit', 'medida', 'um', 'u.m.', 'unidad medida']
+        ],
+        'supplier' => [
+            'label' => 'Proveedor',
+            'required' => false,
+            'type' => 'string',
+            'synonyms' => ['proveedor', 'supplier', 'vendor', 'distribuidor', 'fabricante', 'marca', 'prov', 'prv', 'suplidor', 'abastecedor']
+        ],
+        'brand' => [
+            'label' => 'Marca',
+            'required' => false,
+            'type' => 'string',
+            'synonyms' => ['marca', 'brand', 'fabricante', 'manufacturer', 'lab', 'laboratorio']
+        ],
+        'image_url' => [
+            'label' => 'URL de imagen',
+            'required' => false,
+            'type' => 'string',
+            'synonyms' => ['imagen', 'image', 'foto', 'photo', 'url_imagen', 'image_url', 'picture', 'img']
         ]
     ];
 

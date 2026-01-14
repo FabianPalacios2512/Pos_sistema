@@ -27,6 +27,7 @@
               </svg>
             </div>
             <input
+              ref="searchInputRef"
               v-model="searchTerm"
               type="text"
               placeholder="Buscar por nombre o documento..."
@@ -242,7 +243,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { customersService } from '../services/customersService.js'
 import { appStore } from '../store/appStore.js'
 import { useToast } from '../composables/useToast.js'
@@ -259,6 +260,9 @@ const props = defineProps({
 
 // Sistema de toasts
 const { showSuccess, showError } = useToast()
+
+// Referencia al input de búsqueda
+const searchInputRef = ref(null)
 
 // Estado
 const searchTerm = ref('')
@@ -313,10 +317,13 @@ const quickCustomer = ref({
 
 // Computed
 const filteredCustomers = computed(() => {
-  if (!searchTerm.value) return customers.value || []
+  // 🛡️ Filtrar el Consumidor Final (cliente del sistema) - No debe mostrarse en selectores
+  const systemCustomers = (customers.value || []).filter(c => c.document_number !== '222222222222')
+  
+  if (!searchTerm.value) return systemCustomers
   
   const term = searchTerm.value.toLowerCase()
-  return (customers.value || []).filter(customer => 
+  return systemCustomers.filter(customer => 
     customer.name && customer.name.toLowerCase().includes(term) ||
     customer.document_number && customer.document_number.includes(term) ||
     (customer.email && customer.email.toLowerCase().includes(term)) ||
@@ -408,7 +415,7 @@ const formatCurrency = (value) => {
 }
 
 // Inicialización
-onMounted(() => {
+onMounted(async () => {
   if (props.startCreating) {
     showCreateCustomer.value = true
   }
@@ -416,6 +423,12 @@ onMounted(() => {
   // Usar el loader del store global para evitar fetchs locales redundantes
   if (!appStore.customers || appStore.customers.length === 0) {
     appStore.loadCustomers()
+  }
+
+  // 🎯 AUTOFOCUS: Enfocar el input de búsqueda cuando se abre el modal
+  await nextTick()
+  if (searchInputRef.value && !props.startCreating) {
+    searchInputRef.value.focus()
   }
 })
 </script>

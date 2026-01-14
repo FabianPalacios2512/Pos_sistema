@@ -92,6 +92,17 @@ export const customersService = {
       console.error('Error deleting customer:', error)
       throw error
     }
+  },
+
+  async getCustomerInvoices(customerId) {
+    try {
+      const response = await apiCall(`/customers/${customerId}/invoices`)
+      return response
+    } catch (error) {
+      console.error('❌ Error getting customer invoices:', error)
+      // Si hay error, lanzar la excepción para que el caller la maneje
+      throw error
+    }
   }
 }
 

@@ -1194,10 +1194,34 @@
               </div>
             </div>
             
+            <!-- Imagen Actual (Modo Edición) -->
+            <!-- Mostrar cuando: 1) Estamos editando, 2) Hay imagen actual, 3) NO hay preview nuevo -->
+            <div v-if="isEditing && currentProductImage && !previewImage" class="mb-4">
+              <div class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl p-3">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-semibold text-gray-600 dark:text-zinc-400">🖼️ Imagen actual</span>
+                  <button type="button" @click="deleteProductImage" :disabled="deletingImage"
+                          class="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold flex items-center gap-1 disabled:opacity-50">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    {{ deletingImage ? 'Eliminando...' : 'Eliminar' }}
+                  </button>
+                </div>
+                <div class="relative inline-block w-full">
+                  <img :src="currentProductImage" 
+                       class="w-full rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700"
+                       @error="currentProductImage = null"
+                       alt="Imagen actual">
+                </div>
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2 text-center">Cambia el método abajo para reemplazar</p>
+              </div>
+            </div>
+            
             <!-- Toggle URL/Archivo -->
             <div class="flex bg-gray-100 dark:bg-zinc-800 rounded-lg p-1 mb-3 border border-gray-200 dark:border-zinc-700">
               <button type="button"
-                      @click="imageUploadMethod = 'url'"
+                      @click="changeImageMethod('url')"
                       :class="[
                         'flex-1 px-2 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1',
                         imageUploadMethod === 'url' 
@@ -1210,7 +1234,7 @@
                 URL
               </button>
               <button type="button"
-                      @click="imageUploadMethod = 'file'"
+                      @click="changeImageMethod('file')"
                       :class="[
                         'flex-1 px-2 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1',
                         imageUploadMethod === 'file' 
@@ -2333,7 +2357,7 @@ const props = defineProps({
 })
 
 // Emits
-const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'refresh'])
+const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'openReturnInPos', 'refresh'])
 
 // Router - DEBE estar a nivel de setup, NO dentro de onMounted
 const route = useRoute()
@@ -3056,6 +3080,8 @@ const getIconEmoji = (iconId) => {
 // Sistema de imagen dual
 const imageUploadMethod = ref('url') // 'file' o 'url'
 const previewImage = ref(null)
+const currentProductImage = ref(null) // 🖼️ Imagen actual del producto (en modo edición)
+const deletingImage = ref(false) // 🗑️ Estado de eliminación de imagen
 const imageLoadError = ref(false)
 
 const showStockHelp = ref(false)
@@ -3625,6 +3651,11 @@ const openCreateModal = async () => {
   // Limpiar producto seleccionado (importante para que el watcher en FashionProductForm no cargue datos)
   selectedProduct.value = null
   
+  // 👗 Restaurar el modo según la configuración del SISTEMA (no del producto anterior editado)
+  const storeType = appStore.systemSettings?.store_type
+  isFashionMode.value = storeType === 'fashion' || storeType === 'moda'
+  console.log('🏪 [openCreateModal] Modo restaurado según config del sistema:', isFashionMode.value ? 'FASHION' : 'GENERAL')
+  
   // VALIDACIÓN: Verificar si existen categorías primero
   if (!categories.value || categories.value.length === 0) {
     showNotification(
@@ -3707,6 +3738,17 @@ const editProduct = async (product) => {
     // Usar el producto completo del API
     product = response.data
     console.log('✅ [editProduct] Producto completo obtenido:', product)
+    console.log('🔍 [editProduct] PROPIEDADES DE IMAGEN DEL PRODUCTO:', {
+      tiene_image_url: 'image_url' in product,
+      tiene_image: 'image' in product,
+      tiene_images: 'images' in product,
+      image_url_valor: product.image_url,
+      image_valor: product.image,
+      images_valor: product.images,
+      images_length: product.images?.length,
+      primera_imagen: product.images?.[0],
+      todas_las_keys: Object.keys(product).filter(k => k.toLowerCase().includes('image'))
+    })
   } catch (error) {
     console.error('❌ Error obteniendo producto:', error)
     showNotification(
@@ -3715,6 +3757,21 @@ const editProduct = async (product) => {
       'error'
     )
     return
+  }
+  
+  // 👗 INTELIGENTE: Detectar si el producto es de moda basándose en el PRODUCTO, no en la configuración del sistema
+  const productIsFashion = isFashionProduct(product)
+  console.log('🎯 [editProduct] Tipo detectado del producto:', productIsFashion ? 'FASHION' : 'GENERAL')
+  
+  // Temporalmente establecer isFashionMode según el producto (no la config del sistema)
+  isFashionMode.value = productIsFashion
+  
+  // Si es producto fashion, guardar el producto seleccionado para el form
+  if (productIsFashion) {
+    selectedProduct.value = product
+    isEditing.value = true
+    showProductModal.value = true
+    return // El modal de fashion manejará todo
   }
   
   // Cargar bodegas para obtener todas las tiendas disponibles
@@ -3819,7 +3876,7 @@ const editProduct = async (product) => {
     supplier_id: product.supplier_id || null, // 🏭 Cargar proveedor
     warehouseStock: warehouseStock,
     warehouseEnabled: warehouseEnabled,
-    image: product.image_url || product.image || '',
+    image: '', // Dejar vacío inicialmente
     active: getProductStatus(product) !== false,
     measurement_unit: product.measurement_unit || 'unit', // 📏 Cargar unidad de medida
     allow_decimal: product.allow_decimal || false // 🔢 Cargar si permite decimales
@@ -3829,29 +3886,60 @@ const editProduct = async (product) => {
   previewImage.value = null
   imageLoadError.value = false
   
-  // Detectar si es URL o archivo base64
-  if (productForm.value.image) {
-    if (productForm.value.image.startsWith('data:')) {
-      imageUploadMethod.value = 'file'
-      previewImage.value = productForm.value.image
-    } else {
-      imageUploadMethod.value = 'url'
-    }
-  } else {
-    imageUploadMethod.value = 'url'
+  // 🖼️ Guardar imagen actual del producto
+  // Buscar en: 1) image_url directo, 2) image, 3) array images[0]
+  let productImageUrl = product.image_url || product.image || ''
+  
+  // Si no hay imagen directa, buscar en el array de imágenes
+  if (!productImageUrl && product.images && Array.isArray(product.images) && product.images.length > 0) {
+    const firstImage = product.images[0]
+    // La imagen puede estar en .image_url o .url dependiendo de la estructura
+    productImageUrl = firstImage?.image_url || firstImage?.url || firstImage || ''
+    console.log('🖼️ [editProduct] Imagen encontrada en array images:', productImageUrl)
   }
   
-  // 👗 Si es modo fashion, cargar detalles completos del producto
-  if (isFashionMode.value) {
-    try {
-      const response = await productsService.getById(product.id)
-      if (response.success && response.data) {
-        selectedProduct.value = response.data
-      }
-    } catch (error) {
-      console.error('Error cargando detalles del producto:', error)
+  console.log('🖼️ [editProduct] DEBUG Imagen DETALLADO:', {
+    productId: product.id,
+    productName: product.name,
+    'image_url (valor)': product.image_url,
+    'image_url (tipo)': typeof product.image_url,
+    'images (array)': product.images,
+    'images.length': product.images?.length,
+    'primera_imagen_objeto': product.images?.[0],
+    productImageUrl,
+    'productImageUrl (longitud)': productImageUrl?.length,
+    hasImageUrl: !!productImageUrl
+  })
+  
+  if (productImageUrl && typeof productImageUrl === 'string' && productImageUrl.trim().length > 0) {
+    // Verificar si es una URL válida (empieza con http o /storage)
+    if (productImageUrl.startsWith('http') || productImageUrl.startsWith('/storage') || productImageUrl.startsWith('storage/')) {
+      currentProductImage.value = productImageUrl
+      console.log('✅ [editProduct] Imagen actual cargada:', productImageUrl)
+    } else {
+      console.warn('⚠️ [editProduct] URL de imagen no válida:', productImageUrl)
+      currentProductImage.value = null
     }
+  } else {
+    console.log('ℹ️ [editProduct] Producto sin imagen válida', {
+      productImageUrl,
+      tipo: typeof productImageUrl,
+      esVacio: productImageUrl === '',
+      esNull: productImageUrl === null,
+      esUndefined: productImageUrl === undefined
+    })
+    currentProductImage.value = null
   }
+  
+  console.log('🔍 [editProduct] Estado final:', {
+    isEditing: true,
+    currentProductImage: currentProductImage.value,
+    previewImage: previewImage.value,
+    productFormImage: productForm.value.image
+  })
+  
+  // Por defecto, modo URL
+  imageUploadMethod.value = 'url'
   
   showProductModal.value = true
 }
@@ -4238,6 +4326,55 @@ const clearImageUpload = () => {
   // Limpiar el input file
   const fileInput = document.querySelector('input[type="file"]')
   if (fileInput) fileInput.value = ''
+}
+
+// 🔄 Cambiar método de imagen (URL/Archivo) - Limpia la imagen actual
+const changeImageMethod = (method) => {
+  // Limpiar todo cuando cambiamos de método
+  clearImageUpload()
+  currentProductImage.value = null // Ocultar imagen actual
+  imageUploadMethod.value = method
+  console.log('🔄 [changeImageMethod] Cambiado a:', method)
+}
+
+// Eliminar imagen del producto (físicamente del servidor)
+const deleteProductImage = async () => {
+  if (!productForm.value.id || !currentProductImage.value) {
+    return
+  }
+  
+  try {
+    deletingImage.value = true
+    
+    // Llamar al backend para eliminar la imagen físicamente
+    const response = await productsService.deleteImage(productForm.value.id)
+    
+    if (response.success) {
+      showNotification(
+        'Imagen eliminada',
+        'La imagen se ha eliminado correctamente',
+        'success'
+      )
+      
+      // Limpiar UI
+      currentProductImage.value = null
+      productForm.value.image = ''
+      
+      // Recargar productos para reflejar el cambio
+      await loadProducts()
+    } else {
+      throw new Error(response.message || 'Error al eliminar imagen')
+    }
+  } catch (error) {
+    console.error('[deleteProductImage] Error:', error)
+    showNotification(
+      'Error',
+      error.message || 'No se pudo eliminar la imagen',
+      'error'
+    )
+  } finally {
+    deletingImage.value = false
+  }
 }
 
 const generateBarcode = () => {
@@ -4645,15 +4782,63 @@ const saveProduct = async (skipValidation = false) => {
     console.log('📦 Total stock calculado:', totalStock)
     console.log('✅ Bodegas disponibles:', availableWarehouses.value.map(w => ({ id: w.id, name: w.name })))
     
-    // ✅ Detectar si hay un archivo de imagen para subir
-    const hasImageFile = productForm.value.imageFile instanceof File
+    // ✅ Detectar si hay un archivo de imagen para subir O convertir base64 a archivo
+    let hasImageFile = productForm.value.imageFile instanceof File
     
-    // ✅ Detectar si es una URL externa (no base64)
-    const isExternalUrl = productForm.value.image && 
-                          !productForm.value.image.startsWith('data:') && 
-                          (productForm.value.image.startsWith('http://') || 
-                           productForm.value.image.startsWith('https://') ||
-                           productForm.value.image.startsWith('/storage'))
+    // 🔄 Detectar y convertir base64 a File si es necesario
+    const imageUrl = (productForm.value.image || '').trim()
+    const isBase64 = imageUrl.startsWith('data:image/')
+    
+    if (isBase64 && !hasImageFile) {
+      console.log('🔄 [saveProduct] Convirtiendo base64 a File...')
+      try {
+        // Extraer tipo MIME y datos
+        const matches = imageUrl.match(/^data:([^;]+);base64,(.+)$/)
+        if (matches) {
+          const mimeType = matches[1]
+          const base64Data = matches[2]
+          
+          // Convertir base64 a blob
+          const byteCharacters = atob(base64Data)
+          const byteNumbers = new Array(byteCharacters.length)
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i)
+          }
+          const byteArray = new Uint8Array(byteNumbers)
+          const blob = new Blob([byteArray], { type: mimeType })
+          
+          // Convertir blob a File
+          const fileName = `product_${Date.now()}.${mimeType.split('/')[1]}`
+          productForm.value.imageFile = new File([blob], fileName, { type: mimeType })
+          hasImageFile = true
+          
+          console.log('✅ [saveProduct] Base64 convertido a File:', {
+            fileName,
+            size: blob.size,
+            type: mimeType
+          })
+        }
+      } catch (error) {
+        console.error('❌ [saveProduct] Error convirtiendo base64:', error)
+      }
+    }
+    
+    // ✅ Detectar si es una URL externa (http/https)
+    const isExternalUrl = imageUrl.length > 0 && 
+                          !isBase64 &&
+                          (imageUrl.startsWith('http://') || 
+                           imageUrl.startsWith('https://') ||
+                           imageUrl.startsWith('/storage') ||
+                           imageUrl.startsWith('storage/'))
+    
+    console.log('🖼️ [saveProduct] Detección de imagen:', {
+      hasImageFile,
+      isBase64,
+      imageUrl: imageUrl.substring(0, 100),
+      isExternalUrl,
+      willSendAsFile: hasImageFile,
+      willSendImageUrl: !hasImageFile && isExternalUrl
+    })
     
     let response
     
@@ -4718,7 +4903,7 @@ const saveProduct = async (skipValidation = false) => {
         manage_stock: true,
         active: productForm.value.active !== false,
         // Solo enviar image_url si es una URL externa válida
-        image_url: isExternalUrl ? productForm.value.image.trim() : null,
+        image_url: isExternalUrl ? imageUrl : null,
         tags: null,
         warehouse_stocks: Object.keys(productForm.value.warehouseStock || {}).reduce((acc, warehouseId) => {
           if (productForm.value.warehouseEnabled[warehouseId]) {
@@ -4729,6 +4914,14 @@ const saveProduct = async (skipValidation = false) => {
         measurement_unit: productForm.value.measurement_unit || 'unit',
         allow_decimal: productForm.value.allow_decimal || false,
       }
+      
+      console.log('📤 [saveProduct] Datos a enviar al backend:', {
+        mode: 'JSON',
+        hasImageUrl: !!apiData.image_url,
+        image_url: apiData.image_url,
+        name: apiData.name,
+        isEditing: isEditing.value
+      })
       
       if (isEditing.value) {
         response = await productsService.update(productForm.value.id, apiData)
