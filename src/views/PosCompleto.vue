@@ -15,37 +15,44 @@
       @update:sidebarCollapsed="sidebarCollapsed = $event"
     />
 
-    <!-- Área Principal de Contenido Adaptable -->
-    <div class="transition-all duration-300" style="flex: 1; display: flex; flex-direction: column; min-height: 0;" 
+    <!-- Contenedor Principal con Chat IA Lateral -->
+    <div class="flex flex-1 min-h-0 transition-all duration-300"
          :class="{
            'lg:ml-60 lg:pl-4': !sidebarCollapsed,
            'lg:ml-20': sidebarCollapsed
          }">
       
-      <!-- Header Corporativo Profesional -->
-      <AppHeader
-        :module-title="getModuleTitle()"
-        :module-description="getModuleDescription()"
-        :current-user="currentUser"
-        :current-module="currentModule"
-        :current-warehouse="currentWarehouse"
-        :auto-hide-enabled="autoHideEnabled"
-        :sidebar-collapsed="sidebarCollapsed"
-        :should-show-settings="shouldShowModule('settings')"
-        @toggleSidebar="sidebarOpen = !sidebarOpen"
-        @toggleAutoHide="autoHideEnabled = !autoHideEnabled"
-        @toggleSidebarCollapsed="sidebarCollapsed = !sidebarCollapsed"
-        @navigate-to-settings="setCurrentModule('settings')"
-        @navigate-to-profile="setCurrentModule('my-profile')"
-        @toggle-radio="radioWidgetOpen = !radioWidgetOpen"
-        @logout="handleLogout"
-      />
+      <!-- Área Principal de Contenido -->
+      <div class="flex-1 flex flex-col min-h-0">
+        
+        <!-- Header Corporativo Profesional - Siempre ancho completo -->
+        <AppHeader
+          :module-title="getModuleTitle()"
+          :module-description="getModuleDescription()"
+          :current-user="currentUser"
+          :current-module="currentModule"
+          :current-warehouse="currentWarehouse"
+          :auto-hide-enabled="autoHideEnabled"
+          :sidebar-collapsed="sidebarCollapsed"
+          :should-show-settings="shouldShowModule('settings')"
+          @toggleSidebar="sidebarOpen = !sidebarOpen"
+          @toggleAutoHide="autoHideEnabled = !autoHideEnabled"
+          @toggleSidebarCollapsed="sidebarCollapsed = !sidebarCollapsed"
+          @navigate-to-settings="handleNavigateSettings"
+          @navigate-to-profile="handleNavigateProfile"
+          @toggle-radio="handleToggleRadio"
+          @logout="handleLogout"
+          @notifications-opened="aiChatStore.close()"
+          @profile-dropdown-opened="aiChatStore.close()"
+        />
 
 
 
 
-      <!-- Contenido Principal -->
-      <main style="flex: 1; min-height: 0;">
+        <!-- Contenido Principal - Solo esto se reduce cuando el chat está abierto -->
+        <main class="transition-all duration-300" style="flex: 1; min-height: 0;"
+              :class="{ 'lg:mr-[380px]': aiChatStore.isOpen.value }"
+        >
         
         <!-- Dashboard -->
         <div v-if="currentModule === 'dashboard'">
@@ -86,7 +93,16 @@
         </div>
         
       </main>
+      </div>
     </div>
+
+    <!-- Panel de Chat IA 105 - Fuera del contenedor principal para no interferir -->
+    <AI105Chat 
+      :is-open="aiChatStore.isOpen.value" 
+      :header-height="64"
+      :current-module="currentModule"
+      @close="aiChatStore.close" 
+    />
 
     <!-- Modal de Confirmación - Salir del POS con productos en carrito -->
     <Teleport to="body">
@@ -164,6 +180,39 @@
       @close="radioWidgetOpen = false"
     />
 
+    <!-- 🤖 Botón Flotante IA 105 - Estilo hPanel -->
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 scale-90 translate-y-2"
+      enter-to-class="opacity-100 scale-100 translate-y-0"
+      leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 scale-100 translate-y-0"
+      leave-to-class="opacity-0 scale-90 translate-y-2"
+    >
+      <button
+        v-if="!aiChatStore.isOpen.value"
+        @click="aiChatStore.open"
+        class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-br from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700"
+        title="Asistente IA 105"
+        style="font-family: 'Inter', system-ui, sans-serif;"
+      >
+        <!-- Logo 105 -->
+        <span class="text-white font-bold text-sm tracking-tight">105</span>
+        
+        <!-- Separador -->
+        <div class="w-px h-4 bg-white/30"></div>
+        
+        <!-- Texto -->
+        <span class="text-white/90 font-medium text-xs">Asistente IA</span>
+        
+        <!-- Indicador online -->
+        <div class="absolute -top-1 -right-1 w-3 h-3">
+          <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-white shadow-sm"></span>
+        </div>
+      </button>
+    </Transition>
+
   </div>
 </template>
 
@@ -179,12 +228,16 @@ import { useSessionTimeout } from '../composables/useSessionTimeout.js'
 import { useModuleNavigation } from '../composables/useModuleNavigation.js'
 import { useRouteState } from '../composables/useRouteState.js'
 import { appStore } from '../store/appStore.js'
+import { aiChatStore } from '../store/aiChatStore.js'
 
 // Importar componente Sidebar
 import Sidebar from '../components/Sidebar.vue'
 
 // Importar componente AppHeader
 import AppHeader from '../components/AppHeader.vue'
+
+// Importar Chat IA lateral
+import AI105Chat from '../components/AI105Chat.vue'
 
 // Importar RadioPlayerModal
 import RadioPlayerModal from '../components/RadioPlayerModal.vue'
@@ -403,8 +456,25 @@ const shouldShowModule = (module) => {
   return hasModulePermission(module)
 }
 
+// Funciones que cierran el chat antes de ejecutar la acción
+const handleNavigateSettings = () => {
+  aiChatStore.close()
+  setCurrentModule('settings')
+}
+
+const handleNavigateProfile = () => {
+  aiChatStore.close()
+  setCurrentModule('my-profile')
+}
+
+const handleToggleRadio = () => {
+  aiChatStore.close()
+  radioWidgetOpen.value = !radioWidgetOpen.value
+}
+
 // Manejar logout (el modal de confirmación ya está en AppHeader)
 const handleLogout = async () => {
+  aiChatStore.close()
   await authService.logout()
   router.push('/login')
 }

@@ -19,39 +19,70 @@ class ProductController extends Controller
     /**
      * ✅ Asegura que el symlink del tenant exista para servir archivos públicos
      * Crea: public/storage/tenants/{tenant_id} -> storage/tenant{tenant_id}/app/public
+     *
+     * NOTA: Esta función NO debe detener la ejecución si falla - las imágenes
+     * se guardan correctamente en storage/, solo el acceso público podría fallar.
      */
     private function ensureTenantStorageLink()
     {
-        $tenantId = tenant('id');
-        if (!$tenantId) {
-            return; // No es multi-tenant
-        }
-
-        $symlinkPath = public_path("storage/tenants/{$tenantId}");
-        $targetPath = storage_path('app/public');
-
-        // Si el symlink ya existe, no hacer nada
-        if (is_link($symlinkPath)) {
-            return;
-        }
-
-        // Crear directorio padre si no existe
-        $parentDir = dirname($symlinkPath);
-        if (!File::isDirectory($parentDir)) {
-            File::makeDirectory($parentDir, 0755, true);
-        }
-
-        // Crear el symlink
         try {
-            symlink($targetPath, $symlinkPath);
-            \Log::info("✅ [Storage] Symlink creado para tenant: {$tenantId}", [
-                'symlink' => $symlinkPath,
-                'target' => $targetPath
-            ]);
+            $tenantId = tenant('id');
+            if (!$tenantId) {
+                return; // No es multi-tenant
+            }
+
+            $symlinkPath = public_path("storage/tenants/{$tenantId}");
+            $targetPath = storage_path('app/public');
+
+            // Si el symlink ya existe, no hacer nada
+            if (is_link($symlinkPath) || is_dir($symlinkPath)) {
+                return;
+            }
+
+            // Asegurar que exista el directorio base public/storage
+            $storagePublicDir = public_path('storage');
+            if (!is_dir($storagePublicDir)) {
+                // Intentar crear o verificar que el symlink de storage existe
+                if (!is_link($storagePublicDir)) {
+                    \Log::warning("[Storage] Directorio public/storage no existe. Ejecutar: php artisan storage:link");
+                    // Intentar crear el directorio en lugar de fallar
+                    @mkdir($storagePublicDir, 0755, true);
+                }
+            }
+
+            // Crear directorio tenants si no existe
+            $tenantsDir = public_path('storage/tenants');
+            if (!is_dir($tenantsDir)) {
+                if (!@mkdir($tenantsDir, 0755, true)) {
+                    \Log::warning("[Storage] No se pudo crear directorio tenants: {$tenantsDir}");
+                    return; // No fallar, continuar sin symlink
+                }
+            }
+
+            // Asegurar que el directorio destino exista
+            if (!is_dir($targetPath)) {
+                if (!@mkdir($targetPath, 0755, true)) {
+                    \Log::warning("[Storage] No se pudo crear directorio destino: {$targetPath}");
+                    return;
+                }
+            }
+
+            // Crear el symlink
+            if (@symlink($targetPath, $symlinkPath)) {
+                \Log::info("✅ [Storage] Symlink creado para tenant: {$tenantId}", [
+                    'symlink' => $symlinkPath,
+                    'target' => $targetPath
+                ]);
+            } else {
+                // Si symlink falla, intentar crear como directorio regular
+                // Esto permite que las imágenes se guarden aunque no haya symlink perfecto
+                \Log::warning("⚠️ [Storage] No se pudo crear symlink, continuando sin él", [
+                    'tenant' => $tenantId
+                ]);
+            }
         } catch (\Exception $e) {
-            \Log::error("❌ [Storage] Error creando symlink para tenant: {$tenantId}", [
-                'error' => $e->getMessage()
-            ]);
+            // NUNCA fallar por problemas de symlink - las imágenes igual se guardan en storage
+            \Log::error("❌ [Storage] Error en ensureTenantStorageLink (ignorando): {$e->getMessage()}");
         }
     }
 

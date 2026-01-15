@@ -309,6 +309,7 @@ class AIController extends Controller
 
         } catch (\Exception $e) {
             Log::error('AI Chat Error: ' . $e->getMessage());
+            Log::error('Stack Trace: ' . $e->getTraceAsString());
             if (isset($lockKey)) Cache::forget($lockKey);
 
             // 🔴 FIX: Guardar mensaje de error en historial para evitar "comandos fantasma"
@@ -804,17 +805,17 @@ Tienes herramientas para consultar datos en tiempo real:
    Usuario: "dame información de la factura FACT-000012"
    Paso 1: search_invoices(invoice_number='FACT-000012') → Obtiene [{ id: 12, number: 'FACT-000012', customer_name: 'MARIA JOSE', date: '2025-12-26', total: 1800, status: 'Pagada', payment_method: 'Efectivo' }]
    Paso 2: get_invoice_details(invoice_id=12) → Obtiene productos completos y vendedor
-   Respuesta: "La factura **FACT-000012** del 26 de diciembre de 2025 a nombre de **MARIA JOSE** fue realizada por el vendedor **[Nombre del Vendedor]** y pagada con **efectivo** por un total de **$1.800**. Productos vendidos: [lista productos con cantidades y precios]"
+   Respuesta: "La factura **FACT-000012** del 26 de diciembre de 2025 a nombre de **MARIA JOSE** fue realizada por el vendedor **[Nombre del Vendedor]** y pagada con **efectivo** por un total de **\$1.800**. Productos vendidos: [lista productos con cantidades y precios]"
 
    Ejemplo 2:
    Usuario: "facturas de hoy"
    Paso 1: search_invoices(date='today') → Lista facturas
-   Respuesta: "Hoy tienes X facturas por un total de $XXX. Las principales son: [lista con números, clientes y montos]"
+   Respuesta: "Hoy tienes X facturas por un total de \$XXX. Las principales son: [lista con números, clientes y montos]"
 
    Ejemplo 3:
    Usuario: "muestra los productos de esa factura" (después de haber mencionado FACT-000012)
    Paso 1: get_invoice_details(invoice_id=12) [usar el ID del contexto]
-   Respuesta: "Productos de la factura FACT-000012:\n• [Producto 1]: X unidades x $Y = $Z\n• [Producto 2]: X unidades x $Y = $Z\n**Total: $1.800**\n**Vendedor: [Nombre]**"
+   Respuesta: "Productos de la factura FACT-000012:\n• [Producto 1]: X unidades x \$Y = \$Z\n• [Producto 2]: X unidades x \$Y = \$Z\n**Total: \$1.800**\n**Vendedor: [Nombre]**"
 
    ⚠️ IMPORTANTE: SIEMPRE incluye el vendedor (seller_name) en las respuestas sobre facturas cuando esté disponible.
 

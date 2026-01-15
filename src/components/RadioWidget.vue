@@ -6,7 +6,7 @@
       <div 
         v-if="isOpen" 
         @click="closeWidget"
-        class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[60] transition-all duration-300"
+        class="fixed inset-0 bg-black/50 z-[60]"
       ></div>
     </Transition>
 
@@ -18,9 +18,9 @@
       >
         <!-- 1. HEADER (Ambiente) -->
         <div class="bg-gradient-to-br from-emerald-600 to-teal-800 p-6 relative overflow-hidden flex-shrink-0 text-white">
-          <!-- Efectos de fondo -->
-          <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <div class="absolute bottom-0 left-0 w-24 h-24 bg-emerald-400/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+          <!-- Efectos de fondo simplificados -->
+          <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div class="absolute bottom-0 left-0 w-24 h-24 bg-emerald-400/20 rounded-full translate-y-1/2 -translate-x-1/2"></div>
           
           <div class="relative z-10 flex justify-between items-start">
             <div>

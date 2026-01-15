@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+  <div class="fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-200 dark:border-zinc-700 animate-scale-in">
       
       <!-- Header -->
@@ -7,7 +7,7 @@
         <!-- Botón cerrar -->
         <button 
           @click="$emit('close')"
-          class="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-xl bg-white/60 dark:bg-zinc-800/60 hover:bg-white dark:hover:bg-zinc-700 transition-all backdrop-blur-sm"
+          class="absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-xl bg-white/80 dark:bg-zinc-800/80 hover:bg-white dark:hover:bg-zinc-700 transition-colors"
         >
           <svg class="w-5 h-5 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
@@ -93,8 +93,8 @@
   
   <!-- Modal de Función Premium -->
   <Teleport to="body">
-    <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+    <div v-if="showPremiumModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-[60] p-4">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800">
         
         <!-- Contenido -->
         <div class="p-8 text-center">

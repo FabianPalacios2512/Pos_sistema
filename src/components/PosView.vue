@@ -1817,7 +1817,7 @@
       @confirm="handleVariantConfirmed"
     />
 
-    <!-- Modal de Confirmación de Pago -->
+    <!-- Modal de Confirmación de Pago (Unificado con Post-Pago) -->
     <ConfirmPaymentModal
       v-if="showPaymentModal"
       :total="total"
@@ -1833,6 +1833,10 @@
       :systemSettings="systemSettings"
       :invoiceNumber="getNextInvoiceNumber()"
       @payment-confirmed="handlePaymentConfirmed"
+      @print-invoice="handlePrintInvoice"
+      @send-whatsapp="handleSendWhatsApp"
+      @view-invoice="handleViewInvoice"
+      @new-sale="startNewSale"
       @close="showPaymentModal = false"
     />
 
@@ -1922,8 +1926,8 @@
 
     <!-- Modal Premium -->
     <Teleport to="body">
-      <div v-if="showPremiumModalPOS" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+      <div v-if="showPremiumModalPOS" class="fixed inset-0 bg-black/85 flex items-center justify-center z-[9999] p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800">
           
           <!-- Contenido -->
           <div class="p-8 text-center">
@@ -2015,8 +2019,8 @@
 
     <!-- 🚫 Modal: Límite de Facturas del Plan Gratuito Alcanzado -->
     <Teleport to="body">
-      <div v-if="showFreePlanLimitModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
+      <div v-if="showFreePlanLimitModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-[60] p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800">
           
           <!-- Contenido -->
           <div class="p-8 text-center">
@@ -4784,8 +4788,7 @@ const handlePaymentConfirmed = async (paymentData) => {
     return
   }
   
-  // Cerrar modal de confirmación
-  showPaymentModal.value = false
+  // NO cerrar modal de confirmación - ahora cambia a estado 'success' internamente
   
   try {
     // Verificar si hay una cotización cargada para convertir
@@ -5010,8 +5013,8 @@ const handlePaymentConfirmed = async (paymentData) => {
   // Esto garantiza que el descuento se haya enviado antes de limpiarlo
   clearCart()
   
-  // Mostrar modal post-pago con opciones
-  showAfterPaymentModal.value = true
+  // El modal de confirmación ahora cambia internamente a estado 'success'
+  // Ya no necesitamos abrir AfterPaymentModal
 }
 
 const startNewSale = async () => {

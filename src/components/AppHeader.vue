@@ -586,21 +586,14 @@
       </div>
     </Transition>
   </Teleport>
-
-  <!-- Componente de Chat IA 105 -->
-  <AI105Chat 
-    :is-open="aiChatOpen" 
-    @close="aiChatOpen = false"
-    @navigate="handleAINavigation"
-  />
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import AI105Chat from './AI105Chat.vue'
 import { useRadioStore } from '../store/radioStore'
 import { appStore } from '../store/appStore.js'
+import { aiChatStore } from '../store/aiChatStore.js'
 import { warehouseService } from '../services/warehouseService.js'
 import apiClient from '../services/apiClient.js'
 
@@ -666,18 +659,26 @@ const emit = defineEmits([
   'toggleSidebar',
   'toggleAutoHide',
   'toggleSidebarCollapsed',
-  'toggle-radio'
+  'toggle-radio',
+  'notifications-opened',
+  'profile-dropdown-opened'
 ])
 
 // Estados reactivos
 const userDropdownOpen = ref(false)
+
+// Watch para emitir evento cuando se abre el dropdown de perfil
+watch(userDropdownOpen, (newVal) => {
+  if (newVal) {
+    emit('profile-dropdown-opened')
+  }
+})
 const notificationsOpen = ref(false)
 const showLogoutModal = ref(false)
 const videoModalOpen = ref(false)
 const notifications = ref([]) // Notificaciones reales
 const notificationCount = computed(() => notifications.value.length)
 const notificationsSilent = ref(false) // Estado del silenciador
-const aiChatOpen = ref(false) // Estado del chat IA
 const currentTheme = ref('system') // Estado del tema actual (light, dark, system)
 const isLoadingNotifications = ref(false)
 
@@ -763,6 +764,10 @@ const toggleUserDropdown = () => {
 // Manejar toggle de notificaciones
 const toggleNotifications = async () => {
   notificationsOpen.value = !notificationsOpen.value
+  // Emitir evento para cerrar el chat cuando se abren notificaciones
+  if (notificationsOpen.value) {
+    emit('notifications-opened')
+  }
   // Cerrar dropdown de usuario si está abierto
   if (userDropdownOpen.value) {
     userDropdownOpen.value = false
@@ -792,10 +797,9 @@ const clearNotifications = () => {
   console.log('🗑️ Notificaciones limpiadas')
 }
 
-// Toggle del chat IA
+// Toggle del chat IA (usa store global)
 const toggleAIChat = () => {
-  aiChatOpen.value = !aiChatOpen.value
-  console.log('🤖 Chat IA 105:', aiChatOpen.value ? 'Abierto' : 'Cerrado')
+  aiChatStore.toggle()
 }
 
 // Manejar navegación desde el chat IA

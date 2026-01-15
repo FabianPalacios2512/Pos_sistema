@@ -30,11 +30,11 @@ export const designSystem = {
   },
 
   // ============================================
-  // 🎯 KPIs CON GLASSMORPHISM
+  // 🎯 KPIs CON ESTILO MODERNO
   // ============================================
   kpis: {
-    // Card de KPI
-    card: 'bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/50',
+    // Card de KPI (sin blur para mejor rendimiento)
+    card: 'bg-white dark:bg-zinc-900/95 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-colors duration-150 shadow-md dark:shadow-lg dark:shadow-black/50',
     
     // Contenedor de icono
     iconContainer: 'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5',
@@ -157,7 +157,7 @@ export const designSystem = {
   // 📄 MODALES
   // ============================================
   modals: {
-    overlay: 'fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4',
+    overlay: 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4',
     container: 'bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 max-w-2xl w-full max-h-[90vh] overflow-y-auto',
     header: 'border-b border-gray-200 dark:border-zinc-800 px-6 py-4 bg-gray-50 dark:bg-zinc-900',
     body: 'px-6 py-4',

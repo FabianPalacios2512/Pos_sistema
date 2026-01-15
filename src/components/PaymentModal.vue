@@ -1,12 +1,12 @@
 <template>
-  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+  <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-lg w-full animate-scale-in border border-gray-100 dark:border-gray-700 overflow-hidden">
       
       <!-- Header Mejorado -->
       <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+            <div class="w-12 h-12 bg-white/30 rounded-full flex items-center justify-center">
               <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>

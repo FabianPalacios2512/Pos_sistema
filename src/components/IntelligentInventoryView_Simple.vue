@@ -2440,16 +2440,12 @@
       @action-click="handleAlertAction"
       @dismiss-forever="handleDismissForever"
     />
-
-    <!-- Componente de Chat IA 105 -->
-    <AI105Chat />
   </div>
 </template>
 
 <script>
 import { ref, reactive, onMounted, computed } from 'vue'
 import ToastNotifications from './ToastNotifications.vue'
-import AI105Chat from './AI105Chat.vue'
 import { API_CONFIG, apiCall } from '../services/api.js'
 import { getInitials } from '../utils/avatarUtils.js'
 import { appStore } from '../store/appStore'
@@ -2457,8 +2453,7 @@ import { appStore } from '../store/appStore'
 export default {
   name: 'IntelligentInventoryView',
   components: {
-    ToastNotifications,
-    AI105Chat
+    ToastNotifications
   },
   setup() {
     const API_BASE_URL = API_CONFIG.BASE_URL
