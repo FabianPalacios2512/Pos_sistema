@@ -374,12 +374,27 @@
               
               <!-- Cards de resumen financiero -->
               <div class="grid grid-cols-3 gap-4 mt-5">
-                <!-- Balance Total -->
+                <!-- Balance Total con desglose -->
                 <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/20 rounded-xl p-4 border border-amber-100 dark:border-amber-800/50">
                   <p class="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wide">Deuda Total</p>
                   <p class="text-2xl font-bold text-amber-700 dark:text-amber-300 mt-1">
                     ${{ formatNumber(selectedCustomer.balance || 0) }}
                   </p>
+                  <!-- 📊 Desglose de deuda: Productos + Recargo -->
+                  <div v-if="selectedCustomer.balance > 0" class="mt-3 pt-3 border-t border-amber-200 dark:border-amber-800/50 space-y-1">
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="text-amber-600 dark:text-amber-400">Productos</span>
+                      <span class="text-amber-700 dark:text-amber-300 font-medium">
+                        ${{ formatNumber(Math.round(selectedCustomer.balance / 1.10)) }}
+                      </span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                      <span class="text-amber-600 dark:text-amber-400">Recargo (10%)</span>
+                      <span class="text-amber-700 dark:text-amber-300 font-medium">
+                        +${{ formatNumber(Math.round(selectedCustomer.balance - (selectedCustomer.balance / 1.10))) }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Límite de crédito -->
@@ -2220,6 +2235,34 @@ const sendWelcomeMessages = async () => {
                   </p>
                 </div>
                 
+                <!-- 📊 Información sobre recargo financiero (transparencia) -->
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 18px 20px; margin: 20px 0; border-radius: 8px;">
+                  <p style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 13px; font-weight: 600;">
+                    📊 Información de su Crédito
+                  </p>
+                  <p style="color: #0369a1; margin: 0; font-size: 13px; line-height: 1.7;">
+                    Las compras realizadas a crédito incluyen un <strong>recargo financiero del 10%</strong> 
+                    sobre el valor de los productos, el cual se aplica al momento de la compra.
+                  </p>
+                  <div style="background: #e0f2fe; padding: 12px; margin: 12px 0 0 0; border-radius: 6px;">
+                    <p style="color: #075985; margin: 0 0 8px 0; font-size: 12px; font-weight: 600;">Ejemplo:</p>
+                    <table style="width: 100%; font-size: 12px; color: #0c4a6e;">
+                      <tr>
+                        <td style="padding: 3px 0;">Productos comprados:</td>
+                        <td style="text-align: right; font-weight: 500;">$100.000</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 3px 0;">Recargo financiero (10%):</td>
+                        <td style="text-align: right; font-weight: 500;">+$10.000</td>
+                      </tr>
+                      <tr style="border-top: 2px solid #0891b2;">
+                        <td style="padding: 6px 0 3px 0; font-weight: 600;">Total a pagar:</td>
+                        <td style="text-align: right; font-weight: 700; color: #0369a1;">$110.000</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+                
                 <p style="color: #6b7280; font-size: 14px; line-height: 1.7; margin: 25px 0 0 0;">
                   Si tiene alguna pregunta sobre su crédito, no dude en contactarnos. 
                   Estamos aquí para ayudarle.
@@ -2279,6 +2322,14 @@ ${creditInfo.creditLimit}
 • Cupo disponible: ${creditInfo.creditLimit}
 
 💡 *Recuerda:* Paga tus cuotas a tiempo para mantener tu crédito activo y seguir disfrutando de esta facilidad de pago.
+
+📊 *Información Importante:*
+Las compras a crédito incluyen un *recargo financiero del 10%* sobre el valor de los productos.
+
+_Ejemplo:_
+• Productos: $100.000
+• Recargo (10%): +$10.000
+• Total a pagar: $110.000
 
 ¿Tienes preguntas? ¡Estamos para ayudarte!
 
