@@ -494,6 +494,11 @@
                             <span class="text-gray-500 dark:text-zinc-400">IVA ({{ displayTaxRate }}%):</span>
                             <span class="font-semibold text-gray-900 dark:text-zinc-300">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
                           </div>
+                          <!-- Recargo por crédito -->
+                          <div v-if="selectedInvoice.surcharge_amount && selectedInvoice.surcharge_amount > 0" class="flex justify-between">
+                            <span class="text-amber-600 dark:text-amber-400 font-medium">Recargo Crédito:</span>
+                            <span class="font-semibold text-amber-600 dark:text-amber-400">+${{ formatCurrency(selectedInvoice.surcharge_amount) }}</span>
+                          </div>
                           <div class="pt-2 mt-1.5 border-t border-gray-300 dark:border-zinc-600">
                             <div class="flex justify-between items-center">
                               <span class="text-sm font-bold text-gray-900 dark:text-zinc-200">TOTAL:</span>
@@ -510,7 +515,12 @@
                 <div class="grid grid-cols-2 gap-4 pt-3 border-t border-gray-200 dark:border-zinc-700">
                   <div>
                     <h4 class="text-xs font-bold uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Método de Pago</h4>
-                    <p class="text-sm text-gray-900 dark:text-zinc-200">{{ getPaymentMethodName(selectedInvoice.payment_method) }}</p>
+                    <p class="text-sm text-gray-900 dark:text-zinc-200">
+                      <span v-if="selectedInvoice.payment_method === 'credit'" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800">
+                        Crédito
+                      </span>
+                      <span v-else>{{ getPaymentMethodName(selectedInvoice.payment_method) }}</span>
+                    </p>
                   </div>
                   
                   <div>
@@ -1244,6 +1254,7 @@ const downloadPDF = async (invoice) => {
       discount: parseFloat(invoice.discount_amount || 0),
       tax: parseFloat(invoice.tax || invoice.tax_amount || 0),
       tax_amount: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      surcharge_amount: parseFloat(invoice.surcharge_amount || 0), // 🎯 Recargo por crédito
       total: parseFloat(invoice.total || 0),
       payments: invoice.payments || [{
         method: invoice.payment_method || 'efectivo',
@@ -1251,7 +1262,8 @@ const downloadPDF = async (invoice) => {
       }],
       change: 0,
       notes: invoice.notes || '',
-      validity_days: 15 // Para cotizaciones
+      validity_days: 15, // Para cotizaciones
+      payment_method: invoice.payment_method || '' // Para identificar si es crédito
     }
 
     // Generar PDF usando la plantilla correcta según el tipo de documento
@@ -1326,6 +1338,7 @@ const sendByEmail = async (invoice) => {
       discount: parseFloat(invoice.discount_amount || 0),
       tax: parseFloat(invoice.tax || invoice.tax_amount || 0),
       tax_amount: parseFloat(invoice.tax || invoice.tax_amount || 0),
+      surcharge_amount: parseFloat(invoice.surcharge_amount || 0), // 🎯 Recargo por crédito
       total: parseFloat(invoice.total || 0),
       payments: invoice.payments || [{
         method: invoice.payment_method || 'efectivo',
@@ -1333,7 +1346,8 @@ const sendByEmail = async (invoice) => {
       }],
       change: 0,
       notes: invoice.notes || '',
-      validity_days: 15 // Para cotizaciones
+      validity_days: 15, // Para cotizaciones
+      payment_method: invoice.payment_method || '' // Para identificar si es crédito
     }
 
     // Generar PDF usando la plantilla correcta según el tipo de documento

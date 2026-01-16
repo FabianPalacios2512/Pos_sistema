@@ -97,17 +97,30 @@ class CreditPaymentController extends Controller
                 'user_id' => auth()->id() ?? null
             ]);
 
+            // 🎯 Calcular reducción proporcional de subtotal_debt
+            // Si current_debt = subtotal_debt * factor, entonces:
+            // subtotal_debt a reducir = amount / factor
+            $systemSettings = \App\Models\SystemSetting::first();
+            $surchargePercent = floatval($systemSettings->credit_surcharge_percentage ?? 10);
+            $factor = 1 + ($surchargePercent / 100);
+            $subtotalReduction = $request->amount / $factor;
+
             // Update customer debt
             $customer->current_debt -= $request->amount;
+            $customer->subtotal_debt -= $subtotalReduction;
 
             // Si la deuda llega a $0, limpiar fecha de inicio de deuda
             if ($customer->current_debt <= 0) {
                 $customer->current_debt = 0;
+                $customer->subtotal_debt = 0;
                 $customer->debt_since = null;
                 Log::info('✅ Cliente liquidó deuda completa, limpiando debt_since', [
                     'customer_id' => $customer->id
                 ]);
             }
+            
+            // Asegurar que subtotal_debt no sea negativo
+            if ($customer->subtotal_debt < 0) $customer->subtotal_debt = 0;
 
             $customer->save();
 

@@ -1,422 +1,518 @@
 <template>
-  <!-- 🎯 PORTAL DE CRÉDITO - Diseño Mobile-First App Style -->
-  <!-- Compensar zoom del sistema con transform -->
-  <div class="credit-portal-wrapper min-h-screen bg-slate-100 dark:bg-[#0f0f12]">
+  <!-- 🎯 CREDIT PORTAL - Clean Premium Design -->
+  <div class="credit-portal min-h-screen font-['Inter',system-ui,sans-serif] antialiased">
     
-    <!-- ==================== PANTALLA DE LOGIN ==================== -->
-    <div v-if="!isAuthenticated" class="min-h-screen flex flex-col">
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div v-if="!isAuthenticated" class="min-h-screen bg-slate-50 dark:bg-[#0C0C0E] flex flex-col">
       
-      <!-- Header con gradiente -->
-      <div class="bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600 px-6 pt-12 pb-20 text-center relative overflow-hidden">
-        <!-- Decoración -->
-        <div class="absolute top-0 left-0 w-full h-full opacity-10">
-          <div class="absolute top-10 left-10 w-32 h-32 rounded-full bg-white"></div>
-          <div class="absolute bottom-0 right-0 w-48 h-48 rounded-full bg-white translate-x-1/2 translate-y-1/2"></div>
-        </div>
-        
-        <div class="relative z-10">
-          <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm mx-auto flex items-center justify-center mb-4 shadow-lg">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-            </svg>
-          </div>
-          <h1 class="text-2xl font-bold text-white mb-1">Mi Crédito</h1>
-          <p class="text-emerald-100 text-sm">{{ businessName }}</p>
-        </div>
-      </div>
-      
-      <!-- Card de Login -->
-      <div class="flex-1 -mt-10 px-4 pb-8">
-        <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl max-w-md mx-auto overflow-hidden border border-gray-100 dark:border-zinc-800">
-          
-          <form @submit.prevent="handleLogin" class="p-6 space-y-5">
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white text-center mb-2">Ingresa tus datos</h2>
-            
-            <!-- ID de Crédito -->
-            <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-zinc-400 mb-1.5">ID de Crédito</label>
-              <input
-                v-model="loginForm.creditId"
-                type="text"
-                placeholder="CRD-000001"
-                class="w-full px-4 py-3.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-center text-lg font-mono uppercase tracking-wider"
-                :disabled="loading"
-              />
-            </div>
-            
-            <!-- Apellido -->
-            <div>
-              <label class="block text-sm font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Tu Apellido</label>
-              <input
-                v-model="loginForm.lastName"
-                type="text"
-                placeholder="Ej: García"
-                class="w-full px-4 py-3.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-center"
-                :disabled="loading"
-              />
-            </div>
-            
-            <!-- Error -->
-            <div v-if="error" class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-3">
-              <p class="text-sm text-red-600 dark:text-red-400 text-center">{{ error }}</p>
-            </div>
-            
-            <!-- Botón -->
-            <button
-              type="submit"
-              :disabled="loading || !loginForm.creditId || !loginForm.lastName"
-              class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-            >
-              <svg v-if="loading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-              </svg>
-              <span>{{ loading ? 'Verificando...' : 'Ver mi crédito' }}</span>
-            </button>
-          </form>
-          
-          <div class="bg-gray-50 dark:bg-zinc-800/50 px-6 py-4 border-t border-gray-100 dark:border-zinc-800">
-            <p class="text-xs text-center text-gray-500 dark:text-zinc-500">🔒 Tu información está protegida</p>
+      <!-- Header -->
+      <header class="px-6 py-6 lg:py-8">
+        <div class="max-w-md mx-auto flex items-center justify-center lg:justify-start gap-3">
+          <img src="/logo.png" alt="105 POS" class="h-10 w-auto" />
+          <div>
+            <h1 class="text-lg font-semibold text-slate-900 dark:text-white tracking-tight">Credit Portal</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400">{{ businessName }}</p>
           </div>
         </div>
-        
-        <p class="text-center mt-6 text-sm text-gray-500 dark:text-zinc-500">
-          ¿No tienes tu ID? Contacta a la tienda
-        </p>
-      </div>
+      </header>
+      
+      <!-- Form Container -->
+      <main class="flex-1 flex items-center justify-center px-6 py-8">
+        <div class="w-full max-w-md">
+          
+          <!-- Form Card -->
+          <div class="bg-white dark:bg-[#161618] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-black/20 overflow-hidden">
+            
+            <form @submit.prevent="handleLogin" class="p-8">
+              
+              <!-- Header -->
+              <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Accede a tu cuenta</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Ingresa tus credenciales para continuar</p>
+              </div>
+              
+              <!-- Inputs -->
+              <div class="space-y-5">
+                
+                <!-- Credit ID Input -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    ID de Crédito
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>
+                      </svg>
+                    </div>
+                    <input
+                      v-model="loginForm.creditId"
+                      type="text"
+                      placeholder="CRD-000001"
+                      class="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 font-mono text-center tracking-widest focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                      :disabled="loading"
+                    />
+                  </div>
+                </div>
+                
+                <!-- Last Name Input -->
+                <div class="space-y-2">
+                  <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    Apellido
+                  </label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                      </svg>
+                    </div>
+                    <input
+                      v-model="loginForm.lastName"
+                      type="text"
+                      placeholder="Tu apellido"
+                      class="w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-center focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                      :disabled="loading"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Error Message -->
+              <div v-if="error" class="mt-5 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/50 rounded-xl px-4 py-3 flex items-center gap-3">
+                <svg class="w-5 h-5 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                </svg>
+                <p class="text-sm text-rose-600 dark:text-rose-400">{{ error }}</p>
+              </div>
+              
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                :disabled="loading || !loginForm.creditId || !loginForm.lastName"
+                class="w-full mt-8 py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/30 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-all duration-200 group"
+              >
+                <svg v-if="loading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <span>{{ loading ? 'Verificando...' : 'Continuar' }}</span>
+                <svg v-if="!loading" class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                </svg>
+              </button>
+            </form>
+            
+            <!-- Security Badge -->
+            <div class="px-8 py-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800">
+              <div class="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                </svg>
+                <span class="text-xs font-medium">Conexión segura</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Help Link -->
+          <p class="text-center mt-8 text-sm text-slate-500 dark:text-slate-400">
+            ¿No tienes acceso? 
+            <a href="#" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Contacta al establecimiento</a>
+          </p>
+        </div>
+      </main>
+      
+      <!-- Footer -->
+      <footer class="px-6 py-6 text-center">
+        <p class="text-xs text-slate-400 dark:text-slate-600">© 2026 {{ businessName }}. Todos los derechos reservados.</p>
+      </footer>
     </div>
 
-    <!-- ==================== DASHBOARD (AUTENTICADO) ==================== -->
-    <div v-else class="pb-8">
+    <!-- ==================== DASHBOARD (AUTHENTICATED) ==================== -->
+    <div v-else class="min-h-screen flex flex-col bg-slate-50 dark:bg-[#0C0C0E]">
       
-      <!-- Header con estado y curva inferior -->
-      <div :class="[
-        'px-4 pt-6 pb-12 text-center relative',
-        creditData.credit?.balance > 0 ? 'bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600' : 'bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-600'
-      ]">
-        <!-- Curva decorativa inferior -->
-        <div class="absolute bottom-0 left-0 right-0 h-6 overflow-hidden">
-          <div :class="[
-            'absolute -bottom-3 left-1/2 -translate-x-1/2 w-[120%] h-12 rounded-[50%]',
-            'bg-slate-100 dark:bg-[#0f0f12]'
-          ]"></div>
+      <!-- Compact Header -->
+      <header class="px-4 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#161618]">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+              {{ creditData.customer?.name?.charAt(0)?.toUpperCase() }}
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-900 dark:text-white leading-tight">{{ creditData.customer?.name }}</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">{{ creditData.customer?.credit_id }}</p>
+            </div>
+          </div>
+          <button @click="logout" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+            </svg>
+          </button>
         </div>
-        
-        <!-- Botón salir -->
-        <button @click="logout" class="absolute top-4 right-4 p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-          </svg>
-        </button>
-        
-        <!-- Nombre y ID -->
-        <div class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm mx-auto flex items-center justify-center mb-3 shadow-lg">
-          <span class="text-xl font-bold text-white">{{ creditData.customer?.name?.charAt(0)?.toUpperCase() }}</span>
-        </div>
-        <h2 class="text-lg font-bold text-white mb-0.5">{{ creditData.customer?.name }}</h2>
-        <p class="text-white/70 text-xs mb-3">{{ creditData.customer?.document }}</p>
-        
-        <!-- Saldo grande -->
-        <div class="mt-2">
-          <p class="text-white/70 text-xs uppercase tracking-wider mb-1">
-            {{ creditData.credit?.balance > 0 ? 'Debes' : 'Estado' }}
-          </p>
-          <p class="text-4xl font-black text-white tracking-tight">
-            {{ creditData.credit?.balance > 0 ? '$' + formatNumber(creditData.credit?.balance) : '✓ Al día' }}
-          </p>
-        </div>
-      </div>
+      </header>
       
-      <!-- Cards de métricas (superpuestas sobre la curva) -->
-      <div class="px-4 -mt-2 relative z-10">
-        <div class="grid grid-cols-2 gap-3">
-          <!-- Cupo -->
-          <div class="bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-lg border border-gray-100 dark:border-zinc-800">
-            <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-2">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+      <!-- Main Content -->
+      <main class="flex-1 px-4 py-6 space-y-6">
+        
+        <!-- Status Banner -->
+        <div :class="[
+          'rounded-2xl p-5 border',
+          creditData.credit?.balance > 0 
+            ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50' 
+            : 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
+        ]">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wider mb-1" :class="creditData.credit?.balance > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'">
+                {{ creditData.credit?.balance > 0 ? 'Balance pendiente' : 'Estado de cuenta' }}
+              </p>
+              <p class="text-3xl font-semibold tracking-tight" :class="creditData.credit?.balance > 0 ? 'text-amber-900 dark:text-amber-100' : 'text-emerald-900 dark:text-emerald-100'">
+                {{ creditData.credit?.balance > 0 ? '$' + formatNumber(creditData.credit?.balance) : 'Al día' }}
+              </p>
+            </div>
+            <div :class="[
+              'w-10 h-10 rounded-xl flex items-center justify-center',
+              creditData.credit?.balance > 0 ? 'bg-amber-100 dark:bg-amber-900/50' : 'bg-emerald-100 dark:bg-emerald-900/50'
+            ]">
+              <svg v-if="creditData.credit?.balance > 0" :class="['w-5 h-5', 'text-amber-600 dark:text-amber-400']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <svg v-else class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
-            <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Cupo</p>
-            <p class="text-xl font-bold text-gray-900 dark:text-white">${{ formatNumber(creditData.credit?.limit || 0) }}</p>
           </div>
           
-          <!-- Disponible -->
-          <div class="bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-lg border border-gray-100 dark:border-zinc-800">
-            <div :class="[
-              'w-10 h-10 rounded-xl flex items-center justify-center mb-2',
-              creditData.credit?.available > 0 ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-rose-100 dark:bg-rose-900/30'
-            ]">
-              <svg :class="['w-5 h-5', creditData.credit?.available > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-              </svg>
-            </div>
-            <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Disponible</p>
-            <p class="text-xl font-bold text-gray-900 dark:text-white">${{ formatNumber(creditData.credit?.available || 0) }}</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Desglose de deuda (si hay) -->
-      <div v-if="creditData.credit?.balance > 0" class="px-4 mt-4">
-        <div class="bg-amber-50 dark:bg-amber-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800/50">
-          <h3 class="text-sm font-bold text-amber-800 dark:text-amber-300 mb-3 flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-            </svg>
-            Desglose de tu deuda
-          </h3>
-          <div class="space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-amber-700 dark:text-amber-400">Productos</span>
-              <span class="text-sm font-semibold text-amber-900 dark:text-amber-200">${{ formatNumber(creditData.credit?.balance_breakdown?.products || 0) }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-amber-700 dark:text-amber-400">Recargo financiero (10%)</span>
-              <span class="text-sm font-semibold text-amber-900 dark:text-amber-200">+${{ formatNumber(creditData.credit?.balance_breakdown?.surcharge || 0) }}</span>
-            </div>
-            <div class="border-t border-amber-300 dark:border-amber-700 pt-2 mt-2">
-              <div class="flex justify-between items-center">
-                <span class="text-sm font-bold text-amber-800 dark:text-amber-300">Total a pagar</span>
-                <span class="text-lg font-bold text-amber-900 dark:text-amber-100">${{ formatNumber(creditData.credit?.balance || 0) }}</span>
+          <!-- Debt Breakdown -->
+          <div v-if="creditData.credit?.balance > 0" class="mt-4 pt-4 border-t border-amber-200 dark:border-amber-800/50">
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="text-xs text-amber-600 dark:text-amber-400 mb-0.5">Productos</p>
+                <p class="font-mono font-semibold text-amber-900 dark:text-amber-100">${{ formatNumber(creditData.credit?.balance_breakdown?.products || 0) }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-xs text-amber-600 dark:text-amber-400 mb-0.5">Recargo {{ creditData.credit?.balance_breakdown?.surcharge_percentage || 10 }}%</p>
+                <p class="font-mono font-semibold text-amber-900 dark:text-amber-100">+${{ formatNumber(creditData.credit?.balance_breakdown?.surcharge || 0) }}</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      <!-- Tabs de navegación -->
-      <div class="px-4 mt-6">
-        <div class="flex gap-2 bg-gray-100 dark:bg-zinc-800 rounded-xl p-1">
+        
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Credit Limit -->
+          <div class="bg-white dark:bg-[#161618] rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <svg class="w-4 h-4 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>
+                </svg>
+              </div>
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Cupo</p>
+            </div>
+            <p class="text-2xl font-semibold text-slate-900 dark:text-white font-mono tracking-tight">
+              ${{ formatNumber(creditData.credit?.limit || 0) }}
+            </p>
+          </div>
+          
+          <!-- Available -->
+          <div class="bg-white dark:bg-[#161618] rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2 mb-3">
+              <div :class="[
+                'w-8 h-8 rounded-lg flex items-center justify-center',
+                creditData.credit?.available > 0 ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-slate-100 dark:bg-slate-800'
+              ]">
+                <svg :class="['w-4 h-4', creditData.credit?.available > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Disponible</p>
+            </div>
+            <p :class="[
+              'text-2xl font-semibold font-mono tracking-tight',
+              creditData.credit?.available > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'
+            ]">
+              ${{ formatNumber(creditData.credit?.available || 0) }}
+            </p>
+          </div>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="flex gap-1 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl">
           <button 
             @click="activeTab = 'compras'"
             :class="[
-              'flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all',
-              activeTab === 'compras' ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow' : 'text-gray-500 dark:text-zinc-400'
+              'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium rounded-lg transition-all',
+              activeTab === 'compras' 
+                ? 'bg-white dark:bg-[#161618] text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             ]"
           >
-            📦 Compras
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+            </svg>
+            Compras
           </button>
           <button 
             @click="activeTab = 'pagos'"
             :class="[
-              'flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all',
-              activeTab === 'pagos' ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow' : 'text-gray-500 dark:text-zinc-400'
+              'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium rounded-lg transition-all',
+              activeTab === 'pagos' 
+                ? 'bg-white dark:bg-[#161618] text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
             ]"
           >
-            💵 Abonos
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
+            </svg>
+            Abonos
           </button>
         </div>
-      </div>
-      
-      <!-- Tab Compras -->
-      <div v-if="activeTab === 'compras'" class="px-4 mt-4 space-y-3">
-        <!-- Solo mostrar facturas del crédito actual (pendientes) -->
-        <div v-if="pendingInvoices.length > 0">
-          <p class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2 px-1">
-            Crédito Actual ({{ pendingInvoices.length }})
-          </p>
-          <div v-for="invoice in pendingInvoices" :key="invoice.number" 
-               @click="openInvoiceModal(invoice)"
-               class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow border border-gray-100 dark:border-zinc-800 cursor-pointer active:scale-[0.98] transition-transform">
-            <div class="flex justify-between items-start mb-2">
-              <div>
-                <p class="font-semibold text-gray-900 dark:text-white text-sm">{{ invoice.number }}</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500">{{ formatDate(invoice.date) }}</p>
+        
+        <!-- Tab: Purchases -->
+        <div v-if="activeTab === 'compras'" class="space-y-4">
+          
+          <!-- Current Credit (Pending Invoices) -->
+          <div v-if="pendingInvoices.length > 0">
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 px-1">
+              Pendiente · {{ pendingInvoices.length }}
+            </p>
+            <div class="bg-white dark:bg-[#161618] rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+              <div 
+                v-for="invoice in pendingInvoices" 
+                :key="invoice.number"
+                @click="openInvoiceModal(invoice)"
+                class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors first:rounded-t-xl last:rounded-b-xl"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-slate-900 dark:text-white">{{ invoice.number }}</p>
+                      <p class="text-xs text-slate-500 dark:text-slate-400">{{ formatDate(invoice.date) }}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white font-mono">${{ formatNumber(invoice.total) }}</p>
+                    <span :class="[
+                      'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide',
+                      invoice.status === 'overdue' 
+                        ? 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400' 
+                        : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                    ]">
+                      {{ invoice.status === 'overdue' ? 'Vencida' : 'Pendiente' }}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <span :class="[
-                'px-2 py-1 rounded-lg text-[10px] font-bold uppercase',
-                invoice.status === 'paid' ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400' :
-                invoice.status === 'overdue' ? 'bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-400' :
-                'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400'
-              ]">
-                {{ invoice.status === 'paid' ? 'Pagada' : invoice.status === 'overdue' ? 'Vencida' : 'Pendiente' }}
-              </span>
             </div>
-            <div class="flex justify-between items-center text-sm">
-              <span class="text-gray-500 dark:text-zinc-400">Productos: ${{ formatNumber(invoice.subtotal) }}</span>
-              <span class="text-amber-600 dark:text-amber-400 text-xs">+${{ formatNumber(invoice.surcharge) }}</span>
+          </div>
+          
+          <!-- History (Paid Invoices) -->
+          <div v-if="paidInvoices.length > 0">
+            <button 
+              @click="showHistory = !showHistory" 
+              class="w-full flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 px-1 py-2 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+            >
+              <span>Historial · {{ paidInvoices.length }} pagadas</span>
+              <svg :class="['w-4 h-4 transition-transform', showHistory ? 'rotate-180' : '']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+              </svg>
+            </button>
+            
+            <div v-if="showHistory" class="bg-white dark:bg-[#161618] rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+              <div 
+                v-for="invoice in paidInvoices" 
+                :key="invoice.number"
+                @click="openInvoiceModal(invoice)"
+                class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors first:rounded-t-xl last:rounded-b-xl"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-slate-900 dark:text-white">{{ invoice.number }}</p>
+                      <p class="text-xs text-slate-500 dark:text-slate-400">{{ formatDate(invoice.date) }}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white font-mono">${{ formatNumber(invoice.total) }}</p>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+                      Pagada
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
-              <span class="text-gray-600 dark:text-zinc-300 font-medium">Total</span>
-              <span class="font-bold text-gray-900 dark:text-white">${{ formatNumber(invoice.total) }}</span>
+          </div>
+          
+          <!-- Empty State -->
+          <div v-if="!creditData.invoices?.length" class="text-center py-16">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 mx-auto flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+              </svg>
             </div>
-            <!-- Indicador de clic -->
-            <p class="text-[10px] text-center text-gray-400 dark:text-zinc-600 mt-2">Toca para ver productos</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Sin compras registradas</p>
           </div>
         </div>
         
-        <!-- Historial (facturas pagadas) -->
-        <div v-if="paidInvoices.length > 0" class="mt-6">
-          <button @click="showHistory = !showHistory" class="w-full flex items-center justify-between px-1 py-2 text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-            <span>📜 Historial ({{ paidInvoices.length }} pagadas)</span>
-            <svg :class="['w-4 h-4 transition-transform', showHistory ? 'rotate-180' : '']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </button>
-          
-          <div v-if="showHistory" class="space-y-2 mt-2">
-            <div v-for="invoice in paidInvoices" :key="invoice.number" 
-                 @click="openInvoiceModal(invoice)"
-                 class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-3 border border-gray-100 dark:border-zinc-800/50 cursor-pointer active:scale-[0.98] transition-transform">
-              <div class="flex justify-between items-center">
-                <div>
-                  <p class="font-medium text-gray-700 dark:text-zinc-300 text-sm">{{ invoice.number }}</p>
-                  <p class="text-xs text-gray-400 dark:text-zinc-500">{{ formatDate(invoice.date) }}</p>
+        <!-- Tab: Payments -->
+        <div v-if="activeTab === 'pagos'" class="space-y-4">
+          <div v-if="creditData.payments?.length > 0" class="bg-white dark:bg-[#161618] rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+            <div 
+              v-for="(payment, index) in creditData.payments" 
+              :key="index"
+              class="p-4 first:rounded-t-xl last:rounded-b-xl"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-slate-900 dark:text-white">Abono</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ formatDate(payment.date) }}</p>
+                  </div>
                 </div>
                 <div class="text-right">
-                  <p class="font-semibold text-gray-900 dark:text-white text-sm">${{ formatNumber(invoice.total) }}</p>
-                  <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">✓ Pagada</span>
+                  <p class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 font-mono">+${{ formatNumber(payment.amount) }}</p>
+                  <p v-if="payment.reference" class="text-xs text-slate-400 dark:text-slate-500 font-mono">{{ payment.reference }}</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <!-- Vacío -->
-        <div v-if="!creditData.invoices?.length" class="text-center py-12">
-          <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-zinc-800 mx-auto flex items-center justify-center mb-3">
-            <svg class="w-8 h-8 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-          </div>
-          <p class="text-gray-500 dark:text-zinc-500 text-sm">No hay compras registradas</p>
-        </div>
-      </div>
-      
-      <!-- Tab Pagos -->
-      <div v-if="activeTab === 'pagos'" class="px-4 mt-4 space-y-3">
-        <div v-if="creditData.payments?.length > 0">
-          <div v-for="(payment, index) in creditData.payments" :key="index" 
-               class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow border border-gray-100 dark:border-zinc-800">
-            <div class="flex justify-between items-center">
-              <div>
-                <p class="text-xs text-gray-500 dark:text-zinc-500">{{ formatDate(payment.date) }}</p>
-                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1 capitalize">{{ payment.method || 'Efectivo' }}</p>
-              </div>
-              <div class="text-right">
-                <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">${{ formatNumber(payment.amount) }}</p>
-                <p v-if="payment.reference" class="text-xs text-gray-400 dark:text-zinc-500">Ref: {{ payment.reference }}</p>
-              </div>
+          
+          <!-- Empty State -->
+          <div v-else class="text-center py-16">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 mx-auto flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
+              </svg>
             </div>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Sin abonos registrados</p>
           </div>
         </div>
         
-        <!-- Vacío -->
-        <div v-else class="text-center py-12">
-          <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-zinc-800 mx-auto flex items-center justify-center mb-3">
-            <svg class="w-8 h-8 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-          </div>
-          <p class="text-gray-500 dark:text-zinc-500 text-sm">No hay abonos registrados</p>
+      </main>
+      
+      <!-- Footer Info -->
+      <footer class="px-4 py-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#161618]">
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <span class="font-mono">{{ creditData.customer?.credit_id }}</span>
+          <span>{{ businessName }}</span>
         </div>
-      </div>
-      
-      <!-- Info footer -->
-      <div class="px-4 mt-6">
-        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50">
-          <p class="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
-            💡 Las compras a crédito incluyen un recargo del 10%. Paga a tiempo para mantener tu crédito activo.
-          </p>
-        </div>
-      </div>
-      
-      <!-- ID y última actualización -->
-      <div class="px-4 mt-4 text-center">
-        <p class="text-xs text-gray-400 dark:text-zinc-600">
-          ID: {{ creditData.customer?.credit_id }} • {{ businessName }}
-        </p>
-      </div>
-      
+      </footer>
     </div>
     
-    <!-- ==================== MODAL DETALLE FACTURA ==================== -->
-    <div v-if="showInvoiceModal" class="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
-      <!-- Backdrop -->
-      <div @click="closeInvoiceModal" class="absolute inset-0 bg-black/50"></div>
-      
-      <!-- Modal Content -->
-      <div class="relative bg-white dark:bg-zinc-900 w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up">
-        <!-- Header -->
-        <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 px-5 py-4 flex items-center justify-between">
-          <div>
-            <h3 class="text-lg font-bold text-white">{{ invoiceDetail?.number }}</h3>
-            <p class="text-blue-100 text-xs">{{ invoiceDetail?.date }}</p>
-          </div>
-          <button @click="closeInvoiceModal" class="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
+    <!-- ==================== INVOICE DETAIL MODAL ==================== -->
+    <Teleport to="body">
+      <div v-if="showInvoiceModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="closeInvoiceModal"></div>
         
-        <!-- Loading -->
-        <div v-if="loadingInvoice" class="p-8 text-center">
-          <svg class="animate-spin w-8 h-8 mx-auto text-blue-500" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-          </svg>
-          <p class="text-gray-500 dark:text-zinc-400 mt-2 text-sm">Cargando...</p>
-        </div>
-        
-        <!-- Contenido -->
-        <div v-else-if="invoiceDetail" class="overflow-y-auto max-h-[calc(85vh-80px)]">
-          <!-- Productos -->
-          <div class="p-4">
-            <h4 class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-3">Productos</h4>
-            
-            <!-- Sin productos -->
-            <div v-if="!invoiceDetail.items?.length" class="text-center py-6">
-              <svg class="w-10 h-10 mx-auto text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-              </svg>
-              <p class="text-gray-400 dark:text-zinc-500 text-sm mt-2">Detalle no disponible</p>
+        <!-- Modal -->
+        <div class="relative bg-white dark:bg-[#161618] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up">
+          <!-- Header -->
+          <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-semibold text-slate-900 dark:text-white">{{ invoiceDetail?.number }}</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">{{ invoiceDetail?.date }}</p>
             </div>
-            
-            <!-- Lista de productos -->
-            <div v-else class="space-y-3">
-              <div v-for="(item, idx) in invoiceDetail.items" :key="idx" 
-                   class="flex justify-between items-start bg-gray-50 dark:bg-zinc-800 rounded-lg p-3">
-                <div class="flex-1">
-                  <p class="font-medium text-gray-900 dark:text-white text-sm">{{ item.product_name }}</p>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500">{{ item.quantity }} x ${{ formatNumber(item.unit_price) }}</p>
+            <button @click="closeInvoiceModal" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Loading -->
+          <div v-if="loadingInvoice" class="p-8 text-center">
+            <svg class="animate-spin w-6 h-6 mx-auto text-indigo-500" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <p class="text-slate-500 dark:text-slate-400 mt-3 text-sm">Cargando...</p>
+          </div>
+          
+          <!-- Content -->
+          <div v-else-if="invoiceDetail" class="overflow-y-auto max-h-[calc(85vh-140px)]">
+            <!-- Products -->
+            <div class="p-5">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Productos</p>
+              
+              <div v-if="!invoiceDetail.items?.length" class="text-center py-8">
+                <p class="text-sm text-slate-400 dark:text-slate-500">Detalle no disponible</p>
+              </div>
+              
+              <div v-else class="space-y-3">
+                <div 
+                  v-for="(item, idx) in invoiceDetail.items" 
+                  :key="idx" 
+                  class="flex items-center justify-between py-2"
+                >
+                  <div class="flex-1">
+                    <p class="text-sm text-slate-900 dark:text-white">{{ item.product_name }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ item.quantity }} × ${{ formatNumber(item.unit_price) }}</p>
+                  </div>
+                  <p class="text-sm font-mono font-medium text-slate-900 dark:text-white">${{ formatNumber(item.total) }}</p>
                 </div>
-                <p class="font-semibold text-gray-900 dark:text-white text-sm">${{ formatNumber(item.total) }}</p>
               </div>
             </div>
-          </div>
-          
-          <!-- Totales -->
-          <div class="border-t border-gray-100 dark:border-zinc-800 p-4 space-y-2">
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-500 dark:text-zinc-400">Subtotal</span>
-              <span class="text-gray-700 dark:text-zinc-300">${{ formatNumber(invoiceDetail.subtotal) }}</span>
+            
+            <!-- Totals -->
+            <div class="px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800">
+              <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                  <span class="text-slate-500 dark:text-slate-400">Subtotal</span>
+                  <span class="font-mono text-slate-700 dark:text-slate-300">${{ formatNumber(invoiceDetail.subtotal) }}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-slate-500 dark:text-slate-400">Recargo ({{ invoiceDetail.surcharge_percentage || creditData.credit?.balance_breakdown?.surcharge_percentage || 10 }}%)</span>
+                  <span class="font-mono text-amber-600 dark:text-amber-400">+${{ formatNumber(invoiceDetail.surcharge) }}</span>
+                </div>
+                <div class="flex justify-between text-base font-semibold pt-2 border-t border-slate-200 dark:border-slate-700">
+                  <span class="text-slate-900 dark:text-white">Total</span>
+                  <span class="font-mono text-slate-900 dark:text-white">${{ formatNumber(invoiceDetail.total) }}</span>
+                </div>
+              </div>
             </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-amber-600 dark:text-amber-400">Recargo (10%)</span>
-              <span class="text-amber-600 dark:text-amber-400">+${{ formatNumber(invoiceDetail.surcharge) }}</span>
-            </div>
-            <div class="flex justify-between text-base font-bold pt-2 border-t border-gray-200 dark:border-zinc-700">
-              <span class="text-gray-900 dark:text-white">Total</span>
-              <span class="text-gray-900 dark:text-white">${{ formatNumber(invoiceDetail.total) }}</span>
-            </div>
-          </div>
-          
-          <!-- Estado -->
-          <div class="p-4 border-t border-gray-100 dark:border-zinc-800">
-            <div :class="[
-              'text-center py-3 rounded-xl font-semibold text-sm',
-              invoiceDetail.status === 'paid' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' :
-              invoiceDetail.status === 'overdue' ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400' :
-              'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-            ]">
-              {{ invoiceDetail.status === 'paid' ? '✓ Pagada' : invoiceDetail.status === 'overdue' ? '⚠ Vencida' : '⏳ Pendiente de pago' }}
+            
+            <!-- Status -->
+            <div class="px-5 py-4 border-t border-slate-200 dark:border-slate-800">
+              <div :class="[
+                'flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium',
+                invoiceDetail.status === 'paid' 
+                  ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400' 
+                  : invoiceDetail.status === 'overdue'
+                    ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400'
+                    : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400'
+              ]">
+                <svg v-if="invoiceDetail.status === 'paid'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <svg v-else-if="invoiceDetail.status === 'overdue'" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                </svg>
+                <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ invoiceDetail.status === 'paid' ? 'Pagada' : invoiceDetail.status === 'overdue' ? 'Vencida' : 'Pendiente' }}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </Teleport>
     
   </div>
 </template>
@@ -425,22 +521,22 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import axios from 'axios'
 
-// Estado
+// State
 const isAuthenticated = ref(false)
 const loading = ref(false)
 const error = ref('')
-const businessName = ref('Mi Negocio')
+const businessName = ref('Credit Portal')
 const creditData = ref({})
 const activeTab = ref('compras')
 const showHistory = ref(false)
 
-// Modal de factura
+// Invoice Modal
 const showInvoiceModal = ref(false)
 const loadingInvoice = ref(false)
 const invoiceDetail = ref(null)
 const currentToken = ref('')
 
-// Guardar zoom original para restaurar
+// Original zoom
 let originalZoom = ''
 
 const loginForm = ref({
@@ -448,7 +544,7 @@ const loginForm = ref({
   lastName: ''
 })
 
-// Computed: Facturas pendientes vs pagadas
+// Computed
 const pendingInvoices = computed(() => {
   return creditData.value.invoices?.filter(inv => inv.status !== 'paid') || []
 })
@@ -457,9 +553,8 @@ const paidInvoices = computed(() => {
   return creditData.value.invoices?.filter(inv => inv.status === 'paid') || []
 })
 
-// Obtener parámetros de URL
+// Lifecycle
 onMounted(async () => {
-  // 🎯 Resetear zoom del sistema para esta vista pública
   const html = document.documentElement
   originalZoom = html.style.zoom || ''
   html.style.zoom = '1'
@@ -467,21 +562,26 @@ onMounted(async () => {
   const urlParams = new URLSearchParams(window.location.search)
   const token = urlParams.get('token')
   
-  // Obtener nombre del negocio desde el subdominio
+  // Get business name from subdomain
   const hostname = window.location.hostname
   const subdomain = hostname.split('.')[0]
   if (subdomain && subdomain !== 'localhost' && subdomain !== 'www') {
-    // Capitalizar primera letra del subdominio como nombre del negocio
     businessName.value = subdomain.charAt(0).toUpperCase() + subdomain.slice(1)
   }
   
-  // Si hay token en URL, acceder automáticamente
   if (token) {
     await accessByToken(token)
   }
 })
 
-// Acceso por token
+onUnmounted(() => {
+  const html = document.documentElement
+  if (originalZoom) {
+    html.style.zoom = originalZoom
+  }
+})
+
+// Methods
 const accessByToken = async (token) => {
   loading.value = true
   error.value = ''
@@ -491,10 +591,10 @@ const accessByToken = async (token) => {
     
     if (response.data.success) {
       creditData.value = response.data.data
-      currentToken.value = token // Guardar token para usar en modal
+      currentToken.value = token
       isAuthenticated.value = true
     } else {
-      error.value = response.data.message || 'Error al acceder'
+      error.value = response.data.message || 'Error de acceso'
     }
   } catch (e) {
     error.value = e.response?.data?.message || 'Enlace inválido'
@@ -503,7 +603,6 @@ const accessByToken = async (token) => {
   }
 }
 
-// Acceso por credenciales
 const handleLogin = async () => {
   loading.value = true
   error.value = ''
@@ -527,17 +626,14 @@ const handleLogin = async () => {
   }
 }
 
-// Logout
 const logout = () => {
   isAuthenticated.value = false
   creditData.value = {}
   loginForm.value = { creditId: '', lastName: '' }
   currentToken.value = ''
-  // Limpiar URL
   window.history.replaceState({}, '', window.location.pathname)
 }
 
-// Modal de factura - Abrir
 const openInvoiceModal = async (invoice) => {
   showInvoiceModal.value = true
   loadingInvoice.value = true
@@ -553,22 +649,20 @@ const openInvoiceModal = async (invoice) => {
     if (response.data.success) {
       invoiceDetail.value = response.data.data
     } else {
-      // Si falla, al menos mostrar los datos básicos
       invoiceDetail.value = {
         ...invoice,
         items: [],
         subtotal: invoice.subtotal || invoice.total,
-        recargo: 0,
+        surcharge: 0,
         total: invoice.total
       }
     }
   } catch (e) {
-    // Mostrar datos básicos en caso de error
     invoiceDetail.value = {
       ...invoice,
       items: [],
       subtotal: invoice.subtotal || invoice.total,
-      recargo: 0,
+      surcharge: 0,
       total: invoice.total
     }
   } finally {
@@ -576,13 +670,11 @@ const openInvoiceModal = async (invoice) => {
   }
 }
 
-// Modal de factura - Cerrar
 const closeInvoiceModal = () => {
   showInvoiceModal.value = false
   invoiceDetail.value = null
 }
 
-// Formateo
 const formatNumber = (num) => {
   return new Intl.NumberFormat('es-CO').format(num || 0)
 }
@@ -595,34 +687,39 @@ const formatDate = (date) => {
     year: 'numeric'
   })
 }
-
-// Restaurar zoom al salir de la vista
-onUnmounted(() => {
-  const html = document.documentElement
-  if (originalZoom) {
-    html.style.zoom = originalZoom
-  }
-})
 </script>
 
 <style scoped>
-/* Animación suave */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-/* Animación slide-up para modal */
 @keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { 
+    transform: translateY(100%); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
 }
 
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 2px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
 }
 </style>

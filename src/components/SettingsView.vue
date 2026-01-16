@@ -1262,7 +1262,7 @@ const props = defineProps({
 })
 
 // Emits para eventos
-const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'refresh'])
+const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuotationInPos', 'openReturnInPos', 'refresh'])
 
 // Estado del modal de upgrade de plan
 const showUpgradeModal = ref(false)

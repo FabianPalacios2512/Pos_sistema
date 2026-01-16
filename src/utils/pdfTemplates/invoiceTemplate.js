@@ -30,10 +30,12 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       discount = 0,
       tax = 0,
       tax_amount = tax,
+      surcharge_amount = 0, // 🎯 Recargo por crédito
       total = 0,
       payments = [],
       change = 0,
-      notes = ''
+      notes = '',
+      payment_method = '' // Para saber si es crédito
     } = invoiceData
 
     // Número de factura (compatibilidad con diferentes nombres)
@@ -76,7 +78,8 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     const tableHeaderHeight = 10 // Header tabla
     const itemHeight = 5 // Espacio por producto
     const itemCount = items.length
-    const totalsHeight = 35 // Totales + forma de pago
+    const surchargeLineHeight = surcharge_amount > 0 ? 4 : 0 // 🎯 Espacio para recargo si aplica
+    const totalsHeight = 35 + surchargeLineHeight // Totales + forma de pago
     const messageHeight = 15 // Mensaje agradecimiento
     const qrHeight = 35 // QR + código
     const legalHeight = 18 // Info legal (4 líneas)
@@ -402,6 +405,17 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     if (taxAmount > 0) {
       pdf.text(`${taxLabel} (${actualTaxRate}%):`, leftMargin + 35, yPos)
       pdf.text(`$${taxAmount.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
+      yPos += 4
+    }
+
+    // 🎯 RECARGO POR CRÉDITO (si aplica) - Destacado en ámbar
+    if (surcharge_amount > 0) {
+      // Calcular porcentaje de recargo
+      const surchargePercent = subtotal > 0 ? Math.round((surcharge_amount / subtotal) * 100) : 13
+      pdf.setTextColor(217, 119, 6) // Amber-600
+      pdf.text(`Recargo (${surchargePercent}%):`, leftMargin + 35, yPos)
+      pdf.text(`+$${surcharge_amount.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
+      pdf.setTextColor(0, 0, 0) // Volver a negro
       yPos += 4
     }
 

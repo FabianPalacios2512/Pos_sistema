@@ -118,20 +118,31 @@ class SalesController extends Controller
                     throw new \Exception('El cliente no tiene habilitado el crédito.');
                 }
 
+                // Guardar el subtotal original ANTES de agregar el recargo
+                $originalSubtotal = $request->total_amount;
+
                 // Calcular recargo
                 if ($settings->credit_surcharge_percentage > 0) {
                     $surchargeAmount = $request->total_amount * ($settings->credit_surcharge_percentage / 100);
                     $data['total_amount'] += $surchargeAmount;
                 }
 
-                // Verificar cupo
-                $newDebt = $customer->current_debt + $data['total_amount']; // Usamos current_debt que ya existe
-                if ($newDebt > $customer->credit_limit) {
-                    throw new \Exception("El cliente excede su cupo de crédito. Cupo disponible: " . ($customer->credit_limit - $customer->current_debt));
+                // 🎯 IMPORTANTE: Verificar cupo contra SUBTOTAL (sin recargo)
+                // El recargo es ganancia del negocio, NO cuenta contra el cupo del cliente
+                $subtotalPendiente = \App\Models\Invoice::where('customer_id', $customer->id)
+                    ->where('payment_method', 'credit')
+                    ->whereNotIn('status', ['cancelled', 'returned', 'paid'])
+                    ->sum('subtotal');
+                
+                $availableCredit = $customer->credit_limit - $subtotalPendiente;
+                
+                if ($originalSubtotal > $availableCredit) {
+                    throw new \Exception("El cliente excede su cupo de crédito. Cupo disponible: $" . number_format($availableCredit, 0, ',', '.'));
                 }
 
-                // Actualizar deuda del cliente
-                $customer->current_debt = $newDebt;
+                // Actualizar deuda del cliente (con el TOTAL que es lo que debe pagar)
+                // current_debt sigue guardando el total con recargo para referencia
+                $customer->current_debt = $customer->current_debt + $data['total_amount'];
                 $customer->save();
 
                 $data['status'] = 'pending'; // Venta pendiente
@@ -547,7 +558,13 @@ class SalesController extends Controller
             $purchaseAmount = number_format($sale->total_amount, 0, ',', '.');
             $newDebt = number_format($customer->current_debt, 0, ',', '.');
             $creditLimit = number_format($customer->credit_limit, 0, ',', '.');
-            $availableCredit = number_format(max(0, $customer->credit_limit - $customer->current_debt), 0, ',', '.');
+            
+            // 🎯 Calcular disponible REAL basado en subtotal de facturas pendientes
+            $subtotalPendiente = \App\Models\Invoice::where('customer_id', $customer->id)
+                ->where('payment_method', 'credit')
+                ->whereNotIn('status', ['cancelled', 'returned', 'paid'])
+                ->sum('subtotal');
+            $availableCredit = number_format(max(0, $customer->credit_limit - $subtotalPendiente), 0, ',', '.');
 
             // Crear mensaje de confirmación CRM
             $message = "✅ *COMPRA REGISTRADA - CreditiTenda*\n\n";

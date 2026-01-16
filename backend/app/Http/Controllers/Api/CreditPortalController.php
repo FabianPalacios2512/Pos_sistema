@@ -297,28 +297,23 @@ class CreditPortalController extends Controller
                 ];
             });
 
-        // 🔄 Calcular deuda REAL desde facturas PENDIENTES (no paid)
-        // El TOTAL es lo que el cliente DEBE PAGAR (productos + recargo)
-        $totalDebt = Invoice::where('customer_id', $customer->id)
-            ->where('payment_method', 'credit')
-            ->whereNotIn('status', ['cancelled', 'returned', 'paid'])
-            ->sum('total');
-
-        // El SUBTOTAL es el valor en PRODUCTOS (sin recargo) - para calcular el CUPO DISPONIBLE
-        $subtotalProducts = Invoice::where('customer_id', $customer->id)
-            ->where('payment_method', 'credit')
-            ->whereNotIn('status', ['cancelled', 'returned', 'paid'])
-            ->sum('subtotal');
-
-        $balance = floatval($totalDebt); // Lo que debe pagar
+        // 🎯 Usar los campos current_debt y subtotal_debt del cliente directamente
+        // Las facturas a crédito tienen status='paid' (la venta se hizo)
+        // El crédito/deuda es independiente del status de la factura
+        $balance = floatval($customer->current_debt ?? 0); // Lo que debe pagar (con recargo)
+        $subtotalDebt = floatval($customer->subtotal_debt ?? 0); // Sin recargo (para cupo)
         $creditLimit = floatval($customer->credit_limit ?? 0);
 
         // Calcular desglose de deuda
-        $surcharge = $balance - floatval($subtotalProducts);
+        $surcharge = $balance - $subtotalDebt;
 
         // DISPONIBLE = Cupo - Subtotal de productos pendientes (NO el total con recargo)
         // El recargo es ganancia del negocio, no cuenta contra el cupo del cliente
-        $available = max(0, $creditLimit - floatval($subtotalProducts));
+        $available = max(0, $creditLimit - $subtotalDebt);
+
+        // Obtener el porcentaje de recargo del sistema
+        $settings = \App\Models\SystemSetting::first();
+        $surchargePercentage = $settings ? floatval($settings->credit_surcharge_percentage) : 10;
 
         return response()->json([
             'success' => true,
@@ -332,8 +327,9 @@ class CreditPortalController extends Controller
                     'limit' => $creditLimit,
                     'balance' => $balance, // Deuda total (productos + recargo)
                     'balance_breakdown' => [
-                        'products' => floatval($subtotalProducts),
-                        'surcharge' => $surcharge
+                        'products' => $subtotalDebt,
+                        'surcharge' => $surcharge,
+                        'surcharge_percentage' => $surchargePercentage
                     ],
                     'available' => $available, // Cupo - subtotal productos
                     'status' => $balance > 0 ? ($available <= 0 ? 'exceeded' : 'active') : 'clear'

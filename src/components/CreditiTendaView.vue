@@ -380,18 +380,18 @@
                   <p class="text-2xl font-bold text-amber-700 dark:text-amber-300 mt-1">
                     ${{ formatNumber(selectedCustomer.balance || 0) }}
                   </p>
-                  <!-- 📊 Desglose de deuda: Productos + Recargo -->
+                  <!-- 📊 Desglose de deuda: Productos + Recargo (usa porcentaje dinámico del sistema) -->
                   <div v-if="selectedCustomer.balance > 0" class="mt-3 pt-3 border-t border-amber-200 dark:border-amber-800/50 space-y-1">
                     <div class="flex justify-between items-center text-xs">
                       <span class="text-amber-600 dark:text-amber-400">Productos</span>
                       <span class="text-amber-700 dark:text-amber-300 font-medium">
-                        ${{ formatNumber(Math.round(selectedCustomer.balance / 1.10)) }}
+                        ${{ formatNumber(Math.round(selectedCustomer.balance / (1 + (parseFloat(systemSettings.credit_surcharge_percentage) || 10) / 100))) }}
                       </span>
                     </div>
                     <div class="flex justify-between items-center text-xs">
-                      <span class="text-amber-600 dark:text-amber-400">Recargo (10%)</span>
+                      <span class="text-amber-600 dark:text-amber-400">Recargo ({{ parseFloat(systemSettings.credit_surcharge_percentage) || 10 }}%)</span>
                       <span class="text-amber-700 dark:text-amber-300 font-medium">
-                        +${{ formatNumber(Math.round(selectedCustomer.balance - (selectedCustomer.balance / 1.10))) }}
+                        +${{ formatNumber(Math.round(selectedCustomer.balance - (selectedCustomer.balance / (1 + (parseFloat(systemSettings.credit_surcharge_percentage) || 10) / 100)))) }}
                       </span>
                     </div>
                   </div>
@@ -1532,6 +1532,12 @@ const averageDaysOverdue = computed(() => {
   return 0
 })
 
+// 🔧 System settings para obtener el porcentaje de recargo dinámicamente
+const systemSettings = ref({
+  credit_surcharge_percentage: 10,
+  company_name: ''
+})
+
 // Methods
 const loadCustomers = async () => {
   loading.value = true
@@ -1543,6 +1549,18 @@ const loadCustomers = async () => {
     showError('Error al cargar clientes')
   } finally {
     loading.value = false
+  }
+}
+
+// Cargar configuración del sistema (porcentaje de recargo, nombre de empresa)
+const loadSystemSettings = async () => {
+  try {
+    const response = await axiosInstance.get('/system-settings')
+    if (response.data && response.data.data) {
+      systemSettings.value = response.data.data
+    }
+  } catch (error) {
+    console.warn('No se pudieron cargar los system settings:', error.message)
   }
 }
 
@@ -1606,33 +1624,36 @@ const getStatusText = (customer) => {
 }
 
 const getAvailableCredit = (customer) => {
-  // El disponible se calcula contra el SUBTOTAL (productos), no el total con recargo
-  // El recargo es ganancia del negocio, no cuenta contra el cupo del cliente
-  const subtotalPendiente = getSubtotalPendiente(customer)
-  return Math.max(0, (customer.credit_limit || 0) - subtotalPendiente)
+  // 🎯 El disponible se calcula contra el SUBTOTAL_DEBT (productos sin recargo)
+  // El recargo es ganancia del negocio, NO cuenta contra el cupo del cliente
+  // Usamos subtotal_debt que viene directamente de la BD
+  const subtotalDebt = customer.subtotal_debt || 0
+  return Math.max(0, (customer.credit_limit || 0) - subtotalDebt)
 }
 
 // Función helper para obtener el subtotal de productos pendientes (sin recargo)
 const getSubtotalPendiente = (customer) => {
-  if (!customer.invoices || customer.invoices.length === 0) {
-    // Si no hay facturas cargadas, estimar desde current_debt dividiendo por 1.10
-    const debt = customer.balance || customer.current_debt || 0
-    return debt > 0 ? Math.round(debt / 1.10) : 0
+  // 🎯 USAR subtotal_debt del cliente (calculado correctamente en el backend)
+  // NO calcular desde las facturas porque su status='paid' (la venta se hizo)
+  // El crédito es independiente del status de la factura
+  if (customer.subtotal_debt !== undefined && customer.subtotal_debt !== null) {
+    return parseFloat(customer.subtotal_debt) || 0
   }
   
-  // Sumar subtotales de facturas no pagadas
-  return customer.invoices
-    .filter(inv => inv.status !== 'paid' && inv.status !== 'cancelled' && inv.status !== 'returned')
-    .reduce((sum, inv) => sum + (parseFloat(inv.subtotal) || 0), 0)
+  // Fallback: Si no hay subtotal_debt, usar current_debt / factor
+  const debt = customer.balance || customer.current_debt || 0
+  const surchargePercent = parseFloat(systemSettings.value?.credit_surcharge_percentage) || 10
+  const factor = 1 + (surchargePercent / 100)
+  return debt > 0 ? Math.round(debt / factor) : 0
 }
 
 // Función para calcular el crédito disponible (puede ser negativo para mostrar cuánto sobrepasó)
 const getAvailableCreditAmount = (customer) => {
-  // El disponible es: Límite - Subtotal productos pendientes
+  // 🎯 El disponible es: Límite - subtotal_debt (sin recargo)
   // El recargo NO cuenta contra el cupo (es ganancia del negocio)
   const limit = customer.credit_limit || 0
-  const subtotalPendiente = getSubtotalPendiente(customer)
-  return Math.max(0, limit - subtotalPendiente)
+  const subtotalDebt = customer.subtotal_debt || getSubtotalPendiente(customer)
+  return Math.max(0, limit - subtotalDebt)
 }
 
 // Nueva función para seleccionar cliente en el panel izquierdo
@@ -2163,7 +2184,10 @@ const saveCustomerCredit = async () => {
 const sendWelcomeMessages = async (createdCustomer = null) => {
   try {
     const customerData = createdCustomer || customerForm.value
-    const companyName = 'MATIMAA' // TODO: Obtener del systemSettings
+    // 🔧 Usar nombre de empresa de systemSettings o fallback
+    const companyName = systemSettings.value.company_name || 'MATIMAA'
+    // 🔧 Obtener porcentaje de recargo del sistema (dinámico)
+    const surchargePercent = parseFloat(systemSettings.value.credit_surcharge_percentage) || 10
     
     // 🔗 Construir URL del portal de crédito
     const baseUrl = window.location.origin
@@ -2179,6 +2203,11 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
       email: customerData.email,
       creditId: customerData.credit_id || 'Pendiente'
     }
+
+    // Calcular ejemplo de recargo dinámicamente
+    const ejemploProductos = 100000
+    const ejemploRecargo = Math.round(ejemploProductos * surchargePercent / 100)
+    const ejemploTotal = ejemploProductos + ejemploRecargo
 
     // 📧 Enviar email de bienvenida si tiene correo
     if (customerData.email && customerData.email.includes('@')) {
@@ -2266,7 +2295,7 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
                     📊 Información de su Crédito
                   </p>
                   <p style="color: #0369a1; margin: 0; font-size: 13px; line-height: 1.7;">
-                    Las compras realizadas a crédito incluyen un <strong>recargo financiero del 10%</strong> 
+                    Las compras realizadas a crédito incluyen un <strong>recargo financiero del ${surchargePercent}%</strong> 
                     sobre el valor de los productos, el cual se aplica al momento de la compra.
                   </p>
                   <div style="background: #e0f2fe; padding: 12px; margin: 12px 0 0 0; border-radius: 6px;">
@@ -2274,15 +2303,15 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
                     <table style="width: 100%; font-size: 12px; color: #0c4a6e;">
                       <tr>
                         <td style="padding: 3px 0;">Productos comprados:</td>
-                        <td style="text-align: right; font-weight: 500;">$100.000</td>
+                        <td style="text-align: right; font-weight: 500;">$${ejemploProductos.toLocaleString('es-CO')}</td>
                       </tr>
                       <tr>
-                        <td style="padding: 3px 0;">Recargo financiero (10%):</td>
-                        <td style="text-align: right; font-weight: 500;">+$10.000</td>
+                        <td style="padding: 3px 0;">Recargo financiero (${surchargePercent}%):</td>
+                        <td style="text-align: right; font-weight: 500;">+$${ejemploRecargo.toLocaleString('es-CO')}</td>
                       </tr>
                       <tr style="border-top: 2px solid #0891b2;">
                         <td style="padding: 6px 0 3px 0; font-weight: 600;">Total a pagar:</td>
-                        <td style="text-align: right; font-weight: 700; color: #0369a1;">$110.000</td>
+                        <td style="text-align: right; font-weight: 700; color: #0369a1;">$${ejemploTotal.toLocaleString('es-CO')}</td>
                       </tr>
                     </table>
                   </div>
@@ -2359,7 +2388,7 @@ Tu crédito ha sido *activado exitosamente*.
 • ID: *${creditInfo.creditId}*
 • Documento: ${customerData.document_type} ${customerData.document_number}
 
-📊 *Nota:* Las compras a crédito incluyen un recargo del 10%.
+📊 *Nota:* Las compras a crédito incluyen un recargo del ${surchargePercent}%.
 
 💡 Paga a tiempo para mantener tu crédito activo.
 
@@ -2454,6 +2483,7 @@ const checkWhatsAppStatus = async () => {
 // Initialization
 onMounted(() => {
   loadCustomers()
+  loadSystemSettings()
   loadReminderSettings()
   checkWhatsAppStatus()
   window.addEventListener('keydown', handleEscape)

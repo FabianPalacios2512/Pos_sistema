@@ -42,6 +42,15 @@ class CustomerController extends Controller
             $query->orderBy($sortBy, $sortOrder);
 
             $customers = $query->get();
+            
+            // 🎯 Agregar available_credit calculado para cada cliente
+            // El disponible = credit_limit - subtotal_debt (sin recargo)
+            $customers = $customers->map(function ($customer) {
+                $customer->available_credit = max(0, 
+                    floatval($customer->credit_limit ?? 0) - floatval($customer->subtotal_debt ?? 0)
+                );
+                return $customer;
+            });
 
             return response()->json([
                 'success' => true,

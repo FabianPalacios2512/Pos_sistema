@@ -45,9 +45,19 @@ class CreditController extends Controller
                 'payment_date' => now()
             ]);
 
-            // Actualizar deuda del cliente
+            // 🎯 Calcular reducción proporcional de subtotal_debt
+            // Si current_debt = subtotal_debt * 1.10, entonces:
+            // subtotal_debt a reducir = amount / 1.10
+            $systemSettings = \App\Models\SystemSetting::first();
+            $surchargePercent = floatval($systemSettings->credit_surcharge_percentage ?? 10);
+            $factor = 1 + ($surchargePercent / 100);
+            $subtotalReduction = $request->amount / $factor;
+
+            // Actualizar deudas del cliente
             $customer->current_debt -= $request->amount;
-            if ($customer->current_debt < 0) $customer->current_debt = 0; // Evitar negativos si no manejamos saldo a favor
+            $customer->subtotal_debt -= $subtotalReduction;
+            if ($customer->current_debt < 0) $customer->current_debt = 0;
+            if ($customer->subtotal_debt < 0) $customer->subtotal_debt = 0;
             $customer->save();
 
             // Si es efectivo, validar sesión de caja

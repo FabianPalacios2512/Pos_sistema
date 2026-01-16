@@ -4759,11 +4759,24 @@ const handleCobrarClick = async () => {
     const surcharge = Math.round((total.value * surchargePercent) / 100)
     const estimatedTotal = total.value + surcharge
 
-    // 4. Validar cupo disponible (SOLO SOBRE EL SUBTOTAL, NO EL RECARGO)
-    // El recargo es ganancia adicional del negocio, no cuenta contra el cupo
-    const currentDebt = parseFloat(selectedCustomer.value.current_debt || 0)
-    const creditLimit = parseFloat(selectedCustomer.value.credit_limit || 0)
-    const availableCredit = creditLimit - currentDebt
+    // 4. Validar cupo disponible (basado en SUBTOTAL de productos pendientes, NO el total con recargo)
+    // El backend ya calcula available_credit correctamente basado en subtotales
+    // Si available_credit está disponible, usarlo; si no, calcular con credit_limit - subtotal_debt
+    let availableCredit = parseFloat(selectedCustomer.value.available_credit || 0)
+    
+    // Fallback: Si no viene available_credit, usar subtotal_debt (sin recargo)
+    // Si tampoco hay subtotal_debt, usar current_debt dividido por el factor de recargo
+    if (!selectedCustomer.value.available_credit && selectedCustomer.value.available_credit !== 0) {
+      const creditLimit = parseFloat(selectedCustomer.value.credit_limit || 0)
+      // Usar subtotal_debt si existe, sino estimar desde current_debt
+      let subtotalDebt = parseFloat(selectedCustomer.value.subtotal_debt || 0)
+      if (!subtotalDebt && selectedCustomer.value.current_debt) {
+        // Estimar: current_debt incluye recargo, dividir por factor
+        const factor = 1 + (surchargePercent / 100)
+        subtotalDebt = parseFloat(selectedCustomer.value.current_debt || 0) / factor
+      }
+      availableCredit = creditLimit - subtotalDebt
+    }
 
     if (total.value > availableCredit) {
       showError(`Crédito insuficiente. Disponible: $${availableCredit.toLocaleString()} - Requerido: $${total.value.toLocaleString()}`)
@@ -4855,7 +4868,10 @@ const handlePaymentConfirmed = async (paymentData) => {
             amount: paymentData.amount
           }],
           change: paymentData.change || 0,
-          convertedFromQuote: true // Flag para identificar que fue convertida
+          convertedFromQuote: true, // Flag para identificar que fue convertida
+          // 🎯 Recargo CrediTienda
+          surcharge_amount: paymentData.method === 'credit' ? (paymentData.fee || 0) : 0,
+          payment_method: paymentData.method
         }
       } else {
         throw new Error(result.message || 'Error al convertir cotización')
@@ -4895,7 +4911,10 @@ const handlePaymentConfirmed = async (paymentData) => {
           methodName: paymentData.methodName || getPaymentMethodName(paymentData.method),
           amount: paymentData.amount || total.value
         }],
+        // 🎯 Recargo CrediTienda (normalizado a surcharge_amount)
         surcharge: paymentData.method === 'credit' ? paymentData.fee : 0,
+        surcharge_amount: paymentData.method === 'credit' ? (paymentData.fee || 0) : 0,
+        payment_method: paymentData.method,
         change: paymentData.change || 0
       }
     }
@@ -5007,11 +5026,14 @@ const handlePaymentConfirmed = async (paymentData) => {
     return // IMPORTANTE: detener ejecución aquí
   }
   
-  // DEBUG: Verificar cliente después del pago
-  
   // ⚡ LIMPIAR CARRITO DESPUÉS DE PROCESAR EXITOSAMENTE EN BACKEND
   // Esto garantiza que el descuento se haya enviado antes de limpiarlo
   clearCart()
+  
+  // 🔄 Si fue venta a crédito, refrescar clientes para actualizar available_credit
+  if (selectedPaymentMethod.value === 'credit') {
+    refreshData('customers')
+  }
   
   // El modal de confirmación ahora cambia internamente a estado 'success'
   // Ya no necesitamos abrir AfterPaymentModal
@@ -5102,10 +5124,12 @@ const handlePrintInvoice = async () => {
       subtotal: parseFloat(lastSale.value.subtotal || 0),
       discount: parseFloat(lastSale.value.discount || 0),
       tax: parseFloat(lastSale.value.tax || 0),
+      surcharge_amount: parseFloat(lastSale.value.surcharge_amount || 0), // 🎯 Recargo por crédito
       total: parseFloat(lastSale.value.total || 0),
       payments: lastSale.value.payments || [],
       change: parseFloat(lastSale.value.change || 0),
-      notes: lastSale.value.notes || ''
+      notes: lastSale.value.notes || '',
+      payment_method: lastSale.value.payment_method || '' // Para identificar si es crédito
     }
 
     // Generar PDF y abrir en ventana nueva inmediatamente
@@ -5400,7 +5424,10 @@ const generateInvoicePDF = async () => {
       total: parseFloat(lastSale.value.total || 0),
       payments: lastSale.value.payments || [],
       change: parseFloat(lastSale.value.change || 0),
-      notes: lastSale.value.notes || ''
+      notes: lastSale.value.notes || '',
+      // 🎯 Recargo CrediTienda
+      surcharge_amount: parseFloat(lastSale.value.surcharge_amount || lastSale.value.surcharge || 0),
+      payment_method: lastSale.value.payment_method || lastSale.value.paymentMethod || ''
     }
 
 

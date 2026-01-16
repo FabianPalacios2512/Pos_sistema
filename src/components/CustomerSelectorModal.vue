@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="$emit('close')">
+  <div class="fixed inset-0 bg-black/70 dark:bg-black/85 flex items-center justify-center z-50 p-4" @click.self="$emit('close')">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-2xl w-full animate-scale-in border border-gray-200 dark:border-zinc-800">
       
       <!-- Header -->
@@ -122,10 +122,15 @@
             
             <!-- Indicadores compactos a la derecha -->
             <div class="flex items-center gap-2 flex-shrink-0">
-              <!-- Crédito disponible -->
-              <span v-if="isCreditiendaEnabled && customer.credit_active && (customer.credit_limit - customer.current_debt) > 0" 
+              <!-- Crédito disponible (usa available_credit calculado por el backend) -->
+              <span v-if="isCreditiendaEnabled && customer.credit_active && customer.available_credit > 0" 
                     class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                ${{ formatCurrency(customer.credit_limit - customer.current_debt) }}
+                ${{ formatCurrency(customer.available_credit) }}
+              </span>
+              <!-- Sin cupo disponible -->
+              <span v-else-if="isCreditiendaEnabled && customer.credit_active && customer.available_credit <= 0"
+                    class="text-xs font-semibold text-rose-500 dark:text-rose-400">
+                Sin cupo
               </span>
               <!-- Puntos -->
               <span v-if="isLoyaltyEnabled && (customer.loyalty_points || 0) > 0"
@@ -152,7 +157,7 @@
 
       <!-- Modal Crear Cliente Rápido -->
       <div v-if="showCreateCustomer" 
-           class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-60"
+           class="fixed inset-0 bg-black/70 dark:bg-black/85 flex items-center justify-center p-4 z-60"
            @click.self="showCreateCustomer = false">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full shadow-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
           
@@ -349,12 +354,10 @@ const loadMoreCustomers = () => {
 
 // Métodos
 const selectCustomer = (customer) => {
-  console.log('Cliente seleccionado:', customer)
   emit('select', customer)
 }
 
 const viewCustomerHistory = (customer) => {
-  console.log('Ver historial del cliente:', customer)
   emit('view-history', customer)
 }
 
@@ -378,7 +381,6 @@ const createQuickCustomer = async () => {
     
     // Crear el cliente
     const response = await customersService.create(customerData)
-    console.log('Cliente creado:', response)
     
     // Recargar lista de clientes
   // Refrescar lista desde el store global

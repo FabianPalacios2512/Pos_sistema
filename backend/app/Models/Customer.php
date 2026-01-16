@@ -21,6 +21,7 @@ class Customer extends Model
         'gender',
         'credit_limit',
         'current_debt',
+        'subtotal_debt',       // 🎯 Deuda sin recargo (para calcular cupo)
         'debt_since',
         'total_purchases',
         'total_orders',
@@ -37,6 +38,7 @@ class Customer extends Model
         'birth_date' => 'date',
         'credit_limit' => 'decimal:2',
         'current_debt' => 'decimal:2',
+        'subtotal_debt' => 'decimal:2',
         'debt_since' => 'datetime',
         'total_purchases' => 'decimal:2',
         'total_orders' => 'integer',
@@ -47,7 +49,8 @@ class Customer extends Model
     ];
 
     protected $appends = [
-        'loyalty_points_value'
+        'loyalty_points_value',
+        'available_credit'  // 🎯 Incluir crédito disponible calculado en el JSON
     ];
 
     // Relaciones
@@ -68,9 +71,21 @@ class Customer extends Model
     }
 
     // Métodos auxiliares
+    /**
+     * 🎯 Calcular crédito disponible basado en subtotal_debt
+     * subtotal_debt = suma de subtotales de compras a crédito NO pagadas (sin recargo)
+     * El recargo NO cuenta contra el cupo (es ganancia del negocio)
+     */
     public function getAvailableCreditAttribute()
     {
-        return $this->credit_limit - $this->current_debt;
+        if (!$this->credit_active || $this->credit_limit <= 0) {
+            return 0;
+        }
+        
+        // Usar subtotal_debt (deuda sin recargo) para calcular disponible
+        $subtotalDebt = floatval($this->subtotal_debt ?? 0);
+        
+        return max(0, $this->credit_limit - $subtotalDebt);
     }
 
     public function hasCredit($amount = 0)

@@ -477,6 +477,9 @@ class InvoiceController extends Controller
                 'discount_amount' => (float) ($invoice->discount_amount ?? 0),
                 'tax' => (float) $invoice->tax_amount,
                 'total' => (float) $invoice->total,
+                // 🎯 CrediTienda: agregar recargo y método de pago
+                'surcharge_amount' => (float) ($invoice->surcharge_amount ?? 0),
+                'payment_method' => $invoice->payment_method ?? 'cash',
                 'status' => $invoice->status,
                 'notes' => $invoice->notes,
                 'items' => $this->getInvoiceItems($invoice),
@@ -796,7 +799,7 @@ class InvoiceController extends Controller
             if ($data['type'] === 'quote') {
                 $data['status'] = 'quotation'; // Las cotizaciones deben tener status 'quotation' para activar "Mandar al POS"
             } else {
-                $data['status'] = 'paid'; // Las ventas del POS están pagadas
+                $data['status'] = 'paid'; // Todas las ventas del POS (contado y crédito) están PAGADAS - la venta se realizó
             }
 
             // Asignar cash_session_id SOLO para ventas de contado (no cotizaciones ni crédito)
@@ -870,23 +873,27 @@ class InvoiceController extends Controller
                 // 3. Calcular total con recargo (para registrar la deuda completa)
                 $totalWithSurcharge = $data['total'] + ($data['surcharge_amount'] ?? 0);
 
-                // 4. Validar cupo disponible (SOLO SOBRE EL SUBTOTAL, NO EL RECARGO)
-                // El recargo es ganancia adicional del negocio, no cuenta contra el cupo del cliente
+                // 4. Validar cupo disponible basado en subtotal_debt del cliente
+                // El recargo NO cuenta contra el cupo (es ganancia del negocio)
                 $subtotal = $data['total']; // Subtotal SIN recargo
-                $currentDebt = floatval($customer->current_debt ?? 0);
                 $creditLimit = floatval($customer->credit_limit ?? 0);
-                $availableCredit = $creditLimit - $currentDebt;
-                $newDebt = $currentDebt + $totalWithSurcharge; // La deuda SÍ incluye el recargo
+                
+                // 🎯 Usar subtotal_debt del cliente (deuda sin recargo)
+                $subtotalDebt = floatval($customer->subtotal_debt ?? 0);
+                $availableCredit = max(0, $creditLimit - $subtotalDebt);
+                $newTotalDebt = floatval($customer->current_debt ?? 0) + $totalWithSurcharge;
+                $newSubtotalDebt = $subtotalDebt + $subtotal;
 
-                \Log::info('🔍 Validación de cupo', [
+                \Log::info('🔍 Validación de cupo (basado en subtotal_debt)', [
                     'customer_id' => $customer->id,
                     'customer_name' => $customer->name,
                     'credit_limit' => $creditLimit,
-                    'current_debt' => $currentDebt,
+                    'subtotal_debt_actual' => $subtotalDebt,
                     'available_credit' => $availableCredit,
-                    'subtotal_to_validate' => $subtotal, // Solo valida el subtotal
-                    'total_with_surcharge' => $totalWithSurcharge, // Deuda total que se registrará
-                    'new_debt_if_approved' => $newDebt
+                    'subtotal_compra' => $subtotal,
+                    'total_with_surcharge' => $totalWithSurcharge,
+                    'new_subtotal_debt_if_approved' => $newSubtotalDebt,
+                    'new_total_debt_if_approved' => $newTotalDebt
                 ]);
 
                 if ($subtotal > $availableCredit) {
@@ -902,7 +909,7 @@ class InvoiceController extends Controller
                         'message' => sprintf(
                             'Crédito insuficiente. Disponible: $%s - Requerido: $%s',
                             number_format($availableCredit, 0),
-                            number_format($subtotal, 0) // Muestra el subtotal, no el total con recargo
+                            number_format($subtotal, 0)
                         )
                     ], 400);
                 }
@@ -1007,18 +1014,26 @@ class InvoiceController extends Controller
                     'surcharge_amount' => $data['surcharge_amount'] ?? 0
                 ]);
 
-                // IMPORTANTE: Mantener status = 'paid' para que cuente en reportes de ventas
-                // El payment_method='credit' ya indica que es a crédito
+                // ✅ Factura a crédito: status='paid' (la venta se realizó)
+                // El payment_method='credit' indica que es a crédito
                 // La columna cash_session_id=null indica que no está en caja
-                \Log::info("✅ Factura a crédito mantiene status='paid' para contar en ventas, pero sin cash_session_id");
+                \Log::info("✅ Factura a crédito con status='paid' - La venta está hecha, crédito se controla aparte");
 
                 // Actualizar deuda del cliente (ya validamos antes)
                 $customer = \App\Models\Customer::find($data['customer_id']);
                 if ($customer) {
                     $previousDebt = $customer->current_debt ?? 0;
-                    // Sumar total + recargo a la deuda (el cliente debe pagar ambos)
-                    $totalWithSurcharge = $data['total'] + ($data['surcharge_amount'] ?? 0);
+                    $previousSubtotalDebt = $customer->subtotal_debt ?? 0;
+                    
+                    // 🎯 IMPORTANTE: En este punto $data['total'] YA incluye el recargo (se modificó en línea ~937)
+                    // Por lo tanto:
+                    // - $data['total'] = subtotal + recargo (lo que el cliente DEBE PAGAR)
+                    // - $data['subtotal'] = subtotal original SIN recargo (para calcular cupo)
+                    $totalWithSurcharge = floatval($data['total']); // YA incluye recargo, NO sumar de nuevo
+                    $subtotalSinRecargo = floatval($data['subtotal']); // El subtotal REAL sin recargo
+                    
                     $customer->current_debt = $previousDebt + $totalWithSurcharge;
+                    $customer->subtotal_debt = $previousSubtotalDebt + $subtotalSinRecargo; // 🎯 Deuda sin recargo para calcular cupo
 
                     // Si el cliente pasa de $0 deuda a tener deuda, registrar fecha inicial
                     if ($previousDebt == 0 && $customer->current_debt > 0) {
@@ -1035,10 +1050,13 @@ class InvoiceController extends Controller
                         'customer_id' => $customer->id,
                         'customer_name' => $customer->name,
                         'previous_debt' => $previousDebt,
-                        'added_amount' => $totalWithSurcharge,
-                        'new_debt' => $customer->current_debt,
+                        'added_total' => $totalWithSurcharge,
+                        'new_total_debt' => $customer->current_debt,
+                        'previous_subtotal_debt' => $previousSubtotalDebt,
+                        'added_subtotal' => $subtotalSinRecargo,
+                        'new_subtotal_debt' => $customer->subtotal_debt,
                         'credit_limit' => $customer->credit_limit,
-                        'available_credit' => $customer->credit_limit - $customer->current_debt
+                        'available_credit' => $customer->credit_limit - $customer->subtotal_debt
                     ]);
                 }
             }
