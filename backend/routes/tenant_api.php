@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\ExpenseCategoryController;
 use App\Http\Controllers\Api\ExcelImportController;
 use App\Http\Controllers\Api\WebCatalogConfigController;
 use App\Http\Controllers\Api\EmailController;
+use App\Http\Controllers\Api\CreditPortalController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Tenant\AiUsageController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,13 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 // Route::post('/register-tenant', [\App\Http\Controllers\Api\TenantRegisterController::class, 'register']); // Removed from tenant routes
 Route::post('/auth/validate-admin', [AuthController::class, 'validateAdmin']);
+
+// 🎯 PORTAL PÚBLICO DE CRÉDITOS (sin autenticación)
+Route::prefix('credit-portal')->group(function () {
+    Route::post('/access-by-token', [CreditPortalController::class, 'accessByToken']);
+    Route::post('/access-by-credentials', [CreditPortalController::class, 'accessByCredentials']);
+    Route::post('/invoice-detail', [CreditPortalController::class, 'getInvoiceDetail']);
+});
 
 // 🔥 Endpoint especial para obtener tenant_id incluso con suscripción expirada
 // NO requiere autenticación, solo identifica el tenant por el subdominio

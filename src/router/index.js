@@ -53,6 +53,18 @@ const routes = [
     }
   },
 
+  // 🎯 Portal Público de Créditos (SIN autenticación)
+  {
+    path: '/mi-credito',
+    name: 'CreditPortal',
+    component: () => import('../views/CreditPortalPublic.vue'),
+    meta: {
+      title: 'Mi Crédito - Portal de Cliente',
+      requiresAuth: false,
+      public: true
+    }
+  },
+
   // Ruta de Registro SaaS
   {
     path: '/register',

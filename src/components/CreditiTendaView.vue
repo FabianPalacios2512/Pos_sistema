@@ -1606,16 +1606,33 @@ const getStatusText = (customer) => {
 }
 
 const getAvailableCredit = (customer) => {
-  return Math.max(0, (customer.credit_limit || 0) - (customer.current_debt || 0))
+  // El disponible se calcula contra el SUBTOTAL (productos), no el total con recargo
+  // El recargo es ganancia del negocio, no cuenta contra el cupo del cliente
+  const subtotalPendiente = getSubtotalPendiente(customer)
+  return Math.max(0, (customer.credit_limit || 0) - subtotalPendiente)
+}
+
+// Función helper para obtener el subtotal de productos pendientes (sin recargo)
+const getSubtotalPendiente = (customer) => {
+  if (!customer.invoices || customer.invoices.length === 0) {
+    // Si no hay facturas cargadas, estimar desde current_debt dividiendo por 1.10
+    const debt = customer.balance || customer.current_debt || 0
+    return debt > 0 ? Math.round(debt / 1.10) : 0
+  }
+  
+  // Sumar subtotales de facturas no pagadas
+  return customer.invoices
+    .filter(inv => inv.status !== 'paid' && inv.status !== 'cancelled' && inv.status !== 'returned')
+    .reduce((sum, inv) => sum + (parseFloat(inv.subtotal) || 0), 0)
 }
 
 // Función para calcular el crédito disponible (puede ser negativo para mostrar cuánto sobrepasó)
 const getAvailableCreditAmount = (customer) => {
-  // El disponible es: Límite - Deuda (que incluye recargos)
-  // Si es negativo, el cliente está en sobre-deuda (compró más de su límite + recargos)
+  // El disponible es: Límite - Subtotal productos pendientes
+  // El recargo NO cuenta contra el cupo (es ganancia del negocio)
   const limit = customer.credit_limit || 0
-  const debt = customer.balance || customer.current_debt || 0
-  return Math.max(0, limit - debt)
+  const subtotalPendiente = getSubtotalPendiente(customer)
+  return Math.max(0, limit - subtotalPendiente)
 }
 
 // Nueva función para seleccionar cliente en el panel izquierdo
@@ -2098,6 +2115,7 @@ const saveCustomerCredit = async () => {
 
     if (response.data.success) {
       const isNewCustomer = !customerExists.value
+      const createdCustomer = response.data.data // 📦 Cliente con credit_id y token generados
       
       showSuccess(customerExists.value ? 'Crédito actualizado exitosamente' : 'Crédito creado exitosamente')
       showCreateCreditModal.value = false
@@ -2106,7 +2124,7 @@ const saveCustomerCredit = async () => {
       // 🎉 Enviar mensajes de bienvenida para CUALQUIER nuevo crédito
       // (tanto clientes nuevos como clientes existentes que reciben crédito por primera vez o de nuevo)
       if (customerForm.value.email || customerForm.value.phone) {
-        await sendWelcomeMessages()
+        await sendWelcomeMessages(createdCustomer)
       }
     }
   } catch (error) {
@@ -2142,17 +2160,24 @@ const saveCustomerCredit = async () => {
 }
 
 // 🎉 FUNCIÓN CRM: Enviar mensajes de bienvenida a nuevo cliente con crédito
-const sendWelcomeMessages = async () => {
+const sendWelcomeMessages = async (createdCustomer = null) => {
   try {
-    const customerData = customerForm.value
+    const customerData = createdCustomer || customerForm.value
     const companyName = 'MATIMAA' // TODO: Obtener del systemSettings
+    
+    // 🔗 Construir URL del portal de crédito
+    const baseUrl = window.location.origin
+    const portalUrl = customerData.credit_access_token 
+      ? `${baseUrl}/mi-credito?token=${customerData.credit_access_token}`
+      : `${baseUrl}/mi-credito`
     
     // Preparar datos del crédito
     const creditInfo = {
       customerName: customerData.name,
       creditLimit: new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(customerData.credit_limit),
       phone: customerData.phone,
-      email: customerData.email
+      email: customerData.email,
+      creditId: customerData.credit_id || 'Pendiente'
     }
 
     // 📧 Enviar email de bienvenida si tiene correo
@@ -2263,6 +2288,20 @@ const sendWelcomeMessages = async () => {
                   </div>
                 </div>
                 
+                <!-- 🔗 Botón de acceso al portal de crédito -->
+                <div style="text-align: center; margin: 30px 0;">
+                  <p style="color: #374151; font-size: 14px; margin: 0 0 15px 0;">
+                    Consulte su crédito en línea en cualquier momento:
+                  </p>
+                  <a href="${portalUrl}" 
+                     style="display: inline-block; background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); color: #ffffff; padding: 14px 32px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px; letter-spacing: 0.5px;">
+                    📊 Ver Mi Crédito
+                  </a>
+                  <p style="color: #9ca3af; font-size: 11px; margin: 12px 0 0 0;">
+                    Su ID de Crédito: <strong style="color: #0f766e;">${creditInfo.creditId}</strong>
+                  </p>
+                </div>
+                
                 <p style="color: #6b7280; font-size: 14px; line-height: 1.7; margin: 25px 0 0 0;">
                   Si tiene alguna pregunta sobre su crédito, no dude en contactarnos. 
                   Estamos aquí para ayudarle.
@@ -2312,28 +2351,23 @@ const sendWelcomeMessages = async () => {
 
 Hola *${customerData.name}*,
 
-Nos complace informarte que tu crédito ha sido *activado exitosamente*. 
+Tu crédito ha sido *activado exitosamente*. 
 
-💳 *Tu Cupo de Crédito:*
-${creditInfo.creditLimit}
+💳 *Tu Cupo:* ${creditInfo.creditLimit}
 
-📋 *Información de tu Cuenta:*
+📋 *Tu cuenta:*
+• ID: *${creditInfo.creditId}*
 • Documento: ${customerData.document_type} ${customerData.document_number}
-• Cupo disponible: ${creditInfo.creditLimit}
 
-💡 *Recuerda:* Paga tus cuotas a tiempo para mantener tu crédito activo y seguir disfrutando de esta facilidad de pago.
+📊 *Nota:* Las compras a crédito incluyen un recargo del 10%.
 
-📊 *Información Importante:*
-Las compras a crédito incluyen un *recargo financiero del 10%* sobre el valor de los productos.
-
-_Ejemplo:_
-• Productos: $100.000
-• Recargo (10%): +$10.000
-• Total a pagar: $110.000
-
-¿Tienes preguntas? ¡Estamos para ayudarte!
+💡 Paga a tiempo para mantener tu crédito activo.
 
 ¡Gracias por confiar en nosotros! 🙌
+
+---
+🔗 *Consulta tu crédito aquí:*
+${portalUrl}
 
 _${companyName}_`
 

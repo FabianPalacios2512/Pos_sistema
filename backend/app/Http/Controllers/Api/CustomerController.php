@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\CreditPortalController;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -94,6 +95,13 @@ class CustomerController extends Controller
             $customerData['total_orders'] = 0;
             $customerData['loyalty_points'] = 0;
 
+            // 🎯 Generar ID y Token de crédito si tiene crédito activo
+            if (($customerData['credit_active'] ?? false) || ($customerData['credit_limit'] ?? 0) > 0) {
+                $customerData['credit_active'] = true;
+                $customerData['credit_id'] = CreditPortalController::generateCreditId();
+                $customerData['credit_access_token'] = CreditPortalController::generateAccessToken();
+            }
+
             $customer = Customer::create($customerData);
 
             return response()->json([
@@ -165,7 +173,19 @@ class CustomerController extends Controller
                 ], 422);
             }
 
-            $customer->update($request->all());
+            $updateData = $request->all();
+
+            // 🎯 Generar ID y Token de crédito si se activa crédito y no tiene
+            $creditActivating = ($updateData['credit_active'] ?? false) || ($updateData['credit_limit'] ?? 0) > 0;
+            $noTieneCreditId = empty($customer->credit_id);
+
+            if ($creditActivating && $noTieneCreditId) {
+                $updateData['credit_active'] = true;
+                $updateData['credit_id'] = CreditPortalController::generateCreditId();
+                $updateData['credit_access_token'] = CreditPortalController::generateAccessToken();
+            }
+
+            $customer->update($updateData);
 
             return response()->json([
                 'success' => true,

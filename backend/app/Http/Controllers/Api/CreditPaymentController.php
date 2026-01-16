@@ -183,7 +183,15 @@ class CreditPaymentController extends Controller
             // Preparar mensaje de recordatorio
             $debtAmount = number_format($customer->current_debt, 0, ',', '.');
             $creditLimit = number_format($customer->credit_limit, 0, ',', '.');
-            $availableCredit = number_format(max(0, $customer->credit_limit - $customer->current_debt), 0, ',', '.');
+
+            // Calcular disponible basado en SUBTOTAL de productos pendientes (sin recargo)
+            // El recargo no cuenta contra el cupo del cliente
+            $subtotalPendiente = \App\Models\Invoice::where('customer_id', $customer->id)
+                ->where('payment_method', 'credit')
+                ->whereNotIn('status', ['cancelled', 'returned', 'paid'])
+                ->sum('subtotal');
+            $availableCreditValue = max(0, $customer->credit_limit - $subtotalPendiente);
+            $availableCredit = number_format($availableCreditValue, 0, ',', '.');
 
             // Calcular días de mora
             $daysPastDue = 0;
@@ -191,6 +199,25 @@ class CreditPaymentController extends Controller
                 $debtDate = new \DateTime($customer->debt_since);
                 $today = new \DateTime();
                 $daysPastDue = $today->diff($debtDate)->days;
+            }
+
+            // Generar link al portal de crédito
+            $tenantId = tenant('id') ?? request()->header('X-Tenant-Id');
+            $portalUrl = '';
+            if ($customer->credit_access_token) {
+                // Usar el dominio del request actual
+                $host = request()->getHost();
+                $port = request()->getPort();
+                $scheme = request()->getScheme();
+
+                // Si es localhost con puerto, incluir el puerto
+                if (str_contains($host, 'localhost') && $port && $port != 80 && $port != 443) {
+                    $domain = "{$host}:{$port}";
+                } else {
+                    $domain = $host;
+                }
+
+                $portalUrl = "{$scheme}://{$domain}/mi-credito?token={$customer->credit_access_token}";
             }
 
             // 📱 ENVIAR POR WHATSAPP
@@ -201,13 +228,19 @@ class CreditPaymentController extends Controller
                     $whatsappMessage .= "Le recordamos que tiene una deuda pendiente:\n\n";
                     $whatsappMessage .= "💰 *Deuda Actual:* \${$debtAmount}\n";
                     $whatsappMessage .= "📊 *Cupo de Crédito:* \${$creditLimit}\n";
-                    $whatsappMessage .= "✅ *Crédito Disponible:* \${$availableCredit}\n";
+                    $whatsappMessage .= "✅ *Disponible:* \${$availableCredit}\n";
 
                     if ($daysPastDue > 0) {
                         $whatsappMessage .= "📅 *Días de Mora:* {$daysPastDue} días\n";
                     }
 
                     $whatsappMessage .= "\n_Por favor, realice su pago lo antes posible para mantener su cupo disponible._\n\n";
+
+                    // Agregar link al portal si existe
+                    if ($portalUrl) {
+                        $whatsappMessage .= "📱 *Consulta tu estado de cuenta aquí:*\n{$portalUrl}\n\n";
+                    }
+
                     $whatsappMessage .= "¡Gracias por su preferencia! 😊";
 
                     // Formatear número al formato colombiano

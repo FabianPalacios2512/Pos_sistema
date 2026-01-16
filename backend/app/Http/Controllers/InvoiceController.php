@@ -923,6 +923,24 @@ class InvoiceController extends Controller
                 $data['seller_name'] = Auth::user()->name;
             }
 
+            // 💳 VENTAS A CRÉDITO: El total debe incluir el recargo
+            // El frontend envía total = subtotal, y surcharge_amount por separado
+            // Debemos guardar el total REAL que el cliente debe pagar
+            if (isset($data['payment_method']) && $data['payment_method'] === 'credit') {
+                $surcharge = floatval($data['surcharge_amount'] ?? 0);
+                if ($surcharge > 0) {
+                    $originalTotal = floatval($data['total']);
+                    $data['subtotal'] = $originalTotal; // Guardar el subtotal original
+                    $data['total'] = $originalTotal + $surcharge; // Total = subtotal + recargo
+
+                    \Log::info('💳 Ajustando total de factura a crédito', [
+                        'subtotal' => $originalTotal,
+                        'surcharge' => $surcharge,
+                        'total_final' => $data['total']
+                    ]);
+                }
+            }
+
             // Crear la factura principal
             $invoice = Invoice::create($data);
 

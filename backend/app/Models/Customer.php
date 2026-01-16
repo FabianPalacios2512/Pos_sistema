@@ -27,6 +27,8 @@ class Customer extends Model
         'active',
         'credit_active',
         'credit_photo',
+        'credit_id',           // 🎯 ID visible al cliente (CRD-000001)
+        'credit_access_token', // 🔐 Token para acceso directo
         'last_purchase',
         'loyalty_points'
     ];
