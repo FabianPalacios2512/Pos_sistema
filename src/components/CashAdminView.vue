@@ -825,6 +825,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { apiCall } from '../services/api.js'
 import { useToast } from '../composables/useToast.js'
+import { appStore } from '../store/appStore.js'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 
@@ -1112,6 +1113,10 @@ const confirmCloseSessionFinal = async () => {
       showSuccess('✅ Caja cerrada correctamente')
       showCloseSessionModal.value = false
       sessionToClose.value = null
+      
+      // 🔄 Actualizar appStore para que el POS detecte el cambio
+      await appStore.loadCashSession(true) // force = true
+      
       refreshSessions()
     } else {
       throw new Error(data.message || 'Error al cerrar la sesión')
@@ -1225,6 +1230,10 @@ const closeSessionWithDetails = async () => {
       showSuccess('✅ Sesión cerrada - La sesión se cerró correctamente')
       showCloseSessionModal.value = false
       sessionToClose.value = null
+      
+      // 🔄 Actualizar appStore para que el POS detecte el cambio
+      await appStore.loadCashSession(true) // force = true
+      
       refreshSessions()
     } else {
       throw new Error(response.message || 'Error al cerrar la sesión')

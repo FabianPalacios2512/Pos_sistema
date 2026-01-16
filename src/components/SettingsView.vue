@@ -589,114 +589,121 @@
       </div>
       
       <!-- Funciones Premium (Solo Premium y Enterprise) -->
-      <div v-if="activeSection === 'premium'" class="space-y-5">
+      <div v-if="activeSection === 'premium'" class="space-y-4">
         
-        <!-- Creditienda -->
-        <div class="bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
-            <div>
-              <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">💳 Creditienda (Sistema de Créditos)</h3>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Gestión de ventas a crédito y recargos</p>
-            </div>
-            <span :class="systemSettings.creditienda_enabled ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700'" 
-                  class="px-2.5 py-1 rounded-full text-xs font-semibold">
-              {{ systemSettings.creditienda_enabled ? 'Activo' : 'Inactivo' }}
-            </span>
-          </div>
-          <div class="p-5">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between p-4 bg-indigo-50 dark:bg-indigo-950 rounded-lg border border-indigo-200 dark:border-indigo-900">
-                <div>
-                  <p class="text-sm font-semibold text-gray-900 dark:text-white">Habilitar sistema de créditos</p>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400">Permitir ventas a crédito en el POS</p>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input v-model="systemSettings.creditienda_enabled" type="checkbox" class="sr-only peer">
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
-              </div>
-
-              <div v-if="systemSettings.creditienda_enabled" class="animate-fade-in">
-                <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Porcentaje de Recargo (%)</label>
-                <div class="relative">
-                  <input v-model.number="systemSettings.credit_surcharge_percentage" 
-                         type="number" 
-                         min="0" 
-                         max="100"
-                         step="0.1"
-                         class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all pl-10">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span class="text-gray-500 dark:text-zinc-400 font-bold">%</span>
-                  </div>
-                </div>
-                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Este porcentaje se sumará al total de la venta cuando se seleccione "Crédito".</p>
-              </div>
-            </div>
+        <!-- Header de sección -->
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Funciones Premium</h2>
+            <p class="text-xs text-gray-500 dark:text-zinc-400">Herramientas avanzadas para potenciar tu negocio</p>
           </div>
         </div>
-
-        <!-- Loyalty Points -->
-        <div class="bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
-            <div>
-              <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">🎁 Sistema de Fidelización (Loyalty Points)</h3>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Programa de puntos y recompensas para clientes</p>
-            </div>
-            <span :class="systemSettings.enable_loyalty_system ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700'" 
-                  class="px-2.5 py-1 rounded-full text-xs font-semibold">
-              {{ systemSettings.enable_loyalty_system ? 'Activo' : 'Inactivo' }}
-            </span>
-          </div>
-          <div class="p-5">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-950 rounded-lg border border-amber-200 dark:border-amber-900">
-                <div>
-                  <p class="text-sm font-semibold text-gray-900 dark:text-white">Habilitar programa de fidelización</p>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400">Los clientes acumulan puntos por compras y pueden redimirlos</p>
+        
+        <!-- Grid de funciones premium -->
+        <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+          
+          <!-- Creditienda -->
+          <div class="border-b border-gray-100 dark:border-zinc-800">
+            <div class="px-5 py-4 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                  </svg>
                 </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Sistema de Créditos</h3>
+                  <p class="text-xs text-gray-500 dark:text-zinc-400">Ventas a crédito con recargos configurables</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span :class="systemSettings.creditienda_enabled ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500'" 
+                      class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide">
+                  {{ systemSettings.creditienda_enabled ? 'Activo' : 'Inactivo' }}
+                </span>
                 <label class="relative inline-flex items-center cursor-pointer">
-                  <input v-model="systemSettings.enable_loyalty_system" type="checkbox" class="sr-only peer">
-                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-300 dark:peer-focus:ring-amber-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                  <input v-model="systemSettings.creditienda_enabled" type="checkbox" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-200 dark:bg-zinc-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                 </label>
               </div>
-
-              <div v-if="systemSettings.enable_loyalty_system" class="animate-fade-in space-y-4">
-                <div>
-                  <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Puntos por cada peso gastado</label>
-                  <input v-model.number="systemSettings.loyalty_points_per_currency" 
-                         type="number" 
-                         min="0"
-                         step="0.0001"
-                         class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all">
-                  <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Ejemplo: 0.001 = 1 punto por cada $1,000 gastados</p>
+            </div>
+            
+            <!-- Configuración expandible -->
+            <div v-if="systemSettings.creditienda_enabled" class="px-5 pb-4 pt-0 animate-fade-in">
+              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-100 dark:border-zinc-700/50">
+                <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Porcentaje de recargo</label>
+                <div class="flex items-center gap-2">
+                  <input v-model.number="systemSettings.credit_surcharge_percentage" 
+                         type="number" min="0" max="100" step="0.1"
+                         class="w-24 px-3 py-2 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                  <span class="text-sm text-gray-500 dark:text-zinc-400">%</span>
+                  <span class="text-xs text-gray-400 dark:text-zinc-500 ml-2">Se aplica automáticamente a ventas a crédito</span>
                 </div>
+              </div>
+            </div>
+          </div>
 
+          <!-- Fidelización -->
+          <div>
+            <div class="px-5 py-4 flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
                 <div>
-                  <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Valor de cada punto ($)</label>
-                  <div class="relative">
-                    <input v-model.number="systemSettings.loyalty_point_value" 
-                           type="number" 
-                           min="0"
-                           step="1"
-                           class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all pl-8">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span class="text-gray-500 dark:text-zinc-400 font-bold">$</span>
-                    </div>
+                  <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Programa de Fidelización</h3>
+                  <p class="text-xs text-gray-500 dark:text-zinc-400">Acumulación y canje de puntos por compras</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span :class="systemSettings.enable_loyalty_system ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500'" 
+                      class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide">
+                  {{ systemSettings.enable_loyalty_system ? 'Activo' : 'Inactivo' }}
+                </span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input v-model="systemSettings.enable_loyalty_system" type="checkbox" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-200 dark:bg-zinc-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Configuración expandible -->
+            <div v-if="systemSettings.enable_loyalty_system" class="px-5 pb-4 pt-0 animate-fade-in">
+              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4 border border-gray-100 dark:border-zinc-700/50 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Puntos por peso</label>
+                    <input v-model.number="systemSettings.loyalty_points_per_currency" 
+                           type="number" min="0" step="0.0001"
+                           class="w-full px-3 py-2 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                    <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-1">Ej: 0.001 = 1 pto/$1,000</p>
                   </div>
-                  <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Ejemplo: $10 = cada punto vale $10 al redimirlo</p>
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Valor del punto</label>
+                    <div class="relative">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-sm">$</span>
+                      <input v-model.number="systemSettings.loyalty_point_value" 
+                             type="number" min="0" step="1"
+                             class="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                    <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-1">Valor al redimir</p>
+                  </div>
                 </div>
-
-                <div class="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/50 dark:to-yellow-950/50 border border-amber-200 dark:border-amber-900 rounded-lg p-3">
-                  <p class="text-xs font-semibold text-amber-800 dark:text-amber-400 mb-2">📊 Ejemplo con configuración actual:</p>
-                  <div class="space-y-1 text-xs text-amber-700 dark:text-amber-400">
-                    <p>• Cliente compra: <span class="font-bold">$100,000</span></p>
-                    <p>• Puntos ganados: <span class="font-bold">{{ Math.floor(100000 * (systemSettings.loyalty_points_per_currency || 0.001)) }} puntos</span></p>
-                    <p>• Valor de puntos: <span class="font-bold">${{ (Math.floor(100000 * (systemSettings.loyalty_points_per_currency || 0.001)) * (systemSettings.loyalty_point_value || 10)).toLocaleString() }}</span></p>
+                
+                <!-- Ejemplo calculado -->
+                <div class="flex items-center justify-between py-2 px-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg border border-amber-100 dark:border-amber-900/50">
+                  <span class="text-xs text-amber-700 dark:text-amber-400">Compra de $100,000</span>
+                  <div class="flex items-center gap-3 text-xs">
+                    <span class="text-gray-600 dark:text-zinc-400">→ <strong class="text-amber-700 dark:text-amber-400">{{ Math.floor(100000 * (systemSettings.loyalty_points_per_currency || 0.001)) }} pts</strong></span>
+                    <span class="text-gray-600 dark:text-zinc-400">= <strong class="text-emerald-600 dark:text-emerald-400">${{ (Math.floor(100000 * (systemSettings.loyalty_points_per_currency || 0.001)) * (systemSettings.loyalty_point_value || 10)).toLocaleString() }}</strong></span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+          
         </div>
       </div>
       
@@ -1190,7 +1197,7 @@
   <!-- Modal de Éxito -->
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="showSuccessModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+      <div v-if="showSuccessModal" class="fixed inset-0 bg-black/70 dark:bg-black/85 flex items-center justify-center z-[9999] p-4">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-300 dark:border-zinc-800 transform scale-100 transition-all duration-300">
           <!-- Icono de éxito -->
           <div class="p-6 text-center">

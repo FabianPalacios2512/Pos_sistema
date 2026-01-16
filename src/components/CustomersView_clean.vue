@@ -478,7 +478,7 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="showCustomerModal" 
-           class="fixed inset-0 bg-black/70 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in"
+           class="fixed inset-0 bg-black/70 dark:bg-black/85 flex items-center justify-center p-4 z-[9999] animate-fade-in"
            @click.self="closeCustomerModal">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/60 max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col border border-gray-200 dark:border-zinc-800/80"
              @click.stop>

@@ -52,8 +52,6 @@ export const appStore = reactive({
     try {
       this.loading.products = true
       
-      console.log('🔄 [appStore] Cargando productos...', { warehouseId, searchScope, force })
-      
       // 🏪 Si no se pasa warehouse_id, intentar usar el de la sesión activa
       const targetWarehouseId = warehouseId || this.cashSession.current?.warehouse_id
       
@@ -218,8 +216,14 @@ export const appStore = reactive({
     }
   },
 
-  async loadCashSession() {
-    if (this.loading.cashSession) return // Evitar cargas duplicadas
+  async loadCashSession(force = false) {
+    // Si force=true, resetear el estado de loading primero
+    if (force && this.loading.cashSession) {
+      this.loading.cashSession = false
+    }
+    
+    // Evitar cargas duplicadas solo si NO es force
+    if (!force && this.loading.cashSession) return
     
     try {
       this.loading.cashSession = true
@@ -348,7 +352,7 @@ export const appStore = reactive({
         break
       case 'cashSession':
         this.cashSession.initialized = false
-        await this.loadCashSession()
+        await this.loadCashSession(true) // force = true
         break
       case 'all':
         this.products = []

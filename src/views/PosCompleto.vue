@@ -49,10 +49,9 @@
 
 
 
-        <!-- Contenido Principal - Solo esto se reduce cuando el chat está abierto -->
-        <main class="transition-all duration-300" style="flex: 1; min-height: 0;"
-              :class="{ 'lg:mr-[380px]': aiChatStore.isOpen.value }"
-        >
+        <!-- Contenido Principal - En POS el chat flota, en otras vistas hace espacio -->
+        <main class="flex-1 min-h-0 transition-all duration-300"
+              :class="{ 'ai-chat-content-spacing': aiChatStore.isOpen.value && currentModule !== 'pos' }">
         
         <!-- Dashboard -->
         <div v-if="currentModule === 'dashboard'">
@@ -96,13 +95,7 @@
       </div>
     </div>
 
-    <!-- Panel de Chat IA 105 - Fuera del contenedor principal para no interferir -->
-    <AI105Chat 
-      :is-open="aiChatStore.isOpen.value" 
-      :header-height="64"
-      :current-module="currentModule"
-      @close="aiChatStore.close" 
-    />
+    <!-- Panel de Chat IA 105 ahora es global (App.vue) -->
 
     <!-- Modal de Confirmación - Salir del POS con productos en carrito -->
     <Teleport to="body">
@@ -180,7 +173,7 @@
       @close="radioWidgetOpen = false"
     />
 
-    <!-- 🤖 Botón Flotante IA 105 - Estilo hPanel -->
+    <!-- 🤖 Botón Flotante IA 105 - Solo visible fuera del POS -->
     <Transition
       enter-active-class="transition-all duration-300 ease-out"
       enter-from-class="opacity-0 scale-90 translate-y-2"
@@ -190,25 +183,25 @@
       leave-to-class="opacity-0 scale-90 translate-y-2"
     >
       <button
-        v-if="!aiChatStore.isOpen.value"
+        v-if="!aiChatStore.isOpen.value && currentModule !== 'pos'"
         @click="aiChatStore.open"
-        class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-br from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700"
+        class="fixed bottom-6 right-6 z-50 group flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
         title="Asistente IA 105"
-        style="font-family: 'Inter', system-ui, sans-serif;"
       >
-        <!-- Logo 105 -->
-        <span class="text-white font-bold text-sm tracking-tight">105</span>
-        
-        <!-- Separador -->
-        <div class="w-px h-4 bg-white/30"></div>
+        <!-- Icono IA -->
+        <div class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+          </svg>
+        </div>
         
         <!-- Texto -->
-        <span class="text-white/90 font-medium text-xs">Asistente IA</span>
+        <span class="text-white font-semibold text-sm">Asistente IA</span>
         
         <!-- Indicador online -->
-        <div class="absolute -top-1 -right-1 w-3 h-3">
-          <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 border-2 border-white shadow-sm"></span>
+        <div class="absolute -top-0.5 -right-0.5 w-3 h-3">
+          <span class="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-white border-2 border-emerald-500"></span>
         </div>
       </button>
     </Transition>
@@ -235,9 +228,6 @@ import Sidebar from '../components/Sidebar.vue'
 
 // Importar componente AppHeader
 import AppHeader from '../components/AppHeader.vue'
-
-// Importar Chat IA lateral
-import AI105Chat from '../components/AI105Chat.vue'
 
 // Importar RadioPlayerModal
 import RadioPlayerModal from '../components/RadioPlayerModal.vue'
@@ -1936,5 +1926,12 @@ main > div {
 
 .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: rgba(75, 85, 99, 0.7);
+}
+
+/* Ajuste para contenido cuando el chat IA está abierto - Solo en desktop y NO en POS */
+@media (min-width: 640px) {
+  .ai-chat-content-spacing {
+    padding-right: 380px;
+  }
 }
 </style>

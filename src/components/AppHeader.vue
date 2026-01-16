@@ -1,6 +1,6 @@
 <template>
   <!-- Header Empresarial Profesional - Diseño Limpio y Minimalista -->
-  <header class="sticky top-0 z-50 bg-white dark:bg-[#25252d] border-b border-gray-200 dark:border-zinc-700/50 transition-colors duration-300">
+  <header class="sticky top-0 z-40 bg-white dark:bg-[#25252d] border-b border-gray-200 dark:border-zinc-700/50 transition-colors duration-300">
     <div class="h-16 px-4 lg:px-6">
       <div class="flex items-center justify-between h-full">
         

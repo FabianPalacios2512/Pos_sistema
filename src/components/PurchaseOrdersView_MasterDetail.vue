@@ -2077,12 +2077,13 @@ export default {
         const pdf = generatePurchaseOrderPDF(orderData, systemSettings)
         const pdfBlob = await getPDFBlob(pdf)
 
-        // Enviar por WhatsApp
+        // Enviar por WhatsApp con nombre del proveedor
         await whatsappService.sendDocumentByWhatsApp(
           supplierPhone, 
           pdfBlob, 
           this.selectedOrder.order_number, 
-          'purchase_order'
+          'purchase_order',
+          this.selectedOrder.supplier?.name || 'Proveedor'
         )
         
         this.$toast?.success('✅ Orden enviada por WhatsApp exitosamente')

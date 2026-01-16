@@ -288,7 +288,7 @@ class CustomerController extends Controller
                 ]);
             }
 
-            $query = Customer::where('document', $documentValue);
+            $query = Customer::where('document_number', $documentValue);
 
             if ($request->has('exclude_id')) {
                 $query->where('id', '!=', $request->exclude_id);
@@ -310,6 +310,64 @@ class CustomerController extends Controller
                 'exists' => false,
                 'data' => null
             ]);
+        }
+    }
+
+    /**
+     * 🗑️ Eliminar crédito de un cliente
+     * Solo permite eliminar si el cliente está al día (sin deuda)
+     */
+    public function deleteCredit($id)
+    {
+        try {
+            $customer = Customer::findOrFail($id);
+
+            // Verificar que no tenga deuda pendiente
+            $currentDebt = $customer->balance ?? 0;
+
+            // 🔧 FIX: Verificar en la tabla INVOICES (no sales) las facturas a crédito no pagadas
+            $pendingCredit = \App\Models\Invoice::where('customer_id', $id)
+                ->where('payment_method', 'credit')
+                ->whereNotIn('status', ['paid', 'cancelled', 'returned'])
+                ->sum('total');
+
+            if ($currentDebt > 0 || $pendingCredit > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar el crédito. El cliente tiene deuda pendiente de $' . number_format($currentDebt + $pendingCredit, 0, ',', '.')
+                ], 400);
+            }
+
+            // Eliminar foto si existe
+            if ($customer->credit_photo) {
+                $photoPath = str_replace('/storage/', '', $customer->credit_photo);
+                \Storage::disk('public')->delete($photoPath);
+            }
+
+            // 🔧 FIX: Limpiar datos de crédito del cliente (credit_active, NO has_credit)
+            $customer->update([
+                'credit_limit' => 0,
+                'balance' => 0,
+                'credit_photo' => null,
+                'credit_active' => false  // ✅ Columna correcta en la BD
+            ]);
+
+            // Opcional: Eliminar historial de pagos de crédito
+            // \App\Models\CreditPayment::where('customer_id', $id)->delete();
+
+            Log::info("🗑️ Crédito eliminado para cliente ID: {$id}, Nombre: {$customer->name}");
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Crédito eliminado correctamente'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error eliminando crédito: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el crédito: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

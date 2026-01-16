@@ -5092,27 +5092,24 @@ const handlePrintInvoice = async () => {
       return
     }
     
-    // Generar PDF con la plantilla térmica
+    // Generar PDF con la plantilla usando los mismos datos que WhatsApp
     const invoiceData = {
-      invoice_number: lastSale.value.invoice_number,
-      invoice_date: lastSale.value.invoice_date || new Date().toISOString(),
-      customer: {
-        name: lastSale.value.customer_name || 'Cliente Final',
-        phone: lastSale.value.customer_phone || '',
-        email: lastSale.value.customer_email || '',
-        address: lastSale.value.customer_address || ''
-      },
+      invoice_number: lastSale.value.invoiceNumber || lastSale.value.invoice_number || 'SIN-NUMERO',
+      created_at: lastSale.value.date || lastSale.value.created_at || new Date(),
+      customer_name: lastSale.value.customer || lastSale.value.customer_name || 'Cliente Final',
+      cashier: lastSale.value.cashier || lastSale.value.seller_name || currentUser.value?.name || 'Vendedor',
       items: lastSale.value.items || [],
-      subtotal: lastSale.value.subtotal || 0,
-      discount: lastSale.value.discount || 0,
-      tax: lastSale.value.tax || 0,
-      total: lastSale.value.total || 0,
-      payment_method: lastSale.value.payment_method || 'Efectivo',
+      subtotal: parseFloat(lastSale.value.subtotal || 0),
+      discount: parseFloat(lastSale.value.discount || 0),
+      tax: parseFloat(lastSale.value.tax || 0),
+      total: parseFloat(lastSale.value.total || 0),
+      payments: lastSale.value.payments || [],
+      change: parseFloat(lastSale.value.change || 0),
       notes: lastSale.value.notes || ''
     }
 
     // Generar PDF y abrir en ventana nueva inmediatamente
-    const pdf = await generateInvoicePDFTemplate(invoiceData)
+    const pdf = await generateInvoicePDFTemplate(invoiceData, systemSettings.value)
     const pdfBlob = pdf.output('blob')
     const pdfUrl = URL.createObjectURL(pdfBlob)
     
@@ -5285,6 +5282,15 @@ const handleSendWhatsApp = async () => {
     // Generar PDF de la factura exactamente como se muestra en pantalla
     const pdfBlob = await generateInvoicePDF()
     
+    if (!pdfBlob) {
+      throw new Error('No se pudo generar el PDF de la factura')
+    }
+    
+    console.log('📄 PDF generado correctamente:', {
+      size: pdfBlob.size,
+      type: pdfBlob.type
+    })
+    
     // Enviar por WhatsApp usando API
     await sendWhatsAppMessage(cleanPhone, pdfBlob)
     
@@ -5381,14 +5387,6 @@ const generateInvoicePDF = async () => {
     }
 
     // Preparar datos de la factura para la plantilla
-    // 🔍 DEBUG: Verificar qué datos de vendedor tenemos
-    console.log('🔍 [generateInvoicePDF] Datos de vendedor:', {
-      lastSale_cashier: lastSale.value.cashier,
-      lastSale_seller_name: lastSale.value.seller_name,
-      currentUser_name: currentUser.value?.name,
-      currentUser_full: currentUser.value
-    })
-
     const invoiceData = {
       invoice_number: lastSale.value.invoiceNumber || lastSale.value.invoice_number || 'SIN-NUMERO',
       created_at: lastSale.value.date || lastSale.value.created_at || new Date(),
@@ -5407,7 +5405,7 @@ const generateInvoicePDF = async () => {
 
 
     // Generar PDF usando plantilla centralizada (jsPDF vectorial)
-    const pdf = await generateInvoicePDFTemplate(invoiceData, systemSettings)
+    const pdf = await generateInvoicePDFTemplate(invoiceData, systemSettings.value)
     
     // Convertir a blob
     return getPDFBlob(pdf)
@@ -5424,10 +5422,10 @@ const generateInvoicePDF = async () => {
 const sendWhatsAppMessage = async (phoneNumber, pdfBlob) => {
   try {
     // Crear un mensaje más detallado y profesional
-    const companyName = systemSettings.company_name || 'Mi Empresa'
-    const customerName = lastSale.value.customer_name || selectedCustomer.value?.name || 'Cliente'
-    const invoiceNumber = lastSale.value.invoiceNumber || 'N/A'
-    const totalAmount = (lastSale.value.total || total.value).toLocaleString()
+    const companyName = systemSettings.value?.company_name || 'Mi Empresa'
+    const customerName = lastSale.value?.customer || selectedCustomer.value?.name || 'Cliente'
+    const invoiceNumber = lastSale.value?.invoiceNumber || 'N/A'
+    const totalAmount = (lastSale.value?.total || total.value).toLocaleString()
     const saleDate = new Date().toLocaleDateString('es-CO', {
       year: 'numeric',
       month: '2-digit', 
@@ -6448,29 +6446,17 @@ const showLoadedQuotationDetails = () => {
 // Lifecycle hooks
 onMounted(async () => {
   try {
-    console.log('🚀 [PosView] Iniciando montaje del componente...')
+    // 🔧 FIX: SIEMPRE forzar recarga de sesión al montar el componente
+    // Esto evita condiciones de carrera y asegura datos frescos
+    await appStore.loadCashSession(true) // force = true
     
-    // ✅ SINCRONIZAR sesión desde el store (evitar referencias viejas)
-    // Si no está inicializada, forzar carga para asegurar datos frescos
-    if (!appStore.cashSession.initialized) {
-      console.log('🔄 [PosView] Inicializando sesión de caja...')
-      await appStore.loadCashSession()
-    }
-    
-    // Actualizar refs locales
+    // Actualizar refs locales desde appStore
     hasOpenSession.value = appStore.cashSession.hasOpenSession
     currentSession.value = appStore.cashSession.current
-    
-    console.log('📋 [PosView] Estado de sesión:', { 
-      hasSession: hasOpenSession.value, 
-      warehouseId: currentSession.value?.warehouse_id 
-    })
     
     // 🔄 AUTO-REFRESH FORZADO: Recargar productos SIEMPRE al entrar al POS
     const warehouseId = currentSession.value?.warehouse_id
     const scope = globalSearch.value ? 'global' : 'local'
-    
-    console.log('🔄 [PosView] Refrescando datos al montar...', { warehouseId, scope })
     
     // Ejecutar cargas en paralelo para mayor velocidad
     // IMPORTANTE: Cargar productos incluso sin warehouse_id (usará el default)
@@ -6479,8 +6465,6 @@ onMounted(async () => {
       appStore.loadCustomers(true), // force = true
       appStore.loadPaymentMethods(true) // force = true
     ])
-    
-    console.log('✅ [PosView] Datos cargados. Productos:', appStore.products.length)
 
     // Configurar interfaz inmediatamente
     setTimeout(() => {
@@ -6522,8 +6506,6 @@ onMounted(async () => {
     // Emitir estado inicial del carrito
     emit('cart-status-changed', cart.items.length > 0)
     
-    console.log('✅ [PosView] Inicialización completada. Productos:', appStore.products.length)
-    
   } catch (error) {
     console.error('Error en inicialización de PosView:', error)
   }
@@ -6544,17 +6526,13 @@ window.addEventListener('products-updated', handleProductsUpdate)
 // 🔄 AUTO-REFRESH al reactivar el componente (si se usa KeepAlive)
 onActivated(async () => {
   try {
-    console.log('🔄 [PosView] Reactivado - Verificando frescura de datos...')
-
-    // 0️⃣ Sincronizar sesión (CRÍTICO para evitar usar sesión stale)
-    if (appStore.cashSession.initialized) {
-        currentSession.value = appStore.cashSession.current
-        hasOpenSession.value = appStore.cashSession.hasOpenSession
-    } else {
-        await appStore.loadCashSession()
-        currentSession.value = appStore.cashSession.current
-        hasOpenSession.value = appStore.cashSession.hasOpenSession
-    }
+    // 🔧 FIX: SIEMPRE recargar sesión al reactivar (forzar verificación)
+    // Esto garantiza que si abriste/cerraste caja en otro módulo, se refleje aquí
+    await appStore.loadCashSession(true) // force = true
+    
+    // Sincronizar variables locales
+    currentSession.value = appStore.cashSession.current
+    hasOpenSession.value = appStore.cashSession.hasOpenSession
 
     // 1️⃣ Recargar productos (respetando filtro Global/Local) - FORZADO
     if (currentSession.value?.warehouse_id) {

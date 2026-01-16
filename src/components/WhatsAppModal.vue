@@ -180,16 +180,22 @@ const checkStatus = async () => {
   try {
     const result = await whatsappService.getStatus()
     if (result.success && result.status) {
+      const wasDisconnected = !whatsappStatus.value.connected
       whatsappStatus.value = result.status
       emit('statusChange', result.status)
       
-      // Si está conectado, limpiar QR
+      // Si acaba de conectarse, limpiar QR inmediatamente y notificar
       if (result.status.connected) {
-        qrCode.value = ''
+        if (qrCode.value || wasDisconnected) {
+          qrCode.value = ''
+          // Reiniciar el polling con intervalo más largo
+          stopStatusCheck()
+          startStatusCheck()
+        }
       }
     }
   } catch (error) {
-    console.error('Error verificando estado:', error)
+    // Error silencioso para no spam en consola
   }
 }
 
@@ -298,6 +304,10 @@ const refreshQR = async () => {
 const startStatusCheck = () => {
   if (statusCheckInterval.value) return
   
+  // Verificar cada 2 segundos cuando hay QR activo (más agresivo)
+  // Verificar cada 5 segundos cuando no hay QR
+  const checkInterval = qrCode.value ? 2000 : 5000
+  
   statusCheckInterval.value = setInterval(async () => {
     await checkStatus()
     
@@ -305,7 +315,15 @@ const startStatusCheck = () => {
     if (!whatsappStatus.value.connected && !qrCode.value) {
       await getQRCode()
     }
-  }, 3000)
+    
+    // Si detecta conexión, detener polling y actualizar inmediatamente
+    if (whatsappStatus.value.connected && qrCode.value) {
+      qrCode.value = ''
+      // Reiniciar el intervalo con tiempo más largo
+      stopStatusCheck()
+      startStatusCheck()
+    }
+  }, checkInterval)
 }
 
 const stopStatusCheck = () => {

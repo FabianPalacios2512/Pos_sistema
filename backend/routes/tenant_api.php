@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\ExpenseCategoryController;
 use App\Http\Controllers\Api\ExcelImportController;
 use App\Http\Controllers\Api\WebCatalogConfigController;
+use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Tenant\AiUsageController;
 use Illuminate\Support\Facades\Route;
@@ -157,6 +158,9 @@ Route::get('/subscription/status', function () {
 
 // RUTA TEMPORAL PARA QR - Búsqueda de cotizaciones sin autenticación
 Route::get('/quotes/search/{code}', [SalesController::class, 'searchQuotePublic']);
+
+// 📧 EMAIL - Envío de correos (sin autenticación para permitir desde cualquier módulo)
+Route::post('/send-email', [EmailController::class, 'sendGenericEmail']);
 
 // RUTAS DE PRUEBA PARA REPORTES DE CAJA
 Route::get('/cash-reports/test-db', function() { require_once __DIR__ . '/cash-reports-test.php'; return testDatabaseConnection(); });
@@ -326,6 +330,7 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     // Clientes
     Route::get('/customers/{customer}/invoices', [CustomerController::class, 'getInvoices']); // 🛡️ Obtener facturas del cliente (ANTES del apiResource)
     Route::post('/customers/check-document', [CustomerController::class, 'checkDocument']); // 🎯 CreditiTenda: Validar documento
+    Route::delete('/customers/{id}/credit', [CustomerController::class, 'deleteCredit']); // 🗑️ Eliminar crédito del cliente
     Route::apiResource('customers', CustomerController::class);
 
     // Proveedores

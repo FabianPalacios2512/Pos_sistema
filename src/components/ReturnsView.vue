@@ -820,13 +820,14 @@ const sendByWhatsApp = async () => {
     const pdfDoc = await generateReturnPDF(processedReturn.value, appStore.systemSettings)
     const pdfBlob = await getPDFBlob(pdfDoc)
     
-    // Enviar por WhatsApp
+    // Enviar por WhatsApp con nombre del cliente
     const docNumber = processedReturn.value.number || 'SN'
     await whatsappService.sendDocumentByWhatsApp(
       phoneNumber.value,
       pdfBlob,
       docNumber,
-      'devolucion'
+      'devolucion',
+      processedReturn.value.customer_name || 'Cliente'
     )
     
     showSuccess('Devolución enviada por WhatsApp exitosamente')

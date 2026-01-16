@@ -1,23 +1,12 @@
-CD <template>
-  <!-- Botón Flotante de IA -->
+<template>
+  <!-- Panel Lateral de Chat IA - Estilo Hostinger hPanel -->
   <div>
-    <button 
-      v-if="!isControlledExternally"
-      @click="toggleChat"
-      class="fixed bottom-6 right-6 w-11 h-11 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center z-50"
-    >
-      <div class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-400 rounded-full border-2 border-white animate-pulse"></div>
-      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-      </svg>
-    </button>
-
     <!-- Panel Lateral de Chat IA - Estilo Hostinger hPanel -->
     <transition name="slide-right">
       <div 
         v-if="localChatOpen"
-        class="fixed right-0 w-full sm:w-[380px] bg-white dark:bg-[#18181b] flex flex-col z-[9998] shadow-[-2px_0_20px_rgba(0,0,0,0.08)] dark:shadow-[-2px_0_30px_rgba(0,0,0,0.5)]"
-        :style="{ top: headerHeight + 'px', height: `calc(100% - ${headerHeight}px)` }"
+        class="fixed right-0 w-full sm:w-[380px] bg-white dark:bg-[#18181b] flex flex-col z-[45] shadow-[-2px_0_20px_rgba(0,0,0,0.08)] dark:shadow-[-2px_0_30px_rgba(0,0,0,0.5)]"
+        :style="{ top: dynamicHeaderHeight + 'px', height: `calc(100% - ${dynamicHeaderHeight}px)` }"
       >
         <!-- Header del Chat -->
         <div class="flex items-center justify-between h-11 px-3 border-b border-gray-100 dark:border-zinc-800 flex-shrink-0">
@@ -295,6 +284,7 @@ CD <template>
 import { ref, nextTick, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useModuleNavigation } from '@/composables/useModuleNavigation'
+import { aiChatStore } from '@/store/aiChatStore'
 import api from '@/services/api'
 
 export default {
@@ -318,8 +308,23 @@ export default {
     const router = useRouter()
     const { navigateToModule } = useModuleNavigation()
     
+    // Altura dinámica del chat (detecta si hay banner trial)
+    const dynamicHeaderHeight = ref(props.headerHeight)
+    
+    // Calcular altura real del header + banners
+    const calculateHeaderOffset = () => {
+      // Buscar el header real en el DOM
+      const header = document.querySelector('header.sticky')
+      if (header) {
+        const rect = header.getBoundingClientRect()
+        // El offset es donde termina el header (bottom del header desde el top del viewport)
+        dynamicHeaderHeight.value = Math.max(rect.bottom, props.headerHeight)
+      } else {
+        dynamicHeaderHeight.value = props.headerHeight
+      }
+    }
+    
     // Estado del chat
-    const isChatOpen = ref(false)
     const messages = ref([])
     const inputMessage = ref('')
     const isTyping = ref(false)
@@ -349,7 +354,7 @@ export default {
 
     // Computed
     const isControlledExternally = computed(() => props.isOpen !== undefined)
-    const localChatOpen = computed(() => isControlledExternally.value ? props.isOpen : isChatOpen.value)
+    const localChatOpen = computed(() => isControlledExternally.value ? props.isOpen : aiChatStore.isOpen.value)
     
     // Nombre del usuario para saludo personalizado
     const userName = computed(() => {
@@ -503,14 +508,27 @@ export default {
 
     onMounted(() => {
       loadUsageStats()
+      calculateHeaderOffset()
+      // Recalcular cuando cambie el tamaño de la ventana
+      window.addEventListener('resize', calculateHeaderOffset)
+    })
+
+    // Recalcular cuando se abre el chat
+    watch(localChatOpen, (isOpen) => {
+      if (isOpen) {
+        nextTick(() => {
+          calculateHeaderOffset()
+          messageInput.value?.focus()
+        })
+      }
     })
 
     const toggleChat = () => {
       if (isControlledExternally.value) {
         emit('close')
       } else {
-        isChatOpen.value = !isChatOpen.value
-        if (isChatOpen.value) {
+        aiChatStore.toggle()
+        if (aiChatStore.isOpen.value) {
           nextTick(() => messageInput.value?.focus())
           loadUsageStats()
         }
@@ -521,7 +539,7 @@ export default {
       if (isControlledExternally.value) {
         emit('close')
       } else {
-        isChatOpen.value = false
+        aiChatStore.close()
       }
     }
 
@@ -739,9 +757,9 @@ export default {
     }
 
     return {
-      isChatOpen,
       localChatOpen,
       isControlledExternally,
+      dynamicHeaderHeight,
       messages,
       inputMessage,
       isTyping,

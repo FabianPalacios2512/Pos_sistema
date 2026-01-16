@@ -1427,9 +1427,15 @@ const sendByWhatsApp = async (invoice) => {
     
     const pdfBlob = await getPDFBlob(pdf)
     
-    // Enviar por WhatsApp
+    // Enviar por WhatsApp con nombre del cliente
     showToast(`Enviando ${docType} por WhatsApp...`, 'info')
-    await whatsappService.sendDocumentByWhatsApp(phone, pdfBlob, documentData.code || documentData.invoice_number, isQuote ? 'quotation' : 'invoice')
+    await whatsappService.sendDocumentByWhatsApp(
+      phone, 
+      pdfBlob, 
+      documentData.code || documentData.invoice_number, 
+      isQuote ? 'quotation' : 'invoice',
+      documentData.customer_name || 'Cliente'
+    )
     
     showToast(`✅ ${docType} enviada por WhatsApp exitosamente`, 'success')
   } catch (error) {

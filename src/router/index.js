@@ -396,20 +396,21 @@ router.beforeEach(async (to, from, next) => {
     // ✅ EXCEPCIÓN: Super admins NO pasan por onboarding (no tienen tenant)
     const user = authService.getUser()
     if (user?.role === 'superadmin' || user?.is_super_admin) {
-      console.log('👑 Super Admin detectado - omitiendo validación de onboarding y systemSettings')
+      // console.log('👑 Super Admin detectado - omitiendo validación de onboarding y systemSettings')
       next()
       return
     }
     
     // ⛔ NUEVO FLUJO: Ya NO bloquear rutas cuando la suscripción expira
     // El modal aparecerá automáticamente en el POS y bloqueará el acceso
-    // Solo cargar datos si no están cargados (SOLO para usuarios de tenants)
-    if (!appStore.systemSettings || Object.keys(appStore.systemSettings).length === 0) {
-      try {
-        await appStore.loadSystemSettings()
-      } catch (error) {
-        // Continuar navegación aunque falle (puede ser superadmin o admin central)
-      }
+    
+    // 🔧 FIX: SIEMPRE recargar systemSettings para asegurar datos frescos
+    // Esto evita que el router use datos stale o undefined
+    try {
+      await appStore.loadSystemSettings(true) // force = true
+    } catch (error) {
+      // Continuar navegación aunque falle (puede ser superadmin o admin central)
+      // console.error('⚠️ [Router] Error cargando systemSettings:', error)
     }
     
     // 🔥 PRIORIDAD MÁXIMA: Si suscripción expirada, ir directo al POS
@@ -427,10 +428,32 @@ router.beforeEach(async (to, from, next) => {
 
     // 🔥 PRIORIDAD: Verificar localStorage primero (más rápido y evita race conditions)
     const localOnboardingCompleted = localStorage.getItem('onboarding_completed') === 'true'
-    const onboardingCompleted = localOnboardingCompleted || appStore.systemSettings.onboarding_completed || false
+    
+    // 🔧 Verificar onboarding_completed del backend (puede ser boolean o int 0/1)
+    const backendOnboardingCompleted = appStore.systemSettings?.onboarding_completed === true || 
+                                       appStore.systemSettings?.onboarding_completed === 1 ||
+                                       appStore.systemSettings?.onboarding_completed === '1'
+    
+    const onboardingCompleted = localOnboardingCompleted || backendOnboardingCompleted
 
     // 🎯 REGLA PRINCIPAL: Si ya completó onboarding (en BD o localStorage), permitir acceso normal
     if (onboardingCompleted) {
+      // 🔒 Sincronizar localStorage con backend si no estaba en sync
+      if (!localOnboardingCompleted && backendOnboardingCompleted) {
+        localStorage.setItem('onboarding_completed', 'true')
+      }
+      
+      // 🛡️ PROTECCIÓN: Sincronizar backend si localStorage dice que completó pero backend no
+      if (localOnboardingCompleted && !backendOnboardingCompleted) {
+        // Forzar actualización en backend para prevenir loops
+        try {
+          await axios.post('/api/system-settings', { onboarding_completed: true })
+          console.log('✅ Onboarding sincronizado con backend')
+        } catch (err) {
+          console.warn('⚠️ No se pudo sincronizar onboarding con backend:', err)
+        }
+      }
+      
       // Si completó onboarding pero está intentando acceder a /welcome o /onboarding, redirigir a /pos
       if (to.path === '/welcome' || to.path === '/onboarding') {
         next('/pos')
@@ -442,7 +465,6 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // 🚨 CRÍTICO: Si NO ha completado onboarding, FORZAR completarlo
-    // No importa si ya vio welcome o no - DEBE completar configuración
     
     // Permitir acceso SOLO a /welcome y /onboarding
     const allowedRoutes = ['/welcome', '/onboarding']

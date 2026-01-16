@@ -94,12 +94,20 @@ const authService = {
     } catch (error) {
       console.error('Error al hacer logout:', error);
     } finally {
+      // 🔒 PRESERVAR configuraciones de UI que NO deben perderse entre sesiones
+      const tourCompleted = localStorage.getItem('pos_tour_completed')
+      const tourSkipped = localStorage.getItem('pos_tour_skipped')
+      
       // Limpiar datos locales
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       localStorage.removeItem('onboarding_completed'); // 🔥 Limpiar flag de onboarding
       localStorage.removeItem('welcome_seen'); // 🔥 Limpiar flag de welcome
       delete apiClient.defaults.headers.common['Authorization'];
+      
+      // 🔒 RESTAURAR configuraciones de UI preservadas
+      if (tourCompleted) localStorage.setItem('pos_tour_completed', tourCompleted)
+      if (tourSkipped) localStorage.setItem('pos_tour_skipped', tourSkipped)
     }
   },
 

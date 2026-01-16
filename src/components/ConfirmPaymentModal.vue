@@ -157,7 +157,7 @@
             </svg>
           </div>
           <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¡Pago Realizado!</h3>
-          <p class="text-2xl font-bold text-green-600 dark:text-green-400">${{ total.toLocaleString() }}</p>
+          <p class="text-2xl font-bold text-green-600 dark:text-green-400">${{ fixedTotal.toLocaleString() }}</p>
         </div>
 
         <div class="p-5">
@@ -232,6 +232,7 @@ const emit = defineEmits(['close', 'payment-confirmed', 'print-invoice', 'send-w
 const currentState = ref('confirm')
 const processing = ref(false)
 const paymentData = ref(null)
+const fixedTotal = ref(0) // 🔧 Total fijo para mostrar después del pago
 
 const paymentFee = computed(() => {
   if (!props.paymentMethod.fee_amount) return 0
@@ -247,6 +248,9 @@ const paymentFee = computed(() => {
 
 const confirmPayment = async () => {
   processing.value = true
+  
+  // 🔧 Capturar el total ANTES de que se limpie el carrito
+  fixedTotal.value = props.total
   
   await new Promise(resolve => setTimeout(resolve, 300))
   

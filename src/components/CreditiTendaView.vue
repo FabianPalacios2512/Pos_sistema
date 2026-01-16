@@ -2,9 +2,34 @@
   <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-4 lg:px-6">
     <div class="p-3 lg:p-4 space-y-4 pb-6 animate-fade-in">
       
-      <!-- NIVEL 1: Header Minimalista -->
+      <!-- NIVEL 1: Header Minimalista con Botones -->
       <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">CrediTienda</h1>
+        
+        <!-- Botones de acción -->
+        <div class="flex items-center gap-3">
+          <!-- Botón Configuración -->
+          <button 
+            @click="showReminderSettingsModal = true"
+            class="px-4 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200 active:scale-95 flex items-center gap-2 group"
+            title="Configuración de recordatorios">
+            <svg class="w-4 h-4 text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span>Configuración</span>
+          </button>
+          
+          <!-- Botón Nuevo Crédito -->
+          <button 
+            @click="openCreateCreditModal"
+            class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 active:scale-95 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Nuevo Crédito</span>
+          </button>
+        </div>
       </div>
 
       <!-- NIVEL 2: KPIs Ejecutivos - Estilo Fantasma -->
@@ -303,6 +328,19 @@
                     Editar
                   </button>
                   
+                  <!-- Botón Eliminar Crédito (solo si está al día) -->
+                  <button
+                    v-if="selectedCustomer.balance <= 0"
+                    @click="confirmDeleteCredit(selectedCustomer)"
+                    class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-rose-100 hover:bg-rose-200 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50"
+                    title="Eliminar crédito del cliente"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    Eliminar
+                  </button>
+                  
                   <!-- Botón Enviar Recordatorio -->
                   <button
                     @click="sendReminder(selectedCustomer)"
@@ -502,7 +540,7 @@
       <Transition name="modal">
         <div v-if="showPaymentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <!-- Overlay -->
-          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closePaymentModal"></div>
+          <div class="absolute inset-0 bg-black/70 dark:bg-black/85" @click="closePaymentModal"></div>
           
           <!-- Modal Content -->
           <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 animate-modal-enter">
@@ -626,7 +664,7 @@
       <Transition name="modal">
         <div v-if="showCreateCreditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <!-- Overlay -->
-          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showCreateCreditModal = false"></div>
+          <div class="absolute inset-0 bg-black/70 dark:bg-black/85" @click="showCreateCreditModal = false"></div>
           
           <!-- Modal Content -->
           <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-auto border border-gray-200 dark:border-zinc-700 animate-modal-enter">
@@ -710,7 +748,7 @@
                   <div class="relative">
                     <input 
                       v-model="customerForm.document_number"
-                      @blur="checkDocumentExists"
+                      @input="checkDocumentExists"
                       type="text"
                       placeholder="Ej: 1234567890"
                       class="w-full px-3 py-2.5 pr-10 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -831,36 +869,12 @@
       </Transition>
     </Teleport>
 
-    <!-- Botones FAB Flotantes -->
-    <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
-      <!-- Botón Configuración de Recordatorios -->
-      <button 
-        @click="showReminderSettingsModal = true"
-        class="w-12 h-12 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 rounded-full shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-700 transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center group"
-        title="Configuración de recordatorios automáticos">
-        <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-        </svg>
-      </button>
-      
-      <!-- Botón Nuevo Crédito -->
-      <button 
-        @click="openCreateCreditModal"
-        class="w-14 h-14 bg-black dark:bg-zinc-800 hover:bg-gray-900 dark:hover:bg-zinc-700 text-white rounded-full shadow-2xl dark:shadow-black/70 hover:shadow-black/40 transition-all duration-300 transform hover:scale-110 active:scale-95 flex items-center justify-center group">
-        <svg class="w-7 h-7 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-        </svg>
-        <span class="sr-only">Nuevo Crédito</span>
-      </button>
-    </div>
-
     <!-- MODAL: Configuración de Recordatorios Automáticos -->
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showReminderSettingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <!-- Overlay -->
-          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showReminderSettingsModal = false"></div>
+          <div class="absolute inset-0 bg-black/70 dark:bg-black/85" @click="showReminderSettingsModal = false"></div>
           
           <!-- Modal Content -->
           <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 animate-modal-enter">
@@ -1049,7 +1063,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="showEditCustomerModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div v-if="showEditCustomerModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 dark:bg-black/85">
           <Transition
             enter-active-class="transition-all duration-300 ease-out"
             leave-active-class="transition-all duration-200 ease-in"
@@ -1192,7 +1206,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="showPhotoPreviewModal" @click="closePhotoPreview" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div v-if="showPhotoPreviewModal" @click="closePhotoPreview" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 dark:bg-black/95">
           <Transition
             enter-active-class="transition-all duration-300 ease-out"
             leave-active-class="transition-all duration-200 ease-in"
@@ -1235,6 +1249,106 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- 🗑️ MODAL: Confirmar Eliminación de Crédito -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-200 ease-out"
+        leave-active-class="transition-opacity duration-150 ease-in"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showDeleteModal" @click="showDeleteModal = false" class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
+          <Transition
+            enter-active-class="transition-all duration-200 ease-out"
+            leave-active-class="transition-all duration-150 ease-in"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+          >
+            <div v-if="showDeleteModal" @click.stop class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-200 dark:border-zinc-800">
+              
+              <!-- Icono de advertencia -->
+              <div class="p-6 text-center">
+                <div class="mx-auto w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
+                  <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                </div>
+                
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  ¿Eliminar Cliente?
+                </h3>
+                
+                <p class="text-gray-600 dark:text-zinc-400 mb-1">
+                  ¿Estás seguro de eliminar el cliente <strong class="text-gray-900 dark:text-white">"{{ customerToDelete?.name }}"</strong>?
+                </p>
+                
+                <p class="text-sm text-rose-600 dark:text-rose-400 font-medium mb-4">
+                  Esta acción no se puede deshacer.
+                </p>
+                
+                <!-- Lista de lo que se eliminará -->
+                <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 text-left mb-6">
+                  <p class="text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wide mb-3">Se eliminará:</p>
+                  <ul class="space-y-2 text-sm text-gray-600 dark:text-zinc-400">
+                    <li class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                      Historial de crédito
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                      Pagos registrados
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                      Foto del cliente (si existe)
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                      Acceso a crédito del cliente
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <!-- Botones de acción -->
+              <div class="bg-gray-50 dark:bg-zinc-800/50 px-6 py-4 flex gap-3">
+                <button
+                  @click="showDeleteModal = false"
+                  class="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-xl border border-gray-300 dark:border-zinc-700 transition-all duration-200"
+                >
+                  Cancelar
+                </button>
+                <button
+                  @click="executeDeleteCredit"
+                  :disabled="deletingCredit"
+                  class="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 text-white font-bold rounded-xl transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <svg v-if="deletingCredit" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                  </svg>
+                  <span>{{ deletingCredit ? 'Eliminando...' : 'Eliminar' }}</span>
+                </button>
+              </div>
+              
+            </div>
+          </Transition>
+        </div>
+      </Transition>
+    </Teleport>
     </div>
   </div>
 </template>
@@ -1244,6 +1358,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { customersService } from '../services/customersService.js'
 import { useToast } from '../composables/useToast.js'
 import axiosInstance from '../services/apiClient.js'
+import axios from 'axios'
 
 const { showSuccess, showError } = useToast()
 
@@ -1307,6 +1422,12 @@ const checkingDocument = ref(false)
 const customerExists = ref(false)
 const uploadingPhoto = ref(false)
 const photoPreview = ref(null)
+let documentCheckTimeout = null // Para debounce de búsqueda
+
+// 🗑️ Modal de confirmación para eliminar crédito
+const showDeleteModal = ref(false)
+const customerToDelete = ref(null)
+const deletingCredit = ref(false)
 const customerForm = ref({
   document_type: 'CC',
   document_number: '',
@@ -1727,6 +1848,45 @@ const removePhoto = () => {
   photoPreview.value = null
 }
 
+// 🗑️ Función para confirmar y eliminar crédito
+// 🗑️ Función para abrir modal de confirmación de eliminación
+const confirmDeleteCredit = (customer) => {
+  // Verificar que el cliente esté al día (sin deuda)
+  if (customer.balance > 0 || customer.current_debt > 0) {
+    showError('No se puede eliminar el crédito. El cliente tiene una deuda pendiente.')
+    return
+  }
+  
+  // Abrir modal de confirmación
+  customerToDelete.value = customer
+  showDeleteModal.value = true
+}
+
+// 🗑️ Función para ejecutar la eliminación del crédito
+const executeDeleteCredit = async () => {
+  if (!customerToDelete.value) return
+  
+  deletingCredit.value = true
+  try {
+    const response = await axiosInstance.delete(`/customers/${customerToDelete.value.id}/credit`)
+    
+    if (response.data.success) {
+      showSuccess('Crédito eliminado correctamente')
+      showDeleteModal.value = false
+      customerToDelete.value = null
+      selectedCustomer.value = null
+      await loadCustomers()
+    } else {
+      showError(response.data.message || 'Error al eliminar el crédito')
+    }
+  } catch (error) {
+    console.error('Error eliminando crédito:', error)
+    showError(error.response?.data?.message || 'Error al eliminar el crédito')
+  } finally {
+    deletingCredit.value = false
+  }
+}
+
 // Funciones para editar cliente
 const openEditCustomerModal = (customer) => {
   editForm.value = {
@@ -1832,46 +1992,65 @@ const closePhotoPreview = () => {
 }
 
 const checkDocumentExists = async () => {
+  // Limpiar timeout anterior
+  if (documentCheckTimeout) {
+    clearTimeout(documentCheckTimeout)
+  }
+  
+  // Si el documento es muy corto, resetear estado
   if (!customerForm.value.document_number || customerForm.value.document_number.length < 5) {
+    customerExists.value = false
+    checkingDocument.value = false
     return
   }
 
+  // Mostrar indicador de carga
   checkingDocument.value = true
-  try {
-    const response = await axiosInstance.post('/customers/check-document', {
-      document_type: customerForm.value.document_type,
-      document_number: customerForm.value.document_number
-    })
+  
+  // Esperar 500ms antes de buscar (debounce)
+  documentCheckTimeout = setTimeout(async () => {
+    try {
+      const response = await axiosInstance.post('/customers/check-document', {
+        document_type: customerForm.value.document_type,
+        document_number: customerForm.value.document_number
+      })
 
-    if (response.data.exists) {
-      customerExists.value = true
-      const existingCustomer = response.data.data
-      customerForm.value = {
-        ...customerForm.value,
-        name: existingCustomer.name,
-        email: existingCustomer.email || '',
-        phone: existingCustomer.phone || '',
-        address: existingCustomer.address || '',
-        city: existingCustomer.city || '',
-        credit_limit: existingCustomer.credit_limit || 0,
-        credit_photo: existingCustomer.credit_photo || '',
-        credit_active: true,
-        active: existingCustomer.active ?? true
+      if (response.data.exists) {
+        customerExists.value = true
+        const existingCustomer = response.data.data
+        
+        // Auto-llenar todos los campos del cliente encontrado
+        customerForm.value = {
+          ...customerForm.value,
+          name: existingCustomer.name,
+          email: existingCustomer.email || '',
+          phone: existingCustomer.phone || '',
+          address: existingCustomer.address || '',
+          city: existingCustomer.city || '',
+          credit_limit: existingCustomer.credit_limit || 0,
+          credit_photo: existingCustomer.credit_photo || '',
+          credit_active: true,
+          active: existingCustomer.active ?? true
+        }
+        
+        // Mostrar foto existente si la tiene
+        if (existingCustomer.credit_photo) {
+          photoPreview.value = existingCustomer.credit_photo
+        }
+        
+        console.log('✅ Cliente encontrado y campos auto-llenados:', existingCustomer.name)
+      } else {
+        customerExists.value = false
+        console.log('📝 Cliente no encontrado, listo para crear nuevo')
       }
-      // Mostrar foto existente si la tiene
-      if (existingCustomer.credit_photo) {
-        photoPreview.value = existingCustomer.credit_photo
-      }
-    } else {
+    } catch (error) {
+      // Búsqueda opcional: No mostrar error si no encuentra el cliente
+      console.log('📝 No se encontró cliente con ese documento')
       customerExists.value = false
+    } finally {
+      checkingDocument.value = false
     }
-  } catch (error) {
-    // 🔍 Búsqueda opcional: No mostrar error si no encuentra el cliente
-    console.log('📝 Búsqueda de documento opcional (no se encontró cliente existente)')
-    customerExists.value = false
-  } finally {
-    checkingDocument.value = false
-  }
+  }, 500) // Esperar 500ms después de dejar de escribir
 }
 
 const saveCustomerCredit = async () => {
@@ -1903,9 +2082,17 @@ const saveCustomerCredit = async () => {
     }
 
     if (response.data.success) {
+      const isNewCustomer = !customerExists.value
+      
       showSuccess(customerExists.value ? 'Crédito actualizado exitosamente' : 'Crédito creado exitosamente')
       showCreateCreditModal.value = false
       await loadCustomers()
+      
+      // 🎉 Enviar mensajes de bienvenida para CUALQUIER nuevo crédito
+      // (tanto clientes nuevos como clientes existentes que reciben crédito por primera vez o de nuevo)
+      if (customerForm.value.email || customerForm.value.phone) {
+        await sendWelcomeMessages()
+      }
     }
   } catch (error) {
     console.error('❌ Error al crear/actualizar cliente:', error)
@@ -1936,6 +2123,196 @@ const saveCustomerCredit = async () => {
     }
   } finally {
     processing.value = false
+  }
+}
+
+// 🎉 FUNCIÓN CRM: Enviar mensajes de bienvenida a nuevo cliente con crédito
+const sendWelcomeMessages = async () => {
+  try {
+    const customerData = customerForm.value
+    const companyName = 'MATIMAA' // TODO: Obtener del systemSettings
+    
+    // Preparar datos del crédito
+    const creditInfo = {
+      customerName: customerData.name,
+      creditLimit: new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(customerData.credit_limit),
+      phone: customerData.phone,
+      email: customerData.email
+    }
+
+    // 📧 Enviar email de bienvenida si tiene correo
+    if (customerData.email && customerData.email.includes('@')) {
+      try {
+        const currentDate = new Date().toLocaleDateString('es-CO', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })
+        
+        await axiosInstance.post('/send-email', {
+          to: customerData.email,
+          subject: `Crédito Aprobado - ${companyName}`,
+          html: `
+            <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f4f4f5;">
+              
+              <!-- Header con gradiente sutil -->
+              <div style="background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); padding: 35px 40px; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 600; letter-spacing: 0.5px;">${companyName}</h1>
+                <p style="color: #5eead4; margin: 8px 0 0 0; font-size: 13px; letter-spacing: 1px;">NOTIFICACIÓN DE CRÉDITO</p>
+              </div>
+              
+              <!-- Contenido principal -->
+              <div style="background: #ffffff; padding: 40px;">
+                
+                <!-- Saludo con icono visual -->
+                <div style="text-align: center; margin-bottom: 30px;">
+                  <div style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 60px; height: 60px; border-radius: 50%; line-height: 60px; margin-bottom: 15px;">
+                    <span style="color: white; font-size: 28px;">✓</span>
+                  </div>
+                  <h2 style="color: #0f766e; margin: 0; font-size: 22px; font-weight: 600;">Crédito Aprobado</h2>
+                </div>
+                
+                <p style="color: #374151; font-size: 15px; margin: 0 0 20px 0; line-height: 1.6;">
+                  Estimado(a) <strong>${customerData.name}</strong>,
+                </p>
+                
+                <p style="color: #6b7280; font-size: 14px; line-height: 1.7; margin: 0 0 30px 0;">
+                  Nos complace informarle que su solicitud de crédito ha sido evaluada y 
+                  <strong style="color: #059669;">aprobada satisfactoriamente</strong>. 
+                  A continuación encontrará los detalles de su línea de crédito:
+                </p>
+                
+                <!-- Cupo de crédito destacado -->
+                <div style="background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); border-radius: 12px; padding: 30px; margin: 25px 0; text-align: center;">
+                  <p style="color: #99f6e4; margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 500;">Su Cupo de Crédito</p>
+                  <p style="color: #ffffff; margin: 0; font-size: 38px; font-weight: 700;">${creditInfo.creditLimit}</p>
+                  <p style="color: #5eead4; margin: 10px 0 0 0; font-size: 12px;">Disponible desde hoy</p>
+                </div>
+                
+                <!-- Información de la cuenta con mejor diseño -->
+                <div style="background: #f9fafb; border-radius: 8px; padding: 20px; margin: 25px 0;">
+                  <p style="color: #0f766e; font-size: 13px; font-weight: 600; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 0.5px;">Detalles de su Cuenta</p>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 10px 0; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;">Titular</td>
+                      <td style="padding: 10px 0; color: #111827; font-size: 13px; font-weight: 500; text-align: right; border-bottom: 1px solid #e5e7eb;">${customerData.name}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 10px 0; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;">Documento</td>
+                      <td style="padding: 10px 0; color: #111827; font-size: 13px; font-weight: 500; text-align: right; border-bottom: 1px solid #e5e7eb;">${customerData.document_type} ${customerData.document_number}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 10px 0; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;">Cupo Aprobado</td>
+                      <td style="padding: 10px 0; color: #059669; font-size: 13px; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">${creditInfo.creditLimit}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 10px 0; color: #6b7280; font-size: 13px;">Fecha de Activación</td>
+                      <td style="padding: 10px 0; color: #111827; font-size: 13px; font-weight: 500; text-align: right;">${currentDate}</td>
+                    </tr>
+                  </table>
+                </div>
+                
+                <!-- Nota importante con diseño amigable -->
+                <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                  <p style="color: #92400e; margin: 0; font-size: 13px; line-height: 1.6;">
+                    <strong>Nota:</strong> Recuerde realizar sus pagos de manera oportuna para mantener 
+                    su crédito activo y acceder a futuros incrementos de cupo.
+                  </p>
+                </div>
+                
+                <p style="color: #6b7280; font-size: 14px; line-height: 1.7; margin: 25px 0 0 0;">
+                  Si tiene alguna pregunta sobre su crédito, no dude en contactarnos. 
+                  Estamos aquí para ayudarle.
+                </p>
+                
+                <p style="color: #374151; font-size: 14px; margin: 30px 0 0 0;">
+                  Cordialmente,<br>
+                  <strong style="color: #0f766e;">${companyName}</strong>
+                </p>
+                
+              </div>
+              
+              <!-- Footer -->
+              <div style="background: #134e4a; padding: 25px 40px; text-align: center;">
+                <p style="color: #5eead4; font-size: 13px; margin: 0 0 5px 0;">¿Tiene preguntas?</p>
+                <p style="color: #99f6e4; font-size: 11px; margin: 0;">Contáctenos y con gusto le atenderemos</p>
+                <div style="border-top: 1px solid #0f766e; margin-top: 20px; padding-top: 15px;">
+                  <p style="color: #6b7280; font-size: 10px; margin: 0;">
+                    Este es un mensaje automático. Por favor no responda a este correo.
+                  </p>
+                </div>
+              </div>
+              
+            </div>
+          `
+        })
+        console.log('✅ Email de bienvenida enviado correctamente')
+      } catch (emailError) {
+        console.warn('⚠️ No se pudo enviar el email de bienvenida:', emailError.message)
+      }
+    }
+
+    // 📱 Enviar mensaje de WhatsApp si tiene teléfono
+    if (customerData.phone && customerData.phone.length >= 10) {
+      try {
+        // Formatear número de teléfono
+        let phone = customerData.phone.replace(/[\s\-\(\)]/g, '')
+        if (!phone.startsWith('+')) {
+          if (phone.startsWith('57')) {
+            phone = '+' + phone
+          } else if (phone.startsWith('3')) {
+            phone = '+57' + phone
+          }
+        }
+        
+        const welcomeMessage = `🎉 *¡Bienvenido a ${companyName}!*
+
+Hola *${customerData.name}*,
+
+Nos complace informarte que tu crédito ha sido *activado exitosamente*. 
+
+💳 *Tu Cupo de Crédito:*
+${creditInfo.creditLimit}
+
+📋 *Información de tu Cuenta:*
+• Documento: ${customerData.document_type} ${customerData.document_number}
+• Cupo disponible: ${creditInfo.creditLimit}
+
+💡 *Recuerda:* Paga tus cuotas a tiempo para mantener tu crédito activo y seguir disfrutando de esta facilidad de pago.
+
+¿Tienes preguntas? ¡Estamos para ayudarte!
+
+¡Gracias por confiar en nosotros! 🙌
+
+_${companyName}_`
+
+        // Enviar mensaje directo al backend de WhatsApp
+        const tenantId = window.location.hostname.split('.')[0] || 'matimaa'
+        const whatsappBaseURL = `http://localhost:3002`
+        
+        await axios.post(`${whatsappBaseURL}/send`, {
+          phone: phone,
+          message: welcomeMessage
+        }, {
+          headers: {
+            'X-Tenant-Id': tenantId
+          }
+        })
+        
+        console.log('✅ WhatsApp de bienvenida enviado correctamente')
+      } catch (whatsappError) {
+        console.warn('⚠️ No se pudo enviar el WhatsApp de bienvenida:', whatsappError.message)
+      }
+    }
+
+    // Mostrar notificación de que se enviaron los mensajes
+    if (customerData.email || customerData.phone) {
+      showSuccess('🎉 Mensajes de bienvenida enviados al cliente')
+    }
+
+  } catch (error) {
+    console.error('❌ Error al enviar mensajes de bienvenida:', error)
+    // No mostrar error al usuario, ya que el crédito sí se creó correctamente
   }
 }
 

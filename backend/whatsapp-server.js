@@ -148,34 +148,40 @@ async function sendMessage(phone, message, pdfPath = null) {
         // Formatear número de teléfono
         const jid = phone.includes('@') ? phone : `${phone.replace(/[^\d]/g, '')}@s.whatsapp.net`;
 
-        console.log(`📤 Enviando mensaje a ${jid}`);
+        console.log(`📤 Enviando mensaje a ${jid}${pdfPath ? ' con PDF adjunto' : ''}`);
 
-        // ✅ NO USAR AWAIT - Enviar en background
-        const sendPromise = (async () => {
-            try {
-                if (pdfPath && fs.existsSync(pdfPath)) {
-                    // Enviar PDF
-                    const mediaMessage = {
-                        document: fs.readFileSync(pdfPath),
-                        mimetype: 'application/pdf',
-                        fileName: 'factura.pdf',
-                        caption: message
-                    };
+        // ✅ Enviar con await para asegurar que el PDF se envíe
+        try {
+            if (pdfPath && fs.existsSync(pdfPath)) {
+                // Leer el archivo PDF
+                const pdfBuffer = fs.readFileSync(pdfPath);
+                const fileName = pdfPath.split('/').pop().replace('temp_', '');
 
-                    await sock.sendMessage(jid, mediaMessage);
-                    console.log('✅ PDF enviado exitosamente a', phone);
-                } else {
-                    // Enviar solo texto
-                    await sock.sendMessage(jid, { text: message });
-                    console.log('✅ Mensaje enviado exitosamente a', phone);
-                }
-            } catch (error) {
-                console.error('❌ Error enviando mensaje a', phone, ':', error.message);
+                console.log(`📎 Adjuntando PDF: ${fileName} (${pdfBuffer.length} bytes)`);
+
+                // Enviar PDF con caption (mensaje)
+                const mediaMessage = {
+                    document: pdfBuffer,
+                    mimetype: 'application/pdf',
+                    fileName: fileName,
+                    caption: message
+                };
+
+                await sock.sendMessage(jid, mediaMessage);
+                console.log(`✅ PDF "${fileName}" enviado exitosamente a ${phone}`);
+
+                return { success: true, message: 'PDF enviado correctamente' };
+            } else {
+                // Enviar solo texto
+                await sock.sendMessage(jid, { text: message });
+                console.log(`✅ Mensaje de texto enviado exitosamente a ${phone}`);
+
+                return { success: true, message: 'Mensaje enviado correctamente' };
             }
-        })();
-
-        // ✅ RESPONDER INMEDIATAMENTE sin esperar
-        return { success: true, message: 'Mensaje en cola para envío' };
+        } catch (sendError) {
+            console.error(`❌ Error al enviar a ${phone}:`, sendError.message);
+            throw sendError;
+        }
 
     } catch (error) {
         console.error('❌ Error preparando mensaje:', error);
@@ -199,13 +205,15 @@ const server = http.createServer(async (req, res) => {
     const parsedUrl = url.parse(req.url, true);
 
     if (req.method === 'GET' && parsedUrl.pathname === '/status') {
-        // Endpoint de status
+        // Endpoint de status - Estructura compatible con frontend
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
-            connected: isConnected,
-            timestamp: new Date().toISOString()
+            success: true,
+            status: {
+                connected: isConnected,
+                timestamp: new Date().toISOString()
+            }
         }));
-
     } else if (req.method === 'GET' && parsedUrl.pathname === '/qr') {
         // Endpoint para obtener código QR
         try {
@@ -290,7 +298,7 @@ const server = http.createServer(async (req, res) => {
         }
 
     } else if (req.method === 'POST' && parsedUrl.pathname === '/send') {
-        // Endpoint para enviar mensajes
+        // Endpoint para enviar mensajes con PDF en base64
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
@@ -298,7 +306,7 @@ const server = http.createServer(async (req, res) => {
 
         req.on('end', async () => {
             try {
-                const { phone, message, pdfPath } = JSON.parse(body);
+                const { phone, message, pdfBase64, fileName } = JSON.parse(body);
 
                 if (!phone || !message) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -306,7 +314,39 @@ const server = http.createServer(async (req, res) => {
                     return;
                 }
 
+                let pdfPath = null;
+
+                // Si viene PDF en base64, convertirlo a archivo temporal
+                if (pdfBase64) {
+                    try {
+                        // Extraer el contenido base64 (remover "data:application/pdf;base64,")
+                        const base64Data = pdfBase64.replace(/^data:application\/pdf;base64,/, '');
+                        const buffer = Buffer.from(base64Data, 'base64');
+
+                        // Crear archivo temporal
+                        const tempFileName = fileName || `factura_${Date.now()}.pdf`;
+                        pdfPath = `./temp_${tempFileName}`;
+
+                        fs.writeFileSync(pdfPath, buffer);
+                        console.log(`📄 PDF guardado temporalmente: ${pdfPath} (${buffer.length} bytes)`);
+                    } catch (pdfError) {
+                        console.error('❌ Error procesando PDF base64:', pdfError);
+                    }
+                }
+
                 const result = await sendMessage(phone, message, pdfPath);
+
+                // Eliminar archivo temporal después de enviar
+                if (pdfPath && fs.existsSync(pdfPath)) {
+                    setTimeout(() => {
+                        try {
+                            fs.unlinkSync(pdfPath);
+                            console.log(`🗑️  Archivo temporal eliminado: ${pdfPath}`);
+                        } catch (e) {
+                            // Ignorar errores al eliminar
+                        }
+                    }, 5000); // Esperar 5 segundos antes de eliminar
+                }
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(result));

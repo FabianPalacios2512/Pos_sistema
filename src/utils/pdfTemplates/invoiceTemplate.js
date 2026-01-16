@@ -71,7 +71,7 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     })
 
     // Calcular altura dinámica exacta según contenido
-    const headerHeight = 50 // Header empresa + factura
+    const headerHeight = 60 // Header empresa + factura (aumentado de 50 a 60 para el logo)
     const customerHeight = 10 // Info cliente
     const tableHeaderHeight = 10 // Header tabla
     const itemHeight = 5 // Espacio por producto
@@ -80,11 +80,11 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     const messageHeight = 15 // Mensaje agradecimiento
     const qrHeight = 35 // QR + código
     const legalHeight = 18 // Info legal (4 líneas)
-    const footerHeight = 12 // Powered by + línea divisoria (aumentado de 5 a 12)
+    const footerHeight = 10 // Powered by + línea divisoria + margen inferior
 
     const dynamicHeight = headerHeight + customerHeight + tableHeaderHeight +
       (itemCount * itemHeight) + totalsHeight + messageHeight +
-      qrHeight + legalHeight + footerHeight + 15 // 15mm padding extra (aumentado de 10 a 15)
+      qrHeight + legalHeight + footerHeight + 20 // 20mm padding extra para asegurar espacio
 
     // Crear PDF con formato ticket (80mm ancho, altura dinámica)
     const pdf = new jsPDF({
@@ -112,21 +112,41 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       pdf.setTextColor(17, 24, 39) // Gray-900 para classic
     }
 
-    // Logo (si existe)
+    // Logo (si existe) - Cargar de manera asíncrona
     if (companyLogo) {
       try {
-        pdf.addImage(companyLogo, 'PNG', centerX - 8, yPos, 16, 10, '', 'FAST')
-        yPos += 14  // Espaciado aumentado: 12 → 14 (2mm más de separación)
+        await new Promise((resolve, reject) => {
+          const img = new Image()
+          img.onload = () => {
+            try {
+              const imgAspectRatio = img.width / img.height
+              
+              // Ancho máximo 16mm, altura máxima 12mm
+              let logoWidth = 16
+              let logoHeight = logoWidth / imgAspectRatio
+              
+              // Si la altura calculada excede el máximo, ajustar por altura
+              if (logoHeight > 12) {
+                logoHeight = 12
+                logoWidth = logoHeight * imgAspectRatio
+              }
+              
+              pdf.addImage(companyLogo, 'PNG', centerX - (logoWidth / 2), yPos, logoWidth, logoHeight, '', 'FAST')
+              yPos += logoHeight + 5  // Espacio entre logo y nombre de empresa
+              resolve()
+            } catch (err) {
+              reject(err)
+            }
+          }
+          img.onerror = reject
+          img.src = companyLogo
+        })
       } catch (err) {
-        console.log('No se pudo cargar el logo')
+        console.log('No se pudo cargar el logo', err)
       }
     }
 
-    // Nombre de la empresa (con espacio adicional si hay logo)
-    if (companyLogo) {
-      yPos += 2  // Espacio adicional de 2mm cuando hay logo
-    }
-    
+    // Nombre de la empresa
     pdf.setFont('helvetica', style.fonts.company.style)
     pdf.setFontSize(style.fonts.company.size)
     pdf.text(companyName.toUpperCase(), centerX, yPos, { align: 'center' })
@@ -523,6 +543,9 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     yPos += 5
 
     // ==================== FOOTER POWERED BY CENTRADO ====================
+    // Agregar espacio antes del footer
+    yPos += 3
+    
     pdf.setLineWidth(0.1)
     pdf.setDrawColor(220, 220, 220)
     pdf.line(leftMargin, yPos, rightMargin, yPos)
@@ -535,6 +558,7 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     // Texto completamente centrado
     const poweredText = 'Powered by 105 POS'
     pdf.text(poweredText, centerX, yPos, { align: 'center' })
+    yPos += 3 // Margen inferior después del powered by
 
     pdf.setTextColor(0, 0, 0) // Reset color
 

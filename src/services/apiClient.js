@@ -162,8 +162,11 @@ apiClient.interceptors.response.use(
         
         case 404:
           // Recurso no encontrado
-          // Detectar si es error de tenant/tienda no encontrada
-          if (data?.message && (
+          // 🛡️ EXCEPCIÓN: NO procesar errores de operaciones CRUD normales
+          const isCrudOperation = error.config?.url?.includes('/customers/') && error.config?.method === 'delete'
+          
+          // Detectar si es error de tenant/tienda no encontrada (SOLO en recursos críticos)
+          if (!isCrudOperation && data?.message && (
             data.message.toLowerCase().includes('tenant') ||
             data.message.toLowerCase().includes('tienda') ||
             data.message.toLowerCase().includes('warehouse')
@@ -174,7 +177,16 @@ apiClient.interceptors.response.use(
             // Si es el health-check o recursos críticos, cerrar sesión
             if (error.config?.url?.includes('health-check') || 
                 error.config?.url?.includes('warehouses')) {
+              // 🔐 Preservar configuraciones de UI antes de limpiar
+              const tourCompleted = localStorage.getItem('pos_tour_completed')
+              const tourSkipped = localStorage.getItem('pos_tour_skipped')
+              
               localStorage.clear()
+              
+              // Restaurar configuraciones de UI
+              if (tourCompleted) localStorage.setItem('pos_tour_completed', tourCompleted)
+              if (tourSkipped) localStorage.setItem('pos_tour_skipped', tourSkipped)
+              
               window.location.href = '/login?reason=tenant-error&message=Tu cuenta no está disponible. Por favor, contacta al soporte.'
               return Promise.reject(error)
             }
@@ -195,11 +207,19 @@ apiClient.interceptors.response.use(
             console.error('🔥 Error crítico: Base de datos o tenant no existe')
             console.error('Detalles:', data.message)
             
+            // 🔐 Preservar configuraciones de UI antes de limpiar
+            const tourCompleted = localStorage.getItem('pos_tour_completed')
+            const tourSkipped = localStorage.getItem('pos_tour_skipped')
+            
             // Limpiar sesión y redirigir al login
             localStorage.removeItem('authToken')
             localStorage.removeItem('user')
             localStorage.removeItem('loginTimestamp')
-            localStorage.clear() // Limpiar todo el localStorage
+            localStorage.clear()
+            
+            // Restaurar configuraciones de UI
+            if (tourCompleted) localStorage.setItem('pos_tour_completed', tourCompleted)
+            if (tourSkipped) localStorage.setItem('pos_tour_skipped', tourSkipped)
             
             // Redirigir al login con mensaje
             window.location.href = '/login?reason=tenant-error&message=Tu cuenta no está disponible. Por favor, contacta al soporte.'

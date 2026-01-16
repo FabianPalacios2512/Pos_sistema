@@ -1,0 +1,20 @@
+[Unit]
+Description=WhatsApp Server POS
+After=network.target mysql.service
+
+[Service]
+Type=simple
+User=kali
+WorkingDirectory=/home/kali/Escritorio/definitivo/01_POS_BASICO (2)/backend
+ExecStart=/bin/bash -c 'cd "/home/kali/Escritorio/definitivo/01_POS_BASICO (2)/backend" && /usr/bin/node whatsapp-server.js'
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/kali/Escritorio/definitivo/01_POS_BASICO (2)/whatsapp.log
+StandardError=append:/home/kali/Escritorio/definitivo/01_POS_BASICO (2)/whatsapp.log
+
+# Variables de entorno si las necesitas
+Environment=NODE_ENV=production
+Environment=PORT=3002
+
+[Install]
+WantedBy=multi-user.target

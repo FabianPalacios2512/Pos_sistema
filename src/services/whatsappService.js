@@ -398,7 +398,7 @@ export const whatsappService = {
   },
 
   // Función genérica para enviar documentos por WhatsApp (facturas, cotizaciones, órdenes de compra)
-  async sendDocumentByWhatsApp(phone, pdfBlob, documentNumber, documentType = 'invoice') {
+  async sendDocumentByWhatsApp(phone, pdfBlob, documentNumber, documentType = 'invoice', customerName = '') {
     try {
       // Validar y formatear el número de teléfono
       let formattedPhone = phone.replace(/[\s\-\(\)]/g, '')
@@ -411,11 +411,14 @@ export const whatsappService = {
         }
       }
 
-      // Generar mensaje según el tipo de documento
+      // Usar nombre del cliente si está disponible, sino "Cliente"
+      const clientName = customerName || 'Cliente'
+      
+      // Generar mensaje según el tipo de documento con nombre del cliente
       const messages = {
-        invoice: `📄 *Factura ${documentNumber}*\n\nAdjunto encontrará su factura. ¡Gracias por su compra!`,
-        quotation: `📋 *Cotización ${documentNumber}*\n\nAdjunto encontrará la cotización solicitada. Quedamos atentos a sus comentarios.`,
-        purchase_order: `📦 *Orden de Compra ${documentNumber}*\n\nAdjunto encontrará la orden de compra. Por favor confirmar recepción y disponibilidad de productos. ¡Gracias!`
+        invoice: `📄 *Factura ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás tu factura. ¡Gracias por tu compra!`,
+        quotation: `📋 *Cotización ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás la cotización solicitada. Quedamos atentos a tus comentarios.`,
+        purchase_order: `📦 *Orden de Compra ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás la orden de compra. Por favor confirmar recepción y disponibilidad de productos. ¡Gracias!`
       }
 
       const fileNames = {

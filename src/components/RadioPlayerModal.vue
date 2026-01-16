@@ -3,12 +3,12 @@
     <Transition name="fade">
       <div 
         v-if="isOpen" 
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+        class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4"
         @click="closeModal"
       >
         <!-- Contenedor Principal - Estilo Linear/Vercel -->
         <div 
-          class="radio-modal-container w-full max-w-[1100px] h-[85vh] max-h-[720px] rounded-2xl shadow-2xl overflow-hidden flex flex-col relative font-sans"
+          class="radio-modal-container w-full max-w-[1100px] h-[85vh] max-h-[720px] rounded-2xl shadow-xl overflow-hidden flex flex-col relative font-sans"
           :class="isDarkMode ? 'bg-[#09090b] border border-zinc-800' : 'bg-white border border-slate-200'"
           @click.stop
         >
@@ -49,7 +49,7 @@
                 <nav class="space-y-1">
                   <button 
                     @click="goHome"
-                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-sm font-medium"
+                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-100 text-sm font-medium"
                     :class="radioStore.currentView === 'home' 
                       ? (isDarkMode ? 'bg-zinc-800 text-white' : 'bg-slate-200/80 text-slate-900')
                       : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')"
@@ -64,7 +64,7 @@
                   <!-- Favoritos -->
                   <button 
                     @click="goToFavorites"
-                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-sm font-medium"
+                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-100 text-sm font-medium"
                     :class="radioStore.currentView === 'favorites' 
                       ? (isDarkMode ? 'bg-zinc-800 text-white' : 'bg-slate-200/80 text-slate-900')
                       : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100')"
@@ -86,7 +86,7 @@
                   <!-- Tendencias -->
                   <button 
                     @click="goHome"
-                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-sm font-medium"
+                    class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-100 text-sm font-medium"
                     :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
                   >
                     <!-- Lucide: TrendingUp -->
@@ -103,22 +103,22 @@
                   <h3 class="px-3 text-[11px] font-semibold uppercase tracking-wider mb-2" :class="isDarkMode ? 'text-zinc-600' : 'text-slate-400'">Ciudades</h3>
                   <div class="space-y-0.5">
                     <button @click="filterCity('Medellín', 'Antioquia')" 
-                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-150 flex items-center gap-2.5"
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
                       :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
                       <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Medellín
                     </button>
                     <button @click="filterCity('Bogotá', 'Bogota')" 
-                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-150 flex items-center gap-2.5"
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
                       :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
                       <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Bogotá
                     </button>
                     <button @click="filterCity('Cali', 'Valle del Cauca')" 
-                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-150 flex items-center gap-2.5"
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
                       :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
                       <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span> Cali
                     </button>
                     <button @click="filterCity('Costa', 'Atlantico')" 
-                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-150 flex items-center gap-2.5"
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
                       :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
                       <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Costa
                     </button>
@@ -135,8 +135,8 @@
               
               <!-- Header con Search - Estilo Linear -->
               <header 
-                class="sticky top-0 z-30 backdrop-blur-xl px-6 py-4 border-b"
-                :class="isDarkMode ? 'bg-[#09090b]/80 border-zinc-800/80' : 'bg-white/80 border-slate-100'"
+                class="sticky top-0 z-30 px-6 py-4 border-b"
+                :class="isDarkMode ? 'bg-[#09090b] border-zinc-800/80' : 'bg-white border-slate-100'"
               >
                 <div class="flex items-center gap-4">
                   <span class="text-sm font-medium" :class="isDarkMode ? 'text-zinc-400' : 'text-slate-500'">{{ greeting }}</span>
@@ -151,7 +151,7 @@
                       v-model="searchQuery"
                       @input="handleSearch"
                       placeholder="Buscar emisoras..." 
-                      class="w-full pl-9 pr-4 py-2 rounded-lg text-sm transition-all duration-150 focus:outline-none focus:ring-2"
+                      class="w-full pl-9 pr-4 py-2 rounded-lg text-sm transition-all duration-100 focus:outline-none focus:ring-2"
                       :class="isDarkMode 
                         ? 'bg-zinc-800/50 text-white placeholder-zinc-500 focus:ring-zinc-700 border border-zinc-700/50' 
                         : 'bg-slate-100 text-slate-900 placeholder-slate-400 focus:ring-slate-200 border border-transparent'"
@@ -294,10 +294,10 @@
 
           <!-- PLAYER BAR - Sticky Bottom - Estilo Linear/Vercel -->
           <div 
-            class="absolute bottom-0 left-0 right-0 h-20 flex items-center justify-between px-5 z-50 backdrop-blur-xl border-t"
+            class="absolute bottom-0 left-0 right-0 h-20 flex items-center justify-between px-5 z-50 border-t"
             :class="isDarkMode 
-              ? 'bg-[#09090b]/95 border-zinc-800' 
-              : 'bg-white/95 border-slate-200'"
+              ? 'bg-[#09090b] border-zinc-800' 
+              : 'bg-white border-slate-200'"
           >
             
             <!-- Info Emisora Actual -->
@@ -337,7 +337,7 @@
                 </div>
                 <!-- Botón Favorito -->
                 <button 
-                  class="p-1.5 rounded-md transition-colors"
+                  class="p-1.5 rounded-md transition-colors duration-100"
                   :class="[
                     radioStore.isFavorite(radioStore.currentStation?.id)
                       ? 'text-rose-500'
@@ -367,7 +367,7 @@
                 <!-- Random -->
                 <button 
                   @click="radioStore.playRandom()"
-                  class="p-2 rounded-lg transition-colors"
+                  class="p-2 rounded-lg transition-colors duration-100"
                   :class="isDarkMode ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'"
                   title="Aleatorio"
                 >
@@ -379,7 +379,7 @@
                 <!-- Previous -->
                 <button 
                   @click="radioStore.playPrevious()"
-                  class="p-2 rounded-lg transition-colors"
+                  class="p-2 rounded-lg transition-colors duration-100"
                   :class="isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'"
                 >
                   <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -406,7 +406,7 @@
                 <!-- Next -->
                 <button 
                   @click="radioStore.playNext()"
-                  class="p-2 rounded-lg transition-colors"
+                  class="p-2 rounded-lg transition-colors duration-100"
                   :class="isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'"
                 >
                   <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -416,7 +416,7 @@
 
                 <!-- Repeat -->
                 <button 
-                  class="p-2 rounded-lg transition-colors"
+                  class="p-2 rounded-lg transition-colors duration-100"
                   :class="isDarkMode ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'"
                 >
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -449,7 +449,7 @@
             <div class="w-[28%] flex items-center justify-end gap-2">
               <button 
                 @click="radioStore.toggleMute()" 
-                class="p-2 rounded-lg transition-colors"
+                class="p-2 rounded-lg transition-colors duration-100"
                 :class="isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'"
               >
                 <svg v-if="!radioStore.isMuted && radioStore.volume > 0" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -764,14 +764,14 @@ const StationTile = defineComponent({
 
     return () => h('div', {
       class: [
-        'group cursor-pointer transition-all duration-150',
+        'group cursor-pointer',
       ],
       onClick: () => store.playStation(props.station)
     }, [
       // Image Container - Tile cuadrado minimalista
       h('div', { 
         class: [
-          'relative aspect-square rounded-xl overflow-hidden mb-2.5 border transition-all duration-150',
+          'relative aspect-square rounded-xl overflow-hidden mb-2.5 border transition-all duration-100',
           props.isDarkMode 
             ? 'bg-zinc-800 border-zinc-700/50 group-hover:border-zinc-600' 
             : 'bg-slate-50 border-slate-100 group-hover:border-slate-200 group-hover:shadow-md'
@@ -792,7 +792,7 @@ const StationTile = defineComponent({
           ? h('img', { 
               src: getCardLogo(props.station), 
               class: [
-                'w-full h-full object-contain p-4 transition-all duration-200',
+                'w-full h-full object-contain p-4 transition-opacity duration-150',
                 imageLoaded.value ? 'opacity-100' : 'opacity-0'
               ],
               onLoad: handleImageLoad,
@@ -809,14 +809,14 @@ const StationTile = defineComponent({
         // Hover overlay con play
         h('div', { 
           class: [
-            'absolute inset-0 flex items-center justify-center transition-all duration-150',
+            'absolute inset-0 flex items-center justify-center transition-opacity duration-100',
             'opacity-0 group-hover:opacity-100',
             props.isDarkMode ? 'bg-black/40' : 'bg-black/30'
           ] 
         }, [
           h('button', { 
             class: [
-              'w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-150 group-hover:scale-100 scale-90',
+              'w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-100 group-hover:scale-100 scale-90',
               isCurrentPlaying.value
                 ? 'bg-emerald-500 text-white'
                 : 'bg-white text-slate-900'
@@ -835,7 +835,7 @@ const StationTile = defineComponent({
         // Botón favorito
         h('button', { 
           class: [
-            'absolute top-2 right-2 z-10 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-150',
+            'absolute top-2 right-2 z-10 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-100',
             store.isFavorite(props.station.id) 
               ? 'bg-rose-500 text-white' 
               : [
@@ -889,30 +889,56 @@ const StationTile = defineComponent({
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.2s ease;
+/* Transiciones optimizadas para mejor rendimiento */
+.fade-enter-active {
+  transition: opacity 0.15s ease-out;
+}
+.fade-leave-active {
+  transition: opacity 0.12s ease-in;
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
 }
 
 /* Custom Scrollbar - Minimalista */
-.custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar { 
+  width: 6px; 
+}
+.custom-scrollbar::-webkit-scrollbar-track { 
+  background: transparent; 
+}
 .custom-scrollbar::-webkit-scrollbar-thumb { 
   background: #3f3f46; 
   border-radius: 10px; 
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #52525b; }
-
-/* Animaciones de barras de música - Más sutiles */
-@keyframes music-bar {
-  0%, 100% { height: 3px; }
-  50% { height: 12px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { 
+  background: #52525b; 
 }
-.animate-music-bar-1 { animation: music-bar 0.4s ease-in-out infinite; animation-delay: 0s; }
-.animate-music-bar-2 { animation: music-bar 0.4s ease-in-out infinite; animation-delay: 0.1s; }
-.animate-music-bar-3 { animation: music-bar 0.4s ease-in-out infinite; animation-delay: 0.2s; }
+
+/* Optimizar animaciones con GPU acceleration */
+.group {
+  will-change: auto;
+}
+
+.group:hover {
+  will-change: transform, opacity;
+}
+
+/* Animaciones de barras de música - Optimizadas con GPU */
+@keyframes music-bar {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+.animate-music-bar-1,
+.animate-music-bar-2,
+.animate-music-bar-3 {
+  will-change: transform;
+  transform-origin: center;
+  height: 12px;
+}
+.animate-music-bar-1 { animation: music-bar 0.5s ease-in-out infinite; }
+.animate-music-bar-2 { animation: music-bar 0.5s ease-in-out infinite 0.1s; }
+.animate-music-bar-3 { animation: music-bar 0.5s ease-in-out infinite 0.2s; }
 
 /* Animación de barra de progreso LIVE */
 @keyframes progress-wave {
@@ -921,10 +947,17 @@ const StationTile = defineComponent({
 }
 .animate-progress-wave {
   animation: progress-wave 1.5s linear infinite;
+  will-change: transform;
 }
 
 /* Font Inter */
 .font-sans {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Optimizar rendering del modal */
+.radio-modal-container {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 </style>

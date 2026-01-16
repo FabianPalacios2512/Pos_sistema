@@ -977,7 +977,8 @@ const sendByWhatsApp = async () => {
       phoneNumber.value,
       pdfBlob,
       docNumber,
-      'devolucion'
+      'devolucion',
+      selectedReturn.value.customer_name || 'Cliente'
     )
     
     showToast('Devolución enviada por WhatsApp exitosamente', 'success')

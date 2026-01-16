@@ -685,11 +685,19 @@ const handleLogin = async () => {
     }
 
     // Esperar un momento para mostrar el mensaje de éxito
-    setTimeout(() => {
+    setTimeout(async () => {
       // Si es super admin, ir directo al panel god mode
       if (user?.is_super_admin || user?.role?.name === 'superadmin') {
         router.push('/admin/god-mode')
         return
+      }
+
+      // 🔧 FIX: Cargar systemSettings ANTES de redireccionar
+      // Esto evita que el router guard redirija a welcome/onboarding incorrectamente
+      try {
+        await appStore.loadSystemSettings()
+      } catch (error) {
+        // Continuar de todos modos
       }
 
       // 🎯 REDIRECCIÓN INTELIGENTE BASADA EN PERMISOS

@@ -91,8 +91,8 @@ const updateStatus = (newStatus) => {
 }
 
 const startStatusCheck = () => {
-  // Verificar estado cada 10 segundos
-  statusCheckInterval.value = setInterval(checkStatus, 10000)
+  // Verificar estado cada 5 segundos (más frecuente que antes)
+  statusCheckInterval.value = setInterval(checkStatus, 5000)
 }
 
 const stopStatusCheck = () => {
