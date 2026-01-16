@@ -118,7 +118,7 @@ class CreditPaymentController extends Controller
                     'customer_id' => $customer->id
                 ]);
             }
-            
+
             // Asegurar que subtotal_debt no sea negativo
             if ($customer->subtotal_debt < 0) $customer->subtotal_debt = 0;
 

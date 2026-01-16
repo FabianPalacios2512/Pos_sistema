@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * 
+     *
      * subtotal_debt = Deuda SIN recargo (para calcular crédito disponible)
      * current_debt = Deuda CON recargo (lo que el cliente realmente debe pagar)
      */

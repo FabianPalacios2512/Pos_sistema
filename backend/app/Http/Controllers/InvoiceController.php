@@ -877,7 +877,7 @@ class InvoiceController extends Controller
                 // El recargo NO cuenta contra el cupo (es ganancia del negocio)
                 $subtotal = $data['total']; // Subtotal SIN recargo
                 $creditLimit = floatval($customer->credit_limit ?? 0);
-                
+
                 // 🎯 Usar subtotal_debt del cliente (deuda sin recargo)
                 $subtotalDebt = floatval($customer->subtotal_debt ?? 0);
                 $availableCredit = max(0, $creditLimit - $subtotalDebt);
@@ -1024,14 +1024,14 @@ class InvoiceController extends Controller
                 if ($customer) {
                     $previousDebt = $customer->current_debt ?? 0;
                     $previousSubtotalDebt = $customer->subtotal_debt ?? 0;
-                    
+
                     // 🎯 IMPORTANTE: En este punto $data['total'] YA incluye el recargo (se modificó en línea ~937)
                     // Por lo tanto:
                     // - $data['total'] = subtotal + recargo (lo que el cliente DEBE PAGAR)
                     // - $data['subtotal'] = subtotal original SIN recargo (para calcular cupo)
                     $totalWithSurcharge = floatval($data['total']); // YA incluye recargo, NO sumar de nuevo
                     $subtotalSinRecargo = floatval($data['subtotal']); // El subtotal REAL sin recargo
-                    
+
                     $customer->current_debt = $previousDebt + $totalWithSurcharge;
                     $customer->subtotal_debt = $previousSubtotalDebt + $subtotalSinRecargo; // 🎯 Deuda sin recargo para calcular cupo
 

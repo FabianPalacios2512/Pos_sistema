@@ -64,9 +64,9 @@ class CreditController extends Controller
             if ($request->method === 'cash') {
                 $userId = Auth::id() ?? 1;
                 $session = CashSession::getOpenSessionForUser($userId);
-                
+
                 if (!$session) {
-                    // Si no hay sesión, ¿permitimos el abono? 
+                    // Si no hay sesión, ¿permitimos el abono?
                     // Generalmente sí, pero no sumará a ninguna sesión abierta.
                     // O lanzamos error. El usuario dijo "SUMA a la CashSession actual".
                     // Asumiremos que si no hay sesión, se guarda pero no se asocia (o se fuerza apertura?).

@@ -81,10 +81,10 @@ class Customer extends Model
         if (!$this->credit_active || $this->credit_limit <= 0) {
             return 0;
         }
-        
+
         // Usar subtotal_debt (deuda sin recargo) para calcular disponible
         $subtotalDebt = floatval($this->subtotal_debt ?? 0);
-        
+
         return max(0, $this->credit_limit - $subtotalDebt);
     }
 
