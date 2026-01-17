@@ -1585,8 +1585,11 @@ const handleSendWhatsApp = async () => {
       items: items,
       subtotal: parseFloat(selectedInvoice.value.subtotal || 0),
       discount: parseFloat(selectedInvoice.value.discount_amount || 0),
-      tax: parseFloat(selectedInvoice.value.tax_amount || 0),
+      tax: parseFloat(selectedInvoice.value.tax_amount || selectedInvoice.value.tax || 0),
       total: parseFloat(selectedInvoice.value.total || 0),
+      // 🎯 Recargo CrediTienda
+      surcharge_amount: parseFloat(selectedInvoice.value.surcharge_amount || 0),
+      payment_method: selectedInvoice.value.payment_method || 'efectivo',
       payments: selectedInvoice.value.payments || [{
         method: selectedInvoice.value.payment_method || 'efectivo',
         amount: parseFloat(selectedInvoice.value.total || 0)

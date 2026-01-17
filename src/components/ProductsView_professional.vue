@@ -3456,11 +3456,26 @@ const loadProducts = async () => {
     
     const response = await productsService.getAll(params)
     
+    console.log('🛍️ [ProductsView] Respuesta completa del endpoint:', response)
+    
     // La API devuelve datos paginados, extraer el array de productos
     if (response.data && response.data.data) {
       products.value = response.data.data || []
     } else {
       products.value = response.data || []
+    }
+    
+    console.log('🛍️ [ProductsView] Productos cargados:', products.value.length)
+    
+    // Verificar el primer producto para ver estructura de imágenes
+    if (products.value.length > 0) {
+      console.log('🛍️ [ProductsView] Primer producto (estructura completa):', products.value[0])
+      console.log('🛍️ [ProductsView] Campos de imagen del primer producto:', {
+        image_url: products.value[0].image_url,
+        image: products.value[0].image,
+        images: products.value[0].images,
+        img: products.value[0].img
+      })
     }
   } catch (error) {
     console.error('Error cargando productos:', error)

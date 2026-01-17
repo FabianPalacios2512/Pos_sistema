@@ -4841,6 +4841,10 @@ const handlePaymentConfirmed = async (paymentData) => {
       if (result.success) {
         
         // Preparar datos para el recibo usando la nueva factura generada
+        // 🎯 Calcular total con recargo si es crédito
+        const surchargeForQuote = paymentData.method === 'credit' ? (paymentData.fee || 0) : 0
+        const totalWithSurcharge = total.value + surchargeForQuote
+        
         lastSale.value = {
           id: result.data.id || loadedQuotation.value.id,
           invoiceNumber: result.data.custom_number || result.data.number || `FV-${result.data.id}`,
@@ -4861,7 +4865,7 @@ const handlePaymentConfirmed = async (paymentData) => {
           subtotal: subtotal.value,
           discount: discount.value,
           tax: tax.value,
-          total: total.value,
+          total: totalWithSurcharge, // 🎯 Total CON recargo incluido
           taxRate: displayTaxRate.value,
           payments: [{
             method: paymentData.method,
@@ -4870,7 +4874,7 @@ const handlePaymentConfirmed = async (paymentData) => {
           change: paymentData.change || 0,
           convertedFromQuote: true, // Flag para identificar que fue convertida
           // 🎯 Recargo CrediTienda
-          surcharge_amount: paymentData.method === 'credit' ? (paymentData.fee || 0) : 0,
+          surcharge_amount: surchargeForQuote,
           payment_method: paymentData.method
         }
       } else {
@@ -4883,6 +4887,10 @@ const handlePaymentConfirmed = async (paymentData) => {
       const currentDate = new Date()
       const dueDate = new Date()
       dueDate.setDate(currentDate.getDate() + 30)
+      
+      // 🎯 Calcular total con recargo si es crédito
+      const surchargeAmount = paymentData.method === 'credit' ? (paymentData.fee || 0) : 0
+      const totalWithSurcharge = total.value + surchargeAmount
       
       lastSale.value = {
         id: Date.now(),
@@ -4904,16 +4912,16 @@ const handlePaymentConfirmed = async (paymentData) => {
         subtotal: subtotal.value,
         discount: discount.value,
         tax: tax.value,
-        total: total.value,
+        total: totalWithSurcharge, // 🎯 Total CON recargo incluido
         taxRate: displayTaxRate.value,
         payments: [{
           method: paymentData.method,
           methodName: paymentData.methodName || getPaymentMethodName(paymentData.method),
-          amount: paymentData.amount || total.value
+          amount: paymentData.amount || totalWithSurcharge
         }],
         // 🎯 Recargo CrediTienda (normalizado a surcharge_amount)
-        surcharge: paymentData.method === 'credit' ? paymentData.fee : 0,
-        surcharge_amount: paymentData.method === 'credit' ? (paymentData.fee || 0) : 0,
+        surcharge: surchargeAmount,
+        surcharge_amount: surchargeAmount,
         payment_method: paymentData.method,
         change: paymentData.change || 0
       }

@@ -1,5 +1,42 @@
 # 🐌 → ⚡ Fix: LAG en Modales - Problema backdrop-blur
 
+## ✅ ACTUALIZACIÓN: DEVOLUCIONES OPTIMIZADAS (16 Enero 2026)
+
+### Cambios Aplicados en ReturnsView.vue
+
+**1. ✅ Eliminado `backdrop-blur-sm` de TODOS los modales:**
+- Modal principal de devoluciones
+- Modal de escáner QR
+- Modal de éxito
+- **Resultado:** Modal se abre instantáneamente, sin lag
+
+**2. 🗑️ Eliminados botones de envío por WhatsApp/Email:**
+- ❌ Botón "WhatsApp" en modal de éxito
+- ❌ Botón "Email" en modal de éxito
+- ❌ Modal de solicitud de teléfono (completo)
+- ❌ Modal de solicitud de email (completo)
+- **Razón:** Simplificación UX - el usuario ya no quiere enviar devoluciones
+
+**3. 🧹 Limpieza de código:**
+- ❌ Eliminadas funciones `requestPhone()` y `sendByWhatsApp()`
+- ❌ Eliminadas funciones `requestEmail()` y `sendByEmail()`
+- ❌ Eliminadas variables `showPhoneModal`, `showEmailModal`
+- ❌ Eliminadas variables `phoneNumber`, `emailAddress`
+- ❌ Eliminado import innecesario de `whatsappService`
+
+**Acciones que permanecen en el modal de éxito:**
+- ✅ Imprimir (genera PDF y abre ventana de impresión)
+- ✅ Descargar (descarga PDF directamente)
+- ✅ Cerrar (cierra y resetea el modal)
+
+**Beneficios:**
+- ⚡ Modal extremadamente rápido (0 lag)
+- 🎯 UX más limpia y directa
+- 📦 ~150 líneas de código eliminadas
+- 🚀 Mejor rendimiento general
+
+---
+
 ## 🔴 EL PROBLEMA
 
 **Síntoma:**
@@ -38,6 +75,34 @@ El `backdrop-blur-sm` (o cualquier variante de blur) aplica un **filtro de desen
 - ⚡ Animación suave como mantequilla
 - ⚡ Sin lag ni stuttering
 - ✅ Fondo oscuro suficiente para contraste
+
+---
+
+## 📍 COMPONENTES CORREGIDOS
+
+### ✅ ReturnsView.vue (Devoluciones - COMPLETO)
+**Cambios aplicados:**
+1. ❌ Eliminado `backdrop-blur-sm` de modal principal
+2. ❌ Eliminado `backdrop-blur-sm` de modal escáner QR  
+3. ❌ Eliminado `backdrop-blur-sm` de modal de éxito
+4. 🗑️ Eliminados botones WhatsApp/Email (simplificación UX)
+5. 🗑️ Eliminados modales de solicitud teléfono/email
+6. 🧹 Limpieza código: funciones y variables innecesarias
+
+**Resultado:** Modal super fluido, sin lag, UX más limpia
+
+---
+
+## ⚠️ COMPONENTES CON backdrop-blur DETECTADOS
+
+**Nota:** `backdrop-blur` en **KPIs/cards** no causa lag (son estáticos).  
+**Solo es problemático en OVERLAYS de modales** (elementos fixed que cubren toda la pantalla).
+
+### Modales a revisar si reportan lag:
+- `CategoriesView.vue` - líneas 443, 504, 635 (3 modales overlay)
+- Otros componentes tienen backdrop-blur solo en cards (no crítico)
+
+**Regla:** Si un modal se siente lento, quitar `backdrop-blur-sm` del overlay fixed.
 
 ---
 

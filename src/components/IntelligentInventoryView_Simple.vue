@@ -11,7 +11,7 @@
         
         <div class="flex items-center gap-3">
           <!-- Navegación de Secciones - Estilo Tabs Profesional -->
-          <nav class="flex items-center bg-white/60 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl p-1">
+          <nav class="flex items-center bg-white/60 dark:bg-zinc-800/40  rounded-xl p-1">
             <button
               v-for="section in sections"
               :key="section.id"
@@ -55,7 +55,7 @@
         </div>
         
         <!-- Filtros de Período (Compactos) - Sin bordes, integrado -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white/60 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-4 py-3">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white/60 dark:bg-zinc-900/40  rounded-xl px-4 py-3">
           <span class="text-sm font-medium text-gray-600 dark:text-zinc-400">Período:</span>
           <div class="flex items-center gap-2 flex-wrap">
             <select 
@@ -85,7 +85,7 @@
         <!-- Dashboard Principal - KPIs con Glassmorphism SIN BORDES -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- PRODUCTOS ACTIVOS -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 bg-blue-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@
           </div>
 
           <!-- VALOR INVERTIDO -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 bg-emerald-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +117,7 @@
           </div>
 
           <!-- VALOR POTENCIAL -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 bg-indigo-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@
           </div>
 
           <!-- GANANCIA ESTIMADA -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 bg-purple-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@
         </div>
 
         <!-- Métricas Secundarias Compactas (Una línea) - Sin bordes -->
-        <div class="bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-6 py-5">
+        <div class="bg-white/60 dark:bg-zinc-900/60  rounded-xl px-6 py-5">
           <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
             <!-- Ventas -->
             <div>
@@ -196,7 +196,7 @@
         <!-- Sección de Productos y Movimientos - Cards sin bordes pesados -->
         <div v-if="overviewData" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           <!-- Top Productos -->
-          <div v-if="overviewData.data.topSellingProducts?.length > 0" class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div v-if="overviewData.data.topSellingProducts?.length > 0" class="bg-white/80 dark:bg-zinc-900/80  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
             <div class="px-5 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/30 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -245,7 +245,7 @@
           </div>
 
           <!-- Stock Bajo -->
-          <div v-if="overviewData.data.lowStockProductsList?.length > 0" class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div v-if="overviewData.data.lowStockProductsList?.length > 0" class="bg-white/80 dark:bg-zinc-900/80  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
             <div class="px-5 py-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-rose-50 dark:bg-rose-950/30 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -287,7 +287,7 @@
           </div>
 
           <!-- Movimientos Recientes -->
-          <div v-if="overviewData.data.recentMovements?.length > 0" class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div v-if="overviewData.data.recentMovements?.length > 0" class="bg-white/80 dark:bg-zinc-900/80  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
               <div class="px-5 py-4">
                 <div class="flex items-center gap-3 mb-4">
                   <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -333,7 +333,7 @@
       <div v-if="activeSection === 'products'" class="space-y-4">
         
         <!-- Filtros Compactos -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-4">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-4">
           <div class="flex flex-wrap items-center gap-3">
             <!-- Búsqueda -->
             <div class="flex-1 min-w-48 relative">
@@ -415,7 +415,7 @@
         <!-- KPIs de Productos con Glassmorphism -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- TOTAL PRODUCTOS -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
               <div class="bg-indigo-50 dark:bg-indigo-950/50 rounded-xl p-3">
                 <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,7 +435,7 @@
           </div>
 
           <!-- ACTIVOS -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
               <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-xl p-3">
                 <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -455,7 +455,7 @@
           </div>
 
           <!-- SIN STOCK -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
               <div class="bg-gray-100 dark:bg-zinc-800/50 rounded-xl p-3">
                 <svg class="w-6 h-6 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -475,7 +475,7 @@
           </div>
 
           <!-- VALOR TOTAL -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
               <div class="bg-purple-50 dark:bg-purple-950/50 rounded-xl p-3">
                 <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -497,7 +497,7 @@
         </div>
 
         <!-- Tabla de Productos -->
-        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-white/90 dark:bg-zinc-900/90  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-4 bg-transparent">
             <div class="flex items-center justify-between">
               <div>
@@ -576,35 +576,70 @@
             </table>
           </div>
           
-          <!-- Paginación -->
-          <div v-if="productsData.pagination && productsData.pagination.total > filters.itemsPerPage" class="bg-gray-50 dark:bg-transparent border-t border-gray-200 dark:border-zinc-800 px-4 py-3">
-            <div class="flex items-center justify-between">
-              <div class="text-sm text-gray-700 dark:text-zinc-300">
-                Mostrando {{ ((filters.currentPage - 1) * filters.itemsPerPage) + 1 }} - 
-                {{ Math.min(filters.currentPage * filters.itemsPerPage, productsData.pagination.total) }} 
-                de {{ productsData.pagination.total }} productos
+          <!-- Paginación - Siempre visible cuando hay productos -->
+          <div v-if="productsData.products && productsData.products.length > 0" class="bg-white dark:bg-zinc-900 border-t-2 border-gray-200 dark:border-zinc-700 px-6 py-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <!-- Info de paginación -->
+              <div class="text-sm font-medium text-gray-700 dark:text-zinc-300">
+                <span v-if="productsData.pagination && productsData.pagination.total">
+                  Mostrando <span class="font-bold text-gray-900 dark:text-white">{{ ((filters.currentPage - 1) * filters.itemsPerPage) + 1 }}</span> - 
+                  <span class="font-bold text-gray-900 dark:text-white">{{ Math.min(filters.currentPage * filters.itemsPerPage, productsData.pagination.total) }}</span> 
+                  de <span class="font-bold text-blue-600 dark:text-blue-400">{{ productsData.pagination.total }}</span> productos
+                </span>
+                <span v-else>
+                  <span class="font-bold text-blue-600 dark:text-blue-400">{{ productsData.products.length }}</span> productos encontrados
+                </span>
               </div>
-              <div class="flex items-center space-x-2">
-                <button @click="filters.currentPage--; loadProductsData()" 
-                        :disabled="filters.currentPage <= 1"
-                        class="px-3 py-1.5 text-sm bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              
+              <!-- Controles de paginación -->
+              <div v-if="productsData.pagination && productsData.pagination.total > filters.itemsPerPage" class="flex items-center space-x-3">
+                <button 
+                  @click="filters.currentPage--; loadProductsData()" 
+                  :disabled="filters.currentPage <= 1"
+                  class="px-4 py-2.5 text-sm font-bold bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border-2 border-gray-300 dark:border-zinc-600 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-sm"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                  </svg>
                   Anterior
                 </button>
-                <span class="px-3 py-1.5 text-sm font-medium text-gray-900 dark:text-white">
+                
+                <div class="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 dark:bg-blue-500 rounded-xl shadow-lg shadow-blue-500/30">
                   {{ filters.currentPage }} / {{ Math.ceil(productsData.pagination.total / filters.itemsPerPage) }}
-                </span>
-                <button @click="filters.currentPage++; loadProductsData()" 
-                        :disabled="filters.currentPage >= Math.ceil(productsData.pagination.total / filters.itemsPerPage)"
-                        class="px-3 py-1.5 text-sm bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                </div>
+                
+                <button 
+                  @click="filters.currentPage++; loadProductsData()" 
+                  :disabled="filters.currentPage >= Math.ceil(productsData.pagination.total / filters.itemsPerPage)"
+                  class="px-4 py-2.5 text-sm font-bold bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border-2 border-gray-300 dark:border-zinc-600 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-sm"
+                >
                   Siguiente
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                  </svg>
                 </button>
+              </div>
+              
+              <!-- Selector de items por página -->
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-500 dark:text-zinc-400">Por página:</span>
+                <select 
+                  v-model="filters.itemsPerPage" 
+                  @change="filters.currentPage = 1; loadProductsData()"
+                  class="px-3 py-2 text-sm font-medium bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 dark:text-zinc-200"
+                >
+                  <option :value="10">10</option>
+                  <option :value="25">25</option>
+                  <option :value="50">50</option>
+                  <option :value="100">100</option>
+                </select>
               </div>
             </div>
           </div>
         </div>
         
         <!-- Estado Vacío -->
-        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
+        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
           <div class="text-center">
             <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-zinc-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
@@ -615,7 +650,7 @@
         </div>
         
         <!-- Cargando -->
-        <div v-else class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
+        <div v-else class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
           <div class="text-center">
             <svg class="w-16 h-16 mx-auto text-blue-500 dark:text-blue-400 animate-spin mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -628,7 +663,7 @@
 
       <div v-if="activeSection === 'movements'" class="space-y-6 animate-fade-in">
         <!-- Header y Filtros -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Movimientos de Inventario</h2>
@@ -688,7 +723,7 @@
         <!-- Tarjetas de Resumen - Diseño Limpio -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           <!-- Total Movimientos -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="bg-indigo-50 dark:bg-indigo-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -703,7 +738,7 @@
           </div>
 
           <!-- Entradas -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -718,7 +753,7 @@
           </div>
 
           <!-- Salidas -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="bg-rose-50 dark:bg-rose-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -733,7 +768,7 @@
           </div>
 
           <!-- Valor Entradas -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="bg-teal-50 dark:bg-teal-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -748,7 +783,7 @@
           </div>
 
           <!-- Valor Salidas -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="bg-orange-50 dark:bg-orange-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -763,7 +798,7 @@
           </div>
 
           <!-- Movimiento Neto -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="bg-purple-50 dark:bg-purple-950/50 rounded-xl p-3">
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -781,7 +816,7 @@
         </div>
 
         <!-- Tabla de Movimientos -->
-        <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-4 bg-transparent flex items-center justify-between">
             <div>
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Historial de Movimientos</h3>
@@ -996,7 +1031,7 @@
       <!-- Vista por Cliente -->
       <div v-if="activeSection === 'customers'" class="space-y-6 animate-fade-in">
         <!-- Header y Filtros -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Análisis por Cliente</h2>
@@ -1056,7 +1091,7 @@
         <!-- Tarjetas de Resumen -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4" v-if="customersData">
           <!-- Total Clientes -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1071,7 +1106,7 @@
           </div>
 
           <!-- Ingresos Totales -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1086,7 +1121,7 @@
           </div>
 
           <!-- Ganancia Total -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-teal-50 dark:bg-teal-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1101,7 +1136,7 @@
           </div>
 
           <!-- Valor Promedio -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1116,7 +1151,7 @@
           </div>
 
           <!-- Descuento Prom. -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-orange-50 dark:bg-orange-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-percentage text-orange-600 dark:text-orange-400"></i>
@@ -1129,7 +1164,7 @@
           </div>
 
           <!-- Cliente Top -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1148,7 +1183,7 @@
         </div>
 
         <!-- Tabla de Clientes -->
-        <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-4 bg-transparent flex items-center justify-between">
             <div>
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Análisis de Clientes</h3>
@@ -1335,7 +1370,7 @@
         <!-- Tarjetas de Resumen -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- Total Proveedores -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-slate-50 dark:bg-slate-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1353,7 +1388,7 @@
           </div>
 
           <!-- Cuentas por Pagar -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1371,7 +1406,7 @@
           </div>
 
           <!-- Mejor Proveedor -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-4">
               <div class="w-12 h-12 bg-amber-50 dark:bg-amber-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1392,7 +1427,7 @@
         </div>
 
         <!-- Tabla de Proveedores -->
-        <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="bg-transparent px-4 py-3 flex items-center justify-between">
             <div>
               <h2 class="text-base font-bold text-gray-900 dark:text-white">Lista de Proveedores</h2>
@@ -1546,7 +1581,7 @@
       <div v-if="activeSection === 'alerts'" class="space-y-6 animate-fade-in">
         
         <!-- Header con Filtros -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h2 class="text-lg font-bold text-gray-900 dark:text-white">Centro de Alertas</h2>
@@ -1579,7 +1614,7 @@
         <!-- 4 Tarjetas de Resumen Horizontales -->
         <div v-if="alertsData" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Críticas (Rojo - Alerta) -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-11 h-11 bg-rose-50 dark:bg-rose-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1594,7 +1629,7 @@
           </div>
 
           <!-- Advertencias -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1609,7 +1644,7 @@
           </div>
 
           <!-- Información -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-11 h-11 bg-sky-50 dark:bg-sky-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1624,7 +1659,7 @@
           </div>
 
           <!-- Total -->
-          <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
+          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
             <div class="flex items-center space-x-3">
                 <div class="w-11 h-11 bg-slate-50 dark:bg-slate-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
                     <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1640,7 +1675,7 @@
         </div>
 
         <!-- Alertas del Sistema - DISEÑO TECHNICAL LIST -->
-        <div v-if="alertsData && alertsData.alerts?.length > 0" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div v-if="alertsData && alertsData.alerts?.length > 0" class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-3.5 flex items-center justify-between">
             <div>
               <h3 class="text-base font-bold text-gray-900 dark:text-white">Centro de Alertas</h3>
@@ -1805,7 +1840,7 @@
 
         <!-- Sin alertas -->
         <div v-else-if="alertsData && alertsData.alerts?.length === 0" 
-             class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-lg shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12 text-center">
+             class="bg-white/80 dark:bg-zinc-900/80  rounded-lg shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12 text-center">
           <div class="w-16 h-16 bg-green-100 dark:bg-green-950 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -1820,7 +1855,7 @@
       <div v-if="activeSection === 'predictions'" class="space-y-4">
         
         <!-- Filtros Ejecutivos de Predicciones -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-4">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-4">
           <div class="flex flex-wrap items-center gap-3 justify-between">
             <div class="flex items-center gap-3">
               <div class="flex items-center gap-2">
@@ -1872,7 +1907,7 @@
         </div>
 
         <!-- Análisis de Tendencias - Ejecutivo Minimalista -->
-        <div v-if="predictionsData" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div v-if="predictionsData" class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-4 bg-gradient-to-r from-slate-50/80 to-blue-50/30 dark:from-zinc-800/50 dark:to-blue-950/30">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
@@ -2031,7 +2066,7 @@
 
         <!-- Predicción de Agotamiento de Stock con IA - DISEÑO ENTERPRISE CLEAN -->
         <div v-if="predictionsData && predictionsData.stock_depletion?.length > 0" 
-             class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+             class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-4 bg-transparent">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
@@ -2317,11 +2352,11 @@
 
         <!-- Pronóstico de Ventas con Machine Learning - Ejecutivo -->
         <div v-if="predictionsData && predictionsData.sales_forecast?.length > 0" 
-             class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+             class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-4 bg-gradient-to-r from-emerald-50/80 to-green-50/50 dark:from-emerald-950/30 dark:to-green-950/30">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-3">
-                <div class="p-2.5 bg-white/60 dark:bg-emerald-900/50 backdrop-blur-sm rounded-xl shadow-sm">
+                <div class="p-2.5 bg-white/60 dark:bg-emerald-900/50  rounded-xl shadow-sm">
                   <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                   </svg>
@@ -3340,7 +3375,12 @@ export default {
         // 🏪 Agregar bodega si está seleccionada
         if (selectedWarehouse.value) {
           params.append('warehouse_id', selectedWarehouse.value)
+          console.log('🏢 [IntelligentInventory] Filtrando por warehouse ID:', selectedWarehouse.value)
+        } else {
+          console.log('📍 [IntelligentInventory] Mostrando todas las sedes')
         }
+        
+        console.log('🔍 [IntelligentInventory] Parámetros de búsqueda:', Object.fromEntries(params))
         
         // Si es rango personalizado, agregar fechas
         if (selectedPeriod.value === 'custom' && customDateRange.start) {
@@ -3350,6 +3390,9 @@ export default {
         }
         
         const data = await apiCall(`/inventory/test/products?${params}`)
+        console.log('📦 [IntelligentInventory] Respuesta del backend:', data)
+        console.log('📊 [IntelligentInventory] Pagination recibida:', data?.data?.pagination)
+        console.log('📋 [IntelligentInventory] Total productos:', data?.data?.products?.length)
         
         if (data) {
           

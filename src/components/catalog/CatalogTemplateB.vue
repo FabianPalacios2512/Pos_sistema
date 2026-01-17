@@ -3,7 +3,7 @@
   <div class="catalog-speed-market min-h-screen h-full bg-gradient-to-b from-slate-50 via-gray-50 to-white">
     
     <!-- HEADER ELEGANTE: Logo + Buscador -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200/80">
+    <header class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200/80">
       <div class="container mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center gap-3 md:gap-6 max-w-7xl">
         <!-- Logo con Nombre de Tienda -->
         <div class="flex items-center gap-2 md:gap-3 flex-shrink-0">
@@ -54,7 +54,7 @@
     </header>
 
     <!-- NAVEGACIÓN POR CATEGORÍAS: Pills Modernas STICKY -->
-    <nav class="sticky top-[64px] md:top-[84px] z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100/80 py-3 md:py-4 px-3 md:px-6 overflow-x-auto scrollbar-hide">
+    <nav class="sticky top-[64px] md:top-[84px] z-40 bg-white shadow-sm border-b border-gray-100/80 py-3 md:py-4 px-3 md:px-6 overflow-x-auto scrollbar-hide">
       <div class="container mx-auto max-w-7xl">
         <div class="flex gap-2 md:gap-3 min-w-max pb-1">
           <button
@@ -116,14 +116,14 @@
               </div>
 
               <!-- Badge Agotado con Glassmorphism -->
-              <div v-if="product.stock === 0" class="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30">
+              <div v-if="product.stock === 0" class="absolute inset-0 bg-black/75 flex items-center justify-center">
+                <div class="bg-white/20 px-4 py-2 rounded-full border border-white/30">
                   <span class="text-white text-sm font-black tracking-wide">AGOTADO</span>
                 </div>
               </div>
               
               <!-- Badge Stock Bajo -->
-              <div v-else-if="product.stock < 5" class="absolute top-3 right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
+              <div v-else-if="product.stock < 5" class="absolute top-3 right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg">
                 ⚡ Solo {{ product.stock }}
               </div>
             </div>
@@ -290,7 +290,7 @@
       <Transition name="fade">
         <div 
           v-if="showCheckout" 
-          class="hidden md:block fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]" 
+          class="hidden md:block fixed inset-0 bg-black/60 z-[90]" 
           @click="showCheckout = false"
         ></div>
       </Transition>
@@ -897,15 +897,15 @@ const addToCartWithAnimation = (product, event) => {
     
     flyingItems.value.push(flyingItem)
     
-    // Agregar al carrito después de un delay
+    // Agregar al carrito después de un delay MÁS CORTO (optimizado)
     setTimeout(() => {
       cartItems.value.push({ ...product })
       
       // Remover el item volador después de la animación
       setTimeout(() => {
         flyingItems.value = flyingItems.value.filter(item => item.timestamp !== flyingItem.timestamp)
-      }, 600)
-    }, 400)
+      }, 100)
+    }, 200)
   } else {
     // Fallback si no hay elemento
     addToCart(product)
@@ -1272,21 +1272,17 @@ watch(groupedCartItems, (newItems) => {
    ANIMACIONES DE VUELO DE PRODUCTOS
    ======================================== */
 .flying-product-animation {
-  animation: flyToCart 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: flyToCart 0.3s ease-out forwards;
 }
 
-/* Animación Desktop - vuela hacia la derecha y arriba */
+/* Animación Desktop - simple y rápida */
 @keyframes flyToCart {
   0% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
+    transform: scale(1);
     opacity: 1;
   }
-  50% {
-    transform: translate(40vw, -20vh) scale(0.8) rotate(15deg);
-    opacity: 0.9;
-  }
   100% {
-    transform: translate(80vw, -40vh) scale(0.2) rotate(30deg);
+    transform: scale(0.3) translateY(-30px);
     opacity: 0;
   }
 }
@@ -1294,20 +1290,16 @@ watch(groupedCartItems, (newItems) => {
 /* Animación Móvil - vuela hacia esquina superior derecha (carrito) */
 @media (max-width: 768px) {
   .flying-product-animation {
-    animation: flyToCartMobile 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: flyToCartMobile 0.3s ease-out forwards;
   }
   
   @keyframes flyToCartMobile {
     0% {
-      transform: translate(0, 0) scale(1) rotate(0deg);
+      transform: scale(1);
       opacity: 1;
     }
-    50% {
-      transform: translate(calc(var(--deltaX) * 0.6), calc(var(--deltaY) * 0.6)) scale(0.7) rotate(25deg);
-      opacity: 0.95;
-    }
     100% {
-      transform: translate(var(--deltaX), var(--deltaY)) scale(0.15) rotate(45deg);
+      transform: scale(0.3) translateY(-30px);
       opacity: 0;
     }
   }

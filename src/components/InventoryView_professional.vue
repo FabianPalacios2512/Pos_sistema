@@ -242,17 +242,16 @@
                 <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-slate-50 dark:hover:bg-zinc-800/50 hover:shadow-sm transition-colors group">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
-                      <!-- Imagen o Avatar del producto -->
-                      <div v-if="product.image_url" class="w-12 h-12 rounded-lg mr-4 shadow-sm border border-gray-200 dark:border-zinc-700 overflow-hidden flex-shrink-0">
-                        <img :src="product.image_url" 
+                      <!-- Imagen o Ícono del producto -->
+                      <div class="w-12 h-12 rounded-lg mr-4 shadow-sm border border-gray-200 dark:border-zinc-700 overflow-hidden flex-shrink-0"
+                           :class="getProductImage(product) ? 'bg-white dark:bg-zinc-800' : 'bg-gray-100 dark:bg-zinc-800 flex items-center justify-center'">
+                        <img v-if="getProductImage(product)"
+                             :src="getProductImage(product)" 
                              :alt="product.name"
-                             class="w-full h-full object-cover"
-                             @error="(e) => e.target.style.display='none'">
-                      </div>
-                      <div v-else class="w-12 h-12 rounded-lg flex items-center justify-center mr-4 shadow-sm border border-gray-200 dark:border-zinc-700 flex-shrink-0" :style="{backgroundColor: `hsl(${product.id * 137.5 % 360}, 70%, 92%)`}">
-                        <span class="text-xl font-bold" :style="{color: `hsl(${product.id * 137.5 % 360}, 80%, 35%)`}">
-                          {{ product.name.charAt(0).toUpperCase() }}
-                        </span>
+                             class="w-full h-full object-cover">
+                        <svg v-else class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
+                        </svg>
                       </div>
                       <div>
                         <p class="text-sm font-bold text-gray-900 dark:text-white">{{ product.name }}</p>
@@ -360,17 +359,16 @@
                  class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl p-4 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
               <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4 flex-1 min-w-0">
-                  <!-- Imagen o Avatar del producto -->
-                  <div v-if="alert.image_url" class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ring-2 ring-white dark:ring-zinc-700">
-                    <img :src="alert.image_url" 
+                  <!-- Imagen o Ícono del producto -->
+                  <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 ring-2 ring-white dark:ring-zinc-700"
+                       :class="getProductImage(alert) ? 'bg-white dark:bg-zinc-800' : 'bg-gray-100 dark:bg-zinc-800 flex items-center justify-center'">
+                    <img v-if="getProductImage(alert)"
+                         :src="getProductImage(alert)" 
                          :alt="alert.name"
-                         class="w-full h-full object-cover"
-                         @error="(e) => e.target.style.display='none'">
-                  </div>
-                  <div v-else class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ring-2 ring-white dark:ring-zinc-700" :style="{backgroundColor: `hsl(${alert.id * 137.5 % 360}, 65%, 88%)`}">
-                    <span class="text-lg font-bold" :style="{color: `hsl(${alert.id * 137.5 % 360}, 70%, 35%)`}">
-                      {{ alert.name.charAt(0).toUpperCase() }}
-                    </span>
+                         class="w-full h-full object-cover">
+                    <svg v-else class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
+                    </svg>
                   </div>
                   
                   <!-- Información del producto -->
@@ -1362,18 +1360,35 @@ const loadProducts = async () => {
     loading.value = true
 
     // 🏢 Construir parámetros con filtro de warehouse si está activo
-    const params = { per_page: 1000 }
+    const params = { 
+      per_page: 1000,
+      status: 'all', // Obtener todos los productos (activos e inactivos)
+      _t: Date.now() // Cache busting
+    }
+    
     if (showWarehouseFilter.value && selectedWarehouse.value) {
       params.warehouse_id = selectedWarehouse.value
       console.log(`📦 Filtrando productos por warehouse ID: ${selectedWarehouse.value}`)
     }
 
-    // Usar el endpoint de inventario que incluye métricas de ventas
-    const response = await inventoryService.getProducts(params)
-    console.log('Respuesta inventario:', response)
+    // 🖼️ USAR EL MISMO ENDPOINT QUE PRODUCTSVIEW para obtener imágenes
+    const response = await productsService.getAll(params)
+    console.log('📦 [InventoryView] Respuesta completa del endpoint:', response)
 
     // Los productos pueden venir en response.data.data (paginación) o directamente en response.data
     const productsList = response.data?.data || response.data || []
+    console.log('📦 [InventoryView] Lista de productos extraída:', productsList.length)
+    
+    // Verificar el primer producto para ver estructura de imágenes
+    if (productsList.length > 0) {
+      console.log('📦 [InventoryView] Primer producto (estructura completa):', productsList[0])
+      console.log('📦 [InventoryView] Campos de imagen del primer producto:', {
+        image_url: productsList[0].image_url,
+        image: productsList[0].image,
+        images: productsList[0].images,
+        img: productsList[0].img
+      })
+    }
 
     products.value = productsList.map(product => ({
       ...product,
@@ -1384,7 +1399,8 @@ const loadProducts = async () => {
       min_stock: product.min_stock || 10,
       barcode: product.barcode || `BAR${product.id}${Date.now().toString().slice(-4)}`,
       price: parseFloat(product.sale_price || product.price || 0),
-      image_url: product.image_url || product.image || null
+      image_url: product.image_url || product.image || null,
+      images: product.images || [] // 🖼️ Incluir array de imágenes para getProductImage()
     }))
 
     const warehouseInfo = showWarehouseFilter.value ? ` (Sede: ${selectedWarehouse.value})` : ' (Todas las sedes)'
@@ -2086,6 +2102,104 @@ const refreshInventoryData = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// 🖼️ Función utilitaria para manejo inteligente de imágenes (copiada de ProductsView)
+const getProductImage = (product) => {
+  // Usar el origen actual (mismo puerto que el frontend/proxy)
+  const baseUrl = window.location.origin
+  
+  // 1. Intentar con el array de imágenes (relación images)
+  if (product?.images && Array.isArray(product.images) && product.images.length > 0) {
+    const primaryImage = product.images.find(img => img.is_primary) || product.images[0]
+    if (primaryImage?.image_url) {
+      const imageUrl = primaryImage.image_url
+      // Si la imagen es base64, devolverla directamente
+      if (imageUrl.startsWith('data:image')) {
+        return imageUrl
+      }
+      // Fix relative URLs for tenant backend - usar el mismo origen
+      if (imageUrl.startsWith('/storage')) {
+        return `${baseUrl}${imageUrl}`
+      }
+      // URL externa completa
+      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return imageUrl
+      }
+      return imageUrl
+    }
+  }
+  
+  // 2. Intentar múltiples propiedades de imagen (fallback)
+  const imageUrl = product?.image_url || product?.image || product?.img || product?.photo
+  
+  if (!imageUrl) {
+    return null
+  }
+  
+  // Si la imagen es base64 (data:image), devolverla directamente
+  if (imageUrl.startsWith('data:image')) {
+    return imageUrl
+  }
+  
+  // Si hay imagen URL, procesarla
+  if (imageUrl.length > 5) {
+    // Fix relative URLs for tenant backend - usar el mismo origen
+    if (imageUrl.startsWith('/storage')) {
+      return `${baseUrl}${imageUrl}`
+    }
+    // URL externa completa
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl
+    }
+    return imageUrl
+  }
+  
+  return null
+}
+
+// 🎨 Generar avatar dinámico SVG con iniciales del producto (copiado de ProductsView)
+const generateDynamicAvatar = (name) => {
+  // Obtener las primeras 2 letras del nombre
+  const initials = (name || 'P')
+    .split(' ')
+    .map(word => word.charAt(0))
+    .slice(0, 2)
+    .join('')
+    .toUpperCase() || 'P'
+  
+  // Generar un color único basado en el nombre
+  let hash = 0
+  for (let i = 0; i < (name || '').length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  
+  // Usar hue del hash para generar color HSL (sin rojo ni rosa)
+  const hue = Math.abs(hash % 220) + 140 // Rango 140-360 (evita rojos y rosas)
+  const saturation = 70 // Saturación moderada
+  const lightness = 35 // Oscuridad adecuada para buen contraste
+  
+  // Crear SVG inline
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
+      <rect width="80" height="80" rx="12" fill="hsl(${hue}, ${saturation}%, ${lightness}%)"/>
+      <text x="40" y="46" font-size="28" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="middle" font-family="Inter, system-ui, sans-serif">${initials}</text>
+    </svg>
+  `
+  
+  // Retornar como data URI
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`
+}
+
+// 🚨 Manejar errores de carga de imagen (copiado de ProductsView)
+const handleImageError = (event, product) => {
+  // Evitar bucle infinito
+  if (event.target.dataset.errorHandled) return
+  event.target.dataset.errorHandled = true
+  
+  // Usar el nombre del producto si está disponible en el contexto, o 'Producto' por defecto
+  const name = product?.name || event.target.alt || 'Producto'
+  event.target.src = generateDynamicAvatar(name)
 }
 
 // Inicialización
