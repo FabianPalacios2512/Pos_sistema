@@ -36,7 +36,7 @@
         
         <!-- Logo y marca superior -->
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
+          <div class="w-12 h-12 rounded-2xl bg-white/10  border border-white/20 flex items-center justify-center">
             <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
@@ -67,15 +67,15 @@
 
               <!-- Stats Grid -->
               <div class="grid grid-cols-3 gap-4">
-                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <div class="bg-white/5  rounded-2xl p-4 border border-white/10">
                   <div class="text-3xl font-bold text-white">99.9%</div>
                   <div class="text-sm text-slate-400 mt-1">Uptime garantizado</div>
                 </div>
-                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <div class="bg-white/5  rounded-2xl p-4 border border-white/10">
                   <div class="text-3xl font-bold text-white">+2K</div>
                   <div class="text-sm text-slate-400 mt-1">Negocios activos</div>
                 </div>
-                <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <div class="bg-white/5  rounded-2xl p-4 border border-white/10">
                   <div class="text-3xl font-bold text-white">24/7</div>
                   <div class="text-sm text-slate-400 mt-1">Soporte técnico</div>
                 </div>
@@ -90,7 +90,7 @@
           enter-from-class="translate-y-6 opacity-0"
           enter-to-class="translate-y-0 opacity-100"
         >
-          <div v-if="imageLoaded" class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+          <div v-if="imageLoaded" class="bg-white/10  rounded-2xl p-6 border border-white/20">
             <div class="flex items-start gap-4">
               <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
                 <span class="text-white font-bold text-lg">CP</span>
@@ -876,17 +876,17 @@ img {
 }
 
 /* Glassmorphism mejorado para cards */
-.backdrop-blur-xl {
+. {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
-.backdrop-blur-md {
+. {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
-.backdrop-blur-sm {
+. {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }

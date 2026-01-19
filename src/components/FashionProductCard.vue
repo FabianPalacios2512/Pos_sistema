@@ -17,7 +17,7 @@
            @click="$emit('view', product)"
            class="w-full h-full flex items-center justify-center cursor-pointer bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800/80 dark:to-zinc-900">
         <div class="text-center">
-          <div class="w-20 h-20 mx-auto rounded-2xl bg-white/60 dark:bg-zinc-700/40 flex items-center justify-center mb-2 backdrop-blur-sm">
+          <div class="w-20 h-20 mx-auto rounded-2xl bg-white/60 dark:bg-zinc-700/40 flex items-center justify-center mb-2 ">
             <svg class="w-10 h-10 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
@@ -30,7 +30,7 @@
       
       <!-- Badge Stock Bajo -->
       <div v-if="isLowStock" 
-           class="absolute top-3 left-3 px-2 py-1 bg-red-500/90 dark:bg-red-600/90 backdrop-blur-sm rounded-full flex items-center gap-1.5 shadow-lg"
+           class="absolute top-3 left-3 px-2 py-1 bg-red-500/90 dark:bg-red-600/90  rounded-full flex items-center gap-1.5 shadow-lg"
            title="Stock bajo">
         <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
         <span class="text-[9px] font-bold text-white uppercase tracking-wide">Bajo stock</span>
@@ -38,7 +38,7 @@
       
       <!-- Botón Editar (Solo visible en hover, flotante) -->
       <button @click.stop="$emit('edit', product)"
-              class="absolute bottom-3 right-3 w-10 h-10 bg-white/95 dark:bg-zinc-800/95 backdrop-blur-md rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white dark:hover:bg-zinc-700 shadow-lg dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/10">
+              class="absolute bottom-3 right-3 w-10 h-10 bg-white/95 dark:bg-zinc-800/95  rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white dark:hover:bg-zinc-700 shadow-lg dark:shadow-black/50 ring-1 ring-black/5 dark:ring-white/10">
         <svg class="w-4 h-4 text-gray-700 dark:text-zinc-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
         </svg>

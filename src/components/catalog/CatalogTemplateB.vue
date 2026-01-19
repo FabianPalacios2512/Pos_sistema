@@ -302,7 +302,7 @@
           class="fixed inset-0 md:top-0 md:right-0 md:left-auto md:h-full md:w-[420px] lg:w-[450px] bg-gradient-to-b from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-950 shadow-2xl z-[100] flex flex-col"
         >
           <!-- Header Premium del Panel con Glassmorphism -->
-          <div class="p-6 border-b border-gray-200/80 dark:border-zinc-800/80 backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80">
+          <div class="p-6 border-b border-gray-200/80 dark:border-zinc-800/80  bg-white/80 dark:bg-zinc-900/80">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br" :style="{ backgroundImage: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }">
@@ -438,7 +438,7 @@
             </div>
 
             <!-- Footer Fijo del Panel (Resumen y Botón) - Mejorado con Glassmorphism -->
-            <div class="border-t border-gray-200 dark:border-zinc-800 p-6 bg-gradient-to-t from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-900/50 backdrop-blur-xl space-y-4">
+            <div class="border-t border-gray-200 dark:border-zinc-800 p-6 bg-gradient-to-t from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-900/50  space-y-4">
               <!-- Resumen de Totales con Diseño Pro -->
               <div class="space-y-3">
                 <div class="flex justify-between items-center text-sm">

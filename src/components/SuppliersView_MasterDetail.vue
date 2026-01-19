@@ -681,7 +681,7 @@
   <Transition name="modal">
     <div v-if="viewMode === 'create'" 
          @click.self="cancelCreate"
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 ">
       
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-gray-300 dark:border-zinc-800 animate-modal-in">
         
@@ -831,6 +831,7 @@
 
 <script>
 import { apiCall } from '../services/api.js'
+import { useModuleNavigation } from '../composables/useModuleNavigation'
 
 export default {
   name: 'SuppliersViewMasterDetail',
@@ -850,6 +851,9 @@ export default {
       
       // Edición de proveedor
       editingSupplier: null,
+      
+      // 🔗 QueryParams de navegación
+      navigationParams: null,
       
       // Formulario de nuevo proveedor
       newSupplier: {
@@ -894,6 +898,23 @@ export default {
     this.loadSuppliers()
     // Handler para tecla ESC - deseleccionar proveedor
     document.addEventListener('keydown', this.handleKeyDown)
+    
+    // 🔗 Registrar callback para navegación con queryParams
+    const { onModuleChange, currentQueryGlobal } = useModuleNavigation()
+    
+    // Verificar si hay queryParams actuales al montar
+    if (currentQueryGlobal.value && currentQueryGlobal.value.supplierId && currentQueryGlobal.value.activeTab === 'suppliers') {
+      this.navigationParams = { ...currentQueryGlobal.value }
+      // Procesar después de que se carguen los proveedores
+    }
+    
+    // Escuchar cambios de navegación (el módulo padre es 'purchase-orders')
+    onModuleChange((module, params) => {
+      if (module === 'purchase-orders' && params && params.supplierId && params.activeTab === 'suppliers') {
+        this.navigationParams = params
+        // No procesar aquí - esperar a que loadSuppliers termine
+      }
+    })
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.handleKeyDown)
@@ -910,6 +931,13 @@ export default {
         const response = await apiCall('/suppliers/analytics')
         if (response.success) {
           this.suppliers = response.data.suppliers || []
+          
+          // 🔗 Si hay queryParams pendientes, procesarlos después de cargar
+          if (this.navigationParams) {
+            this.$nextTick(() => {
+              this.processNavigationParams()
+            })
+          }
         }
       } catch (error) {
         console.error('Error cargando proveedores:', error)
@@ -917,6 +945,21 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    
+    // 🔗 Procesar parámetros de navegación
+    processNavigationParams() {
+      if (!this.navigationParams || !this.navigationParams.supplierId) return
+      
+      const supplierId = this.navigationParams.supplierId
+      const supplier = this.suppliers.find(s => s.id === supplierId)
+      
+      if (supplier) {
+        this.selectSupplier(supplier)
+      }
+      
+      // Limpiar params después de procesar
+      this.navigationParams = null
     },
 
     selectSupplier(supplier) {
@@ -986,7 +1029,6 @@ export default {
         // status=all para incluir activos e inactivos
         // per_page=1000 para obtener todos sin paginación
         const response = await apiCall(`/products?supplier_id=${supplierId}&status=all&per_page=1000`)
-        console.log('📦 Respuesta productos del proveedor:', response)
         
         if (response.success) {
           // Laravel pagina los resultados, los datos están en response.data.data
@@ -994,16 +1036,14 @@ export default {
           
           // Asegurar que sea un array
           if (!Array.isArray(products)) {
-            console.log('⚠️ Respuesta no es un array:', products)
             products = []
           }
           
           // Filtrar productos nulos o sin ID
           this.supplierProducts = products.filter(p => p && p.id)
-          console.log('✅ Productos del proveedor cargados:', this.supplierProducts.length, this.supplierProducts)
         }
       } catch (error) {
-        console.error('❌ Error cargando productos del proveedor:', error)
+        console.error('Error cargando productos del proveedor:', error)
         this.supplierProducts = []
       } finally {
         this.loadingProducts = false

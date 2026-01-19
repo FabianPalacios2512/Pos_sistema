@@ -4,7 +4,7 @@
       <div v-if="isActive" class="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
         
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto transition-opacity duration-500" @click="handleBackdropClick"></div>
+        <div class="absolute inset-0 bg-black/60  pointer-events-auto transition-opacity duration-500" @click="handleBackdropClick"></div>
 
         <!-- Tour Card -->
         <div class="relative w-full max-w-lg mx-4 pointer-events-auto">

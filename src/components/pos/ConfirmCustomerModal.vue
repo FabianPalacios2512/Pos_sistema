@@ -11,7 +11,7 @@
       <div 
         v-if="isOpen"
         @click="handleCancel"
-        class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4"
+        class="fixed inset-0 bg-gray-900/60  z-[110] flex items-center justify-center p-4"
       >
         <Transition
           enter-active-class="transition-all duration-300 ease-out"

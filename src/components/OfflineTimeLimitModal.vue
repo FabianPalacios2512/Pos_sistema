@@ -3,7 +3,7 @@
   <transition name="fade">
     <div 
       v-if="showModal" 
-      class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 "
     >
       <div class="max-w-md w-full mx-4 animate-fade-in">
         <!-- Card principal - Diseño limpio y profesional -->

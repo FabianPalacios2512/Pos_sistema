@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+  <div class="fixed inset-0 bg-black/50 dark:bg-black/70  flex items-center justify-center z-50 p-4 overflow-y-auto">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-5xl border border-gray-200 dark:border-zinc-800 shadow-2xl dark:shadow-black/50 my-8">
       <!-- Header -->
       <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-zinc-800">

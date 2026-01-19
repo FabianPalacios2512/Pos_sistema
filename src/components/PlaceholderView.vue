@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-indigo-100 p-8">
     <div class="max-w-4xl mx-auto">
-      <div class="bg-white rounded-3xl shadow-2xl border border-gray-200 p-8 backdrop-blur-lg bg-opacity-95">
+      <div class="bg-white rounded-3xl shadow-2xl border border-gray-200 p-8  bg-opacity-95">
       
         <!-- Icono y título principal -->
         <div class="text-center mb-8">

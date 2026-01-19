@@ -121,35 +121,45 @@ function getCashDashboardData() {
         $period = request()->get('period', 'today');
         $nowColombia = Carbon::now()->setTimezone('America/Bogota');
 
-        // CORREGIDO: Para 'today', usar fecha actual de Colombia y convertir UTC
+        // CORREGIDO: Para 'today', usar el campo 'date' que ya está en formato Y-m-d
         if ($period === 'today') {
             $todayString = $nowColombia->format('Y-m-d');
 
-            // Total de ventas de hoy (convirtiendo UTC a hora Colombia)
+            // Total de ventas de hoy usando el campo 'date'
             $totalSales = DB::table('invoices')
-                ->whereRaw('DATE(CONVERT_TZ(created_at, "+00:00", "-05:00")) = ?', [$todayString])
+                ->whereDate('date', $todayString)
                 ->where('status', 'paid')
-                ->where('type', 'invoice')
                 ->sum('total') ?: 0;
 
             // Total de transacciones de hoy
             $totalTransactions = DB::table('invoices')
-                ->whereRaw('DATE(CONVERT_TZ(created_at, "+00:00", "-05:00")) = ?', [$todayString])
+                ->whereDate('date', $todayString)
                 ->where('status', 'paid')
-                ->where('type', 'invoice')
                 ->count();
+
+            // DEBUG: Log para verificar qué está pasando
+            \Log::info('Cash Reports Dashboard - Today', [
+                'today_string' => $todayString,
+                'total_sales' => $totalSales,
+                'total_transactions' => $totalTransactions,
+                'sample_invoices' => DB::table('invoices')
+                    ->whereDate('date', $todayString)
+                    ->select('id', 'invoice_number', 'total', 'status', 'date', 'created_at')
+                    ->limit(5)
+                    ->get()
+            ]);
         } else {
             // Para otros períodos, usar el rango de fechas
             $dateRange = getCashReportDateRange($period);
 
             $totalSales = DB::table('invoices')
                 ->whereBetween('date', [$dateRange['start'], $dateRange['end']])
-                ->where('status', '!=', 'cancelled')
+                ->where('status', 'paid')
                 ->sum('total') ?: 0;
 
             $totalTransactions = DB::table('invoices')
                 ->whereBetween('date', [$dateRange['start'], $dateRange['end']])
-                ->where('status', '!=', 'cancelled')
+                ->where('status', 'paid')
                 ->count();
         }
 
@@ -175,7 +185,8 @@ function getCashDashboardData() {
             'total_transactions' => $totalTransactions,
             'average_sale' => $averageSale,
             'active_sessions' => $activeSessions,
-            'period' => $period
+            'period' => $period,
+            'debug_date' => $nowColombia->format('Y-m-d H:i:s')
         ]);
 
 

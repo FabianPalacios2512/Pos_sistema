@@ -2,7 +2,7 @@
   <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] flex items-center justify-center px-4 transition-colors duration-300">
     
     <!-- Card Principal con Glassmorphism -->
-    <div class="max-w-lg w-full bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 p-8 md:p-10 text-center space-y-8 relative overflow-hidden">
+    <div class="max-w-lg w-full bg-white dark:bg-zinc-900/80  rounded-2xl shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 p-8 md:p-10 text-center space-y-8 relative overflow-hidden">
       
       <!-- Decoración de fondo (Glow) -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-2 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-50"></div>

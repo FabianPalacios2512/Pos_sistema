@@ -4,7 +4,7 @@
   <div class="flex overflow-hidden bg-gray-50 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c]" style="height: 100%;">
     
     <!-- SIDEBAR IZQUIERDO - Menú de Navegación -->
-    <aside class="w-64 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-r border-gray-200/80 dark:border-zinc-800/50 flex flex-col shadow-lg shadow-gray-200/50 dark:shadow-black/30" style="min-height: 0;">
+    <aside class="w-64 bg-white/95 dark:bg-zinc-900/95  border-r border-gray-200/80 dark:border-zinc-800/50 flex flex-col shadow-lg shadow-gray-200/50 dark:shadow-black/30" style="min-height: 0;">
       <!-- Header Sidebar - Compacto -->
       <div class="px-4 py-3 border-b border-gray-100/80 dark:border-zinc-800/50 flex-shrink-0">
         <div class="flex items-center gap-2 mb-3">
@@ -127,7 +127,7 @@
           <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
             
             <!-- 🎨 TARJETA 1: Logo y Color Primario -->
-            <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+            <div class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
               <div class="px-6 py-5 border-b border-gray-100/80 dark:border-zinc-800/50">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Identidad Visual</h3>
                 <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Logo y color principal de tu tienda</p>
@@ -155,7 +155,7 @@
                             </svg>
                             Eliminar
                           </button>
-                          <span class="text-white text-xs font-semibold px-3 py-2 bg-white/20 backdrop-blur-sm rounded-lg">Cambiar</span>
+                          <span class="text-white text-xs font-semibold px-3 py-2 bg-white/20  rounded-lg">Cambiar</span>
                         </div>
                       </div>
                       <div v-else class="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex flex-col items-center gap-2">
@@ -197,7 +197,7 @@
             </div>
             
             <!-- 🎨 TARJETA 2: Selección de Plantilla -->
-            <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+            <div class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
               <div class="px-6 py-5 border-b border-gray-100/80 dark:border-zinc-800/50">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Plantilla de Diseño</h3>
                 <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Elige el estilo visual de tu catálogo web</p>
@@ -296,7 +296,7 @@
             </div>
             
             <!-- 🎨 TARJETA 3: Banner Promocional (Solo Fashion) -->
-            <div v-if="isFashionStore" class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+            <div v-if="isFashionStore" class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
               <div class="px-6 py-5 border-b border-gray-100/80 dark:border-zinc-800/50">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white">Banner Promocional</h3>
                 <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Imagen destacada en la parte superior (exclusivo para tiendas de moda)</p>
@@ -319,7 +319,7 @@
                         </svg>
                         Eliminar Banner
                       </button>
-                      <span class="text-white text-sm font-semibold px-4 py-2.5 bg-white/20 backdrop-blur-sm rounded-lg">Cambiar Imagen</span>
+                      <span class="text-white text-sm font-semibold px-4 py-2.5 bg-white/20  rounded-lg">Cambiar Imagen</span>
                     </div>
                   </div>
                   <div v-else class="text-gray-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex flex-col items-center gap-3">
@@ -347,7 +347,7 @@
                 <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Controla qué categorías y productos se muestran en tu tienda online.</p>
               </div>
               
-              <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+              <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
                 <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-3">Categorías Visibles</label>
                 <div class="flex flex-wrap gap-2">
                   <button 
@@ -371,7 +371,7 @@
             </section>
 
             <section>
-              <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 flex items-center justify-between">
+              <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-bold text-gray-900 dark:text-white">Ocultar productos sin stock</h3>
                   <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">No mostrar productos agotados en el catálogo</p>
@@ -403,7 +403,7 @@
               <!-- Grid 2 Columnas: Número + País/Horario (Placeholder) -->
               <div class="grid grid-cols-2 gap-6">
                 
-                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+                <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
                   <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Número de WhatsApp</label>
                   <input 
                     type="text" 
@@ -414,7 +414,7 @@
                   <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Es el número donde recibirás los pedidos.</p>
                 </div>
 
-                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 opacity-60">
+                <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 opacity-60">
                   <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Horario de Atención</label>
                   <input 
                     type="text" 
@@ -428,7 +428,7 @@
               </div>
 
               <!-- Mensaje Inicial - Full Width -->
-              <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 mt-6">
+              <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 mt-6">
                 <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Mensaje Inicial Personalizado</label>
                 <textarea 
                   v-model="config.ordersConfig.customMessage"
@@ -455,7 +455,7 @@
               <!-- Grid 2 Columnas: Costo + Mínimo -->
               <div class="grid grid-cols-2 gap-6">
                 
-                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+                <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
                   <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Costo de Domicilio</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-sm font-medium">$</span>
@@ -469,7 +469,7 @@
                   <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2">Precio del envío a domicilio.</p>
                 </div>
 
-                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+                <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
                   <label class="block text-xs font-bold uppercase tracking-wide text-gray-600 dark:text-zinc-400 mb-2">Pedido Mínimo</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-sm font-medium">$</span>
@@ -492,7 +492,7 @@
                 <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Conecta tu tienda con otros sistemas.</p>
               </div>
               
-              <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 flex items-center justify-between">
+              <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 flex items-center justify-between">
                 <div>
                   <h3 class="text-sm font-bold text-gray-900 dark:text-white">Sincronizar con Caja Registradora</h3>
                   <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Registrar pedidos online automáticamente en el POS</p>

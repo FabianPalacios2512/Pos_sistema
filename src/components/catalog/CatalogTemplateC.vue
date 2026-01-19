@@ -12,7 +12,7 @@
     <!-- Floating Glass Header -->
     <header 
       class="fixed top-0 inset-x-0 z-50 transition-all duration-300"
-      :class="isScrolled ? 'bg-white/95 backdrop-blur-xl shadow-md py-2.5' : 'bg-white/80 backdrop-blur-xl py-3 shadow-sm'"
+      :class="isScrolled ? 'bg-white/95  shadow-md py-2.5' : 'bg-white/80  py-3 shadow-sm'"
     >
       <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div class="flex items-center justify-between gap-4 md:gap-6">
@@ -81,7 +81,7 @@
     </div>
 
     <!-- Categories Pills -->
-    <div class="sticky top-[52px] md:top-[58px] z-40 mb-6 md:mb-8 bg-white/80 backdrop-blur-md border-b border-slate-200/50 py-3 md:py-4 shadow-sm">
+    <div class="sticky top-[52px] md:top-[58px] z-40 mb-6 md:mb-8 bg-white/80  border-b border-slate-200/50 py-3 md:py-4 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div class="flex justify-start md:justify-center overflow-x-auto scrollbar-hide">
           <div class="flex space-x-2 md:space-x-3">
@@ -221,14 +221,14 @@
     <Teleport to="body">
       <!-- Overlay -->
       <Transition name="fade">
-        <div v-if="showCheckout" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[90]" @click="showCheckout = false"></div>
+        <div v-if="showCheckout" class="fixed inset-0 bg-black/40  z-[90]" @click="showCheckout = false"></div>
       </Transition>
       
       <!-- Panel Deslizante desde la Derecha -->
       <Transition name="slide-right">
         <div v-if="showCheckout" class="fixed inset-y-0 right-0 w-full md:w-[420px] lg:w-[450px] bg-gradient-to-b from-gray-50 to-white dark:from-zinc-900 dark:to-zinc-950 shadow-2xl z-[100] flex flex-col">
           <!-- Header del Panel -->
-          <div class="p-6 border-b border-gray-200/80 dark:border-zinc-800/80 backdrop-blur-xl bg-white/80 dark:bg-zinc-900/80">
+          <div class="p-6 border-b border-gray-200/80 dark:border-zinc-800/80  bg-white/80 dark:bg-zinc-900/80">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-slate-900 to-slate-700">
@@ -498,7 +498,7 @@
           </div>
 
           <!-- Footer -->
-          <div class="border-t border-gray-200 dark:border-zinc-800 p-6 bg-gradient-to-t from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-900/50 backdrop-blur-xl space-y-4">
+          <div class="border-t border-gray-200 dark:border-zinc-800 p-6 bg-gradient-to-t from-white to-gray-50 dark:from-zinc-900 dark:to-zinc-900/50  space-y-4">
             
             <!-- Vista Carrito: Totales + Botón Completar -->
             <template v-if="!showCheckoutForm">

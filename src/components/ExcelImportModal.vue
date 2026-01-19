@@ -4,7 +4,7 @@
     <Transition name="modal">
       <div v-if="isOpen" class="fixed inset-0 z-[60] overflow-y-auto">
         <!-- Backdrop -->
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="handleClose"></div>
+        <div class="fixed inset-0 bg-black/60 " @click="handleClose"></div>
         
         <!-- Modal Container -->
         <div class="flex min-h-full items-center justify-center p-4">
@@ -222,6 +222,29 @@
 
               <!-- Step 3: Preview & Edit -->
               <div v-else-if="currentStep === 3" class="space-y-4">
+                <!-- Selector de Bodega/Sede (solo si hay más de una) -->
+                <div v-if="showWarehouseSelector" class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <p class="font-medium text-blue-900 dark:text-blue-100">Selecciona la sede/bodega destino</p>
+                      <p class="text-sm text-blue-600 dark:text-blue-400 mb-3">Tienes {{ warehouses.length }} sedes configuradas. Elige dónde deseas agregar estos productos:</p>
+                      <select 
+                        v-model="selectedWarehouseId"
+                        class="w-full max-w-md px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 border border-blue-200 dark:border-blue-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white font-medium"
+                      >
+                        <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">
+                          {{ warehouse.name }} {{ warehouse.is_main ? '(Principal)' : '' }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Stats -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 text-center">
@@ -386,10 +409,14 @@
                     <p class="text-gray-500 dark:text-zinc-400">{{ importResult.message }}</p>
                   </div>
 
-                  <div v-if="importResult.stats" class="grid grid-cols-3 gap-3 mt-6">
+                  <div v-if="importResult.stats" class="grid grid-cols-4 gap-3 mt-6">
                     <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-3">
                       <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{{ importResult.stats.imported }}</p>
-                      <p class="text-xs text-emerald-600 dark:text-emerald-400">Importados</p>
+                      <p class="text-xs text-emerald-600 dark:text-emerald-400">Nuevos</p>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3">
+                      <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ importResult.stats.updated || 0 }}</p>
+                      <p class="text-xs text-blue-600 dark:text-blue-400">Actualizados</p>
                     </div>
                     <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3">
                       <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ importResult.stats.skipped }}</p>
@@ -447,7 +474,7 @@
     <!-- Modal de Imagen -->
     <Transition name="modal">
       <div v-if="showImageModal" class="fixed inset-0 z-[70] overflow-y-auto">
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="closeImageModal"></div>
+        <div class="fixed inset-0 bg-black/60 " @click="closeImageModal"></div>
         <div class="flex min-h-full items-center justify-center p-4">
           <div class="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 overflow-hidden">
             <!-- Header -->
@@ -511,8 +538,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import api from '@/services/api'
+import { warehouseService } from '@/services/warehouseService'
 
 const props = defineProps({
   isOpen: {
@@ -543,6 +571,13 @@ const aiAnalysis = ref(null)
 
 const previewData = ref([])
 const previewStats = ref({ total: 0, valid: 0, with_warnings: 0, invalid: 0 })
+
+const importResult = ref(null)
+
+// Bodegas/Sedes
+const warehouses = ref([])
+const selectedWarehouseId = ref(null)
+const showWarehouseSelector = computed(() => warehouses.value.length > 1)
 
 const importResult = ref(null)
 
@@ -897,7 +932,8 @@ const importProducts = async () => {
       headers: fetchHeaders,
       body: JSON.stringify({
         import_id: importId.value,
-        products: productsToImport
+        products: productsToImport,
+        warehouse_id: selectedWarehouseId.value
       })
     })
     
@@ -940,6 +976,25 @@ const handleClose = () => {
   emit('close')
 }
 
+const loadWarehouses = async () => {
+  try {
+    const response = await warehouseService.getAll()
+    warehouses.value = response.data || response || []
+    
+    // Seleccionar automáticamente si solo hay una bodega
+    if (warehouses.value.length === 1) {
+      selectedWarehouseId.value = warehouses.value[0].id
+    } else if (warehouses.value.length > 1) {
+      // Seleccionar la principal o la primera
+      const mainWarehouse = warehouses.value.find(w => w.is_main) || warehouses.value[0]
+      selectedWarehouseId.value = mainWarehouse?.id || null
+    }
+  } catch (error) {
+    console.error('Error loading warehouses:', error)
+    warehouses.value = []
+  }
+}
+
 const resetState = () => {
   currentStep.value = 1
   uploadedFile.value = null
@@ -954,11 +1009,15 @@ const resetState = () => {
   importResult.value = null
   isLoading.value = false
   isImporting.value = false
+  selectedWarehouseId.value = null
 }
 
 // Watch for modal open/close
-watch(() => props.isOpen, (newVal) => {
-  if (!newVal) {
+watch(() => props.isOpen, async (newVal) => {
+  if (newVal) {
+    // Cargar bodegas cuando se abre el modal
+    await loadWarehouses()
+  } else {
     resetState()
   }
 })

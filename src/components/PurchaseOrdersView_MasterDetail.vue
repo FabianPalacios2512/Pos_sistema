@@ -585,13 +585,6 @@
                     </svg>
                     Ingresar Productos a Stock
                   </button>
-
-                  <button class="px-4 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Descargar PDF
-                  </button>
                 </div>
               </div>
             </div>
@@ -893,7 +886,7 @@
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showReceiveModal" 
-             class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+             class="fixed inset-0 bg-black/60  flex items-center justify-center p-4 z-50"
              @click.self="closeReceiveModal">
           <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden animate-fade-in max-h-[90vh] flex flex-col">
             
@@ -1013,7 +1006,7 @@
 
     <!-- Modal Premium Feature -->
     <Teleport to="body">
-      <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
+      <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[60] p-4 animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
           
           <!-- Contenido -->
@@ -1061,7 +1054,7 @@
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showEmailModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="cancelEmail"></div>
+          <div class="absolute inset-0 bg-black/60 " @click="cancelEmail"></div>
           <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
               <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -1099,7 +1092,7 @@
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showPhoneModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="cancelPhone"></div>
+          <div class="absolute inset-0 bg-black/60 " @click="cancelPhone"></div>
           <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
               <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -1133,11 +1126,13 @@
       </Transition>
     </Teleport>
 
+    
+
     <!-- Modal: ¿Cómo deseas enviar la orden? -->
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showSendOptionsModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeSendOptionsModal"></div>
+          <div class="absolute inset-0 bg-black/60 " @click="closeSendOptionsModal"></div>
           <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 overflow-hidden animate-scale-in">
             <!-- Header -->
             <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-700 text-center">
@@ -1219,9 +1214,13 @@ import { appStore } from '../store/appStore.js'
 import { invoicesService } from '../services/invoicesService.js'
 import { whatsappService } from '../services/whatsappService.js'
 import { useModuleNavigation } from '../composables/useModuleNavigation.js'
+import { useToast } from '../composables/useToast.js'
 
 // Obtener función de navegación
 const { navigateToModule } = useModuleNavigation()
+
+// Obtener funciones de toast (global)
+const { showToast, showSuccess, showError, showWarning, showInfo } = useToast()
 
 export default {
   name: 'PurchaseOrdersViewMasterDetail',
@@ -1248,6 +1247,7 @@ export default {
       phoneInput: '',
       phoneModalResolve: null,
       sendingEmail: false,
+      
       
       // Modal de opciones de envío después de crear orden
       showSendOptionsModal: false,
@@ -1306,7 +1306,10 @@ export default {
         { value: 'pending', label: 'Pendientes' },
         { value: 'partial', label: 'Parciales' },
         { value: 'received', label: 'Recibidas' }
-      ]
+      ],
+      
+      // 🔗 QueryParams de navegación
+      navigationParams: null
     }
   },
   computed: {
@@ -1380,6 +1383,25 @@ export default {
     window.addEventListener('products-updated', this.handleProductsUpdate)
     // Handler para tecla ESC - deseleccionar orden
     document.addEventListener('keydown', this.handleKeyDown)
+    
+    // 🔗 Registrar callback para navegación con queryParams
+    const { onModuleChange, currentQueryGlobal } = useModuleNavigation()
+    
+    // Verificar si hay queryParams actuales al montar
+    if (currentQueryGlobal.value && (currentQueryGlobal.value.supplierId || currentQueryGlobal.value.activeTab)) {
+      this.navigationParams = { ...currentQueryGlobal.value }
+      this.$nextTick(() => {
+        this.processNavigationParams()
+      })
+    }
+    
+    // Escuchar cambios de navegación
+    onModuleChange((module, params) => {
+      if (module === 'purchase-orders' && params) {
+        this.navigationParams = params
+        this.processNavigationParams()
+      }
+    })
   },
   beforeUnmount() {
     window.removeEventListener('products-updated', this.handleProductsUpdate)
@@ -1433,7 +1455,7 @@ export default {
         }
       } catch (error) {
         console.error('❌ Error cargando órdenes:', error)
-        this.$toast?.error('Error al cargar las órdenes')
+        showError('Error al cargar las órdenes')
       } finally {
         this.loading = false
       }
@@ -1456,7 +1478,7 @@ export default {
 
     openReceiveModal() {
       if (!this.selectedOrder || !this.selectedOrder.items) {
-        this.$toast?.warning('No hay productos en esta orden')
+        showWarning('No hay productos en esta orden')
         return
       }
 
@@ -1495,7 +1517,7 @@ export default {
       const itemsToReceive = this.receiveForm.items.filter(item => item.quantity_to_receive > 0)
       
       if (itemsToReceive.length === 0) {
-        this.$toast?.warning('Ingresa al menos una cantidad a recibir')
+        showWarning('Ingresa al menos una cantidad a recibir')
         return
       }
 
@@ -1514,7 +1536,7 @@ export default {
         })
 
         if (response.success) {
-          this.$toast?.success('Productos ingresados al stock correctamente')
+          showSuccess('Productos ingresados al stock correctamente')
           this.closeReceiveModal()
           await this.refreshOrders()
 
@@ -1525,7 +1547,7 @@ export default {
         }
       } catch (error) {
         console.error('Error ingresando productos:', error)
-        this.$toast?.error(error.message || 'Error al ingresar productos')
+        showError(error.message || 'Error al ingresar productos')
       } finally {
         this.receivingMerchandise = false
       }
@@ -1573,6 +1595,37 @@ export default {
       return new Intl.NumberFormat('es-CO').format(value)
     },
 
+    // 🔗 Procesar parámetros de navegación
+    processNavigationParams() {
+      if (!this.navigationParams) return
+      
+      const { activeTab, action, supplierId } = this.navigationParams
+      
+      // Cambiar al tab correspondiente si se especifica
+      if (activeTab) {
+        this.activeTab = activeTab
+      }
+      
+      // Si la acción es 'create', abrir formulario con proveedor preseleccionado
+      if (action === 'create' && supplierId) {
+        this.activeTab = 'orders'
+        this.viewMode = 'create'
+        this.orderForm.supplier_id = supplierId
+      }
+      
+      // Si la acción es 'view' y estamos en proveedores, seleccionar el proveedor
+      // (Esto lo manejará el componente SuppliersViewMasterDetail hijo)
+      if (action === 'view' && supplierId && activeTab === 'suppliers') {
+        // Emitir evento al componente hijo de proveedores
+        this.$nextTick(() => {
+          // El SuppliersViewMasterDetail escuchará los queryParams globales
+        })
+      }
+      
+      // Limpiar params después de procesar
+      this.navigationParams = null
+    },
+
     // === CREATE ORDER METHODS ===
     
     async loadSuppliers() {
@@ -1580,6 +1633,13 @@ export default {
         const response = await apiCall('/suppliers/analytics')
         if (response.success) {
           this.suppliers = response.data.suppliers
+          
+          // 🔗 Si hay queryParams pendientes, procesarlos después de cargar
+          if (this.navigationParams) {
+            this.$nextTick(() => {
+              this.processNavigationParams()
+            })
+          }
         }
       } catch (error) {
         console.error('Error cargando proveedores:', error)
@@ -1630,7 +1690,7 @@ export default {
           }
         } catch (error) {
           console.error('Error cargando variantes:', error)
-          this.$toast?.error('Error al cargar las variantes del producto')
+          showError('Error al cargar las variantes del producto')
           this.addSimpleProductToOrder(product)
         } finally {
           this.loadingVariants = false
@@ -1646,7 +1706,7 @@ export default {
     addSimpleProductToOrder(product) {
       const exists = this.orderForm.items.find(i => i.product_id === product.id && !i.variant_id)
       if (exists) {
-        this.$toast?.warning('Este producto ya está en la orden')
+        showWarning('Este producto ya está en la orden')
         return
       }
       
@@ -1673,7 +1733,7 @@ export default {
         i => i.product_id === product.id && i.variant_id === variant.id
       )
       if (exists) {
-        this.$toast?.warning('Esta variante ya está en la orden')
+        showWarning('Esta variante ya está en la orden')
         return
       }
       
@@ -1811,7 +1871,7 @@ export default {
             return createdOrder || response.data
           }
           
-          this.$toast?.success(response.message || 'Orden guardada exitosamente')
+          showSuccess(response.message || 'Orden guardada exitosamente')
           this.viewMode = 'list'
           this.resetOrderForm()
           await this.loadOrders()
@@ -1820,7 +1880,7 @@ export default {
         return null
       } catch (error) {
         console.error('Error guardando orden:', error)
-        this.$toast?.error(error.message || 'Error al guardar orden')
+        showError(error.message || 'Error al guardar orden')
         return null
       } finally {
         this.savingOrder = false
@@ -1841,7 +1901,7 @@ export default {
     closeSendOptionsModal() {
       this.showSendOptionsModal = false
       this.pendingOrderToSend = null
-      this.$toast?.success('Orden creada exitosamente')
+      showSuccess('Orden creada exitosamente')
     },
 
     async sendNewOrderByEmail() {
@@ -1878,11 +1938,11 @@ export default {
     async downloadOrderPDF() {
       try {
         if (!this.selectedOrder) {
-          this.$toast?.warning('Selecciona una orden primero')
+          showWarning('Selecciona una orden primero')
           return
         }
 
-        this.$toast?.info('Generando PDF...')
+        showInfo('Generando PDF...')
 
         // Cargar configuración del sistema desde el backend
         const settingsResponse = await apiCall('/system-settings')
@@ -1922,11 +1982,11 @@ export default {
         const pdf = generatePurchaseOrderPDF(orderData, systemSettings)
         downloadPDF(pdf, `orden-compra-${this.selectedOrder.order_number}.pdf`)
         
-        this.$toast?.success('PDF descargado correctamente')
+        showSuccess('PDF descargado correctamente')
         
       } catch (error) {
         console.error('Error descargando PDF:', error)
-        this.$toast?.error('Error al generar PDF')
+        showError('Error al generar PDF')
       }
     },
 
@@ -1940,10 +2000,13 @@ export default {
         }
 
         if (!this.selectedOrder) {
-          this.$toast?.warning('Selecciona una orden primero')
+          showWarning('Selecciona una orden primero')
           return
         }
 
+        // IMPORTANTE: Recargar órdenes para obtener datos frescos del proveedor
+        await this.refreshOrders()
+        
         let supplierEmail = this.selectedOrder.supplier?.email
         
         // Si no tiene email, pedirlo con el modal
@@ -1955,7 +2018,7 @@ export default {
         }
 
         this.sendingEmail = true
-        this.$toast?.info('Generando y enviando orden de compra...')
+        showInfo('Generando y enviando orden de compra...')
 
         // Preparar datos de la orden
         const settings = appStore.systemSettings || {}
@@ -2003,11 +2066,11 @@ export default {
           this.selectedOrder.order_number
         )
         
-        this.$toast?.success(`✅ Orden enviada exitosamente a ${supplierEmail}`)
+        showSuccess(`✅ Orden enviada exitosamente a ${supplierEmail}`)
         
       } catch (error) {
         console.error('Error enviando email:', error)
-        this.$toast?.error('Error al enviar email')
+        showError('Error al enviar email')
       } finally {
         this.sendingEmail = false
       }
@@ -2023,9 +2086,12 @@ export default {
         }
 
         if (!this.selectedOrder) {
-          this.$toast?.warning('Selecciona una orden primero')
+          showWarning('Selecciona una orden primero')
           return
         }
+
+        // IMPORTANTE: Recargar órdenes para obtener datos frescos del proveedor
+        await this.refreshOrders()
 
         let supplierPhone = this.selectedOrder.supplier?.phone
         
@@ -2037,7 +2103,7 @@ export default {
           }
         }
 
-        this.$toast?.info('Preparando WhatsApp...')
+        showInfo('Preparando WhatsApp...')
 
         // Preparar datos de la orden
         const settings = appStore.systemSettings || {}
@@ -2086,11 +2152,11 @@ export default {
           this.selectedOrder.supplier?.name || 'Proveedor'
         )
         
-        this.$toast?.success('✅ Orden enviada por WhatsApp exitosamente')
+        showSuccess('✅ Orden enviada por WhatsApp exitosamente')
         
       } catch (error) {
         console.error('Error enviando WhatsApp:', error)
-        this.$toast?.error('Error al enviar por WhatsApp')
+        showError('Error al enviar por WhatsApp')
       }
     },
 
@@ -2110,7 +2176,7 @@ export default {
       // Validar formato de email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(email)) {
-        this.$toast?.warning('Email inválido')
+        showWarning('Email inválido')
         return
       }
       
@@ -2144,7 +2210,7 @@ export default {
       const phone = this.phoneInput.trim()
       
       if (phone.length < 7) {
-        this.$toast?.warning('Número de teléfono inválido')
+        showWarning('Número de teléfono inválido')
         return
       }
       
@@ -2164,6 +2230,8 @@ export default {
       }
     },
 
+    
+
     // Navegar a configuración de planes
     navigateToPlans() {
       this.showPremiumModal = false
@@ -2174,36 +2242,20 @@ export default {
     async markOrderAsPaid() {
       try {
         if (!this.selectedOrder) {
-          this.$toast?.warning('Selecciona una orden primero')
+          showWarning('Selecciona una orden primero')
           return
         }
 
         if (this.selectedOrder.status !== 'pending') {
-          this.$toast?.warning('Solo se pueden marcar como pagadas las órdenes pendientes')
+          showWarning('Solo se pueden marcar como pagadas las órdenes pendientes')
           return
         }
 
-        const confirmed = confirm(`¿Marcar la orden ${this.selectedOrder.order_number} como pagada?`)
-        if (!confirmed) return
-
-        const response = await apiCall(`/purchase-orders/${this.selectedOrder.id}/status`, {
-          method: 'POST',
-          body: JSON.stringify({ status: 'paid' })
-        })
-
-        if (response.success) {
-          this.$toast?.success('Orden marcada como pagada')
-          await this.loadOrders()
-          
-          // Actualizar orden seleccionada
-          const updated = this.orders.find(o => o.id === this.selectedOrder.id)
-          if (updated) {
-            this.selectedOrder = { ...updated }
-          }
-        }
+        // Abrir modal de recepción para ingresar productos al stock
+        this.openReceiveModal()
       } catch (error) {
         console.error('Error marcando como pagada:', error)
-        this.$toast?.error(error.message || 'Error al actualizar estado')
+        showError(error.message || 'Error al actualizar estado')
       }
     },
 
@@ -2235,7 +2287,7 @@ export default {
       // Validación
       if (!this.supplierForm.name || this.supplierForm.name.trim() === '') {
         this.supplierErrors.name = 'El nombre del proveedor es requerido'
-        this.$toast?.warning('El nombre del proveedor es requerido')
+        showWarning('El nombre del proveedor es requerido')
         return
       }
       
@@ -2247,7 +2299,7 @@ export default {
         })
         
         if (response.success) {
-          this.$toast?.success('Proveedor creado exitosamente')
+          showSuccess('Proveedor creado exitosamente')
           this.viewMode = 'list'
           this.resetSupplierForm()
           await this.loadSuppliers()
@@ -2258,7 +2310,7 @@ export default {
         }
       } catch (error) {
         console.error('Error guardando proveedor:', error)
-        this.$toast?.error(error.message || 'Error al guardar proveedor')
+        showError(error.message || 'Error al guardar proveedor')
       } finally {
         this.savingSupplier = false
       }

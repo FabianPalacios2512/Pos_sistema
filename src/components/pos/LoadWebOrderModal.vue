@@ -11,7 +11,7 @@
       <div 
         v-if="isOpen"
         @click="closeModal"
-        class="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+        class="fixed inset-0 bg-black/70 dark:bg-black/80  z-[100] flex items-center justify-center p-4"
       >
         <Transition
           enter-active-class="transition-all duration-300 ease-out"

@@ -497,12 +497,12 @@
         </div>
 
         <!-- Tabla de Productos -->
-        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-white/90 dark:bg-zinc-900/90  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-4 bg-transparent">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="text-base font-bold text-gray-900 dark:text-white">Lista de Productos</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">{{ productsData.products.length }} productos encontrados</p>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">{{ totalProductItems }} productos encontrados</p>
               </div>
             </div>
           </div>
@@ -520,7 +520,7 @@
                 </tr>
               </thead>
               <tbody class="bg-transparent">
-                <tr v-for="product in productsData.products" :key="product.id"
+                <tr v-for="product in paginatedProductsList" :key="product.id"
                     class="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors border-b border-gray-100 dark:border-zinc-800/30 last:border-b-0">
                   <td class="px-4 py-3">
                     <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ product.name }}</div>
@@ -576,70 +576,19 @@
             </table>
           </div>
           
-          <!-- Paginación - Siempre visible cuando hay productos -->
-          <div v-if="productsData.products && productsData.products.length > 0" class="bg-white dark:bg-zinc-900 border-t-2 border-gray-200 dark:border-zinc-700 px-6 py-4">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <!-- Info de paginación -->
-              <div class="text-sm font-medium text-gray-700 dark:text-zinc-300">
-                <span v-if="productsData.pagination && productsData.pagination.total">
-                  Mostrando <span class="font-bold text-gray-900 dark:text-white">{{ ((filters.currentPage - 1) * filters.itemsPerPage) + 1 }}</span> - 
-                  <span class="font-bold text-gray-900 dark:text-white">{{ Math.min(filters.currentPage * filters.itemsPerPage, productsData.pagination.total) }}</span> 
-                  de <span class="font-bold text-blue-600 dark:text-blue-400">{{ productsData.pagination.total }}</span> productos
-                </span>
-                <span v-else>
-                  <span class="font-bold text-blue-600 dark:text-blue-400">{{ productsData.products.length }}</span> productos encontrados
-                </span>
-              </div>
-              
-              <!-- Controles de paginación -->
-              <div v-if="productsData.pagination && productsData.pagination.total > filters.itemsPerPage" class="flex items-center space-x-3">
-                <button 
-                  @click="filters.currentPage--; loadProductsData()" 
-                  :disabled="filters.currentPage <= 1"
-                  class="px-4 py-2.5 text-sm font-bold bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border-2 border-gray-300 dark:border-zinc-600 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-sm"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-                  </svg>
-                  Anterior
-                </button>
-                
-                <div class="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 dark:bg-blue-500 rounded-xl shadow-lg shadow-blue-500/30">
-                  {{ filters.currentPage }} / {{ Math.ceil(productsData.pagination.total / filters.itemsPerPage) }}
-                </div>
-                
-                <button 
-                  @click="filters.currentPage++; loadProductsData()" 
-                  :disabled="filters.currentPage >= Math.ceil(productsData.pagination.total / filters.itemsPerPage)"
-                  class="px-4 py-2.5 text-sm font-bold bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 border-2 border-gray-300 dark:border-zinc-600 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-700 hover:border-blue-400 dark:hover:border-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-sm"
-                >
-                  Siguiente
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                  </svg>
-                </button>
-              </div>
-              
-              <!-- Selector de items por página -->
-              <div class="flex items-center gap-2">
-                <span class="text-xs text-gray-500 dark:text-zinc-400">Por página:</span>
-                <select 
-                  v-model="filters.itemsPerPage" 
-                  @change="filters.currentPage = 1; loadProductsData()"
-                  class="px-3 py-2 text-sm font-medium bg-white dark:bg-zinc-800 border-2 border-gray-300 dark:border-zinc-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700 dark:text-zinc-200"
-                >
-                  <option :value="10">10</option>
-                  <option :value="25">25</option>
-                  <option :value="50">50</option>
-                  <option :value="100">100</option>
-                </select>
-              </div>
-            </div>
-          </div>
+          <!-- Paginador usando componente estándar -->
+          <TablePaginator
+            v-if="totalProductItems > 10"
+            v-model:currentPage="filters.currentPage"
+            v-model:itemsPerPage="filters.itemsPerPage"
+            :totalPages="totalProductPages"
+            :totalItems="totalProductItems"
+            label="productos"
+          />
         </div>
         
         <!-- Estado Vacío -->
-        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
+        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
           <div class="text-center">
             <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-zinc-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
@@ -650,7 +599,7 @@
         </div>
         
         <!-- Cargando -->
-        <div v-else class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
+        <div v-else class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
           <div class="text-center">
             <svg class="w-16 h-16 mx-auto text-blue-500 dark:text-blue-400 animate-spin mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -1364,75 +1313,91 @@
         </div>
       </div>
 
-      <!-- Vista de Proveedores -->
+      <!-- Vista de Proveedores - Rediseñada -->
       <div v-if="activeSection === 'suppliers'" class="space-y-6 animate-fade-in">
         
         <!-- Tarjetas de Resumen -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Total Proveedores -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-slate-50 dark:bg-slate-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800">
+            <div class="flex items-center space-x-3">
+              <div class="w-11 h-11 bg-slate-100 dark:bg-slate-900/50 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Total Proveedores</h3>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ suppliersData?.summary?.total_suppliers || 0 }}</p>
-                <p class="text-sm text-gray-500 dark:text-zinc-400">{{ suppliersData?.summary?.active_suppliers || 0 }} activos</p>
+              <div>
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase">Proveedores</p>
+                <p class="text-xl font-bold text-gray-900 dark:text-white">{{ suppliersData?.summary?.total_suppliers || 0 }}</p>
+                <p class="text-xs text-emerald-600 dark:text-emerald-400">{{ suppliersData?.summary?.active_suppliers || 0 }} activos</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Órdenes Pendientes -->
+          <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800">
+            <div class="flex items-center space-x-3">
+              <div class="w-11 h-11 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase">Órdenes Pendientes</p>
+                <p class="text-xl font-bold text-gray-900 dark:text-white">{{ suppliersData?.summary?.total_pending_orders || 0 }}</p>
+                <p class="text-xs text-amber-600 dark:text-amber-400">Por recibir</p>
               </div>
             </div>
           </div>
 
           <!-- Cuentas por Pagar -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-rose-50 dark:bg-rose-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800">
+            <div class="flex items-center space-x-3">
+              <div class="w-11 h-11 bg-rose-100 dark:bg-rose-900/30 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Cuentas por Pagar</h3>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ formatCurrency(suppliersData?.summary?.total_debt || 0) }}</p>
-                <p class="text-sm text-gray-500 dark:text-zinc-400">Dinero que debo a proveedores</p>
+              <div>
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase">Por Pagar</p>
+                <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(suppliersData?.summary?.total_debt || 0) }}</p>
+                <p class="text-xs text-rose-600 dark:text-rose-400">Deuda total</p>
               </div>
             </div>
           </div>
 
           <!-- Mejor Proveedor -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-amber-50 dark:bg-amber-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800">
+            <div class="flex items-center space-x-3">
+              <div class="w-11 h-11 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
               </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Mejor Proveedor</h3>
-                </div>
-                <p class="text-lg font-bold text-gray-900 dark:text-white mb-1 truncate">
-                  {{ suppliersData?.best_supplier?.name || 'N/A' }}
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase">Top Proveedor</p>
+                <p class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ suppliersData?.summary?.best_supplier?.name || 'N/A' }}</p>
+                <p class="text-xs text-emerald-600 dark:text-emerald-400" v-if="suppliersData?.summary?.best_supplier?.total_purchases">
+                  {{ formatCurrency(suppliersData.summary.best_supplier.total_purchases) }} comprado
                 </p>
-                <p class="text-sm text-gray-500 dark:text-zinc-400">Al que más le compro</p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Tabla de Proveedores -->
-        <div class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="bg-transparent px-4 py-3 flex items-center justify-between">
+        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
             <div>
               <h2 class="text-base font-bold text-gray-900 dark:text-white">Lista de Proveedores</h2>
               <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ suppliersData?.suppliers?.length || 0 }} proveedores registrados</p>
             </div>
+            <button 
+              @click="navigateToSuppliers()"
+              class="px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 rounded-lg transition-colors"
+            >
+              Gestionar Proveedores
+            </button>
           </div>
 
           <div v-if="!suppliersData" class="p-12 text-center">
@@ -1455,58 +1420,83 @@
           </div>
 
           <div v-else class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-              <thead class="bg-gray-50 dark:bg-transparent border-b border-gray-200 dark:border-zinc-800">
+            <table class="min-w-full">
+              <thead class="bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-800">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Proveedor</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Tiempo Entrega</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Última Compra</th>
+                  <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Proveedor</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Productos</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Órdenes</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Última Orden</th>
+                  <th class="px-4 py-3 text-right text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Total Comprado</th>
                   <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Estado</th>
                   <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
-                <tr v-for="supplier in paginatedSuppliers" :key="supplier.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 border-b border-gray-200 dark:border-zinc-800 transition-colors">
-                  <td class="px-4 py-4">
-                    <div>
-                      <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ supplier.name }}</div>
-                      <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
-                        {{ supplier.contact_name || 'Sin contacto' }}
+              <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
+                <tr v-for="supplier in paginatedSuppliers" :key="supplier.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors">
+                  <td class="px-5 py-4">
+                    <div class="flex items-center space-x-3">
+                      <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                           :style="{ backgroundColor: getSupplierColor(supplier.name) }">
+                        {{ getInitials(supplier.name) }}
                       </div>
-                      <div class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5 flex items-center space-x-2">
-                        <span v-if="supplier.phone">📞 {{ supplier.phone }}</span>
-                        <span v-if="supplier.city">📍 {{ supplier.city }}</span>
+                      <div>
+                        <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ supplier.name }}</div>
+                        <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                          {{ supplier.contact_person || supplier.phone || supplier.email || 'Sin contacto' }}
+                        </div>
                       </div>
                     </div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">
-                      {{ supplier.delivery_time || '2-3 días' }}
-                    </div>
-                  </td>
-                  <td class="px-4 py-4 text-center">
-                    <div class="text-sm text-gray-900 dark:text-white" v-if="supplier.last_purchase_date">
-                      {{ formatDate(supplier.last_purchase_date) }}
-                    </div>
-                    <div class="text-xs text-gray-400 dark:text-zinc-500" v-else>Sin compras</div>
-                  </td>
-                  <td class="px-4 py-4 text-center">
-                    <span :class="[
-                      'px-2 py-1 text-xs font-semibold rounded-full border',
-                      supplier.status === 'active' 
-                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20' 
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-400 border-slate-100 dark:border-slate-700'
-                    ]">
-                      {{ supplier.status === 'active' ? 'Activo' : 'Inactivo' }}
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20">
+                      {{ supplier.products_count || 0 }}
                     </span>
                   </td>
                   <td class="px-4 py-4 text-center">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ supplier.total_orders || 0 }}</div>
+                    <div v-if="supplier.pending_orders > 0" class="text-xs text-amber-600 dark:text-amber-400">
+                      {{ supplier.pending_orders }} pendiente{{ supplier.pending_orders > 1 ? 's' : '' }}
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 text-center">
+                    <div v-if="supplier.last_order_date">
+                      <div class="text-sm text-gray-900 dark:text-white">{{ formatDate(supplier.last_order_date) }}</div>
+                      <div class="text-xs text-gray-500 dark:text-zinc-500">#{{ supplier.last_order_number }}</div>
+                    </div>
+                    <div v-else class="text-xs text-gray-400 dark:text-zinc-500">Sin órdenes</div>
+                  </td>
+                  <td class="px-4 py-4 text-right">
+                    <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ formatCurrency(supplier.total_purchased || 0) }}</div>
+                    <div v-if="supplier.current_debt > 0" class="text-xs text-rose-600 dark:text-rose-400">
+                      Debe: {{ formatCurrency(supplier.current_debt) }}
+                    </div>
+                  </td>
+                  <td class="px-4 py-4 text-center">
+                    <span :class="[
+                      'px-2.5 py-1 text-xs font-semibold rounded-full border',
+                      supplier.active 
+                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20' 
+                        : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                    ]">
+                      {{ supplier.active ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-4">
                     <div class="flex items-center justify-center space-x-2">
-                      <button class="px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-100 dark:border-blue-500/20 rounded-lg transition-colors">
+                      <button 
+                        @click="viewSupplierProducts(supplier)"
+                        class="px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-100 dark:border-blue-500/20 rounded-lg transition-colors"
+                        title="Ver productos de este proveedor"
+                      >
                         Ver Productos
                       </button>
-                      <button class="px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-100 dark:border-emerald-500/20 rounded-lg transition-colors">
-                        Nuevo Pedido
+                      <button 
+                        @click="createOrderForSupplier(supplier)"
+                        class="px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-100 dark:border-emerald-500/20 rounded-lg transition-colors"
+                        title="Crear nueva orden de compra"
+                      >
+                        Nueva Orden
                       </button>
                     </div>
                   </td>
@@ -1516,64 +1506,15 @@
           </div>
 
           <!-- Paginador -->
-          <div v-if="suppliersData?.suppliers && suppliersData.suppliers.length > 0" class="bg-gray-50 dark:bg-transparent border-t border-gray-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div class="flex items-center space-x-2">
-                <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Mostrar:</span>
-                <select v-model="suppliersFilters.itemsPerPage" @change="suppliersFilters.currentPage = 1"
-                        class="bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-zinc-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-                <span class="text-xs text-gray-700 dark:text-zinc-300">por página</span>
-              </div>
-              <div class="text-xs text-gray-700 dark:text-zinc-300">
-                Mostrando {{ suppliersPaginationInfo.start }} a {{ suppliersPaginationInfo.end }} de {{ suppliersPaginationInfo.total }}
-              </div>
-            </div>
-            
-            <div class="flex items-center space-x-1">
-              <button @click="suppliersFilters.currentPage = 1" :disabled="suppliersFilters.currentPage === 1"
-                      class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
-                </svg>
-              </button>
-              <button @click="suppliersFilters.currentPage--" :disabled="suppliersFilters.currentPage === 1"
-                      class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-              </button>
-              
-              <div class="flex items-center space-x-1">
-                <button v-for="page in suppliersTotalPages" :key="page" @click="suppliersFilters.currentPage = page"
-                        :class="[
-                          'px-2.5 py-1 text-xs font-medium rounded-lg transition-colors',
-                          page === suppliersFilters.currentPage 
-                            ? 'bg-blue-600 dark:bg-blue-500 text-white border border-blue-600 dark:border-blue-500' 
-                            : 'text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'
-                        ]">
-                  {{ page }}
-                </button>
-              </div>
-              
-              <button @click="suppliersFilters.currentPage++" :disabled="suppliersFilters.currentPage === suppliersTotalPages"
-                      class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-              <button @click="suppliersFilters.currentPage = suppliersTotalPages" :disabled="suppliersFilters.currentPage === suppliersTotalPages"
-                      class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
+          <TablePaginator
+            v-if="suppliersData?.suppliers && suppliersData.suppliers.length > 10"
+            v-model:currentPage="suppliersFilters.currentPage"
+            v-model:itemsPerPage="suppliersFilters.itemsPerPage"
+            :totalPages="suppliersTotalPages"
+            :totalItems="suppliersData.suppliers.length"
+            label="proveedores"
+            @update:itemsPerPage="savePaginatorPreference('suppliers', $event)"
+          />
         </div>
       </div>
 
@@ -2479,19 +2420,25 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import ToastNotifications from './ToastNotifications.vue'
+import TablePaginator from './TablePaginator.vue'
 import { API_CONFIG, apiCall } from '../services/api.js'
 import { getInitials } from '../utils/avatarUtils.js'
 import { appStore } from '../store/appStore'
+import { useModuleNavigation } from '../composables/useModuleNavigation'
 
 export default {
   name: 'IntelligentInventoryView',
   components: {
-    ToastNotifications
+    ToastNotifications,
+    TablePaginator
   },
   setup() {
     const API_BASE_URL = API_CONFIG.BASE_URL
+    
+    // 🔗 Composable para navegación entre módulos
+    const { navigateToModule } = useModuleNavigation()
 
     // Estado reactivo
     const activeSection = ref('overview')
@@ -2537,6 +2484,26 @@ export default {
       const hasMultipleWarehouses = warehouses.value.length > 1
       
       return isPremiumOrEnterprise && hasMultipleWarehouses
+    })
+    
+    // 📊 Computed para paginación de productos
+    const totalProductItems = computed(() => {
+      return productsData.value?.products?.length || 0
+    })
+    
+    const totalProductPages = computed(() => {
+      const total = totalProductItems.value
+      const perPage = filters.itemsPerPage || 25
+      return Math.ceil(total / perPage) || 1
+    })
+    
+    const paginatedProductsList = computed(() => {
+      const products = productsData.value?.products || []
+      const perPage = filters.itemsPerPage || 25
+      const page = filters.currentPage || 1
+      const start = (page - 1) * perPage
+      const end = start + perPage
+      return products.slice(start, end)
     })
     
     // Datos para vista de movimientos
@@ -3360,6 +3327,14 @@ export default {
       }
     }
 
+    // Cambiar items por página
+    const changeItemsPerPage = (event) => {
+      const newValue = parseInt(event.target.value, 10)
+      filters.itemsPerPage = newValue
+      filters.currentPage = 1
+      loadProductsData()
+    }
+
     // Cargar datos de productos
     const loadProductsData = async () => {
       try {
@@ -3375,12 +3350,7 @@ export default {
         // 🏪 Agregar bodega si está seleccionada
         if (selectedWarehouse.value) {
           params.append('warehouse_id', selectedWarehouse.value)
-          console.log('🏢 [IntelligentInventory] Filtrando por warehouse ID:', selectedWarehouse.value)
-        } else {
-          console.log('📍 [IntelligentInventory] Mostrando todas las sedes')
         }
-        
-        console.log('🔍 [IntelligentInventory] Parámetros de búsqueda:', Object.fromEntries(params))
         
         // Si es rango personalizado, agregar fechas
         if (selectedPeriod.value === 'custom' && customDateRange.start) {
@@ -3390,9 +3360,6 @@ export default {
         }
         
         const data = await apiCall(`/inventory/test/products?${params}`)
-        console.log('📦 [IntelligentInventory] Respuesta del backend:', data)
-        console.log('📊 [IntelligentInventory] Pagination recibida:', data?.data?.pagination)
-        console.log('📋 [IntelligentInventory] Total productos:', data?.data?.products?.length)
         
         if (data) {
           
@@ -3483,25 +3450,91 @@ export default {
             summary: response.data.summary || {
               total_suppliers: 0,
               active_suppliers: 0,
-              total_debt: 0
+              total_debt: 0,
+              total_pending_orders: 0
             },
             best_supplier: response.data.summary?.best_supplier || null
           }
-          
-          console.log('✅ Proveedores cargados:', suppliersData.value.suppliers.length)
         }
       } catch (error) {
-        console.error('❌ Error cargando proveedores:', error)
+        console.error('Error cargando proveedores:', error)
         // Establecer datos vacíos en caso de error
         suppliersData.value = {
           suppliers: [],
           summary: {
             total_suppliers: 0,
             active_suppliers: 0,
-            total_debt: 0
+            total_debt: 0,
+            total_pending_orders: 0
           },
           best_supplier: null
         }
+      }
+    }
+
+    // 🎨 Generar color consistente para avatar de proveedor
+    const getSupplierColor = (name) => {
+      const colors = [
+        '#3B82F6', '#8B5CF6', '#EC4899', '#EF4444', '#F97316', 
+        '#EAB308', '#22C55E', '#14B8A6', '#06B6D4', '#6366F1'
+      ]
+      let hash = 0
+      for (let i = 0; i < (name || '').length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash)
+      }
+      return colors[Math.abs(hash) % colors.length]
+    }
+
+    // 🔗 Navegar a Gestión de Proveedores (va al tab de proveedores en purchase-orders)
+    const navigateToSuppliers = () => {
+      navigateToModule('purchase-orders', { 
+        activeTab: 'suppliers' 
+      })
+    }
+
+    // 👁️ Ver productos de un proveedor (abre en master detail)
+    const viewSupplierProducts = (supplier) => {
+      // Navegar al módulo de órdenes de compra con el proveedor seleccionado
+      navigateToModule('purchase-orders', { 
+        activeTab: 'suppliers',
+        action: 'view', 
+        supplierId: supplier.id,
+        supplierName: supplier.name 
+      })
+    }
+
+    // 📝 Crear orden de compra para un proveedor
+    const createOrderForSupplier = (supplier) => {
+      // Navegar al módulo de órdenes de compra con el proveedor preseleccionado
+      navigateToModule('purchase-orders', { 
+        activeTab: 'orders',
+        action: 'create', 
+        supplierId: supplier.id,
+        supplierName: supplier.name 
+      })
+    }
+
+    // 💾 Guardar preferencia de paginador en localStorage
+    const savePaginatorPreference = (key, value) => {
+      try {
+        const prefs = JSON.parse(localStorage.getItem('pos_paginator_prefs') || '{}')
+        prefs[key] = value
+        localStorage.setItem('pos_paginator_prefs', JSON.stringify(prefs))
+      } catch (e) {
+        console.warn('Error guardando preferencia de paginador:', e)
+      }
+    }
+
+    // 📖 Cargar preferencias de paginador desde localStorage
+    const loadPaginatorPreferences = () => {
+      try {
+        const prefs = JSON.parse(localStorage.getItem('pos_paginator_prefs') || '{}')
+        if (prefs.products) filters.itemsPerPage = prefs.products
+        if (prefs.suppliers) suppliersFilters.itemsPerPage = prefs.suppliers
+        if (prefs.movements) movementsFilters.itemsPerPage = prefs.movements
+        if (prefs.customers) customersFilters.itemsPerPage = prefs.customers
+      } catch (e) {
+        console.warn('Error cargando preferencias de paginador:', e)
       }
     }
 
@@ -3733,11 +3766,31 @@ export default {
 
     // Cargar datos automáticamente al montar el componente
     onMounted(() => {
+      // 💾 Primero cargar preferencias de paginador
+      loadPaginatorPreferences()
+      
       loadDashboardData()
       loadProductsData()
       loadMovementsData()
       loadCustomersData()
       loadSuppliersData() // 🏭 Cargar proveedores
+    })
+
+    // 👁️ Watchers para guardar preferencias de paginador automáticamente
+    watch(() => filters.itemsPerPage, (newValue) => {
+      savePaginatorPreference('products', newValue)
+    })
+    
+    watch(() => suppliersFilters.itemsPerPage, (newValue) => {
+      savePaginatorPreference('suppliers', newValue)
+    })
+    
+    watch(() => movementsFilters.itemsPerPage, (newValue) => {
+      savePaginatorPreference('movements', newValue)
+    })
+    
+    watch(() => customersFilters.itemsPerPage, (newValue) => {
+      savePaginatorPreference('customers', newValue)
     })
 
     // Computed properties para paginación de movimientos
@@ -3920,6 +3973,10 @@ export default {
       selectedWarehouse, // 🏪 Bodega seleccionada
       showWarehouseSelector, // 🏪 Mostrar selector (computed)
       filters,
+      // 📊 Paginación de productos
+      totalProductItems,
+      totalProductPages,
+      paginatedProductsList,
       productsTotalPages,
       productsPaginationInfo,
       movementsData,
@@ -3980,6 +4037,7 @@ export default {
       testConnection,
       loadWarehouses, // 🏪 Cargar bodegas
       loadProductsData,
+      changeItemsPerPage,
       loadMovementsData,
       loadCustomersData,
       loadSuppliersData,
@@ -4010,7 +4068,17 @@ export default {
       resolveAlertGroup,
       
       // Funciones de movimientos
-      viewMovementDocument
+      viewMovementDocument,
+      
+      // 🆕 Funciones de proveedores
+      getSupplierColor,
+      navigateToSuppliers,
+      viewSupplierProducts,
+      createOrderForSupplier,
+      
+      // 💾 Funciones de persistencia de paginador
+      savePaginatorPreference,
+      loadPaginatorPreferences
     }
   }
 }

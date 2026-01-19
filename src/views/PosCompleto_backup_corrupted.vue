@@ -140,7 +140,7 @@
               <div class="w-full border-t border-gradient-to-r from-transparent via-slate-600/30 to-transparent"></div>
             </div>
             <div class="relative flex justify-center">
-              <div class="bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 px-4 py-1.5 rounded-full border border-slate-700/50 shadow-lg backdrop-blur-sm">
+              <div class="bg-gradient-to-r from-slate-800 via-slate-900 to-slate-800 px-4 py-1.5 rounded-full border border-slate-700/50 shadow-lg ">
                 <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
                   <svg class="w-3 h-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
@@ -343,7 +343,7 @@
             <button
               v-if="shouldShowModule('settings')"
               @click="setCurrentModule('settings')"
-              class="group flex-1 p-3.5 rounded-2xl bg-gradient-to-br from-slate-800/40 via-slate-700/40 to-slate-800/40 hover:from-slate-700/60 hover:via-slate-600/60 hover:to-slate-700/60 text-slate-300 hover:text-white transition-all duration-300 backdrop-blur-sm border border-slate-600/30 hover:border-slate-500/50 hover:shadow-lg hover:scale-[1.02]"
+              class="group flex-1 p-3.5 rounded-2xl bg-gradient-to-br from-slate-800/40 via-slate-700/40 to-slate-800/40 hover:from-slate-700/60 hover:via-slate-600/60 hover:to-slate-700/60 text-slate-300 hover:text-white transition-all duration-300  border border-slate-600/30 hover:border-slate-500/50 hover:shadow-lg hover:scale-[1.02]"
               :title="sidebarCollapsed ? 'Configuración' : ''"
             >
               <div class="flex items-center justify-center" :class="sidebarCollapsed ? '' : 'space-x-3'">
@@ -361,7 +361,7 @@
             <button
               v-show="!sidebarCollapsed"
               @click="logout"
-              class="group p-3.5 rounded-2xl bg-gradient-to-br from-red-500/20 via-red-600/20 to-red-700/20 hover:from-red-500/30 hover:via-red-600/30 hover:to-red-700/30 text-red-300 hover:text-red-200 transition-all duration-300 backdrop-blur-sm border border-red-500/30 hover:border-red-400/50 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105"
+              class="group p-3.5 rounded-2xl bg-gradient-to-br from-red-500/20 via-red-600/20 to-red-700/20 hover:from-red-500/30 hover:via-red-600/30 hover:to-red-700/30 text-red-300 hover:text-red-200 transition-all duration-300  border border-red-500/30 hover:border-red-400/50 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105"
               title="Cerrar Sesión"
             >
               <div class="w-6 h-6 flex items-center justify-center">
@@ -383,7 +383,7 @@
          }">
       
       <!-- Header Corporativo Profesional -->
-  <header class="sticky top-0 z-40 bg-gray-50/95 shadow-md border-b border-gray-200 backdrop-blur-xl">
+  <header class="sticky top-0 z-40 bg-gray-50/95 shadow-md border-b border-gray-200 ">
         <div class="px-6 py-3">
           <div class="flex items-center justify-between">
             <!-- Izquierda: Controles de menú y título -->
@@ -460,7 +460,7 @@
                 <!-- Dropdown Menu Profesional -->
                 <div 
                   v-if="userDropdownOpen"
-                  class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 backdrop-blur-sm"
+                  class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 "
                   @click.stop="() => {}"
                 >
                   <!-- Información del Usuario -->
@@ -1722,11 +1722,11 @@ const getPOSMenuClass = (module, isPrimary = false) => {
       return baseClasses + ' bg-gradient-to-br from-emerald-500 via-blue-600 to-indigo-700 text-white shadow-2xl shadow-blue-600/40 ring-2 ring-emerald-400/30 transform scale-[1.02] border border-white/10';
     } else {
       // Botón secundario activo - elegante y profesional
-      return baseClasses + ' bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-blue-700/90 text-white shadow-xl shadow-blue-500/30 ring-1 ring-blue-400/30 border border-white/10 backdrop-blur-sm';
+      return baseClasses + ' bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-blue-700/90 text-white shadow-xl shadow-blue-500/30 ring-1 ring-blue-400/30 border border-white/10 ';
     }
   } else {
     // Estado inactivo - sutil y moderno
-    return baseClasses + ' bg-slate-800/20 hover:bg-gradient-to-br hover:from-slate-700/40 hover:via-slate-600/50 hover:to-slate-700/40 text-slate-300 hover:text-white hover:shadow-lg backdrop-blur-sm border border-slate-700/20 hover:border-slate-500/40 hover:scale-[1.01] hover:ring-1 hover:ring-slate-500/20';
+    return baseClasses + ' bg-slate-800/20 hover:bg-gradient-to-br hover:from-slate-700/40 hover:via-slate-600/50 hover:to-slate-700/40 text-slate-300 hover:text-white hover:shadow-lg  border border-slate-700/20 hover:border-slate-500/40 hover:scale-[1.01] hover:ring-1 hover:ring-slate-500/20';
   }
 };
 
@@ -1746,14 +1746,14 @@ const getPOSIconClass = (module, isPrimary = false) => {
   if (isActive) {
     if (isPrimary) {
       // Icono primario activo - destacado
-      return baseClasses + ' bg-white/25 text-white shadow-xl ring-2 ring-white/20 backdrop-blur-sm';
+      return baseClasses + ' bg-white/25 text-white shadow-xl ring-2 ring-white/20 ';
     } else {
       // Icono secundario activo - profesional
-      return baseClasses + ' bg-white/20 text-white shadow-lg ring-1 ring-white/15 backdrop-blur-sm';
+      return baseClasses + ' bg-white/20 text-white shadow-lg ring-1 ring-white/15 ';
     }
   } else {
     // Icono inactivo - sutil con hover elegante
-    return baseClasses + ' bg-slate-700/25 group-hover:bg-slate-600/40 text-slate-400 group-hover:text-white group-hover:shadow-md group-hover:ring-1 group-hover:ring-slate-500/30 backdrop-blur-sm';
+    return baseClasses + ' bg-slate-700/25 group-hover:bg-slate-600/40 text-slate-400 group-hover:text-white group-hover:shadow-md group-hover:ring-1 group-hover:ring-slate-500/30 ';
   }
 };
 

@@ -270,7 +270,7 @@ class InventoryTestController extends Controller
             $category = $request->get('category');
             $supplier = $request->get('supplier');
             $search = $request->get('search');
-            $warehouseId = $request->get('warehouse_id'); // 🏪 Nuevo parámetro para filtrar por bodega
+            $warehouseId = $request->get('warehouse_id'); // 🏪 Filtrar por bodega
 
             // Calcular fechas según el período
             $now = Carbon::now();
@@ -279,8 +279,13 @@ class InventoryTestController extends Controller
             // Query base para productos
             $query = Product::with(['category:id,name', 'supplier:id,name']);
 
-            // 🏪 Si se especifica bodega, cargar relación con stock de esa bodega
+            // 🏪 Si se especifica bodega, FILTRAR solo productos que tienen stock en esa bodega
             if ($warehouseId) {
+                // Solo obtener productos que existen en esa bodega (con o sin stock)
+                $query->whereHas('warehouses', function($q) use ($warehouseId) {
+                    $q->where('warehouse_id', $warehouseId);
+                });
+
                 $query->with(['warehouses' => function($q) use ($warehouseId) {
                     $q->where('warehouse_id', $warehouseId);
                 }]);

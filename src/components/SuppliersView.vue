@@ -32,7 +32,7 @@
       </div>
 
       <!-- Tabs Navigation -->
-      <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl border border-gray-300 dark:border-white/5 p-1 inline-flex">
+      <div class="bg-white dark:bg-zinc-900/80  rounded-xl border border-gray-300 dark:border-white/5 p-1 inline-flex">
         <button 
           @click="activeTab = 'suppliers'" 
           :class="[
@@ -71,7 +71,7 @@
       <div v-if="activeTab === 'suppliers'">
       <!-- Métricas con Glassmorphism -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +86,7 @@
           </div>
         </div>
 
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-red-50 dark:bg-red-950 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@
           </div>
         </div>
 
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,7 +270,7 @@
       <div v-if="activeTab === 'orders'" class="space-y-6">
         <!-- Métricas de Órdenes -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
+          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +284,7 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
+          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -298,7 +298,7 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
+          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,7 +312,7 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
+          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-black/50">
             <div class="flex items-center gap-3">
               <div class="w-11 h-11 bg-purple-50 dark:bg-purple-950 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,7 +328,7 @@
         </div>
 
         <!-- Filtros -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-white/5">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-white/5">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <select v-model="orderFilters.status" @change="loadOrders" class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
               <option value="">Todos los estados</option>

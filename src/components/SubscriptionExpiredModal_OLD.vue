@@ -4,7 +4,7 @@
   <div 
     v-if="showModal"
     data-modal-subscription="active"
-    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md animate-fade-in"
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90  animate-fade-in"
     @click.prevent
     @contextmenu.prevent
   >

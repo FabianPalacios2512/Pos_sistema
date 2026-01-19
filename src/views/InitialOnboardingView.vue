@@ -4,7 +4,7 @@
     <div class="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
       
       <!-- Header con tu estilo -->
-      <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
+      <div class="bg-white/50  rounded-[24px] border border-white shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div class="flex items-center space-x-3 sm:space-x-4">
             <div class="w-11 h-11 sm:w-14 sm:h-14 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
@@ -77,7 +77,7 @@
       <Transition name="fade-slide" mode="out-in">
         
         <div v-if="currentStep === 1" key="step1" class="space-y-6">
-          <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
+          <div class="bg-white/50  rounded-[24px] border border-white shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
             <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight mb-1 sm:mb-2">Elige tu Plantilla de Facturación</h2>
             <p class="text-xs sm:text-sm font-semibold text-slate-600">
               Selecciona el diseño que mejor represente tu marca. Podrás cambiarlo después en configuración.
@@ -165,7 +165,7 @@
 
         <!-- STEP 2: CONFIGURATION -->
         <div v-else-if="currentStep === 2" key="step2" class="space-y-6">
-          <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-6 mb-6">
+          <div class="bg-white/50  rounded-[24px] border border-white shadow-sm p-6 mb-6">
             <h2 class="text-xl font-black text-slate-900 tracking-tight mb-2">Información de tu Negocio</h2>
             <p class="text-sm font-semibold text-slate-600">
               Estos datos aparecerán en todas tus facturas. Asegúrate de que sean correctos.
@@ -387,7 +387,7 @@
 
         <!-- STEP 3: WHATSAPP - Solo para planes Premium/Enterprise -->
         <div v-else-if="currentStep === 3 && isPremiumPlan" key="step3" class="space-y-6">
-          <div class="bg-white/50 backdrop-blur-sm rounded-[24px] border border-white shadow-sm p-6 mb-6">
+          <div class="bg-white/50  rounded-[24px] border border-white shadow-sm p-6 mb-6">
             <h2 class="text-xl font-black text-slate-900 tracking-tight mb-2">Conecta WhatsApp Business</h2>
             <p class="text-sm font-semibold text-slate-600">
               Envía facturas automáticamente, recupera carritos abandonados y automatiza tu comunicación con clientes.

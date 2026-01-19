@@ -94,7 +94,7 @@
       <!-- KPIs con Glassmorphism -->
       <div v-if="activeTab === 'users'" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Total Usuarios -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@
         </div>
 
         <!-- Usuarios Activos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,7 +124,7 @@
         </div>
 
         <!-- Usuarios Inactivos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +139,7 @@
         </div>
 
         <!-- Roles Configurados -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +157,7 @@
       <!-- KPIs para Roles -->
       <div v-else class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Total Roles -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +172,7 @@
         </div>
 
         <!-- Permisos Disponibles -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +187,7 @@
         </div>
 
         <!-- Módulos del Sistema -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,7 +202,7 @@
         </div>
 
         <!-- Roles Activos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

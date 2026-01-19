@@ -262,7 +262,7 @@
     <!-- Modal Premium -->
     <Teleport to="body">
       <div v-if="showPremiumModal" 
-           class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in"
+           class="fixed inset-0 bg-black/60  flex items-center justify-center z-[9999] p-4 animate-fade-in"
            @click.self="showPremiumModal = false">
         <div class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-scale-in border-2 border-blue-200 dark:border-indigo-700">
           

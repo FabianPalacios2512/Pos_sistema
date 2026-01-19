@@ -37,11 +37,38 @@ class SupplierController extends Controller
     public function getAnalytics(): JsonResponse
     {
         try {
-            // Obtener todos los proveedores
-            $suppliers = Supplier::orderBy('name', 'asc')->get();
+            // Obtener todos los proveedores con sus órdenes de compra
+            $suppliers = Supplier::with(['products'])->orderBy('name', 'asc')->get();
 
-            // Para cada proveedor, obtener el conteo de productos
+            // Para cada proveedor, obtener datos reales de órdenes de compra
             $suppliersWithData = $suppliers->map(function ($supplier) {
+                // Obtener última orden de compra
+                $lastOrder = \DB::table('purchase_orders')
+                    ->where('supplier_id', $supplier->id)
+                    ->whereNull('deleted_at')
+                    ->orderBy('order_date', 'desc')
+                    ->first();
+
+                // Contar órdenes totales
+                $ordersCount = \DB::table('purchase_orders')
+                    ->where('supplier_id', $supplier->id)
+                    ->whereNull('deleted_at')
+                    ->count();
+
+                // Total comprado
+                $totalPurchased = \DB::table('purchase_orders')
+                    ->where('supplier_id', $supplier->id)
+                    ->whereNull('deleted_at')
+                    ->where('status', '!=', 'cancelled')
+                    ->sum('total');
+
+                // Órdenes pendientes
+                $pendingOrders = \DB::table('purchase_orders')
+                    ->where('supplier_id', $supplier->id)
+                    ->whereNull('deleted_at')
+                    ->whereIn('status', ['draft', 'pending', 'ordered'])
+                    ->count();
+
                 return [
                     'id' => $supplier->id,
                     'name' => $supplier->name,
@@ -50,14 +77,20 @@ class SupplierController extends Controller
                     'phone' => $supplier->phone,
                     'email' => $supplier->email,
                     'address' => $supplier->address,
+                    'city' => $supplier->city ?? null,
                     'payment_terms' => $supplier->payment_terms,
-                    'credit_limit' => $supplier->credit_limit,
-                    'current_debt' => $supplier->current_debt,
+                    'credit_limit' => floatval($supplier->credit_limit ?? 0),
+                    'current_debt' => floatval($supplier->current_debt ?? 0),
                     'active' => $supplier->active,
                     'products_count' => $supplier->products()->count(),
-                    'last_purchase_date' => $supplier->last_order_date,
-                    'total_purchases_amount' => $supplier->total_purchased,
-                    'purchase_orders_count' => $supplier->total_orders
+                    // Datos reales de órdenes de compra
+                    'last_order_date' => $lastOrder ? $lastOrder->order_date : null,
+                    'last_order_number' => $lastOrder ? $lastOrder->order_number : null,
+                    'last_order_total' => $lastOrder ? floatval($lastOrder->total) : null,
+                    'total_orders' => $ordersCount,
+                    'total_purchased' => floatval($totalPurchased),
+                    'pending_orders' => $pendingOrders,
+                    'notes' => $supplier->notes
                 ];
             });
 
@@ -65,7 +98,15 @@ class SupplierController extends Controller
             $totalSuppliers = $suppliers->count();
             $activeSuppliers = $suppliers->where('active', true)->count();
             $totalDebt = $suppliers->sum('current_debt');
-            $bestSupplier = $suppliers->first();
+
+            // Mejor proveedor (el que más compras tiene)
+            $bestSupplierData = $suppliersWithData->sortByDesc('total_purchased')->first();
+
+            // Total de órdenes pendientes
+            $totalPendingOrders = \DB::table('purchase_orders')
+                ->whereNull('deleted_at')
+                ->whereIn('status', ['draft', 'pending', 'ordered'])
+                ->count();
 
             return response()->json([
                 'success' => true,
@@ -74,11 +115,12 @@ class SupplierController extends Controller
                     'summary' => [
                         'total_suppliers' => $totalSuppliers,
                         'active_suppliers' => $activeSuppliers,
-                        'total_debt' => $totalDebt,
-                        'best_supplier' => $bestSupplier ? [
-                            'id' => $bestSupplier->id,
-                            'name' => $bestSupplier->name,
-                            'total_purchases' => 0
+                        'total_debt' => floatval($totalDebt),
+                        'total_pending_orders' => $totalPendingOrders,
+                        'best_supplier' => $bestSupplierData ? [
+                            'id' => $bestSupplierData['id'],
+                            'name' => $bestSupplierData['name'],
+                            'total_purchases' => $bestSupplierData['total_purchased']
                         ] : null
                     ]
                 ]

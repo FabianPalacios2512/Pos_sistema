@@ -41,7 +41,7 @@
         <!-- Botón Scroll Down -->
         <button 
           @click="scrollToProducts"
-          class="mt-8 md:mt-12 animate-bounce bg-white/10 backdrop-blur-md border border-white/30 rounded-full p-3 md:p-4 hover:bg-white/20 transition-all"
+          class="mt-8 md:mt-12 animate-bounce bg-white/10  border border-white/30 rounded-full p-3 md:p-4 hover:bg-white/20 transition-all"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -333,10 +333,10 @@
                   </button>
 
                   <!-- Badge de Stock Bajo (Mini) -->
-                  <div v-if="product.stock < 5 && product.stock > 0" class="absolute top-3 left-3 bg-amber-500/90 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                  <div v-if="product.stock < 5 && product.stock > 0" class="absolute top-3 left-3 bg-amber-500/90  text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
                     Solo {{ product.stock }}
                   </div>
-                  <div v-else-if="product.stock === 0" class="absolute top-3 left-3 bg-red-500/90 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                  <div v-else-if="product.stock === 0" class="absolute top-3 left-3 bg-red-500/90  text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm">
                     Agotado
                   </div>
                 </div>
@@ -371,7 +371,7 @@
 
     <!-- PRODUCT DETAIL MODAL (Modern E-commerce Style) -->
     <Transition name="fade">
-      <div v-if="selectedProduct" class="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 lg:p-8 animate-fade-in">
+      <div v-if="selectedProduct" class="fixed inset-0 z-[200] bg-black/50  flex items-center justify-center p-4 lg:p-8 animate-fade-in">
         
         <!-- Modal Container -->
         <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col lg:flex-row">
@@ -379,7 +379,7 @@
           <!-- Close Button -->
           <button 
             @click="closeProductDetails"
-            class="absolute top-4 right-4 z-[210] p-2 bg-white/90 backdrop-blur-md rounded-full hover:bg-gray-100 transition-colors shadow-lg"
+            class="absolute top-4 right-4 z-[210] p-2 bg-white/90  rounded-full hover:bg-gray-100 transition-colors shadow-lg"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -553,7 +553,7 @@
 
     <!-- CHECKOUT DRAWER (Responsive: Bottom Sheet en Móvil, Slide-out en Desktop) -->
     <Transition name="fade">
-      <div v-if="showCheckout" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" @click="showCheckout = false"></div>
+      <div v-if="showCheckout" class="fixed inset-0 bg-black/60  z-[100]" @click="showCheckout = false"></div>
     </Transition>
     
     <Transition :name="isMobilePreview ? 'slide-up' : 'slide-right'">

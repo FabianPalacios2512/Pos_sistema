@@ -33,7 +33,7 @@
       <!-- KPIs con glassmorphism -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Total Gastos Mes -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
               <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@
         </div>
 
         <!-- Efectivo -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
               <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Transferencia -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
               <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@
         </div>
 
         <!-- Tarjeta -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
               <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,7 +346,7 @@
     </div>
 
     <!-- Modal de Confirmación de Eliminación -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-black/60 dark:bg-black/75  flex items-center justify-center z-50 p-4">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/40 max-w-md w-full border border-gray-300 dark:border-zinc-800 overflow-hidden">
         <div class="bg-rose-50 dark:bg-rose-950/30 border-b border-rose-100 dark:border-rose-900/50 px-6 py-4">
           <div class="flex items-center gap-3">
@@ -403,7 +403,7 @@
     </div>
 
     <!-- Modal Crear/Editar Gasto -->
-    <div v-if="showModal" class="fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div v-if="showModal" class="fixed inset-0 bg-black/60 dark:bg-black/75  flex items-center justify-center z-50 p-4">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/40 border border-gray-300 dark:border-zinc-800 max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <!-- Header Modal -->
         <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between flex-shrink-0">
@@ -614,7 +614,7 @@
     </div>
 
     <!-- Modal Ver Detalles -->
-    <div v-if="showViewModal" class="fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div v-if="showViewModal" class="fixed inset-0 bg-black/60 dark:bg-black/75  flex items-center justify-center z-50 p-4">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/40 border border-gray-300 dark:border-zinc-800 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between rounded-t-2xl">
           <h3 class="text-base font-bold text-gray-900 dark:text-white">Detalles del Gasto</h3>

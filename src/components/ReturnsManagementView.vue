@@ -38,7 +38,7 @@
       <div class="flex items-center gap-2 mb-4">
         
         <!-- KPI: Total Devuelto -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-red-50 dark:bg-red-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4.5 h-4.5 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +53,7 @@
         </div>
 
         <!-- KPI: Completadas -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-emerald-50 dark:bg-emerald-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4.5 h-4.5 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@
         </div>
 
         <!-- KPI: Pendientes -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-amber-50 dark:bg-amber-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4.5 h-4.5 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -453,7 +453,7 @@
     
     <!-- Modal solicitar teléfono para WhatsApp -->
     <Teleport to="body">
-      <div v-if="showPhoneModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+      <div v-if="showPhoneModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4 animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-zinc-800 animate-scale-in">
           <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Enviar por WhatsApp</h3>
           <p class="text-sm text-gray-600 dark:text-zinc-400 mb-4">Ingresa el número de teléfono del cliente:</p>
@@ -485,7 +485,7 @@
     
     <!-- Modal solicitar email -->
     <Teleport to="body">
-      <div v-if="showEmailModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+      <div v-if="showEmailModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4 animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-zinc-800 animate-scale-in">
           <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Enviar por Email</h3>
           <p class="text-sm text-gray-600 dark:text-zinc-400 mb-4">Ingresa el correo electrónico del cliente:</p>
@@ -517,7 +517,7 @@
     
     <!-- Modal Premium - Bloqueo de plan básico -->
     <Teleport to="body">
-      <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+      <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4 animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
           
           <!-- Contenido -->

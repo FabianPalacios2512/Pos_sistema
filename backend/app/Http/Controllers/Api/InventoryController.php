@@ -173,12 +173,12 @@ class InventoryController extends Controller
             } else {
                 // Sin filtro de warehouse: métricas globales
                 $query->selectRaw('products.*,
-                    (SELECT SUM(quantity) FROM invoice_items
+                    COALESCE((SELECT SUM(quantity) FROM invoice_items
                      JOIN invoices ON invoice_items.invoice_id = invoices.id
-                     WHERE invoice_items.product_id = products.id AND invoices.status = "paid") as total_sold,
-                    (SELECT SUM(quantity * unit_price) FROM invoice_items
+                     WHERE invoice_items.product_id = products.id AND invoices.status = "paid"), 0) as total_sold,
+                    COALESCE((SELECT SUM(quantity * unit_price) FROM invoice_items
                      JOIN invoices ON invoice_items.invoice_id = invoices.id
-                     WHERE invoice_items.product_id = products.id AND invoices.status = "paid") as total_revenue,
+                     WHERE invoice_items.product_id = products.id AND invoices.status = "paid"), 0) as total_revenue,
                     (SELECT COUNT(*) FROM inventory_movements WHERE product_id = products.id AND movement_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as movement_count');
             }
 
@@ -206,6 +206,51 @@ class InventoryController extends Controller
                             $product->stock = (int)$warehouseStock;
                         }
                     }
+
+                    // 💰 CALCULAR ventas e ingresos filtradas por warehouse
+                    $salesData = DB::table('invoice_items')
+                        ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                        ->leftJoin('cash_sessions', 'invoices.cash_session_id', '=', 'cash_sessions.id')
+                        ->where('invoice_items.product_id', $product->id)
+                        ->where('invoices.status', 'paid')
+                        ->where(function($q) use ($warehouseId) {
+                            $q->where('cash_sessions.warehouse_id', $warehouseId)
+                              ->orWhereNull('invoices.cash_session_id');
+                        })
+                        ->selectRaw('
+                            COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
+                            COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
+                        ')
+                        ->first();
+
+                    $product->total_sold = (int)($salesData->total_sold ?? 0);
+                    $product->total_revenue = (float)($salesData->total_revenue ?? 0);
+
+                    return $product;
+                });
+            } else {
+                // ✅ IMPORTANTE: Transformar todos los productos para asegurar total_sold y total_revenue
+                $products->getCollection()->transform(function($product) {
+                    // 💰 CALCULAR ventas e ingresos directamente desde la BD
+                    $salesData = DB::table('invoice_items')
+                        ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                        ->where('invoice_items.product_id', $product->id)
+                        ->where('invoices.status', 'paid')
+                        ->selectRaw('
+                            COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
+                            COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
+                        ')
+                        ->first();
+
+                    $product->total_sold = (int)($salesData->total_sold ?? 0);
+                    $product->total_revenue = (float)($salesData->total_revenue ?? 0);
+
+                    \Log::info('💰 VENTAS CALCULADAS', [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'total_sold' => $product->total_sold,
+                        'total_revenue' => $product->total_revenue
+                    ]);
 
                     return $product;
                 });

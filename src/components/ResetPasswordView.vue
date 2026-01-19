@@ -27,7 +27,7 @@
         enter-to-class="translate-y-0 opacity-100"
       >
         <div v-if="imageLoaded" class="absolute bottom-8 left-8 right-8 z-10">
-          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+          <div class="bg-white/10  rounded-2xl p-6 border border-white/20">
             <h3 class="text-2xl font-bold text-white mb-2">🔓 Nueva Contraseña</h3>
             <p class="text-white/80 text-sm">Crea una contraseña segura y única para tu cuenta</p>
           </div>

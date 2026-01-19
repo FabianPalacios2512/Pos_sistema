@@ -2,7 +2,7 @@
   <Teleport to="body">
     <!-- Modal de Bienvenida (Pregunta antes de iniciar) -->
     <Transition name="fade">
-      <div v-if="showWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div v-if="showWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50  p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-scale-in">
           <div class="p-6 text-center">
             <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-indigo-600">

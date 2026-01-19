@@ -474,7 +474,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="showLogoutModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div v-if="showLogoutModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 ">
         <Transition
           enter-active-class="transition ease-out duration-200"
           enter-from-class="opacity-0 scale-95"
@@ -539,7 +539,7 @@
     >
       <div 
         v-if="videoModalOpen"
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 dark:bg-opacity-70 backdrop-blur-sm"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 dark:bg-opacity-70 "
         @click="closeVideoModal"
       >
         <div 

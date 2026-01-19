@@ -8,7 +8,7 @@
     @contextmenu.prevent
   >
     <!-- Fondo con blur sobre la app -->
-    <div class="fixed inset-0 bg-gradient-to-br from-gray-900/80 via-gray-900/90 to-black/95 backdrop-blur-md"></div>
+    <div class="fixed inset-0 bg-gradient-to-br from-gray-900/80 via-gray-900/90 to-black/95 "></div>
     
     <!-- Contenido centrado -->
     <div class="relative min-h-screen flex items-center justify-center p-4 md:p-8">

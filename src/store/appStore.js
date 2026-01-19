@@ -172,7 +172,12 @@ export const appStore = reactive({
         console.log('🔍 [appStore] Plan del tenant cargado:', this.tenantPlan)
         
         // 🏪 Guardar nombre del negocio
-        this.businessName = response.data.data?.business_name || 'Mi Tienda'
+        this.businessName = response.data.data?.business_name || response.data.tenant?.business_name || 'Mi Tienda'
+        
+        // 🏢 IMPORTANTE: Agregar business_name a systemSettings si no viene en settings pero sí en tenant
+        if (!this.systemSettings.business_name && response.data.tenant?.business_name) {
+          this.systemSettings.business_name = response.data.tenant.business_name
+        }
         
         // 🆕 Guardar información completa del tenant (si viene del backend)
         if (response.data.tenant) {

@@ -15,7 +15,7 @@
  4. Emitir 'edit' cuando se clickea el botón editar
 -->
 <template>
-  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="$emit('close')">
+  <div class="fixed inset-0 bg-black/50  flex items-center justify-center z-50 p-4" @click.self="$emit('close')">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
       
       <!-- Header (fixed) -->

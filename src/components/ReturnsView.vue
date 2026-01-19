@@ -421,7 +421,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { useToast } from '../composables/useToast.js'
 import returnsService from '../services/returnsService.js'
 import { generateReturnPDF, downloadPDF as downloadPDFHelper, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
-import { useAppStore } from '../stores/app.js'
+import { appStore } from '../store/appStore.js'
 
 // Props
 const props = defineProps({
@@ -439,7 +439,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'success'])
 
 const { showSuccess, showError, showInfo } = useToast()
-const appStore = useAppStore()
+// appStore se importa directamente desde ../store/appStore.js
 
 // Estados reactivos
 const currentStep = ref(1)
@@ -634,7 +634,24 @@ const processReturn = async () => {
     const result = await returnsService.createReturn(returnData)
     
     console.log('Resultado de devolución:', result.data)
-    processedReturn.value = result.data
+    
+    // Procesar la respuesta para parsear items JSON (igual que en ReturnsManagementView)
+    let returnResponse = result.data
+    if (returnResponse.items && typeof returnResponse.items === 'string') {
+      try {
+        returnResponse.items = JSON.parse(returnResponse.items)
+      } catch (e) {
+        console.error('Error parsing items JSON:', e)
+        returnResponse.items = []
+      }
+    }
+    
+    // Si return_items no existe o no es array, usar items
+    if (!Array.isArray(returnResponse.return_items)) {
+      returnResponse.return_items = returnResponse.items || []
+    }
+    
+    processedReturn.value = returnResponse
     
     // Esperar un tick para asegurar que los datos se actualicen
     await nextTick()

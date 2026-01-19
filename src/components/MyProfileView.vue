@@ -25,7 +25,7 @@
           <div class="lg:col-span-1 space-y-6">
             
             <!-- Tarjeta de Perfil -->
-            <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+            <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
               <!-- Avatar y nombre -->
               <div class="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 px-6 py-6 text-center">
                 <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-blue-500/30">
@@ -69,7 +69,7 @@
           <div class="lg:col-span-2 space-y-6">
             
             <!-- Información Personal -->
-            <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
+            <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
               <div class="flex items-center gap-3 mb-5">
                 <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +151,7 @@
             </div>
 
             <!-- Seguridad - Cambio de Contraseña (Solo para usuarios NO de Google) -->
-            <div v-if="!isGoogleUser" class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
+            <div v-if="!isGoogleUser" class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
               <div class="flex items-center gap-3 mb-5">
                 <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,7 +261,7 @@
             </div>
 
             <!-- Mensaje para usuarios de Google -->
-            <div v-if="isGoogleUser" class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
+            <div v-if="isGoogleUser" class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
               <div class="flex items-center gap-3 mb-4">
                 <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center">
                   <svg class="w-5 h-5" viewBox="0 0 24 24">

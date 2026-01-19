@@ -11,7 +11,7 @@
       <div 
         v-if="isOpen"
         @click="$emit('close')"
-        class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50"
+        class="fixed inset-0 bg-gray-900/60  z-50"
       ></div>
     </Transition>
     
@@ -27,7 +27,7 @@
         v-if="isOpen"
         class="fixed bottom-0 right-0 w-full md:w-[450px] h-[90vh] md:h-screen bg-white z-50 flex flex-col rounded-t-3xl md:rounded-none shadow-2xl overflow-hidden"
       >
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-10">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white/80  sticky top-0 z-10">
           <div>
             <h2 class="text-xl font-bold text-gray-900 tracking-tight">Tu Pedido</h2>
             <p class="text-xs text-gray-500 font-medium">

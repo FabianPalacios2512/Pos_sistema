@@ -34,7 +34,7 @@
       <!-- Métricas Principales - Estilo Ghost/Glass -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <!-- Total Productos -->
-        <div class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
+        <div class="bg-white/80 dark:bg-zinc-800/40  rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -49,7 +49,7 @@
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
+        <div class="bg-white/80 dark:bg-zinc-800/40  rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -64,7 +64,7 @@
         </div>
 
         <!-- Valor Inventario -->
-        <div class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
+        <div class="bg-white/80 dark:bg-zinc-800/40  rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -79,7 +79,7 @@
         </div>
 
         <!-- Movimientos Hoy -->
-        <div class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
+        <div class="bg-white/80 dark:bg-zinc-800/40  rounded-xl px-4 py-3 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -95,7 +95,7 @@
       </div>
 
       <!-- 🏢 Selector de Sede/Bodega - Diseño minimalista integrado -->
-      <div v-if="showWarehouseFilter" class="flex items-center justify-between py-3 px-4 bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]">
+      <div v-if="showWarehouseFilter" class="flex items-center justify-between py-3 px-4 bg-white/80 dark:bg-zinc-800/40  rounded-xl border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)]">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 bg-gray-100 dark:bg-zinc-700/50 rounded-lg flex items-center justify-center">
             <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -356,7 +356,7 @@
             </div>
 
             <div v-for="alert in stockAlerts" :key="alert.id" 
-                 class="bg-white/80 dark:bg-zinc-800/40 backdrop-blur-sm rounded-xl p-4 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
+                 class="bg-white/80 dark:bg-zinc-800/40  rounded-xl p-4 border-0 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] transition-all duration-200">
               <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4 flex-1 min-w-0">
                   <!-- Imagen o Ícono del producto -->
@@ -604,7 +604,7 @@
 
     <!-- Modal Ajustar Stock -->
     <div v-if="showAdjustModal" 
-         class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
+         class="fixed inset-0 bg-black/60  flex items-center justify-center p-4 z-50 animate-fade-in"
          @click.self="showAdjustModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-5xl shadow-2xl border border-gray-200 dark:border-zinc-800 flex flex-col max-h-[90vh] animate-scale-in">
         
@@ -1388,6 +1388,7 @@ const loadProducts = async () => {
         images: productsList[0].images,
         img: productsList[0].img
       })
+      console.log('💰 [DEBUG VENTAS] total_sold:', productsList[0].total_sold, 'total_revenue:', productsList[0].total_revenue)
     }
 
     products.value = productsList.map(product => ({
@@ -1400,7 +1401,9 @@ const loadProducts = async () => {
       barcode: product.barcode || `BAR${product.id}${Date.now().toString().slice(-4)}`,
       price: parseFloat(product.sale_price || product.price || 0),
       image_url: product.image_url || product.image || null,
-      images: product.images || [] // 🖼️ Incluir array de imágenes para getProductImage()
+      images: product.images || [], // 🖼️ Incluir array de imágenes para getProductImage()
+      total_sold: parseInt(product.total_sold || 0), // 📊 Ventas totales (backend las calcula)
+      total_revenue: parseFloat(product.total_revenue || 0) // 💰 Ingresos totales (backend los calcula)
     }))
 
     const warehouseInfo = showWarehouseFilter.value ? ` (Sede: ${selectedWarehouse.value})` : ' (Todas las sedes)'

@@ -20,7 +20,7 @@
         <span v-if="product.stock <= 5 && product.stock > 0" class="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold uppercase rounded-md shadow-sm">
           ¡Quedan {{ product.stock }}!
         </span>
-        <span v-if="product.category" class="px-2 py-0.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-sm text-gray-700 dark:text-gray-300 text-[10px] font-bold uppercase rounded-md border border-gray-200 dark:border-zinc-700">
+        <span v-if="product.category" class="px-2 py-0.5 bg-white/90 dark:bg-zinc-800/90  text-gray-700 dark:text-gray-300 text-[10px] font-bold uppercase rounded-md border border-gray-200 dark:border-zinc-700">
           {{ product.category }}
         </span>
       </div>

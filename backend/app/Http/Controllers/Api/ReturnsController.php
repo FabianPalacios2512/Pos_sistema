@@ -231,8 +231,14 @@ class ReturnsController extends Controller
                 // ✅ CAPTURAR source_warehouse_id AHORA (antes de que se elimine el item)
                 $sourceWarehouseId = $originalItem->source_warehouse_id;
 
-                \Log::info('📦 Capturando source_warehouse_id para devolución', [
+                // 👗 CAPTURAR product_variant_id para tiendas fashion
+                $productVariantId = $originalItem->product_variant_id ?? null;
+                $variantOptions = $originalItem->variant_options ?? null;
+
+                \Log::info('📦 Capturando datos para devolución', [
                     'product_id' => $itemData['product_id'],
+                    'product_variant_id' => $productVariantId ?? 'NULL (producto simple)',
+                    'variant_options' => $variantOptions ?? 'N/A',
                     'invoice_item_id' => $originalItem->id,
                     'source_warehouse_id' => $sourceWarehouseId ?? 'NULL',
                     'current_quantity_in_invoice' => $originalItem->quantity
@@ -240,6 +246,8 @@ class ReturnsController extends Controller
 
                 $returnItems[] = [
                     'product_id' => $itemData['product_id'],
+                    'product_variant_id' => $productVariantId, // 👗 NUEVO: Para restaurar stock de variante
+                    'variant_options' => $variantOptions, // 👗 NUEVO: Para trazabilidad
                     'original_invoice_item_id' => $originalItem->id,
                     'source_warehouse_id' => $sourceWarehouseId, // ✅ NUEVO: Guardar para restaurar stock
                     'quantity' => $itemData['quantity'],
@@ -277,9 +285,13 @@ class ReturnsController extends Controller
                 // 🏢 MULTI-SEDE: Usar el source_warehouse_id que ya capturamos ANTES
                 $warehouseId = $itemData['source_warehouse_id'] ?? null;
 
+                // 👗 FASHION: Obtener variant_id si existe
+                $productVariantId = $itemData['product_variant_id'] ?? null;
+
                 if ($warehouseId) {
                     \Log::info('✅ Usando warehouse de origen capturado previamente', [
                         'product_id' => $itemData['product_id'],
+                        'product_variant_id' => $productVariantId ?? 'NULL (producto simple)',
                         'source_warehouse_id' => $warehouseId
                     ]);
                 } else {
@@ -300,42 +312,93 @@ class ReturnsController extends Controller
 
                 // Restaurar stock en product_warehouse de la sede correcta
                 if ($warehouseId) {
-                    $warehouseStock = DB::table('product_warehouse')
+                    // 👗 FASHION: Si hay variante, incluirla en la query
+                    $stockQuery = DB::table('product_warehouse')
                         ->where('product_id', $itemData['product_id'])
-                        ->where('warehouse_id', $warehouseId)
-                        ->first();
+                        ->where('warehouse_id', $warehouseId);
+
+                    // Si es un producto con variantes (fashion), filtrar por variante específica
+                    if ($productVariantId) {
+                        $stockQuery->where('product_variant_id', $productVariantId);
+                        \Log::info('👗 FASHION: Restaurando stock a variante específica', [
+                            'product_id' => $itemData['product_id'],
+                            'product_variant_id' => $productVariantId,
+                            'variant_options' => $itemData['variant_options'] ?? 'N/A',
+                            'warehouse_id' => $warehouseId
+                        ]);
+                    }
+
+                    $warehouseStock = $stockQuery->first();
 
                     if ($warehouseStock) {
                         // Incrementar stock en la sede
                         $previousStock = $warehouseStock->stock;
                         $newStock = $previousStock + $itemData['quantity'];
 
-                        DB::table('product_warehouse')
+                        // 👗 FASHION: Construir query de update con variante si aplica
+                        $updateQuery = DB::table('product_warehouse')
                             ->where('product_id', $itemData['product_id'])
-                            ->where('warehouse_id', $warehouseId)
-                            ->update(['stock' => $newStock]);
+                            ->where('warehouse_id', $warehouseId);
+
+                        if ($productVariantId) {
+                            $updateQuery->where('product_variant_id', $productVariantId);
+                        }
+
+                        $updateQuery->update(['stock' => $newStock]);
 
                         \Log::info('✅ Stock restaurado en bodega por devolución', [
                             'product_id' => $itemData['product_id'],
+                            'product_variant_id' => $productVariantId ?? 'NULL (producto simple)',
                             'warehouse_id' => $warehouseId,
                             'stock_anterior' => $previousStock,
                             'cantidad_devuelta' => $itemData['quantity'],
                             'stock_nuevo' => $newStock
                         ]);
+
+                        // 👗 FASHION: También actualizar el stock en product_variants si existe
+                        if ($productVariantId) {
+                            $variant = DB::table('product_variants')
+                                ->where('id', $productVariantId)
+                                ->first();
+
+                            if ($variant) {
+                                $previousVariantStock = $variant->stock ?? 0;
+                                $newVariantStock = $previousVariantStock + $itemData['quantity'];
+
+                                DB::table('product_variants')
+                                    ->where('id', $productVariantId)
+                                    ->update(['stock' => $newVariantStock]);
+
+                                \Log::info('👗 FASHION: Stock de variante también actualizado', [
+                                    'product_variant_id' => $productVariantId,
+                                    'variant_sku' => $variant->sku ?? 'N/A',
+                                    'stock_anterior_variante' => $previousVariantStock,
+                                    'stock_nuevo_variante' => $newVariantStock
+                                ]);
+                            }
+                        }
                     } else {
                         \Log::warning('⚠️ Producto no existe en bodega, creando registro', [
                             'product_id' => $itemData['product_id'],
+                            'product_variant_id' => $productVariantId ?? 'NULL',
                             'warehouse_id' => $warehouseId
                         ]);
 
                         // Crear registro si no existe
-                        DB::table('product_warehouse')->insert([
+                        $insertData = [
                             'product_id' => $itemData['product_id'],
                             'warehouse_id' => $warehouseId,
                             'stock' => $itemData['quantity'],
                             'created_at' => now(),
                             'updated_at' => now()
-                        ]);
+                        ];
+
+                        // 👗 FASHION: Incluir variant_id si aplica
+                        if ($productVariantId) {
+                            $insertData['product_variant_id'] = $productVariantId;
+                        }
+
+                        DB::table('product_warehouse')->insert($insertData);
                     }
                 } else {
                     \Log::error('❌ No se pudo determinar la bodega para la devolución', [
@@ -533,7 +596,7 @@ class ReturnsController extends Controller
             DB::commit();
 
             // IMPORTANTE: Recargar la devolución desde la BD después del commit
-            $savedReturn = ProductReturn::with(['originalInvoice', 'customer'])
+            $savedReturn = ProductReturn::with(['originalInvoice', 'customer', 'user'])
                 ->find($return->id);
 
             // Usar la devolución recargada desde la BD
@@ -547,10 +610,19 @@ class ReturnsController extends Controller
                 ], 500);
             }
 
+            // Asegurar que los items estén disponibles como return_items para el PDF
+            $responseData = $return->toArray();
+            $responseData['return_items'] = is_array($return->items) ? $return->items : json_decode($return->items, true);
+
+            // Agregar información de factura original
+            if ($return->originalInvoice) {
+                $responseData['invoice_number'] = $return->originalInvoice->number;
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Devolución procesada exitosamente',
-                'data' => $return
+                'data' => $responseData
             ]);
 
         } catch (\Exception $e) {

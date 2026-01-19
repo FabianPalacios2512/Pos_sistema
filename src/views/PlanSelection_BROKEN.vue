@@ -11,7 +11,7 @@
   >
     <div 
       v-if="showTrialSuccessModal" 
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50  px-4"
     >
       <transition
         enter-active-class="transition ease-out duration-300"

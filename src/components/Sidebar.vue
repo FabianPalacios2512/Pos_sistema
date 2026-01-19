@@ -11,7 +11,7 @@
     >
       <div 
         v-if="sidebarOpen" 
-        class="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+        class="lg:hidden fixed inset-0 z-40 bg-black/50 "
         @click="$emit('toggle-sidebar')"
       ></div>
     </Transition>

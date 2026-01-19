@@ -58,7 +58,7 @@
     >
       <div 
         v-if="showDuplicateModal" 
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50  px-4"
         @click.self="closeDuplicateModal"
       >
         <transition
@@ -175,7 +175,7 @@
         
         <!-- Logo y marca superior -->
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center">
+          <div class="w-12 h-12 rounded-2xl bg-white/10  border border-white/20 flex items-center justify-center">
             <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
@@ -235,7 +235,7 @@
         </div>
 
         <!-- Testimonial Card inferior -->
-        <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/20">
+        <div class="bg-white/10  rounded-2xl p-5 border border-white/20">
             <div class="flex items-start gap-4">
               <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0 border-2 border-white/20">
                 <span class="text-white font-bold text-sm">CR</span>
@@ -263,7 +263,7 @@
       
       <!-- Mobile Header -->
       <!-- 📱 MOBILE HEADER: Solo en móviles -->
-      <div class="lg:hidden p-5 flex items-center border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-20">
+      <div class="lg:hidden p-5 flex items-center border-b border-gray-100 bg-white/80  sticky top-0 z-20">
         <div class="w-10 h-10 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl flex items-center justify-center mr-3 shadow-lg shadow-slate-900/20">
            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />

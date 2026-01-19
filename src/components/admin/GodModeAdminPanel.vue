@@ -152,7 +152,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             
             <!-- MRR Total -->
-            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900/80  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
               <div class="flex items-start justify-between mb-3">
                 <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
                   <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +174,7 @@
             </div>
 
             <!-- Clientes Activos -->
-            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900/80  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
               <div class="flex items-start justify-between mb-3">
                 <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
                   <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +190,7 @@
             </div>
 
             <!-- Nuevos Este Mes -->
-            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900/80  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
               <div class="flex items-start justify-between mb-3">
                 <div class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
                   <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +206,7 @@
             </div>
 
             <!-- ARR Proyectado -->
-            <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+            <div class="bg-white dark:bg-zinc-900/80  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
               <div class="flex items-start justify-between mb-3">
                 <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
                   <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -597,7 +597,7 @@
       <div v-show="activeTab === 'ai-monitoring'" class="space-y-6">
         <!-- KPIs Resumen IA -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
                 <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -611,7 +611,7 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
                 <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -625,7 +625,7 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
                 <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -639,7 +639,7 @@
             </div>
           </div>
 
-          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
                 <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -810,7 +810,7 @@
       </div>
 
       <!-- Modal: Creando Cuenta (Loading) -->
-      <div v-if="creatingTenant" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in">
+      <div v-if="creatingTenant" class="fixed inset-0 bg-black/60  flex items-center justify-center z-[9999] animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 border border-gray-300 dark:border-zinc-800">
           <div class="text-center">
             <!-- Spinner animado -->
@@ -865,7 +865,7 @@
       />
 
       <!-- Modal: Generar Enlace de Registro -->
-      <div v-if="showLinkModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in" @click.self="showLinkModal = false">
+      <div v-if="showLinkModal" class="fixed inset-0 bg-black/60  flex items-center justify-center z-[9999] animate-fade-in" @click.self="showLinkModal = false">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-lg w-full mx-4 border border-gray-200 dark:border-zinc-800 overflow-hidden">
           <!-- Header del Modal -->
           <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
@@ -985,7 +985,7 @@
       >
         <div 
           :class="[
-            'flex items-start gap-3 px-4 py-3 rounded-xl shadow-2xl border backdrop-blur-sm',
+            'flex items-start gap-3 px-4 py-3 rounded-xl shadow-2xl border ',
             notification.type === 'success' 
               ? 'bg-emerald-50 dark:bg-emerald-950/90 border-emerald-200 dark:border-emerald-800' 
               : notification.type === 'error'

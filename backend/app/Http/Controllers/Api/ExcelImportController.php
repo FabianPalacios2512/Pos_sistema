@@ -222,6 +222,7 @@ class ExcelImportController extends Controller
         }
 
         $imported = 0;
+        $updated = 0; // Contador de productos actualizados
         $errors = [];
         $skipped = 0;
 
@@ -232,36 +233,89 @@ class ExcelImportController extends Controller
                 try {
                     // Preparar datos del producto
                     $preparedData = $this->prepareProductData($productData);
-                    $stockToAdd = $preparedData['current_stock'] ?? 0;
+                    $stockFromExcel = $preparedData['current_stock'] ?? 0;
 
                     // Verificar si ya existe (por SKU o código de barras)
-                    $exists = false;
                     $existingProduct = null;
 
                     if (!empty($preparedData['sku'])) {
                         $existingProduct = Product::where('sku', $preparedData['sku'])->first();
-                        $exists = $existingProduct !== null;
                     }
-                    if (!$exists && !empty($preparedData['barcode'])) {
+                    if (!$existingProduct && !empty($preparedData['barcode'])) {
                         $existingProduct = Product::where('barcode', $preparedData['barcode'])->first();
-                        $exists = $existingProduct !== null;
                     }
 
-                    if ($exists) {
-                        $skipped++;
+                    if ($existingProduct) {
+                        // ✅ ACTUALIZAR producto existente en lugar de saltarlo
+                        $previousStock = $existingProduct->current_stock ?? 0;
+
+                        // Actualizar campos del producto (excepto el stock por ahora)
+                        $updateData = [
+                            'name' => $preparedData['name'],
+                            'description' => $preparedData['description'] ?? $existingProduct->description,
+                            'category_id' => $preparedData['category_id'] ?? $existingProduct->category_id,
+                            'supplier_id' => $preparedData['supplier_id'] ?? $existingProduct->supplier_id,
+                            'cost_price' => $preparedData['cost_price'] > 0 ? $preparedData['cost_price'] : $existingProduct->cost_price,
+                            'sale_price' => $preparedData['sale_price'] > 0 ? $preparedData['sale_price'] : $existingProduct->sale_price,
+                            'wholesale_price' => $preparedData['wholesale_price'] > 0 ? $preparedData['wholesale_price'] : $existingProduct->wholesale_price,
+                            'min_stock' => $preparedData['min_stock'] ?? $existingProduct->min_stock,
+                            'max_stock' => $preparedData['max_stock'] ?? $existingProduct->max_stock,
+                            'unit' => $preparedData['unit'] ?? $existingProduct->unit,
+                            'image_url' => $preparedData['image_url'] ?? $existingProduct->image_url,
+                        ];
+
+                        // Si el barcode viene en el Excel y el producto no tiene, actualizarlo
+                        if (!empty($preparedData['barcode']) && empty($existingProduct->barcode)) {
+                            $updateData['barcode'] = $preparedData['barcode'];
+                        }
+
+                        $existingProduct->update($updateData);
+
+                        // Actualizar stock si viene en el Excel
+                        if ($stockFromExcel > 0 && $warehouseId) {
+                            // Actualizar current_stock del producto
+                            $existingProduct->current_stock = $stockFromExcel;
+                            $existingProduct->save();
+
+                            // Actualizar o crear en la tabla pivote product_warehouse
+                            $existingProduct->warehouses()->syncWithoutDetaching([
+                                $warehouseId => ['stock' => $stockFromExcel]
+                            ]);
+
+                            // Solo registrar movimiento si hay diferencia de stock
+                            if ($stockFromExcel != $previousStock) {
+                                $movementType = $stockFromExcel > $previousStock ? 'in' : 'out';
+                                $quantityDiff = abs($stockFromExcel - $previousStock);
+
+                                \App\Models\InventoryMovement::create([
+                                    'product_id' => $existingProduct->id,
+                                    'warehouse_id' => $warehouseId,
+                                    'type' => $movementType,
+                                    'reason' => 'adjustment',
+                                    'quantity' => $quantityDiff,
+                                    'previous_stock' => $previousStock,
+                                    'new_stock' => $stockFromExcel,
+                                    'reference' => 'Actualización desde Excel',
+                                    'user_id' => auth()->id() ?? 1,
+                                    'movement_date' => now()
+                                ]);
+                            }
+                        }
+
+                        $updated++;
                         continue;
                     }
 
-                    // Crear producto
+                    // Crear producto nuevo
                     $product = Product::create($preparedData);
 
                     // Asignar stock a la bodega si hay una configurada
-                    if ($warehouseId && $stockToAdd > 0) {
+                    if ($warehouseId && $stockFromExcel > 0) {
                         // Sincronizar con la tabla pivote product_warehouse
-                        $product->warehouses()->attach($warehouseId, ['stock' => $stockToAdd]);
+                        $product->warehouses()->attach($warehouseId, ['stock' => $stockFromExcel]);
 
                         // Actualizar current_stock del producto
-                        $product->current_stock = $stockToAdd;
+                        $product->current_stock = $stockFromExcel;
                         $product->save();
 
                         // Registrar movimiento de inventario
@@ -270,9 +324,9 @@ class ExcelImportController extends Controller
                             'warehouse_id' => $warehouseId,
                             'type' => 'in',
                             'reason' => 'purchase',
-                            'quantity' => $stockToAdd,
+                            'quantity' => $stockFromExcel,
                             'previous_stock' => 0,
-                            'new_stock' => $stockToAdd,
+                            'new_stock' => $stockFromExcel,
                             'reference' => 'Importación Excel',
                             'user_id' => auth()->id() ?? 1,
                             'movement_date' => now()
@@ -304,6 +358,7 @@ class ExcelImportController extends Controller
 
             Log::info('[ExcelImport] Import completed', [
                 'imported' => $imported,
+                'updated' => $updated,
                 'skipped' => $skipped,
                 'errors' => count($errors),
                 'warehouse_id' => $warehouseId
@@ -314,6 +369,7 @@ class ExcelImportController extends Controller
                 'message' => "Importación completada",
                 'stats' => [
                     'imported' => $imported,
+                    'updated' => $updated,
                     'skipped' => $skipped,
                     'errors' => count($errors)
                 ],

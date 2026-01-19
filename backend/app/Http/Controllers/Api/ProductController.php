@@ -174,6 +174,20 @@ class ProductController extends Controller
                 }
             }
 
+            // 💰 CALCULAR ventas e ingresos para mostrar en inventario
+            $salesData = DB::table('invoice_items')
+                ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                ->where('invoice_items.product_id', $product->id)
+                ->where('invoices.status', 'paid')
+                ->selectRaw('
+                    COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
+                    COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
+                ')
+                ->first();
+
+            $product->total_sold = (int)($salesData->total_sold ?? 0);
+            $product->total_revenue = (float)($salesData->total_revenue ?? 0);
+
             return $product;
         });
 

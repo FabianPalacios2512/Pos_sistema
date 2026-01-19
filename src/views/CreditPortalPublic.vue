@@ -418,7 +418,7 @@
     <Teleport to="body">
       <div v-if="showInvoiceModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="closeInvoiceModal"></div>
+        <div class="absolute inset-0 bg-black/40 " @click="closeInvoiceModal"></div>
         
         <!-- Modal -->
         <div class="relative bg-white dark:bg-[#161618] w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up">

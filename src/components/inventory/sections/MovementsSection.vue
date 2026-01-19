@@ -2,7 +2,7 @@
   <div class="movements-section animate-fade-in">
     <!-- Tarjetas de Resumen - Estilo Ghost/Glass compacto -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-5" v-if="data && data.summary">
-      <div class="bg-white/60 dark:bg-zinc-800/30 backdrop-blur-sm rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
+      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <div class="bg-white/60 dark:bg-zinc-800/30 backdrop-blur-sm rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
+      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <div class="bg-white/60 dark:bg-zinc-800/30 backdrop-blur-sm rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
+      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 bg-rose-50 dark:bg-rose-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -44,7 +44,7 @@
         </div>
       </div>
 
-      <div class="bg-white/60 dark:bg-zinc-800/30 backdrop-blur-sm rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
+      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -58,7 +58,7 @@
         </div>
       </div>
 
-      <div class="bg-white/60 dark:bg-zinc-800/30 backdrop-blur-sm rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
+      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 bg-orange-50 dark:bg-orange-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <div class="bg-white/60 dark:bg-zinc-800/30 backdrop-blur-sm rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
+      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
             <svg class="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -90,7 +90,7 @@
     </div>
 
     <!-- Controles y Filtros - Compacto -->
-    <div class="bg-white/60 dark:bg-zinc-800/30 backdrop-blur-sm rounded-xl border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)] p-4 mb-4">
+    <div class="bg-white/60 dark:bg-zinc-800/30  rounded-xl border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)] p-4 mb-4">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-base font-semibold text-gray-900 dark:text-white">Historial de Movimientos</h2>
         <button 
@@ -163,7 +163,7 @@
     </div>
 
     <!-- Tabla de Movimientos - Estilo limpio -->
-    <div class="bg-white/60 dark:bg-zinc-800/30 backdrop-blur-sm rounded-xl border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)] overflow-hidden">
+    <div class="bg-white/60 dark:bg-zinc-800/30  rounded-xl border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)] overflow-hidden">
       <div class="px-4 py-3 border-b border-gray-100 dark:border-zinc-700/50">
         <h3 class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Detalle de Movimientos</h3>
       </div>
@@ -392,6 +392,8 @@ export default {
         'transfer': 'Transferencia',
         'entry': 'Entrada',
         'exit': 'Salida',
+        'in': 'Entrada',      // 🔄 Backend usa 'in' para entradas
+        'out': 'Salida',      // 🔄 Backend usa 'out' para salidas (ventas)
         'manual_entry': 'Entrada Manual',
         'manual_exit': 'Salida Manual'
       }
@@ -407,6 +409,8 @@ export default {
         'transfer': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
         'entry': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
         'exit': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',
+        'in': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',   // 🔄 Backend usa 'in'
+        'out': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',             // 🔄 Backend usa 'out'
         'manual_entry': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
         'manual_exit': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400'
       }

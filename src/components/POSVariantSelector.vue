@@ -3,7 +3,7 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="show" 
-           class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+           class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4"
            @click.self="closeModal">
         
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-gray-200 dark:border-zinc-800 animate-scale-in">

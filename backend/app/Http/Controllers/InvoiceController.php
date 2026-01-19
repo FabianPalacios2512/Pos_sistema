@@ -376,10 +376,16 @@ class InvoiceController extends Controller
                     }
                 }
 
-                // ✅ Crear invoice_item CON source_warehouse_id
+                // 👗 Obtener variant_id y variant_options si el item tiene variante
+                $variantId = $item['variant_id'] ?? $item['product_variant_id'] ?? null;
+                $variantOptions = $item['variant_options'] ?? $item['options_summary'] ?? null;
+
+                // ✅ Crear invoice_item CON source_warehouse_id Y product_variant_id
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
+                    'product_variant_id' => $variantId, // 👗 NUEVO: Para tiendas fashion
+                    'variant_options' => $variantOptions, // 👗 NUEVO: Ej: "Talla: M, Color: Rojo"
                     'source_warehouse_id' => $sourceWarehouseId, // ✅ NUEVO: Guardar de dónde se descontó
                     'product_name' => $item['product_name'],
                     'product_sku' => $item['product_sku'] ?? null,

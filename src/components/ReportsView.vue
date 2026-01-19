@@ -82,7 +82,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         
         <!-- Total Sales -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
           <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/50 dark:to-emerald-900/30 transition-transform group-hover:scale-105">
               <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +103,7 @@
         </div>
 
         <!-- Total Transactions -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
           <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 transition-transform group-hover:scale-105">
               <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,7 +124,7 @@
         </div>
 
         <!-- Average Ticket -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
           <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/50 dark:to-amber-900/30 transition-transform group-hover:scale-105">
               <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +145,7 @@
         </div>
 
         <!-- Gross Margin -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
           <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30 transition-transform group-hover:scale-105">
               <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,7 +170,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <!-- Sales Trend Chart -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
             <div>
               <h2 class="text-lg font-bold text-gray-900 dark:text-white">Tendencia de Ventas</h2>
@@ -200,7 +200,7 @@
         </div>
 
         <!-- Top Products Chart -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden transition-all duration-300">
+        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden transition-all duration-300">
           <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
             <div>
               <h2 class="text-lg font-bold text-gray-900 dark:text-white">Top Productos</h2>
@@ -220,7 +220,7 @@
         </div>
 
         <!-- Category Sales Chart -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
             <div>
               <h2 class="text-lg font-bold text-gray-900 dark:text-white">Ventas por Categoría</h2>
@@ -240,7 +240,7 @@
         </div>
 
         <!-- Critical Stock Chart -->
-        <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
           <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
             <div>
               <h2 class="text-lg font-bold text-gray-900 dark:text-white">Stock Crítico</h2>

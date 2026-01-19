@@ -105,7 +105,7 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
     const companyName = systemSettings.company_name || 
                         systemSettings.business_name || 
                         systemSettings.store_name ||
-                        'MI EMPRESA'
+                        'MI EMPRESA'  // Este es el último fallback, raramente se usará
     const companyAddress = systemSettings.company_address || systemSettings.address || ''
     const companyPhone = systemSettings.company_phone || systemSettings.phone || ''
     const companyEmail = systemSettings.company_email || systemSettings.email || ''
@@ -117,22 +117,22 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
     const qrDataURL = await QRCode.toDataURL(`DEV:${returnNumber}`, {
       width: 100,
       margin: 0,
-      color: { dark: '#1f2937', light: '#FFFFFF' }
+      color: { dark: '#374151', light: '#FFFFFF' }  // Gris oscuro para QR
     })
 
     // ==================== CALCULAR ALTURA DINÁMICA ====================
-    // Cálculo preciso basado en cada sección del PDF
-    const headerHeight = companyLogo ? 50 : 35  // Logo o solo nombre + info
-    const bannerHeight = 18  // Banner rojo + número
-    const infoHeight = 28 + (cashierName ? 4 : 0) + ((reason && reason.trim()) ? 8 : 0) // Fecha, factura, cliente, atendió, motivo
-    const tableHeaderHeight = 10  // Encabezado de tabla
-    const itemHeight = 10  // Por cada producto
-    const itemsHeight = Math.max(itemsList.length * itemHeight, 12)
-    const totalsHeight = 26  // Subtotal, IVA, Total banner
-    const refundMethodHeight = 14  // Método de reembolso box
-    const notesHeight = (notes && typeof notes === 'string' && notes.trim()) ? 12 : 0
-    const footerHeight = 45  // Mensaje + QR + número + línea + Powered by
-    const marginBottom = 4  // Pequeño margen al final
+    // Cálculo preciso basado en cada sección del PDF - Optimizado para evitar desperdicio
+    const headerHeight = companyLogo ? 45 : 30  // Logo o solo nombre + info (reducido)
+    const bannerHeight = 16  // Banner + número (compacto)
+    const infoHeight = 24 + (cashierName ? 4 : 0) + ((reason && reason.trim()) ? 8 : 0) // Info compacta
+    const tableHeaderHeight = 8  // Encabezado de tabla (reducido)
+    const itemHeight = 6  // Por cada producto (más compacto)
+    const itemsHeight = Math.max(itemsList.length * itemHeight, 10)
+    const totalsHeight = 24  // Subtotal, IVA, Total banner (ajustado)
+    const refundMethodHeight = 12  // Método de reembolso box (ajustado)
+    const notesHeight = (notes && typeof notes === 'string' && notes.trim()) ? 10 : 0
+    const footerHeight = 40  // Mensaje + QR + número + línea + Powered by (compacto)
+    const marginBottom = 2  // Margen mínimo al final - PDF termina justo después de Powered by
     
     const dynamicHeight = headerHeight + bannerHeight + infoHeight + tableHeaderHeight + 
                          itemsHeight + totalsHeight + refundMethodHeight + notesHeight + 
@@ -154,14 +154,17 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
     const contentWidth = rightMargin - leftMargin
 
     // ==================== COLORES ====================
+    // Diseño profesional con tonos sobrios - menos rojo, más elegante
     const colors = {
-      primary: [220, 38, 38],      // Rojo para devoluciones
-      dark: [17, 24, 39],          // Gris oscuro
-      medium: [75, 85, 99],        // Gris medio
+      primary: [55, 65, 81],       // Gris oscuro profesional (reemplaza rojo)
+      accent: [99, 102, 241],      // Indigo para acentos
+      dark: [17, 24, 39],          // Gris muy oscuro para títulos
+      medium: [75, 85, 99],        // Gris medio para labels
       light: [156, 163, 175],      // Gris claro
-      accent: [239, 68, 68],       // Rojo accent
-      success: [16, 185, 129],     // Verde
-      background: [249, 250, 251]  // Fondo
+      success: [16, 185, 129],     // Verde para confirmaciones
+      warning: [234, 88, 12],      // Naranja para alertas
+      background: [249, 250, 251], // Fondo
+      returnBadge: [220, 38, 38]   // Rojo solo para badge "DEVOLUCIÓN"
     }
 
     // ==================== HEADER EMPRESA ====================
@@ -208,7 +211,7 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
     // ==================== BANNER DEVOLUCIÓN ====================
     yPos += 2
     
-    // Rectángulo rojo con bordes redondeados (simulado)
+    // Banner elegante gris oscuro con borde sutil
     pdf.setFillColor(...colors.primary)
     pdf.roundedRect(leftMargin, yPos, contentWidth, 10, 2, 2, 'F')
     
@@ -396,8 +399,8 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
     pdf.text(`$${formatNumber(taxAmount)}`, rightMargin, yPos, { align: 'right' })
     yPos += 5
 
-    // Total a reembolsar (destacado)
-    pdf.setFillColor(...colors.primary)
+    // Total a reembolsar (destacado) - Diseño profesional gris oscuro
+    pdf.setFillColor(...colors.dark)
     pdf.roundedRect(leftMargin, yPos - 1, contentWidth, 10, 1.5, 1.5, 'F')
     
     pdf.setFont('helvetica', 'bold')
@@ -426,7 +429,7 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
     pdf.setFontSize(8)
     pdf.setTextColor(...colors.success)
     pdf.text(refundMethodText.toUpperCase(), rightMargin - 2, yPos + 4, { align: 'right' })
-    yPos += 12
+    yPos += 10
 
     // ==================== NOTAS (si existen) ====================
     if (notes && typeof notes === 'string' && notes.trim()) {
@@ -435,44 +438,44 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
       pdf.setTextColor(...colors.light)
       const notesLines = pdf.splitTextToSize(`Nota: ${notes}`, contentWidth - 4)
       pdf.text(notesLines, centerX, yPos, { align: 'center' })
-      yPos += notesLines.length * 3 + 3
+      yPos += notesLines.length * 3 + 2
     }
 
     // ==================== QR Y PIE DE PÁGINA ====================
     
-    // Mensaje
+    // Mensaje compacto
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(7)
+    pdf.setFontSize(6)
     pdf.setTextColor(...colors.medium)
     pdf.text('Conserve este documento como', centerX, yPos, { align: 'center' })
-    yPos += 3
+    yPos += 2.5
     pdf.text('comprobante de su devolución', centerX, yPos, { align: 'center' })
-    yPos += 5
+    yPos += 4
 
-    // QR Code centrado
-    const qrSize = 22
+    // QR Code centrado - tamaño optimizado
+    const qrSize = 20
     pdf.addImage(qrDataURL, 'PNG', centerX - qrSize/2, yPos, qrSize, qrSize, '', 'FAST')
-    yPos += qrSize + 3
+    yPos += qrSize + 2
 
     // Número bajo QR
     pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(7)
+    pdf.setFontSize(6)
     pdf.setTextColor(...colors.dark)
     pdf.text(returnNumber, centerX, yPos, { align: 'center' })
-    yPos += 6
-
-    // Línea final
-    pdf.setDrawColor(...colors.light)
-    pdf.setLineWidth(0.2)
-    pdf.line(leftMargin + 10, yPos, rightMargin - 10, yPos)
     yPos += 4
 
-    // Footer
+    // Línea final sutil
+    pdf.setDrawColor(...colors.light)
+    pdf.setLineWidth(0.1)
+    pdf.line(leftMargin + 15, yPos, rightMargin - 15, yPos)
+    yPos += 3
+
+    // Footer - Powered by (compacto)
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(6)
+    pdf.setFontSize(5)
     pdf.setTextColor(...colors.light)
     pdf.text('Powered by 105POS', centerX, yPos, { align: 'center' })
-    // PDF termina exactamente aquí - altura dinámica calculada para ajustar
+    // PDF termina exactamente aquí - altura dinámica calculada para ajustar perfectamente
 
     return pdf
 

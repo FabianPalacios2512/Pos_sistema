@@ -52,32 +52,32 @@
       <!-- KPIs Minimalistas Monocromáticos (Sin iconos gigantes) -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <!-- Total Productos -->
-        <div class="bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
+        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
           <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Total</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">{{ displayProducts.length }}</p>
         </div>
 
         <!-- Productos Activos -->
-        <div class="bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
+        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
           <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Activos</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">{{ activeProducts }}</p>
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
+        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
           <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Stock Bajo</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">{{ lowStockProducts }}</p>
         </div>
 
         <!-- Valor Total -->
-        <div class="bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
+        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
           <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Valor Inventario</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">${{ formatCurrency(totalValue) }}</p>
         </div>
       </div>
 
       <!-- Filtros Limpios -->
-      <div class="bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm rounded-xl p-4 mb-8 transition-colors duration-300">
+      <div class="bg-white/50 dark:bg-zinc-900/50  rounded-xl p-4 mb-8 transition-colors duration-300">
         <div class="flex flex-wrap items-center gap-4">
           <!-- Búsqueda -->
           <div class="flex-1 min-w-[250px] relative">
@@ -166,7 +166,7 @@
             <div class="absolute top-3 left-3 flex flex-col gap-2">
               <!-- Badge "Nuevo" (Si producto es nuevo - menos de 7 días) -->
               <span v-if="isNewProduct(product)" 
-                    class="px-2 py-1 bg-white/90 dark:bg-black/60 backdrop-blur-sm text-gray-900 dark:text-white text-[10px] font-medium uppercase tracking-wider rounded-md">
+                    class="px-2 py-1 bg-white/90 dark:bg-black/60  text-gray-900 dark:text-white text-[10px] font-medium uppercase tracking-wider rounded-md">
                 Nuevo
               </span>
               
@@ -178,7 +178,7 @@
             
             <!-- Botón Editar (Solo visible en hover) -->
             <button @click.stop="editProduct(product)"
-                    class="absolute bottom-3 right-3 w-10 h-10 bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white dark:hover:bg-black/80">
+                    class="absolute bottom-3 right-3 w-10 h-10 bg-white/90 dark:bg-black/60  rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white dark:hover:bg-black/80">
               <svg class="w-4 h-4 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
               </svg>

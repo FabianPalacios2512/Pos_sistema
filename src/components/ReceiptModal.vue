@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div class="fixed inset-0 bg-black/50  flex items-center justify-center z-50 p-4">
     <!-- Contenedor optimizado para factura POS 58mm -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-sm w-full max-h-[90vh] overflow-y-auto animate-scale-in" style="width: 350px;">
       
@@ -270,7 +270,7 @@
     
     <!-- Modal de Función Premium -->
     <Teleport to="body">
-      <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
+      <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[60] p-4 animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
           
           <!-- Contenido -->

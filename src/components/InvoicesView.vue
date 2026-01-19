@@ -38,7 +38,7 @@
       <div class="flex items-center gap-2 mb-4">
         
         <!-- KPI: Facturas del Mes -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-blue-50 dark:bg-blue-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4.5 h-4.5 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +53,7 @@
         </div>
 
         <!-- KPI: Total Facturado -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-emerald-50 dark:bg-emerald-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4.5 h-4.5 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@
         </div>
 
         <!-- KPI: Cotizaciones -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-purple-50 dark:bg-purple-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4.5 h-4.5 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -650,7 +650,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="showEditModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+      <div v-if="showEditModal" class="fixed inset-0 bg-black/50  flex items-center justify-center z-[60] p-4">
         <Transition
           enter-active-class="transition ease-out duration-300"
           enter-from-class="opacity-0 scale-95"
@@ -712,7 +712,7 @@
   </Teleport>
 
   <!-- Modal de Nueva Factura (simplificado) -->
-  <div v-if="showNewInvoiceModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div v-if="showNewInvoiceModal" class="fixed inset-0 bg-slate-900/60  flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6">
       <h3 class="text-lg font-bold text-gray-900 mb-4">Nueva Factura</h3>
       <p class="text-sm text-gray-600">Funcionalidad próximamente...</p>
@@ -724,7 +724,7 @@
 
   <!-- Modal de Función Premium -->
   <Teleport to="body">
-    <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
+    <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[60] p-4 animate-fade-in">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
         
         <!-- Contenido -->

@@ -37,7 +37,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         
         <!-- Sesiones Activas (Verde Empresarial) -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
               <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@
         </div>
         
         <!-- Total en Cajas (Ámbar Empresarial) -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
               <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,7 +67,7 @@
         </div>
         
         <!-- Ventas del Día (Púrpura Empresarial) -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
           <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
               <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,7 +416,7 @@
     </div>
 
     <!-- Session Details Modal Empresarial -->
-    <div v-if="selectedSession" class="fixed inset-0 bg-black/75 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-4" @click.self="selectedSession = null">
+    <div v-if="selectedSession" class="fixed inset-0 bg-black/75 dark:bg-black/85  flex items-center justify-center z-50 p-4" @click.self="selectedSession = null">
       <div class="bg-white dark:bg-zinc-900 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl dark:shadow-black/40 border border-gray-300 dark:border-zinc-800">
         <!-- Header Empresarial -->
         <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 rounded-t-xl">
@@ -562,7 +562,7 @@
     </div>
 
     <!-- Modal de Cierre Empresarial -->
-    <div v-if="showCloseSessionModal" class="fixed inset-0 bg-black/75 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center z-[100] p-4" @click.self="showCloseSessionModal = false">
+    <div v-if="showCloseSessionModal" class="fixed inset-0 bg-black/75 dark:bg-black/85  flex items-center justify-center z-[100] p-4" @click.self="showCloseSessionModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800">
         <!-- Header -->
         <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 rounded-t-2xl">
@@ -683,7 +683,7 @@
     </div>
 
     <!-- Modal de Auditoría Empresarial -->
-    <div v-if="showAuditModal" class="fixed inset-0 bg-black/75 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center z-[100] p-4" @click.self="showAuditModal = false">
+    <div v-if="showAuditModal" class="fixed inset-0 bg-black/75 dark:bg-black/85  flex items-center justify-center z-[100] p-4" @click.self="showAuditModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800">
         <!-- Header -->
         <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 rounded-t-xl">
@@ -779,7 +779,7 @@
   </div>
 
   <!-- 🎯 Modal de Confirmación Profesional (reemplaza confirm() nativo) -->
-  <div v-if="showConfirmModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200]" @click.self="showConfirmModal = false">
+  <div v-if="showConfirmModal" class="fixed inset-0 bg-black/60  flex items-center justify-center z-[200]" @click.self="showConfirmModal = false">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-gray-200 dark:border-zinc-800 animate-fade-in">
       <!-- Header con icono -->
       <div class="p-6 text-center">

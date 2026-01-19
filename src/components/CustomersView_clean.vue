@@ -438,7 +438,7 @@
                         <p class="text-amber-100 font-medium uppercase tracking-wider text-sm">Puntos Disponibles</p>
                         <h3 class="text-4xl font-bold mt-1">{{ selectedCustomer.loyalty_points || 0 }}</h3>
                       </div>
-                      <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                      <div class="bg-white/20 p-3 rounded-xl ">
                         <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
@@ -780,7 +780,7 @@
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="showInvoiceDetailModal && selectedInvoice"
-           class="fixed inset-0 bg-black/70 dark:bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in"
+           class="fixed inset-0 bg-black/70 dark:bg-black/85  flex items-center justify-center p-4 z-[9999] animate-fade-in"
            @click.self="showInvoiceDetailModal = false">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-200 dark:border-zinc-800">
           
@@ -918,7 +918,7 @@
 
   <!-- Modal Premium Feature -->
   <Teleport to="body">
-    <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+    <div v-if="showPremiumModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4 animate-fade-in">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
         
         <!-- Contenido -->
@@ -972,7 +972,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="showPhotoPreviewModal" @click="closePhotoPreview" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div v-if="showPhotoPreviewModal" @click="closePhotoPreview" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 ">
         <Transition
           enter-active-class="transition-all duration-300 ease-out"
           leave-active-class="transition-all duration-200 ease-in"
@@ -1014,7 +1014,7 @@
   <!-- Modal: Confirmar Eliminación (cuando NO tiene facturas) -->
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="showDeleteConfirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+      <div v-if="showDeleteConfirmModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4 animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
           
           <!-- Contenido -->
@@ -1062,7 +1062,7 @@
   <!-- Modal: No se puede eliminar (tiene facturas asociadas) -->
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="showCannotDeleteModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 animate-fade-in">
+      <div v-if="showCannotDeleteModal" class="fixed inset-0 bg-black/70  flex items-center justify-center z-[9999] p-4 animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-in">
           
           <!-- Contenido -->

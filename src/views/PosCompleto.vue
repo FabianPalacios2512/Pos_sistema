@@ -1451,11 +1451,11 @@ const getPOSMenuClass = (module, isPrimary = false) => {
       return baseClasses + ' bg-gradient-to-br from-emerald-500 via-blue-600 to-indigo-700 text-white shadow-2xl shadow-blue-600/40 ring-2 ring-emerald-400/30 transform scale-[1.02] border border-white/10';
     } else {
       // Botón secundario activo - elegante y profesional
-      return baseClasses + ' bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-blue-700/90 text-white shadow-xl shadow-blue-500/30 ring-1 ring-blue-400/30 border border-white/10 backdrop-blur-sm';
+      return baseClasses + ' bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-blue-700/90 text-white shadow-xl shadow-blue-500/30 ring-1 ring-blue-400/30 border border-white/10 ';
     }
   } else {
     // Estado inactivo - sutil y moderno
-    return baseClasses + ' bg-slate-800/20 hover:bg-gradient-to-br hover:from-slate-700/40 hover:via-slate-600/50 hover:to-slate-700/40 text-slate-300 hover:text-white hover:shadow-lg backdrop-blur-sm border border-slate-700/20 hover:border-slate-500/40 hover:scale-[1.01] hover:ring-1 hover:ring-slate-500/20';
+    return baseClasses + ' bg-slate-800/20 hover:bg-gradient-to-br hover:from-slate-700/40 hover:via-slate-600/50 hover:to-slate-700/40 text-slate-300 hover:text-white hover:shadow-lg  border border-slate-700/20 hover:border-slate-500/40 hover:scale-[1.01] hover:ring-1 hover:ring-slate-500/20';
   }
 };
 
@@ -1475,14 +1475,14 @@ const getPOSIconClass = (module, isPrimary = false) => {
   if (isActive) {
     if (isPrimary) {
       // Icono primario activo - destacado
-      return baseClasses + ' bg-white/25 text-white shadow-xl ring-2 ring-white/20 backdrop-blur-sm';
+      return baseClasses + ' bg-white/25 text-white shadow-xl ring-2 ring-white/20 ';
     } else {
       // Icono secundario activo - profesional
-      return baseClasses + ' bg-white/20 text-white shadow-lg ring-1 ring-white/15 backdrop-blur-sm';
+      return baseClasses + ' bg-white/20 text-white shadow-lg ring-1 ring-white/15 ';
     }
   } else {
     // Icono inactivo - sutil con hover elegante
-    return baseClasses + ' bg-slate-700/25 group-hover:bg-slate-600/40 text-slate-400 group-hover:text-white group-hover:shadow-md group-hover:ring-1 group-hover:ring-slate-500/30 backdrop-blur-sm';
+    return baseClasses + ' bg-slate-700/25 group-hover:bg-slate-600/40 text-slate-400 group-hover:text-white group-hover:shadow-md group-hover:ring-1 group-hover:ring-slate-500/30 ';
   }
 };
 

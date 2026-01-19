@@ -71,19 +71,19 @@
       <!-- Métricas Principales - Condicional Fashion/Standard -->
       <div v-if="isFashionStore" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <!-- KPIs Minimalistas Fashion (Sin iconos) -->
-        <div class="bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
+        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
           <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Total</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">{{ displayProducts.length }}</p>
         </div>
-        <div class="bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
+        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
           <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Activos</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">{{ activeProducts }}</p>
         </div>
-        <div class="bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
+        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
           <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Stock Bajo</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">{{ lowStockProducts }}</p>
         </div>
-        <div class="bg-white/70 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
+        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
           <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Valor Inventario</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">${{ formatCurrency(totalValue) }}</p>
         </div>
@@ -92,7 +92,7 @@
       <!-- KPIs Standard (Con iconos) - Estilo fantasma profesional -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <!-- Total Productos -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-slate-100 dark:bg-zinc-800/50 border border-slate-200/50 dark:border-zinc-700/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@
         </div>
 
         <!-- Productos Activos -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100/50 dark:border-emerald-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +122,7 @@
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/30 border border-amber-100/50 dark:border-amber-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +137,7 @@
         </div>
 
         <!-- Valor Total -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950/30 border border-blue-100/50 dark:border-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +152,7 @@
         </div>
 
         <!-- Categorías -->
-        <div class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100/50 dark:border-indigo-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,7 +170,7 @@
       <!-- Contenedor Principal Tour - Filtros + Productos -->
       <div id="tour-products-main">
       <!-- Filtros - Diseño limpio y profesional -->
-    <div class="bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm rounded-xl p-4 mb-6 border border-gray-200/40 dark:border-zinc-800/40 transition-colors duration-300">
+    <div class="bg-white/40 dark:bg-zinc-900/40  rounded-xl p-4 mb-6 border border-gray-200/40 dark:border-zinc-800/40 transition-colors duration-300">
       <div class="flex flex-wrap items-center gap-4">
         <!-- Búsqueda limpia (como Facturas) -->
         <div id="tour-search-products" class="flex-1 min-w-[200px] relative">
@@ -723,7 +723,7 @@
       >
         <div v-if="showStatusConfirmModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <!-- Overlay -->
-          <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showStatusConfirmModal = false"></div>
+          <div class="fixed inset-0 bg-black/60 " @click="showStatusConfirmModal = false"></div>
           
           <!-- Modal -->
           <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-md w-full overflow-hidden border border-gray-200 dark:border-zinc-800">
@@ -786,7 +786,7 @@
 
     <!-- Modal de Categoría Inactiva -->
     <div v-if="showCategoryInactiveModal" 
-         class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+         class="fixed inset-0 bg-gray-900/50 dark:bg-black/70  flex items-center justify-center p-4 z-50"
          @click.self="showCategoryInactiveModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in">
         <!-- Header -->
@@ -842,7 +842,7 @@
     <!-- Modal Crear/Editar Producto -->
     <Teleport to="body">
       <div v-if="showProductModal" 
-           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center"
+           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70  flex items-center justify-center"
            style="z-index: 50000"
            @click.self="showProductModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden border border-gray-300 dark:border-zinc-800 mx-4 flex flex-col">
@@ -1350,7 +1350,7 @@
 
     <!-- ⚠️ Modal de Confirmación: Producto sin Stock -->
     <div v-if="showStockWarningModal" 
-         class="fixed inset-0 bg-gray-900/70 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[60]"
+         class="fixed inset-0 bg-gray-900/70 dark:bg-black/80  flex items-center justify-center p-4 z-[60]"
          @click.self="showStockWarningModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-lg shadow-2xl transform transition-all border dark:border-zinc-800">
         
@@ -1457,7 +1457,7 @@
     <!-- Modal Ver Producto AVANZADO (Fashion/Variantes) -->
     <Teleport to="body">
       <div v-if="showViewModal" 
-           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+           class="fixed inset-0 bg-gray-900/50 dark:bg-black/70  flex items-center justify-center p-4"
            style="z-index: 50000"
            @click.self="showViewModal = false">
       <!-- Modal Full Width para productos FASHION (con o sin variantes) -->
@@ -1497,7 +1497,7 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <!-- Galería de Imágenes -->
             <div class="lg:col-span-1">
-              <div class="bg-white dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-3 border border-gray-200 dark:border-zinc-800 shadow-sm">
+              <div class="bg-white dark:bg-zinc-900/60  rounded-2xl p-3 border border-gray-200 dark:border-zinc-800 shadow-sm">
                 <!-- Imagen Principal -->
                 <div class="relative aspect-square rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-zinc-800 dark:to-zinc-900">
                   <!-- Si hay imágenes reales, mostrar con <img> -->
@@ -1547,7 +1547,7 @@
             
             <!-- Resumen Global (Estadísticas) -->
             <div class="lg:col-span-2 flex flex-col">
-              <div class="flex-1 bg-white dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl p-5 border border-gray-200 dark:border-zinc-800 shadow-sm">
+              <div class="flex-1 bg-white dark:bg-zinc-900/60  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800 shadow-sm">
                 <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -1597,7 +1597,7 @@
           </div>
           
           <!-- TABLA EXCEL-STYLE: Edición en Línea -->
-          <div class="bg-white dark:bg-zinc-900/60 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm dark:shadow-none">
+          <div class="bg-white dark:bg-zinc-900/60  rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm dark:shadow-none">
             <div class="bg-gray-50 dark:bg-zinc-800/50 px-5 py-3 border-b border-gray-200 dark:border-zinc-700/50">
               <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1886,7 +1886,7 @@
 
   <!-- Modal: Crear Proveedor Rápido -->
   <div v-if="showSupplierModal" 
-       class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+       class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80  flex items-center justify-center p-4"
        style="z-index: 60000"
        @click.self="showSupplierModal = false">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full animate-fade-in">
@@ -1989,11 +1989,11 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="showProductsWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+      <div v-if="showProductsWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 ">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-lg w-full overflow-hidden border border-gray-300 dark:border-zinc-800">
           <!-- Header con diseño profesional -->
           <div class="bg-gradient-to-br from-slate-800 via-slate-900 to-black dark:from-zinc-800 dark:via-zinc-900 dark:to-black px-8 py-8 text-center border-b border-slate-700 dark:border-zinc-700">
-            <div class="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-5 border border-white/20 shadow-lg shadow-black/20">
+            <div class="w-20 h-20 bg-white/10  rounded-2xl flex items-center justify-center mx-auto mb-5 border border-white/20 shadow-lg shadow-black/20">
               <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
               </svg>
@@ -2095,7 +2095,7 @@
             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-pulse"></div>
             
             <div class="relative">
-              <div class="w-20 h-20 bg-emerald-500/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-5 border border-emerald-500/30 shadow-lg shadow-emerald-500/20">
+              <div class="w-20 h-20 bg-emerald-500/20  rounded-2xl flex items-center justify-center mx-auto mb-5 border border-emerald-500/30 shadow-lg shadow-emerald-500/20">
                 <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
@@ -2189,7 +2189,7 @@
   <!-- Modal: No hay categorías (Teleport para escapar del contenedor) -->
   <Teleport to="body">
     <div v-if="showNoCategoriesModal" 
-         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/70  flex items-center justify-center p-4"
          style="z-index: 50000; margin: 0 !important;"
          @click.self="showNoCategoriesModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full p-6 animate-fade-in">
@@ -2223,7 +2223,7 @@
   <!-- Modal: Crear Categoría (Teleport para escapar del contenedor) -->
   <Teleport to="body">
     <div v-if="showCategoryModal" 
-         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80  flex items-center justify-center p-4"
          style="z-index: 60000; margin: 0 !important;"
          @click.self="showCategoryModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-lg w-full animate-fade-in">

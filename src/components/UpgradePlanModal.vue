@@ -12,7 +12,7 @@
       <div 
         v-if="isOpen" 
         @click="closeModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md px-4 py-6 overflow-y-auto"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60  px-4 py-6 overflow-y-auto"
       >
         <Transition
           enter-active-class="transition ease-out duration-300"

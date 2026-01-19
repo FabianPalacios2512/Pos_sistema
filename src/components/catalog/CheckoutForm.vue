@@ -4,7 +4,7 @@
     <Transition name="fade">
       <div 
         v-if="show" 
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110]" 
+        class="fixed inset-0 bg-black/50  z-[110]" 
         @click="$emit('close')"
       ></div>
     </Transition>
