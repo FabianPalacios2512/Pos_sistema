@@ -31,21 +31,28 @@ class ProductController extends Controller
                 return; // No es multi-tenant
             }
 
+            // ✅ CORRECCIÓN: El storage del tenant está en storage/tenant{id}/app/public
+            $tenantStoragePath = storage_path("tenant{$tenantId}/app/public");
             $symlinkPath = public_path("storage/tenants/{$tenantId}");
-            $targetPath = storage_path('app/public');
 
             // Si el symlink ya existe, no hacer nada
             if (is_link($symlinkPath) || is_dir($symlinkPath)) {
                 return;
             }
 
+            // Asegurar que exista el directorio del tenant
+            if (!is_dir($tenantStoragePath)) {
+                if (!@mkdir($tenantStoragePath, 0755, true)) {
+                    \Log::warning("[Storage] No se pudo crear directorio tenant: {$tenantStoragePath}");
+                    return;
+                }
+            }
+
             // Asegurar que exista el directorio base public/storage
             $storagePublicDir = public_path('storage');
             if (!is_dir($storagePublicDir)) {
-                // Intentar crear o verificar que el symlink de storage existe
                 if (!is_link($storagePublicDir)) {
                     \Log::warning("[Storage] Directorio public/storage no existe. Ejecutar: php artisan storage:link");
-                    // Intentar crear el directorio en lugar de fallar
                     @mkdir($storagePublicDir, 0755, true);
                 }
             }
@@ -55,27 +62,17 @@ class ProductController extends Controller
             if (!is_dir($tenantsDir)) {
                 if (!@mkdir($tenantsDir, 0755, true)) {
                     \Log::warning("[Storage] No se pudo crear directorio tenants: {$tenantsDir}");
-                    return; // No fallar, continuar sin symlink
-                }
-            }
-
-            // Asegurar que el directorio destino exista
-            if (!is_dir($targetPath)) {
-                if (!@mkdir($targetPath, 0755, true)) {
-                    \Log::warning("[Storage] No se pudo crear directorio destino: {$targetPath}");
                     return;
                 }
             }
 
-            // Crear el symlink
-            if (@symlink($targetPath, $symlinkPath)) {
+            // Crear el symlink apuntando al storage correcto del tenant
+            if (@symlink($tenantStoragePath, $symlinkPath)) {
                 \Log::info("✅ [Storage] Symlink creado para tenant: {$tenantId}", [
                     'symlink' => $symlinkPath,
-                    'target' => $targetPath
+                    'target' => $tenantStoragePath
                 ]);
             } else {
-                // Si symlink falla, intentar crear como directorio regular
-                // Esto permite que las imágenes se guarden aunque no haya symlink perfecto
                 \Log::warning("⚠️ [Storage] No se pudo crear symlink, continuando sin él", [
                     'tenant' => $tenantId
                 ]);

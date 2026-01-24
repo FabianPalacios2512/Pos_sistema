@@ -36,13 +36,20 @@ class PublicCatalogController extends Controller
         $query = Product::with(['category', 'images', 'options.values', 'variants.optionValues'])
             ->availableForOnline();
 
-        // Filtrar por categorías visibles si está configurado
+        // ⚠️ IMPORTANTE: Si hay configuración de categorías visibles, respetarla
         if ($config && $config->visible_categories) {
             $visibleCategories = json_decode($config->visible_categories, true);
-            if (!empty($visibleCategories)) {
-                $query->whereIn('category_id', $visibleCategories);
+            
+            // Si el array está vacío o es null, NO mostrar ningún producto
+            if (empty($visibleCategories)) {
+                // Retornar array vacío porque no hay categorías seleccionadas
+                return response()->json([]);
             }
+            
+            // Si hay categorías configuradas, filtrar solo esas
+            $query->whereIn('category_id', $visibleCategories);
         }
+        // Si no existe la configuración o visible_categories es null, mostrar todo (por defecto)
 
         // Ocultar productos sin stock si está configurado
         if ($config && $config->hide_out_of_stock) {

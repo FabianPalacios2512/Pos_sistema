@@ -579,8 +579,6 @@ const warehouses = ref([])
 const selectedWarehouseId = ref(null)
 const showWarehouseSelector = computed(() => warehouses.value.length > 1)
 
-const importResult = ref(null)
-
 // System fields for mapping
 const systemFields = [
   { key: 'name', label: 'Nombre del producto', required: true },

@@ -142,11 +142,24 @@
               <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">{{ creditData.customer?.credit_id }}</p>
             </div>
           </div>
-          <button @click="logout" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
-            </svg>
-          </button>
+          <div class="flex items-center gap-2">
+            <!-- 🛒 Ver Catálogo (solo si está activo) -->
+            <button 
+              v-if="creditData.catalog_active"
+              @click="goToCatalog"
+              class="px-3 py-2 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800/50 transition-colors flex items-center gap-1.5"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+              </svg>
+              <span>Catálogo</span>
+            </button>
+            <button @click="logout" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
       
@@ -311,18 +324,64 @@
             </div>
           </div>
           
-          <!-- History (Paid Invoices) -->
+          <!-- History (Paid Invoices) - Siempre visible -->
           <div v-if="paidInvoices.length > 0">
-            <button 
-              @click="showHistory = !showHistory" 
-              class="w-full flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 px-1 py-2 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
-            >
-              <span>Historial · {{ paidInvoices.length }} pagadas</span>
-              <svg :class="['w-4 h-4 transition-transform', showHistory ? 'rotate-180' : '']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
-              </svg>
-            </button>
+            <div class="flex items-center justify-between mb-3 px-1">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <span class="text-emerald-600 dark:text-emerald-400">✓</span> Historial · {{ paidInvoices.length }} pagadas
+              </p>
+              <button 
+                @click="showHistory = !showHistory" 
+                class="flex items-center gap-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+              >
+                <span>{{ showHistory ? 'Ocultar' : 'Ver todas' }}</span>
+                <svg :class="['w-4 h-4 transition-transform', showHistory ? 'rotate-180' : '']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                </svg>
+              </button>
+            </div>
             
+            <!-- Preview de las primeras 3 facturas (siempre visible) -->
+            <div v-if="!showHistory" class="bg-white dark:bg-[#161618] rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+              <div 
+                v-for="invoice in paidInvoices.slice(0, 3)" 
+                :key="invoice.number"
+                @click="openInvoiceModal(invoice)"
+                class="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors first:rounded-t-xl last:rounded-b-xl"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-slate-900 dark:text-white">{{ invoice.number }}</p>
+                      <p class="text-xs text-slate-500 dark:text-slate-400">{{ formatDate(invoice.date) }}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white font-mono">${{ formatNumber(invoice.total) }}</p>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+                      Pagada
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Indicador de más facturas -->
+              <div v-if="paidInvoices.length > 3" class="p-3 text-center bg-slate-50 dark:bg-slate-800/30">
+                <button 
+                  @click="showHistory = true"
+                  class="text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+                >
+                  Ver {{ paidInvoices.length - 3 }} facturas más →
+                </button>
+              </div>
+            </div>
+            
+            <!-- Lista completa (cuando showHistory es true) -->
             <div v-if="showHistory" class="bg-white dark:bg-[#161618] rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
               <div 
                 v-for="invoice in paidInvoices" 
@@ -632,6 +691,12 @@ const logout = () => {
   loginForm.value = { creditId: '', lastName: '' }
   currentToken.value = ''
   window.history.replaceState({}, '', window.location.pathname)
+}
+
+// Navegar al catálogo web
+const goToCatalog = () => {
+  // Redirigir al catálogo manteniendo el mismo dominio
+  window.location.href = '/catalog'
 }
 
 const openInvoiceModal = async (invoice) => {

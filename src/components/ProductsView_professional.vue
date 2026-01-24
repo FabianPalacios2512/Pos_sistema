@@ -22,8 +22,8 @@
         </div>
         <!-- Título Standard -->
         <div v-else>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Product</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Manage your inventory and catalog</p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Productos</h1>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestiona tu inventario y catálogo</p>
         </div>
         
         <div class="flex items-center space-x-3">

@@ -315,6 +315,27 @@ class CreditPortalController extends Controller
         $settings = \App\Models\SystemSetting::first();
         $surchargePercentage = $settings ? floatval($settings->credit_surcharge_percentage) : 10;
 
+        // 🛒 Verificar si el catálogo web está activo
+        $catalogActive = false;
+        try {
+            $catalogConfig = \DB::table('web_catalog_configs')
+                ->where('tenant_id', tenant('id'))
+                ->first();
+            $catalogActive = $catalogConfig ? (bool) $catalogConfig->store_active : false;
+            
+            // 🐛 DEBUG temporal
+            Log::info('🛒 CATALOG CHECK', [
+                'tenant_id' => tenant('id'),
+                'config_found' => $catalogConfig ? 'YES' : 'NO',
+                'store_active_value' => $catalogConfig ? $catalogConfig->store_active : null,
+                'catalog_active_result' => $catalogActive
+            ]);
+        } catch (\Exception $e) {
+            // Si no existe la tabla o hay error, dejar en false
+            Log::error('Error checking catalog: ' . $e->getMessage());
+            $catalogActive = false;
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -336,6 +357,7 @@ class CreditPortalController extends Controller
                 ],
                 'invoices' => $invoices,
                 'payments' => $payments,
+                'catalog_active' => $catalogActive, // 🆕 Estado del catálogo web
                 'last_updated' => now()->format('Y-m-d H:i:s')
             ]
         ]);

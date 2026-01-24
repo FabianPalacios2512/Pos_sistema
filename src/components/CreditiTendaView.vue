@@ -171,13 +171,15 @@
                   @click.stop="customer.credit_photo && openPhotoPreview(customer.credit_photo, customer.name)"
                   class="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden transition-transform duration-200"
                   :class="[
-                    customer.credit_photo ? 'cursor-pointer hover:scale-110 ring-2 ring-transparent hover:ring-blue-400' : getAvatarColor(customer)
-                  ]">
+                    customer.credit_photo ? 'cursor-pointer hover:scale-110 ring-2 ring-transparent hover:ring-blue-400' : 'text-white',
+                    !customer.credit_photo && 'dark:brightness-110'
+                  ]"
+                  :style="!customer.credit_photo ? getAvatarStyle(customer) : {}">
                   <img v-if="customer.credit_photo" 
                        :src="customer.credit_photo" 
                        :alt="customer.name"
                        class="w-full h-full object-cover" />
-                  <span v-else class="text-sm font-bold text-white">{{ customer.name.charAt(0).toUpperCase() }}</span>
+                  <span v-else class="text-sm font-bold">{{ customer.name.charAt(0).toUpperCase() }}</span>
                 </div>
                 
                 <!-- Info del cliente -->
@@ -277,13 +279,14 @@
                     :class="[
                       selectedCustomer.credit_photo 
                         ? 'bg-gray-100 dark:bg-zinc-800 cursor-pointer hover:scale-105 hover:shadow-xl ring-2 ring-transparent hover:ring-blue-400' 
-                        : getAvatarColor(selectedCustomer)
-                    ]">
+                        : 'text-white dark:brightness-110'
+                    ]"
+                    :style="!selectedCustomer.credit_photo ? getAvatarStyle(selectedCustomer) : {}">
                     <img v-if="selectedCustomer.credit_photo" 
                          :src="selectedCustomer.credit_photo" 
                          :alt="selectedCustomer.name"
                          class="w-full h-full object-cover" />
-                    <span v-else class="text-white">{{ selectedCustomer.name?.charAt(0)?.toUpperCase() || '?' }}</span>
+                    <span v-else>{{ selectedCustomer.name?.charAt(0)?.toUpperCase() || '?' }}</span>
                   </div>
                   
                   <div>
@@ -1664,22 +1667,52 @@ const selectCustomer = async (customer) => {
 
 // Función para obtener color del avatar basado en el ID o customer
 const getAvatarColor = (customerOrId) => {
+  // Colores profesionales sutiles con mejor legibilidad usando HSL
   const colors = [
-    'bg-blue-500 text-white',
-    'bg-indigo-500 text-white', 
-    'bg-purple-500 text-white',
-    'bg-pink-500 text-white',
-    'bg-rose-500 text-white',
-    'bg-emerald-500 text-white',
-    'bg-teal-500 text-white',
-    'bg-cyan-500 text-white',
-    'bg-amber-500 text-white',
-    'bg-orange-500 text-white'
+    { bg: 'hsl(210, 70%, 45%)', dark: 'hsl(210, 80%, 55%)' },  // Azul profesional
+    { bg: 'hsl(260, 65%, 50%)', dark: 'hsl(260, 75%, 60%)' },  // Índigo
+    { bg: 'hsl(280, 60%, 50%)', dark: 'hsl(280, 70%, 60%)' },  // Púrpura
+    { bg: 'hsl(340, 60%, 50%)', dark: 'hsl(340, 70%, 60%)' },  // Rosa moderado
+    { bg: 'hsl(160, 65%, 42%)', dark: 'hsl(160, 75%, 52%)' },  // Esmeralda
+    { bg: 'hsl(180, 65%, 45%)', dark: 'hsl(180, 75%, 55%)' },  // Teal
+    { bg: 'hsl(200, 70%, 48%)', dark: 'hsl(200, 80%, 58%)' },  // Cian
+    { bg: 'hsl(45, 75%, 50%)', dark: 'hsl(45, 85%, 60%)' },    // Ámbar
+    { bg: 'hsl(25, 70%, 52%)', dark: 'hsl(25, 80%, 62%)' },    // Naranja
+    { bg: 'hsl(230, 65%, 50%)', dark: 'hsl(230, 75%, 60%)' }   // Azul oscuro
   ]
+  
   // Acepta tanto un objeto customer como un ID directo
   const id = typeof customerOrId === 'object' ? customerOrId?.id : customerOrId
   const index = (id || 0) % colors.length
-  return colors[index]
+  const color = colors[index]
+  
+  // Retornar estilo con CSS variables para modo claro/oscuro
+  return `text-white`
+}
+
+// Función auxiliar para obtener el color de fondo del avatar
+const getAvatarStyle = (customerOrId) => {
+  const colors = [
+    { bg: 'hsl(210, 70%, 45%)', dark: 'hsl(210, 80%, 55%)' },
+    { bg: 'hsl(260, 65%, 50%)', dark: 'hsl(260, 75%, 60%)' },
+    { bg: 'hsl(280, 60%, 50%)', dark: 'hsl(280, 70%, 60%)' },
+    { bg: 'hsl(340, 60%, 50%)', dark: 'hsl(340, 70%, 60%)' },
+    { bg: 'hsl(160, 65%, 42%)', dark: 'hsl(160, 75%, 52%)' },
+    { bg: 'hsl(180, 65%, 45%)', dark: 'hsl(180, 75%, 55%)' },
+    { bg: 'hsl(200, 70%, 48%)', dark: 'hsl(200, 80%, 58%)' },
+    { bg: 'hsl(45, 75%, 50%)', dark: 'hsl(45, 85%, 60%)' },
+    { bg: 'hsl(25, 70%, 52%)', dark: 'hsl(25, 80%, 62%)' },
+    { bg: 'hsl(230, 65%, 50%)', dark: 'hsl(230, 75%, 60%)' }
+  ]
+  
+  const id = typeof customerOrId === 'object' ? customerOrId?.id : customerOrId
+  const index = (id || 0) % colors.length
+  const color = colors[index]
+  
+  return {
+    backgroundColor: color.bg,
+    '--avatar-dark-bg': color.dark
+  }
 }
 
 // Función para obtener etiqueta de método de pago
@@ -2401,8 +2434,15 @@ ${portalUrl}
 _${companyName}_`
 
         // Enviar mensaje directo al backend de WhatsApp
-        const tenantId = window.location.hostname.split('.')[0] || 'matimaa'
-        const whatsappBaseURL = `http://localhost:3002`
+        const rawTenantId = window.location.hostname.split('.')[0] || 'default'
+        const tenantId = rawTenantId.replace(/-/g, '_') // Normalizar: guiones a guiones bajos
+        
+        // En producción usar proxy Nginx, en desarrollo usar localhost
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1'
+        const whatsappBaseURL = isLocalhost 
+          ? 'http://localhost:3002' 
+          : `https://${rawTenantId}.105pos.pro/api/whatsapp`
         
         await axios.post(`${whatsappBaseURL}/send`, {
           phone: phone,
@@ -2549,5 +2589,16 @@ onUnmounted(() => {
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(82, 82, 91, 0.8);
+}
+
+/* Avatar styles - modo oscuro usa colores más brillantes */
+@media (prefers-color-scheme: dark) {
+  [style*="--avatar-dark-bg"] {
+    background-color: var(--avatar-dark-bg) !important;
+  }
+}
+
+html.dark [style*="--avatar-dark-bg"] {
+  background-color: var(--avatar-dark-bg) !important;
 }
 </style>

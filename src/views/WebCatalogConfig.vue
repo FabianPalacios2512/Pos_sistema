@@ -122,6 +122,30 @@
     <!-- CONTENIDO CENTRAL -->
     <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-transparent">
       <div class="p-8 space-y-6 max-w-5xl mx-auto">
+        
+        <!-- ⚠️ Barra de Advertencia - Configuración Incompleta -->
+        <div v-if="showWarningMessage" 
+             class="bg-amber-50 dark:bg-amber-950/30 border-l-4 border-amber-500 rounded-xl p-4 flex items-start gap-3 shadow-sm animate-fade-in">
+          <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <div class="flex-1">
+            <h4 class="text-sm font-bold text-amber-800 dark:text-amber-300">Configuración Incompleta</h4>
+            <p v-if="warningType === 'categories'" class="text-xs text-amber-700 dark:text-amber-400 mt-1">
+              No puedes activar el catálogo sin seleccionar ninguna categoría para mostrar. 
+              Ve a la pestaña <span class="font-semibold">"Catálogo"</span> y selecciona al menos una categoría.
+            </p>
+            <p v-else-if="warningType === 'whatsapp'" class="text-xs text-amber-700 dark:text-amber-400 mt-1">
+              No puedes activar el catálogo sin configurar un número de WhatsApp válido. 
+              Ve a la pestaña <span class="font-semibold">"Pedidos"</span> e ingresa tu número completo (ej: +573001234567).
+            </p>
+          </div>
+          <button 
+            @click="activeTab = warningType === 'categories' ? 'catalog' : 'orders'; showWarningMessage = false" 
+            class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition-colors flex-shrink-0">
+            {{ warningType === 'categories' ? 'Ir a Catálogo' : 'Ir a Pedidos' }}
+          </button>
+        </div>
           
           <!-- SECCIÓN: DISEÑO - Estilo SaaS Profesional -->
           <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
@@ -345,6 +369,16 @@
               <div class="mb-4">
                 <h3 class="text-base font-bold text-gray-900 dark:text-white">Visibilidad del Catálogo</h3>
                 <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">Controla qué categorías y productos se muestran en tu tienda online.</p>
+              </div>
+              
+              <!-- ⚠️ Advertencia si no hay categorías cargadas -->
+              <div v-if="availableCategories.length === 0" 
+                   class="bg-blue-50 dark:bg-blue-950/30 border-l-4 border-blue-500 rounded-xl p-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="text-sm text-blue-700 dark:text-blue-300">Cargando categorías desde la base de datos...</p>
               </div>
               
               <div class="bg-white/90 dark:bg-zinc-900/90  rounded-xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
@@ -605,9 +639,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue'
 import { appStore } from '../store/appStore.js'
 import apiClient from '../services/apiClient.js'
+import axios from 'axios'
 
 // Props & Emits
 const props = defineProps({
@@ -643,6 +678,18 @@ const toastMessage = reactive({
 })
 const isLoading = ref(true)
 const activeTab = ref('identity')
+const showWarningMessage = ref(false) // Control independiente del mensaje de alerta
+const warningType = ref('categories') // 'categories' | 'whatsapp' - tipo de advertencia
+
+// Helper: Verificar si el número de WhatsApp es válido (más de solo el código de país)
+const isValidWhatsappNumber = (number) => {
+  if (!number) return false
+  // Remover espacios y caracteres especiales
+  const cleanNumber = number.replace(/[\s\-\(\)]/g, '')
+  // Debe tener más de 4 caracteres (mínimo código país + algunos dígitos)
+  // +57 solo tiene 3 caracteres, necesitamos al menos el código + número real
+  return cleanNumber.length >= 10
+}
 
 // Tabs Configuration
 const tabs = [
@@ -710,7 +757,7 @@ const getValidTemplate = (template) => {
 
 // Configuration Object (Reactive)
 const config = reactive({
-  storeActive: true,
+  storeActive: false, // Por defecto inactivo hasta que seleccionen categorías
   brandIdentity: {
     logo: '', 
     banner: '',
@@ -737,18 +784,35 @@ const availableCategories = ref([])
 
 // Load categories from store
 onMounted(async () => {
-  // Load categories
-  if (appStore.categories && appStore.categories.length > 0) {
-    availableCategories.value = appStore.categories
-  } else {
-    availableCategories.value = [
-      { id: 1, name: 'Bebidas' },
-      { id: 2, name: 'Snacks' },
-      { id: 3, name: 'Lácteos' },
-      { id: 4, name: 'Panadería' },
-      { id: 5, name: 'Aseo' },
-      { id: 6, name: 'Insumos' }
-    ]
+  isLoading.value = true
+  
+  // 🔄 Cargar categorías desde la API con autenticación
+  try {
+    console.log('📦 Cargando categorías desde la API...')
+    const response = await apiClient.get('/categories-pos')
+    
+    // La API devuelve {success: true, data: Array, message: '...'}
+    const categoriesData = response.data?.data || response.data
+    
+    if (categoriesData && Array.isArray(categoriesData)) {
+      availableCategories.value = categoriesData.map(cat => ({
+        id: cat.id,
+        name: cat.name
+      }))
+      console.log('✅ Categorías cargadas:', availableCategories.value.length, 'categorías')
+    } else {
+      console.warn('⚠️ No se encontraron categorías en la respuesta')
+      availableCategories.value = []
+    }
+  } catch (error) {
+    console.error('❌ Error cargando categorías:', error)
+    // Fallback: usar categorías del appStore si falló la API
+    if (appStore.categories && appStore.categories.length > 0) {
+      console.log('🔄 Usando categorías del appStore como fallback')
+      availableCategories.value = appStore.categories
+    } else {
+      availableCategories.value = []
+    }
   }
 
   // Load existing configuration from backend
@@ -758,6 +822,117 @@ onMounted(async () => {
   config.brandIdentity.template = getValidTemplate(config.brandIdentity.template)
   
   isLoading.value = false
+})
+
+// ⚠️ Validación: Desactivar catálogo automáticamente si no hay categorías O número WhatsApp
+watch(() => config.storeActive, async (newValue) => {
+  if (newValue) {
+    // Verificar categorías
+    if (config.inventoryVisibility.visibleCategories.length === 0) {
+      console.warn('⚠️ Intento de activar catálogo sin categorías seleccionadas')
+      
+      // Desactivar INMEDIATAMENTE el toggle
+      config.storeActive = false
+      
+      // Esperar a que se actualice el DOM
+      await nextTick()
+      
+      // 💾 Guardar automáticamente el cambio en el backend
+      console.log('💾 Guardando estado inactivo automáticamente...')
+      await saveConfiguration()
+      console.log('✅ Estado guardado en backend')
+      
+      // Mostrar mensaje de alerta por 40 segundos
+      warningType.value = 'categories'
+      showWarningMessage.value = true
+      setTimeout(() => {
+        showWarningMessage.value = false
+        console.log('🔄 Mensaje de alerta ocultado después de 40 segundos')
+      }, 40000)
+      return
+    }
+    
+    // Verificar número de WhatsApp
+    if (!isValidWhatsappNumber(config.ordersConfig.whatsappNumber)) {
+      console.warn('⚠️ Intento de activar catálogo sin número de WhatsApp válido')
+      
+      // Desactivar INMEDIATAMENTE el toggle
+      config.storeActive = false
+      
+      // Esperar a que se actualice el DOM
+      await nextTick()
+      
+      // 💾 Guardar automáticamente el cambio en el backend
+      console.log('💾 Guardando estado inactivo automáticamente...')
+      await saveConfiguration()
+      console.log('✅ Estado guardado en backend')
+      
+      // Mostrar mensaje de alerta por 40 segundos
+      warningType.value = 'whatsapp'
+      showWarningMessage.value = true
+      setTimeout(() => {
+        showWarningMessage.value = false
+        console.log('🔄 Mensaje de alerta ocultado después de 40 segundos')
+      }, 40000)
+      return
+    }
+    
+    // ✅ Si llegó aquí, el cambio es válido - Guardar automáticamente
+    await nextTick()
+    console.log('💾 Toggle cambiado - Guardando configuración automáticamente...')
+    await saveConfiguration()
+    console.log('✅ Configuración guardada automáticamente')
+  } else if (!newValue) {
+    // 🔴 Usuario desactivó la tienda manualmente - Guardar automáticamente
+    await nextTick()
+    console.log('💾 Tienda desactivada - Guardando configuración automáticamente...')
+    await saveConfiguration()
+    console.log('✅ Configuración guardada automáticamente')
+  }
+})
+
+// 🛡️ Validación inteligente al cambiar categorías
+watch(() => config.inventoryVisibility.visibleCategories.length, async (newLength, oldLength) => {
+  console.log('📊 Cambio en categorías detectado:', { newLength, oldLength, storeActive: config.storeActive })
+  
+  // 1️⃣ Si se selecciona al menos una categoría, cerrar mensaje de alerta inmediatamente
+  if (newLength > 0 && showWarningMessage.value) {
+    showWarningMessage.value = false
+    console.log('✅ Categoría seleccionada - Mensaje de alerta cerrado')
+  }
+  
+  // 2️⃣ Si se quitan TODAS las categorías y el catálogo está activo, desactivarlo automáticamente
+  if (config.storeActive && newLength === 0 && oldLength > 0) {
+    console.warn('⚠️ Se quitaron todas las categorías - Desactivando catálogo automáticamente')
+    
+    // Desactivar el toggle
+    config.storeActive = false
+    
+    // Esperar a que se actualice el DOM
+    await nextTick()
+    
+    // 💾 Guardar automáticamente el cambio en el backend
+    console.log('💾 Guardando estado inactivo automáticamente...')
+    await saveConfiguration()
+    console.log('✅ Estado guardado en backend')
+    
+    // Mostrar mensaje de alerta por 40 segundos
+    warningType.value = 'categories'
+    showWarningMessage.value = true
+    setTimeout(() => {
+      showWarningMessage.value = false
+      console.log('🔄 Mensaje de alerta ocultado después de 40 segundos')
+    }, 40000)
+  }
+})
+
+// 🛡️ Validación del número de WhatsApp
+watch(() => config.ordersConfig.whatsappNumber, (newValue) => {
+  // Si se ingresa un número válido, cerrar mensaje de alerta si era de WhatsApp
+  if (isValidWhatsappNumber(newValue) && showWarningMessage.value && warningType.value === 'whatsapp') {
+    showWarningMessage.value = false
+    console.log('✅ Número de WhatsApp válido - Mensaje de alerta cerrado')
+  }
 })
 
 // Refresh Preview - Recarga el iframe completamente
@@ -887,7 +1062,8 @@ const loadConfiguration = async () => {
         banner_url: data.banner_url ? `${data.banner_url.substring(0, 50)}...` : 'null'
       })
       
-      config.storeActive = data.store_active ?? true
+      // Por defecto inactivo si no está explícitamente configurado
+      config.storeActive = data.store_active ?? false
       config.brandIdentity.logo = data.logo_url || ''
       config.brandIdentity.banner = data.banner_url || ''
       config.brandIdentity.primaryColor = data.primary_color || '#10B981'
@@ -899,6 +1075,12 @@ const loadConfiguration = async () => {
       
       // Respetar la configuración guardada, incluso si está vacía
       config.inventoryVisibility.visibleCategories = visibleCats
+      
+      // 🛡️ REGLA: Si no hay categorías seleccionadas, FORZAR catálogo inactivo
+      if (visibleCats.length === 0) {
+        console.warn('⚠️ No hay categorías seleccionadas - Forzando catálogo inactivo')
+        config.storeActive = false
+      }
       
       config.inventoryVisibility.hideOutOfStock = data.hide_out_of_stock ?? false
       config.ordersConfig.whatsappNumber = data.whatsapp_number || '+57'
@@ -952,6 +1134,7 @@ const saveConfiguration = async () => {
     }
     
     console.log('💾 Guardando configuración:', {
+      storeActive: payload.storeActive,
       visibleCategories: payload.products.visibleCategories,
       logo_length: payload.brandIdentity.logo ? payload.brandIdentity.logo.length : 0,
       banner_length: payload.brandIdentity.banner ? payload.brandIdentity.banner.length : 0

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio 105 FM - Demo de Integración</title>
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg-dark: #0f172a;
+            --card-dark: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: var(--text);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        
+        .demo-section {
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+        
+        .widget-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+        
+        @media (max-width: 900px) {
+            .widget-demo {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .widget-container {
+            background: var(--card-dark);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .code-block {
+            background: #0d1117;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        
+        .code-block .keyword {
+            color: #ff79c6;
+        }
+        
+        .code-block .string {
+            color: #f1fa8c;
+        }
+        
+        .code-block .comment {
+            color: #6272a4;
+        }
+        
+        .code-block .tag {
+            color: #ff79c6;
+        }
+        
+        .code-block .attr {
+            color: #50fa7b;
+        }
+        
+        .code-block .value {
+            color: #f1fa8c;
+        }
+        
+        .api-endpoints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .endpoint-card {
+            background: var(--card-dark);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        
+        .endpoint-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-color: var(--primary);
+        }
+        
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .endpoint-path {
+            font-family: 'Fira Code', monospace;
+            color: var(--primary);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .endpoint-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        
+        .test-section {
+            background: var(--card-dark);
+            border-radius: 16px;
+            padding: 30px;
+        }
+        
+        .test-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .test-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            color: white;
+            font-size: 14px;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .test-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: scale(1.02);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .response-viewer {
+            background: #0d1117;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .quick-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .quick-btns button {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+        }
+        
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 16px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .copy-btn:hover {
+            background: var(--primary);
+        }
+        
+        .code-wrapper {
+            position: relative;
+        }
+        
+        .theme-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .theme-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .theme-btn.active {
+            border-color: var(--primary);
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        .theme-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📻 Radio 105 FM</h1>
+            <p class="subtitle">API Pública de Radio Colombiana - Demo de Integración</p>
+        </header>
+        
+        <!-- Widget Demo -->
+        <section class="demo-section">
+            <h2 class="section-title">🎧 Widget Embebible</h2>
+            
+            <div class="widget-demo">
+                <div>
+                    <h3 style="margin-bottom: 15px;">Personalización</h3>
+                    <div class="theme-toggle">
+                        <button class="theme-btn active" onclick="setTheme('dark')">🌙 Dark</button>
+                        <button class="theme-btn" onclick="setTheme('light')">☀️ Light</button>
+                        <button class="theme-btn" onclick="setTheme('auto')">🔄 Auto</button>
+                    </div>
+                    
+                    <div class="widget-container">
+                        <div id="radio-105"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 style="margin-bottom: 15px;">Código de Integración</h3>
+                    <div class="code-wrapper">
+                        <button class="copy-btn" onclick="copyCode('widget-code')">📋 Copiar</button>
+                        <div class="code-block">
+<pre id="widget-code"><span class="comment">&lt;!-- 1. Contenedor del widget --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="value">"radio-105"</span><span class="tag">&gt;&lt;/div&gt;</span>
+
+<span class="comment">&lt;!-- 2. Script del widget --&gt;</span>
+<span class="tag">&lt;script</span> <span class="attr">src</span>=<span class="value">"https://105pos.pro/api/public/radio/widget"</span><span class="tag">&gt;&lt;/script&gt;</span>
+
+<span class="comment">&lt;!-- 3. Inicializar --&gt;</span>
+<span class="tag">&lt;script&gt;</span>
+  <span class="keyword">Radio105</span>.<span class="keyword">init</span>({
+    <span class="attr">container</span>: <span class="string">'#radio-105'</span>,
+    <span class="attr">theme</span>: <span class="string">'dark'</span>,
+    <span class="attr">primaryColor</span>: <span class="string">'#10b981'</span>,
+    <span class="attr">height</span>: <span class="string">'500px'</span>
+  });
+<span class="tag">&lt;/script&gt;</span></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- API Endpoints -->
+        <section class="demo-section">
+            <h2 class="section-title">📡 Endpoints de la API</h2>
+            
+            <div class="api-endpoints">
+                <div class="endpoint-card" onclick="testEndpoint('/info')">
+                    <span class="endpoint-method">GET</span>
+                    <div class="endpoint-path">/api/public/radio/info</div>
+                    <div class="endpoint-desc">Información del servicio y lista de endpoints disponibles</div>
+                </div>
+                
+                <div class="endpoint-card" onclick="testEndpoint('/stations?limit=5')">
+                    <span class="endpoint-method">GET</span>
+                    <div class="endpoint-path">/api/public/radio/stations</div>
+                    <div class="endpoint-desc">Lista de todas las estaciones de radio disponibles</div>
+                </div>
+                
+                <div class="endpoint-card" onclick="testEndpoint('/stations/co-medellin-mega')">
+                    <span class="endpoint-method">GET</span>
+                    <div class="endpoint-path">/api/public/radio/stations/{id}</div>
+                    <div class="endpoint-desc">Obtener información de una estación específica</div>
+                </div>
+                
+                <div class="endpoint-card" onclick="testEndpoint('/search?q=olimpica')">
+                    <span class="endpoint-method">GET</span>
+                    <div class="endpoint-path">/api/public/radio/search</div>
+                    <div class="endpoint-desc">Buscar estaciones por nombre, ciudad o categoría</div>
+                </div>
+                
+                <div class="endpoint-card" onclick="testEndpoint('/categories')">
+                    <span class="endpoint-method">GET</span>
+                    <div class="endpoint-path">/api/public/radio/categories</div>
+                    <div class="endpoint-desc">Lista de categorías musicales disponibles</div>
+                </div>
+                
+                <div class="endpoint-card" onclick="testEndpoint('/cities')">
+                    <span class="endpoint-method">GET</span>
+                    <div class="endpoint-path">/api/public/radio/cities</div>
+                    <div class="endpoint-desc">Lista de ciudades con estaciones de radio</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- API Tester -->
+        <section class="demo-section">
+            <h2 class="section-title">🧪 Probador de API</h2>
+            
+            <div class="test-section">
+                <div class="quick-btns">
+                    <button class="btn btn-secondary" onclick="testEndpoint('/info')">📋 Info</button>
+                    <button class="btn btn-secondary" onclick="testEndpoint('/stations?limit=3')">📻 Estaciones</button>
+                    <button class="btn btn-secondary" onclick="testEndpoint('/search?q=mega')">🔍 Buscar "mega"</button>
+                    <button class="btn btn-secondary" onclick="testEndpoint('/categories')">🏷️ Categorías</button>
+                    <button class="btn btn-secondary" onclick="testEndpoint('/cities')">🏙️ Ciudades</button>
+                    <button class="btn btn-secondary" onclick="testEndpoint('/stations?state=Antioquia')">📍 Antioquia</button>
+                </div>
+                
+                <div class="test-input">
+                    <input type="text" id="endpoint-input" value="/stations?limit=5" placeholder="/stations?limit=5">
+                    <button class="btn btn-primary" onclick="testFromInput()">🚀 Ejecutar</button>
+                </div>
+                
+                <div class="response-viewer" id="response-viewer">
+// Haz clic en un endpoint para ver la respuesta aquí
+// O escribe tu propio endpoint y presiona "Ejecutar"
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>
+                📚 <a href="https://github.com/105pos/radio-api" target="_blank">Documentación Completa</a> &nbsp;|&nbsp;
+                🏠 <a href="https://105pos.pro" target="_blank">105POS</a> &nbsp;|&nbsp;
+                💬 <a href="mailto:soporte@105pos.pro">Soporte</a>
+            </p>
+            <p style="margin-top: 15px; font-size: 14px;">
+                © 2026 Radio 105 FM by 105POS - Servicio gratuito de radio colombiana
+            </p>
+        </footer>
+    </div>
+    
+    <!-- Widget Script -->
+    <script src="https://105pos.pro/api/public/radio/widget"></script>
+    <script>
+        // Initialize widget
+        Radio105.init({
+            container: '#radio-105',
+            theme: 'dark',
+            primaryColor: '#10b981',
+            height: '450px'
+        });
+        
+        // Theme toggle
+        let currentTheme = 'dark';
+        function setTheme(theme) {
+            currentTheme = theme;
+            
+            // Update buttons
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(theme)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Reinitialize widget with new theme
+            Radio105.destroy();
+            Radio105.init({
+                container: '#radio-105',
+                theme: theme,
+                primaryColor: '#10b981',
+                height: '450px'
+            });
+        }
+        
+        // API Tester
+        const BASE_URL = 'https://105pos.pro/api/public/radio';
+        
+        async function testEndpoint(endpoint) {
+            const viewer = document.getElementById('response-viewer');
+            const input = document.getElementById('endpoint-input');
+            
+            input.value = endpoint;
+            viewer.textContent = '⏳ Cargando...';
+            
+            try {
+                const start = performance.now();
+                const response = await fetch(BASE_URL + endpoint);
+                const elapsed = (performance.now() - start).toFixed(0);
+                const data = await response.json();
+                
+                viewer.innerHTML = `<span style="color: #50fa7b;">✅ ${response.status} OK</span> <span style="color: #6272a4;">(${elapsed}ms)</span>\n\n` + 
+                    syntaxHighlight(JSON.stringify(data, null, 2));
+            } catch (error) {
+                viewer.innerHTML = `<span style="color: #ff5555;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        function testFromInput() {
+            const input = document.getElementById('endpoint-input');
+            let endpoint = input.value.trim();
+            if (!endpoint.startsWith('/')) endpoint = '/' + endpoint;
+            testEndpoint(endpoint);
+        }
+        
+        // JSON syntax highlighting
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'color: #bd93f9;'; // number
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'color: #8be9fd;'; // key
+                    } else {
+                        cls = 'color: #f1fa8c;'; // string
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'color: #ff79c6;'; // boolean
+                } else if (/null/.test(match)) {
+                    cls = 'color: #ff5555;'; // null
+                }
+                return '<span style="' + cls + '">' + match + '</span>';
+            });
+        }
+        
+        // Copy code
+        function copyCode(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                btn.textContent = '✅ Copiado!';
+                setTimeout(() => {
+                    btn.textContent = '📋 Copiar';
+                }, 2000);
+            });
+        }
+        
+        // Enter key to test
+        document.getElementById('endpoint-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') testFromInput();
+        });
+    </script>
+</body>
+</html>

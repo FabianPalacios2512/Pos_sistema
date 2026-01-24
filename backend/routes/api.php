@@ -12,6 +12,7 @@ use App\Http\Controllers\EPaycoPaymentController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\RadioProxyController;
+use App\Http\Controllers\PublicRadioController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,6 +20,20 @@ use Illuminate\Support\Facades\Route;
 | API Routes (Central)
 |--------------------------------------------------------------------------
 */
+
+// ==================== RADIO 105 FM - API PÚBLICA ====================
+// Servicio gratuito de streaming de radio colombiana
+// Documentación: https://105pos.pro/docs/radio-api
+Route::prefix('public/radio')->group(function () {
+    Route::get('/info', [PublicRadioController::class, 'info']);
+    Route::get('/stations', [PublicRadioController::class, 'stations']);
+    Route::get('/stations/{id}', [PublicRadioController::class, 'station']);
+    Route::get('/search', [PublicRadioController::class, 'search']);
+    Route::get('/categories', [PublicRadioController::class, 'categories']);
+    Route::get('/cities', [PublicRadioController::class, 'cities']);
+    Route::get('/widget', [PublicRadioController::class, 'widget']);      // Sirve JS
+    Route::get('/styles', [PublicRadioController::class, 'widgetCSS']);   // Sirve CSS
+});
 
 // Rutas públicas (sin autenticación)
 Route::post('/login', [AuthController::class, 'login']);

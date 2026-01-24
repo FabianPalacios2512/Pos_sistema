@@ -291,6 +291,42 @@
             <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Datos corporativos y contacto</p>
           </div>
           <div class="p-5">
+            <!-- Logo de la Empresa - Compacto en línea -->
+            <div class="flex items-center gap-4 mb-5 pb-5 border-b border-gray-100 dark:border-zinc-800">
+              <!-- Preview del Logo -->
+              <div class="flex-shrink-0">
+                <div v-if="systemSettings.company_logo" 
+                     class="w-16 h-16 rounded-xl border-2 border-gray-200 dark:border-zinc-700 overflow-hidden bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm">
+                  <img :src="systemSettings.company_logo" alt="Logo" class="w-full h-full object-contain">
+                </div>
+                <div v-else class="w-16 h-16 rounded-xl border-2 border-dashed border-gray-300 dark:border-zinc-700 flex items-center justify-center bg-gray-50 dark:bg-zinc-800/50">
+                  <svg class="w-7 h-7 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Botones y Texto -->
+              <div class="flex-1 min-w-0">
+                <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Logo de la Empresa</label>
+                <div class="flex items-center gap-2">
+                  <label class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <span>{{ systemSettings.company_logo ? 'Cambiar' : 'Subir' }}</span>
+                    <input type="file" @change="handleCompanyLogoUpload" accept="image/*" class="hidden">
+                  </label>
+                  <button v-if="systemSettings.company_logo" 
+                          @click="removeCompanyLogo"
+                          class="px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors">
+                    Eliminar
+                  </button>
+                </div>
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-1">PNG, JPG o SVG • Máx. 2MB • Se usa en facturas</p>
+              </div>
+            </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Nombre de la Empresa</label>
@@ -1483,6 +1519,43 @@ const discountForm = ref({
   stackable: false,
   allow_multiple_uses_per_user: false
 })
+
+// 🖼️ Funciones para manejar el logo de la empresa
+const handleCompanyLogoUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    // Validar tamaño máximo 2MB
+    if (file.size > 2 * 1024 * 1024) {
+      showNotification('La imagen es demasiado grande. Máximo 2MB.', 'error')
+      return
+    }
+    
+    // Validar tipo de archivo
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      showNotification('Formato no soportado. Usa PNG, JPG, GIF, SVG o WebP.', 'error')
+      return
+    }
+    
+    // Leer archivo como base64
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      systemSettings.value.company_logo = e.target.result
+      showNotification('Logo cargado correctamente. Recuerda guardar los cambios.', 'success')
+    }
+    reader.onerror = () => {
+      showNotification('Error al leer el archivo.', 'error')
+    }
+    reader.readAsDataURL(file)
+  }
+  // Limpiar input para permitir subir el mismo archivo de nuevo
+  event.target.value = ''
+}
+
+const removeCompanyLogo = () => {
+  systemSettings.value.company_logo = null
+  showNotification('Logo eliminado. Recuerda guardar los cambios.', 'success')
+}
 
 // Métodos
 const loadSystemSettings = async () => {

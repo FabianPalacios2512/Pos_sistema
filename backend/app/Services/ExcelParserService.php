@@ -280,6 +280,13 @@ class ExcelParserService
 
     /**
      * Normalizar valor según el tipo de campo
+     * 
+     * Soporta formatos de moneda colombiana:
+     * - $2.500 = 2500
+     * - 2.500 = 2500 (punto como separador de miles)
+     * - 2500 = 2500
+     * - 2.500,00 = 2500 (formato europeo/colombiano)
+     * - 2,500.00 = 2500 (formato americano)
      */
     private function normalizeValue(string $field, string $value): mixed
     {
@@ -287,16 +294,8 @@ class ExcelParserService
         $numericFields = ['sale_price', 'cost_price', 'wholesale_price', 'current_stock', 'min_stock', 'max_stock'];
 
         if (in_array($field, $numericFields)) {
-            // Limpiar formato de moneda
-            $value = preg_replace('/[^\d.,\-]/', '', $value);
-            // Convertir comas a puntos
-            $value = str_replace(',', '.', $value);
-            // Si tiene múltiples puntos, es formato europeo (1.234.567,89)
-            if (substr_count($value, '.') > 1) {
-                $value = str_replace('.', '', $value);
-            }
-
-            return is_numeric($value) ? floatval($value) : 0;
+            $value = $this->parseColombianCurrency($value, $field);
+            return $value;
         }
 
         // Campos booleanos
@@ -306,6 +305,125 @@ class ExcelParserService
         }
 
         return $value;
+    }
+
+    /**
+     * Parsear valores de moneda colombiana
+     * 
+     * En Colombia:
+     * - Separador de miles: punto (.)
+     * - Separador decimal: coma (,)
+     * - Símbolo: $ (peso colombiano)
+     * 
+     * Ejemplos soportados:
+     * - $2.500 → 2500
+     * - $2.500,50 → 2500.50
+     * - 2.500 → 2500
+     * - 2500 → 2500
+     * - 2,500.00 → 2500 (formato americano)
+     * - $ 1.234.567 → 1234567
+     */
+    private function parseColombianCurrency(string $value, string $field = ''): float
+    {
+        // Si está vacío, retornar 0
+        if (empty(trim($value))) {
+            return 0.0;
+        }
+
+        // Guardar valor original para debug
+        $original = $value;
+
+        // 1. Remover símbolo de peso ($) y espacios
+        $value = preg_replace('/[$\s]/', '', $value);
+
+        // 2. Remover cualquier otro símbolo de moneda (€, USD, COP, etc.)
+        $value = preg_replace('/[^\d.,\-]/', '', $value);
+
+        // Si está vacío después de limpiar, retornar 0
+        if (empty($value)) {
+            return 0.0;
+        }
+
+        // 3. Detectar el formato basándose en la posición y cantidad de separadores
+        $dotCount = substr_count($value, '.');
+        $commaCount = substr_count($value, ',');
+
+        // 4. Analizar patrones
+        if ($dotCount === 0 && $commaCount === 0) {
+            // Solo números: 2500
+            return floatval($value);
+        }
+
+        if ($dotCount === 0 && $commaCount === 1) {
+            // Formato: 2500,50 (coma decimal europeo/colombiano)
+            $value = str_replace(',', '.', $value);
+            return floatval($value);
+        }
+
+        if ($dotCount === 1 && $commaCount === 0) {
+            // Puede ser: 2.500 (miles) o 25.50 (decimal)
+            // Si el punto está seguido de exactamente 3 dígitos, es separador de miles
+            if (preg_match('/\.(\d{3})$/', $value)) {
+                // Es separador de miles: 2.500 → 2500
+                $value = str_replace('.', '', $value);
+                return floatval($value);
+            } else {
+                // Es decimal: 25.50 → 25.50
+                return floatval($value);
+            }
+        }
+
+        if ($dotCount >= 1 && $commaCount === 1) {
+            // Determinar cuál es el decimal basándose en la posición
+            $lastDot = strrpos($value, '.');
+            $lastComma = strrpos($value, ',');
+
+            if ($lastComma > $lastDot) {
+                // Formato colombiano/europeo: 1.234.567,89
+                // Puntos son miles, coma es decimal
+                $value = str_replace('.', '', $value);
+                $value = str_replace(',', '.', $value);
+                return floatval($value);
+            } else {
+                // Formato americano: 1,234,567.89
+                // Comas son miles, punto es decimal
+                $value = str_replace(',', '', $value);
+                return floatval($value);
+            }
+        }
+
+        if ($dotCount >= 2 && $commaCount === 0) {
+            // Formato: 1.234.567 (solo puntos como miles, sin decimales)
+            $value = str_replace('.', '', $value);
+            return floatval($value);
+        }
+
+        if ($commaCount >= 2 && $dotCount === 0) {
+            // Formato: 1,234,567 (solo comas como miles, formato americano sin decimales)
+            $value = str_replace(',', '', $value);
+            return floatval($value);
+        }
+
+        if ($commaCount >= 1 && $dotCount === 1) {
+            // Similar al caso anterior pero invertido
+            $lastDot = strrpos($value, '.');
+            $lastComma = strrpos($value, ',');
+
+            if ($lastDot > $lastComma) {
+                // Formato americano: 1,234.89
+                $value = str_replace(',', '', $value);
+                return floatval($value);
+            } else {
+                // Formato europeo: 1.234,89
+                $value = str_replace('.', '', $value);
+                $value = str_replace(',', '.', $value);
+                return floatval($value);
+            }
+        }
+
+        // Fallback: intentar limpiar todo y convertir
+        $value = preg_replace('/[^\d.]/', '', str_replace(',', '.', $value));
+        return floatval($value) ?: 0.0;
     }
 
     /**

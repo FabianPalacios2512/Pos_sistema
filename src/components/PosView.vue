@@ -680,8 +680,9 @@
       
       <div class="p-3 overflow-y-auto bg-gray-100/80 dark:bg-zinc-800/40" style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
-        <!-- Loading skeleton - Modo oscuro mejorado -->
-      <div v-if="productsLoading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
+        <!-- Loading skeleton - SOLO mostrar si está cargando Y NO hay productos previos -->
+        <!-- Esto evita el parpadeo molesto cuando ya hay productos cargados -->
+      <div v-if="showSkeletonLoaders" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
           <div v-for="n in 10" :key="n" class="bg-white dark:bg-zinc-800/50 rounded-2xl p-3 border border-gray-100 dark:border-zinc-700/50 shadow-sm">
             <div class="aspect-square bg-gray-100 dark:bg-zinc-700/50 rounded-xl mb-3 animate-pulse"></div>
             <div class="h-4 bg-gray-100 dark:bg-zinc-700/50 rounded-lg w-2/3 mb-2 animate-pulse"></div>
@@ -3223,19 +3224,27 @@ const isNewProduct = (product) => {
 // Número de factura real desde el backend
 const nextInvoiceNumber = ref('FACT-000001') // Valor inicial por defecto
 
+// 🔧 FIX: Solo mostrar skeleton loaders cuando se carga Y NO hay productos previos
+// Esto evita el parpadeo molesto al entrar al POS cuando ya hay productos en cache
+const showSkeletonLoaders = computed(() => {
+  // Mostrar skeleton SOLO si está cargando Y no hay productos aún
+  return productsLoading.value && (products.value?.length || 0) === 0
+})
+
 // Detectar si es primera vez (NO hay productos en la base de datos)
 const isFirstTimeNoProducts = computed(() => {
-  // Si está cargando, no es primera vez
-  if (productsLoading.value) return false
+  // Si estamos mostrando skeleton, no mostrar mensaje de "primera vez"
+  if (showSkeletonLoaders.value) return false
   
   // Si NO hay productos en absoluto (sin filtros ni búsqueda)
   const totalProducts = products.value?.length || 0
-  return totalProducts === 0
+  return totalProducts === 0 && !productsLoading.value
 })
 
 // Detectar si el resultado vacío es por filtros/búsqueda
 const isEmptyByFilters = computed(() => {
-  if (productsLoading.value || isFirstTimeNoProducts.value) return false
+  // No mostrar si hay skeleton o es primera vez
+  if (showSkeletonLoaders.value || isFirstTimeNoProducts.value) return false
   
   // Hay productos en la BD pero filteredProducts está vacío
   const totalProducts = products.value?.length || 0

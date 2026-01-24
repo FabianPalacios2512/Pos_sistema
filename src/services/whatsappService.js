@@ -38,6 +38,10 @@ const getWhatsAppClient = () => {
   
   // Si tenemos tenant_id: usar /api/whatsapp/ (proxy Nginx)
   if (tenantId) {
+    // Normalizar tenant_id: reemplazar guiones con guiones bajos
+    // Los subdomains usan guiones pero la DB usa guiones bajos
+    const normalizedTenantId = tenantId.replace(/-/g, '_')
+    
     // En producción usar /api/whatsapp/ (proxy Nginx)
     // En desarrollo usar puerto 3002 directo
     const isLocalhost = window.location.hostname === 'localhost' || 
@@ -52,7 +56,7 @@ const getWhatsAppClient = () => {
     const client = axios.create({
       baseURL: whatsappBaseURL,
       headers: {
-        'X-Tenant-Id': tenantId
+        'X-Tenant-Id': normalizedTenantId
       },
       // Agregar timeout para evitar que el error tarde mucho
       timeout: 10000
