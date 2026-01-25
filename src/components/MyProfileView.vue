@@ -1,289 +1,172 @@
 <template>
-  <!-- 🎨 Mi Perfil - Diseño Panel de Configuración SaaS -->
-  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
-    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
+  <!-- 🎨 Mi Perfil - Diseño Ejecutivo SaaS Dashboard -->
+  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-4 md:px-8">
+    <div class="p-4 lg:p-6 max-w-6xl mx-auto space-y-5 pb-8 animate-fade-in">
       
       <!-- Header -->
-      <div class="flex items-center justify-between pb-4">
+      <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mi Perfil</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Administra tu información personal y seguridad</p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Configuración de cuenta</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Administra tu información personal y preferencias de seguridad</p>
         </div>
       </div>
 
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-20">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div class="w-8 h-8 border-2 border-slate-200 dark:border-zinc-700 border-t-slate-600 dark:border-t-slate-400 rounded-full animate-spin"></div>
       </div>
 
-      <div v-else class="space-y-6">
+      <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         
-        <!-- Layout Grid: 2 columnas en desktop -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- COLUMNA IZQUIERDA: Cuenta + Seguridad -->
+        <div class="lg:col-span-1 space-y-5">
           
-          <!-- Columna Izquierda: Info del Usuario (1 col) -->
-          <div class="lg:col-span-1 space-y-6">
-            
-            <!-- Tarjeta de Perfil -->
-            <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-              <!-- Avatar y nombre -->
-              <div class="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700 px-6 py-6 text-center">
-                <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-blue-500/30">
-                  <span class="text-white font-bold text-2xl">{{ userInitials }}</span>
-                </div>
-                <h2 class="text-lg font-bold text-white mt-3">{{ currentUser?.name || 'Usuario' }}</h2>
-                <p class="text-slate-300 text-sm">{{ currentUser?.email || '' }}</p>
+          <!-- Tarjeta: Cuenta -->
+          <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm p-5">
+            <div class="flex flex-col items-center text-center">
+              <!-- Avatar -->
+              <div class="w-20 h-20 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center border-2 border-gray-200 dark:border-zinc-700 mb-4">
+                <span class="text-slate-600 dark:text-zinc-300 font-semibold text-2xl">{{ userInitials }}</span>
               </div>
               
-              <!-- Info rápida -->
-              <div class="p-4 space-y-3">
-                <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-zinc-800">
-                  <span class="text-sm text-gray-500 dark:text-zinc-400">Rol</span>
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">{{ currentUser?.role?.name || 'Usuario' }}</span>
-                </div>
-                <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-zinc-800">
-                  <span class="text-sm text-gray-500 dark:text-zinc-400">Plan</span>
-                  <span class="text-sm font-medium text-gray-900 dark:text-white capitalize">{{ planDisplayName }}</span>
-                </div>
-                <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-zinc-800">
-                  <span class="text-sm text-gray-500 dark:text-zinc-400">ID</span>
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">#{{ currentUser?.id || '-' }}</span>
-                </div>
-                <div class="flex items-center justify-between py-2">
-                  <span class="text-sm text-gray-500 dark:text-zinc-400">Estado</span>
-                  <span 
-                    :class="userIsActive 
-                      ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' 
-                      : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800'"
-                    class="px-2.5 py-1 rounded-full text-xs font-bold border"
-                  >
-                    {{ userIsActive ? 'Activo' : 'Inactivo' }}
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ currentUser?.name || 'Usuario' }}</h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">{{ currentUser?.email || '' }}</p>
+              
+              <div class="flex items-center justify-center gap-2 mt-3 flex-wrap">
+                <span class="px-2.5 py-1 text-xs font-medium bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 rounded-full">
+                  {{ currentUser?.role?.name || 'Usuario' }}
+                </span>
+                <span class="px-2.5 py-1 text-xs font-medium bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 rounded-full capitalize">
+                  {{ planDisplayName }}
+                </span>
+                <span 
+                  class="px-2.5 py-1 text-xs font-medium rounded-full border"
+                  :class="userIsActive 
+                    ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' 
+                    : 'bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 border-gray-200 dark:border-zinc-700'"
+                >
+                  {{ userIsActive ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjeta: Seguridad -->
+          <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm p-5">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide mb-4">Seguridad</h2>
+            
+            <!-- Usuario de Google -->
+            <div v-if="isGoogleUser" class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-lg bg-white border border-gray-200 dark:border-zinc-700 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-sm font-medium text-gray-900 dark:text-white">Google</span>
+                  <span class="px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[10px] font-medium rounded border border-blue-200 dark:border-blue-800">
+                    Conectado
                   </span>
                 </div>
+                <p class="text-xs text-gray-500 dark:text-zinc-400">Tu contraseña es administrada por Google</p>
+                <a href="https://myaccount.google.com/security" target="_blank" class="inline-flex items-center gap-1 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mt-2 transition-colors">
+                  Administrar seguridad
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
               </div>
-            </div>
-            
-          </div>
-          
-          <!-- Columna Derecha: Formularios (2 cols) -->
-          <div class="lg:col-span-2 space-y-6">
-            
-            <!-- Información Personal -->
-            <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
-              <div class="flex items-center gap-3 mb-5">
-                <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="text-lg font-bold text-gray-900 dark:text-white">Información Personal</h3>
-                  <p class="text-xs text-gray-500 dark:text-zinc-400">Actualiza tus datos de contacto</p>
-                </div>
-              </div>
-              
-              <form @submit.prevent="saveProfile" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <!-- Nombre -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Nombre Completo</label>
-                    <input
-                      v-model="formData.name"
-                      type="text"
-                      required
-                      class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                      placeholder="Tu nombre"
-                    />
-                  </div>
-                  
-                  <!-- Email (solo lectura) -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Correo Electrónico</label>
-                    <input
-                      v-model="formData.email"
-                      type="email"
-                      disabled
-                      class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800/50 text-gray-500 dark:text-zinc-400 rounded-lg cursor-not-allowed"
-                    />
-                  </div>
-                  
-                  <!-- Cédula -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Cédula / Documento</label>
-                    <input
-                      v-model="formData.cc"
-                      type="text"
-                      class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                      placeholder="Número de documento"
-                    />
-                  </div>
-                  
-                  <!-- Teléfono -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Teléfono</label>
-                    <input
-                      v-model="formData.phone"
-                      type="tel"
-                      class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                      placeholder="+57 300 123 4567"
-                    />
-                  </div>
-                </div>
-                
-                <!-- Botón Guardar -->
-                <div class="flex justify-end pt-2">
-                  <button
-                    type="submit"
-                    :disabled="savingProfile"
-                    class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:opacity-50 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
-                  >
-                    <svg v-if="savingProfile" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    {{ savingProfile ? 'Guardando...' : 'Guardar Cambios' }}
-                  </button>
-                </div>
-              </form>
             </div>
 
-            <!-- Seguridad - Cambio de Contraseña (Solo para usuarios NO de Google) -->
-            <div v-if="!isGoogleUser" class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
-              <div class="flex items-center gap-3 mb-5">
-                <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                  </svg>
+            <!-- Usuario de Email/Contraseña -->
+            <div v-else>
+              <form @submit.prevent="changePassword" class="space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Contraseña actual</label>
+                  <div class="relative">
+                    <input v-model="passwordData.current_password" :type="showCurrentPassword ? 'text' : 'password'" required class="w-full px-3 py-2 pr-9 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-slate-500" placeholder="••••••••"/>
+                    <button type="button" @click="showCurrentPassword = !showCurrentPassword" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
+                  </div>
                 </div>
                 <div>
-                  <h3 class="text-lg font-bold text-gray-900 dark:text-white">Seguridad</h3>
-                  <p class="text-xs text-gray-500 dark:text-zinc-400">Cambia tu contraseña de acceso</p>
+                  <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Nueva contraseña</label>
+                  <div class="relative">
+                    <input v-model="passwordData.new_password" :type="showNewPassword ? 'text' : 'password'" required minlength="8" class="w-full px-3 py-2 pr-9 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-slate-500" placeholder="Mínimo 8 caracteres"/>
+                    <button type="button" @click="showNewPassword = !showNewPassword" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              
-              <form @submit.prevent="changePassword" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <!-- Contraseña Actual -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Contraseña Actual</label>
-                    <div class="relative">
-                      <input
-                        v-model="passwordData.current_password"
-                        :type="showCurrentPassword ? 'text' : 'password'"
-                        required
-                        class="w-full px-3 py-2.5 pr-10 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                        placeholder="••••••••"
-                      />
-                      <button type="button" @click="showCurrentPassword = !showCurrentPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <svg v-if="showCurrentPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <!-- Nueva Contraseña -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Nueva Contraseña</label>
-                    <div class="relative">
-                      <input
-                        v-model="passwordData.new_password"
-                        :type="showNewPassword ? 'text' : 'password'"
-                        required
-                        minlength="8"
-                        class="w-full px-3 py-2.5 pr-10 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                        placeholder="Mínimo 8 caracteres"
-                      />
-                      <button type="button" @click="showNewPassword = !showNewPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <svg v-if="showNewPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <!-- Confirmar Contraseña -->
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Confirmar Nueva</label>
-                    <div class="relative">
-                      <input
-                        v-model="passwordData.confirm_password"
-                        :type="showConfirmPassword ? 'text' : 'password'"
-                        required
-                        minlength="8"
-                        class="w-full px-3 py-2.5 pr-10 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                        placeholder="Repite la contraseña"
-                      />
-                      <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        <svg v-if="showConfirmPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
-                      </button>
-                    </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Confirmar contraseña</label>
+                  <div class="relative">
+                    <input v-model="passwordData.confirm_password" :type="showConfirmPassword ? 'text' : 'password'" required minlength="8" class="w-full px-3 py-2 pr-9 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-slate-500" placeholder="Repite la contraseña"/>
+                    <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
                   </div>
                 </div>
                 
                 <!-- Indicador de fortaleza -->
-                <div v-if="passwordData.new_password" class="flex items-center gap-3">
-                  <div class="flex-1 h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                    <div 
-                      class="h-full transition-all duration-300 rounded-full"
-                      :class="passwordStrengthClass"
-                      :style="{ width: passwordStrength + '%' }"
-                    ></div>
+                <div v-if="passwordData.new_password" class="flex items-center gap-2">
+                  <div class="flex gap-1 flex-1">
+                    <div class="h-1 flex-1 rounded-full transition-all" :class="passwordStrength >= 33 ? passwordStrengthClass : 'bg-gray-200 dark:bg-zinc-700'"></div>
+                    <div class="h-1 flex-1 rounded-full transition-all" :class="passwordStrength >= 66 ? passwordStrengthClass : 'bg-gray-200 dark:bg-zinc-700'"></div>
+                    <div class="h-1 flex-1 rounded-full transition-all" :class="passwordStrength >= 100 ? passwordStrengthClass : 'bg-gray-200 dark:bg-zinc-700'"></div>
                   </div>
-                  <span class="text-xs font-medium min-w-[50px]" :class="passwordStrengthTextClass">{{ passwordStrengthText }}</span>
+                  <span class="text-[10px] font-medium" :class="passwordStrengthTextClass">{{ passwordStrengthText }}</span>
                 </div>
                 
-                <!-- Error de confirmación -->
-                <p v-if="passwordData.confirm_password && passwordData.new_password !== passwordData.confirm_password" class="text-xs text-rose-600 dark:text-rose-400">
-                  Las contraseñas no coinciden
-                </p>
+                <p v-if="passwordData.confirm_password && passwordData.new_password !== passwordData.confirm_password" class="text-xs text-rose-600 dark:text-rose-400">Las contraseñas no coinciden</p>
                 
-                <!-- Botón Cambiar -->
-                <div class="flex justify-end pt-2">
-                  <button
-                    type="submit"
-                    :disabled="savingPassword || !canChangePassword"
-                    class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-amber-400/40 transition-all duration-300 flex items-center gap-2"
-                  >
-                    <svg v-if="savingPassword" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                    </svg>
-                    {{ savingPassword ? 'Cambiando...' : 'Cambiar Contraseña' }}
-                  </button>
-                </div>
+                <button type="submit" :disabled="savingPassword || !canChangePassword" class="w-full px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2">
+                  <svg v-if="savingPassword" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  {{ savingPassword ? 'Actualizando...' : 'Cambiar contraseña' }}
+                </button>
               </form>
             </div>
+          </div>
+        </div>
 
-            <!-- Mensaje para usuarios de Google -->
-            <div v-if="isGoogleUser" class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-6">
-              <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
+        <!-- COLUMNA DERECHA: Información Personal (más ancha) -->
+        <div class="lg:col-span-2">
+          <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
+              <h2 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">Información personal</h2>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Datos de contacto y facturación</p>
+            </div>
+            
+            <form @submit.prevent="saveProfile" class="p-5">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Nombre completo</label>
+                  <input v-model="formData.name" type="text" required class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-slate-500" placeholder="Ingresa tu nombre"/>
                 </div>
                 <div>
-                  <h3 class="text-lg font-bold text-gray-900 dark:text-white">Autenticación con Google</h3>
-                  <p class="text-xs text-gray-500 dark:text-zinc-400">Tu cuenta está protegida por Google</p>
+                  <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Correo electrónico</label>
+                  <input v-model="formData.email" type="email" disabled class="w-full px-3 py-2.5 text-sm border border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/50 text-gray-400 dark:text-zinc-500 rounded-lg cursor-not-allowed"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Documento de identidad</label>
+                  <input v-model="formData.cc" type="text" class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-slate-500" placeholder="Número de cédula o NIT"/>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Teléfono de contacto</label>
+                  <input v-model="formData.phone" type="tel" class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg focus:ring-2 focus:ring-slate-500" placeholder="+57 300 000 0000"/>
                 </div>
               </div>
               
-              <div class="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-xl p-4">
-                <p class="text-sm text-blue-800 dark:text-blue-300">
-                  Iniciaste sesión con tu cuenta de Google. La seguridad de tu contraseña es administrada directamente por Google.
-                </p>
+              <div class="flex justify-end pt-4 mt-4 border-t border-gray-100 dark:border-zinc-800">
+                <button type="submit" :disabled="savingProfile" class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-all flex items-center gap-2">
+                  <svg v-if="savingProfile" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  {{ savingProfile ? 'Guardando...' : 'Guardar cambios' }}
+                </button>
               </div>
-            </div>
-            
+            </form>
           </div>
         </div>
         
@@ -314,8 +197,15 @@ const currentUser = computed(() => auth.user.value)
 const tenantPlan = computed(() => appStore.tenantPlan || 'free_trial')
 
 // Detectar si el usuario inició sesión con Google
+// Chequeamos múltiples fuentes: google_id del usuario, o flag en localStorage
 const isGoogleUser = computed(() => {
-  return currentUser.value?.google_id !== null && currentUser.value?.google_id !== undefined
+  // 1. Verificar google_id en el objeto de usuario
+  if (currentUser.value?.google_id) return true
+  
+  // 2. Verificar flag en localStorage (guardado al hacer login con Google)
+  if (localStorage.getItem('google_login') === 'true') return true
+  
+  return false
 })
 
 // El usuario siempre está activo si está logueado

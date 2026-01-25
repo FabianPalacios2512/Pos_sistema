@@ -204,11 +204,3 @@ select option {
 .safe-area-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
-
-/* 
-   FIX: Compensación de altura para pantallas con zoom (Windows 125%+)
-   Cuando se aplica zoom al html, 100vh se reduce. Esto restaura la altura visual completa.
-*/
-body.screen-compensated .min-h-screen {
-  min-height: calc(100vh * var(--inv-scale, 1)) !important;
-}

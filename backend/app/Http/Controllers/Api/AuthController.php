@@ -106,9 +106,39 @@ class AuthController extends Controller
 
         $token = $user->createToken('api-token')->plainTextToken;
 
+        // 🔥 VERIFICAR SI EL TENANT TIENE UN PLAN VÁLIDO
+        $tenant = tenant();
+        $validPlans = ['basic', 'premium', 'enterprise', 'free_trial'];
+        $needsPlanSelection = false;
+        $tenantInfo = null;
+        
+        if ($tenant) {
+            $planType = $tenant->plan ?? 'pending';
+            $subscriptionStatus = 'pending';
+            
+            if ($tenant->subscription_ends_at && now()->isBefore($tenant->subscription_ends_at)) {
+                $subscriptionStatus = 'active';
+            } elseif ($tenant->subscription_ends_at && now()->isAfter($tenant->subscription_ends_at)) {
+                $subscriptionStatus = 'expired';
+            }
+            
+            // Si no tiene plan válido, enviar señal al frontend
+            if (!in_array($planType, $validPlans) || $subscriptionStatus === 'pending') {
+                $needsPlanSelection = true;
+                $tenantInfo = [
+                    'id' => $tenant->id,
+                    'business_name' => $tenant->business_name,
+                    'plan_type' => $planType,
+                    'subscription_status' => $subscriptionStatus
+                ];
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Inicio de sesión exitoso',
+            'needs_plan_selection' => $needsPlanSelection, // 🔥 NUEVO FLAG
+            'tenant' => $tenantInfo, // 🔥 INFO DEL TENANT SI NECESITA PLAN
             'data' => [
                 'user' => [
                     'id' => $user->id,

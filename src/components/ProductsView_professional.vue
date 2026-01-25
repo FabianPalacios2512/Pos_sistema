@@ -1886,7 +1886,7 @@
 
   <!-- Modal: Crear Proveedor Rápido -->
   <div v-if="showSupplierModal" 
-       class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80  flex items-center justify-center p-4"
+       class="fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black/80  flex items-center justify-center p-4"
        style="z-index: 60000"
        @click.self="showSupplierModal = false">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full animate-fade-in">
@@ -2189,7 +2189,7 @@
   <!-- Modal: No hay categorías (Teleport para escapar del contenedor) -->
   <Teleport to="body">
     <div v-if="showNoCategoriesModal" 
-         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/70  flex items-center justify-center p-4"
+         class="fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black/70  flex items-center justify-center p-4"
          style="z-index: 50000; margin: 0 !important;"
          @click.self="showNoCategoriesModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full p-6 animate-fade-in">
@@ -2223,7 +2223,7 @@
   <!-- Modal: Crear Categoría (Teleport para escapar del contenedor) -->
   <Teleport to="body">
     <div v-if="showCategoryModal" 
-         class="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black/80  flex items-center justify-center p-4"
+         class="fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black/80  flex items-center justify-center p-4"
          style="z-index: 60000; margin: 0 !important;"
          @click.self="showCategoryModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-lg w-full animate-fade-in">

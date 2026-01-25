@@ -503,10 +503,10 @@ const proceedToPayment = async () => {
     verificationToken = initResponse.data.verification_token
     paymentReference = reference
 
-    // Configurar ePayco con la API Key correcta
+    // Configurar ePayco con la API Key correcta - PRODUCCIÓN
     const handler = window.ePayco.checkout.configure({
-      key: '2943652c673afffaa5b7b67829f00a0c', // API Key de producción
-      test: true // Mantener en TRUE para usar tarjeta de prueba
+      key: 'de4263d3e7094669c4d837ad7dadb69e', // ✅ PUBLIC_KEY Producción
+      test: false // ✅ MODO PRODUCCIÓN - Usar tarjetas reales
     })
 
     // Obtener URL de respuesta correcta (usar verificación)

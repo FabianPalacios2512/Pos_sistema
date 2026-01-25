@@ -13,9 +13,9 @@ $reference = $argv[1] ?? 'upgrade_fabiana_1767297611588';
 
 echo "📋 Referencia a consultar: {$reference}\n\n";
 
-// Credenciales
-$publicKey = '2943652c673afffaa5b7b67829f00a0c';
-$privateKey = 'e893ca6c08e3caeab2da3634a25de91c';
+// ✅ Credenciales de PRODUCCIÓN - Actualizadas 24/01/2026
+$publicKey = 'de4263d3e7094669c4d837ad7dadb69e';
+$privateKey = 'd189d75b9ab72d6d2541ecbf97051ed8';
 
 $client = new \GuzzleHttp\Client([
     'base_uri' => 'https://secure.epayco.co/',

@@ -218,8 +218,8 @@ class AdminAIMonitoringController extends Controller
 
         $keys = [];
         for ($i = 1; $i <= 10; $i++) {
-            // Verificar si la key existe en .env
-            $envKey = env("GROQ_API_KEY_{$i}");
+            // Verificar si la key existe (usando config() para compatibilidad con cache)
+            $envKey = config("services.groq.api_key_{$i}");
 
             if (!empty($envKey)) {
                 $keyQuery = (clone $query)->where('api_key_index', $i);

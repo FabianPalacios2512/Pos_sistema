@@ -9,9 +9,9 @@ require __DIR__ . '/vendor/autoload.php';
 echo "🧪 TEST DIRECTO EPAYCO - CREANDO TRANSACCIÓN\n";
 echo "============================================\n\n";
 
-// Credenciales de ePayco
-$publicKey = '2943652c673afffaa5b7b67829f00a0c';
-$privateKey = 'e893ca6c08e3caeab2da3634a25de91c'; // Necesitamos la private key
+// ✅ Credenciales de PRODUCCIÓN - Actualizadas 24/01/2026
+$publicKey = 'de4263d3e7094669c4d837ad7dadb69e';
+$privateKey = 'd189d75b9ab72d6d2541ecbf97051ed8'; // PRIVATE_KEY de producción
 
 echo "📋 Configuración:\n";
 echo "Public Key: {$publicKey}\n";

@@ -27,7 +27,8 @@ class User extends Authenticatable
         'phone',
         'active',
         'last_login',
-        'tour_completed'
+        'tour_completed',
+        'google_id'
     ];
 
     /**

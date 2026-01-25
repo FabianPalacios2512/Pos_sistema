@@ -1,26 +1,61 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Jobs;
 
-use Stancl\Tenancy\Contracts\Tenant;
-use Stancl\Tenancy\Contracts\TenantWithDatabase;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Stancl\Tenancy\Contracts\TenantWithDatabase;
 
 /**
  * Job para crear el symlink de storage cuando se crea un tenant.
  * 
- * Crea DOS symlinks:
- * 1. storage/app/public/tenants/{tenant_id} -> storage/tenant{tenant_id}/app/public
- * 2. public/storage/tenants/{tenant_id} -> storage/tenant{tenant_id}/app/public
+ * ARQUITECTURA DE SYMLINKS:
+ * ========================
+ * 1. public/storage -> ../storage/app/public (symlink principal, creado por php artisan storage:link)
+ * 2. storage/app/public/tenants/{tenant_id} -> storage/tenant{tenant_id}/app/public (este job)
+ * 
+ * Con esta estructura, las URLs funcionan así:
+ * https://tenant.105pos.pro/storage/tenants/{tenant_id}/products/image.jpg
+ *   -> public/storage (symlink) -> storage/app/public
+ *   -> storage/app/public/tenants/{tenant_id} (symlink) -> storage/tenant{tenant_id}/app/public
+ *   -> storage/tenant{tenant_id}/app/public/products/image.jpg (archivo real)
+ * 
+ * ⚠️ IMPORTANTE: NO crear symlinks dentro de public/storage/tenants/ directamente,
+ * ya que eso requeriría que public/storage sea un directorio real en lugar de symlink.
  */
-class CreateTenantStorageLink
+class CreateTenantStorageLink implements ShouldQueue
 {
-    public function handle(Tenant $tenant): void
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    /** @var TenantWithDatabase|Model */
+    protected $tenant;
+
+    /**
+     * Create a new job instance.
+     *
+     * @param TenantWithDatabase $tenant
+     */
+    public function __construct(TenantWithDatabase $tenant)
     {
-        $tenantId = $tenant->getTenantKey();
+        $this->tenant = $tenant;
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        $tenantId = $this->tenant->getTenantKey();
         
-        Log::info("🔗 [Tenant Storage] Creando symlinks para tenant: {$tenantId}");
+        Log::info("🔗 [Tenant Storage] Creando symlink para tenant: {$tenantId}");
         
         try {
             // Ruta del storage del tenant (donde se guardan realmente los archivos)
@@ -42,42 +77,46 @@ class CreateTenantStorageLink
             }
             
             // ========================================
-            // SYMLINK 1: storage/app/public/tenants/{tenant_id}
+            // SYMLINK: storage/app/public/tenants/{tenant_id}
+            // Apunta a: storage/tenant{tenant_id}/app/public
             // ========================================
             $storageTenantsDir = storage_path('app/public/tenants');
             if (!is_dir($storageTenantsDir)) {
                 File::makeDirectory($storageTenantsDir, 0755, true);
             }
             
-            $symlinkPath1 = "{$storageTenantsDir}/{$tenantId}";
-            if (!is_link($symlinkPath1) && !is_dir($symlinkPath1)) {
-                if (@symlink($tenantStoragePath, $symlinkPath1)) {
-                    Log::info("✅ [Tenant Storage] Symlink 1 creado: {$symlinkPath1}");
+            $symlinkPath = "{$storageTenantsDir}/{$tenantId}";
+            
+            // Si ya existe como directorio, eliminarlo primero
+            if (is_dir($symlinkPath) && !is_link($symlinkPath)) {
+                Log::warning("⚠️ [Tenant Storage] Eliminando directorio existente: {$symlinkPath}");
+                File::deleteDirectory($symlinkPath);
+            }
+            
+            // Si ya existe como symlink roto, eliminarlo
+            if (is_link($symlinkPath) && !file_exists($symlinkPath)) {
+                Log::warning("⚠️ [Tenant Storage] Eliminando symlink roto: {$symlinkPath}");
+                unlink($symlinkPath);
+            }
+            
+            // Crear el symlink si no existe
+            if (!is_link($symlinkPath)) {
+                if (@symlink($tenantStoragePath, $symlinkPath)) {
+                    Log::info("✅ [Tenant Storage] Symlink creado: {$symlinkPath} -> {$tenantStoragePath}");
                 } else {
-                    Log::warning("⚠️ [Tenant Storage] No se pudo crear symlink 1: {$symlinkPath1}");
+                    Log::warning("⚠️ [Tenant Storage] No se pudo crear symlink: {$symlinkPath}");
                 }
+            } else {
+                Log::info("ℹ️ [Tenant Storage] Symlink ya existe: {$symlinkPath}");
             }
             
             // ========================================
-            // SYMLINK 2: public/storage/tenants/{tenant_id}
+            // VERIFICAR symlink principal public/storage
             // ========================================
-            $publicTenantsDir = public_path('storage/tenants');
-            if (!is_dir($publicTenantsDir)) {
-                // Asegurar que public/storage existe
-                $publicStorageDir = public_path('storage');
-                if (!is_dir($publicStorageDir)) {
-                    File::makeDirectory($publicStorageDir, 0755, true);
-                }
-                File::makeDirectory($publicTenantsDir, 0755, true);
-            }
+            $publicStoragePath = public_path('storage');
             
-            $symlinkPath2 = "{$publicTenantsDir}/{$tenantId}";
-            if (!is_link($symlinkPath2) && !is_dir($symlinkPath2)) {
-                if (@symlink($tenantStoragePath, $symlinkPath2)) {
-                    Log::info("✅ [Tenant Storage] Symlink 2 creado (público): {$symlinkPath2}");
-                } else {
-                    Log::warning("⚠️ [Tenant Storage] No se pudo crear symlink 2: {$symlinkPath2}");
-                }
+            if (!is_link($publicStoragePath)) {
+                Log::warning("⚠️ [Tenant Storage] public/storage no es un symlink. Ejecutar: php artisan storage:link");
             }
             
             Log::info("🎉 [Tenant Storage] Symlinks configurados exitosamente para: {$tenantId}");

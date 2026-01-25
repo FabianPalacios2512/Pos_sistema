@@ -101,6 +101,7 @@ const authService = {
       // Limpiar datos locales
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
+      localStorage.removeItem('google_login'); // 🔥 Limpiar flag de login con Google
       localStorage.removeItem('onboarding_completed'); // 🔥 Limpiar flag de onboarding
       localStorage.removeItem('welcome_seen'); // 🔥 Limpiar flag de welcome
       delete apiClient.defaults.headers.common['Authorization'];

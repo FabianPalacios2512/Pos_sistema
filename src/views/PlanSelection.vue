@@ -554,6 +554,19 @@ onMounted(() => {
   const companyParam = urlParams.get('company')
   const subdomainParam = urlParams.get('subdomain') // 🔥 LEER EL SUBDOMAIN
   const redirectParam = urlParams.get('redirect_url')
+  const authTokenParam = urlParams.get('auth_token') // 🔑 LEER TOKEN DE LA URL
+  
+  // 🔑 CRÍTICO: Si viene un token en la URL, guardarlo en localStorage
+  if (authTokenParam) {
+    const decodedToken = decodeURIComponent(authTokenParam)
+    console.log('🔑 Token recibido desde URL - guardando en localStorage')
+    localStorage.setItem('authToken', decodedToken)
+    
+    // Limpiar el token de la URL por seguridad
+    const cleanUrl = new URL(window.location.href)
+    cleanUrl.searchParams.delete('auth_token')
+    window.history.replaceState({}, document.title, cleanUrl.toString())
+  }
   
   if (tenantIdParam) {
     // Datos vienen de URL params (cross-domain desde registro)
@@ -670,10 +683,10 @@ const handlePlanSelection = async (plan) => {
       tenant_id: tenantId.value
     })
 
-    // Configurar ePayco
+    // Configurar ePayco - PRODUCCIÓN
     const handler = window.ePayco.checkout.configure({
-      key: '2943652c673afffaa5b7b67829f00a0c',
-      test: true
+      key: 'de4263d3e7094669c4d837ad7dadb69e', // ✅ PUBLIC_KEY Producción
+      test: false // ✅ MODO PRODUCCIÓN
     })
 
     const data = {

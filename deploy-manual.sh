@@ -61,6 +61,10 @@ ssh root@72.61.73.245 "cd /var/www/105pos/backend && \
   sudo systemctl restart php8.3-fpm"
 
 echo ""
+echo "🔗 Fixing tenant storage symlinks..."
+ssh root@72.61.73.245 "cd /var/www/105pos/backend && php fix_tenant_symlinks.php"
+
+echo ""
 echo "✅ Deploy manual completado!"
 echo "🌐 Verifica en: https://maria.105pos.pro/pos"
 echo ""

@@ -11,11 +11,11 @@ use Epayco\Epayco;
 echo "🧪 TEST COMPLETO EPAYCO - SDK OFICIAL\n";
 echo "====================================\n\n";
 
-// Credenciales CORRECTAS
-$apiKey = '1569644'; // P_CUST_ID_CLIENTE
-$privateKey = 'bbc93c88d4780f0898bbe4e9ed29e6bc8e33ca72'; // P_KEY
-$publicKey = '2943652c673afffaa5b7b67829f00a0c'; // PUBLIC_KEY (para checkout)
-$test = true;
+// ✅ Credenciales de PRODUCCIÓN - Actualizadas 24/01/2026
+$apiKey = '1571846'; // P_CUST_ID_CLIENTE
+$privateKey = 'e5e7233edaaf62678da861c1befbd92a47f3a1a6'; // P_KEY
+$publicKey = 'de4263d3e7094669c4d837ad7dadb69e'; // PUBLIC_KEY (para checkout)
+$test = false; // MODO PRODUCCIÓN
 
 echo "📋 Configuración:\n";
 echo "Public Key: {$publicKey}\n";

@@ -680,18 +680,18 @@
       
       <div class="p-3 overflow-y-auto bg-gray-100/80 dark:bg-zinc-800/40" style="flex: 1 1 0; min-height: 0; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
         
-        <!-- Loading skeleton - SOLO mostrar si está cargando Y NO hay productos previos -->
-        <!-- Esto evita el parpadeo molesto cuando ya hay productos cargados -->
-      <div v-if="showSkeletonLoaders" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
-          <div v-for="n in 10" :key="n" class="bg-white dark:bg-zinc-800/50 rounded-2xl p-3 border border-gray-100 dark:border-zinc-700/50 shadow-sm">
-            <div class="aspect-square bg-gray-100 dark:bg-zinc-700/50 rounded-xl mb-3 animate-pulse"></div>
-            <div class="h-4 bg-gray-100 dark:bg-zinc-700/50 rounded-lg w-2/3 mb-2 animate-pulse"></div>
-            <div class="h-3 bg-gray-100 dark:bg-zinc-700/50 rounded-lg w-1/3 animate-pulse"></div>
+        <!-- Loading spinner elegante - SOLO si está cargando Y no hay productos previos Y pasó el delay -->
+        <!-- Evita flash al cargar rápido, muestra loader limpio en vez de skeletons feos -->
+      <div v-if="showLoadingSpinner" class="h-full flex flex-col items-center justify-center text-center py-12 min-h-[400px]">
+        <div class="relative">
+          <!-- Spinner animado -->
+          <div class="w-12 h-12 border-4 border-slate-200 dark:border-zinc-700 border-t-slate-600 dark:border-t-zinc-400 rounded-full animate-spin"></div>
         </div>
+        <p class="mt-4 text-sm text-gray-500 dark:text-zinc-400">Cargando productos...</p>
       </div>
       
       <!-- Primera vez: NO hay productos en la base de datos - Icono Limpio y Profesional -->
-      <div v-else-if="isFirstTimeNoProducts" class="h-full flex flex-col items-center justify-center text-center py-8 min-h-[500px]">
+      <div v-else-if="isFirstTimeNoProducts" class="h-full flex flex-col items-center justify-center text-center py-8 min-h-[400px]">
         
         <!-- Icono de Carrito Profesional -->
         <div class="w-24 h-24 mb-5 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-zinc-800 dark:to-zinc-800/50 border border-slate-200 dark:border-zinc-700 flex items-center justify-center shadow-lg shadow-slate-200/50 dark:shadow-black/30">
@@ -3224,17 +3224,41 @@ const isNewProduct = (product) => {
 // Número de factura real desde el backend
 const nextInvoiceNumber = ref('FACT-000001') // Valor inicial por defecto
 
-// 🔧 FIX: Solo mostrar skeleton loaders cuando se carga Y NO hay productos previos
-// Esto evita el parpadeo molesto al entrar al POS cuando ya hay productos en cache
-const showSkeletonLoaders = computed(() => {
-  // Mostrar skeleton SOLO si está cargando Y no hay productos aún
-  return productsLoading.value && (products.value?.length || 0) === 0
+// 🔧 FIX: Mostrar spinner de carga SOLO después de un delay para evitar flash
+// Esto previene el parpadeo molesto cuando la carga es rápida
+const loadingDelayPassed = ref(false)
+let loadingDelayTimer = null
+
+// Watcher para manejar el delay de loading
+watch(productsLoading, (isLoading) => {
+  if (isLoading) {
+    // Iniciar timer - solo mostrar spinner si la carga tarda más de 200ms
+    loadingDelayTimer = setTimeout(() => {
+      loadingDelayPassed.value = true
+    }, 200)
+  } else {
+    // Limpiar timer y resetear
+    if (loadingDelayTimer) {
+      clearTimeout(loadingDelayTimer)
+      loadingDelayTimer = null
+    }
+    loadingDelayPassed.value = false
+  }
+})
+
+// Mostrar spinner de carga elegante (reemplaza los skeletons feos)
+const showLoadingSpinner = computed(() => {
+  // Mostrar spinner SOLO si:
+  // 1. Está cargando productos
+  // 2. NO hay productos aún
+  // 3. Pasó el delay mínimo (200ms) para evitar flash
+  return productsLoading.value && (products.value?.length || 0) === 0 && loadingDelayPassed.value
 })
 
 // Detectar si es primera vez (NO hay productos en la base de datos)
 const isFirstTimeNoProducts = computed(() => {
-  // Si estamos mostrando skeleton, no mostrar mensaje de "primera vez"
-  if (showSkeletonLoaders.value) return false
+  // Si estamos mostrando spinner, no mostrar mensaje de "primera vez"
+  if (showLoadingSpinner.value || productsLoading.value) return false
   
   // Si NO hay productos en absoluto (sin filtros ni búsqueda)
   const totalProducts = products.value?.length || 0
@@ -3243,8 +3267,8 @@ const isFirstTimeNoProducts = computed(() => {
 
 // Detectar si el resultado vacío es por filtros/búsqueda
 const isEmptyByFilters = computed(() => {
-  // No mostrar si hay skeleton o es primera vez
-  if (showSkeletonLoaders.value || isFirstTimeNoProducts.value) return false
+  // No mostrar si hay spinner o es primera vez
+  if (showLoadingSpinner.value || isFirstTimeNoProducts.value) return false
   
   // Hay productos en la BD pero filteredProducts está vacío
   const totalProducts = products.value?.length || 0

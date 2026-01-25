@@ -55,14 +55,16 @@ class GoogleAuthController extends Controller
                 return redirect($frontendUrl . '/register?error=no_code');
             }
 
-            // Intercambiar código por token de acceso
-            $tokenResponse = Http::asForm()->post('https://oauth2.googleapis.com/token', [
-                'code' => $code,
-                'client_id' => config('services.google.client_id'),
-                'client_secret' => config('services.google.client_secret'),
-                'redirect_uri' => config('services.google.redirect_uri'),
-                'grant_type' => 'authorization_code'
-            ]);
+            // Intercambiar código por token de acceso (con timeout extendido)
+            $tokenResponse = Http::timeout(30)
+                ->asForm()
+                ->post('https://oauth2.googleapis.com/token', [
+                    'code' => $code,
+                    'client_id' => config('services.google.client_id'),
+                    'client_secret' => config('services.google.client_secret'),
+                    'redirect_uri' => config('services.google.redirect_uri'),
+                    'grant_type' => 'authorization_code'
+                ]);
 
             if (!$tokenResponse->successful()) {
                 return response()->json([
@@ -74,8 +76,9 @@ class GoogleAuthController extends Controller
 
             $accessToken = $tokenResponse->json()['access_token'];
 
-            // Obtener información del usuario de Google
-            $userResponse = Http::withToken($accessToken)
+            // Obtener información del usuario de Google (con timeout extendido)
+            $userResponse = Http::timeout(30) // Aumentar timeout a 30 segundos
+                ->withToken($accessToken)
                 ->get('https://www.googleapis.com/oauth2/v2/userinfo');
 
             if (!$userResponse->successful()) {
@@ -476,14 +479,44 @@ class GoogleAuthController extends Controller
                 ];
             });
 
+            // 🔥 VERIFICAR SI EL TENANT TIENE UN PLAN VÁLIDO
+            $validPlans = ['basic', 'premium', 'enterprise', 'free_trial'];
+            $needsPlanSelection = false;
+            $tenantInfo = null;
+            
+            if ($tenant) {
+                $planType = $tenant->plan ?? 'pending';
+                $subscriptionStatus = 'pending';
+                
+                if ($tenant->subscription_ends_at && now()->isBefore($tenant->subscription_ends_at)) {
+                    $subscriptionStatus = 'active';
+                } elseif ($tenant->subscription_ends_at && now()->isAfter($tenant->subscription_ends_at)) {
+                    $subscriptionStatus = 'expired';
+                }
+                
+                // Si no tiene plan válido, enviar señal al frontend
+                if (!in_array($planType, $validPlans) || $subscriptionStatus === 'pending') {
+                    $needsPlanSelection = true;
+                    $tenantInfo = [
+                        'id' => $tenant->id,
+                        'business_name' => $tenant->business_name,
+                        'plan_type' => $planType,
+                        'subscription_status' => $subscriptionStatus
+                    ];
+                }
+            }
+
             \Log::info('✅ Token Sanctum generado para usuario de Google', [
                 'user_id' => $sessionData['user_id'],
                 'tenant_id' => $sessionData['tenant_id'],
-                'email' => $sessionData['email']
+                'email' => $sessionData['email'],
+                'needs_plan_selection' => $needsPlanSelection
             ]);
 
             return response()->json([
                 'success' => true,
+                'needs_plan_selection' => $needsPlanSelection, // 🔥 NUEVO FLAG
+                'tenant' => $tenantInfo, // 🔥 INFO DEL TENANT SI NECESITA PLAN
                 'data' => [
                     'token' => $authToken,
                     'user' => $userData

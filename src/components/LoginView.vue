@@ -426,14 +426,40 @@ onMounted(async () => {
         password: creds.password
       })
 
-      // Verificar rol y redireccionar INMEDIATAMENTE al POS (sin delay)
+      // Verificar rol y redireccionar INMEDIATAMENTE
       const user = response.data?.user || response.user
       
       if (user?.is_super_admin || user?.role?.name === 'superadmin') {
         router.push('/admin/god-mode')
-      } else {
-        router.push('/pos')
+        return
       }
+      
+      // 🔥 VERIFICAR SI EL BACKEND INDICA QUE NECESITA SELECCIONAR PLAN
+      if (response.needs_plan_selection && response.tenant) {
+        const tenant = response.tenant
+        const subdomain = tenant.id
+        const companyName = tenant.business_name || ''
+        
+        const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+        const baseUrl = isLocalhost ? `http://localhost:${window.location.port || 3000}` : 'https://105pos.pro'
+        
+        const params = new URLSearchParams()
+        if (subdomain) params.append('tenant_id', subdomain)
+        if (subdomain) params.append('subdomain', subdomain)
+        if (companyName) params.append('company', companyName)
+        
+        // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+        const currentToken = localStorage.getItem('authToken')
+        if (currentToken) {
+          params.append('auth_token', encodeURIComponent(currentToken))
+        }
+        
+        window.location.href = `${baseUrl}/select-plan?${params.toString()}`
+        return
+      }
+      
+      // Si todo está bien, ir al POS
+      router.push('/pos')
       
       return
     } catch (error) {
@@ -504,12 +530,54 @@ onMounted(async () => {
         localStorage.setItem('authToken', token)
         localStorage.setItem('user', JSON.stringify(user))
         
+        // 🔥 Marcar que este usuario inició sesión con Google
+        localStorage.setItem('google_login', 'true')
+        
         // Configurar token en axios global
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
         
         message.text = '✅ Inicio de sesión exitoso. Redirigiendo...'
         message.type = 'success'
         
+        // 🔥 VERIFICAR SI EL BACKEND INDICA QUE NECESITA SELECCIONAR PLAN
+        console.log('🔍 DEBUG Google Login - Respuesta completa:', JSON.stringify(response.data, null, 2))
+        console.log('🔍 DEBUG - needs_plan_selection:', response.data.needs_plan_selection)
+        console.log('🔍 DEBUG - tenant:', response.data.tenant)
+        
+        if (response.data.needs_plan_selection && response.data.tenant) {
+          console.log('🚨 DETECTADO: Usuario sin plan válido - REDIRIGIENDO A SELECT-PLAN')
+          const tenant = response.data.tenant
+          const subdomain = tenant.id
+          const companyName = tenant.business_name || ''
+          
+          const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+          const baseUrl = isLocalhost ? `http://localhost:${window.location.port || 3000}` : 'https://105pos.pro'
+          
+          const params = new URLSearchParams()
+          if (subdomain) params.append('tenant_id', subdomain)
+          if (subdomain) params.append('subdomain', subdomain)
+          if (companyName) params.append('company', companyName)
+          
+          // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+          const currentToken = localStorage.getItem('authToken')
+          if (currentToken) {
+            params.append('auth_token', encodeURIComponent(currentToken))
+          }
+          
+          const redirectUrl = `${baseUrl}/select-plan?${params.toString()}`
+          console.log('🚀 REDIRECT URL:', redirectUrl.substring(0, 100) + '...')
+          
+          message.text = '⚠️ Necesitas seleccionar un plan. Redirigiendo...'
+          message.type = 'info'
+          
+          setTimeout(() => {
+            console.log('⏰ Ejecutando redirect a:', redirectUrl.substring(0, 100) + '...')
+            window.location.href = redirectUrl
+          }, 1000)
+          return // 🛑 PARAR AQUÍ - NO IR AL POS
+        }
+        
+        console.log('✅ Usuario con plan válido - Redirigiendo a POS')
         // Pequeño delay para que el usuario vea el mensaje de éxito
         setTimeout(() => {
           window.location.href = '/pos'
@@ -692,7 +760,46 @@ const handleLogin = async () => {
         return
       }
 
-      // 🔧 FIX: Cargar systemSettings ANTES de redireccionar
+      // � VALIDAR SI EL TENANT TIENE UN PLAN VÁLIDO
+      try {
+        const tenantResponse = await axios.get('/api/tenant/info')
+        const tenant = tenantResponse.data?.tenant || tenantResponse.data
+        
+        // Verificar si el plan es válido (no pendiente ni trial expirado)
+        const validPlans = ['basic', 'premium', 'enterprise', 'free_trial']
+        const planStatus = tenant?.subscription_status || 'pending'
+        const planType = tenant?.plan_type || 'pending'
+        
+        // Si el plan es pendiente, redirigir a select-plan
+        if (planStatus === 'pending' || planType === 'pending' || !validPlans.includes(planType)) {
+          // Obtener subdomain y company name para el redirect
+          const subdomain = tenant?.id || tenant?.subdomain || ''
+          const companyName = tenant?.company_name || tenant?.name || ''
+          
+          // Redirigir al dominio central para seleccionar plan
+          const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+          const baseUrl = isLocalhost ? `http://localhost:${window.location.port || 3000}` : 'https://105pos.pro'
+          
+          const params = new URLSearchParams()
+          if (subdomain) params.append('tenant_id', subdomain)
+          if (subdomain) params.append('subdomain', subdomain)
+          if (companyName) params.append('company', companyName)
+          
+          // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+          const currentToken = localStorage.getItem('authToken')
+          if (currentToken) {
+            params.append('auth_token', encodeURIComponent(currentToken))
+          }
+          
+          window.location.href = `${baseUrl}/select-plan?${params.toString()}`
+          return
+        }
+      } catch (error) {
+        console.error('Error verificando plan del tenant:', error)
+        // Continuar de todos modos
+      }
+
+      // �🔧 FIX: Cargar systemSettings ANTES de redireccionar
       // Esto evita que el router guard redirija a welcome/onboarding incorrectamente
       try {
         await appStore.loadSystemSettings()
@@ -798,7 +905,53 @@ const setDemoCredentials = (role) => {
 
 // Verificar si ya está autenticado
 if (authService.isAuthenticated()) {
-  router.push('/pos')
+  // 🔥 ANTES de redirigir al POS, verificar si tiene plan válido
+  const checkPlanAndRedirect = async () => {
+    try {
+      const response = await axios.get('/api/tenant/info')
+      const tenant = response.data?.tenant || response.data
+      
+      const validPlans = ['basic', 'premium', 'enterprise', 'free_trial']
+      const planType = tenant?.plan_type || tenant?.plan || 'pending'
+      const subscriptionStatus = tenant?.subscription_status || 'pending'
+      
+      // Si no tiene plan válido, redirigir a select-plan
+      if (subscriptionStatus === 'pending' || planType === 'pending' || !validPlans.includes(planType)) {
+        const subdomain = tenant?.id || tenant?.subdomain || ''
+        const companyName = tenant?.company_name || tenant?.name || tenant?.business_name || ''
+        
+        const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+        const baseUrl = isLocalhost ? `http://localhost:${window.location.port || 3000}` : 'https://105pos.pro'
+        
+        const params = new URLSearchParams()
+        if (subdomain) params.append('tenant_id', subdomain)
+        if (subdomain) params.append('subdomain', subdomain)
+        if (companyName) params.append('company', companyName)
+        
+        // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+        const currentToken = localStorage.getItem('authToken')
+        if (currentToken) {
+          params.append('auth_token', encodeURIComponent(currentToken))
+        }
+        
+        window.location.href = `${baseUrl}/select-plan?${params.toString()}`
+        return
+      }
+      
+      // Si tiene plan válido, ir al POS
+      router.push('/pos')
+    } catch (error) {
+      // 🛑 CUALQUIER ERROR = limpiar tokens y quedarse en login
+      // NO redirigir al POS bajo ninguna circunstancia si hay error
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('user')
+      localStorage.removeItem('sanctum_token')
+      delete axios.defaults.headers.common['Authorization']
+      // Quedarse en login - el usuario deberá autenticarse nuevamente
+    }
+  }
+  
+  checkPlanAndRedirect()
 }
 </script>
 

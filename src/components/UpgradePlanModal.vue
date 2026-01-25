@@ -818,8 +818,8 @@ const processPayment = async () => {
     }
 
     const handler = window.ePayco.checkout.configure({
-      key: import.meta.env.VITE_EPAYCO_PUBLIC_KEY || '2943652c673afffaa5b7b67829f00a0c',
-      test: import.meta.env.VITE_EPAYCO_TEST_MODE === 'true' || true
+      key: import.meta.env.VITE_EPAYCO_PUBLIC_KEY || 'de4263d3e7094669c4d837ad7dadb69e',
+      test: false // MODO PRODUCCIÓN
     })
 
     const planNames = {
@@ -844,16 +844,27 @@ const processPayment = async () => {
       tax: '0',
       country: 'co',
       lang: 'es',
-      external: 'false',
+      external: 'true', // true = Redirige a página completa de ePayco (más confiable)
       extra1: tenantId,
       extra2: selectedPlan.value,
       extra3: paymentFrequency.value,
       confirmation: `${window.location.origin}/api/epayco/webhook`,
-      response: `${window.location.origin}/#/payment/verify?tenant_id=${tenantId}&plan=${selectedPlan.value}&reference=${reference}&is_upgrade=true`,
+      response: `${window.location.origin}/payment/verify?tenant_id=${tenantId}&plan=${selectedPlan.value}&reference=${reference}&is_upgrade=true`,
       email_billing: appStore.userEmail || 'cliente@105pos.pro',
       name_billing: appStore.userName || 'Cliente 105 POS',
+      // Datos adicionales para formulario de ePayco
+      address_billing: 'Calle 123 # 45-67',
+      type_doc_billing: 'cc',
+      mobilephone_billing: '3000000000',
+      number_doc_billing: '1234567890'
     }
 
+    // 🔥 CERRAR EL MODAL ANTES de abrir ePayco para que el iframe se vea correctamente
+    emit('close')
+    
+    // Pequeño delay para que el modal se cierre completamente
+    await new Promise(resolve => setTimeout(resolve, 300))
+    
     handler.open(data)
     
   } catch (error) {

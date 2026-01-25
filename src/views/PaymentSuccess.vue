@@ -1,7 +1,36 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-emerald-100 p-8 text-center animate-fade-in">
-      <!-- Icono de éxito -->
+    <!-- Estado: Verificando pago -->
+    <div v-if="isVerifying" class="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-blue-100 p-8 text-center animate-fade-in">
+      <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-12 h-12 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900 mb-4">Verificando pago...</h1>
+      <p class="text-gray-600">Por favor espera mientras confirmamos tu transacción.</p>
+    </div>
+
+    <!-- Estado: Pago NO válido / Cancelado -->
+    <div v-else-if="paymentFailed" class="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-red-100 p-8 text-center animate-fade-in">
+      <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ errorTitle }}</h1>
+      <p class="text-gray-600 mb-6">{{ errorMessage }}</p>
+      <button 
+        @click="goToPlans"
+        class="w-full bg-gray-900 hover:bg-black text-white font-semibold py-3.5 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+      >
+        Volver a intentar
+      </button>
+    </div>
+
+    <!-- Estado: Pago Exitoso -->
+    <div v-else class="max-w-md w-full bg-white rounded-2xl shadow-2xl border border-emerald-100 p-8 text-center animate-fade-in">
       <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
         <svg class="w-12 h-12 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
@@ -43,7 +72,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
 // 🔥 Crear instancia de axios con la URL base correcta del backend
@@ -74,54 +103,123 @@ const backendAPI = axios.create({
   allowAbsoluteUrls: true
 })
 
-console.log('🚀 PaymentSuccess.vue - COMPONENTE CARGADO')
-
 const route = useRoute()
+const router = useRouter()
+
+// Estados de UI
+const isVerifying = ref(true)
+const paymentFailed = ref(false)
+const errorTitle = ref('Pago no completado')
+const errorMessage = ref('El pago fue cancelado o no se pudo procesar.')
+
+// Datos del pago
 const planName = ref('')
 const companyName = ref('')
 const paymentId = ref('')
 const countdown = ref(5)
 
-console.log('🔍 PaymentSuccess.vue - route.query:', route.query)
+// Función para ir a selección de planes con mensaje de error
+const goToPlans = () => {
+  // Obtener datos de la URL
+  const tenantId = route.query.tenant_id || route.query.subdomain || ''
+  const company = route.query.company || ''
+  const subdomain = route.query.subdomain || tenantId || ''
+  
+  // Obtener datos de localStorage si existen
+  let registrationData = {}
+  try {
+    const savedData = localStorage.getItem('registration_data')
+    if (savedData) {
+      registrationData = JSON.parse(savedData)
+    }
+  } catch (e) {
+    // Ignorar error
+  }
+  
+  // Construir URL de regreso a select-plan en el dominio CENTRAL
+  const params = new URLSearchParams()
+  if (tenantId) params.append('tenant_id', tenantId)
+  if (subdomain) params.append('subdomain', subdomain)
+  if (company || registrationData.company_name) {
+    params.append('company', company || registrationData.company_name)
+  }
+  
+  // Siempre redirigir al dominio central (105pos.pro), no al subdominio
+  const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+  const baseUrl = isLocalhost ? `http://localhost:${window.location.port || 3000}` : 'https://105pos.pro'
+  
+  window.location.href = `${baseUrl}/select-plan?${params.toString()}`
+}
 
 onMounted(async () => {
-  console.log('🎯 PaymentSuccess - onMounted EJECUTADO')
-  
-  // 1. Intentar recuperar datos de localStorage (ePayco a veces limpia params)
-  const pendingPayment = localStorage.getItem('pending_payment')
-  let localData = {}
-  if (pendingPayment) {
-    try {
-      localData = JSON.parse(pendingPayment)
-      console.log('📦 Datos recuperados de localStorage:', localData)
-    } catch (e) {
-      console.error('Error parsing pending_payment:', e)
-    }
-  }
-
-  // 2. Obtener información del pago de URL params o localStorage
-  // ePayco envía ?ref_payco=...
+  // 1. Obtener parámetros de la URL
   const refPayco = route.query.ref_payco
-  
-  const reference = route.query.reference || route.query.id || localData.reference || ''
-  const tenantId = route.query.tenant_id || localData.tenant_id || ''
-  const plan = route.query.plan || localData.plan || ''
-  const isUpgrade = route.query.is_upgrade === 'true' || localData.is_upgrade === true
-  
-  console.log('🔍 PaymentSuccess - Params combinados:', { reference, tenantId, plan, isUpgrade, refPayco })
+  const reference = route.query.reference || route.query.id || ''
+  const tenantId = route.query.tenant_id || ''
+  const plan = route.query.plan || ''
+  const isUpgrade = route.query.is_upgrade === 'true'
   
   paymentId.value = refPayco || reference
   
-  // Si tenemos ref_payco pero no reference, usar ref_payco como ID visual
-  if (refPayco && !reference) {
-     // Si viene de ePayco Dashboard, es posible que solo tengamos ref_payco
-     // En este caso, confiamos en que el Webhook ya procesó el pago en el backend
-     // O usamos los datos de localStorage para mostrar la info
+  // 🔥 VALIDACIÓN CRÍTICA: Si ref_payco es 'undefined' o vacío, el pago NO fue completado
+  if (!refPayco || refPayco === 'undefined' || refPayco === 'null') {
+    isVerifying.value = false
+    paymentFailed.value = true
+    errorTitle.value = 'Pago cancelado'
+    errorMessage.value = 'El proceso de pago fue cancelado. No se realizó ningún cargo a tu cuenta.'
+    return
   }
   
-  // 🔥 SI TENEMOS DATOS (URL o LocalStorage), ACTIVAR O MOSTRAR ÉXITO
-  if ((reference || refPayco) && plan) {
-    console.log('✅ PaymentSuccess - Datos encontrados, procesando...', { isUpgrade })
+  // 🔥 VERIFICAR CON EL BACKEND si el pago realmente fue aprobado
+  try {
+    const verifyResponse = await backendAPI.get('/api/epayco/check-payment-status', {
+      params: {
+        reference: reference,
+        ref_payco: refPayco
+      }
+    })
+    
+    const paymentStatus = verifyResponse.data.status
+    
+    if (paymentStatus !== 'approved' && paymentStatus !== 'Aceptada') {
+      // Pago NO fue aprobado
+      isVerifying.value = false
+      paymentFailed.value = true
+      
+      if (paymentStatus === 'pending' || paymentStatus === 'Pendiente') {
+        errorTitle.value = 'Pago pendiente'
+        errorMessage.value = 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.'
+      } else if (paymentStatus === 'rejected' || paymentStatus === 'Rechazada') {
+        errorTitle.value = 'Pago rechazado'
+        errorMessage.value = 'El pago fue rechazado por la entidad financiera. Por favor intenta con otro método de pago.'
+      } else {
+        errorTitle.value = 'Pago no completado'
+        errorMessage.value = `Estado del pago: ${paymentStatus}. Por favor contacta a soporte si crees que es un error.`
+      }
+      return
+    }
+    
+    // ✅ Pago verificado como aprobado - Continuar con activación
+    isVerifying.value = false
+    
+    // Recuperar datos de localStorage si existen
+    const pendingPayment = localStorage.getItem('pending_payment')
+    let localData = {}
+    if (pendingPayment) {
+      try {
+        localData = JSON.parse(pendingPayment)
+      } catch (e) {
+        // Ignorar error de parsing
+      }
+    }
+    
+    // Usar datos combinados de URL y localStorage
+    const finalTenantId = tenantId || localData.tenant_id || ''
+    const finalPlan = plan || localData.plan || ''
+    const finalReference = reference || localData.reference || ''
+  
+  // 🔥 SI TENEMOS DATOS, ACTIVAR O MOSTRAR ÉXITO
+  if ((finalReference || refPayco) && finalPlan) {
     
     try {
       // Limpiar localStorage para no reutilizar
@@ -132,42 +230,31 @@ onMounted(async () => {
         // ==================== FLUJO DE UPGRADE ====================
         // Después de pago, Wompi redirige desde su servidor
         // El usuario NO está autenticado, por eso usamos endpoint PÚBLICO
-        console.log('📤 PaymentSuccess - UPGRADE: Enviando a /api/process-upgrade (PÚBLICO)')
         
-        if (!tenantId) {
+        if (!finalTenantId) {
           throw new Error('No se encontró el ID del negocio en la URL')
         }
         
         // Recuperar payment_frequency de localStorage
         const pendingUpgrade = localStorage.getItem('pending_upgrade')
-        if (!pendingUpgrade) {
-          console.warn('⚠️ PaymentSuccess - No hay pending_upgrade en localStorage, usando defaults')
-        }
-        
         const upgradeData = pendingUpgrade ? JSON.parse(pendingUpgrade) : {}
-        
-        console.log('📤 PaymentSuccess - Datos de upgrade:', { plan, tenantId, reference })
         
         // Llamar a endpoint PÚBLICO para procesar upgrade
         const upgradeResponse = await backendAPI.post('/api/process-upgrade', {
-          tenant_id: tenantId,
-          plan: plan,
-          reference: reference,
+          tenant_id: finalTenantId,
+          plan: finalPlan,
+          reference: finalReference,
           is_upgrade: true
         })
         
-        console.log('✅ PaymentSuccess - Respuesta de upgrade:', upgradeResponse.data)
-        
         if (upgradeResponse.data.success) {
-          planName.value = plan === 'basic' ? 'Plan Basic' : 
-                         plan === 'premium' ? 'Plan Premium' : 
-                         plan === 'enterprise' ? 'Plan Enterprise' : 'Plan Seleccionado'
+          planName.value = finalPlan === 'basic' ? 'Plan Basic' : 
+                         finalPlan === 'premium' ? 'Plan Premium' : 
+                         finalPlan === 'enterprise' ? 'Plan Enterprise' : 'Plan Seleccionado'
           
           // Limpiar datos pendientes
           localStorage.removeItem('pending_upgrade')
           localStorage.removeItem('pending_payment')
-          
-          console.log('✅ PaymentSuccess - Plan actualizado correctamente (UPGRADE)')
         } else {
           throw new Error(upgradeResponse.data.message || 'Error al actualizar el plan')
         }
@@ -175,46 +262,42 @@ onMounted(async () => {
       } else {
         // ==================== FLUJO DE PAGO INICIAL ====================
         // Nuevo tenant, sin autenticación requerida
-        console.log('📤 PaymentSuccess - PAGO INICIAL: Enviando a /api/update-tenant-plan')
         
-        if (!tenantId) {
+        if (!finalTenantId) {
           throw new Error('No se encontró el ID del negocio')
         }
         
-        // Activar plan directamente (Wompi ya verificó el pago)
+        // Activar plan directamente (ya verificamos que el pago fue aprobado)
         const updateResponse = await backendAPI.post('/api/update-tenant-plan', {
-          tenant_id: tenantId,
-          plan: plan
+          tenant_id: finalTenantId,
+          plan: finalPlan
         })
         
-        console.log('✅ PaymentSuccess - Respuesta de activación de plan:', updateResponse.data)
-        
         if (updateResponse.data.success) {
-          planName.value = plan === 'basic' ? 'Plan Basic' : 
-                         plan === 'premium' ? 'Plan Premium' : 
-                         plan === 'enterprise' ? 'Plan Enterprise' : 'Plan Seleccionado'
+          planName.value = finalPlan === 'basic' ? 'Plan Basic' : 
+                         finalPlan === 'premium' ? 'Plan Premium' : 
+                         finalPlan === 'enterprise' ? 'Plan Enterprise' : 'Plan Seleccionado'
           
           // Limpiar pago pendiente (por si existe)
           localStorage.removeItem('pending_payment')
-          
-          console.log('✅ PaymentSuccess - Plan activado correctamente (INICIAL)')
         } else {
           throw new Error(updateResponse.data.message || 'Error al activar el plan')
         }
       }
       
     } catch (error) {
-      console.error('❌ PaymentSuccess - Error procesando pago:', error)
-      console.error('❌ PaymentSuccess - Error response:', error.response?.data)
-      console.error('❌ PaymentSuccess - Error message:', error.message)
-      console.error('❌ PaymentSuccess - Full error:', JSON.stringify(error, null, 2))
-      
       // Mostrar error más específico
       const errorMsg = error.response?.data?.message || error.message || 'Error desconocido'
-      alert('❌ Error al activar el plan\n\n' + errorMsg + '\n\nContacta a soporte con el ID: ' + reference)
+      paymentFailed.value = true
+      errorTitle.value = 'Error al activar plan'
+      errorMessage.value = errorMsg + '. Contacta a soporte con el ID: ' + (finalReference || refPayco)
+      return
     }
   } else {
-    console.warn('⚠️ PaymentSuccess - Faltan datos en URL:', { reference, plan, isUpgrade })
+    paymentFailed.value = true
+    errorTitle.value = 'Datos incompletos'
+    errorMessage.value = 'No se encontraron los datos necesarios para activar el plan.'
+    return
   }
   
   // Obtener datos de localStorage
@@ -224,14 +307,24 @@ onMounted(async () => {
     companyName.value = data.company_name || ''
   }
 
-  // Countdown para redirección automática
-  const interval = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) {
-      clearInterval(interval)
-      redirectToDashboard()
-    }
-  }, 1000)
+  // Countdown para redirección automática (solo si no hay error)
+  if (!paymentFailed.value) {
+    const interval = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0) {
+        clearInterval(interval)
+        redirectToDashboard()
+      }
+    }, 1000)
+  }
+  
+  } catch (error) {
+    // Error general de verificación
+    isVerifying.value = false
+    paymentFailed.value = true
+    errorTitle.value = 'Error de verificación'
+    errorMessage.value = 'No pudimos verificar el estado de tu pago. Contacta a soporte si ya realizaste el pago.'
+  }
 })
 
 const redirectToDashboard = async () => {

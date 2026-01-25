@@ -56,6 +56,7 @@ function applyCompensation() {
     
     // Limpiar cualquier estilo residual
     html.style.zoom = ''
+    html.style.removeProperty('--inv-scale')
     body.classList.remove('screen-compensated')
     return
   }
@@ -67,6 +68,7 @@ function applyCompensation() {
   
   // Aplicar solo el zoom CSS - el navegador maneja el resto
   html.style.zoom = String(zoom)
+  html.style.setProperty('--inv-scale', String(1 / zoom))
   body.classList.add('screen-compensated')
 }
 

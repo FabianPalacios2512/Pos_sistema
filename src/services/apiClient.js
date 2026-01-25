@@ -112,7 +112,7 @@ apiClient.interceptors.response.use(
             return Promise.reject(error)
           }
           
-          // 🔥 NO hacer logout si estamos en rutas protegidas o especiales
+          // 🔥 NO hacer logout si estamos en rutas especiales de pago
           const allowedExpiredRoutes = [
             '/subscription-expired', 
             '/select-plan', 
@@ -120,10 +120,9 @@ apiClient.interceptors.response.use(
             '/payment/failure', 
             '/payment/pending',
             '/admin/god-mode',
-            '/pos', // No cerrar sesión si estamos en POS
-            '/dashboard', // No cerrar sesión si estamos en dashboard
             '/welcome', // Onboarding
             '/onboarding' // Configuración inicial
+            // ❌ REMOVIDO: '/pos', '/dashboard' - Si el token es inválido, DEBE redirigir a login
           ]
           
           if (allowedExpiredRoutes.includes(currentPath) || currentPath.startsWith('/payment/')) {

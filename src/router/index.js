@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { requireAuth, redirectIfAuth, requireRole } from '../middleware/auth.js'
 import authService from '../services/authService.js'
 import { appStore } from '../store/appStore.js'
+import apiClient from '../services/apiClient.js'
 import axios from 'axios'
 
 // Componentes
@@ -376,6 +377,98 @@ router.beforeEach((to, from, next) => {
     document.title = to.meta.title
   }
 
+  next()
+})
+
+// 🔥 GUARD CRÍTICO: Verificar si el tenant tiene plan válido ANTES de permitir acceso al POS
+router.beforeEach(async (to, from, next) => {
+  // Solo verificar en rutas protegidas (no públicas)
+  const publicRoutes = [
+    '/login', 
+    '/register', 
+    '/catalog', 
+    '/select-plan',
+    '/payment/success', 
+    '/payment/failure', 
+    '/payment/pending',
+    '/payment/verify',
+    '/terminos-condiciones',
+    '/politica-privacidad',
+    '/forgot-password',
+    '/reset-password',
+    '/welcome',
+    '/onboarding'
+  ]
+  
+  // Si es ruta pública, no verificar plan
+  if (publicRoutes.includes(to.path) || to.path.startsWith('/payment/')) {
+    next()
+    return
+  }
+  
+  // Si no está autenticado, dejar que otros guards manejen
+  if (!authService.isAuthenticated()) {
+    next()
+    return
+  }
+  
+  // 🛡️ Solo verificar plan si estamos en un subdominio de tenant (no en dominio central)
+  const hostname = window.location.hostname
+  const isCentralDomain = hostname === '105pos.pro' || hostname === 'www.105pos.pro' || hostname === 'localhost' || hostname === '127.0.0.1'
+  
+  if (isCentralDomain) {
+    // En dominio central, permitir navegación normal
+    next()
+    return
+  }
+  
+  // 🔥 Estamos en un subdominio de tenant - VERIFICAR PLAN
+  try {
+    const response = await apiClient.get('/tenant/info')
+    const tenant = response.data?.tenant || response.data
+    
+    const validPlans = ['basic', 'premium', 'enterprise', 'free_trial']
+    const planType = tenant?.plan_type || tenant?.plan || 'pending'
+    const subscriptionStatus = tenant?.subscription_status || 'pending'
+    
+    // Si el plan NO es válido o la suscripción está pendiente
+    if (!validPlans.includes(planType) || subscriptionStatus === 'pending' || planType === 'pending') {
+      console.log('🚨 [Router Guard] Tenant sin plan válido, redirigiendo a select-plan')
+      
+      const subdomain = tenant?.id || tenant?.subdomain || ''
+      const companyName = tenant?.company_name || tenant?.business_name || tenant?.name || ''
+      
+      const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+      const baseUrl = isLocalhost ? `http://localhost:${window.location.port || 3000}` : 'https://105pos.pro'
+      const params = new URLSearchParams()
+      if (subdomain) params.append('tenant_id', subdomain)
+      if (subdomain) params.append('subdomain', subdomain)
+      if (companyName) params.append('company', companyName)
+      
+      // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+      const currentToken = localStorage.getItem('authToken')
+      if (currentToken) {
+        params.append('auth_token', encodeURIComponent(currentToken))
+      }
+      
+      // Redirigir al dominio central para seleccionar plan
+      window.location.href = `${baseUrl}/select-plan?${params.toString()}`
+      return // No llamar next() - estamos redirigiendo con window.location
+    }
+  } catch (error) {
+    // 🛑 Si hay error 401, el token es inválido - limpiar y redirigir a login
+    if (error.response?.status === 401) {
+      console.warn('⚠️ [Router Guard] Token inválido, limpiando y redirigiendo a login')
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('user')
+      localStorage.removeItem('sanctum_token')
+      next('/login')
+      return
+    }
+    // Para otros errores, permitir navegación (puede ser error de red temporal)
+    console.warn('⚠️ [Router Guard] Error verificando plan de tenant:', error)
+  }
+  
   next()
 })
 

@@ -106,13 +106,13 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     // ==================== HEADER EMPRESA CON TEMPLATE ====================
     // Header colorido para template moderno
     // ==================== HEADER EMPRESA CON TEMPLATE ====================
-    // Header colorido para template moderno
+    // Modern: Minimalista con color de acento (sin fondo sólido)
+    // Classic: Negro puro para máximo contraste
     if (style.name === 'modern') {
-      pdf.setFillColor(79, 70, 229) // Indigo-600
-      pdf.rect(0, 0, pageWidth, 25, 'F')
-      pdf.setTextColor(255, 255, 255) // Texto blanco
+      // Modern: Color de acento azul oscuro profesional (sin fondo)
+      pdf.setTextColor(0, 86, 179) // #0056b3 - Azul oscuro profesional
     } else {
-      pdf.setTextColor(17, 24, 39) // Gray-900 para classic
+      pdf.setTextColor(0, 0, 0) // Negro puro para Classic (mejor contraste térmico)
     }
 
     // Logo (si existe) - Cargar de manera asíncrona
@@ -124,18 +124,18 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
             try {
               const imgAspectRatio = img.width / img.height
               
-              // Ancho máximo 16mm, altura máxima 12mm
-              let logoWidth = 16
+              // Ancho máximo 14mm, altura máxima 10mm (más compacto)
+              let logoWidth = 14
               let logoHeight = logoWidth / imgAspectRatio
               
               // Si la altura calculada excede el máximo, ajustar por altura
-              if (logoHeight > 12) {
-                logoHeight = 12
+              if (logoHeight > 10) {
+                logoHeight = 10
                 logoWidth = logoHeight * imgAspectRatio
               }
               
               pdf.addImage(companyLogo, 'PNG', centerX - (logoWidth / 2), yPos, logoWidth, logoHeight, '', 'FAST')
-              yPos += logoHeight + 5  // Espacio entre logo y nombre de empresa
+              yPos += logoHeight + 3  // Espacio reducido entre logo y nombre
               resolve()
             } catch (err) {
               reject(err)
@@ -149,15 +149,22 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       }
     }
 
-    // Nombre de la empresa
-    pdf.setFont('helvetica', style.fonts.company.style)
-    pdf.setFontSize(style.fonts.company.size)
+    // Nombre de la empresa - DESTACADO
+    pdf.setFont('helvetica', 'bold')
+    if (style.name === 'modern') {
+      pdf.setFontSize(15) // Ligeramente más grande para Modern
+      pdf.setTextColor(0, 86, 179) // Color de acento
+    } else {
+      pdf.setFontSize(14)
+      pdf.setTextColor(0, 0, 0)
+    }
     pdf.text(companyName.toUpperCase(), centerX, yPos, { align: 'center' })
-    yPos += 6
+    yPos += 5
 
-    // Información de empresa
-    pdf.setFont('helvetica', style.fonts.header.style)
-    pdf.setFontSize(style.fonts.header.size)
+    // Información de empresa - Compacta
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(8)
+    pdf.setTextColor(85, 85, 85) // Gris oscuro elegante para info de contacto
 
     if (companyDocument) {
       pdf.text(`NIT: ${companyDocument}`, centerX, yPos, { align: 'center' })
@@ -172,48 +179,76 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     if (companyPhone || companyEmail) {
       const contactLine = [companyPhone, companyEmail].filter(Boolean).join(' • ')
       pdf.text(contactLine, centerX, yPos, { align: 'center' })
-      yPos += 5
+      yPos += 4
     } else {
-      yPos += 3
+      yPos += 2
     }
 
-    // Resetear color del texto a negro después del header moderno
+    // Resetear color del texto a negro después del header
     pdf.setTextColor(0, 0, 0)
 
     // Línea separadora según template
-    applyBorderStyle(pdf, style)
-    if (style.name === 'minimal') {
-      pdf.setLineWidth(style.layout.borderWidth * 2)
-    }
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
     if (style.name === 'classic') {
-      yPos += 0.5
+      // Classic: Línea doble negra
+      pdf.setLineWidth(0.3)
+      pdf.setDrawColor(0, 0, 0)
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+      yPos += 1
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+    } else if (style.name === 'modern') {
+      // Modern: Línea gruesa con color de acento
+      pdf.setLineWidth(0.5)
+      pdf.setDrawColor(0, 86, 179) // #0056b3
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+    } else {
+      // Minimal
+      pdf.setLineWidth(style.layout.borderWidth * 2)
+      pdf.setDrawColor(0, 0, 0)
       pdf.line(leftMargin, yPos, rightMargin, yPos)
     }
     yPos += 5
 
     // ==================== INFORMACIÓN DE FACTURA CON TEMPLATE ====================
-    // Caja con el número de factura según template
-    applyHeaderStyle(pdf, style, leftMargin, yPos, pageWidth - 8, 14)
-
-    // Color del texto según template
-    if (style.name === 'modern') {
-      pdf.setTextColor(255, 255, 255) // Blanco para modern
-    } else if (style.name === 'classic') {
-      pdf.setTextColor(17, 24, 39) // Gray-900 fuerte
+    if (style.name === 'classic') {
+      // Classic: Sin fondo, solo texto centrado
+      pdf.setTextColor(0, 0, 0)
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(9)
+      pdf.text('FACTURA DE VENTA', centerX, yPos + 3, { align: 'center' })
+      
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(10)
+      pdf.text(`No. ${invoiceCode}`, centerX, yPos + 8, { align: 'center' })
+      yPos += 12
+    } else if (style.name === 'modern') {
+      // Modern: Sin fondo, tipografía elegante con color de acento
+      pdf.setTextColor(0, 86, 179) // Color de acento
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(8)
+      pdf.text('FACTURA DE VENTA', centerX, yPos + 3, { align: 'center' })
+      
+      pdf.setTextColor(26, 26, 26) // Casi negro
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(11)
+      pdf.text(`No. ${invoiceCode}`, centerX, yPos + 9, { align: 'center' })
+      
+      pdf.setTextColor(0, 0, 0)
+      yPos += 13
     } else {
-      pdf.setTextColor(0, 0, 0) // Negro para minimal
+      // Minimal: Caja con borde
+      applyHeaderStyle(pdf, style, leftMargin, yPos, pageWidth - 8, 14)
+      pdf.setTextColor(0, 0, 0)
+
+      pdf.setFont('helvetica', style.fonts.title.style)
+      pdf.setFontSize(style.fonts.title.size)
+      pdf.text('FACTURA DE VENTA', centerX, yPos + 5, { align: 'center' })
+
+      pdf.setFontSize(style.fonts.title.size - 1)
+      pdf.text(`No. ${invoiceCode}`, centerX, yPos + 10, { align: 'center' })
+
+      pdf.setTextColor(0, 0, 0) // Reset color
+      yPos += 17
     }
-
-    pdf.setFont('helvetica', style.fonts.title.style)
-    pdf.setFontSize(style.fonts.title.size)
-    pdf.text('FACTURA DE VENTA', centerX, yPos + 5, { align: 'center' })
-
-    pdf.setFontSize(style.fonts.title.size - 1)
-    pdf.text(`No. ${invoiceCode}`, centerX, yPos + 10, { align: 'center' })
-
-    pdf.setTextColor(0, 0, 0) // Reset color
-    yPos += 17
 
     // Fecha y hora en formato más legible
     const invoiceDate = new Date(created_at || date)
@@ -267,59 +302,71 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       yPos += 4
     }
 
-    // Línea doble antes de productos (más profesional)
-    pdf.setLineWidth(0.3)
+    // Línea antes de productos
+    if (style.name === 'modern') {
+      pdf.setLineWidth(0.5)
+      pdf.setDrawColor(0, 86, 179) // Color de acento
+    } else {
+      pdf.setLineWidth(0.3)
+      pdf.setDrawColor(0, 0, 0)
+    }
     pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 0.5
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    if (style.name === 'classic') {
+      yPos += 0.5
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+    }
     yPos += 5
 
     // ==================== TABLA DE PRODUCTOS MEJORADA ====================
-    // Encabezado con fondo según template
-    // Encabezado con fondo según template
-    if (style.name === 'modern') {
-      pdf.setFillColor(238, 242, 255) // Indigo-50
-    } else if (style.name === 'classic') {
-      pdf.setFillColor(255, 255, 255) // Blanco (sin fondo gris)
-    } else {
-      pdf.setFillColor(255, 255, 255) // Blanco para minimal
-    }
-
-    // Dibujar fondo solo si no es classic (Classic es limpio)
-    if (style.name !== 'classic') {
-      pdf.rect(leftMargin, yPos - 1, pageWidth - 8, 5, 'F')
-    } else {
-      // En classic, solo una línea abajo del header
-      pdf.setDrawColor(229, 231, 235)
-      pdf.setLineWidth(0.1)
-      pdf.line(leftMargin, yPos + 4, rightMargin, yPos + 4)
-    }
-
-    // Color texto header según template
-    // Color texto header según template
-    if (style.name === 'modern') {
-      pdf.setTextColor(67, 56, 202) // Indigo-700
-    } else if (style.name === 'classic') {
-      pdf.setTextColor(17, 24, 39) // Gray-900
-    } else {
+    if (style.name === 'classic') {
+      // CLASSIC: Header simple DESCRIPCIÓN | TOTAL
       pdf.setTextColor(0, 0, 0)
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(8)
+      pdf.text('DESCRIPCIÓN', leftMargin + 1, yPos + 2)
+      pdf.text('TOTAL', rightMargin - 1, yPos + 2, { align: 'right' })
+      
+      yPos += 4
+      pdf.setLineWidth(0.3)
+      pdf.setDrawColor(0, 0, 0)
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+      yPos += 4
+    } else if (style.name === 'modern') {
+      // MODERN: 4 columnas con color de acento, sin fondo
+      pdf.setTextColor(0, 86, 179) // Color de acento azul
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(7)
+      
+      // Headers: CANT. | DESCRIPCIÓN | P. UNIT. | TOTAL
+      pdf.text('CANT.', leftMargin + 6, yPos + 2, { align: 'center' })
+      pdf.text('DESCRIPCIÓN', leftMargin + 15, yPos + 2)
+      pdf.text('P. UNIT.', leftMargin + 48, yPos + 2, { align: 'right' })
+      pdf.text('TOTAL', rightMargin - 1, yPos + 2, { align: 'right' })
+
+      pdf.setTextColor(51, 51, 51) // Gris oscuro
+      yPos += 5
+
+      pdf.setLineWidth(0.2)
+      pdf.setDrawColor(224, 224, 224) // Gris claro
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+      yPos += 3
+    } else {
+      // MINIMAL: Sin fondo
+      pdf.setTextColor(0, 0, 0)
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(style.fonts.header.size)
+      pdf.text('DESCRIPCIÓN', leftMargin + 1, yPos + 2)
+      pdf.text('CANT.', leftMargin + 38, yPos + 2, { align: 'center' })
+      pdf.text('PRECIO', leftMargin + 53, yPos + 2, { align: 'right' })
+      pdf.text('TOTAL', rightMargin - 1, yPos + 2, { align: 'right' })
+
+      yPos += 5
+      pdf.setLineWidth(0.2)
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+      yPos += 3
     }
 
-    pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(style.fonts.header.size)
-    pdf.text('DESCRIPCIÓN', leftMargin + 1, yPos + 2)
-    pdf.text('CANT.', leftMargin + 38, yPos + 2, { align: 'center' })
-    pdf.text('PRECIO', leftMargin + 53, yPos + 2, { align: 'right' })
-    pdf.text('TOTAL', rightMargin - 1, yPos + 2, { align: 'right' })
-
-    pdf.setTextColor(0, 0, 0) // Reset
-    yPos += 5
-
-    pdf.setLineWidth(0.2)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 3
-
-    // Items de la factura con mejor formato
+    // Items de la factura con formato según template
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(7)
 
@@ -329,65 +376,131 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       const price = item.price || item.unit_price || 0
       const itemTotal = quantity * price
 
-      // Fondo alternado para mejor legibilidad
-      if (index % 2 === 0) {
-        pdf.setFillColor(252, 252, 252)
-        pdf.rect(leftMargin, yPos - 2, pageWidth - 8, 5, 'F')
-      }
-
-      // Nombre del producto (con wrapping si es muy largo)
-      const nameLines = pdf.splitTextToSize(itemName, 32)
-      const firstLine = nameLines[0]
-      pdf.text(firstLine, leftMargin + 1, yPos)
-
-      // Cantidad (centrado)
-      pdf.text(quantity.toString(), leftMargin + 38, yPos, { align: 'center' })
-
-      // Precio (alineado derecha)
-      pdf.text(`$${price.toLocaleString('es-CO')}`, leftMargin + 53, yPos, { align: 'right' })
-
-      // Total (alineado derecha, en negrita si es múltiple)
-      if (quantity > 1) {
+      if (style.name === 'classic') {
+        // CLASSIC: Nombre + total en línea 1, cantidad x precio en línea 2
+        const nameLines = pdf.splitTextToSize(itemName, 50)
         pdf.setFont('helvetica', 'bold')
-      }
-      pdf.text(`$${itemTotal.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
-      pdf.setFont('helvetica', 'normal')
-
-      // Líneas adicionales del nombre (si las hay)
-      if (nameLines.length > 1) {
+        pdf.setFontSize(8)
+        pdf.text(nameLines[0], leftMargin + 1, yPos)
+        
+        pdf.setFont('helvetica', 'bold')
+        pdf.text(`$${itemTotal.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
         yPos += 3
-        for (let i = 1; i < nameLines.length && i < 2; i++) {
-          pdf.setFontSize(6)
-          pdf.text(nameLines[i], leftMargin + 1, yPos)
-          yPos += 2.5
-        }
+        
+        pdf.setFont('courier', 'normal')
         pdf.setFontSize(7)
-      }
+        pdf.text(`${quantity} x $${price.toLocaleString('es-CO')}`, leftMargin + 1, yPos)
+        
+        yPos += 3
+        if (index < items.length - 1) {
+          pdf.setLineWidth(0.1)
+          pdf.setDrawColor(200, 200, 200)
+          pdf.setLineDashPattern([1, 1], 0)
+          pdf.line(leftMargin, yPos, rightMargin, yPos)
+          pdf.setLineDashPattern([], 0)
+          yPos += 2
+        }
+      } else if (style.name === 'modern') {
+        // MODERN: 4 columnas limpias, sin fondos alternados
+        // Columnas: CANT. | DESCRIPCIÓN | P. UNIT. | TOTAL
+        const nameLines = pdf.splitTextToSize(itemName, 28)
+        
+        // Cantidad (monospace, centrado)
+        pdf.setFont('courier', 'bold')
+        pdf.setFontSize(8)
+        pdf.text(quantity.toString(), leftMargin + 6, yPos, { align: 'center' })
+        
+        // Nombre del producto
+        pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(7)
+        pdf.setTextColor(51, 51, 51)
+        pdf.text(nameLines[0], leftMargin + 15, yPos)
+        
+        // Precio unitario (monospace, gris)
+        pdf.setFont('courier', 'normal')
+        pdf.setFontSize(7)
+        pdf.setTextColor(102, 102, 102)
+        pdf.text(`$${price.toLocaleString('es-CO')}`, leftMargin + 48, yPos, { align: 'right' })
+        
+        // Total (monospace, bold, oscuro)
+        pdf.setFont('courier', 'bold')
+        pdf.setFontSize(8)
+        pdf.setTextColor(26, 26, 26)
+        pdf.text(`$${itemTotal.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
+        
+        pdf.setTextColor(0, 0, 0)
+        yPos += 4
+        
+        // Línea separadora fina entre productos
+        if (index < items.length - 1) {
+          pdf.setLineWidth(0.1)
+          pdf.setDrawColor(240, 240, 240)
+          pdf.line(leftMargin, yPos, rightMargin, yPos)
+          yPos += 2
+        }
+      } else {
+        // MINIMAL: Layout con 4 columnas
+        const nameLines = pdf.splitTextToSize(itemName, 32)
+        pdf.setFont('helvetica', 'normal')
+        pdf.text(nameLines[0], leftMargin + 1, yPos)
 
-      yPos += 4
+        pdf.text(quantity.toString(), leftMargin + 38, yPos, { align: 'center' })
+        pdf.text(`$${price.toLocaleString('es-CO')}`, leftMargin + 53, yPos, { align: 'right' })
+
+        if (quantity > 1) {
+          pdf.setFont('helvetica', 'bold')
+        }
+        pdf.text(`$${itemTotal.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
+        pdf.setFont('helvetica', 'normal')
+
+        if (nameLines.length > 1) {
+          yPos += 3
+          for (let i = 1; i < nameLines.length && i < 2; i++) {
+            pdf.setFontSize(6)
+            pdf.text(nameLines[i], leftMargin + 1, yPos)
+            yPos += 2.5
+          }
+          pdf.setFontSize(7)
+        }
+
+        yPos += 4
+      }
     })
 
     // Línea separadora antes de totales
     yPos += 2
-    pdf.setLineWidth(0.2)
-    pdf.setLineDashPattern([2, 2], 0)
+    if (style.name === 'modern') {
+      pdf.setLineWidth(0.2)
+      pdf.setDrawColor(224, 224, 224) // Gris claro
+    } else {
+      pdf.setLineWidth(0.2)
+      pdf.setDrawColor(0, 0, 0)
+      pdf.setLineDashPattern([2, 2], 0)
+    }
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     pdf.setLineDashPattern([], 0)
     yPos += 4
 
     // ==================== TOTALES MEJORADOS ====================
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(8)
+    pdf.setFontSize(9)
 
-    // Subtotal
-    pdf.text('Subtotal:', leftMargin + 35, yPos)
+    // Subtotal - Alineado a la derecha
+    if (style.name === 'modern') {
+      pdf.setTextColor(102, 102, 102) // Gris medio
+    }
+    pdf.text('Subtotal:', rightMargin - 25, yPos, { align: 'right' })
+    if (style.name === 'modern') {
+      pdf.setTextColor(51, 51, 51) // Gris oscuro
+    }
     pdf.text(`$${subtotal.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
+    pdf.setTextColor(0, 0, 0)
     yPos += 4
 
     // Descuento (si aplica) - destacado en rojo
     if (discount > 0) {
       pdf.setTextColor(220, 38, 38) // Rojo
-      pdf.text('Descuento:', leftMargin + 35, yPos)
+      pdf.text('Descuento:', rightMargin - 25, yPos, { align: 'right' })
       pdf.text(`-$${discount.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
       pdf.setTextColor(0, 0, 0) // Volver a negro
       yPos += 4
@@ -403,7 +516,7 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     }
     
     if (taxAmount > 0) {
-      pdf.text(`${taxLabel} (${actualTaxRate}%):`, leftMargin + 35, yPos)
+      pdf.text(`${taxLabel} (${actualTaxRate}%):`, rightMargin - 25, yPos, { align: 'right' })
       pdf.text(`$${taxAmount.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
       yPos += 4
     }
@@ -413,50 +526,90 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       // Calcular porcentaje de recargo
       const surchargePercent = subtotal > 0 ? Math.round((surcharge_amount / subtotal) * 100) : 13
       pdf.setTextColor(217, 119, 6) // Amber-600
-      pdf.text(`Recargo (${surchargePercent}%):`, leftMargin + 35, yPos)
+      pdf.text(`Recargo (${surchargePercent}%):`, rightMargin - 25, yPos, { align: 'right' })
       pdf.text(`+$${surcharge_amount.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
       pdf.setTextColor(0, 0, 0) // Volver a negro
       yPos += 4
     }
 
-    // Línea doble antes del total
+    // Línea antes del total
     yPos += 1
-    pdf.setLineWidth(0.4)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 0.5
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    if (style.name === 'modern') {
+      pdf.setLineWidth(0.5)
+      pdf.setDrawColor(0, 86, 179) // Color de acento
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+    } else {
+      pdf.setLineWidth(0.3)
+      pdf.setDrawColor(0, 0, 0)
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+      yPos += 1
+      pdf.line(leftMargin, yPos, rightMargin, yPos)
+    }
     yPos += 4
 
-    // TOTAL FINAL - Con estilo del template
-    applyTotalStyle(pdf, style, leftMargin, yPos - 2, pageWidth - 8, 9)
-
-    // Color del texto del total según template
-    // Color del texto del total según template
-    if (style.name === 'modern') {
-      pdf.setTextColor(67, 56, 202) // Indigo-700
-    } else if (style.name === 'classic') {
-      pdf.setTextColor(17, 24, 39) // Gray-900
-    } else {
+    // TOTAL FINAL - Grande y destacado
+    if (style.name === 'classic') {
+      // Classic: Sin fondo, solo texto grande negro
       pdf.setTextColor(0, 0, 0)
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(11)
+      pdf.text('TOTAL A PAGAR:', leftMargin + 1, yPos + 3)
+      pdf.setFontSize(16)
+      pdf.text(`$${total.toLocaleString('es-CO')}`, rightMargin - 1, yPos + 3, { align: 'right' })
+      yPos += 10
+    } else if (style.name === 'modern') {
+      // Modern: Sin fondo, total con color de acento
+      pdf.setTextColor(26, 26, 26) // Casi negro
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(10)
+      pdf.text('TOTAL A PAGAR:', leftMargin + 1, yPos + 3)
+      
+      pdf.setTextColor(0, 86, 179) // Color de acento azul
+      pdf.setFontSize(18) // Grande y destacado
+      pdf.text(`$${total.toLocaleString('es-CO')}`, rightMargin - 1, yPos + 3, { align: 'right' })
+      
+      pdf.setTextColor(0, 0, 0)
+      yPos += 10
+    } else {
+      // Minimal: Con estilo del template
+      applyTotalStyle(pdf, style, leftMargin, yPos - 2, pageWidth - 8, 9)
+      pdf.setTextColor(0, 0, 0)
+
+      pdf.setFont('helvetica', style.fonts.total.style)
+      pdf.setFontSize(style.fonts.total.size)
+      pdf.text('TOTAL A PAGAR:', leftMargin + 2, yPos + 3.5)
+      pdf.setFontSize(style.fonts.total.size + 2)
+      pdf.text(`$${total.toLocaleString('es-CO')}`, rightMargin - 2, yPos + 3.5, { align: 'right' })
+
+      pdf.setTextColor(0, 0, 0) // Reset color
+      yPos += 11
     }
 
-    pdf.setFont('helvetica', style.fonts.total.style)
-    pdf.setFontSize(style.fonts.total.size)
-    pdf.text('TOTAL A PAGAR:', leftMargin + 2, yPos + 3.5)
-    pdf.setFontSize(style.fonts.total.size + 2)
-    pdf.text(`$${total.toLocaleString('es-CO')}`, rightMargin - 2, yPos + 3.5, { align: 'right' })
-
-    pdf.setTextColor(0, 0, 0) // Reset color
-    yPos += 11
-
     // ==================== INFORMACIÓN DE PAGO MEJORADA ====================
+    // Línea antes de forma de pago
+    if (style.name === 'modern') {
+      pdf.setLineWidth(0.2)
+      pdf.setDrawColor(224, 224, 224)
+    } else {
+      pdf.setLineWidth(0.2)
+      pdf.setDrawColor(0, 0, 0)
+      pdf.setLineDashPattern([2, 2], 0)
+    }
+    pdf.line(leftMargin, yPos, rightMargin, yPos)
+    pdf.setLineDashPattern([], 0)
+    yPos += 4
+
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(7)
+    if (style.name === 'modern') {
+      pdf.setTextColor(0, 86, 179) // Color de acento
+    }
     pdf.text('FORMA DE PAGO', leftMargin, yPos)
+    pdf.setTextColor(0, 0, 0)
     yPos += 3
 
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(7)
+    pdf.setFontSize(8)
 
     if (payments && payments.length > 0) {
       payments.forEach(payment => {
@@ -488,8 +641,13 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     }
 
     // Línea separadora elegante
-    pdf.setLineWidth(0.2)
-    pdf.setLineDashPattern([2, 2], 0)
+    if (style.name === 'modern') {
+      pdf.setLineWidth(0.2)
+      pdf.setDrawColor(224, 224, 224)
+    } else {
+      pdf.setLineWidth(0.2)
+      pdf.setLineDashPattern([2, 2], 0)
+    }
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     pdf.setLineDashPattern([], 0)
     yPos += 5
@@ -497,6 +655,13 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     // ==================== MENSAJE PERSONALIZADO ====================
     pdf.setFont('helvetica', 'bold')
     pdf.setFontSize(10)
+    
+    // Color del mensaje según template
+    if (style.name === 'modern') {
+      pdf.setTextColor(0, 86, 179) // Color de acento
+    } else {
+      pdf.setTextColor(0, 0, 0)
+    }
 
     // Usar el mensaje personalizado del onboarding
     const messageLines = pdf.splitTextToSize(thankYouMessage, 65)
@@ -504,6 +669,7 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       pdf.text(line, centerX, yPos, { align: 'center' })
       yPos += 4
     })
+    pdf.setTextColor(0, 0, 0)
     yPos += 4
 
     // ==================== QR CODE CON ESTILO SELECCIONADO ====================
@@ -511,27 +677,28 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     const qrX = (pageWidth - qrSize) / 2
 
     // Marco alrededor del QR según estilo seleccionado
-    pdf.setLineWidth(0.3)
+    pdf.setLineWidth(0.4)
 
     if (style.name === 'modern') {
-      pdf.setDrawColor(79, 70, 229) // Indigo-600
-      pdf.setFillColor(238, 242, 255) // Indigo-50
+      pdf.setDrawColor(0, 86, 179) // Color de acento azul
     } else if (style.name === 'minimal') {
       pdf.setDrawColor(0, 0, 0)
     } else {
-      pdf.setDrawColor(200, 200, 200)
+      pdf.setDrawColor(0, 0, 0) // Negro para Classic
     }
 
     // Aplicar estilo de QR seleccionado en onboarding
     if (qrStyle === 'circle') {
-      // QR circular
       pdf.circle(qrX + qrSize / 2, yPos + qrSize / 2, qrSize / 2 + 1, 'S')
     } else if (qrStyle === 'square') {
-      // QR cuadrado sin redondeo
       pdf.rect(qrX - 1, yPos - 1, qrSize + 2, qrSize + 2, 'S')
     } else {
       // QR redondeado (default)
-      pdf.roundedRect(qrX - 1, yPos - 1, qrSize + 2, qrSize + 2, 2, 2, 'S')
+      if (style.name === 'modern') {
+        pdf.roundedRect(qrX - 1, yPos - 1, qrSize + 2, qrSize + 2, 3, 3, 'S')
+      } else {
+        pdf.roundedRect(qrX - 1, yPos - 1, qrSize + 2, qrSize + 2, 2, 2, 'S')
+      }
     }
 
     pdf.addImage(qrDataURL, 'PNG', qrX, yPos, qrSize, qrSize)
@@ -539,35 +706,37 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
 
     pdf.setFontSize(7)
     pdf.setFont('helvetica', 'bold')
+    if (style.name === 'modern') {
+      pdf.setTextColor(85, 85, 85) // Gris medio
+    }
     pdf.text(invoiceCode, centerX, yPos, { align: 'center' })
+    pdf.setTextColor(0, 0, 0)
     yPos += 6
 
     // ==================== INFORMACIÓN LEGAL PROFESIONAL ====================
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(6.5)
-    pdf.setTextColor(60, 60, 60) // Gris oscuro para mejor legibilidad
+    pdf.setFontSize(6) // Más pequeño para ahorrar papel
+    pdf.setTextColor(0, 0, 0) // Negro puro para impresión térmica
 
     pdf.text('Régimen Común - No responsable de IVA', centerX, yPos, { align: 'center' })
-    yPos += 3.5
+    yPos += 3
     pdf.text('Factura de venta Art. 617 del E.T.', centerX, yPos, { align: 'center' })
-    yPos += 3.5
+    yPos += 3
     pdf.text('Resolución DIAN 18764069871234', centerX, yPos, { align: 'center' })
-    yPos += 3.5
+    yPos += 3
     pdf.text('Vigencia: 01/01/2024 al 31/12/2024', centerX, yPos, { align: 'center' })
-    yPos += 5
+    yPos += 4
 
     // ==================== FOOTER POWERED BY CENTRADO ====================
-    // Agregar espacio antes del footer
-    yPos += 3
-    
+    // Línea separadora final
     pdf.setLineWidth(0.1)
-    pdf.setDrawColor(220, 220, 220)
+    pdf.setDrawColor(180, 180, 180)
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     yPos += 3
 
     pdf.setFont('helvetica', 'normal')
     pdf.setFontSize(6)
-    pdf.setTextColor(120, 120, 120) // Gris medio profesional
+    pdf.setTextColor(140, 140, 140) // Gris sutil
 
     // Texto completamente centrado
     const poweredText = 'Powered by 105 POS'

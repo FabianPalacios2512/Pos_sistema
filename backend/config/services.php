@@ -58,4 +58,30 @@ return [
         'currency' => env('WOMPI_CURRENCY', 'COP'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | AI Services Configuration
+    |--------------------------------------------------------------------------
+    */
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+    ],
+
+    'groq' => [
+        'api_key_1' => env('GROQ_API_KEY_1'),
+        'api_key_2' => env('GROQ_API_KEY_2'),
+        'api_key_3' => env('GROQ_API_KEY_3'),
+        'api_key_4' => env('GROQ_API_KEY_4'),
+        'api_key_5' => env('GROQ_API_KEY_5'),
+        'api_key_6' => env('GROQ_API_KEY_6'),
+        'api_key_7' => env('GROQ_API_KEY_7'),
+        'api_key_8' => env('GROQ_API_KEY_8'),
+        'api_key_9' => env('GROQ_API_KEY_9'),
+        'api_key_10' => env('GROQ_API_KEY_10'),
+        'api_key_11' => env('GROQ_API_KEY_11'),
+        'api_key_12' => env('GROQ_API_KEY_12'),
+        'api_key_13' => env('GROQ_API_KEY_13'),
+        'api_key_14' => env('GROQ_API_KEY_14'),
+    ],
+
 ];

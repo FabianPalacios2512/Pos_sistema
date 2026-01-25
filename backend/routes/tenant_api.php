@@ -272,12 +272,51 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     // Información del Tenant (Plan y Suscripción)
     Route::get('/tenant-info', function() {
         $tenant = tenant();
+        
+        // Determinar el estado de la suscripción
+        $subscriptionStatus = 'pending';
+        if ($tenant->subscription_ends_at && now()->isBefore($tenant->subscription_ends_at)) {
+            $subscriptionStatus = 'active';
+        } elseif ($tenant->subscription_ends_at && now()->isAfter($tenant->subscription_ends_at)) {
+            $subscriptionStatus = 'expired';
+        }
+        
         return response()->json([
             'success' => true,
             'tenant' => [
                 'id' => $tenant->id,
                 'business_name' => $tenant->business_name,
-                'plan' => $tenant->plan,
+                'company_name' => $tenant->business_name,
+                'subdomain' => $tenant->id, // El id ES el subdomain en Stancl
+                'plan_type' => $tenant->plan ?? 'pending',
+                'subscription_status' => $subscriptionStatus,
+                'subscription_ends_at' => $tenant->subscription_ends_at,
+                'created_at' => $tenant->created_at,
+            ]
+        ]);
+    });
+    
+    // Alias /tenant/info para compatibilidad
+    Route::get('/tenant/info', function() {
+        $tenant = tenant();
+        
+        // Determinar el estado de la suscripción
+        $subscriptionStatus = 'pending';
+        if ($tenant->subscription_ends_at && now()->isBefore($tenant->subscription_ends_at)) {
+            $subscriptionStatus = 'active';
+        } elseif ($tenant->subscription_ends_at && now()->isAfter($tenant->subscription_ends_at)) {
+            $subscriptionStatus = 'expired';
+        }
+        
+        return response()->json([
+            'success' => true,
+            'tenant' => [
+                'id' => $tenant->id,
+                'business_name' => $tenant->business_name,
+                'company_name' => $tenant->business_name,
+                'subdomain' => $tenant->id, // El id ES el subdomain en Stancl
+                'plan_type' => $tenant->plan ?? 'pending',
+                'subscription_status' => $subscriptionStatus,
                 'subscription_ends_at' => $tenant->subscription_ends_at,
                 'created_at' => $tenant->created_at,
             ]

@@ -23,7 +23,8 @@ class GeminiAgentService
 
     public function __construct()
     {
-        $this->apiKey = env('GEMINI_API_KEY');
+        // Usar config() en lugar de env() para compatibilidad con config cacheado
+        $this->apiKey = config('services.gemini.api_key');
     }
 
     /**

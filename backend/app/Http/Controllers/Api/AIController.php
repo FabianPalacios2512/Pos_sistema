@@ -1119,18 +1119,18 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
      */
     private function callGroqAPIWithTools($messages)
     {
-        // Sistema de rotación de múltiples API Keys
+        // Sistema de rotación de múltiples API Keys (usando config() para compatibilidad con cache)
         $apiKeys = array_filter([
-            env('GROQ_API_KEY_1'),
-            env('GROQ_API_KEY_2'),
-            env('GROQ_API_KEY_3'),
-            env('GROQ_API_KEY_4'),
-            env('GROQ_API_KEY_5'),
-            env('GROQ_API_KEY_6'),
-            env('GROQ_API_KEY_7'),
-            env('GROQ_API_KEY_8'),
-            env('GROQ_API_KEY_9'),
-            env('GROQ_API_KEY_10'),
+            config('services.groq.api_key_1'),
+            config('services.groq.api_key_2'),
+            config('services.groq.api_key_3'),
+            config('services.groq.api_key_4'),
+            config('services.groq.api_key_5'),
+            config('services.groq.api_key_6'),
+            config('services.groq.api_key_7'),
+            config('services.groq.api_key_8'),
+            config('services.groq.api_key_9'),
+            config('services.groq.api_key_10'),
         ]);
 
         if (empty($apiKeys)) {

@@ -1987,6 +1987,19 @@ onMounted(async () => {
   await loadDiscounts()
   await loadPaymentMethods()
   
+  // 🔥 Verificar si viene un error de pago en la URL (desde PaymentSuccess)
+  const urlParams = new URLSearchParams(window.location.search)
+  const paymentError = urlParams.get('payment_error')
+  if (paymentError) {
+    // Mostrar error de pago
+    activeSection.value = 'plan'
+    setTimeout(() => {
+      showNotification(decodeURIComponent(paymentError), 'error')
+      // Limpiar el parámetro de la URL sin recargar
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }, 500)
+  }
+  
   // Si viene con query param section=plans, ir directo a Mi Plan y abrir modal
   if (props.queryParams?.section === 'plans') {
     activeSection.value = 'plan'
