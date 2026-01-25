@@ -201,9 +201,9 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       pdf.setDrawColor(0, 86, 179) // #0056b3
       pdf.line(leftMargin, yPos, rightMargin, yPos)
     } else {
-      // Minimal
-      pdf.setLineWidth(style.layout.borderWidth * 2)
-      pdf.setDrawColor(0, 0, 0)
+      // Minimal: Línea fina y sutil gris
+      pdf.setLineWidth(0.15)
+      pdf.setDrawColor(204, 204, 204) // #cccccc
       pdf.line(leftMargin, yPos, rightMargin, yPos)
     }
     yPos += 5
@@ -235,19 +235,18 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       pdf.setTextColor(0, 0, 0)
       yPos += 13
     } else {
-      // Minimal: Caja con borde
-      applyHeaderStyle(pdf, style, leftMargin, yPos, pageWidth - 8, 14)
+      // Minimal: Sin fondo, solo tipografía pura y espacio en blanco
       pdf.setTextColor(0, 0, 0)
-
-      pdf.setFont('helvetica', style.fonts.title.style)
-      pdf.setFontSize(style.fonts.title.size)
-      pdf.text('FACTURA DE VENTA', centerX, yPos + 5, { align: 'center' })
-
-      pdf.setFontSize(style.fonts.title.size - 1)
-      pdf.text(`No. ${invoiceCode}`, centerX, yPos + 10, { align: 'center' })
-
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(8)
+      pdf.text('FACTURA DE VENTA', centerX, yPos + 3, { align: 'center' })
+      
+      pdf.setFont('courier', 'bold') // Monospace para número
+      pdf.setFontSize(12)
+      pdf.text(`No. ${invoiceCode}`, centerX, yPos + 9, { align: 'center' })
+      
       pdf.setTextColor(0, 0, 0) // Reset color
-      yPos += 17
+      yPos += 14
     }
 
     // Fecha y hora en formato más legible
@@ -351,17 +350,18 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       pdf.line(leftMargin, yPos, rightMargin, yPos)
       yPos += 3
     } else {
-      // MINIMAL: Sin fondo
+      // MINIMAL: Headers pequeños con letra espaciada, línea fina gris
       pdf.setTextColor(0, 0, 0)
       pdf.setFont('helvetica', 'bold')
-      pdf.setFontSize(style.fonts.header.size)
+      pdf.setFontSize(6)
       pdf.text('DESCRIPCIÓN', leftMargin + 1, yPos + 2)
       pdf.text('CANT.', leftMargin + 38, yPos + 2, { align: 'center' })
       pdf.text('PRECIO', leftMargin + 53, yPos + 2, { align: 'right' })
       pdf.text('TOTAL', rightMargin - 1, yPos + 2, { align: 'right' })
 
       yPos += 5
-      pdf.setLineWidth(0.2)
+      pdf.setLineWidth(0.15)
+      pdf.setDrawColor(204, 204, 204) // Gris claro
       pdf.line(leftMargin, yPos, rightMargin, yPos)
       yPos += 3
     }
@@ -439,31 +439,40 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
           yPos += 2
         }
       } else {
-        // MINIMAL: Layout con 4 columnas
+        // MINIMAL: Layout limpio con 4 columnas, monospace para números
         const nameLines = pdf.splitTextToSize(itemName, 32)
+        
+        // Nombre producto (sans-serif)
         pdf.setFont('helvetica', 'normal')
+        pdf.setFontSize(7)
+        pdf.setTextColor(0, 0, 0)
         pdf.text(nameLines[0], leftMargin + 1, yPos)
 
+        // Cantidad (monospace)
+        pdf.setFont('courier', 'normal')
         pdf.text(quantity.toString(), leftMargin + 38, yPos, { align: 'center' })
+        
+        // Precio unitario (monospace, gris)
+        pdf.setTextColor(102, 102, 102)
+        pdf.setFontSize(6)
         pdf.text(`$${price.toLocaleString('es-CO')}`, leftMargin + 53, yPos, { align: 'right' })
-
-        if (quantity > 1) {
-          pdf.setFont('helvetica', 'bold')
-        }
+        
+        // Total (monospace, bold, negro)
+        pdf.setFont('courier', 'bold')
+        pdf.setFontSize(7)
+        pdf.setTextColor(0, 0, 0)
         pdf.text(`$${itemTotal.toLocaleString('es-CO')}`, rightMargin - 1, yPos, { align: 'right' })
+        
         pdf.setFont('helvetica', 'normal')
-
-        if (nameLines.length > 1) {
-          yPos += 3
-          for (let i = 1; i < nameLines.length && i < 2; i++) {
-            pdf.setFontSize(6)
-            pdf.text(nameLines[i], leftMargin + 1, yPos)
-            yPos += 2.5
-          }
-          pdf.setFontSize(7)
-        }
-
         yPos += 4
+        
+        // Línea separadora muy fina entre productos
+        if (index < items.length - 1) {
+          pdf.setLineWidth(0.1)
+          pdf.setDrawColor(238, 238, 238) // Gris muy claro
+          pdf.line(leftMargin, yPos, rightMargin, yPos)
+          yPos += 2
+        }
       }
     })
 
@@ -571,18 +580,19 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       pdf.setTextColor(0, 0, 0)
       yPos += 10
     } else {
-      // Minimal: Con estilo del template
-      applyTotalStyle(pdf, style, leftMargin, yPos - 2, pageWidth - 8, 9)
+      // Minimal: Sin fondo, tipografía pura - Grande y limpio
       pdf.setTextColor(0, 0, 0)
-
-      pdf.setFont('helvetica', style.fonts.total.style)
-      pdf.setFontSize(style.fonts.total.size)
-      pdf.text('TOTAL A PAGAR:', leftMargin + 2, yPos + 3.5)
-      pdf.setFontSize(style.fonts.total.size + 2)
-      pdf.text(`$${total.toLocaleString('es-CO')}`, rightMargin - 2, yPos + 3.5, { align: 'right' })
-
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(10)
+      pdf.text('TOTAL A PAGAR', leftMargin + 1, yPos + 3)
+      
+      // Total con fuente grande monospace
+      pdf.setFont('courier', 'bold')
+      pdf.setFontSize(18)
+      pdf.text(`$${total.toLocaleString('es-CO')}`, rightMargin - 1, yPos + 3, { align: 'right' })
+      
       pdf.setTextColor(0, 0, 0) // Reset color
-      yPos += 11
+      yPos += 10
     }
 
     // ==================== INFORMACIÓN DE PAGO MEJORADA ====================
@@ -682,7 +692,8 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     if (style.name === 'modern') {
       pdf.setDrawColor(0, 86, 179) // Color de acento azul
     } else if (style.name === 'minimal') {
-      pdf.setDrawColor(0, 0, 0)
+      pdf.setDrawColor(204, 204, 204) // Gris claro para Minimal
+      pdf.setLineWidth(0.2) // Línea más fina
     } else {
       pdf.setDrawColor(0, 0, 0) // Negro para Classic
     }

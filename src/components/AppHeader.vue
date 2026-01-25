@@ -682,15 +682,19 @@ const notificationsSilent = ref(false) // Estado del silenciador
 const currentTheme = ref('system') // Estado del tema actual (light, dark, system)
 const isLoadingNotifications = ref(false)
 
-// Videos por módulo/sección (URLs de ejemplo - reemplazar con videos reales)
+// Videos tutoriales por módulo/sección (URLs de YouTube)
 const videoUrls = {
-  dashboard: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Video ejemplo Dashboard
-  pos: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Video ejemplo Punto de Venta
-  invoices: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Video ejemplo Facturas
-  inventory: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Video ejemplo Inventario
-  customers: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Video ejemplo Clientes
-  reports: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Video ejemplo Reportes
-  settings: 'https://www.youtube.com/embed/dQw4w9WgXcQ' // Video ejemplo Configuración
+  dashboard: 'https://www.youtube.com/embed/GOuXJvGKE7I', // Dashboard general
+  pos: 'https://www.youtube.com/embed/GOuXJvGKE7I', // Punto de Venta
+  invoices: 'https://www.youtube.com/embed/so8d5xf7Bbs', // Facturas
+  'returns-management': 'https://www.youtube.com/embed/VyP9w68mluA', // Devoluciones
+  products: 'https://www.youtube.com/embed/W63Z22N4ls8', // Productos
+  categories: 'https://www.youtube.com/embed/wd0Jx19hdPE', // Categorías
+  stock: 'https://www.youtube.com/embed/Eno-Pd5NlVg', // Control de Stock
+  intelligent_inventory: 'https://www.youtube.com/embed/TuIn42LpouM', // Inventario Inteligente
+  customers: null, // Sin video aún
+  reports: null, // Sin video aún
+  settings: null // Sin video aún
 }
 
 // Computed
@@ -703,7 +707,11 @@ const currentModuleTitle = computed(() => {
     dashboard: 'Dashboard Principal',
     pos: 'Punto de Venta',
     invoices: 'Gestión de Facturas',
-    inventory: 'Control de Inventario',
+    'returns-management': 'Devoluciones',
+    products: 'Gestión de Productos',
+    categories: 'Categorías',
+    stock: 'Gestión de Stock',
+    intelligent_inventory: 'Inventario Inteligente',
     customers: 'Gestión de Clientes',
     reports: 'Reportes y Análisis',
     settings: 'Configuración del Sistema'
