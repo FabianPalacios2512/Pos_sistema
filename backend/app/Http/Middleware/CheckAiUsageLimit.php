@@ -24,11 +24,6 @@ class CheckAiUsageLimit
         // Obtener tenant_id del tenant actual
         $tenantId = tenant('id');
 
-        // 🔓 BYPASS TEMPORAL PARA GEMINI AGENT (SPRINT)
-        if ($request->input('provider') === 'gemini') {
-            return $next($request);
-        }
-
         if (!$tenantId) {
             return response()->json([
                 'success' => false,

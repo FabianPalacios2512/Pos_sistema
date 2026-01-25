@@ -58,8 +58,17 @@ class AIController extends Controller
                 Log::error("❌ [Gemini] Error: " . $e->getMessage(), [
                     'trace' => $e->getTraceAsString()
                 ]);
+                
+                // Mensaje amigable sin exponer detalles técnicos
+                $userFriendlyMessage = 'Tuve un problema técnico al procesar tu solicitud. Por favor intenta de nuevo en unos segundos.';
+                
+                // Si es error de conexión, mensaje específico
+                if (str_contains($e->getMessage(), 'connection') || str_contains($e->getMessage(), 'timeout')) {
+                    $userFriendlyMessage = 'Parece que hay problemas de conexión. Verifica tu internet e intenta de nuevo.';
+                }
+                
                 return response()->json([
-                    'reply' => 'Error con el Agente Gemini: ' . $e->getMessage(),
+                    'reply' => $userFriendlyMessage,
                     'status' => 'error'
                 ], 500);
             }
@@ -324,7 +333,6 @@ class AIController extends Controller
 
             return response()->json([
                 'reply' => 'Lo siento, tuve un problema al procesar tu solicitud. Por favor intenta de nuevo.',
-                'error' => $e->getMessage(),
                 'status' => 'error'
             ], 500);
         }
@@ -371,7 +379,7 @@ class AIController extends Controller
         } catch (\Throwable $e) {
             Log::error('AI Chat With File Error: ' . $e->getMessage());
             return response()->json([
-                'reply' => 'Error al procesar el archivo: ' . $e->getMessage(),
+                'reply' => 'Tuve un problema al procesar el archivo. Verifica que sea un archivo válido e intenta de nuevo.',
                 'status' => 'error'
             ], 500);
         }
@@ -1310,7 +1318,7 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             }
         } catch (\Exception $e) {
             Log::error("[Tool Execution Error] {$toolName}: " . $e->getMessage());
-            return ['error' => $e->getMessage()];
+            return ['error' => 'No se pudo ejecutar esta función. Por favor intenta de nuevo.'];
         }
     }
 
@@ -1689,7 +1697,7 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
 
             return [
                 'success' => false,
-                'message' => 'Error ejecutando acción: ' . $e->getMessage()
+                'message' => 'No se pudo completar la acción. Por favor intenta de nuevo.'
             ];
         }
     }
@@ -1794,9 +1802,10 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 'data' => $warehouse
             ];
         } catch (\Exception $e) {
+            Log::error('Error creando sede via IA: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => "Error al crear la sede: " . $e->getMessage()
+                'message' => "No pude crear la sede. Verifica los datos e intenta de nuevo."
             ];
         }
     }

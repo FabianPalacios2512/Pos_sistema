@@ -57,6 +57,77 @@
           </div>
         </div>
 
+        <!-- 🎵 Mini Controles de Radio (Solo si fue iniciada desde el chat) -->
+        <transition name="slide-down">
+          <div 
+            v-if="showRadioControls"
+            class="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/10 dark:from-emerald-900/30 dark:via-teal-900/30 dark:to-emerald-900/30 border-b border-emerald-200/50 dark:border-emerald-800/30"
+          >
+            <!-- Info de la estación -->
+            <div class="flex items-center gap-2 flex-1 min-w-0">
+              <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                <svg class="w-4 h-4 text-white" :class="{ 'animate-pulse': isRadioPlaying }" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-gray-800 dark:text-white truncate">{{ currentStationName }}</p>
+                <p class="text-[10px] text-emerald-600 dark:text-emerald-400">{{ isRadioPlaying ? '♪ Reproduciendo' : '⏸ Pausado' }}</p>
+              </div>
+            </div>
+            
+            <!-- Controles -->
+            <div class="flex items-center gap-1">
+              <!-- Anterior -->
+              <button 
+                @click="radioControlPrevious"
+                class="w-8 h-8 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all"
+                title="Anterior"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                </svg>
+              </button>
+              
+              <!-- Play/Pause -->
+              <button 
+                @click="radioControlPlayPause"
+                class="w-9 h-9 flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-md shadow-emerald-500/30 transition-all"
+                :title="isRadioPlaying ? 'Pausar' : 'Reproducir'"
+              >
+                <svg v-if="isRadioPlaying" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                </svg>
+                <svg v-else class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </button>
+              
+              <!-- Siguiente -->
+              <button 
+                @click="radioControlNext"
+                class="w-8 h-8 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all"
+                title="Siguiente"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                </svg>
+              </button>
+              
+              <!-- Cerrar controles -->
+              <button 
+                @click="closeRadioControls"
+                class="w-6 h-6 flex items-center justify-center text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 ml-1 transition-all"
+                title="Ocultar controles"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </transition>
+
         <!-- Contenido del Chat -->
         <div v-show="activeTab === 'chat'" class="flex-1 flex flex-col overflow-hidden">
           <!-- Área de Mensajes -->
@@ -285,6 +356,7 @@ import { ref, nextTick, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useModuleNavigation } from '@/composables/useModuleNavigation'
 import { aiChatStore } from '@/store/aiChatStore'
+import { useRadioStore } from '@/store/radioStore'
 import api from '@/services/api'
 
 export default {
@@ -303,10 +375,11 @@ export default {
       default: ''
     }
   },
-  emits: ['close', 'navigate'],
+  emits: ['close', 'navigate', 'toggle-radio'],
   setup(props, { emit }) {
     const router = useRouter()
     const { navigateToModule } = useModuleNavigation()
+    const radioStore = useRadioStore()
     
     // Altura dinámica del chat (detecta si hay banner trial)
     const dynamicHeaderHeight = ref(props.headerHeight)
@@ -335,6 +408,10 @@ export default {
     
     // Hover suggestion para preview
     const hoverSuggestion = ref('')
+    
+    // Estado para controles de radio en el chat
+    // Solo se muestran si la radio fue iniciada desde el chat (para no gastar créditos)
+    const radioStartedFromChat = ref(false)
     
     // Selector de proveedor IA
     const selectedProvider = ref('gemini')
@@ -365,6 +442,15 @@ export default {
         return '105 Code'
       }
     })
+    
+    // Computed para mostrar controles de radio (solo si fue iniciada desde el chat)
+    const showRadioControls = computed(() => {
+      return radioStartedFromChat.value && radioStore.currentStation
+    })
+    
+    // Computed para estado de reproducción
+    const isRadioPlaying = computed(() => radioStore.isPlaying)
+    const currentStationName = computed(() => radioStore.currentStation?.name || 'Radio 105')
     
     // Categorías con sugerencias específicas
     const categories = [
@@ -642,19 +728,30 @@ export default {
         const today = new Date().toISOString().split('T')[0]
         localStorage.setItem('ai_daily_usage', JSON.stringify({ date: today, count: messagesUsedToday.value }))
 
+        // Debug: ver respuesta completa
+        console.log('🤖 [AI105Chat] Respuesta completa del backend:', response)
+
         let aiReply = response.reply
         let aiAction = null
         let suggestedAction = null
+
+        // Primero verificar si la acción viene directamente en response.action (del backend)
+        if (response.action) {
+          aiAction = response.action
+          console.log('🎯 [AI105Chat] Acción recibida del backend:', aiAction)
+        } else {
+          console.log('ℹ️ [AI105Chat] No hay acción en response.action')
+        }
 
         try {
           if (typeof response.reply === 'string' && response.reply.trim().startsWith('{')) {
             const parsed = JSON.parse(response.reply)
             aiReply = parsed.reply || parsed.text || response.reply
-            aiAction = parsed.action
+            aiAction = aiAction || parsed.action // No sobreescribir si ya existe
             suggestedAction = parsed.suggested_action
           } else if (typeof response.reply === 'object') {
             aiReply = response.reply.reply
-            aiAction = response.reply.action
+            aiAction = aiAction || response.reply.action
             suggestedAction = response.reply.suggested_action
           }
         } catch (e) {}
@@ -690,6 +787,70 @@ export default {
           const targetModule = aiAction.payload.params?.module
           const queryParams = aiAction.payload.query || {}
           if (targetModule) navigateToModule(targetModule, queryParams)
+        }
+
+        // 🎵 Procesar acciones de radio
+        if (aiAction && aiAction.type === 'radio' && aiAction.payload) {
+          console.log('🎵 [AI105Chat] Procesando acción de radio:', aiAction.payload)
+          const radioAction = aiAction.payload.action
+          const volume = aiAction.payload.volume
+          
+          // Asegurar que el audio esté inicializado
+          if (!radioStore.audio) {
+            console.log('🎵 [AI105Chat] Inicializando audio...')
+            radioStore.initAudio()
+          }
+          
+          // Cargar estaciones si están vacías
+          if (radioStore.topStations.length === 0) {
+            console.log('🎵 [AI105Chat] Cargando estaciones de radio...')
+            await radioStore.fetchHomeData()
+          }
+          
+          console.log('🎵 [AI105Chat] Ejecutando acción:', radioAction)
+          
+          switch (radioAction) {
+            case 'play':
+              radioStartedFromChat.value = true // Marcar que la radio fue iniciada desde el chat
+              if (!radioStore.currentStation) {
+                // Si no hay estación, reproducir una aleatoria
+                console.log('🎵 [AI105Chat] No hay estación actual, reproduciendo aleatoria...')
+                radioStore.playRandom()
+              } else {
+                console.log('🎵 [AI105Chat] Reproduciendo estación actual:', radioStore.currentStation?.name)
+                radioStore.audio?.play()
+              }
+              emit('toggle-radio') // Abrir panel de radio
+              break
+            case 'pause':
+              console.log('🎵 [AI105Chat] Pausando radio...')
+              radioStore.audio?.pause()
+              break
+            case 'toggle':
+              radioStore.togglePlay()
+              break
+            case 'next':
+              console.log('🎵 [AI105Chat] Siguiente canción...')
+              radioStore.playNext()
+              break
+            case 'previous':
+              console.log('🎵 [AI105Chat] Canción anterior...')
+              radioStore.playPrevious()
+              break
+            case 'volume_up':
+              radioStore.setVolume(Math.min(100, radioStore.volume + 10))
+              break
+            case 'volume_down':
+              radioStore.setVolume(Math.max(0, radioStore.volume - 10))
+              break
+            case 'mute':
+              radioStore.toggleMute()
+              break
+          }
+          
+          if (volume !== undefined) {
+            radioStore.setVolume(volume)
+          }
         }
 
       } catch (error) {
@@ -747,6 +908,23 @@ export default {
         textarea.selectionStart = textarea.selectionEnd = start + 1
       })
     }
+    
+    // Controles de radio directos (sin gastar créditos de IA)
+    const radioControlPrevious = () => {
+      radioStore.playPrevious()
+    }
+    
+    const radioControlPlayPause = () => {
+      radioStore.togglePlay()
+    }
+    
+    const radioControlNext = () => {
+      radioStore.playNext()
+    }
+    
+    const closeRadioControls = () => {
+      radioStartedFromChat.value = false
+    }
 
     const autoResizeTextarea = () => {
       const textarea = messageInput.value
@@ -790,7 +968,15 @@ export default {
       autoResizeTextarea,
       executeSuggestedAction,
       handleFileSelect,
-      clearFile
+      clearFile,
+      // Controles de radio
+      showRadioControls,
+      isRadioPlaying,
+      currentStationName,
+      radioControlPrevious,
+      radioControlPlayPause,
+      radioControlNext,
+      closeRadioControls
     }
   }
 }
@@ -806,6 +992,26 @@ export default {
 .slide-right-enter-from,
 .slide-right-leave-to {
   transform: translateX(100%);
+}
+
+/* Animación slide-down para controles de radio */
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-down-enter-from,
+.slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-100%);
+  max-height: 0;
+}
+
+.slide-down-enter-to,
+.slide-down-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 60px;
 }
 
 /* Fade in para mensajes */

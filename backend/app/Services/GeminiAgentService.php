@@ -19,7 +19,7 @@ class GeminiAgentService
     protected $apiKey;
     protected $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
     protected $sessionId;
-    protected $maxHistoryMessages = 10; // Cuántos mensajes recordar
+    protected $maxHistoryMessages = 20; // Cuántos mensajes recordar (suficiente contexto)
 
     public function __construct()
     {
@@ -29,11 +29,15 @@ class GeminiAgentService
 
     /**
      * Obtiene o crea el session_id para el usuario actual
+     * IMPORTANTE: El session_id es por usuario+tenant, NO por día
+     * Esto permite mantener contexto entre conversaciones
      */
     private function getSessionId()
     {
         $userId = auth()->id() ?? 'guest_' . request()->ip();
-        return 'gemini_sess_' . md5($userId . '_' . date('Ymd'));
+        $tenantId = tenant('id') ?? 'default';
+        // Session por usuario+tenant (sin fecha para mantener contexto)
+        return 'gemini_sess_' . md5($userId . '_' . $tenantId);
     }
 
     /**
@@ -46,10 +50,12 @@ class GeminiAgentService
 
         // Obtener plan actual del tenant
         $tenantPlan = 'free_trial';
+        $businessName = 'tu negocio';
         try {
             if (function_exists('tenant')) {
                 $tenant = tenant();
                 $tenantPlan = $tenant ? ($tenant->plan ?? 'free_trial') : 'free_trial';
+                $businessName = $tenant ? ($tenant->business_name ?? 'tu negocio') : 'tu negocio';
             }
         } catch (\Exception $e) {
             Log::warning('No se pudo obtener el plan del tenant: ' . $e->getMessage());
@@ -64,70 +70,167 @@ class GeminiAgentService
         };
 
         return <<<EOT
-Eres "105 IA", el asistente virtual inteligente del sistema POS 105. Eres amigable, profesional, eficiente y MUY útil.
+Eres "105 IA", el asistente virtual INTELIGENTE del sistema POS 105 para "{$businessName}". 
+No eres un simple chatbot que responde - eres un ASISTENTE DE NEGOCIO que PIENSA, ANALIZA y ACTÚA.
 
-🏢 CONTEXTO DEL NEGOCIO:
-- Plan Actual: {$tenantPlan} ({$planInfo})
-- Fecha actual: {$currentDate}
-- Hora actual: {$currentTime}
+🏢 CONTEXTO:
+- Negocio: {$businessName}
+- Plan: {$tenantPlan} ({$planInfo})
+- País: Colombia 🇨🇴
+- Fecha: {$currentDate}
+- Hora: {$currentTime}
 
-🎯 TUS CAPACIDADES (Herramientas disponibles):
-• crearProducto - Crear productos nuevos en el inventario
-• consultarInventario - Buscar productos por nombre
-• obtenerEstadisticas - Ver estadísticas generales del inventario
-• actualizarProducto - Modificar precio o stock de productos
-• eliminarProducto - Eliminar productos del inventario
-• consultarVentas - Ver ventas por fecha o período
-• consultarClientes - Buscar información de clientes
-• consultarFacturas - Ver facturas y detalles de ventas
-• consultarCategorias - Ver categorías de productos
-• obtenerReporteVentas - Obtener resumen de ventas con métricas
-• obtenerProductosMenosVendidos - Ver productos con menos rotación/ventas
-• obtenerMejoresClientes - Ver clientes que más compran
-• consultarDeudasClientes - (PREMIUM) Ver clientes con deudas/créditos activos
-• consultarSedes - (PREMIUM) Ver listado de sedes/bodegas
-• crearSede - (PREMIUM) Crear nuevas sedes/bodegas
-• analizarArchivoProductos - Analizar archivos Excel/CSV con productos
-• importarProductosMasivo - Importar productos masivamente
+═══════════════════════════════════════════════════════════════
+            🧠 TU MENTALIDAD: PIENSA → ANALIZA → ACTÚA
+═══════════════════════════════════════════════════════════════
 
-⚡ REGLAS CRÍTICAS DE COMPORTAMIENTO:
+ERES PROACTIVO, NO REACTIVO. Cuando el usuario dice algo:
 
-1. **NUNCA PREGUNTES PARA CONFIRMAR** - Si el usuario pide algo, HAZLO INMEDIATAMENTE.
-   - Si dice "sí", "ok", "por favor", "hazlo", "mira", "dale" → EJECUTA la acción sin preguntar.
-   - Si dice "¿cuál fue el cliente que más compró?" → USA la herramienta y RESPONDE con datos.
-   - Si dice "¿cuál es el producto menos vendido?" → USA obtenerProductosMenosVendidos y RESPONDE.
+1. **PIENSA**: ¿Qué quiere realmente? ¿Qué información necesito?
+2. **ANALIZA**: ¿Tengo una herramienta para esto? ¿Qué datos debo consultar?
+3. **ACTÚA**: Ejecuta las herramientas necesarias y entrega la respuesta COMPLETA.
 
-2. **IMPORTACIÓN DE ARCHIVOS** (NUEVO):
-   - Si el usuario dice "quiero importar productos desde Excel", "tengo un Excel con productos", o adjunta un archivo CSV/Excel:
-     * DETECTA automáticamente si hay archivos adjuntos en el mensaje del contexto
-     * USA analizarArchivoProductos con la ruta del archivo adjunto
-     * MUESTRA un preview de los productos detectados
-     * PREGUNTA solo UNA VEZ si quiere continuar con la importación
-     * Si confirma, USA importarProductosMasivo
-   - NUNCA digas: "proporciona la ruta del archivo en el servidor"
-   - NUNCA uses términos técnicos como "backend", "storage", "tenant"
-   - Responde natural: "¡Perfecto! Veo que adjuntaste un archivo. Déjame revisarlo..."
+❌ MAL (reactivo, preguntón):
+Usuario: "Dame mis productos"
+Tú: "¿Qué término de búsqueda quieres usar?" ← HORRIBLE
 
-3. **MEMORIA Y CONTEXTO**:
-   - RECUERDA toda la conversación. Si el usuario preguntó algo antes, ÚSALO.
-   - Si dice "sí" o "ese", se refiere a lo ÚLTIMO que mencionaste.
-   - NUNCA digas "¿Te refieres a...?" si ya sabes de qué hablan.
+✅ BIEN (proactivo, inteligente):
+Usuario: "Dame mis productos"  
+Tú: *Usa listarProductos* → "Tienes 45 productos activos. Aquí están los primeros 15..."
 
-4. **SÉ DIRECTO Y ÚTIL**:
-   - Da respuestas COMPLETAS con datos reales.
-   - Si una herramienta devuelve datos, INTERPRÉTALOS y explícalos claramente.
-   - NUNCA digas "no tengo herramienta para eso" si SÍ la tienes.
+❌ MAL:
+Usuario: "Cuál factura me dio más ganancia?"
+Tú: "No puedo calcular eso" ← INACEPTABLE
 
-5. **FORMATO**:
-   - Responde en español natural, amigable y profesional.
-   - NUNCA devuelvas JSON crudo.
-   - Usa emojis moderadamente para hacer las respuestas más amigables.
+✅ BIEN:
+Usuario: "Cuál factura me dio más ganancia?"
+Tú: *Usa obtenerFacturaMasRentable* → "La factura FACT-0234 del 15/01 te dejó $125.000 de margen (42%)..."
 
-6. **PROMOCIÓN SUTIL DE PLANES**:
-   - Solo sugiere upgrades si el usuario pregunta por funciones Premium que no tiene.
-   - Sé útil PRIMERO, vende DESPUÉS.
+❌ MAL:
+Usuario: "No me sale el módulo de Creditienda"
+Tú: "Eso no lo puedo solucionar" ← INÚTIL
 
-¡Tu misión es hacer que el usuario sienta que tiene un asistente INTELIGENTE y EFICIENTE!
+✅ BIEN:
+Usuario: "No me sale el módulo de Creditienda"
+Tú: *Usa consultarConfiguracion* → "Veo que Creditienda está desactivada en tu configuración. ¿Quieres que la active?"
+Usuario: "Sí"
+Tú: *Usa actualizarConfiguracion* → "¡Listo! Ya activé Creditienda. ¿Te ayudo a crear tu primer crédito o prefieres hacerlo manual?"
+
+═══════════════════════════════════════════════════════════════
+                    🛡️ REGLAS INVIOLABLES
+═══════════════════════════════════════════════════════════════
+
+⚠️ REGLA CRÍTICA: NO INVENTES ACCIONES ⚠️
+- NUNCA digas "ya lo activé" o "ya está activo" SIN haber llamado a la herramienta primero.
+- Si el usuario dice "activa X" → DEBES llamar a actualizarConfiguracion ANTES de responder.
+- Si el usuario dice "dame mis productos" → DEBES llamar a listarProductos ANTES de responder.
+- NUNCA inventes que algo "ya está activo" sin verificar con consultarConfiguracion.
+- Si no llamaste a una herramienta, NO puedes afirmar que hiciste una acción.
+
+⚠️ REGLA CRÍTICA: RADIO Y NAVEGACIÓN ⚠️
+- Si el usuario menciona "radio", "música", "préndeme", "pon" → DEBES llamar a controlarRadio.
+- Si el usuario dice "llévame a X", "ir a X", "abre X" → DEBES llamar a navegarModulo.
+- NUNCA digas "pongo la radio" sin llamar a controlarRadio primero.
+- NUNCA digas "te llevo a X" sin llamar a navegarModulo primero.
+
+📌 REGLA 1: ACTÚA, NO PREGUNTES
+- Si el usuario pide algo claro → HAZLO inmediatamente.
+- "Mis productos" → Lista productos (no preguntes "¿cuáles?")
+- "Ventas de hoy" → Muestra ventas (no preguntes "¿qué quieres ver?")
+- "Sí", "ok", "hazlo", "dale" → EJECUTA la última acción propuesta.
+
+📌 REGLA 1.5: NO PREGUNTES POR PERÍODO
+- "Producto más vendido" → Consulta TODO el histórico (no preguntes "¿de qué período?")
+- "Cuántos proveedores tengo" → Consulta TODOS (no digas "no puedo")
+- Si el usuario dice "en total" o "histórico" → USA TODO lo que hay en la base de datos.
+- Solo pregunta por período si el usuario explícitamente dice "de este mes" o similar.
+- Tienes herramientas para PROVEEDORES, PRODUCTOS MÁS VENDIDOS, etc. ¡ÚSALAS!
+
+📌 REGLA 2: VERDAD ABSOLUTA (Anti-Alucinación)
+- NUNCA inventes datos. Si no existen, di "No encontré X".
+- SIEMPRE usa las herramientas para obtener datos REALES.
+- Si buscas y hay 0 resultados → "No encontré productos con ese nombre"
+- Si hay 5 resultados → "Encontré 5 productos" (número exacto, nunca "varios")
+
+📌 REGLA 3: RESUELVE PROBLEMAS
+- Si algo no está disponible → PIENSA por qué y ofrece solución.
+- "No me aparece X" → Consulta configuración → Ofrece activar si está desactivado.
+- "No puedo hacer Y" → Verifica si es limitación de plan → Explica y ofrece alternativa.
+
+📌 REGLA 4: PROTEGE ACCIONES DESTRUCTIVAS
+- ELIMINAR productos: Pide confirmación con nombre exacto.
+- Eliminar TODOS los productos: PROHIBIDO. Di "No puedo eliminar todo, dime cuáles específicamente".
+- ACTUALIZAR masivo: Muestra preview antes de aplicar.
+
+📌 REGLA 5: CONTEXTO COLOMBIANO 🇨🇴
+- Precios: $15.000 (punto para miles, sin decimales)
+- Fechas: dd/mm/yyyy
+- Saludo: Buenos días/tardes/noches según hora actual.
+
+📌 REGLA 6: SÉ CONCISO PERO COMPLETO
+- Respuestas directas sin rodeos.
+- Si hay datos, muéstralos organizados.
+- Usa emojis moderados (✅ ❌ 📦 💰 📊).
+- Nunca digas "backend", "API", "query" - habla como humano.
+
+═══════════════════════════════════════════════════════════════
+                    🔧 TUS HERRAMIENTAS
+═══════════════════════════════════════════════════════════════
+
+📦 PRODUCTOS:
+• listarProductos - Listar TODOS los productos (sin necesidad de búsqueda)
+• consultarInventario - Buscar productos por nombre/SKU  
+• crearProducto - Crear nuevo producto
+• actualizarProducto - Modificar precio/stock
+• eliminarProducto - Eliminar producto (requiere confirmación)
+• obtenerEstadisticas - Estadísticas generales del negocio
+• productoMasVendido - El producto MÁS VENDIDO de TODO el histórico (NO pide período)
+• productosPocoVendidos - Productos sin rotación CON RECOMENDACIONES ACCIONABLES
+
+💰 VENTAS Y FACTURACIÓN:
+• consultarVentas - Ver ventas por período
+• consultarFacturas - Buscar facturas
+• obtenerDetalleFactura - Ver detalle de una factura
+• obtenerReporteVentas - Resumen de ventas con métricas
+• obtenerFacturaMasRentable - La factura con mayor margen de ganancia
+
+👥 CLIENTES:
+• consultarClientes - Buscar clientes
+• obtenerMejoresClientes - Top clientes por ventas
+• consultarDeudasClientes - Clientes con créditos pendientes
+
+🏭 PROVEEDORES:
+• consultarProveedores - Listar/buscar proveedores con estadísticas
+
+⚙️ CONFIGURACIÓN DEL SISTEMA:
+• consultarConfiguracion - Ver estado de módulos y opciones
+• actualizarConfiguracion - Activar/desactivar módulos
+• consultarSedes - Ver sedes registradas
+• crearSede - Crear nueva sede
+
+📂 IMPORTACIÓN:
+• analizarArchivoProductos - Analizar Excel/CSV
+• importarProductosMasivo - Importar productos en lote
+
+🚀 NAVEGACIÓN Y CONTROL DEL SISTEMA:
+• navegarModulo - Lleva al usuario a un módulo específico (productos, ventas, clientes, etc.)
+• controlarRadio - Controla la radio del sistema (play, pause, siguiente, anterior)
+
+═══════════════════════════════════════════════════════════════
+
+🎯 NAVEGACIÓN INTELIGENTE:
+Cuando el usuario diga:
+- "llévame a productos" → Usa navegarModulo con modulo="productos"
+- "quiero ver mis clientes" → Usa navegarModulo con modulo="clientes"
+- "préndeme la radio" / "pon música" → Usa controlarRadio con accion="play"
+- "para la radio" / "apaga la música" → Usa controlarRadio con accion="pause"
+- "siguiente canción" → Usa controlarRadio con accion="next"
+
+Después de crear un producto, puedes sugerir: "¿Quieres que te lleve al módulo de productos?"
+
+🎯 TU MISIÓN: Que el dueño del negocio sienta que tiene un asistente BRILLANTE que ENTIENDE, PIENSA y RESUELVE. No un bot tonto que solo sigue reglas.
+
+¡Ahora ve y sorprende al usuario con tu inteligencia!
 EOT;
     }
 
@@ -157,22 +260,37 @@ EOT;
     }
 
     /**
-     * Limpia el historial viejo de la sesión actual
+     * Limpia SOLO mensajes antiguos (>48 horas) para mantener contexto reciente
+     * CRÍTICO: Mantener 2 días de historial para contexto entre sesiones
      */
     private function cleanOldHistory()
     {
         try {
-            $sessionId = $this->getSessionId();
-
-            // Eliminar TODO el historial de esta sesión (del tenant actual)
-            $deleted = ConversationHistory::where('session_id', $sessionId)->delete();
+            // Solo eliminar mensajes de más de 48 horas (mantener 2 días de conversación)
+            $deleted = ConversationHistory::where('created_at', '<', now()->subHours(48))->delete();
 
             if ($deleted > 0) {
-                Log::info("🧹 [Gemini] Historial limpiado: {$deleted} mensajes eliminados (session: {$sessionId})");
+                Log::info("🧹 [Gemini] Historial antiguo limpiado: {$deleted} mensajes >48h eliminados");
             }
 
         } catch (\Exception $e) {
             Log::error('❌ [Gemini] Error limpiando historial: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Limpia TODO el historial de una sesión específica (solo cuando el usuario lo solicita)
+     */
+    public function clearSessionHistory()
+    {
+        try {
+            $sessionId = $this->getSessionId();
+            $deleted = ConversationHistory::where('session_id', $sessionId)->delete();
+            Log::info("🧹 [Gemini] Sesión reiniciada: {$deleted} mensajes eliminados");
+            return $deleted;
+        } catch (\Exception $e) {
+            Log::error('❌ [Gemini] Error limpiando sesión: ' . $e->getMessage());
+            return 0;
         }
     }
 
@@ -194,90 +312,182 @@ EOT;
      */
     public function runAgent($prompt)
     {
+        $startTime = microtime(true);
+        
+        // Validar API Key
         if (!$this->apiKey) {
+            Log::error('❌ [Gemini] API Key no configurada');
             return [
-                'reply' => 'Error: GEMINI_API_KEY no está configurada en el .env',
+                'reply' => '⚠️ El asistente no está disponible en este momento. Por favor contacta al administrador.',
                 'status' => 'error'
             ];
         }
 
-        // Limpiar historial viejo al iniciar
-        $this->cleanOldHistory();
-
-        // Guardar mensaje del usuario en historial
-        $this->saveMessage('user', $prompt);
-
-        // 1. Definir herramientas (Tools) - AMPLIADAS
-        $tools = $this->getToolsDefinition();
-
-        // 2. Construir mensajes con historial
-        $history = $this->getConversationHistory();
-
-        // El historial ya incluye el mensaje actual, así que lo usamos directamente
-        $messages = $history;
-
-        // Si el historial está vacío (primera vez), agregamos el mensaje
-        if (empty($messages)) {
-            $messages = [
-                [
-                    'role' => 'user',
-                    'parts' => [['text' => $prompt]]
-                ]
+        // Validar prompt vacío
+        $prompt = trim($prompt);
+        if (empty($prompt)) {
+            return [
+                'reply' => '¿En qué puedo ayudarte? Escribe tu pregunta o solicitud.',
+                'status' => 'success'
             ];
         }
 
-        $response = $this->callGemini($messages, $tools);
+        try {
+            // Limpiar historial antiguo (>24h) - NO el historial actual
+            $this->cleanOldHistory();
 
-        // Validar estructura de respuesta
-        if (!isset($response['candidates']) || !is_array($response['candidates']) || count($response['candidates']) === 0) {
-            Log::warning('Gemini: No candidates returned', ['response' => $response]);
+            // Guardar mensaje del usuario en historial
+            $this->saveMessage('user', $prompt);
+
+            // 1. Definir herramientas (Tools)
+            $tools = $this->getToolsDefinition();
+
+            // 2. Construir mensajes con historial
+            $history = $this->getConversationHistory();
+
+            // El historial ya incluye el mensaje actual, así que lo usamos directamente
+            $messages = $history;
+
+            // Si el historial está vacío (primera vez), agregamos el mensaje
+            if (empty($messages)) {
+                $messages = [
+                    [
+                        'role' => 'user',
+                        'parts' => [['text' => $prompt]]
+                    ]
+                ];
+            }
+
+            $response = $this->callGemini($messages, $tools);
+
+            // Validar estructura de respuesta
+            if (!isset($response['candidates']) || !is_array($response['candidates']) || count($response['candidates']) === 0) {
+                Log::warning('Gemini: No candidates returned', ['response' => $response]);
+                
+                // Verificar si fue bloqueado por seguridad
+                if (isset($response['promptFeedback']['blockReason'])) {
+                    return [
+                        'reply' => 'No puedo responder a eso. Por favor reformula tu pregunta.',
+                        'status' => 'blocked'
+                    ];
+                }
+                
+                return [
+                    'reply' => 'Tuve un problema procesando tu solicitud. Por favor intenta de nuevo.',
+                    'status' => 'error'
+                ];
+            }
+
+            $candidate = $response['candidates'][0];
+            
+            // Verificar finish reason
+            $finishReason = $candidate['finishReason'] ?? 'STOP';
+            if ($finishReason === 'SAFETY') {
+                return [
+                    'reply' => 'No puedo ayudarte con eso. ¿Hay algo más en lo que pueda asistirte?',
+                    'status' => 'blocked'
+                ];
+            }
+            
+            $content = $candidate['content'] ?? null;
+            $parts = $content['parts'] ?? [];
+
+            if (empty($parts)) {
+                Log::warning('Gemini: No content parts returned', ['candidate' => $candidate]);
+                return [
+                    'reply' => 'No obtuve una respuesta clara. ¿Puedes reformular tu pregunta?',
+                    'status' => 'error'
+                ];
+            }
+
+            $firstPart = $parts[0];
+
+            // 3. Verificar si Gemini quiere ejecutar una función
+            if (isset($firstPart['functionCall'])) {
+                $result = $this->handleFunctionCalls($parts, $messages, $tools);
+                $this->logAIUsage($prompt, $result, $startTime);
+                return $result;
+            }
+
+            // Si no hubo llamada a función, devolver la respuesta de texto normal
+            $replyText = $firstPart['text'] ?? 'No entendí tu solicitud. ¿Puedes ser más específico?';
+
+            // Guardar respuesta en historial
+            $this->saveMessage('assistant', $replyText);
+
+            // Extraer información de tokens
+            $tokensInfo = $this->extractTokensInfo($response);
+
+            $result = [
+                'reply' => $replyText,
+                'status' => 'success',
+                'tokens' => $tokensInfo
+            ];
+
+            $this->logAIUsage($prompt, $result, $startTime);
+
+            return $result;
+
+        } catch (\Exception $e) {
+            Log::error('❌ [Gemini] Error en runAgent: ' . $e->getMessage(), [
+                'prompt' => substr($prompt, 0, 100),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Guardar mensaje de error en historial para mantener contexto
+            $this->saveMessage('assistant', 'Tuve un problema técnico al procesar tu solicitud.');
+
             return [
-                'reply' => 'Lo siento, Gemini no devolvió ninguna respuesta válida.',
+                'reply' => 'Tuve un problema técnico. Por favor intenta de nuevo en unos segundos.',
                 'status' => 'error'
             ];
         }
+    }
 
-        $candidate = $response['candidates'][0];
-        $content = $candidate['content'] ?? null;
-        $parts = $content['parts'] ?? [];
-
-        if (empty($parts)) {
-            Log::warning('Gemini: No content parts returned', ['candidate' => $candidate]);
-            return [
-                'reply' => 'Lo siento, la respuesta de Gemini estaba vacía.',
-                'status' => 'error'
-            ];
+    /**
+     * Extrae información de tokens de la respuesta de Gemini
+     */
+    private function extractTokensInfo($response)
+    {
+        if (!isset($response['usageMetadata'])) {
+            return null;
         }
-
-        $firstPart = $parts[0];
-
-        // 3. Verificar si Gemini quiere ejecutar una función (puede ser múltiples)
-        if (isset($firstPart['functionCall'])) {
-            return $this->handleFunctionCalls($parts, $messages, $tools);
-        }
-
-        // Si no hubo llamada a función, devolver la respuesta de texto normal
-        $replyText = $firstPart['text'] ?? 'Lo siento, no entendí tu solicitud.';
-
-        // Guardar respuesta en historial
-        $this->saveMessage('assistant', $replyText);
-
-        // Extraer información de tokens
-        $tokensInfo = null;
-        if (isset($response['usageMetadata'])) {
-            $usage = $response['usageMetadata'];
-            $tokensInfo = [
-                'promptTokens' => $usage['promptTokenCount'] ?? 0,
-                'candidatesTokens' => $usage['candidatesTokenCount'] ?? 0,
-                'totalTokens' => $usage['totalTokenCount'] ?? 0,
-            ];
-        }
-
+        
+        $usage = $response['usageMetadata'];
         return [
-            'reply' => $replyText,
-            'status' => 'success',
-            'tokens' => $tokensInfo
+            'promptTokens' => $usage['promptTokenCount'] ?? 0,
+            'candidatesTokens' => $usage['candidatesTokenCount'] ?? 0,
+            'totalTokens' => $usage['totalTokenCount'] ?? 0,
         ];
+    }
+
+    /**
+     * Registra el uso de la IA para auditoría
+     */
+    private function logAIUsage($prompt, $result, $startTime)
+    {
+        try {
+            $responseTime = round((microtime(true) - $startTime) * 1000); // en ms
+            
+            \App\Models\AiUsageLog::create([
+                'user_id' => auth()->id(),
+                'api_key_index' => 0,
+                'api_key_last_4' => substr($this->apiKey, -4),
+                'user_message' => substr($prompt, 0, 500),
+                'prompt_tokens' => $result['tokens']['promptTokens'] ?? 0,
+                'completion_tokens' => $result['tokens']['candidatesTokens'] ?? 0,
+                'total_tokens' => $result['tokens']['totalTokens'] ?? 0,
+                'status' => $result['status'],
+                'error_message' => $result['status'] === 'error' ? substr($result['reply'], 0, 255) : null,
+                'response_time_ms' => $responseTime,
+                'model' => 'gemini-2.0-flash',
+                'endpoint' => 'generateContent',
+                'ip_address' => request()->ip()
+            ]);
+        } catch (\Exception $e) {
+            // No fallar si el logging falla
+            Log::warning('No se pudo registrar uso de IA: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -287,6 +497,7 @@ EOT;
     {
         $functionResults = [];
         $executedFunctions = [];
+        $actions = []; // Para almacenar acciones de navegación/radio
 
         foreach ($parts as $part) {
             if (!isset($part['functionCall'])) continue;
@@ -309,6 +520,11 @@ EOT;
                 'result' => $functionResult
             ];
             $executedFunctions[] = $functionName;
+
+            // Capturar acciones de navegación/radio
+            if (isset($functionResult['action'])) {
+                $actions[] = $functionResult['action'];
+            }
 
             // Agregar respuesta de función al historial
             $messages[] = [
@@ -357,12 +573,19 @@ EOT;
             ];
         }
 
-        return [
+        $result = [
             'reply' => $replyText,
             'status' => 'success',
             'agent_action' => 'Ejecutado: ' . implode(', ', $executedFunctions),
             'tokens' => $tokensInfo
         ];
+
+        // Agregar la primera acción si existe (navegación/radio)
+        if (!empty($actions)) {
+            $result['action'] = $actions[0];
+        }
+
+        return $result;
     }
 
     /**
@@ -631,6 +854,151 @@ EOT;
                             ],
                             'required' => ['products_data']
                         ]
+                    ],
+
+                    // === NUEVAS HERRAMIENTAS INTELIGENTES ===
+                    [
+                        'name' => 'listarProductos',
+                        'description' => 'Lista TODOS los productos del inventario sin necesidad de búsqueda. Usa esta herramienta cuando el usuario diga "mis productos", "dame los productos", "ver inventario completo", "lista de productos". NO PIDAS término de búsqueda, simplemente lista.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'limite' => ['type' => 'NUMBER', 'description' => 'Máximo de productos a mostrar (default 20)'],
+                                'ordenar_por' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Campo para ordenar: nombre, precio, stock, ventas',
+                                    'enum' => ['nombre', 'precio', 'stock', 'ventas']
+                                ],
+                                'solo_activos' => ['type' => 'BOOLEAN', 'description' => 'Solo mostrar productos activos (default true)']
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'consultarConfiguracion',
+                        'description' => 'Consulta el estado de la configuración del sistema: módulos activos (Creditienda, descuentos, fidelización), opciones habilitadas, y configuraciones de la tienda. Usa esto cuando el usuario pregunte "está activo X", "por qué no me aparece X", "qué módulos tengo".',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'modulo' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Módulo específico a consultar (opcional). Si no se especifica, devuelve todo.',
+                                    'enum' => ['creditienda', 'descuentos', 'fidelizacion', 'iva', 'general']
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'actualizarConfiguracion',
+                        'description' => 'OBLIGATORIO para activar o desactivar módulos del sistema. SIEMPRE usa esta función cuando el usuario diga: "activa X", "habilita X", "quiero usar X", "desactiva X", "actívalo", "sí actívalo". Los módulos son: creditienda, descuentos, fidelizacion (puntos/lealtad), iva. Esta función modifica la base de datos directamente. NO respondas que vas a activar algo sin llamar a esta función primero.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'modulo' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Módulo a modificar: creditienda, descuentos, fidelizacion (sistema de puntos/lealtad), iva',
+                                    'enum' => ['creditienda', 'descuentos', 'fidelizacion', 'iva']
+                                ],
+                                'activar' => ['type' => 'BOOLEAN', 'description' => 'true para activar, false para desactivar']
+                            ],
+                            'required' => ['modulo', 'activar']
+                        ]
+                    ],
+                    [
+                        'name' => 'obtenerFacturaMasRentable',
+                        'description' => 'Obtiene la factura con mayor margen de ganancia (diferencia entre precio de venta y costo). Responde preguntas como "cuál factura me dio más ganancia", "venta más rentable", "mejor margen".',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'periodo' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Período a analizar',
+                                    'enum' => ['hoy', 'ayer', 'semana', 'mes', 'año']
+                                ],
+                                'limite' => ['type' => 'NUMBER', 'description' => 'Cantidad de facturas top a mostrar (default 5)']
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'analizarNegocio',
+                        'description' => 'Analiza el estado general del negocio y da recomendaciones inteligentes. Usa esto cuando el usuario pida "recomendaciones", "cómo mejorar ventas", "analiza mi negocio", "qué puedo hacer mejor".',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => new \stdClass()
+                        ]
+                    ],
+
+                    // === NUEVAS: PROVEEDORES Y PRODUCTOS MÁS/MENOS VENDIDOS ===
+                    [
+                        'name' => 'consultarProveedores',
+                        'description' => 'Lista TODOS los proveedores registrados con estadísticas: cuántos productos les compramos, deuda pendiente, último pedido. Usa cuando pregunten "cuántos proveedores tengo", "mis proveedores", "a quién le compro".',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'query' => ['type' => 'STRING', 'description' => 'Buscar proveedor por nombre (opcional)'],
+                                'solo_activos' => ['type' => 'BOOLEAN', 'description' => 'Solo mostrar proveedores activos (default true)'],
+                                'limite' => ['type' => 'NUMBER', 'description' => 'Máximo de proveedores a mostrar (default 20)']
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'productoMasVendido',
+                        'description' => 'Obtiene el producto MÁS VENDIDO de TODO el histórico. NO pidas período - usa TODA la base de datos. Responde "cuál es el producto que más he vendido", "producto más vendido", "qué se vende más". Si el usuario quiere un período específico, lo dirá explícitamente.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'limite' => ['type' => 'NUMBER', 'description' => 'Cantidad de productos top a mostrar (default 10)'],
+                                'periodo' => [
+                                    'type' => 'STRING',
+                                    'description' => 'OPCIONAL - Solo usar si el usuario lo especifica explícitamente',
+                                    'enum' => ['hoy', 'semana', 'mes', 'año', 'todo']
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => 'productosPocoVendidos',
+                        'description' => 'Obtiene productos con poca o ninguna venta e incluye RECOMENDACIONES ACCIONABLES: bajar precio, crear promoción, enviar por WhatsApp a clientes. Usa cuando digan "productos que no se venden", "qué no he vendido", "productos estancados", "cómo mover inventario".',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'limite' => ['type' => 'NUMBER', 'description' => 'Cantidad de productos a mostrar (default 10)'],
+                                'dias_sin_venta' => ['type' => 'NUMBER', 'description' => 'Días sin ventas para considerar estancado (default 30)']
+                            ]
+                        ]
+                    ],
+
+                    // === NAVEGACIÓN Y CONTROL DEL SISTEMA ===
+                    [
+                        'name' => 'navegarModulo',
+                        'description' => 'Lleva al usuario a un módulo específico del sistema. Usa cuando digan "llévame a X", "quiero ver X", "abre X", "ir a X". Después de crear un producto, ofrece llevar al módulo de productos.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'modulo' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Módulo destino. Opciones: dashboard, pos/ventas/vender, facturas/facturacion, devoluciones, productos/inventario, categorias, stock, clientes, proveedores/compras, usuarios, caja/cajas, gastos/egresos, reportes, configuracion/ajustes',
+                                    'enum' => ['dashboard', 'pos', 'ventas', 'facturas', 'facturacion', 'devoluciones', 'productos', 'inventario', 'categorias', 'stock', 'clientes', 'proveedores', 'compras', 'usuarios', 'caja', 'cajas', 'gastos', 'gastos operativos', 'egresos', 'reportes', 'configuracion', 'ajustes']
+                                ],
+                                'mensaje' => ['type' => 'STRING', 'description' => 'Mensaje a mostrar al usuario antes de navegar']
+                            ],
+                            'required' => ['modulo']
+                        ]
+                    ],
+                    [
+                        'name' => 'controlarRadio',
+                        'description' => 'OBLIGATORIO para controlar la radio. SIEMPRE usa esta función cuando el usuario mencione: "radio", "música", "pon música", "préndeme", "apaga", "siguiente canción", "anterior", "volumen". Esta función envía comandos REALES al reproductor de radio del sistema. NO respondas sobre la radio sin llamar a esta función.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'accion' => [
+                                    'type' => 'STRING',
+                                    'description' => 'play=reproducir/prender, pause=pausar/parar/apagar, next=siguiente, previous=anterior, volume_up=subir volumen, volume_down=bajar volumen, mute=silenciar',
+                                    'enum' => ['play', 'pause', 'toggle', 'next', 'previous', 'volume_up', 'volume_down', 'mute']
+                                ],
+                                'volumen' => ['type' => 'NUMBER', 'description' => 'Nivel de volumen (0-100) si la acción es ajustar volumen']
+                            ],
+                            'required' => ['accion']
+                        ]
                     ]
                 ]
             ]
@@ -638,11 +1006,12 @@ EOT;
     }
 
     /**
-     * Realiza la petición HTTP a la API de Gemini.
+     * Realiza la petición HTTP a la API de Gemini con reintentos y manejo de errores robusto.
      */
-    private function callGemini($contents, $tools = null)
+    private function callGemini($contents, $tools = null, $retryCount = 0)
     {
         $url = $this->baseUrl . '?key=' . $this->apiKey;
+        $maxRetries = 2;
 
         $payload = [
             'contents' => $contents,
@@ -653,6 +1022,12 @@ EOT;
                 'temperature' => 0.7,
                 'topP' => 0.95,
                 'maxOutputTokens' => 2048
+            ],
+            'safetySettings' => [
+                ['category' => 'HARM_CATEGORY_HARASSMENT', 'threshold' => 'BLOCK_ONLY_HIGH'],
+                ['category' => 'HARM_CATEGORY_HATE_SPEECH', 'threshold' => 'BLOCK_ONLY_HIGH'],
+                ['category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold' => 'BLOCK_ONLY_HIGH'],
+                ['category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold' => 'BLOCK_ONLY_HIGH'],
             ]
         ];
 
@@ -665,35 +1040,68 @@ EOT;
             ];
         }
 
-        Log::info('Gemini Request Payload', ['payload' => json_encode($payload)]);
+        // Log reducido para producción
+        Log::info('🤖 [Gemini] Enviando request', [
+            'messages_count' => count($contents),
+            'has_tools' => !empty($tools),
+            'retry' => $retryCount
+        ]);
 
-        $response = Http::timeout(60)->withHeaders([
-            'Content-Type' => 'application/json'
-        ])->post($url, $payload);
+        try {
+            $response = Http::timeout(60)
+                ->retry(2, 1000)
+                ->withHeaders([
+                    'Content-Type' => 'application/json'
+                ])
+                ->post($url, $payload);
 
-        if ($response->failed()) {
-            Log::error('Gemini API Error', ['status' => $response->status(), 'body' => $response->body()]);
-            throw new \Exception('Error al conectar con Gemini: ' . $response->body());
+            if ($response->failed()) {
+                $statusCode = $response->status();
+                $errorBody = $response->body();
+                
+                Log::error('❌ [Gemini API Error]', [
+                    'status' => $statusCode, 
+                    'body' => substr($errorBody, 0, 500)
+                ]);
+                
+                if ($statusCode === 429) {
+                    throw new \Exception('El asistente está ocupado. Por favor espera unos segundos.');
+                }
+                if ($statusCode === 503 || $statusCode === 500) {
+                    if ($retryCount < $maxRetries) {
+                        sleep(1);
+                        return $this->callGemini($contents, $tools, $retryCount + 1);
+                    }
+                    throw new \Exception('El servicio no está disponible temporalmente.');
+                }
+                if ($statusCode === 400) {
+                    throw new \Exception('No pude procesar tu solicitud. Intenta reformularla.');
+                }
+                
+                throw new \Exception('Error de conexión con el asistente.');
+            }
+
+            $jsonResponse = $response->json();
+
+            if (isset($jsonResponse['usageMetadata'])) {
+                $usage = $jsonResponse['usageMetadata'];
+                Log::info('📊 [Gemini Tokens]', [
+                    'prompt' => $usage['promptTokenCount'] ?? 0,
+                    'completion' => $usage['candidatesTokenCount'] ?? 0,
+                    'total' => $usage['totalTokenCount'] ?? 0,
+                ]);
+            }
+
+            if (!$jsonResponse) {
+                throw new \Exception('Respuesta vacía del asistente.');
+            }
+
+            return $jsonResponse;
+
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('❌ [Gemini] Error de conexión: ' . $e->getMessage());
+            throw new \Exception('No hay conexión con el servicio. Verifica tu internet.');
         }
-
-        $jsonResponse = $response->json();
-        Log::info('Gemini Response', ['response' => $jsonResponse]);
-
-        // 📊 LOG DE TOKENS CONSUMIDOS
-        if (isset($jsonResponse['usageMetadata'])) {
-            $usage = $jsonResponse['usageMetadata'];
-            Log::info('📊 [Gemini Tokens]', [
-                'promptTokens' => $usage['promptTokenCount'] ?? 0,
-                'candidatesTokens' => $usage['candidatesTokenCount'] ?? 0,
-                'totalTokens' => $usage['totalTokenCount'] ?? 0,
-            ]);
-        }
-
-        if (!$jsonResponse) {
-            throw new \Exception('Respuesta vacía o inválida de Gemini API');
-        }
-
-        return $jsonResponse;
     }
 
     /**
@@ -754,6 +1162,32 @@ EOT;
             case 'importarProductosMasivo':
                 return $this->importarProductosMasivoHandler($args);
 
+            // === NUEVAS HERRAMIENTAS INTELIGENTES ===
+            case 'listarProductos':
+                return $this->listarProductosDB($args);
+            case 'consultarConfiguracion':
+                return $this->consultarConfiguracionDB($args);
+            case 'actualizarConfiguracion':
+                return $this->actualizarConfiguracionDB($args);
+            case 'obtenerFacturaMasRentable':
+                return $this->obtenerFacturaMasRentableDB($args);
+            case 'analizarNegocio':
+                return $this->analizarNegocioDB();
+
+            // === PROVEEDORES Y ANÁLISIS DE VENTAS ===
+            case 'consultarProveedores':
+                return $this->consultarProveedoresDB($args);
+            case 'productoMasVendido':
+                return $this->productoMasVendidoDB($args);
+            case 'productosPocoVendidos':
+                return $this->productosPocoVendidosDB($args);
+
+            // === NAVEGACIÓN Y CONTROL DEL SISTEMA ===
+            case 'navegarModulo':
+                return $this->navegarModuloAction($args);
+            case 'controlarRadio':
+                return $this->controlarRadioAction($args);
+
             default:
                 return ['error' => 'Función no encontrada: ' . $name];
         }
@@ -767,12 +1201,53 @@ EOT;
     {
         try {
             // 1. Validar datos mínimos
-            $nombre = $data['nombre'] ?? 'Producto sin nombre';
-            $precio = $data['precio'] ?? 0;
-            $stock = $data['stock'] ?? 0;
+            $nombre = trim($data['nombre'] ?? '');
+            $precio = floatval($data['precio'] ?? 0);
+            $stock = intval($data['stock'] ?? 0);
+
+            // Validación de nombre
+            if (empty($nombre) || $nombre === 'Producto sin nombre') {
+                return [
+                    'status' => 'error',
+                    'message' => "Necesito el nombre del producto para crearlo. ¿Cómo se llama?"
+                ];
+            }
+
+            // Validación de precio
+            if ($precio < 0) {
+                return [
+                    'status' => 'error',
+                    'message' => "El precio no puede ser negativo."
+                ];
+            }
+
+            // Validación de stock
+            if ($stock < 0) {
+                return [
+                    'status' => 'error',
+                    'message' => "El stock no puede ser negativo."
+                ];
+            }
+
+            // Verificar si ya existe un producto con ese nombre
+            $existente = Product::where('name', 'LIKE', $nombre)->where('active', true)->first();
+            if ($existente) {
+                return [
+                    'status' => 'duplicate',
+                    'existing_product' => [
+                        'id' => $existente->id,
+                        'name' => $existente->name,
+                        'price' => $existente->sale_price,
+                        'stock' => $existente->current_stock
+                    ],
+                    'message' => "Ya existe un producto llamado '{$existente->name}' (ID: {$existente->id}) con precio \$" . 
+                                number_format($existente->sale_price, 0, ',', '.') . 
+                                " y stock de {$existente->current_stock} unidades. ¿Deseas actualizar el existente o crear uno nuevo con diferente nombre?"
+                ];
+            }
 
             // 2. Obtener Categoría por defecto (o crearla si no existe)
-            $categoria = Category::first();
+            $categoria = Category::where('active', true)->first();
             if (!$categoria) {
                 $categoria = Category::create([
                     'name' => 'General',
@@ -781,13 +1256,13 @@ EOT;
             }
 
             // 3. Obtener Proveedor por defecto (o crear uno si no existe)
-            $proveedor = Supplier::first();
+            $proveedor = Supplier::where('active', true)->first();
             if (!$proveedor) {
                 $proveedor = Supplier::create([
                     'name' => 'Proveedor General',
                     'document' => '000000000',
                     'active' => true,
-                    'email' => 'general@example.com',
+                    'email' => 'general@proveedor.com',
                     'phone' => '0000000000'
                 ]);
             }
@@ -799,60 +1274,129 @@ EOT;
                 'sale_price' => $precio,
                 'cost_price' => 0,
                 'current_stock' => $stock,
+                'min_stock' => 5, // Valor por defecto razonable
                 'manage_stock' => true,
                 'active' => true,
                 'category_id' => $categoria->id,
                 'supplier_id' => $proveedor->id,
-                'sku' => 'GEN-' . strtoupper(uniqid()),
-                'barcode' => rand(10000000, 99999999),
+                'sku' => 'SKU-' . strtoupper(substr(md5($nombre . time()), 0, 8)),
+                'barcode' => strval(rand(1000000000000, 9999999999999)), // EAN-13
             ]);
 
-            Log::info("✅ Producto creado por IA: {$producto->name} (ID: {$producto->id})");
+            // Log de auditoría
+            Log::info("📦 [IA Auditoría] Producto CREADO", [
+                'product_id' => $producto->id,
+                'product_name' => $producto->name,
+                'sale_price' => $producto->sale_price,
+                'stock' => $producto->current_stock,
+                'user_id' => auth()->id(),
+                'timestamp' => now()->toISOString()
+            ]);
+
+            $precioFormateado = '$' . number_format($producto->sale_price, 0, ',', '.');
 
             return [
                 'status' => 'ok',
-                'message' => "Producto '{$producto->name}' creado exitosamente con ID {$producto->id}, precio \${$producto->sale_price} y stock {$producto->current_stock}.",
-                'id' => $producto->id
+                'product_id' => $producto->id,
+                'message' => "✅ Producto creado exitosamente:\n\n" .
+                            "📦 **{$producto->name}**\n" .
+                            "• ID: {$producto->id}\n" .
+                            "• Precio: {$precioFormateado}\n" .
+                            "• Stock inicial: {$producto->current_stock} unidades\n" .
+                            "• Categoría: {$categoria->name}\n" .
+                            "• SKU: {$producto->sku}"
             ];
 
         } catch (\Exception $e) {
             Log::error("❌ Error al crear producto por IA: " . $e->getMessage());
             return [
                 'status' => 'error',
-                'message' => 'No se pudo crear el producto: ' . $e->getMessage()
+                'message' => 'No pude crear el producto. ' . $this->formatErrorMessage($e->getMessage())
             ];
         }
+    }
+
+    /**
+     * Formatea mensajes de error para el usuario (sin tecnicismos)
+     */
+    private function formatErrorMessage($errorMessage)
+    {
+        // Ocultar detalles técnicos y dar mensajes amigables
+        if (str_contains($errorMessage, 'Duplicate entry')) {
+            return 'Ya existe un registro con esos datos.';
+        }
+        if (str_contains($errorMessage, 'Connection refused')) {
+            return 'Hay un problema de conexión. Por favor intenta en unos segundos.';
+        }
+        if (str_contains($errorMessage, 'SQLSTATE')) {
+            return 'Hubo un problema al guardar los datos. Por favor intenta de nuevo.';
+        }
+        return 'Por favor intenta de nuevo o contacta soporte si el problema persiste.';
     }
 
     private function consultarInventarioDB($data)
     {
         try {
-            $query = $data['query'] ?? '';
+            $query = trim($data['query'] ?? '');
 
-            $productos = Product::where('name', 'like', "%{$query}%")
-                ->orWhere('sku', 'like', "%{$query}%")
-                ->limit(10)
-                ->get(['id', 'name', 'sale_price', 'current_stock']);
+            if (empty($query)) {
+                return [
+                    'results' => [],
+                    'count' => 0,
+                    'message' => "Por favor, indícame qué producto deseas buscar."
+                ];
+            }
+
+            $productos = Product::where('active', true)
+                ->where(function($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%")
+                      ->orWhere('sku', 'like', "%{$query}%")
+                      ->orWhere('barcode', 'like', "%{$query}%");
+                })
+                ->orderBy('name')
+                ->limit(15)
+                ->get(['id', 'name', 'sku', 'sale_price', 'current_stock', 'category_id']);
 
             if ($productos->isEmpty()) {
                 return [
                     'results' => [],
                     'count' => 0,
-                    'message' => "No se encontraron productos con '{$query}'."
+                    'encontrados' => false,
+                    'message' => "No encontré ningún producto que coincida con '{$query}'. Verifica el nombre o intenta con otra palabra clave."
                 ];
             }
 
+            // Formatear resultados con precios en formato colombiano
+            $resultadosFormateados = $productos->map(function($p) {
+                return [
+                    'id' => $p->id,
+                    'nombre' => $p->name,
+                    'sku' => $p->sku,
+                    'precio' => '$' . number_format($p->sale_price, 0, ',', '.'),
+                    'precio_raw' => $p->sale_price,
+                    'stock' => intval($p->current_stock) . ' unidades'
+                ];
+            })->toArray();
+
+            $mensajeAmbiguedad = '';
+            if ($productos->count() > 1) {
+                $mensajeAmbiguedad = " Si necesitas información de uno específico, indícame cuál.";
+            }
+
             return [
-                'results' => $productos->toArray(),
+                'results' => $resultadosFormateados,
                 'count' => $productos->count(),
-                'message' => "Se encontraron {$productos->count()} productos."
+                'encontrados' => true,
+                'multiple_results' => $productos->count() > 1,
+                'message' => "Encontré {$productos->count()} producto(s) con '{$query}'.{$mensajeAmbiguedad}"
             ];
 
         } catch (\Exception $e) {
             Log::error("❌ Error al consultar inventario: " . $e->getMessage());
             return [
                 'status' => 'error',
-                'message' => 'Error al consultar inventario.'
+                'count' => 0,
+                'message' => 'Tuve un problema al buscar en el inventario. Por favor intenta de nuevo.'
             ];
         }
     }
@@ -860,83 +1404,255 @@ EOT;
     private function obtenerEstadisticasDB()
     {
         try {
-            $totalProductos = Product::count();
-            $valorInventario = Product::sum(DB::raw('sale_price * current_stock'));
-            $bajoStock = Product::whereColumn('current_stock', '<=', 'min_stock')->count();
+            // Estadísticas de inventario
+            $totalProductos = Product::where('active', true)->count();
+            $productosInactivos = Product::where('active', false)->count();
+            $valorInventario = Product::where('active', true)->sum(DB::raw('sale_price * current_stock'));
+            $costoInventario = Product::where('active', true)->sum(DB::raw('cost_price * current_stock'));
+            $bajoStock = Product::where('active', true)->whereColumn('current_stock', '<=', 'min_stock')->count();
+            $sinStock = Product::where('active', true)->where('current_stock', '<=', 0)->count();
 
             // Ventas de hoy
             $ventasHoy = Invoice::where('type', 'invoice')
                 ->where('status', '!=', 'cancelled')
                 ->whereDate('date', Carbon::today())
                 ->sum('total');
+            
+            $facturasHoy = Invoice::where('type', 'invoice')
+                ->where('status', '!=', 'cancelled')
+                ->whereDate('date', Carbon::today())
+                ->count();
+
+            // Ventas de ayer para comparación
+            $ventasAyer = Invoice::where('type', 'invoice')
+                ->where('status', '!=', 'cancelled')
+                ->whereDate('date', Carbon::yesterday())
+                ->sum('total');
+
+            // Calcular variación
+            $variacion = $ventasAyer > 0 ? round((($ventasHoy - $ventasAyer) / $ventasAyer) * 100, 1) : 0;
+            $variacionTexto = $variacion > 0 ? "+{$variacion}%" : "{$variacion}%";
+            $variacionEmoji = $variacion >= 0 ? '📈' : '📉';
+
+            // Formatear valores en formato colombiano
+            $valorInventarioFmt = '$' . number_format($valorInventario, 0, ',', '.');
+            $ventasHoyFmt = '$' . number_format($ventasHoy, 0, ',', '.');
+            $ventasAyerFmt = '$' . number_format($ventasAyer, 0, ',', '.');
+
+            // Determinar saludo según hora
+            $hora = intval(now()->format('H'));
+            $saludo = $hora >= 5 && $hora < 12 ? 'Buenos días' : ($hora >= 12 && $hora < 18 ? 'Buenas tardes' : 'Buenas noches');
 
             return [
                 'total_productos' => $totalProductos,
-                'valor_total_inventario' => $valorInventario,
+                'productos_inactivos' => $productosInactivos,
+                'valor_inventario' => $valorInventario,
+                'valor_inventario_formateado' => $valorInventarioFmt,
+                'costo_inventario' => $costoInventario,
                 'productos_bajo_stock' => $bajoStock,
+                'productos_sin_stock' => $sinStock,
                 'ventas_hoy' => $ventasHoy,
-                'mensaje' => "Tienes {$totalProductos} productos en inventario. Valor total: $" . number_format($valorInventario, 0, ',', '.') . ". Productos con stock bajo: {$bajoStock}. Ventas de hoy: $" . number_format($ventasHoy, 0, ',', '.')
+                'ventas_hoy_formateado' => $ventasHoyFmt,
+                'facturas_hoy' => $facturasHoy,
+                'ventas_ayer' => $ventasAyer,
+                'variacion_vs_ayer' => $variacionTexto,
+                'mensaje' => "{$saludo}! 📊 Aquí está el resumen de tu negocio:\n\n" .
+                            "📦 **Inventario**\n" .
+                            "• {$totalProductos} productos activos\n" .
+                            "• Valor total: {$valorInventarioFmt}\n" .
+                            ($bajoStock > 0 ? "• ⚠️ {$bajoStock} productos con stock bajo\n" : "") .
+                            ($sinStock > 0 ? "• ❌ {$sinStock} productos sin stock\n" : "") .
+                            "\n💰 **Ventas de Hoy**\n" .
+                            "• Total: {$ventasHoyFmt} ({$facturasHoy} facturas)\n" .
+                            "• Ayer: {$ventasAyerFmt}\n" .
+                            "• {$variacionEmoji} Variación: {$variacionTexto}"
             ];
         } catch (\Exception $e) {
             Log::error("❌ Error obtenerEstadisticas: " . $e->getMessage());
-            return ['status' => 'error', 'message' => 'Error al obtener estadísticas.'];
+            return ['status' => 'error', 'message' => 'Tuve un problema al obtener las estadísticas. Por favor intenta de nuevo.'];
         }
     }
 
     private function actualizarProductoDB($data)
     {
         try {
-            $nombre = $data['nombre'];
-            $producto = Product::where('name', 'LIKE', "%{$nombre}%")->first();
-
-            if (!$producto) {
-                return ['status' => 'error', 'message' => "No encontré ningún producto llamado '{$nombre}'."];
+            $nombre = trim($data['nombre'] ?? '');
+            
+            if (empty($nombre)) {
+                return ['status' => 'error', 'message' => "Necesito saber qué producto deseas actualizar."];
             }
 
+            // Buscar productos que coincidan
+            $productos = Product::where('active', true)
+                ->where(function($q) use ($nombre) {
+                    $q->where('name', 'LIKE', "%{$nombre}%")
+                      ->orWhere('sku', 'LIKE', "%{$nombre}%");
+                })
+                ->limit(5)
+                ->get(['id', 'name', 'sku', 'sale_price', 'current_stock']);
+
+            if ($productos->isEmpty()) {
+                return [
+                    'status' => 'not_found', 
+                    'message' => "No encontré ningún producto con '{$nombre}'. Verifica el nombre e intenta de nuevo."
+                ];
+            }
+
+            // REGLA DE AMBIGÜEDAD: Si hay múltiples resultados, listarlos
+            if ($productos->count() > 1) {
+                $lista = $productos->map(function($p, $i) {
+                    return ($i + 1) . ") {$p->name} - \$" . number_format($p->sale_price, 0, ',', '.') . " - Stock: {$p->current_stock}";
+                })->join("\n");
+
+                return [
+                    'status' => 'ambiguous',
+                    'count' => $productos->count(),
+                    'opciones' => $productos->toArray(),
+                    'message' => "Encontré {$productos->count()} productos similares:\n{$lista}\n\n¿Cuál deseas actualizar? Indícame el nombre exacto."
+                ];
+            }
+
+            // Solo un producto encontrado - proceder
+            $producto = $productos->first();
             $cambios = [];
+            $valoresAnteriores = [];
+
+            // Guardar valores anteriores para trazabilidad
             if (isset($data['nuevo_precio'])) {
-                $producto->sale_price = $data['nuevo_precio'];
-                $cambios[] = "precio a \${$data['nuevo_precio']}";
+                $valoresAnteriores['precio'] = $producto->sale_price;
+                $producto->sale_price = floatval($data['nuevo_precio']);
+                $cambios[] = "precio: \$" . number_format($valoresAnteriores['precio'], 0, ',', '.') . " → \$" . number_format($data['nuevo_precio'], 0, ',', '.');
             }
             if (isset($data['nuevo_stock'])) {
-                $producto->current_stock = $data['nuevo_stock'];
-                $cambios[] = "stock a {$data['nuevo_stock']}";
+                $valoresAnteriores['stock'] = $producto->current_stock;
+                $producto->current_stock = intval($data['nuevo_stock']);
+                $cambios[] = "stock: {$valoresAnteriores['stock']} → {$data['nuevo_stock']} unidades";
             }
 
             if (empty($cambios)) {
-                return ['status' => 'warning', 'message' => "Encontré el producto '{$producto->name}' pero no me diste nuevos valores para actualizar."];
+                return [
+                    'status' => 'no_changes', 
+                    'message' => "Encontré '{$producto->name}' pero no especificaste qué actualizar (precio o stock)."
+                ];
             }
 
             $producto->save();
 
+            // Log de auditoría
+            Log::info("📝 [IA Auditoría] Producto actualizado", [
+                'product_id' => $producto->id,
+                'product_name' => $producto->name,
+                'user_id' => auth()->id(),
+                'cambios' => $cambios,
+                'valores_anteriores' => $valoresAnteriores,
+                'timestamp' => now()->toISOString()
+            ]);
+
             return [
                 'status' => 'ok',
-                'message' => "Producto '{$producto->name}' actualizado: " . implode(', ', $cambios) . "."
+                'product_id' => $producto->id,
+                'message' => "✅ Producto '{$producto->name}' actualizado:\n• " . implode("\n• ", $cambios)
             ];
+
         } catch (\Exception $e) {
             Log::error("❌ Error actualizarProducto: " . $e->getMessage());
-            return ['status' => 'error', 'message' => 'Error al actualizar producto.'];
+            return ['status' => 'error', 'message' => 'Tuve un problema al actualizar el producto. Por favor intenta de nuevo.'];
         }
     }
 
     private function eliminarProductoDB($data)
     {
         try {
-            $nombre = $data['nombre'];
-            $producto = Product::where('name', $nombre)->first();
+            $nombre = trim($data['nombre'] ?? '');
+            $confirmacion = $data['confirmacion'] ?? false;
 
-            if (!$producto) {
-                return ['status' => 'error', 'message' => "No encontré ningún producto llamado '{$nombre}' para eliminar."];
+            if (empty($nombre)) {
+                return ['status' => 'error', 'message' => "Necesito saber qué producto deseas eliminar."];
             }
 
-            $producto->delete();
+            // Buscar productos que coincidan
+            $productos = Product::where('active', true)
+                ->where(function($q) use ($nombre) {
+                    $q->where('name', 'LIKE', "%{$nombre}%")
+                      ->orWhere('name', $nombre); // Búsqueda exacta también
+                })
+                ->limit(5)
+                ->get(['id', 'name', 'sku', 'sale_price', 'current_stock']);
+
+            if ($productos->isEmpty()) {
+                return [
+                    'status' => 'not_found', 
+                    'message' => "No encontré ningún producto con '{$nombre}' para eliminar."
+                ];
+            }
+
+            // REGLA DE AMBIGÜEDAD: Si hay múltiples resultados, listarlos
+            if ($productos->count() > 1) {
+                $lista = $productos->map(function($p, $i) {
+                    return ($i + 1) . ") {$p->name} (Stock: {$p->current_stock})";
+                })->join("\n");
+
+                return [
+                    'status' => 'ambiguous',
+                    'count' => $productos->count(),
+                    'message' => "Encontré {$productos->count()} productos similares:\n{$lista}\n\n⚠️ Para eliminar, dime el nombre EXACTO del producto."
+                ];
+            }
+
+            // Solo un producto encontrado
+            $producto = $productos->first();
+
+            // REGLA DE PROTECCIÓN: Verificar si el nombre coincide EXACTAMENTE
+            // Si el usuario dijo "Coca" y el producto es "Coca-Cola 2L", pedir confirmación
+            $nombreExacto = strtolower(trim($producto->name)) === strtolower(trim($nombre));
+
+            if (!$nombreExacto && !$confirmacion) {
+                return [
+                    'status' => 'requires_confirmation',
+                    'product_id' => $producto->id,
+                    'product_name' => $producto->name,
+                    'message' => "⚠️ ¿Confirmas que deseas eliminar '{$producto->name}'?\n\n" .
+                                 "• Precio: \$" . number_format($producto->sale_price, 0, ',', '.') . "\n" .
+                                 "• Stock actual: {$producto->current_stock} unidades\n\n" .
+                                 "Esta acción NO se puede deshacer. Responde 'sí, eliminar {$producto->name}' para confirmar."
+                ];
+            }
+
+            // Guardar información antes de eliminar para auditoría
+            $productoInfo = [
+                'id' => $producto->id,
+                'name' => $producto->name,
+                'sku' => $producto->sku,
+                'sale_price' => $producto->sale_price,
+                'current_stock' => $producto->current_stock
+            ];
+
+            // Desactivar en lugar de eliminar físicamente (mejor para auditoría DIAN)
+            $producto->active = false;
+            $producto->save();
+
+            // Log de auditoría CRÍTICO
+            Log::warning("🗑️ [IA Auditoría] Producto ELIMINADO (desactivado)", [
+                'product' => $productoInfo,
+                'user_id' => auth()->id(),
+                'action' => 'soft_delete_via_ai',
+                'timestamp' => now()->toISOString(),
+                'ip' => request()->ip()
+            ]);
 
             return [
                 'status' => 'ok',
-                'message' => "Producto '{$nombre}' eliminado correctamente del inventario."
+                'deleted_product' => $productoInfo,
+                'message' => "✅ Producto '{$producto->name}' eliminado del inventario.\n\n" .
+                            "📋 Registro guardado:\n" .
+                            "• ID: {$productoInfo['id']}\n" .
+                            "• Último precio: \$" . number_format($productoInfo['sale_price'], 0, ',', '.') . "\n" .
+                            "• Stock que tenía: {$productoInfo['current_stock']} unidades"
             ];
+
         } catch (\Exception $e) {
-            return ['status' => 'error', 'message' => 'Error al eliminar producto.'];
+            Log::error("❌ Error eliminarProducto: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Tuve un problema al eliminar el producto. Por favor intenta de nuevo.'];
         }
     }
 
@@ -949,46 +1665,62 @@ EOT;
         try {
             $periodo = $args['periodo'] ?? null;
             $fecha = $args['fecha'] ?? null;
-            $limite = $args['limite'] ?? 10;
+            $limite = intval($args['limite'] ?? 10);
 
             $query = Invoice::with('customer:id,name')
                 ->where('type', 'invoice')
                 ->where('status', '!=', 'cancelled');
 
+            // Texto descriptivo del período
+            $periodoTexto = 'todos los tiempos';
+
             // Filtrar por fecha específica
             if ($fecha) {
-                $fechaCarbon = Carbon::parse($fecha);
-                $query->whereDate('date', $fechaCarbon);
+                try {
+                    $fechaCarbon = Carbon::parse($fecha);
+                    $query->whereDate('date', $fechaCarbon);
+                    $periodoTexto = $fechaCarbon->locale('es')->isoFormat('dddd D [de] MMMM [de] YYYY');
+                } catch (\Exception $e) {
+                    return ['status' => 'error', 'message' => "La fecha '{$fecha}' no es válida. Usa formato YYYY-MM-DD (ej: 2026-01-25)."];
+                }
             }
             // Filtrar por período
             elseif ($periodo) {
                 switch ($periodo) {
                     case 'hoy':
                         $query->whereDate('date', Carbon::today());
+                        $periodoTexto = 'hoy (' . Carbon::today()->format('d/m/Y') . ')';
                         break;
                     case 'ayer':
                         $query->whereDate('date', Carbon::yesterday());
+                        $periodoTexto = 'ayer (' . Carbon::yesterday()->format('d/m/Y') . ')';
                         break;
                     case 'semana':
                         $query->where('date', '>=', Carbon::now()->startOfWeek());
+                        $periodoTexto = 'esta semana';
                         break;
                     case 'mes':
                         $query->where('date', '>=', Carbon::now()->startOfMonth());
+                        $periodoTexto = 'este mes (' . Carbon::now()->locale('es')->isoFormat('MMMM YYYY') . ')';
                         break;
                     case 'año':
                         $query->where('date', '>=', Carbon::now()->startOfYear());
+                        $periodoTexto = 'este año (' . Carbon::now()->format('Y') . ')';
                         break;
                     case 'ultimos_7_dias':
                         $query->where('date', '>=', Carbon::now()->subDays(7));
+                        $periodoTexto = 'los últimos 7 días';
                         break;
                     case 'ultimos_30_dias':
                         $query->where('date', '>=', Carbon::now()->subDays(30));
+                        $periodoTexto = 'los últimos 30 días';
                         break;
                 }
             }
 
             $totalVentas = (clone $query)->sum('total');
             $cantidadFacturas = (clone $query)->count();
+            $ticketPromedio = $cantidadFacturas > 0 ? round($totalVentas / $cantidadFacturas, 0) : 0;
 
             $facturas = $query->orderBy('date', 'desc')
                 ->limit($limite)
@@ -998,28 +1730,57 @@ EOT;
                         'id' => $f->id,
                         'numero' => $f->number,
                         'cliente' => $f->customer?->name ?? 'Cliente General',
-                        'fecha' => $f->date,
-                        'total' => $f->total,
+                        'fecha' => Carbon::parse($f->date)->format('d/m/Y H:i'),
+                        'total' => '$' . number_format($f->total, 0, ',', '.'),
+                        'total_raw' => $f->total,
                         'metodo_pago' => $f->payment_method
                     ];
                 });
 
-            $periodoTexto = $fecha ? "el {$fecha}" : ($periodo ?? 'todos los tiempos');
+            // Formatear valores
+            $totalVentasFmt = '$' . number_format($totalVentas, 0, ',', '.');
+            $ticketPromedioFmt = '$' . number_format($ticketPromedio, 0, ',', '.');
+
+            // Construir mensaje según resultados
+            if ($cantidadFacturas === 0) {
+                return [
+                    'periodo' => $periodoTexto,
+                    'total_ventas' => 0,
+                    'total_ventas_formateado' => '$0',
+                    'cantidad_facturas' => 0,
+                    'ticket_promedio' => 0,
+                    'facturas' => [],
+                    'hay_ventas' => false,
+                    'mensaje' => "📊 No encontré ventas para {$periodoTexto}.\n\nEl período consultado no tiene facturas registradas."
+                ];
+            }
+
+            // Construir lista de facturas para el mensaje
+            $listaFacturas = $facturas->take(5)->map(function($f) {
+                return "• {$f['numero']}: {$f['cliente']} - {$f['total']}";
+            })->join("\n");
+
+            $mensajeMasFacturas = $cantidadFacturas > 5 ? "\n...y " . ($cantidadFacturas - 5) . " facturas más." : "";
 
             return [
                 'periodo' => $periodoTexto,
                 'total_ventas' => $totalVentas,
+                'total_ventas_formateado' => $totalVentasFmt,
                 'cantidad_facturas' => $cantidadFacturas,
-                'ticket_promedio' => $cantidadFacturas > 0 ? round($totalVentas / $cantidadFacturas, 2) : 0,
+                'ticket_promedio' => $ticketPromedio,
+                'ticket_promedio_formateado' => $ticketPromedioFmt,
                 'facturas' => $facturas->toArray(),
-                'mensaje' => $cantidadFacturas > 0
-                    ? "Se encontraron {$cantidadFacturas} ventas por un total de $" . number_format($totalVentas, 0, ',', '.') . " para {$periodoTexto}."
-                    : "No se encontraron ventas para {$periodoTexto}."
+                'hay_ventas' => true,
+                'mensaje' => "💰 **Ventas de {$periodoTexto}**\n\n" .
+                            "• Total: {$totalVentasFmt}\n" .
+                            "• Facturas: {$cantidadFacturas}\n" .
+                            "• Ticket promedio: {$ticketPromedioFmt}\n\n" .
+                            "📋 **Últimas facturas:**\n{$listaFacturas}{$mensajeMasFacturas}"
             ];
 
         } catch (\Exception $e) {
             Log::error("❌ Error consultarVentas: " . $e->getMessage());
-            return ['status' => 'error', 'message' => 'Error al consultar ventas: ' . $e->getMessage()];
+            return ['status' => 'error', 'message' => 'Tuve un problema al consultar las ventas. Por favor intenta de nuevo.'];
         }
     }
 
@@ -1824,5 +2585,966 @@ EOT;
             }
         }
         return null;
+    }
+
+    // ========================================
+    // NUEVAS FUNCIONES INTELIGENTES
+    // ========================================
+
+    /**
+     * Lista TODOS los productos sin necesidad de búsqueda
+     */
+    private function listarProductosDB($args)
+    {
+        try {
+            $limite = intval($args['limite'] ?? 20);
+            $ordenarPor = $args['ordenar_por'] ?? 'nombre';
+            $soloActivos = $args['solo_activos'] ?? true;
+
+            $query = Product::query();
+
+            if ($soloActivos) {
+                $query->where('active', true);
+            }
+
+            // Ordenar
+            switch ($ordenarPor) {
+                case 'precio':
+                    $query->orderBy('sale_price', 'desc');
+                    break;
+                case 'stock':
+                    $query->orderBy('current_stock', 'desc');
+                    break;
+                case 'ventas':
+                    $query->withCount(['invoiceItems as total_vendido' => function($q) {
+                        $q->select(DB::raw('COALESCE(SUM(quantity), 0)'));
+                    }])->orderBy('total_vendido', 'desc');
+                    break;
+                default:
+                    $query->orderBy('name', 'asc');
+            }
+
+            $totalProductos = Product::where('active', true)->count();
+            $productos = $query->limit($limite)->get(['id', 'name', 'sku', 'sale_price', 'cost_price', 'current_stock']);
+
+            if ($productos->isEmpty()) {
+                return [
+                    'status' => 'empty',
+                    'count' => 0,
+                    'message' => 'No tienes productos registrados aún. ¿Quieres que te ayude a crear el primero?'
+                ];
+            }
+
+            $lista = $productos->map(function($p, $i) {
+                $margen = $p->cost_price > 0 
+                    ? round((($p->sale_price - $p->cost_price) / $p->sale_price) * 100, 1) 
+                    : 0;
+                return [
+                    'id' => $p->id,
+                    'nombre' => $p->name,
+                    'precio' => '$' . number_format($p->sale_price, 0, ',', '.'),
+                    'stock' => intval($p->current_stock),
+                    'margen' => $margen . '%'
+                ];
+            })->toArray();
+
+            return [
+                'status' => 'success',
+                'total_inventario' => $totalProductos,
+                'mostrando' => count($lista),
+                'productos' => $lista,
+                'message' => "Tienes {$totalProductos} productos en tu inventario. Mostrando los primeros {$limite}."
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error listarProductos: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'No pude obtener la lista de productos.'];
+        }
+    }
+
+    /**
+     * Consulta configuración del sistema
+     */
+    private function consultarConfiguracionDB($args)
+    {
+        try {
+            $modulo = $args['modulo'] ?? null;
+            $settings = \App\Models\SystemSetting::getSettings();
+
+            // Obtener plan del tenant
+            $tenantPlan = 'free_trial';
+            try {
+                $tenantPlan = \DB::connection('mysql')
+                    ->table('tenants')
+                    ->where('id', tenant('id'))
+                    ->value('plan') ?? 'free_trial';
+            } catch (\Exception $e) {}
+
+            $isPremium = in_array($tenantPlan, ['premium', 'enterprise']);
+
+            $config = [
+                'plan_actual' => $tenantPlan,
+                'es_premium' => $isPremium,
+                'modulos' => [
+                    'creditienda' => [
+                        'activo' => (bool) $settings->creditienda_enabled,
+                        'disponible_en_plan' => $isPremium,
+                        'descripcion' => 'Sistema de créditos para clientes (vender fiado)'
+                    ],
+                    'descuentos' => [
+                        'activo' => (bool) $settings->discounts_enabled,
+                        'disponible_en_plan' => true,
+                        'descripcion' => 'Descuentos generales en productos'
+                    ],
+                    'descuentos_cliente' => [
+                        'activo' => (bool) $settings->customer_discounts_enabled,
+                        'disponible_en_plan' => true,
+                        'descripcion' => 'Descuentos específicos por cliente'
+                    ],
+                    'codigos_promo' => [
+                        'activo' => (bool) $settings->promo_codes_enabled,
+                        'disponible_en_plan' => true,
+                        'descripcion' => 'Códigos promocionales'
+                    ],
+                    'fidelizacion' => [
+                        'activo' => (bool) $settings->enable_loyalty_system,
+                        'disponible_en_plan' => $isPremium,
+                        'descripcion' => 'Sistema de puntos de fidelización'
+                    ],
+                    'iva' => [
+                        'activo' => (bool) $settings->iva_enabled,
+                        'porcentaje' => $settings->iva_percentage ?? 19,
+                        'disponible_en_plan' => true,
+                        'descripcion' => 'Impuesto al Valor Agregado'
+                    ]
+                ],
+                'configuracion_general' => [
+                    'nombre_empresa' => $settings->company_name,
+                    'tipo_tienda' => $settings->store_type,
+                    'requiere_cliente' => (bool) $settings->require_customer,
+                    'alertas_stock_bajo' => (bool) $settings->low_stock_alerts,
+                    'umbral_stock_bajo' => $settings->low_stock_threshold
+                ]
+            ];
+
+            // Si pidió un módulo específico
+            if ($modulo && isset($config['modulos'][$modulo])) {
+                $mod = $config['modulos'][$modulo];
+                $estado = $mod['activo'] ? '✅ Activo' : '❌ Desactivado';
+                $disponible = $mod['disponible_en_plan'] ? '' : ' (Requiere plan Premium)';
+
+                return [
+                    'status' => 'success',
+                    'modulo' => $modulo,
+                    'configuracion' => $mod,
+                    'message' => "{$modulo}: {$estado}{$disponible}. {$mod['descripcion']}."
+                ];
+            }
+
+            // Construir mensaje resumido
+            $modulosActivos = [];
+            $modulosInactivos = [];
+            foreach ($config['modulos'] as $nombre => $mod) {
+                if ($mod['activo']) {
+                    $modulosActivos[] = $nombre;
+                } else {
+                    $modulosInactivos[] = $nombre;
+                }
+            }
+
+            $mensaje = "📊 **Estado de tu configuración:**\n\n";
+            $mensaje .= "Plan: " . strtoupper($tenantPlan) . "\n\n";
+            $mensaje .= "✅ Activos: " . (count($modulosActivos) > 0 ? implode(', ', $modulosActivos) : 'Ninguno') . "\n";
+            $mensaje .= "❌ Inactivos: " . (count($modulosInactivos) > 0 ? implode(', ', $modulosInactivos) : 'Ninguno') . "\n";
+
+            if (!$isPremium && (in_array('creditienda', $modulosInactivos) || in_array('fidelizacion', $modulosInactivos))) {
+                $mensaje .= "\n💡 Creditienda y Fidelización requieren plan Premium.";
+            }
+
+            return [
+                'status' => 'success',
+                'configuracion' => $config,
+                'message' => $mensaje
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error consultarConfiguracion: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'No pude consultar la configuración.'];
+        }
+    }
+
+    /**
+     * Actualiza configuración del sistema (activa/desactiva módulos)
+     */
+    private function actualizarConfiguracionDB($args)
+    {
+        try {
+            $modulo = $args['modulo'] ?? null;
+            $activar = $args['activar'] ?? false;
+
+            if (!$modulo) {
+                return ['status' => 'error', 'message' => 'Necesito saber qué módulo quieres modificar.'];
+            }
+
+            $settings = \App\Models\SystemSetting::first();
+            if (!$settings) {
+                $settings = \App\Models\SystemSetting::create([]);
+            }
+
+            // Obtener plan del tenant
+            $tenantPlan = 'free_trial';
+            try {
+                $tenantPlan = \DB::connection('mysql')
+                    ->table('tenants')
+                    ->where('id', tenant('id'))
+                    ->value('plan') ?? 'free_trial';
+            } catch (\Exception $e) {}
+
+            $isPremium = in_array($tenantPlan, ['premium', 'enterprise']);
+
+            // Mapeo de módulos a columnas
+            $moduloColumna = [
+                'creditienda' => 'creditienda_enabled',
+                'descuentos' => 'discounts_enabled',
+                'fidelizacion' => 'enable_loyalty_system',
+                'iva' => 'iva_enabled',
+            ];
+
+            if (!isset($moduloColumna[$modulo])) {
+                return ['status' => 'error', 'message' => "No reconozco el módulo '{$modulo}'."];
+            }
+
+            // Verificar restricciones de plan
+            $modulosPremium = ['creditienda', 'fidelizacion'];
+            if (in_array($modulo, $modulosPremium) && !$isPremium && $activar) {
+                return [
+                    'status' => 'plan_required',
+                    'message' => "⚠️ {$modulo} solo está disponible en planes Premium o Enterprise. " .
+                                "Tu plan actual es {$tenantPlan}. ¿Quieres que te muestre cómo actualizar tu plan?"
+                ];
+            }
+
+            // Actualizar
+            $columna = $moduloColumna[$modulo];
+            $estadoAnterior = $settings->$columna;
+            $settings->$columna = $activar;
+            $settings->save();
+
+            $accion = $activar ? 'activado' : 'desactivado';
+            $emoji = $activar ? '✅' : '❌';
+
+            Log::info("⚙️ [IA Config] Módulo {$modulo} {$accion}", [
+                'user_id' => auth()->id(),
+                'modulo' => $modulo,
+                'anterior' => $estadoAnterior,
+                'nuevo' => $activar
+            ]);
+
+            $mensajeSeguimiento = '';
+            if ($activar && $modulo === 'creditienda') {
+                $mensajeSeguimiento = "\n\n¿Te ayudo a crear tu primer crédito para un cliente o prefieres hacerlo manual desde el módulo?";
+            } elseif ($activar && $modulo === 'fidelizacion') {
+                $mensajeSeguimiento = "\n\n¿Quieres que configure los puntos de fidelización o lo hacemos después?";
+            }
+
+            return [
+                'status' => 'success',
+                'modulo' => $modulo,
+                'activado' => $activar,
+                'message' => "{$emoji} ¡Listo! {$modulo} ha sido {$accion}.{$mensajeSeguimiento}"
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error actualizarConfiguracion: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'No pude actualizar la configuración.'];
+        }
+    }
+
+    /**
+     * Obtiene la factura con mayor margen de ganancia
+     */
+    private function obtenerFacturaMasRentableDB($args)
+    {
+        try {
+            $periodo = $args['periodo'] ?? 'mes';
+            $limite = intval($args['limite'] ?? 5);
+
+            // Determinar rango de fechas
+            $fechaInicio = match($periodo) {
+                'hoy' => Carbon::today(),
+                'ayer' => Carbon::yesterday(),
+                'semana' => Carbon::now()->startOfWeek(),
+                'mes' => Carbon::now()->startOfMonth(),
+                'año' => Carbon::now()->startOfYear(),
+                default => Carbon::now()->startOfMonth()
+            };
+
+            // Buscar facturas con sus items y calcular margen
+            $facturas = Invoice::where('type', 'invoice')
+                ->where('status', '!=', 'cancelled')
+                ->where('date', '>=', $fechaInicio)
+                ->with(['items.product', 'customer'])
+                ->get();
+
+            if ($facturas->isEmpty()) {
+                return [
+                    'status' => 'empty',
+                    'message' => "No encontré facturas en el período '{$periodo}'."
+                ];
+            }
+
+            // Calcular margen por factura
+            $facturasConMargen = $facturas->map(function($factura) {
+                $totalVenta = $factura->total;
+                $totalCosto = 0;
+
+                foreach ($factura->items as $item) {
+                    $costoProd = $item->product->cost_price ?? 0;
+                    $totalCosto += $costoProd * $item->quantity;
+                }
+
+                $margen = $totalVenta - $totalCosto;
+                $porcentajeMargen = $totalVenta > 0 ? ($margen / $totalVenta) * 100 : 0;
+
+                return [
+                    'id' => $factura->id,
+                    'numero' => $factura->invoice_number,
+                    'fecha' => Carbon::parse($factura->date)->format('d/m/Y'),
+                    'cliente' => $factura->customer->name ?? 'Cliente general',
+                    'total_venta' => $totalVenta,
+                    'total_costo' => $totalCosto,
+                    'margen' => $margen,
+                    'porcentaje_margen' => round($porcentajeMargen, 1),
+                    'items_count' => $factura->items->count()
+                ];
+            })->sortByDesc('margen')->take($limite)->values();
+
+            $mejor = $facturasConMargen->first();
+
+            $mensaje = "🏆 **Facturas más rentables ({$periodo}):**\n\n";
+            foreach ($facturasConMargen as $i => $f) {
+                $mensaje .= ($i + 1) . ". **{$f['numero']}** ({$f['fecha']})\n";
+                $mensaje .= "   Cliente: {$f['cliente']}\n";
+                $mensaje .= "   Venta: \$" . number_format($f['total_venta'], 0, ',', '.') . "\n";
+                $mensaje .= "   Margen: \$" . number_format($f['margen'], 0, ',', '.') . " ({$f['porcentaje_margen']}%)\n\n";
+            }
+
+            return [
+                'status' => 'success',
+                'periodo' => $periodo,
+                'facturas' => $facturasConMargen->toArray(),
+                'mejor_factura' => $mejor,
+                'message' => $mensaje
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error obtenerFacturaMasRentable: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'No pude calcular las facturas más rentables.'];
+        }
+    }
+
+    /**
+     * Analiza el negocio y da recomendaciones inteligentes
+     */
+    private function analizarNegocioDB()
+    {
+        try {
+            $recomendaciones = [];
+
+            // 1. Productos sin stock
+            $sinStock = Product::where('active', true)
+                ->where('current_stock', '<=', 0)
+                ->count();
+            if ($sinStock > 0) {
+                $recomendaciones[] = [
+                    'tipo' => 'stock',
+                    'prioridad' => 'alta',
+                    'mensaje' => "⚠️ Tienes {$sinStock} productos sin stock. Esto significa ventas perdidas."
+                ];
+            }
+
+            // 2. Productos con stock bajo
+            $stockBajo = Product::where('active', true)
+                ->whereColumn('current_stock', '<=', 'min_stock')
+                ->where('current_stock', '>', 0)
+                ->count();
+            if ($stockBajo > 0) {
+                $recomendaciones[] = [
+                    'tipo' => 'stock',
+                    'prioridad' => 'media',
+                    'mensaje' => "📦 {$stockBajo} productos están por agotarse. Considera hacer pedidos pronto."
+                ];
+            }
+
+            // 3. Productos sin ventas en 30 días
+            $hace30Dias = Carbon::now()->subDays(30);
+            $productosConVentas = InvoiceItem::where('created_at', '>=', $hace30Dias)
+                ->distinct()
+                ->pluck('product_id');
+            $sinVentas = Product::where('active', true)
+                ->whereNotIn('id', $productosConVentas)
+                ->count();
+            if ($sinVentas > 5) {
+                $recomendaciones[] = [
+                    'tipo' => 'ventas',
+                    'prioridad' => 'media',
+                    'mensaje' => "📉 {$sinVentas} productos no se han vendido en 30 días. Considera promociones o ajustar precios."
+                ];
+            }
+
+            // 4. Margen promedio
+            $productosConMargen = Product::where('active', true)
+                ->where('cost_price', '>', 0)
+                ->where('sale_price', '>', 0)
+                ->get();
+            if ($productosConMargen->count() > 0) {
+                $margenPromedio = $productosConMargen->avg(function($p) {
+                    return (($p->sale_price - $p->cost_price) / $p->sale_price) * 100;
+                });
+                if ($margenPromedio < 20) {
+                    $recomendaciones[] = [
+                        'tipo' => 'rentabilidad',
+                        'prioridad' => 'alta',
+                        'mensaje' => "💰 Tu margen promedio es " . round($margenPromedio, 1) . "%. Es bajo. Revisa tus precios de venta."
+                    ];
+                } elseif ($margenPromedio > 40) {
+                    $recomendaciones[] = [
+                        'tipo' => 'positivo',
+                        'prioridad' => 'info',
+                        'mensaje' => "✅ Excelente margen promedio de " . round($margenPromedio, 1) . "%."
+                    ];
+                }
+            }
+
+            // 5. Ventas de hoy vs ayer
+            $ventasHoy = Invoice::where('type', 'invoice')
+                ->where('status', '!=', 'cancelled')
+                ->whereDate('date', Carbon::today())
+                ->sum('total');
+            $ventasAyer = Invoice::where('type', 'invoice')
+                ->where('status', '!=', 'cancelled')
+                ->whereDate('date', Carbon::yesterday())
+                ->sum('total');
+            
+            if ($ventasAyer > 0 && $ventasHoy < $ventasAyer * 0.7) {
+                $recomendaciones[] = [
+                    'tipo' => 'ventas',
+                    'prioridad' => 'info',
+                    'mensaje' => "📊 Las ventas de hoy (\$" . number_format($ventasHoy, 0, ',', '.') . 
+                                ") van más bajas que ayer (\$" . number_format($ventasAyer, 0, ',', '.') . ")."
+                ];
+            }
+
+            // 6. Clientes con deuda alta (si aplica)
+            try {
+                $clientesConDeuda = Customer::where('credit_balance', '>', 100000)->count();
+                if ($clientesConDeuda > 0) {
+                    $recomendaciones[] = [
+                        'tipo' => 'cartera',
+                        'prioridad' => 'media',
+                        'mensaje' => "💳 Tienes {$clientesConDeuda} clientes con deudas mayores a \$100.000. Considera hacer seguimiento."
+                    ];
+                }
+            } catch (\Exception $e) {}
+
+            // Construir mensaje
+            if (empty($recomendaciones)) {
+                return [
+                    'status' => 'success',
+                    'recomendaciones' => [],
+                    'message' => "🎉 ¡Tu negocio está en buen estado! No encontré problemas críticos. Sigue así."
+                ];
+            }
+
+            $mensaje = "📋 **Análisis de tu negocio:**\n\n";
+            foreach ($recomendaciones as $rec) {
+                $mensaje .= $rec['mensaje'] . "\n\n";
+            }
+            $mensaje .= "¿Quieres que te ayude con alguno de estos puntos?";
+
+            return [
+                'status' => 'success',
+                'recomendaciones' => $recomendaciones,
+                'resumen' => [
+                    'productos_sin_stock' => $sinStock,
+                    'productos_stock_bajo' => $stockBajo,
+                    'sin_ventas_30_dias' => $sinVentas ?? 0,
+                    'ventas_hoy' => $ventasHoy,
+                    'ventas_ayer' => $ventasAyer
+                ],
+                'message' => $mensaje
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error analizarNegocio: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'No pude analizar tu negocio en este momento.'];
+        }
+    }
+
+    // ========================================
+    // NUEVAS FUNCIONES: PROVEEDORES Y ANÁLISIS
+    // ========================================
+
+    /**
+     * Consulta proveedores con estadísticas
+     */
+    private function consultarProveedoresDB($args)
+    {
+        try {
+            $query = trim($args['query'] ?? '');
+            $soloActivos = $args['solo_activos'] ?? true;
+            $limite = intval($args['limite'] ?? 20);
+
+            $proveedoresQuery = Supplier::query();
+
+            if ($soloActivos) {
+                $proveedoresQuery->where('active', true);
+            }
+
+            if (!empty($query)) {
+                $proveedoresQuery->where(function($q) use ($query) {
+                    $q->where('name', 'LIKE', "%{$query}%")
+                      ->orWhere('contact_person', 'LIKE', "%{$query}%")
+                      ->orWhere('email', 'LIKE', "%{$query}%");
+                });
+            }
+
+            $proveedores = $proveedoresQuery
+                ->orderBy('name')
+                ->limit($limite)
+                ->get();
+
+            $totalProveedores = Supplier::when($soloActivos, fn($q) => $q->where('active', true))->count();
+
+            if ($proveedores->isEmpty()) {
+                return [
+                    'status' => 'success',
+                    'count' => 0,
+                    'message' => empty($query) 
+                        ? "No tienes proveedores registrados todavía."
+                        : "No encontré proveedores con '{$query}'."
+                ];
+            }
+
+            // Formatear resultados
+            $lista = $proveedores->map(function($p) {
+                $productos = Product::where('supplier_id', $p->id)->count();
+                return [
+                    'id' => $p->id,
+                    'nombre' => $p->name,
+                    'contacto' => $p->contact_person ?? 'Sin contacto',
+                    'telefono' => $p->phone ?? 'Sin teléfono',
+                    'email' => $p->email ?? 'Sin email',
+                    'productos_asociados' => $productos,
+                    'deuda_pendiente' => '$' . number_format($p->current_debt ?? 0, 0, ',', '.'),
+                    'total_comprado' => '$' . number_format($p->total_purchased ?? 0, 0, ',', '.'),
+                    'ultimo_pedido' => $p->last_order_date ? Carbon::parse($p->last_order_date)->format('d/m/Y') : 'Nunca',
+                    'activo' => $p->active
+                ];
+            })->toArray();
+
+            $deudaTotal = $proveedores->sum('current_debt');
+            $totalComprado = $proveedores->sum('total_purchased');
+
+            $mensaje = "🏭 Tienes **{$totalProveedores} proveedores** registrados.\n\n";
+            
+            foreach ($lista as $p) {
+                $mensaje .= "• **{$p['nombre']}**\n";
+                $mensaje .= "  📦 {$p['productos_asociados']} productos | 💰 Comprado: {$p['total_comprado']}\n";
+                if (floatval(str_replace(['$', '.'], '', $p['deuda_pendiente'])) > 0) {
+                    $mensaje .= "  ⚠️ Le debemos: {$p['deuda_pendiente']}\n";
+                }
+                $mensaje .= "\n";
+            }
+
+            if ($deudaTotal > 0) {
+                $mensaje .= "💳 **Deuda total a proveedores:** \$" . number_format($deudaTotal, 0, ',', '.');
+            }
+
+            return [
+                'status' => 'success',
+                'count' => $totalProveedores,
+                'proveedores' => $lista,
+                'deuda_total' => $deudaTotal,
+                'total_comprado' => $totalComprado,
+                'message' => $mensaje
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error consultarProveedores: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'No pude consultar los proveedores.'];
+        }
+    }
+
+    /**
+     * Obtiene el producto más vendido de TODO el histórico
+     * NO pide período - usa toda la base de datos por defecto
+     */
+    private function productoMasVendidoDB($args)
+    {
+        try {
+            $limite = intval($args['limite'] ?? 10);
+            $periodo = $args['periodo'] ?? 'todo'; // Por defecto TODO el histórico
+
+            // Base query - productos más vendidos por cantidad
+            $query = InvoiceItem::select(
+                    'product_id',
+                    'product_name',
+                    DB::raw('SUM(quantity) as total_vendido'),
+                    DB::raw('SUM(subtotal) as total_facturado'),
+                    DB::raw('COUNT(DISTINCT invoice_id) as num_ventas')
+                )
+                ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                ->where('invoices.type', 'invoice')
+                ->where('invoices.status', '!=', 'cancelled')
+                ->groupBy('product_id', 'product_name');
+
+            // Solo aplicar filtro de fecha si el usuario especificó un período diferente a "todo"
+            if ($periodo !== 'todo') {
+                $fechaInicio = match($periodo) {
+                    'hoy' => Carbon::today(),
+                    'semana' => Carbon::now()->startOfWeek(),
+                    'mes' => Carbon::now()->startOfMonth(),
+                    'año' => Carbon::now()->startOfYear(),
+                    default => null
+                };
+                
+                if ($fechaInicio) {
+                    $query->where('invoices.date', '>=', $fechaInicio);
+                }
+            }
+
+            $productos = $query
+                ->orderByDesc('total_vendido')
+                ->limit($limite)
+                ->get();
+
+            if ($productos->isEmpty()) {
+                return [
+                    'status' => 'success',
+                    'count' => 0,
+                    'message' => "No encontré ventas registradas" . ($periodo !== 'todo' ? " en este período." : ".")
+                ];
+            }
+
+            // El más vendido es el primero
+            $topProducto = $productos->first();
+            
+            $mensaje = "🏆 **Producto más vendido" . ($periodo !== 'todo' ? " ({$periodo})" : " (histórico total)") . ":**\n\n";
+            $mensaje .= "🥇 **{$topProducto->product_name}**\n";
+            $mensaje .= "   📦 {$topProducto->total_vendido} unidades vendidas\n";
+            $mensaje .= "   💰 Facturado: \$" . number_format($topProducto->total_facturado, 0, ',', '.') . "\n";
+            $mensaje .= "   🧾 En {$topProducto->num_ventas} facturas diferentes\n\n";
+
+            if ($productos->count() > 1) {
+                $mensaje .= "**Top {$limite} productos más vendidos:**\n";
+                $posicion = 1;
+                foreach ($productos as $p) {
+                    $medalla = match($posicion) {
+                        1 => '🥇',
+                        2 => '🥈',
+                        3 => '🥉',
+                        default => "{$posicion}."
+                    };
+                    $mensaje .= "{$medalla} {$p->product_name} - {$p->total_vendido} uds (\$" . number_format($p->total_facturado, 0, ',', '.') . ")\n";
+                    $posicion++;
+                }
+            }
+
+            return [
+                'status' => 'success',
+                'periodo' => $periodo,
+                'top_producto' => [
+                    'nombre' => $topProducto->product_name,
+                    'unidades_vendidas' => $topProducto->total_vendido,
+                    'total_facturado' => $topProducto->total_facturado,
+                    'num_facturas' => $topProducto->num_ventas
+                ],
+                'ranking' => $productos->map(fn($p) => [
+                    'nombre' => $p->product_name,
+                    'vendido' => $p->total_vendido,
+                    'facturado' => $p->total_facturado
+                ])->toArray(),
+                'message' => $mensaje
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error productoMasVendido: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'No pude consultar los productos más vendidos.'];
+        }
+    }
+
+    /**
+     * Productos con poca o ninguna venta + RECOMENDACIONES ACCIONABLES
+     */
+    private function productosPocoVendidosDB($args)
+    {
+        try {
+            $limite = intval($args['limite'] ?? 10);
+            $diasSinVenta = intval($args['dias_sin_venta'] ?? 30);
+
+            $fechaCorte = Carbon::now()->subDays($diasSinVenta);
+
+            // Productos que SÍ se vendieron en el período
+            $productosConVentas = InvoiceItem::join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                ->where('invoices.date', '>=', $fechaCorte)
+                ->where('invoices.type', 'invoice')
+                ->where('invoices.status', '!=', 'cancelled')
+                ->distinct()
+                ->pluck('product_id');
+
+            // Productos activos que NO se vendieron
+            $productosSinVenta = Product::where('active', true)
+                ->where('current_stock', '>', 0) // Solo los que tienen stock
+                ->whereNotIn('id', $productosConVentas)
+                ->orderByDesc(DB::raw('sale_price * current_stock')) // Mayor valor estancado primero
+                ->limit($limite)
+                ->get();
+
+            if ($productosSinVenta->isEmpty()) {
+                return [
+                    'status' => 'success',
+                    'count' => 0,
+                    'message' => "🎉 ¡Excelente! Todos tus productos con stock se han vendido en los últimos {$diasSinVenta} días."
+                ];
+            }
+
+            $totalEstancado = $productosSinVenta->sum(fn($p) => $p->sale_price * $p->current_stock);
+
+            $mensaje = "📉 **Productos sin ventas en {$diasSinVenta} días:**\n\n";
+            $mensaje .= "💰 Valor total estancado: \$" . number_format($totalEstancado, 0, ',', '.') . "\n\n";
+
+            $recomendaciones = [];
+            foreach ($productosSinVenta as $p) {
+                $valorEstancado = $p->sale_price * $p->current_stock;
+                $mensaje .= "• **{$p->name}**\n";
+                $mensaje .= "  Stock: {$p->current_stock} | Precio: \$" . number_format($p->sale_price, 0, ',', '.') . "\n";
+                $mensaje .= "  💵 Valor estancado: \$" . number_format($valorEstancado, 0, ',', '.') . "\n\n";
+
+                $recomendaciones[] = [
+                    'producto_id' => $p->id,
+                    'nombre' => $p->name,
+                    'stock' => $p->current_stock,
+                    'precio_actual' => $p->sale_price,
+                    'valor_estancado' => $valorEstancado,
+                    'acciones_sugeridas' => [
+                        '📉 Bajar precio un 10-20% para impulsar ventas',
+                        '🏷️ Crear combo o promoción con productos populares',
+                        '📱 Enviar oferta por WhatsApp a clientes registrados',
+                        '📦 Considerar devolución a proveedor si es posible'
+                    ]
+                ];
+            }
+
+            $mensaje .= "---\n**🎯 RECOMENDACIONES:**\n\n";
+            $mensaje .= "1. **Baja los precios** un 10-20% para estos productos\n";
+            $mensaje .= "2. **Crea combos** mezclándolos con productos populares\n";
+            $mensaje .= "3. **Envía promociones** por WhatsApp a tus clientes\n";
+            $mensaje .= "4. **Ubícalos visiblemente** en tu tienda física\n\n";
+            $mensaje .= "¿Quieres que te ayude a bajar el precio de alguno o crear una promoción?";
+
+            return [
+                'status' => 'success',
+                'count' => $productosSinVenta->count(),
+                'dias_analizados' => $diasSinVenta,
+                'valor_total_estancado' => $totalEstancado,
+                'productos' => $recomendaciones,
+                'message' => $mensaje
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error productosPocoVendidos: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'No pude analizar los productos sin ventas.'];
+        }
+    }
+
+    // ========================================
+    // NAVEGACIÓN Y CONTROL DEL SISTEMA
+    // ========================================
+
+    /**
+     * Navegar a un módulo específico del sistema
+     * Devuelve una acción que el frontend interpretará
+     */
+    private function navegarModuloAction($args)
+    {
+        $modulo = strtolower(trim($args['modulo'] ?? ''));
+        $mensaje = $args['mensaje'] ?? '';
+
+        // Mapeo de módulos a nombres REALES del frontend (según Sidebar.vue)
+        // IMPORTANTE: Estos son los IDs exactos que usa el sistema
+        $moduloMap = [
+            // Dashboard
+            'dashboard' => 'dashboard',
+            'inicio' => 'dashboard',
+            'home' => 'dashboard',
+            
+            // Operaciones
+            'pos' => 'pos',
+            'punto de venta' => 'pos',
+            'venta' => 'pos',
+            'ventas' => 'pos',
+            'vender' => 'pos',
+            
+            'facturas' => 'invoices',
+            'facturacion' => 'invoices',
+            'factura' => 'invoices',
+            'invoices' => 'invoices',
+            
+            'devoluciones' => 'returns-management',
+            'devolucion' => 'returns-management',
+            'returns' => 'returns-management',
+            
+            // Inventario
+            'productos' => 'products',
+            'producto' => 'products',
+            'inventario' => 'products',
+            'products' => 'products',
+            
+            'categorias' => 'categories',
+            'categoria' => 'categories',
+            'categories' => 'categories',
+            
+            'stock' => 'stock',
+            'gestion de stock' => 'stock',
+            
+            'inventario inteligente' => 'intelligent_inventory',
+            'inventario ia' => 'intelligent_inventory',
+            
+            // Tienda Online
+            'catalogo web' => 'web-catalog-config',
+            'tienda online' => 'web-catalog-config',
+            'catalogo' => 'web-catalog-config',
+            
+            // Multisede
+            'sedes' => 'warehouses',
+            'bodegas' => 'warehouses',
+            'sucursales' => 'warehouses',
+            
+            // Relaciones
+            'clientes' => 'customers',
+            'cliente' => 'customers',
+            'customers' => 'customers',
+            
+            'creditienda' => 'accounts-receivable',
+            'creditos' => 'accounts-receivable',
+            'cuentas por cobrar' => 'accounts-receivable',
+            
+            'proveedores' => 'purchase-orders',
+            'proveedor' => 'purchase-orders',
+            'ordenes de compra' => 'purchase-orders',
+            'compras' => 'purchase-orders',
+            
+            // Sistema
+            'usuarios' => 'users',
+            'usuario' => 'users',
+            'users' => 'users',
+            
+            'caja' => 'cash-admin',
+            'cajas' => 'cash-admin',
+            'control de cajas' => 'cash-admin',
+            
+            'gastos' => 'expenses',
+            'gastos operativos' => 'expenses',
+            'egresos' => 'expenses',
+            
+            'reportes' => 'reports',
+            'reporte' => 'reports',
+            'informes' => 'reports',
+            'reports' => 'reports',
+            
+            'configuracion' => 'settings',
+            'config' => 'settings',
+            'ajustes' => 'settings',
+            'settings' => 'settings'
+        ];
+
+        if (!isset($moduloMap[$modulo])) {
+            return [
+                'status' => 'error',
+                'message' => "No reconozco el módulo '{$modulo}'. Los módulos disponibles son: dashboard, pos/ventas, facturas, productos, categorías, stock, clientes, proveedores, reportes, configuración, cajas, gastos, devoluciones."
+            ];
+        }
+
+        $moduloDestino = $moduloMap[$modulo];
+
+        // Nombres legibles para el mensaje
+        $nombresLegibles = [
+            'dashboard' => 'Dashboard',
+            'pos' => 'Punto de Venta',
+            'invoices' => 'Facturas',
+            'returns-management' => 'Devoluciones',
+            'products' => 'Productos',
+            'categories' => 'Categorías',
+            'stock' => 'Gestión de Stock',
+            'intelligent_inventory' => 'Inventario Inteligente',
+            'web-catalog-config' => 'Catálogo Web',
+            'warehouses' => 'Gestión de Sedes',
+            'customers' => 'Clientes',
+            'accounts-receivable' => 'CrediTienda',
+            'purchase-orders' => 'Proveedores',
+            'users' => 'Usuarios',
+            'cash-admin' => 'Control de Cajas',
+            'expenses' => 'Gastos Operativos',
+            'reports' => 'Reportes',
+            'settings' => 'Configuración'
+        ];
+
+        $nombreLegible = $nombresLegibles[$moduloDestino] ?? ucfirst($moduloDestino);
+
+        return [
+            'status' => 'success',
+            'action' => [
+                'type' => 'navigate',
+                'payload' => [
+                    'params' => ['module' => $moduloDestino]
+                ]
+            ],
+            'message' => $mensaje ?: "🚀 Te llevo al módulo de **{$nombreLegible}**..."
+        ];
+    }
+
+    /**
+     * Controlar la radio del sistema
+     * Devuelve una acción que el frontend interpretará
+     */
+    private function controlarRadioAction($args)
+    {
+        $accion = strtolower(trim($args['accion'] ?? ''));
+        $volumen = isset($args['volumen']) ? intval($args['volumen']) : null;
+
+        $accionesValidas = ['play', 'pause', 'toggle', 'next', 'previous', 'volume_up', 'volume_down', 'mute'];
+
+        if (!in_array($accion, $accionesValidas)) {
+            return [
+                'status' => 'error',
+                'message' => "No reconozco la acción '{$accion}'. Puedo: reproducir, pausar, siguiente, anterior, subir/bajar volumen."
+            ];
+        }
+
+        $mensajes = [
+            'play' => '🎵 ¡Listo! La radio está sonando.',
+            'pause' => '⏸️ Radio pausada.',
+            'toggle' => '🎵 Cambiando estado de la radio...',
+            'next' => '⏭️ Siguiente estación...',
+            'previous' => '⏮️ Estación anterior...',
+            'volume_up' => '🔊 Subiendo volumen...',
+            'volume_down' => '🔉 Bajando volumen...',
+            'mute' => '🔇 Radio silenciada.'
+        ];
+
+        $payload = ['action' => $accion];
+        if ($volumen !== null) {
+            $payload['volume'] = max(0, min(100, $volumen));
+        }
+
+        return [
+            'status' => 'success',
+            'action' => [
+                'type' => 'radio',
+                'payload' => $payload
+            ],
+            'message' => $mensajes[$accion] ?? '🎵 Controlando radio...'
+        ];
     }
 }
