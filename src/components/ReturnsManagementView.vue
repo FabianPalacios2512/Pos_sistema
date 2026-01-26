@@ -8,7 +8,7 @@
             
             <!-- Título y Subtítulo -->
             <div>
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Devoluciones</h1>
+              <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Devoluciones</h1>
             </div>
             
             <!-- Botones de Acción -->
@@ -35,49 +35,49 @@
           </div>
 
       <!-- NIVEL 2: KPIs Compactos - Ribbon horizontal -->
-      <div class="flex items-center gap-2 mb-4">
+      <div class="flex items-center gap-3">
         
         <!-- KPI: Total Devuelto -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-red-50 dark:bg-red-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4.5 h-4.5 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-rose-50 dark:bg-rose-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-rose-100 dark:border-rose-900/30">
+              <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Total Devuelto</p>
-              <p class="text-lg font-bold text-gray-800 dark:text-white leading-tight">${{ formatCurrency(stats.totalRefunded) }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Total Devuelto</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white leading-tight">${{ formatCurrency(stats.totalRefunded) }}</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Completadas -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-emerald-50 dark:bg-emerald-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4.5 h-4.5 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-100 dark:border-emerald-900/30">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Completadas</p>
-              <p class="text-lg font-bold text-gray-800 dark:text-white leading-tight">{{ stats.completedCount }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Completadas</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white leading-tight">{{ stats.completedCount }}</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Pendientes -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-amber-50 dark:bg-amber-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4.5 h-4.5 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-amber-100 dark:border-amber-900/30">
+              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Pendientes</p>
-              <p class="text-lg font-bold text-gray-800 dark:text-white leading-tight">{{ stats.pendingCount }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Pendientes</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white leading-tight">{{ stats.pendingCount }}</p>
             </div>
           </div>
         </div>
@@ -91,10 +91,10 @@
       <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
         <!-- PANEL IZQUIERDO: Lista con fondo diferenciado -->
-        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-slate-50 dark:bg-[#0c0c0f] border-r border-gray-200 dark:border-zinc-800/80 transition-colors duration-300">
+        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-gray-50 dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
           
           <!-- Header compacto con búsqueda y filtros en UNA línea -->
-          <div class="p-3 border-b border-gray-200 dark:border-zinc-800/80 bg-slate-100/80 dark:bg-[#0a0a0d]">
+          <div class="p-3 border-b border-gray-200 dark:border-zinc-800 bg-gray-100/80 dark:bg-zinc-900/80">
             <div class="flex items-center gap-2">
               <!-- Búsqueda -->
               <div class="relative flex-1">
@@ -121,7 +121,7 @@
           </div>
           
           <!-- Lista con scroll independiente - Fondo diferenciado -->
-          <div class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0c0c0f] px-2">
+          <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-zinc-950 px-2">
             
             <div
               v-for="returnItem in filteredReturns"

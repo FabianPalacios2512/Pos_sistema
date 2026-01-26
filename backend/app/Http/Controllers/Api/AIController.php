@@ -2074,5 +2074,302 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             ], 500);
         }
     }
-}
 
+    /**
+     * 🔊 Text-to-Speech usando Gemini 2.5 Flash TTS
+     * Genera audio de alta calidad a partir de texto
+     */
+    public function textToSpeech(Request $request)
+    {
+        $request->validate([
+            'text' => 'required|string|max:5000',
+            'voice' => 'string|in:Kore,Charon,Fenrir,Aoede,Puck,Leda,Orus,Achird',
+            'model' => 'string'
+        ]);
+
+        $text = trim($request->input('text'));
+        $voice = $request->input('voice', 'Kore'); // Voz natural en español
+        $model = $request->input('model', 'gemini-2.5-flash-preview-tts');
+
+        Log::info('🔊 [TTS] Solicitud de síntesis de voz', [
+            'text_length' => strlen($text),
+            'voice' => $voice,
+            'model' => $model,
+            'user_id' => auth()->id()
+        ]);
+
+        try {
+            $apiKey = config('services.gemini.api_key') ?: env('GEMINI_API_KEY');
+            
+            if (!$apiKey) {
+                throw new \Exception('API key de Gemini no configurada');
+            }
+
+            // Llamar a Gemini TTS API
+            $response = Http::timeout(30)->withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $text]
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'responseModalities' => ['AUDIO'],
+                    'speechConfig' => [
+                        'voiceConfig' => [
+                            'prebuiltVoiceConfig' => [
+                                'voiceName' => $voice
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('❌ [TTS] Error de API Gemini', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                throw new \Exception('Error en API de Gemini TTS: ' . $response->status());
+            }
+
+            $data = $response->json();
+
+            // Extraer audio del response
+            $audioData = $data['candidates'][0]['content']['parts'][0]['inlineData']['data'] ?? null;
+            $mimeType = $data['candidates'][0]['content']['parts'][0]['inlineData']['mimeType'] ?? 'audio/mp3';
+
+            if (!$audioData) {
+                throw new \Exception('No se recibió audio en la respuesta');
+            }
+
+            // Decodificar base64 a binario
+            $audioBlob = base64_decode($audioData);
+
+            Log::info('✅ [TTS] Audio generado exitosamente', [
+                'audio_size' => strlen($audioBlob),
+                'mime_type' => $mimeType
+            ]);
+
+            // Retornar audio como stream
+            return response($audioBlob, 200)
+                ->header('Content-Type', $mimeType)
+                ->header('Content-Length', strlen($audioBlob))
+                ->header('Cache-Control', 'no-cache');
+
+        } catch (\Exception $e) {
+            Log::error('❌ [TTS] Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error generando audio: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * 🎵 TTS Preview para selector de voces
+     * Usa las voces reales de Gemini para que el usuario escuche exactamente
+     * cómo sonará su asistente antes de elegir
+     */
+    public function ttsPreview(Request $request)
+    {
+        $request->validate([
+            'text' => 'required|string|max:500',
+            'voiceName' => 'required|string|in:Kore,Charon,Fenrir,Aoede,Puck,Leda,Orus,Achird'
+        ]);
+
+        $text = trim($request->input('text'));
+        $voiceName = $request->input('voiceName');
+
+        try {
+            $apiKey = config('services.gemini.api_key') ?: env('GEMINI_API_KEY');
+            
+            if (!$apiKey) {
+                throw new \Exception('API key de Gemini no configurada');
+            }
+
+            // Usar modelo TTS de Gemini
+            $response = Http::timeout(15)->withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key={$apiKey}", [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $text]
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'responseModalities' => ['AUDIO'],
+                    'speechConfig' => [
+                        'voiceConfig' => [
+                            'prebuiltVoiceConfig' => [
+                                'voiceName' => $voiceName
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('❌ [TTS Preview] Error de API Gemini', [
+                    'status' => $response->status(),
+                    'body' => $response->body()
+                ]);
+                throw new \Exception('Error en API de Gemini TTS');
+            }
+
+            $data = $response->json();
+
+            // Extraer audio del response
+            $audioData = $data['candidates'][0]['content']['parts'][0]['inlineData']['data'] ?? null;
+            $mimeType = $data['candidates'][0]['content']['parts'][0]['inlineData']['mimeType'] ?? 'audio/pcm';
+
+            if (!$audioData) {
+                throw new \Exception('No se recibió audio en la respuesta');
+            }
+
+            // Decodificar base64 a binario (PCM raw)
+            $pcmData = base64_decode($audioData);
+            
+            // Convertir PCM a WAV para que el navegador pueda reproducirlo
+            // Gemini TTS devuelve PCM 24kHz, 16-bit, mono
+            $wavData = $this->pcmToWav($pcmData, 24000, 16, 1);
+
+            // Retornar audio como WAV
+            return response($wavData, 200)
+                ->header('Content-Type', 'audio/wav')
+                ->header('Content-Length', strlen($wavData))
+                ->header('Cache-Control', 'no-cache');
+
+        } catch (\Exception $e) {
+            Log::error('❌ [TTS Preview] Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error generando preview de audio'
+            ], 500);
+        }
+    }
+
+    /**
+     * 📞 Genera un token efímero para la Gemini Live API
+     * 
+     * Los tokens efímeros permiten que el cliente se conecte directamente
+     * al WebSocket de Gemini sin exponer la API key.
+     * 
+     * @see https://ai.google.dev/gemini-api/docs/ephemeral-tokens
+     */
+    public function getLiveToken(Request $request)
+    {
+        $request->validate([
+            'model' => 'string'
+        ]);
+
+        $model = $request->input('model', 'gemini-2.5-flash-native-audio-dialog');
+
+        Log::info('📞 [Live] Solicitud de token efímero', [
+            'model' => $model,
+            'user_id' => auth()->id()
+        ]);
+
+        try {
+            $apiKey = config('services.gemini.api_key') ?: env('GEMINI_API_KEY');
+            
+            if (!$apiKey) {
+                throw new \Exception('API key de Gemini no configurada');
+            }
+
+            // Generar token efímero usando la API de Google
+            // El token efímero es válido por ~2 minutos
+            $response = Http::timeout(10)->withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateEphemeralToken?key={$apiKey}", [
+                'config' => [
+                    'ttl' => '120s' // 2 minutos de validez
+                ]
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                
+                Log::info('✅ [Live] Token efímero generado', [
+                    'expires_in' => '120s'
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'token' => $data['ephemeralToken'] ?? $data['token'] ?? null,
+                    'expires_in' => 120,
+                    'model' => $model
+                ]);
+            }
+
+            // Si la API de tokens efímeros no está disponible,
+            // devolvemos la API key directamente (menos seguro, solo para desarrollo)
+            Log::warning('⚠️ [Live] API de tokens efímeros no disponible, usando API key directa', [
+                'status' => $response->status(),
+                'body' => substr($response->body(), 0, 200)
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'token' => $apiKey,
+                'expires_in' => 0, // Sin expiración (es la API key real)
+                'model' => $model,
+                'warning' => 'Usando API key directa (modo desarrollo)'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('❌ [Live] Error obteniendo token: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error obteniendo token de sesión: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * 🔧 Convierte audio PCM raw a formato WAV
+     * 
+     * @param string $pcmData - Datos PCM raw en binario
+     * @param int $sampleRate - Frecuencia de muestreo (ej: 24000)
+     * @param int $bitsPerSample - Bits por muestra (ej: 16)
+     * @param int $channels - Número de canales (1 = mono, 2 = stereo)
+     * @return string - Datos WAV completos con header
+     */
+    private function pcmToWav(string $pcmData, int $sampleRate = 24000, int $bitsPerSample = 16, int $channels = 1): string
+    {
+        $dataSize = strlen($pcmData);
+        $byteRate = $sampleRate * $channels * ($bitsPerSample / 8);
+        $blockAlign = $channels * ($bitsPerSample / 8);
+        
+        // Construir header WAV (44 bytes)
+        $header = '';
+        
+        // RIFF chunk descriptor
+        $header .= 'RIFF';                                    // ChunkID
+        $header .= pack('V', 36 + $dataSize);                 // ChunkSize (tamaño total - 8)
+        $header .= 'WAVE';                                    // Format
+        
+        // fmt sub-chunk
+        $header .= 'fmt ';                                    // Subchunk1ID
+        $header .= pack('V', 16);                             // Subchunk1Size (16 para PCM)
+        $header .= pack('v', 1);                              // AudioFormat (1 = PCM)
+        $header .= pack('v', $channels);                      // NumChannels
+        $header .= pack('V', $sampleRate);                    // SampleRate
+        $header .= pack('V', $byteRate);                      // ByteRate
+        $header .= pack('v', $blockAlign);                    // BlockAlign
+        $header .= pack('v', $bitsPerSample);                 // BitsPerSample
+        
+        // data sub-chunk
+        $header .= 'data';                                    // Subchunk2ID
+        $header .= pack('V', $dataSize);                      // Subchunk2Size
+        
+        return $header . $pcmData;
+    }}

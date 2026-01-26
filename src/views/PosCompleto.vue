@@ -222,6 +222,7 @@ import { useModuleNavigation } from '../composables/useModuleNavigation.js'
 import { useRouteState } from '../composables/useRouteState.js'
 import { appStore } from '../store/appStore.js'
 import { aiChatStore } from '../store/aiChatStore.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 
 // Importar componente Sidebar
 import Sidebar from '../components/Sidebar.vue'
@@ -247,6 +248,9 @@ const { saveCurrentModule, restoreLastModule, markRefresh, wasRecentlyRefreshed 
 
 // Sistema de timeout de sesión
 const sessionTimeout = useSessionTimeout()
+
+// 🎯 Store de contexto UI para IA de voz
+const uiContext = useUIContextStore()
 
 // Importar componentes de módulos
 const DashboardView = defineAsyncComponent(() => import('../components/DashboardView_Executive.vue'))
@@ -1266,6 +1270,9 @@ const setCurrentModule = (module, options = {}) => {
 
   currentModule.value = module
   
+  // 🎯 Notificar al contexto UI para la IA de voz
+  uiContext.setCurrentModule(module)
+  
   // � Si volvemos al POS, forzar recreación del componente para refrescar datos
   if (module === 'pos') {
     posRefreshKey.value = Date.now()
@@ -1931,7 +1938,7 @@ main > div {
 /* Ajuste para contenido cuando el chat IA está abierto - Solo en desktop y NO en POS */
 @media (min-width: 640px) {
   .ai-chat-content-spacing {
-    padding-right: 380px;
+    padding-right: 400px;
   }
 }
 </style>

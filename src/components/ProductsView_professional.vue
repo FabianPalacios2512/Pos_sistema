@@ -22,8 +22,8 @@
         </div>
         <!-- Título Standard -->
         <div v-else>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Productos</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestiona tu inventario y catálogo</p>
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Productos</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">Gestiona tu inventario y catálogo</p>
         </div>
         
         <div class="flex items-center space-x-3">
@@ -92,76 +92,76 @@
       <!-- KPIs Standard (Con iconos) - Estilo fantasma profesional -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <!-- Total Productos -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-slate-100 dark:bg-zinc-800/50 border border-slate-200/50 dark:border-zinc-700/30 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-slate-100 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700/50 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Total Productos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ displayProducts.length }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Total Productos</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{{ displayProducts.length }}</p>
             </div>
           </div>
         </div>
 
         <!-- Productos Activos -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100/50 dark:border-emerald-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Activos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ activeProducts }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Activos</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{{ activeProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/30 border border-amber-100/50 dark:border-amber-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/50 border border-amber-100 dark:border-amber-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Stock Bajo</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ lowStockProducts }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Stock Bajo</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{{ lowStockProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Valor Total -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950/30 border border-blue-100/50 dark:border-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Valor Total</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatCurrency(totalValue) }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Valor Total</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatCurrency(totalValue) }}</p>
             </div>
           </div>
         </div>
 
         <!-- Categorías -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-md dark:shadow-black/20">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100/50 dark:border-indigo-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Categorías</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ uniqueCategories }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Categorías</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{{ uniqueCategories }}</p>
             </div>
           </div>
         </div>
@@ -170,7 +170,7 @@
       <!-- Contenedor Principal Tour - Filtros + Productos -->
       <div id="tour-products-main">
       <!-- Filtros - Diseño limpio y profesional -->
-    <div class="bg-white/40 dark:bg-zinc-900/40  rounded-xl p-4 mb-6 border border-gray-200/40 dark:border-zinc-800/40 transition-colors duration-300">
+    <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 mb-6 border border-gray-200 dark:border-zinc-800 shadow-sm transition-colors duration-300">
       <div class="flex flex-wrap items-center gap-4">
         <!-- Búsqueda limpia (como Facturas) -->
         <div id="tour-search-products" class="flex-1 min-w-[200px] relative">

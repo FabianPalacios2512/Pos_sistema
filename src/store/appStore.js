@@ -84,7 +84,6 @@ export const appStore = reactive({
           })
         
         this.products = productsFormatted
-        console.log(`✅ [appStore] Productos cargados: ${productsFormatted.length} productos activos`)
       } else {
         console.warn('⚠️ [appStore] Respuesta sin datos de productos:', response)
       }
@@ -169,7 +168,6 @@ export const appStore = reactive({
         this.systemSettings = response.data.data
         // 🔒 Guardar el plan del tenant
         this.tenantPlan = response.data.tenant_plan || 'free_trial'
-        console.log('🔍 [appStore] Plan del tenant cargado:', this.tenantPlan)
         
         // 🏪 Guardar nombre del negocio
         this.businessName = response.data.data?.business_name || response.data.tenant?.business_name || 'Mi Tienda'

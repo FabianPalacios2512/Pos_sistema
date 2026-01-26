@@ -4,7 +4,7 @@
       
       <!-- NIVEL 1: Header Minimalista con Botones -->
       <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">CrediTienda</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">CrediTienda</h1>
         
         <!-- Botones de acción -->
         <div class="flex items-center gap-3">

@@ -5,8 +5,8 @@
       <!-- Header con Navegación Integrada -->
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Inventario Inteligente</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Sistema de análisis predictivo y gestión avanzada</p>
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Inventario Inteligente</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">Sistema de análisis predictivo y gestión avanzada</p>
         </div>
         
         <div class="flex items-center gap-3">

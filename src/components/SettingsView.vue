@@ -12,8 +12,8 @@
             </svg>
           </div>
           <div>
-            <h1 class="text-sm font-bold text-gray-900 dark:text-white">Configuración</h1>
-            <p class="text-xs text-gray-500 dark:text-zinc-400">Sistema</p>
+            <h1 class="text-sm font-semibold text-gray-900 dark:text-white tracking-tight">Configuración</h1>
+            <p class="text-xs text-gray-500 dark:text-zinc-500">Sistema</p>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@
             
             <!-- Título y Subtítulo -->
             <div>
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Facturas</h1>
+              <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Facturas</h1>
             </div>
         
         <!-- Botones de Acción -->
@@ -35,49 +35,49 @@
       </div>
 
       <!-- NIVEL 2: KPIs Compactos - Ribbon horizontal tipo dashboard moderno -->
-      <div class="flex items-center gap-2 mb-4">
+      <div class="flex items-center gap-3">
         
         <!-- KPI: Facturas del Mes -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-blue-50 dark:bg-blue-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4.5 h-4.5 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-blue-100 dark:border-blue-900/30">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Facturas del Mes</p>
-              <p class="text-lg font-bold text-gray-800 dark:text-white leading-tight">{{ monthlyInvoices }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Facturas del Mes</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white leading-tight">{{ monthlyInvoices }}</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Total Facturado -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-emerald-50 dark:bg-emerald-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4.5 h-4.5 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-100 dark:border-emerald-900/30">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Total Facturado</p>
-              <p class="text-lg font-bold text-gray-800 dark:text-white leading-tight">${{ formatCurrency(totalInvoiced) }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Total Facturado</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white leading-tight">${{ formatCurrency(totalInvoiced) }}</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Cotizaciones -->
-        <div class="flex-1 bg-white/90 dark:bg-zinc-800/60  rounded-xl px-3 py-2 border border-gray-200/60 dark:border-zinc-700/40 hover:border-gray-300 dark:hover:border-zinc-600 transition-all duration-200 shadow-sm hover:shadow-md">
+        <div class="flex-1 bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-purple-50 dark:bg-purple-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4.5 h-4.5 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-purple-100 dark:border-purple-900/30">
+              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Cotizaciones</p>
-              <p class="text-lg font-bold text-gray-800 dark:text-white leading-tight">{{ quotations }}</p>
+              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Cotizaciones</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white leading-tight">{{ quotations }}</p>
             </div>
           </div>
         </div>
@@ -91,10 +91,10 @@
       <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
         <!-- PANEL IZQUIERDO: Lista con fondo diferenciado (Efecto profundidad WhatsApp) -->
-        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-slate-50 dark:bg-[#0c0c0f] border-r border-gray-200 dark:border-zinc-800/80 transition-colors duration-300">
+        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-gray-50 dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
           
           <!-- Header compacto con búsqueda y filtros en UNA línea -->
-          <div class="p-3 border-b border-gray-200 dark:border-zinc-800/80 bg-slate-100/80 dark:bg-[#0a0a0d]">
+          <div class="p-3 border-b border-gray-200 dark:border-zinc-800 bg-gray-100/80 dark:bg-zinc-900/80">
             <!-- Búsqueda + Filtros en una sola fila -->
             <div class="flex items-center gap-2">
               <!-- Búsqueda -->
@@ -130,7 +130,7 @@
           </div>
           
           <!-- Lista con scroll independiente - Fondo diferenciado -->
-          <div class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0c0c0f] px-2">
+          <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-zinc-950 px-2">
             
             <div
               v-for="invoice in displayedInvoices"
@@ -524,8 +524,8 @@
                   </div>
                   
                   <div>
-                    <h4 class="text-xs font-bold uppercase mb-2" style="color: #6B7280; letter-spacing: 0.05em;">Vendedor</h4>
-                    <p class="text-sm" style="color: #0F172A;">{{ selectedInvoice.seller_name || 'Vendedor' }}</p>
+                    <h4 class="text-xs font-bold uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Vendedor</h4>
+                    <p class="text-sm text-gray-900 dark:text-zinc-200">{{ selectedInvoice.seller_name || 'Vendedor' }}</p>
                   </div>
                 </div>
 
@@ -775,12 +775,14 @@ import { useModuleNavigation } from '../composables/useModuleNavigation.js'
 import { useToast } from '../composables/useToast.js'
 import { useAuth } from '../store/auth.js'
 import { appStore } from '../store/appStore.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 import QuotationModal from './QuotationModal.vue'
 import PhoneInputModal from './PhoneInputModal.vue'
 import ReceiptModal from './ReceiptModal.vue'
 import { invoiceService } from '../services/invoiceService.js'
 
 const { navigateToModule } = useModuleNavigation()
+const uiContext = useUIContextStore()
 import { invoicesService } from '../services/invoicesService.js'
 import { formatInvoiceDate } from '@/utils/dateFormatter.js'
 import { generateInvoicePDF, generateQuotationPDF, downloadPDF as downloadPDFHelper, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
@@ -996,9 +998,11 @@ const selectInvoice = async (invoice) => {
   try {
     const fullInvoice = await invoiceService.getInvoice(invoice.id)
     selectedInvoice.value = fullInvoice
+    // El watcher de selectedInvoice se encarga de notificar al contexto UI
   } catch (error) {
     console.error('Error al cargar factura:', error)
     selectedInvoice.value = invoice
+    // El watcher de selectedInvoice se encarga de notificar al contexto UI
   }
 }
 
@@ -1869,11 +1873,55 @@ watch([searchTerm, statusFilter, typeFilter], () => {
   displayLimit.value = 20 // Resetear a 20 cuando cambien los filtros
 })
 
+// 🎯 Watcher para actualizar contexto cuando cambie la factura seleccionada
+watch(selectedInvoice, (newInvoice) => {
+  if (newInvoice) {
+    // Notificar al contexto UI para la IA de voz
+    uiContext.setSelectedElement('invoice', newInvoice, [
+      { id: 'sendEmail', label: 'Enviar por Email' },
+      { id: 'sendWhatsApp', label: 'Enviar por WhatsApp' },
+      { id: 'downloadPDF', label: 'Descargar PDF' },
+      { id: 'printInvoice', label: 'Imprimir' }
+    ])
+  } else {
+    // Si se deselecciona, limpiar contexto
+    uiContext.clearSelection()
+  }
+})
+
 // 🎯 Watcher para query params de navegación AI (búsqueda y filtros automáticos)
-watch(() => props.queryParams, (newParams) => {
+watch(() => props.queryParams, async (newParams) => {
   if (!newParams || Object.keys(newParams).length === 0) return
   
   console.log('🔍 [InvoicesView] Query params detectados:', newParams)
+  
+  // Seleccionar factura por ID (para mostrar detalle)
+  if (newParams.selectId) {
+    // Esperar a que las facturas estén cargadas
+    await new Promise(resolve => {
+      if (props.invoices.length > 0) {
+        resolve()
+      } else {
+        const unwatch = watch(() => props.invoices.length, (len) => {
+          if (len > 0) {
+            unwatch()
+            resolve()
+          }
+        })
+        // Timeout de seguridad
+        setTimeout(resolve, 2000)
+      }
+    })
+    
+    const facturaId = parseInt(newParams.selectId)
+    const factura = props.invoices.find(f => f.id === facturaId)
+    if (factura) {
+      // Usar selectInvoice para que notifique al contexto UI
+      await selectInvoice(factura)
+      console.log('✅ [InvoicesView] Factura seleccionada por AI:', factura.invoice_number || factura.id)
+      showToast(`Mostrando factura ${factura.invoice_number || 'seleccionada'}`, 'success', 3000)
+    }
+  }
   
   // Aplicar búsqueda si hay query.search
   if (newParams.search) {
@@ -1912,6 +1960,27 @@ const handleKeyDown = (event) => {
 onMounted(() => {
   document.addEventListener('click', closeActionsMenu)
   document.addEventListener('keydown', handleKeyDown)
+  
+  // 🎯 Registrar callbacks de acciones para la IA de voz
+  uiContext.registerAction('sendEmail', async () => {
+    if (!selectedInvoice.value) throw new Error('No hay factura seleccionada')
+    await sendByEmail(selectedInvoice.value)
+  })
+  
+  uiContext.registerAction('sendWhatsApp', async () => {
+    if (!selectedInvoice.value) throw new Error('No hay factura seleccionada')
+    await handleSendWhatsApp()
+  })
+  
+  uiContext.registerAction('downloadPDF', async () => {
+    if (!selectedInvoice.value) throw new Error('No hay factura seleccionada')
+    await downloadPDF(selectedInvoice.value)
+  })
+  
+  uiContext.registerAction('printInvoice', async () => {
+    if (!selectedInvoice.value) throw new Error('No hay factura seleccionada')
+    await viewAndPrintInvoice(selectedInvoice.value)
+  })
   
   // NO seleccionar automáticamente - dejar en blanco para que el usuario elija
 })

@@ -5,8 +5,8 @@
       <!-- Header sin icono -->
       <div class="flex items-center justify-between pb-4">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gastos Operativos</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestiona los gastos del negocio</p>
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Gastos Operativos</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">Gestiona los gastos del negocio</p>
         </div>
         
         <div class="flex items-center gap-3">

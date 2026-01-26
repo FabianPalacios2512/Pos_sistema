@@ -1,17 +1,17 @@
 <template>
-  <!-- Executive Dashboard - Estilo Linear/Raycast/Shadcn -->
+  <!-- Executive Dashboard - Estilo Premium inspirado en el AI Chat -->
   <div class="min-h-screen bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] font-sans antialiased">
     
-    <!-- Container Principal con más whitespace -->
-    <div class="max-w-[1600px] mx-auto px-6 lg:px-12 py-8 space-y-8">
+    <!-- Container Principal -->
+    <div class="max-w-[1600px] mx-auto px-6 lg:px-10 py-8 space-y-8">
       
-      <!-- Header Executive Clean -->
-      <div class="flex items-center justify-between pb-6">
-        <div class="space-y-1">
-          <h1 class="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+      <!-- Header Premium - Sin iconos, tipografía clara -->
+      <div class="flex items-center justify-between">
+        <div class="space-y-1.5">
+          <h1 class="text-2xl lg:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
             Panel de Control
           </h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 font-medium flex items-center gap-2">
+          <p class="text-sm text-gray-500 dark:text-zinc-500 font-normal flex items-center gap-2">
             <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
             Sistema Operativo • {{ currentDate }}
           </p>
@@ -21,7 +21,7 @@
           <button 
             @click="refreshData" 
             :disabled="loading"
-            class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-zinc-200 bg-white dark:bg-zinc-800 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors shadow-sm dark:shadow-black/20"
+            class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200"
           >
             <svg :class="['w-4 h-4', loading ? 'animate-spin' : '']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -31,7 +31,7 @@
           
           <button 
             @click="handleNewSale"
-            class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-slate-900 dark:bg-slate-700 rounded-xl hover:bg-black dark:hover:bg-slate-600 transition-colors shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50"
+            class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 dark:shadow-emerald-900/30"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -41,198 +41,192 @@
         </div>
       </div>
 
-      <!-- Grid de KPIs Executive (4 columnas con más padding y whitespace) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <!-- Grid de KPIs Premium (4 columnas) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         
         <!-- 1. Estado de Caja -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 group">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl flex items-center justify-center"
-                   :class="hasOpenSession ? 'bg-emerald-50 dark:bg-emerald-950/50' : 'bg-gray-100 dark:bg-zinc-800'">
-                <svg class="w-5 h-5" :class="hasOpenSession ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path v-if="hasOpenSession" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-              </div>
-              <div>
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Estado de Caja</p>
-                <p class="text-sm font-semibold mt-0.5" :class="hasOpenSession ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-700 dark:text-zinc-300'">
-                  {{ hasOpenSession ? 'Abierta' : 'Cerrada' }}
-                </p>
-              </div>
+        <div class="group relative bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/80 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-300 hover:shadow-lg dark:hover:shadow-black/20">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                 :class="hasOpenSession 
+                   ? 'bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-800/30' 
+                   : 'bg-gray-100 dark:bg-zinc-800/60 border border-gray-200/50 dark:border-zinc-700/30'">
+              <svg class="w-5 h-5" :class="hasOpenSession ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-zinc-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path v-if="hasOpenSession" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
             </div>
-          </div>
-          
-          <div class="space-y-3">
-            <div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Estado de Caja</p>
+                <span class="px-1.5 py-0.5 text-[10px] font-semibold rounded-md"
+                      :class="hasOpenSession 
+                        ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' 
+                        : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400'">
+                  {{ hasOpenSession ? 'Abierta' : 'Cerrada' }}
+                </span>
+              </div>
               <p class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                 ${{ formatCurrency(cashAmount) }}
               </p>
-              <p v-if="hasOpenSession" class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              <p v-if="hasOpenSession" class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
                 Sesión #{{ currentSession?.id }}
               </p>
             </div>
-            
-            
           </div>
         </div>
 
         <!-- 2. Ventas Hoy -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 group">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
-                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Ventas Hoy</p>
-              </div>
-            </div>
-            <span 
-              class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full"
-              :class="growthPercentage >= 0 
-                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400' 
-                : 'bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400'"
-            >
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="growthPercentage >= 0 ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3'"></path>
+        <div class="group relative bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/80 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-300 hover:shadow-lg dark:hover:shadow-black/20">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 border border-blue-200/50 dark:border-blue-800/30 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
               </svg>
-              {{ Math.abs(growthPercentage) }}%
-            </span>
-          </div>
-          
-          <div class="space-y-1">
-            <p class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-              ${{ formatCurrency(todaySalesData.revenue) }}
-            </p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ todaySalesData.sales }} transacciones
-            </p>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between mb-1">
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Ventas Hoy</p>
+                <span 
+                  class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold rounded-md"
+                  :class="growthPercentage >= 0 
+                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' 
+                    : 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400'"
+                >
+                  <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" :d="growthPercentage >= 0 ? 'M5 10l7-7m0 0l7 7m-7-7v18' : 'M19 14l-7 7m0 0l-7-7m7 7V3'"></path>
+                  </svg>
+                  {{ Math.abs(growthPercentage) }}%
+                </span>
+              </div>
+              <p class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                ${{ formatCurrency(todaySalesData.revenue) }}
+              </p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
+                {{ todaySalesData.sales }} transacciones
+              </p>
+            </div>
           </div>
         </div>
 
         <!-- 3. Transacciones -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 group">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center">
-                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Transacciones</p>
-              </div>
+        <div class="group relative bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/80 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-300 hover:shadow-lg dark:hover:shadow-black/20">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-violet-100 dark:bg-violet-950/60 border border-violet-200/50 dark:border-violet-800/30 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-violet-600 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
             </div>
-          </div>
-          
-          <div class="space-y-1">
-            <p class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-              {{ todaySalesData.sales }}
-            </p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              Ticket promedio: <span class="font-semibold text-slate-700 dark:text-gray-300">${{ formatCurrency(averageTicket) }}</span>
-            </p>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1">Transacciones</p>
+              <p class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                {{ todaySalesData.sales }}
+              </p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
+                Ticket promedio: <span class="font-semibold text-slate-700 dark:text-zinc-300">${{ formatCurrency(averageTicket) }}</span>
+              </p>
+            </div>
           </div>
         </div>
 
         <!-- 4. Alertas/Stock -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30 group">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl flex items-center justify-center"
-                   :class="lowStockCount > 0 ? 'bg-amber-50 dark:bg-amber-950/50' : 'bg-gray-100 dark:bg-zinc-800'">
-                <svg class="w-5 h-5" :class="lowStockCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Alertas Stock</p>
-              </div>
+        <div class="group relative bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-200/80 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-300 hover:shadow-lg dark:hover:shadow-black/20">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                 :class="lowStockCount > 0 
+                   ? 'bg-amber-100 dark:bg-amber-950/60 border border-amber-200/50 dark:border-amber-800/30' 
+                   : 'bg-gray-100 dark:bg-zinc-800/60 border border-gray-200/50 dark:border-zinc-700/30'">
+              <svg class="w-5 h-5" :class="lowStockCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-zinc-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
             </div>
-          </div>
-          
-          <div class="space-y-3">
-            <div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1">Alertas Stock</p>
               <p class="text-2xl font-bold tracking-tight"
-                 :class="lowStockCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'">
+                 :class="lowStockCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-white'">
                 {{ lowStockCount }}
               </p>
-              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
                 {{ lowStockCount === 0 ? 'Todo en orden' : 'Productos críticos' }}
               </p>
             </div>
-            
-            <button 
-              @click="handleGoToInventory"
-              class="w-full py-2.5 px-4 text-sm font-medium bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
-            >
-              Ver Inventario
-            </button>
           </div>
+          <!-- Link sutil -->
+          <button 
+            @click="handleGoToInventory"
+            class="absolute bottom-4 right-4 text-xs font-medium text-gray-400 dark:text-zinc-600 hover:text-gray-600 dark:hover:text-zinc-400 transition-colors"
+          >
+            Ver Inventario →
+          </button>
         </div>
       </div>
 
       <!-- Grid de Gráficos (2 columnas) -->
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
         
-        <!-- Gráfico de Ingresos (Area Chart Mejorado) -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+        <!-- Gráfico de Ingresos -->
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/80 dark:border-zinc-800/60">
           <div class="flex items-center justify-between mb-6">
             <div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white">Análisis de Ingresos</h3>
-              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Tendencia de ventas en el tiempo</p>
+              <h3 class="text-base font-semibold text-slate-900 dark:text-white">Análisis de Ingresos</h3>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Tendencia de ventas en el tiempo</p>
             </div>
             
-            <!-- Tabs de período -->
-            <div class="inline-flex items-center gap-1 p-1 bg-gray-100 dark:bg-zinc-800 rounded-xl">
+            <!-- Tabs de período - Estilo pill más sutil -->
+            <div class="inline-flex items-center gap-0.5 p-1 bg-gray-100 dark:bg-zinc-800/80 rounded-lg border border-gray-200/50 dark:border-zinc-700/30">
               <button 
                 v-for="period in periods" 
                 :key="period.value"
                 @click="selectedPeriod = period.value"
-                class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                class="px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200"
                 :class="selectedPeriod === period.value 
                   ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
-                  : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200'"
+                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'"
               >
                 {{ period.label }}
               </button>
             </div>
           </div>
           
-          <div class="h-[300px] flex items-center justify-center" :class="loading ? 'opacity-50' : 'opacity-100'">
+          <div class="h-[280px] flex items-center justify-center" :class="loading ? 'opacity-50' : 'opacity-100'">
             <Line :data="chartData" :options="chartOptions" />
           </div>
         </div>
 
-        <!-- Gráfico de Top Productos (Doughnut Mejorado) -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
-          <div class="mb-6">
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">Top Productos</h3>
-            <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Distribución de ingresos</p>
+        <!-- Gráfico de Top Productos -->
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/80 dark:border-zinc-800/60">
+          <div class="mb-5">
+            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Top Productos</h3>
+            <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Distribución de ingresos</p>
           </div>
           
-          <div class="flex items-center gap-8">
-            <!-- Gráfico circular más delgado -->
-            <div class="w-48 h-48 relative flex-shrink-0">
-              <Doughnut v-if="!loading" :data="productChartData" :options="productChartOptions" />
-              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ totalItems }}</p>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Items</p>
+          <div class="flex items-center gap-6">
+            <!-- Gráfico circular -->
+            <div class="w-44 h-44 relative flex-shrink-0">
+              <Doughnut v-if="!loading && topProducts.length > 0" :data="productChartData" :options="productChartOptions" />
+              <div v-else class="w-full h-full rounded-full bg-gray-100 dark:bg-zinc-800/50 flex items-center justify-center">
+                <span class="text-xs text-gray-400 dark:text-zinc-600">Sin datos</span>
+              </div>
+              <div v-if="topProducts.length > 0" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ totalItems }}</p>
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 uppercase tracking-wider font-medium">Items</p>
               </div>
             </div>
             
-            <!-- Leyenda mejorada -->
-            <div class="flex-1 space-y-3">
-              <div v-for="(product, index) in topProducts.slice(0, 5)" :key="index" class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+            <!-- Leyenda -->
+            <div class="flex-1 space-y-2">
+              <div v-for="(product, index) in topProducts.slice(0, 5)" :key="index" 
+                   class="flex items-center justify-between py-2 px-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group cursor-default">
                 <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{ backgroundColor: productColors[index] }"></div>
-                  <span class="text-sm text-gray-700 dark:text-zinc-300 truncate">{{ product.name }}</span>
+                  <div class="w-2 h-2 rounded-full flex-shrink-0" :style="{ backgroundColor: productColors[index] }"></div>
+                  <span class="text-sm text-gray-700 dark:text-zinc-300 truncate group-hover:text-gray-900 dark:group-hover:text-white transition-colors">{{ product.name }}</span>
                 </div>
-                <span class="text-sm font-semibold text-gray-900 dark:text-white ml-2 flex-shrink-0">${{ formatCurrency(product.revenue) }}</span>
+                <span class="text-sm font-semibold text-gray-900 dark:text-white ml-3 flex-shrink-0 tabular-nums">${{ formatCurrency(product.revenue) }}</span>
+              </div>
+              
+              <!-- Estado vacío -->
+              <div v-if="topProducts.length === 0" class="text-center py-8">
+                <p class="text-sm text-gray-400 dark:text-zinc-600">Sin productos vendidos</p>
               </div>
             </div>
           </div>
@@ -240,46 +234,46 @@
       </div>
 
       <!-- Últimas Transacciones -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
-        <div class="mb-6">
-          <h3 class="text-base font-bold text-gray-900 dark:text-white">Últimas Transacciones</h3>
-          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Actividad reciente del sistema</p>
+      <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl border border-gray-200/80 dark:border-zinc-800/60 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800/60">
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white">Últimas Transacciones</h3>
+          <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Actividad reciente del sistema</p>
         </div>
         
-        <div class="space-y-2">
-          <div v-if="recentSalesComputed && recentSalesComputed.length > 0">
+        <div class="divide-y divide-gray-100 dark:divide-zinc-800/60">
+          <template v-if="recentSalesComputed && recentSalesComputed.length > 0">
             <div v-for="sale in recentSalesComputed.slice(0, 5)" :key="sale.id" 
-                 class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+                 class="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
               <div class="flex items-center gap-4 min-w-0 flex-1">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/50 border border-emerald-200/50 dark:border-emerald-800/30 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                 </div>
                 <div class="min-w-0 flex-1">
-                  <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ sale.customer?.name || 'Cliente General' }}</p>
-                  <p class="text-xs text-gray-500 dark:text-zinc-400">{{ formatDate(sale.created_at) }}</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ sale.customer?.name || 'Cliente General' }}</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-500">{{ formatDate(sale.created_at) }}</p>
                 </div>
               </div>
               <div class="text-right ml-4 flex-shrink-0">
-                <p class="text-sm font-bold text-gray-900 dark:text-white">${{ formatCurrency(sale.total) }}</p>
-                <span class="inline-flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                  <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(sale.total) }}</p>
+                <span class="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span class="w-1 h-1 bg-emerald-500 rounded-full"></span>
                   Pagado
                 </span>
               </div>
             </div>
-          </div>
+          </template>
           
           <!-- Estado vacío -->
-          <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-            <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center mb-4">
-              <svg class="w-8 h-8 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div v-else class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-zinc-800/60 border border-gray-200/50 dark:border-zinc-700/30 flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
             </div>
-            <p class="text-sm font-semibold text-gray-900 dark:text-white mb-1">No hay transacciones recientes</p>
-            <p class="text-xs text-gray-500 dark:text-zinc-400">Las ventas aparecerán aquí</p>
+            <p class="text-sm font-medium text-gray-700 dark:text-zinc-300 mb-0.5">No hay transacciones recientes</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-500">Las ventas aparecerán aquí</p>
           </div>
         </div>
       </div>

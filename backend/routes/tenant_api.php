@@ -536,6 +536,15 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::get('/ai/usage-stats', [\App\Http\Controllers\Api\AIController::class, 'getUsageStats']);
     Route::get('/ai/provider-config', [\App\Http\Controllers\Api\AIController::class, 'getProviderConfig']);
     Route::post('/ai/actions/create-category', [\App\Http\Controllers\Api\AIActionsController::class, 'createCategory']);
+    
+    // 🔊 Text-to-Speech con Gemini (sin límite de IA pero sí autenticado)
+    Route::post('/ai/text-to-speech', [\App\Http\Controllers\Api\AIController::class, 'textToSpeech']);
+    
+    // 🎵 TTS Preview para selector de voces (usa las voces reales de Gemini)
+    Route::post('/ai/tts-preview', [\App\Http\Controllers\Api\AIController::class, 'ttsPreview']);
+    
+    // 📞 Live Call - Token efímero para WebSocket de Gemini Live API
+    Route::post('/ai/live-token', [\App\Http\Controllers\Api\AIController::class, 'getLiveToken']);
 
 });
 

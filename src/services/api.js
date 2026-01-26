@@ -196,7 +196,24 @@ export const apiCall = async (endpoint, options = {}) => {
 // Default API object
 const api = {
   get: (endpoint, options = {}) => {
-    return apiCall(endpoint, { method: 'GET', ...options })
+    // Procesar params y convertirlos a query string (compatibilidad con Axios)
+    let url = endpoint
+    if (options.params) {
+      const queryParams = new URLSearchParams()
+      for (const [key, value] of Object.entries(options.params)) {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value)
+        }
+      }
+      const queryString = queryParams.toString()
+      if (queryString) {
+        url = `${endpoint}${endpoint.includes('?') ? '&' : '?'}${queryString}`
+      }
+      // Eliminar params del options ya que lo procesamos
+      const { params, ...restOptions } = options
+      return apiCall(url, { method: 'GET', ...restOptions })
+    }
+    return apiCall(url, { method: 'GET', ...options })
   },
   
   post: (endpoint, data = {}, options = {}) => {

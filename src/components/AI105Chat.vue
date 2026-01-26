@@ -1,337 +1,616 @@
 <template>
-  <!-- Panel Lateral de Chat IA - Estilo Hostinger hPanel -->
+  <!-- Panel Lateral de Chat IA - Diseño GEMINI Style -->
   <div>
-    <!-- Panel Lateral de Chat IA - Estilo Hostinger hPanel -->
     <transition name="slide-right">
       <div 
         v-if="localChatOpen"
-        class="fixed right-0 w-full sm:w-[380px] bg-white dark:bg-[#18181b] flex flex-col z-[45] shadow-[-2px_0_20px_rgba(0,0,0,0.08)] dark:shadow-[-2px_0_30px_rgba(0,0,0,0.5)]"
+        class="fixed right-0 w-full sm:w-[400px] bg-white dark:bg-[#131314] flex flex-col z-[45] shadow-[-8px_0_30px_-5px_rgba(0,0,0,0.15)] dark:shadow-[-8px_0_30px_-5px_rgba(0,0,0,0.5)] border-l border-gray-200/80 dark:border-zinc-800"
         :style="{ top: dynamicHeaderHeight + 'px', height: `calc(100% - ${dynamicHeaderHeight}px)` }"
       >
-        <!-- Header del Chat -->
-        <div class="flex items-center justify-between h-11 px-3 border-b border-gray-100 dark:border-zinc-800 flex-shrink-0">
-          <!-- Tabs -->
-          <div class="flex items-center gap-1">
-            <button
-              @click="activeTab = 'chat'"
-              :class="[
-                'px-2.5 py-1 text-sm font-medium rounded-md transition-all',
-                activeTab === 'chat'
-                  ? 'bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white'
-                  : 'text-gray-500 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300'
-              ]"
-            >Chat</button>
-            <button
-              @click="activeTab = 'history'"
-              :class="[
-                'px-2.5 py-1 text-sm font-medium rounded-md transition-all',
-                activeTab === 'history'
-                  ? 'bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-white'
-                  : 'text-gray-500 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300'
-              ]"
-            >Historia</button>
+        <!-- ═══════════════════════════════════════════════════════════════
+             🔴 LIVE CALL OVERLAY - Vista de llamada en vivo estilo Gemini
+        ═══════════════════════════════════════════════════════════════ -->
+        <transition name="fade">
+          <div 
+            v-if="liveCall.isActive.value"
+            class="absolute inset-0 z-50 flex flex-col overflow-hidden"
+          >
+            <!-- Fondo con gradiente animado tipo Gemini -->
+            <div class="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0d1525] to-[#1a2744]">
+              <!-- Aurora/Glow effect animado -->
+              <div class="absolute bottom-0 left-0 right-0 h-[60%] overflow-hidden">
+                <div 
+                  class="absolute inset-0 opacity-60"
+                  :class="{ 'animate-pulse': liveCall.isSpeaking.value }"
+                  style="background: radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.4) 0%, rgba(59,130,246,0.1) 40%, transparent 70%);"
+                ></div>
+                <div 
+                  class="absolute inset-0 opacity-40"
+                  style="background: radial-gradient(ellipse at 30% 90%, rgba(147,51,234,0.3) 0%, transparent 50%);"
+                ></div>
+                <div 
+                  class="absolute inset-0 opacity-30"
+                  style="background: radial-gradient(ellipse at 70% 95%, rgba(236,72,153,0.2) 0%, transparent 40%);"
+                ></div>
+              </div>
+            </div>
+            
+            <!-- ═══════════════════════════════════════════════════════════
+                 SELECTOR DE VOZ (Primera vez)
+            ═══════════════════════════════════════════════════════════ -->
+            <div 
+              v-if="liveCall.showVoiceSelector.value"
+              class="relative z-10 flex-1 flex flex-col px-6 py-6"
+            >
+              <!-- Header -->
+              <div class="text-center mb-4">
+                <h2 class="text-lg font-medium text-white mb-1">Elige tu asistente</h2>
+                <p class="text-white/40 text-xs">Toca el círculo para escuchar la voz</p>
+              </div>
+              
+              <!-- Círculo central con ondas -->
+              <div class="flex-1 flex flex-col items-center justify-center relative">
+                <!-- Flechas de navegación -->
+                <button
+                  @click="liveCall.prevVoice()"
+                  class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center transition-all"
+                  :class="{ 'opacity-20 pointer-events-none': liveCall.currentVoiceIndex.value === 0 }"
+                >
+                  <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                  </svg>
+                </button>
+                
+                <!-- Círculo principal con ondas -->
+                <div class="relative">
+                  <!-- Ondas de sonido (anillos que se expanden) -->
+                  <div 
+                    v-if="liveCall.isPlayingPreview.value"
+                    class="absolute inset-0 flex items-center justify-center"
+                  >
+                    <div class="absolute w-32 h-32 rounded-full border-2 border-white/20 animate-ping" style="animation-duration: 1.5s;"></div>
+                    <div class="absolute w-40 h-40 rounded-full border border-white/10 animate-ping" style="animation-duration: 2s;"></div>
+                    <div class="absolute w-48 h-48 rounded-full border border-white/5 animate-ping" style="animation-duration: 2.5s;"></div>
+                  </div>
+                  
+                  <!-- Círculo con gradiente -->
+                  <button
+                    @click="liveCall.playVoicePreview()"
+                    :disabled="liveCall.isPlayingPreview.value"
+                    class="relative w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl hover:scale-105 disabled:hover:scale-100"
+                    :class="[`bg-gradient-to-br ${liveCall.voices.value[liveCall.currentVoiceIndex.value]?.color || 'from-gray-500 to-gray-700'}`]"
+                    :style="{ boxShadow: `0 0 60px ${liveCall.isPlayingPreview.value ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.5)'}` }"
+                  >
+                    <!-- Icono interior -->
+                    <div 
+                      v-if="liveCall.isPlayingPreview.value"
+                      class="flex items-end gap-0.5 h-6"
+                    >
+                      <div class="w-1 bg-white rounded-full animate-bounce" style="height: 40%; animation-delay: 0ms;"></div>
+                      <div class="w-1 bg-white rounded-full animate-bounce" style="height: 80%; animation-delay: 100ms;"></div>
+                      <div class="w-1 bg-white rounded-full animate-bounce" style="height: 50%; animation-delay: 200ms;"></div>
+                      <div class="w-1 bg-white rounded-full animate-bounce" style="height: 90%; animation-delay: 300ms;"></div>
+                      <div class="w-1 bg-white rounded-full animate-bounce" style="height: 60%; animation-delay: 400ms;"></div>
+                    </div>
+                    <svg 
+                      v-else
+                      class="w-10 h-10 text-white/90" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24" 
+                      stroke-width="1.5"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"/>
+                    </svg>
+                  </button>
+                </div>
+                
+                <!-- Nombre y descripción debajo del círculo -->
+                <div class="text-center mt-6">
+                  <h3 class="text-xl font-semibold text-white">
+                    {{ liveCall.voices.value[liveCall.currentVoiceIndex.value]?.name }}
+                  </h3>
+                  <p class="text-white/50 text-sm mt-1">
+                    {{ liveCall.voices.value[liveCall.currentVoiceIndex.value]?.description }}
+                  </p>
+                  <!-- Género -->
+                  <span 
+                    class="inline-block mt-2 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider"
+                    :class="liveCall.voices.value[liveCall.currentVoiceIndex.value]?.gender === 'female' 
+                      ? 'bg-pink-500/20 text-pink-300' 
+                      : 'bg-blue-500/20 text-blue-300'"
+                  >
+                    {{ liveCall.voices.value[liveCall.currentVoiceIndex.value]?.gender === 'female' ? 'Femenina' : 'Masculina' }}
+                  </span>
+                </div>
+                
+                <!-- Flecha siguiente -->
+                <button
+                  @click="liveCall.nextVoice()"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center transition-all"
+                  :class="{ 'opacity-20 pointer-events-none': liveCall.currentVoiceIndex.value === liveCall.voices.value.length - 1 }"
+                >
+                  <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <!-- Indicadores (dots) -->
+              <div class="flex justify-center gap-1.5 mt-4">
+                <button
+                  v-for="(voice, index) in liveCall.voices.value"
+                  :key="voice.id"
+                  @click="liveCall.goToVoice(index)"
+                  class="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                  :class="[
+                    index === liveCall.currentVoiceIndex.value 
+                      ? 'bg-white w-4' 
+                      : 'bg-white/20 hover:bg-white/40'
+                  ]"
+                ></button>
+              </div>
+              
+              <!-- Botón continuar -->
+              <div class="mt-6 space-y-2">
+                <button
+                  @click="liveCall.confirmVoiceSelection()"
+                  :disabled="liveCall.isPlayingPreview.value"
+                  class="w-full py-3.5 rounded-xl font-semibold transition-all disabled:opacity-50 shadow-lg"
+                  :class="[`bg-gradient-to-r ${liveCall.voices.value[liveCall.currentVoiceIndex.value]?.color || 'from-gray-500 to-gray-700'} text-white`]"
+                >
+                  Continuar con {{ liveCall.voices.value[liveCall.currentVoiceIndex.value]?.name }}
+                </button>
+                <button
+                  @click="liveCall.cancelVoiceSelection()"
+                  class="w-full py-2 text-white/40 hover:text-white/60 text-sm transition-all"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+            
+            <!-- ═══════════════════════════════════════════════════════════
+                 LLAMADA EN CURSO
+            ═══════════════════════════════════════════════════════════ -->
+            <template v-else>
+              <!-- Header de la llamada -->
+              <div class="relative z-10 flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span class="text-white/80 text-sm font-medium">Live</span>
+                </div>
+                <span class="text-white/60 text-sm font-mono">{{ liveCall.formattedDuration.value }}</span>
+              </div>
+              
+              <!-- Contenido central -->
+              <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
+                <!-- Indicador de estado -->
+                <div class="mb-8">
+                  <div 
+                    v-if="liveCall.isConnecting.value"
+                    class="flex flex-col items-center"
+                  >
+                    <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+                    <p class="text-white/80 text-lg">Conectando...</p>
+                  </div>
+                  
+                  <div 
+                    v-else-if="liveCall.isSpeaking.value"
+                    class="flex flex-col items-center"
+                  >
+                    <!-- Barras de audio animadas -->
+                    <div class="flex items-end gap-1 h-16 mb-4">
+                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 60%; animation-delay: 0ms;"></div>
+                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 80%; animation-delay: 100ms;"></div>
+                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 100%; animation-delay: 200ms;"></div>
+                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 70%; animation-delay: 300ms;"></div>
+                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 90%; animation-delay: 400ms;"></div>
+                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 50%; animation-delay: 500ms;"></div>
+                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 75%; animation-delay: 600ms;"></div>
+                    </div>
+                    <p class="text-white/80 text-lg">105 IA está hablando...</p>
+                  </div>
+                  
+                  <div 
+                    v-else
+                    class="flex flex-col items-center"
+                  >
+                    <!-- Círculo de micrófono pulsante -->
+                    <div class="relative mb-4">
+                      <div class="absolute inset-0 bg-blue-500/20 rounded-full animate-ping"></div>
+                      <div class="relative w-16 h-16 bg-blue-500/30 rounded-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <p class="text-white/80 text-lg">Escuchándote...</p>
+                  </div>
+                </div>
+                
+                <!-- Voz actual -->
+                <div class="flex items-center gap-2 mb-4 px-3 py-1.5 bg-white/10 rounded-full">
+                  <span class="text-lg">{{ liveCall.currentVoice.value?.emoji }}</span>
+                  <span class="text-white/60 text-sm">{{ liveCall.currentVoice.value?.name }}</span>
+                </div>
+              </div>
+              
+              <!-- Barra de controles inferior -->
+              <div class="relative z-10 px-6 pb-8 pt-4">
+                <div class="flex items-center justify-center gap-4">
+                  <!-- Botón de micrófono -->
+                  <button
+                    class="w-14 h-14 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all backdrop-blur-sm border border-white/10"
+                    :class="{ 'bg-blue-500/50': liveCall.isListening.value }"
+                  >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
+                    </svg>
+                  </button>
+                  
+                  <!-- Botón de colgar -->
+                  <button
+                    @click="endLiveCall"
+                    class="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all shadow-lg shadow-red-500/30"
+                  >
+                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+                
+                <!-- Texto de ayuda -->
+                <p class="text-center text-white/40 text-xs mt-4">
+                  Habla naturalmente • 105 IA te escucha
+                </p>
+              </div>
+            </template>
           </div>
+        </transition>
+        
+        <!-- ═══════════════════════════════════════════════════════════════
+             HEADER - Estilo Gemini Minimalista
+        ═══════════════════════════════════════════════════════════════ -->
+        <div class="flex items-center justify-between h-14 px-4 flex-shrink-0">
+          <!-- Izquierda: Menu hamburguesa -->
+          <button 
+            @click="activeTab = activeTab === 'chat' ? 'history' : 'chat'"
+            class="w-10 h-10 flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-all"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+            </svg>
+          </button>
           
-          <!-- Controles -->
-          <div class="flex items-center gap-0.5">
+          <!-- Centro: Título -->
+          <h1 class="text-lg font-normal text-gray-900 dark:text-white tracking-tight">105 IA</h1>
+          
+          <!-- Derecha: Avatar usuario + Nueva conversación -->
+          <div class="flex items-center gap-1">
             <button 
               v-if="messages.length > 0"
               @click="startNewConversation"
-              class="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded transition-all"
+              class="w-10 h-10 flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-all"
               title="Nueva conversación"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
               </svg>
             </button>
-            <!-- Cerrar con línea vertical estilo Hostinger -->
             <button 
               @click="closeChat"
-              class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all"
-              title="Cerrar chat"
+              class="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden"
             >
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                {{ userName.charAt(0).toUpperCase() }}
+              </div>
             </button>
           </div>
         </div>
 
-        <!-- 🎵 Mini Controles de Radio (Solo si fue iniciada desde el chat) -->
+        <!-- ═══════════════════════════════════════════════════════════════
+             🎵 Mini Controles de Radio (flotante)
+        ═══════════════════════════════════════════════════════════════ -->
         <transition name="slide-down">
           <div 
             v-if="showRadioControls"
-            class="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/10 dark:from-emerald-900/30 dark:via-teal-900/30 dark:to-emerald-900/30 border-b border-emerald-200/50 dark:border-emerald-800/30"
+            class="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-zinc-900 mx-4 rounded-2xl"
           >
-            <!-- Info de la estación -->
-            <div class="flex items-center gap-2 flex-1 min-w-0">
-              <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                <svg class="w-4 h-4 text-white" :class="{ 'animate-pulse': isRadioPlaying }" fill="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-white" :class="{ 'animate-pulse': isRadioPlaying }" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-semibold text-gray-800 dark:text-white truncate">{{ currentStationName }}</p>
-                <p class="text-[10px] text-emerald-600 dark:text-emerald-400">{{ isRadioPlaying ? '♪ Reproduciendo' : '⏸ Pausado' }}</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ currentStationName }}</p>
+                <p class="text-xs text-gray-500 dark:text-zinc-500">{{ isRadioPlaying ? 'Reproduciendo' : 'Pausado' }}</p>
               </div>
             </div>
             
-            <!-- Controles -->
             <div class="flex items-center gap-1">
-              <!-- Anterior -->
-              <button 
-                @click="radioControlPrevious"
-                class="w-8 h-8 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all"
-                title="Anterior"
-              >
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
-                </svg>
+              <button @click="radioControlPrevious" class="w-9 h-9 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
               </button>
-              
-              <!-- Play/Pause -->
-              <button 
-                @click="radioControlPlayPause"
-                class="w-9 h-9 flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-md shadow-emerald-500/30 transition-all"
-                :title="isRadioPlaying ? 'Pausar' : 'Reproducir'"
-              >
-                <svg v-if="isRadioPlaying" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                </svg>
-                <svg v-else class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
+              <button @click="radioControlPlayPause" class="w-11 h-11 flex items-center justify-center bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full transition-all hover:scale-105">
+                <svg v-if="isRadioPlaying" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                <svg v-else class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               </button>
-              
-              <!-- Siguiente -->
-              <button 
-                @click="radioControlNext"
-                class="w-8 h-8 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-lg transition-all"
-                title="Siguiente"
-              >
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                </svg>
+              <button @click="radioControlNext" class="w-9 h-9 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
               </button>
-              
-              <!-- Cerrar controles -->
-              <button 
-                @click="closeRadioControls"
-                class="w-6 h-6 flex items-center justify-center text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 ml-1 transition-all"
-                title="Ocultar controles"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
+              <button @click="closeRadioControls" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-zinc-300 ml-1 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>
           </div>
         </transition>
 
-        <!-- Contenido del Chat -->
+        <!-- ═══════════════════════════════════════════════════════════════
+             CONTENIDO PRINCIPAL - Chat Tab
+        ═══════════════════════════════════════════════════════════════ -->
         <div v-show="activeTab === 'chat'" class="flex-1 flex flex-col overflow-hidden">
-          <!-- Área de Mensajes -->
           <div ref="messagesContainer" class="flex-1 overflow-y-auto">
             
-            <!-- Estado vacío - Bienvenida -->
-            <div v-if="messages.length === 0" class="h-full flex flex-col items-center justify-center px-5 py-6">
-              <!-- Logo 105 elegante -->
-              <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/20">
-                <span class="text-white font-bold text-lg">105</span>
+            <!-- ══════════════════════════════════════════════════════════
+                 ESTADO VACÍO - Bienvenida Estilo Gemini
+            ══════════════════════════════════════════════════════════ -->
+            <div v-if="messages.length === 0" class="h-full flex flex-col px-6 pt-16">
+              <!-- Saludo Grande -->
+              <div class="mb-8">
+                <h2 class="text-[28px] leading-tight font-normal text-gray-900 dark:text-white mb-1">
+                  Hola, {{ userName }}
+                </h2>
+                <p class="text-[28px] leading-tight font-normal text-gray-400 dark:text-zinc-500">
+                  ¿Por dónde empezamos?
+                </p>
               </div>
               
-              <!-- Saludo -->
-              <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                Hola, {{ userName }} 👋
-              </h2>
-              <p class="text-sm text-gray-600 dark:text-zinc-400 mb-6 font-medium">
-                ¿En qué te puedo ayudar hoy?
-              </p>
-              
-              <!-- Sugerencias con hover que muestra en input -->
-              <div class="w-full space-y-2 mb-5">
+              <!-- Chips de Sugerencias - Estilo Gemini -->
+              <div class="space-y-3">
                 <button
-                  v-for="(suggestion, index) in quickSuggestions"
+                  v-for="(chip, index) in geminiChips"
                   :key="index"
-                  @click="sendQuickMessage(suggestion)"
-                  @mouseenter="hoverSuggestion = suggestion.text"
+                  @click="sendQuickMessage(chip)"
+                  @mouseenter="hoverSuggestion = chip.text"
                   @mouseleave="hoverSuggestion = ''"
-                  class="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-all duration-150 cursor-pointer group"
+                  class="flex items-center gap-3 px-5 py-4 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all cursor-pointer group w-fit max-w-full"
                 >
-                  <svg class="w-4 h-4 text-gray-400 dark:text-zinc-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  <span class="text-sm font-medium text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">{{ suggestion.text }}</span>
+                  <span class="text-xl flex-shrink-0">{{ chip.icon }}</span>
+                  <span class="text-[15px] text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-white">{{ chip.text }}</span>
                 </button>
               </div>
             </div>
 
-            <!-- Mensajes del Chat -->
-            <div v-else class="px-4 py-3 space-y-3">
+            <!-- ══════════════════════════════════════════════════════════
+                 MENSAJES DEL CHAT
+            ══════════════════════════════════════════════════════════ -->
+            <div v-else class="py-4 px-4 space-y-5">
               <div 
                 v-for="(message, index) in messages" 
                 :key="index"
                 class="animate-fade-in"
               >
                 <!-- Mensaje del usuario -->
-                <div v-if="message.type === 'user'" class="flex justify-end mb-3">
-                  <div class="max-w-[85%] bg-gray-900 dark:bg-zinc-700 text-white px-3.5 py-2 rounded-2xl rounded-br-sm">
-                    <p class="text-sm whitespace-pre-line leading-relaxed">{{ message.text }}</p>
+                <div v-if="message.type === 'user'" class="flex justify-end">
+                  <div class="max-w-[85%] bg-[#e3f2fd] dark:bg-blue-900/40 text-gray-900 dark:text-blue-100 px-4 py-3 rounded-[20px] rounded-br-md">
+                    <p class="text-[15px] whitespace-pre-line leading-relaxed">{{ message.text }}</p>
                   </div>
                 </div>
 
                 <!-- Mensaje de la IA -->
-                <div v-else class="flex gap-2 mb-3">
-                  <!-- Avatar IA -->
-                  <div class="w-6 h-6 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-md flex items-center justify-center flex-shrink-0">
-                    <span class="text-white font-bold text-[8px]">105</span>
+                <div v-else class="flex gap-3">
+                  <!-- Avatar Gemini -->
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/>
+                    </svg>
                   </div>
 
                   <div class="flex-1 max-w-[88%]">
                     <div
-                      class="px-3 py-2 rounded-2xl rounded-tl-sm text-sm"
+                      class="text-[15px] leading-relaxed"
                       :class="[
-                        message.isLimit ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50' :
-                        message.isError ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50' :
-                        message.isInfo ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50' :
-                        message.isWarning ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50' :
-                        'bg-gray-100 dark:bg-zinc-800'
+                        message.isLimit ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200/50 dark:border-amber-800/30 px-4 py-3 rounded-2xl' :
+                        message.isError ? 'bg-red-50 dark:bg-red-900/20 border border-red-200/50 dark:border-red-800/30 px-4 py-3 rounded-2xl' :
+                        message.isInfo ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/30 px-4 py-3 rounded-2xl' :
+                        message.isWarning ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200/50 dark:border-orange-800/30 px-4 py-3 rounded-2xl' :
+                        'text-gray-800 dark:text-zinc-200'
                       ]"
                     >
-                      <!-- Límite -->
-                      <div v-if="message.isLimit" class="space-y-2">
-                        <p class="text-amber-700 dark:text-amber-400 font-medium text-xs">⏰ Límite diario alcanzado</p>
-                        <p class="text-gray-600 dark:text-zinc-300 text-sm">Has usado tus {{ message.limitData?.used || 10 }} mensajes. ¡Mañana tendrás más!</p>
-                        <button @click="$emit('navigate', 'upgrade')" class="text-xs bg-gradient-to-r from-violet-500 to-purple-600 text-white px-3 py-1.5 rounded-lg font-medium">
-                          💎 Obtener Premium
+                      <div v-if="message.isLimit" class="space-y-3">
+                        <p class="text-amber-700 dark:text-amber-400 font-medium text-sm">⏰ Límite alcanzado</p>
+                        <p class="text-gray-600 dark:text-zinc-300">Has usado tus {{ message.limitData?.used || 10 }} mensajes. ¡Mañana tendrás más!</p>
+                        <button @click="$emit('navigate', 'upgrade')" class="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-full transition-all">
+                          ✨ Obtener Ilimitado
                         </button>
                       </div>
                       <div v-else-if="message.isInfo"><p class="text-blue-700 dark:text-blue-400">{{ message.text }}</p></div>
                       <div v-else-if="message.isWarning"><p class="text-orange-700 dark:text-orange-400">{{ message.text }}</p></div>
-                      <p v-else class="text-gray-700 dark:text-zinc-200 whitespace-pre-line leading-relaxed">{{ message.text }}</p>
+                      <p v-else class="whitespace-pre-line">{{ message.text }}</p>
                       
                       <button 
                         v-if="message.suggested_action"
                         @click="executeSuggestedAction(message.suggested_action)"
-                        class="mt-2 w-full py-1.5 px-3 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 text-xs font-medium rounded-lg border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center gap-1.5"
+                        class="mt-3 px-4 py-2 bg-[#f8f9fa] dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-full flex items-center gap-2 transition-all"
                       >
                         {{ message.suggested_action.label || 'Ver detalles' }}
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Typing indicator -->
-              <div v-if="isTyping" class="flex gap-2 animate-fade-in">
-                <div class="w-6 h-6 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-md flex items-center justify-center flex-shrink-0">
-                  <span class="text-white font-bold text-[8px]">105</span>
+              <!-- Typing indicator - Estilo Gemini -->
+              <div v-if="isTyping" class="flex gap-3 animate-fade-in">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 via-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/>
+                  </svg>
                 </div>
-                <div class="bg-gray-100 dark:bg-zinc-800 rounded-2xl rounded-tl-sm px-3 py-2.5">
-                  <div class="flex gap-1">
-                    <div class="w-1.5 h-1.5 bg-gray-400 dark:bg-zinc-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                    <div class="w-1.5 h-1.5 bg-gray-400 dark:bg-zinc-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                    <div class="w-1.5 h-1.5 bg-gray-400 dark:bg-zinc-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                  </div>
+                <div class="flex items-center gap-1 py-3">
+                  <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                  <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                  <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Footer -->
-          <div class="flex-shrink-0 border-t border-gray-100 dark:border-zinc-800 p-3">
-            <!-- Categorías inteligentes -->
-            <div class="flex flex-wrap gap-1.5 mb-3">
-              <button
-                v-for="category in categories"
-                :key="category.id"
-                @click="setCategory(category)"
-                :class="[
-                  'px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all',
-                  selectedCategory === category.id
-                    ? 'bg-emerald-500 dark:bg-emerald-600 border-emerald-500 dark:border-emerald-600 text-white shadow-sm'
-                    : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700'
-                ]"
-              >{{ category.name }}</button>
-            </div>
+          <!-- ══════════════════════════════════════════════════════════
+               INPUT BAR - Estilo Gemini Exacto
+          ══════════════════════════════════════════════════════════ -->
+          <div class="flex-shrink-0 px-4 pb-5 pt-3 bg-white dark:bg-[#131314]">
             
-            <!-- Input inteligente -->
-            <form @submit.prevent="sendMessage" class="mb-2">
-              <div class="relative bg-gray-50 dark:bg-zinc-800/60 rounded-xl border border-gray-200 dark:border-zinc-700 focus-within:border-gray-300 dark:focus-within:border-zinc-600 transition-colors">
+            <!-- Input Container - Estilo Gemini -->
+            <form @submit.prevent="sendMessage">
+              <!-- Línea superior decorativa como Gemini -->
+              <div class="bg-[#f0f4f9] dark:bg-[#1e1f20] rounded-t-[28px] h-3 mb-[-12px] mx-2"></div>
+              
+              <div class="bg-[#f0f4f9] dark:bg-[#1e1f20] rounded-[28px] flex flex-col px-4 py-3">
+                
+                <!-- Input de texto -->
                 <textarea
                   ref="messageInput"
                   v-model="inputMessage"
                   @keydown.enter.exact.prevent="sendMessage"
                   @input="autoResizeTextarea"
                   @focus="hoverSuggestion = ''"
-                  :placeholder="hoverSuggestion || 'Escribe tu pregunta...'"
+                  :placeholder="voiceInput.isListening.value ? (voiceInput.displayText.value || 'Escuchando...') : 'Pregúntale a 105 IA'"
                   rows="1"
-                  class="w-full bg-transparent border-none focus:outline-none resize-none text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 py-2.5 pl-3 pr-11 min-h-[40px] max-h-[120px]"
+                  class="w-full bg-transparent border-none focus:outline-none resize-none text-[15px] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-zinc-400 min-h-[24px] max-h-[120px]"
+                  :class="{ 'placeholder-red-400 dark:placeholder-red-400': voiceInput.isListening.value }"
                   style="line-height: 1.5;"
                 ></textarea>
-                <button
-                  type="submit"
-                  :disabled="!inputMessage.trim() || isTyping"
-                  :class="[
-                    'absolute right-1.5 bottom-1.5 p-1.5 rounded-lg transition-all',
-                    inputMessage.trim() && !isTyping
-                      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100'
-                      : 'bg-gray-200 dark:bg-zinc-700 text-gray-400 dark:text-zinc-500'
-                  ]"
-                >
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                  </svg>
-                </button>
+
+                <!-- Fila de botones debajo del input -->
+                <div class="flex items-center justify-between mt-3">
+                  <!-- Izquierda: + y Ajustes -->
+                  <div class="flex items-center gap-1">
+                    <button
+                      type="button"
+                      class="w-9 h-9 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-white/60 dark:hover:bg-zinc-700/50 rounded-full transition-all"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="w-9 h-9 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-white/60 dark:hover:bg-zinc-700/50 rounded-full transition-all"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/>
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <!-- Derecha: Selector + Mic + Enviar -->
+                  <div class="flex items-center gap-1">
+                    <!-- Selector Modelo (Pill) -->
+                    <button
+                      type="button"
+                      @click="selectedProvider = selectedProvider === 'gemini' ? 'groq' : 'gemini'"
+                      class="px-3 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-medium rounded-full border border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all flex items-center gap-1.5"
+                    >
+                      {{ selectedProvider === 'gemini' ? 'Gemini' : 'Meta' }}
+                      <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                    </button>
+                    
+                    <!-- 🎤 Micrófono (Voice Input) -->
+                    <button
+                      type="button"
+                      @click="handleVoiceInput"
+                      :disabled="isTyping"
+                      :class="[
+                        'w-10 h-10 flex items-center justify-center rounded-full transition-all',
+                        voiceInput.isListening.value
+                          ? 'bg-red-500 text-white animate-pulse'
+                          : 'text-gray-600 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200 hover:bg-white/60 dark:hover:bg-zinc-700/50'
+                      ]"
+                    >
+                      <svg v-if="voiceInput.isListening.value" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="6"/>
+                      </svg>
+                      <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
+                      </svg>
+                    </button>
+
+                    <!-- 📞 Botón Live Call (al lado del micrófono) -->
+                    <button
+                      type="button"
+                      @click="startLiveCall"
+                      :disabled="isTyping"
+                      class="w-10 h-10 flex items-center justify-center rounded-full transition-all text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                      title="Llamada en vivo con 105 IA"
+                    >
+                      <!-- Icono de onda de audio / Live -->
+                      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 3v18M8 7v10M4 10v4M16 7v10M20 10v4"/>
+                        <path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 3v18M8 7v10M4 10v4M16 7v10M20 10v4"/>
+                      </svg>
+                    </button>
+
+                    <!-- Enviar / Ecualizer -->
+                    <button
+                      type="submit"
+                      :disabled="!inputMessage.trim() || isTyping"
+                      :class="[
+                        'w-10 h-10 flex items-center justify-center rounded-full transition-all',
+                        inputMessage.trim() && !isTyping
+                          ? 'bg-gray-800 dark:bg-zinc-700 text-white hover:bg-gray-900 dark:hover:bg-zinc-600'
+                          : 'text-gray-500 dark:text-zinc-500 hover:bg-white/60 dark:hover:bg-zinc-700/50'
+                      ]"
+                    >
+                      <!-- Icono de ecualizer cuando no hay texto -->
+                      <svg v-if="!inputMessage.trim()" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 18h2V6H7v12zm4 4h2V2h-2v20zm4-8h2v-4h-2v4z"/>
+                      </svg>
+                      <!-- Flecha de enviar cuando hay texto -->
+                      <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
             </form>
 
-            <!-- Selector IA compacto -->
-            <div class="flex items-center justify-center gap-1.5">
-              <button
-                @click="selectedProvider = 'gemini'"
-                :class="[
-                  'flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium transition-all border',
-                  selectedProvider === 'gemini'
-                    ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-400 dark:border-emerald-600 text-emerald-700 dark:text-emerald-400'
-                    : 'border-gray-200 dark:border-zinc-700 text-gray-400 dark:text-zinc-500 hover:border-gray-300'
-                ]"
-              >
-                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/></svg>
-                Gemini
-              </button>
-              <button
-                @click="selectedProvider = 'groq'"
-                :class="[
-                  'flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium transition-all border',
-                  selectedProvider === 'groq'
-                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-400 dark:border-blue-600 text-blue-700 dark:text-blue-400'
-                    : 'border-gray-200 dark:border-zinc-700 text-gray-400 dark:text-zinc-500 hover:border-gray-300'
-                ]"
-              >
-                <!-- Meta Infinity Logo -->
-                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6.5 8c-1.93 0-3.5 1.57-3.5 3.5 0 1.05.47 1.99 1.2 2.64L1.93 18.5h3.57l1.5-3h2.5l1.5 3h3.57l-2.27-4.36c.73-.65 1.2-1.59 1.2-2.64C13.5 9.57 11.93 8 10 8H6.5zm0 2h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H6.5c-.83 0-1.5-.67-1.5-1.5S5.67 10 6.5 10zm8.5-2c-1.93 0-3.5 1.57-3.5 3.5 0 1.05.47 1.99 1.2 2.64L10.43 18.5H14l1.5-3h2.5l1.5 3h3.57l-2.27-4.36c.73-.65 1.2-1.59 1.2-2.64C22 9.57 20.43 8 18.5 8H15zm0 2h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H15c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10z"/>
-                </svg>
-                Meta
-              </button>
-            </div>
-
-            <p class="text-center text-[9px] text-gray-400 dark:text-zinc-600 mt-1.5">La IA puede producir información inexacta</p>
+            <!-- Disclaimer -->
+            <p class="text-center text-[11px] text-gray-400 dark:text-zinc-600 mt-3">
+              105 IA puede mostrar información inexacta, así que verifica las respuestas.
+            </p>
           </div>
         </div>
 
-        <!-- Tab Historia -->
-        <div v-show="activeTab === 'history'" class="flex-1 overflow-y-auto p-4 bg-gray-50/50 dark:bg-[#141417]">
-          <div v-if="chatHistory.length === 0" class="h-full flex flex-col items-center justify-center text-center px-4">
-            <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800/60 rounded-xl flex items-center justify-center mb-3">
-              <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <!-- ══════════════════════════════════════════════════════════
+             TAB HISTORIAL
+        ══════════════════════════════════════════════════════════ -->
+        <div v-show="activeTab === 'history'" class="flex-1 overflow-y-auto px-4 py-6">
+          <!-- Header del historial -->
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-normal text-gray-900 dark:text-white">Historial</h2>
+            <button 
+              @click="activeTab = 'chat'"
+              class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-all"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <div v-if="chatHistory.length === 0" class="flex flex-col items-center justify-center text-center py-16">
+            <div class="w-16 h-16 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
+              <svg class="w-7 h-7 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
-            <h3 class="text-gray-700 dark:text-zinc-300 font-medium text-sm mb-0.5">Sin historial</h3>
-            <p class="text-xs text-gray-500 dark:text-zinc-500">Tus conversaciones aparecerán aquí</p>
+            <h3 class="text-gray-700 dark:text-zinc-300 font-medium mb-1">Sin historial</h3>
+            <p class="text-sm text-gray-500 dark:text-zinc-500 max-w-[200px]">Tus conversaciones anteriores aparecerán aquí</p>
           </div>
           
           <div v-else class="space-y-2">
@@ -339,10 +618,10 @@
               v-for="(session, index) in chatHistory"
               :key="index"
               @click="loadSession(session)"
-              class="w-full text-left p-3 bg-white dark:bg-zinc-800/60 hover:bg-gray-50 dark:hover:bg-zinc-800 border border-gray-100 dark:border-zinc-700/50 rounded-lg transition-all cursor-pointer group hover:shadow-sm"
+              class="w-full text-left p-4 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#282a2c] rounded-2xl transition-all cursor-pointer group"
             >
-              <p class="text-sm font-medium text-gray-700 dark:text-zinc-300 truncate group-hover:text-gray-900 dark:group-hover:text-white">{{ session.title || 'Conversación' }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">{{ session.date }}</p>
+              <p class="text-[15px] font-medium text-gray-700 dark:text-zinc-300 truncate group-hover:text-gray-900 dark:group-hover:text-white">{{ session.title || 'Conversación' }}</p>
+              <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1">{{ session.date }}</p>
             </button>
           </div>
         </div>
@@ -352,9 +631,11 @@
 </template>
 
 <script>
-import { ref, nextTick, computed, watch, onMounted } from 'vue'
+import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useModuleNavigation } from '@/composables/useModuleNavigation'
+import { useVoiceInput } from '@/composables/useVoiceInput'
+import { useLiveCall } from '@/composables/useLiveCall'
 import { aiChatStore } from '@/store/aiChatStore'
 import { useRadioStore } from '@/store/radioStore'
 import api from '@/services/api'
@@ -380,6 +661,12 @@ export default {
     const router = useRouter()
     const { navigateToModule } = useModuleNavigation()
     const radioStore = useRadioStore()
+    
+    // 🎤 Composables de voz
+    const voiceInput = useVoiceInput()
+    
+    // 📞 Composable para llamada en vivo con Gemini Live API
+    const liveCall = useLiveCall()
     
     // Altura dinámica del chat (detecta si hay banner trial)
     const dynamicHeaderHeight = ref(props.headerHeight)
@@ -505,6 +792,15 @@ export default {
         ]
       }
     ]
+
+    // 🎨 Chips estilo Gemini con emojis
+    const geminiChips = computed(() => [
+      { icon: '📊', text: '¿Cuánto vendí hoy?', category: 'ventas' },
+      { icon: '📦', text: 'Productos con stock bajo', category: 'inventario' },
+      { icon: '➕', text: 'Crear un nuevo producto', category: 'inventario' },
+      { icon: '📄', text: 'Facturas pendientes', category: 'facturas' },
+      { icon: '🎵', text: 'Pon música', category: 'radio' }
+    ])
 
     // Sugerencias que cambian según la categoría seleccionada
     const quickSuggestions = computed(() => {
@@ -934,6 +1230,64 @@ export default {
       }
     }
 
+    // 🎤 Manejar entrada por voz
+    const handleVoiceInput = async () => {
+      if (!voiceInput.isSupported.value) {
+        messages.value.push({
+          type: 'ai',
+          text: 'Tu navegador no soporta entrada por voz. Usa Chrome o Edge para esta función.',
+          timestamp: getCurrentTime(),
+          isWarning: true
+        })
+        return
+      }
+      
+      // Si está escuchando, detener
+      if (voiceInput.isListening.value) {
+        voiceInput.stopListening()
+        return
+      }
+      
+      try {
+        const transcript = await voiceInput.startListening()
+        
+        if (transcript && transcript.trim()) {
+          // Poner el texto en el input y enviar
+          inputMessage.value = transcript
+          await sendMessage()
+        }
+      } catch (err) {
+        // Si no se capturó nada, mostrar error suave
+        if (err.message !== 'No se capturó ningún texto') {
+          messages.value.push({
+            type: 'ai',
+            text: `🎤 ${err.message || 'No pude escucharte. Intenta de nuevo.'}`,
+            timestamp: getCurrentTime(),
+            isWarning: true
+          })
+        }
+      }
+    }
+
+    // 📞 Iniciar llamada en vivo
+    const startLiveCall = async () => {
+      try {
+        await liveCall.startCall()
+      } catch (err) {
+        messages.value.push({
+          type: 'ai',
+          text: `📞 No se pudo iniciar la llamada: ${err.message || 'Error desconocido'}`,
+          timestamp: getCurrentTime(),
+          isWarning: true
+        })
+      }
+    }
+    
+    // 📞 Terminar llamada en vivo
+    const endLiveCall = () => {
+      liveCall.endCall()
+    }
+
     return {
       localChatOpen,
       isControlledExternally,
@@ -951,6 +1305,7 @@ export default {
       messagesUsedToday,
       selectedFile,
       quickSuggestions,
+      geminiChips,
       activeTab,
       chatHistory,
       selectedCategory,
@@ -976,7 +1331,14 @@ export default {
       radioControlPrevious,
       radioControlPlayPause,
       radioControlNext,
-      closeRadioControls
+      closeRadioControls,
+      // 🎤 Voz
+      voiceInput,
+      handleVoiceInput,
+      // 📞 Llamada en vivo
+      liveCall,
+      startLiveCall,
+      endLiveCall
     }
   }
 }
@@ -1011,14 +1373,14 @@ export default {
 .slide-down-leave-from {
   opacity: 1;
   transform: translateY(0);
-  max-height: 60px;
+  max-height: 80px;
 }
 
-/* Fade in para mensajes */
+/* Fade in para mensajes - más suave */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -1027,12 +1389,23 @@ export default {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Scrollbar personalizado */
+/* Fade animation para Live Call overlay */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Scrollbar ultra minimalista */
 .overflow-y-auto::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
@@ -1040,19 +1413,37 @@ export default {
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
 .dark .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #3f3f46;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #52525b;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Pulse animation para typing dots */
+@keyframes pulse-dot {
+  0%, 80%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Font para el chat - Inter/System */
+.font-chat {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 </style>

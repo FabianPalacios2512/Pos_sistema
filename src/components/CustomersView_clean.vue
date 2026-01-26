@@ -4,7 +4,7 @@
       
       <!-- NIVEL 1: Header Minimalista -->
       <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Clientes</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Clientes</h1>
         
         <button @click="openCreateModal" 
                 class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">

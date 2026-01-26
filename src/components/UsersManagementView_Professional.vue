@@ -6,8 +6,8 @@
       <!-- Header sin borde, sin icono -->
       <div class="flex items-center justify-between pb-4">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Usuarios y Roles</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Usuarios y Roles</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">
             {{ activeTab === 'users' ? 'Administra empleados y su acceso al sistema' : 'Configura roles y permisos granulares' }}
           </p>
         </div>
