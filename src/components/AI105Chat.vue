@@ -354,9 +354,35 @@
           <div ref="messagesContainer" class="flex-1 overflow-y-auto">
             
             <!-- ══════════════════════════════════════════════════════════
-                 ESTADO VACÍO - Bienvenida Estilo Gemini
+                 🔒 BLOQUEO POR PLAN - Free Trial y Básico sin IA
             ══════════════════════════════════════════════════════════ -->
-            <div v-if="messages.length === 0" class="h-full flex flex-col px-6 pt-16">
+            <div v-if="!hasAIAccess" class="h-full flex flex-col items-center justify-center px-6 text-center">
+              <div class="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mb-6">
+                <svg class="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Desbloquea 105 IA
+              </h3>
+              <p class="text-gray-500 dark:text-zinc-400 mb-6 max-w-[280px]">
+                El asistente de inteligencia artificial está disponible en planes Premium y Enterprise
+              </p>
+              <button 
+                @click="$emit('navigate', 'upgrade')"
+                class="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium rounded-full hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+              >
+                ✨ Actualizar Plan
+              </button>
+              <p class="text-xs text-gray-400 dark:text-zinc-500 mt-4">
+                Plan actual: {{ tenantPlan.replace('_', ' ').toUpperCase() }}
+              </p>
+            </div>
+            
+            <!-- ══════════════════════════════════════════════════════════
+                 ESTADO VACÍO - Bienvenida Estilo Gemini (solo si tiene acceso)
+            ══════════════════════════════════════════════════════════ -->
+            <div v-else-if="messages.length === 0" class="h-full flex flex-col px-6 pt-16">
               <!-- Saludo Grande -->
               <div class="mb-8">
                 <h2 class="text-[28px] leading-tight font-normal text-gray-900 dark:text-white mb-1">
@@ -420,14 +446,29 @@
                       ]"
                     >
                       <div v-if="message.isLimit" class="space-y-3">
-                        <p class="text-amber-700 dark:text-amber-400 font-medium text-sm">⏰ Límite alcanzado</p>
-                        <p class="text-gray-600 dark:text-zinc-300">Has usado tus {{ message.limitData?.used || 10 }} mensajes. ¡Mañana tendrás más!</p>
-                        <button @click="$emit('navigate', 'upgrade')" class="w-full py-2.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-full transition-all">
-                          ✨ Obtener Ilimitado
+                        <div class="flex items-center gap-2">
+                          <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                          </svg>
+                          <p class="text-amber-700 dark:text-amber-400 font-medium text-sm">Límite diario alcanzado</p>
+                        </div>
+                        <p class="text-gray-600 dark:text-zinc-300 text-sm">Has utilizado los {{ message.limitData?.used || 5 }} mensajes disponibles en tu plan. Se renovarán mañana.</p>
+                        <button @click="$emit('navigate', 'upgrade')" class="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-medium rounded-xl transition-all shadow-sm">
+                          Obtener mensajes ilimitados
                         </button>
                       </div>
-                      <div v-else-if="message.isInfo"><p class="text-blue-700 dark:text-blue-400">{{ message.text }}</p></div>
-                      <div v-else-if="message.isWarning"><p class="text-orange-700 dark:text-orange-400">{{ message.text }}</p></div>
+                      <div v-else-if="message.isInfo" class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+                        </svg>
+                        <p class="text-blue-700 dark:text-blue-400 text-sm">{{ message.text.replace(/^ℹ️\s*/, '') }}</p>
+                      </div>
+                      <div v-else-if="message.isWarning" class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                        <p class="text-amber-700 dark:text-amber-400 text-sm">{{ message.text.replace(/^⚠️\s*/, '') }}</p>
+                      </div>
                       <p v-else class="whitespace-pre-line">{{ message.text }}</p>
                       
                       <button 
@@ -462,7 +503,7 @@
           <!-- ══════════════════════════════════════════════════════════
                INPUT BAR - Estilo Gemini Exacto
           ══════════════════════════════════════════════════════════ -->
-          <div class="flex-shrink-0 px-4 pb-5 pt-3 bg-white dark:bg-[#131314]">
+          <div v-if="hasAIAccess" class="flex-shrink-0 px-4 pb-5 pt-3 bg-white dark:bg-[#131314]">
             
             <!-- Input Container - Estilo Gemini -->
             <form @submit.prevent="sendMessage">
@@ -478,10 +519,9 @@
                   @keydown.enter.exact.prevent="sendMessage"
                   @input="autoResizeTextarea"
                   @focus="hoverSuggestion = ''"
-                  :placeholder="voiceInput.isListening.value ? (voiceInput.displayText.value || 'Escuchando...') : 'Pregúntale a 105 IA'"
+                  placeholder="Pregúntale a 105 IA"
                   rows="1"
                   class="w-full bg-transparent border-none focus:outline-none resize-none text-[15px] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-zinc-400 min-h-[24px] max-h-[120px]"
-                  :class="{ 'placeholder-red-400 dark:placeholder-red-400': voiceInput.isListening.value }"
                   style="line-height: 1.5;"
                 ></textarea>
 
@@ -519,34 +559,27 @@
                       <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
                     </button>
                     
-                    <!-- 🎤 Micrófono (Voice Input) -->
+                    <!-- 📞 Botón Live Call (solo para Premium y Enterprise) -->
                     <button
-                      type="button"
-                      @click="handleVoiceInput"
-                      :disabled="isTyping"
-                      :class="[
-                        'w-10 h-10 flex items-center justify-center rounded-full transition-all',
-                        voiceInput.isListening.value
-                          ? 'bg-red-500 text-white animate-pulse'
-                          : 'text-gray-600 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-zinc-200 hover:bg-white/60 dark:hover:bg-zinc-700/50'
-                      ]"
-                    >
-                      <svg v-if="voiceInput.isListening.value" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="6"/>
-                      </svg>
-                      <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
-                      </svg>
-                    </button>
-
-                    <!-- 📞 Botón Live Call (al lado del micrófono) -->
-                    <button
+                      v-if="hasVoiceAccess"
                       type="button"
                       @click="startLiveCall"
-                      :disabled="isTyping"
-                      class="w-10 h-10 flex items-center justify-center rounded-full transition-all text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                      title="Llamada en vivo con 105 IA"
+                      :disabled="isTyping || !canUseVoice"
+                      class="relative w-10 h-10 flex items-center justify-center rounded-full transition-all"
+                      :class="[
+                        canUseVoice 
+                          ? 'text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                          : 'text-gray-300 dark:text-zinc-600 cursor-not-allowed'
+                      ]"
+                      :title="canUseVoice ? `Llamada en vivo (${Math.floor(voiceSecondsRemaining / 60)}:${String(voiceSecondsRemaining % 60).padStart(2, '0')} restantes)` : 'Sin minutos de voz disponibles'"
                     >
+                      <!-- Indicador de tiempo restante (muestra si hay límite y ha usado algo) -->
+                      <span 
+                        v-if="voiceLimitSeconds > 0 && voiceSecondsRemaining < voiceLimitSeconds"
+                        class="absolute -top-1 -right-1 px-1 py-0.5 bg-blue-500 text-white text-[8px] font-bold rounded-full"
+                      >
+                        {{ Math.floor(voiceSecondsRemaining / 60) }}m
+                      </span>
                       <!-- Icono de onda de audio / Live -->
                       <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 3v18M8 7v10M4 10v4M16 7v10M20 10v4"/>
@@ -578,6 +611,25 @@
                 </div>
               </div>
             </form>
+
+            <!-- Indicador de mensajes restantes (solo para planes con límite) -->
+            <div v-if="chatMessageLimit > 0" class="flex items-center justify-center gap-2 mt-2">
+              <span class="text-[11px] text-gray-400 dark:text-zinc-500">
+                <template v-if="chatMessagesRemaining > 0">
+                  {{ chatMessagesRemaining }} de {{ chatMessageLimit }} mensajes restantes hoy
+                </template>
+                <template v-else>
+                  Sin mensajes disponibles • Renueva mañana
+                </template>
+              </span>
+              <div class="flex-1 max-w-[100px] h-1.5 bg-gray-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <div 
+                  class="h-full transition-all duration-300 rounded-full"
+                  :class="chatMessagesRemaining > 3 ? 'bg-blue-500' : chatMessagesRemaining > 0 ? 'bg-amber-500' : 'bg-red-500'"
+                  :style="{ width: `${(chatMessagesRemaining / chatMessageLimit) * 100}%` }"
+                ></div>
+              </div>
+            </div>
 
             <!-- Disclaimer -->
             <p class="text-center text-[11px] text-gray-400 dark:text-zinc-600 mt-3">
@@ -634,10 +686,10 @@
 import { ref, nextTick, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useModuleNavigation } from '@/composables/useModuleNavigation'
-import { useVoiceInput } from '@/composables/useVoiceInput'
 import { useLiveCall } from '@/composables/useLiveCall'
 import { aiChatStore } from '@/store/aiChatStore'
 import { useRadioStore } from '@/store/radioStore'
+import { appStore } from '@/store/appStore'
 import api from '@/services/api'
 
 export default {
@@ -661,12 +713,124 @@ export default {
     const router = useRouter()
     const { navigateToModule } = useModuleNavigation()
     const radioStore = useRadioStore()
-    
-    // 🎤 Composables de voz
-    const voiceInput = useVoiceInput()
+    // appStore ya está importado directamente
     
     // 📞 Composable para llamada en vivo con Gemini Live API
     const liveCall = useLiveCall()
+    
+    // 🔒 Control de acceso a IA por plan - ESCALERA DE BENEFICIOS
+    // Todos tienen IA, pero con límites diferentes según el plan
+    const tenantPlan = computed(() => appStore.tenantPlan || 'free_trial')
+    
+    // Límites de mensajes de chat por día según plan
+    const CHAT_LIMITS = {
+      'free_trial': 5,      // 5 mensajes/día - para que prueben
+      'basico': 15,         // 15 mensajes/día - uso básico
+      'premium': 0,         // 0 = ilimitado
+      'enterprise': 0       // 0 = ilimitado
+    }
+    
+    // Límites de voz en segundos por día según plan
+    // Presupuesto máximo diario: Premium ~$285 COP, Enterprise ~$2,850 COP
+    const VOICE_LIMITS = {
+      'free_trial': 0,      // Sin voz
+      'basico': 0,          // Sin voz
+      'premium': 180,       // 3 minutos/día (~$285 COP)
+      'enterprise': 1800    // 30 minutos/día (~$2,850 COP) - protección de costos
+    }
+    
+    // Todos tienen acceso a IA (chat de texto)
+    const hasAIAccess = computed(() => true)
+    
+    // Solo Premium y Enterprise tienen voz
+    const hasVoiceAccess = computed(() => {
+      const plan = tenantPlan.value.toLowerCase()
+      return ['premium', 'enterprise'].includes(plan)
+    })
+    
+    const isEnterprise = computed(() => {
+      return tenantPlan.value.toLowerCase() === 'enterprise'
+    })
+    
+    const isPremium = computed(() => {
+      return tenantPlan.value.toLowerCase() === 'premium'
+    })
+    
+    // Límite de mensajes para el plan actual
+    const chatMessageLimit = computed(() => {
+      const plan = tenantPlan.value.toLowerCase()
+      return CHAT_LIMITS[plan] ?? 5
+    })
+    
+    // Límite de voz para el plan actual
+    const voiceLimitSeconds = computed(() => {
+      const plan = tenantPlan.value.toLowerCase()
+      return VOICE_LIMITS[plan] ?? 0
+    })
+    
+    // Contador de mensajes usados hoy
+    const chatMessagesUsedToday = ref(0)
+    const voiceSecondsUsedToday = ref(0)
+    
+    // ¿Puede enviar más mensajes de chat?
+    const canSendChat = computed(() => {
+      if (chatMessageLimit.value === 0) return true // Ilimitado
+      return chatMessagesUsedToday.value < chatMessageLimit.value
+    })
+    
+    const chatMessagesRemaining = computed(() => {
+      if (chatMessageLimit.value === 0) return Infinity
+      return Math.max(0, chatMessageLimit.value - chatMessagesUsedToday.value)
+    })
+    
+    // ¿Puede usar voz?
+    const canUseVoice = computed(() => {
+      if (!hasVoiceAccess.value) return false
+      // Todos los planes con voz tienen límite ahora
+      return voiceSecondsUsedToday.value < voiceLimitSeconds.value
+    })
+    
+    const voiceSecondsRemaining = computed(() => {
+      // Todos los planes con voz tienen límite ahora
+      return Math.max(0, voiceLimitSeconds.value - voiceSecondsUsedToday.value)
+    })
+    
+    // Cargar uso del día
+    const loadDailyUsage = () => {
+      const today = new Date().toISOString().split('T')[0]
+      
+      // Chat
+      const chatStored = JSON.parse(localStorage.getItem('ai_chat_usage') || '{}')
+      if (chatStored.date !== today) {
+        chatMessagesUsedToday.value = 0
+        localStorage.setItem('ai_chat_usage', JSON.stringify({ date: today, count: 0 }))
+      } else {
+        chatMessagesUsedToday.value = chatStored.count || 0
+      }
+      
+      // Voz
+      const voiceStored = JSON.parse(localStorage.getItem('ai_voice_usage') || '{}')
+      if (voiceStored.date !== today) {
+        voiceSecondsUsedToday.value = 0
+        localStorage.setItem('ai_voice_usage', JSON.stringify({ date: today, seconds: 0 }))
+      } else {
+        voiceSecondsUsedToday.value = voiceStored.seconds || 0
+      }
+    }
+    
+    // Registrar uso de chat
+    const recordChatUsage = () => {
+      const today = new Date().toISOString().split('T')[0]
+      chatMessagesUsedToday.value += 1
+      localStorage.setItem('ai_chat_usage', JSON.stringify({ date: today, count: chatMessagesUsedToday.value }))
+    }
+    
+    // Registrar uso de voz
+    const recordVoiceUsage = (seconds) => {
+      const today = new Date().toISOString().split('T')[0]
+      voiceSecondsUsedToday.value += seconds
+      localStorage.setItem('ai_voice_usage', JSON.stringify({ date: today, seconds: voiceSecondsUsedToday.value }))
+    }
     
     // Altura dinámica del chat (detecta si hay banner trial)
     const dynamicHeaderHeight = ref(props.headerHeight)
@@ -702,11 +866,6 @@ export default {
     
     // Selector de proveedor IA
     const selectedProvider = ref('gemini')
-    const userPlan = ref('basic')
-    
-    // Sistema de límites - 10 mensajes por día para Basic
-    const messageLimit = ref(10)
-    const messagesUsedToday = ref(0)
     
     // Archivo seleccionado
     const selectedFile = ref(null)
@@ -855,44 +1014,52 @@ export default {
       }
     }, { immediate: true })
 
-    // Cargar estadísticas de uso y plan del usuario
+    // Cargar configuración del proveedor de IA
     const loadUsageStats = async () => {
       try {
         const providerResponse = await api.get('/ai/provider-config')
         if (providerResponse.success && providerResponse.data) {
           const config = providerResponse.data
           selectedProvider.value = config.default || 'groq'
-          userPlan.value = config.current_plan || 'basic'
-        }
-        
-        const today = new Date().toISOString().split('T')[0]
-        const storedData = JSON.parse(localStorage.getItem('ai_daily_usage') || '{}')
-        
-        if (storedData.date !== today) {
-          messagesUsedToday.value = 0
-          localStorage.setItem('ai_daily_usage', JSON.stringify({ date: today, count: 0 }))
-        } else {
-          messagesUsedToday.value = storedData.count || 0
-        }
-        
-        if (userPlan.value === 'premium' || userPlan.value === 'enterprise') {
-          messageLimit.value = 0
-        } else {
-          messageLimit.value = 10
         }
       } catch (error) {
         selectedProvider.value = 'groq'
-        userPlan.value = 'basic'
-        messageLimit.value = 10
-        messagesUsedToday.value = 0
       }
     }
 
     onMounted(() => {
       loadUsageStats()
+      loadDailyUsage()
       calculateHeaderOffset()
       // Recalcular cuando cambie el tamaño de la ventana
       window.addEventListener('resize', calculateHeaderOffset)
+    })
+    
+    // Watch para registrar uso de voz cuando termine la llamada
+    watch(() => liveCall.callDuration.value, (newDuration, oldDuration) => {
+      // Solo registrar si la llamada terminó (pasó de valor a 0 o el estado cambió a desconectado)
+    })
+    
+    watch(() => liveCall.isConnected.value, (isConnected, wasConnected) => {
+      // Cuando la llamada termine (pasa de conectado a desconectado)
+      if (wasConnected && !isConnected && liveCall.callDuration.value > 0) {
+        const secondsUsed = liveCall.callDuration.value
+        
+        // Registrar uso de voz
+        if (voiceLimitSeconds.value > 0) {
+          recordVoiceUsage(secondsUsed)
+        }
+        
+        // 🔒 Mostrar mensaje si la llamada fue terminada automáticamente por límite
+        if (liveCall.wasAutoTerminated.value) {
+          messages.value.push({
+            type: 'ai',
+            text: `⏰ Tu tiempo de voz de hoy se agotó. Has usado ${Math.floor(voiceLimitSeconds.value / 60)} minutos. Se renovará mañana.`,
+            timestamp: getCurrentTime(),
+            isLimit: true
+          })
+        }
+      }
     })
 
     // Recalcular cuando se abre el chat
@@ -969,15 +1136,16 @@ export default {
     const sendMessage = async () => {
       if ((!inputMessage.value.trim() && !selectedFile.value) || isTyping.value) return
 
-      if (messageLimit.value > 0 && messagesUsedToday.value >= messageLimit.value) {
+      // Verificar límite de chat (0 = ilimitado)
+      if (!canSendChat.value) {
         messages.value.push({
           type: 'ai',
           text: '',
           timestamp: getCurrentTime(),
           isLimit: true,
           limitData: {
-            used: messageLimit.value,
-            renewalText: `Mañana tendrás ${messageLimit.value} mensajes nuevos disponibles.`
+            used: chatMessageLimit.value,
+            renewalText: `Mañana tendrás ${chatMessageLimit.value} mensajes nuevos disponibles.`
           }
         })
         scrollToBottom()
@@ -1020,9 +1188,8 @@ export default {
 
         if (response.session_id) sessionId.value = response.session_id
 
-        messagesUsedToday.value++
-        const today = new Date().toISOString().split('T')[0]
-        localStorage.setItem('ai_daily_usage', JSON.stringify({ date: today, count: messagesUsedToday.value }))
+        // Registrar uso de chat (solo si tiene límite)
+        recordChatUsage()
 
         // Debug: ver respuesta completa
         console.log('🤖 [AI105Chat] Respuesta completa del backend:', response)
@@ -1059,20 +1226,21 @@ export default {
           suggested_action: suggestedAction
         })
 
-        if (messageLimit.value > 0) {
-          const messagesRemaining = messageLimit.value - messagesUsedToday.value
+        // Mostrar advertencia cuando quedan pocos mensajes (solo si tiene límite)
+        if (chatMessageLimit.value > 0) {
+          const remaining = chatMessagesRemaining.value
           
-          if (messagesRemaining === 3) {
+          if (remaining === 3) {
             messages.value.push({
               type: 'ai',
-              text: `ℹ️ Te quedan 3 mensajes hoy.`,
+              text: `Te quedan 3 mensajes disponibles hoy`,
               timestamp: getCurrentTime(),
               isInfo: true
             })
-          } else if (messagesRemaining === 1) {
+          } else if (remaining === 1) {
             messages.value.push({
               type: 'ai',
-              text: `⚠️ Este es tu último mensaje de hoy.`,
+              text: `Este es tu último mensaje del día`,
               timestamp: getCurrentTime(),
               isWarning: true
             })
@@ -1230,49 +1398,42 @@ export default {
       }
     }
 
-    // 🎤 Manejar entrada por voz
-    const handleVoiceInput = async () => {
-      if (!voiceInput.isSupported.value) {
+    // 📞 Iniciar llamada en vivo
+    const startLiveCall = async () => {
+      // Verificar acceso por plan
+      if (!hasVoiceAccess.value) {
         messages.value.push({
           type: 'ai',
-          text: 'Tu navegador no soporta entrada por voz. Usa Chrome o Edge para esta función.',
+          text: 'La asistencia por voz está disponible en planes Premium y Enterprise.',
           timestamp: getCurrentTime(),
           isWarning: true
         })
         return
       }
       
-      // Si está escuchando, detener
-      if (voiceInput.isListening.value) {
-        voiceInput.stopListening()
+      // Verificar límite de minutos para Premium (voiceLimitSeconds = 0 significa ilimitado)
+      if (voiceLimitSeconds.value > 0 && voiceSecondsUsedToday.value >= voiceLimitSeconds.value) {
+        messages.value.push({
+          type: 'ai',
+          text: `Has usado tus ${Math.floor(voiceLimitSeconds.value / 60)} minutos de voz de hoy. Se renovarán mañana.`,
+          timestamp: getCurrentTime(),
+          isLimit: true
+        })
         return
       }
       
       try {
-        const transcript = await voiceInput.startListening()
+        // Guardar tiempo de inicio para calcular duración
+        const startTime = Date.now()
         
-        if (transcript && transcript.trim()) {
-          // Poner el texto en el input y enviar
-          inputMessage.value = transcript
-          await sendMessage()
-        }
-      } catch (err) {
-        // Si no se capturó nada, mostrar error suave
-        if (err.message !== 'No se capturó ningún texto') {
-          messages.value.push({
-            type: 'ai',
-            text: `🎤 ${err.message || 'No pude escucharte. Intenta de nuevo.'}`,
-            timestamp: getCurrentTime(),
-            isWarning: true
-          })
-        }
-      }
-    }
-
-    // 📞 Iniciar llamada en vivo
-    const startLiveCall = async () => {
-      try {
+        // 🔒 Establecer límite máximo de duración para corte automático
+        const remainingSeconds = voiceSecondsRemaining.value
+        liveCall.setMaxDuration(remainingSeconds)
+        
         await liveCall.startCall()
+        
+        // Cuando termine la llamada, registrar el uso
+        // Esto se hace mediante un watch al estado de conexión
       } catch (err) {
         messages.value.push({
           type: 'ai',
@@ -1300,9 +1461,6 @@ export default {
       fileInput,
       sessionId,
       selectedProvider,
-      userPlan,
-      messageLimit,
-      messagesUsedToday,
       selectedFile,
       quickSuggestions,
       geminiChips,
@@ -1332,13 +1490,23 @@ export default {
       radioControlPlayPause,
       radioControlNext,
       closeRadioControls,
-      // 🎤 Voz
-      voiceInput,
-      handleVoiceInput,
       // 📞 Llamada en vivo
       liveCall,
       startLiveCall,
-      endLiveCall
+      endLiveCall,
+      // 🔒 Control de acceso por plan
+      tenantPlan,
+      hasAIAccess,
+      hasVoiceAccess,
+      isEnterprise,
+      canUseVoice,
+      voiceSecondsRemaining,
+      voiceLimitSeconds,
+      // 💬 Límites de chat por plan
+      chatMessageLimit,
+      chatMessagesUsedToday,
+      chatMessagesRemaining,
+      canSendChat
     }
   }
 }

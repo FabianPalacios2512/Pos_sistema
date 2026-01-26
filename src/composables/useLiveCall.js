@@ -100,7 +100,10 @@ const getDateRange = (periodo) => {
   }
 }
 
-export function useLiveCall() {
+export function useLiveCall(options = {}) {
+  // Opciones: maxDurationSeconds - límite máximo de la llamada
+  const maxDurationSeconds = ref(options.maxDurationSeconds || 0) // 0 = sin límite externo
+  
   // ═══════════════════════════════════════════════════════════════
   // ESTADO
   // ═══════════════════════════════════════════════════════════════
@@ -111,6 +114,7 @@ export function useLiveCall() {
   const error = ref(null)
   const callDuration = ref(0)         // Duración en segundos
   const transcript = ref('')          // Último texto reconocido
+  const wasAutoTerminated = ref(false) // Si se terminó por límite de tiempo
   
   // Configuración de voz - Selector mejorado
   const showVoiceSelector = ref(false)
@@ -451,6 +455,7 @@ export function useLiveCall() {
     isConnecting.value = true
     error.value = null
     callDuration.value = 0
+    wasAutoTerminated.value = false  // 🔄 Reset flag al iniciar nueva llamada
     setupCompleteReceived = false
     
     try {
@@ -687,9 +692,16 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
             isConnecting.value = false
             isListening.value = true
             
-            // Iniciar timer de duración
+            // Iniciar timer de duración con verificación de límite
             durationInterval = setInterval(() => {
               callDuration.value++
+              
+              // 🔒 Verificar límite de tiempo y cortar automáticamente
+              if (maxDurationSeconds.value > 0 && callDuration.value >= maxDurationSeconds.value) {
+                console.log(`⏰ [LiveCall] Límite de ${maxDurationSeconds.value}s alcanzado - terminando llamada`)
+                wasAutoTerminated.value = true
+                endCall('limit_reached')
+              }
             }, 1000)
             
             // Iniciar captura de audio
@@ -921,7 +933,10 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
   // ═══════════════════════════════════════════════════════════════
   // TERMINAR LLAMADA
   // ═══════════════════════════════════════════════════════════════
-  const endCall = () => {
+  const endCall = async (status = 'success') => {
+    // Guardar duración antes de limpiar
+    const finalDuration = callDuration.value
+    
     cleanup()
     
     isConnected.value = false
@@ -929,6 +944,19 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
     isListening.value = false
     isSpeaking.value = false
     showVoiceSelector.value = false
+    
+    // Registrar uso de voz en el backend (si duró más de 1 segundo)
+    if (finalDuration > 1) {
+      try {
+        await api.post('/ai/log-voice-usage', {
+          duration_seconds: finalDuration,
+          status: status
+        })
+        console.log(`📊 [LiveCall] Uso de voz registrado: ${finalDuration}s`)
+      } catch (err) {
+        console.warn('[LiveCall] No se pudo registrar uso de voz:', err)
+      }
+    }
   }
   
   // Limpiar recursos
@@ -1405,6 +1433,11 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
   // ═══════════════════════════════════════════════════════════════
   // EXPORT
   // ═══════════════════════════════════════════════════════════════
+  // Función para establecer el límite máximo de duración
+  const setMaxDuration = (seconds) => {
+    maxDurationSeconds.value = seconds > 0 ? seconds : 0
+  }
+
   return {
     // Estado
     isConnected,
@@ -1416,6 +1449,11 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
     callDuration,
     formattedDuration,
     transcript,
+    
+    // Control de límites
+    maxDurationSeconds,
+    wasAutoTerminated,
+    setMaxDuration,
     
     // Selector de voz
     showVoiceSelector,

@@ -469,19 +469,26 @@ EOT;
         try {
             $responseTime = round((microtime(true) - $startTime) * 1000); // en ms
             
+            $promptTokens = $result['tokens']['promptTokens'] ?? 0;
+            $completionTokens = $result['tokens']['candidatesTokens'] ?? 0;
+            $costUsd = \App\Models\AiUsageLog::calculateTextCost($promptTokens, $completionTokens, 'gemini');
+            
             \App\Models\AiUsageLog::create([
                 'user_id' => auth()->id(),
                 'api_key_index' => 0,
                 'api_key_last_4' => substr($this->apiKey, -4),
                 'user_message' => substr($prompt, 0, 500),
-                'prompt_tokens' => $result['tokens']['promptTokens'] ?? 0,
-                'completion_tokens' => $result['tokens']['candidatesTokens'] ?? 0,
+                'prompt_tokens' => $promptTokens,
+                'completion_tokens' => $completionTokens,
                 'total_tokens' => $result['tokens']['totalTokens'] ?? 0,
                 'status' => $result['status'],
                 'error_message' => $result['status'] === 'error' ? substr($result['reply'], 0, 255) : null,
                 'response_time_ms' => $responseTime,
                 'model' => 'gemini-2.0-flash',
+                'provider' => 'gemini',
                 'endpoint' => 'generateContent',
+                'request_type' => 'chat',
+                'cost_usd' => $costUsd,
                 'ip_address' => request()->ip()
             ]);
         } catch (\Exception $e) {

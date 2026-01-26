@@ -161,6 +161,7 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: false,
         secure: false,
+        rewrite: (path) => path.replace(/^\/admin\/api/, '/api/admin/api'),
       },
       '/storage': {
         target: 'http://127.0.0.1:8000',

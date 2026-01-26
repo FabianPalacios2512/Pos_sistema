@@ -1193,6 +1193,9 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                             }
                         }
 
+                        // Calcular costo
+                        $costUsd = AiUsageLog::calculateTextCost($promptTokens, $completionTokens, 'groq');
+
                         // Registrar en tabla tenant (histórico local)
                         AiUsageLog::create([
                             'user_id' => auth()->id(),
@@ -1205,14 +1208,16 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                             'status' => 'success',
                             'response_time_ms' => $responseTime,
                             'model' => 'llama-3.3-70b-versatile',
+                            'provider' => 'groq',
                             'endpoint' => 'chat',
+                            'request_type' => 'chat',
+                            'cost_usd' => $costUsd,
                             'ip_address' => request()->ip(),
                         ]);
 
                         // ✅ Registrar en tabla central para límites y facturación
                         $aiUsageService = app(AiUsageService::class);
-                        $cost = ($totalTokens / 1000000) * 0.50; // Costo aproximado
-                        $aiUsageService->logUsage(tenant('id'), $totalTokens, $cost);
+                        $aiUsageService->logUsage(tenant('id'), $totalTokens, $costUsd);
                     } catch (\Exception $e) {
                         Log::error("[AI Usage Log] Error: " . $e->getMessage());
                     }
@@ -2372,4 +2377,71 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
         $header .= pack('V', $dataSize);                      // Subchunk2Size
         
         return $header . $pcmData;
-    }}
+    }
+
+    /**
+     * 📊 Registrar uso de llamada de voz en vivo
+     * Llamado desde el frontend cuando termina una llamada Live
+     */
+    public function logVoiceUsage(Request $request)
+    {
+        $request->validate([
+            'duration_seconds' => 'required|integer|min:1',
+            'status' => 'nullable|string|in:success,cancelled,error,timeout',
+        ]);
+
+        $durationSeconds = $request->input('duration_seconds');
+        $status = $request->input('status', 'success');
+
+        try {
+            // Calcular costo estimado
+            $costUsd = AiUsageLog::calculateVoiceCost($durationSeconds);
+
+            // Registrar en la base de datos
+            $log = AiUsageLog::create([
+                'user_id' => auth()->id(),
+                'api_key_index' => 0,
+                'api_key_last_4' => 'LIVE',
+                'user_message' => 'Llamada de voz en vivo',
+                'prompt_tokens' => 0,
+                'completion_tokens' => 0,
+                'total_tokens' => 0,
+                'status' => $status,
+                'response_time_ms' => $durationSeconds * 1000,
+                'model' => 'gemini-2.5-flash-preview-native-audio',
+                'provider' => 'gemini',
+                'endpoint' => 'live',
+                'request_type' => 'voice',
+                'voice_duration_seconds' => $durationSeconds,
+                'cost_usd' => $costUsd,
+                'ip_address' => $request->ip(),
+            ]);
+
+            // También registrar en tabla central si existe
+            try {
+                $aiUsageService = app(\App\Services\AiUsageService::class);
+                $aiUsageService->logUsage(tenant('id'), 0, $costUsd);
+            } catch (\Exception $e) {
+                \Log::warning("No se pudo registrar en central: " . $e->getMessage());
+            }
+
+            \Log::info("[AI Voice Log] Llamada registrada: {$durationSeconds}s, costo: \${$costUsd} USD");
+
+            return response()->json([
+                'success' => true,
+                'logged' => [
+                    'duration_seconds' => $durationSeconds,
+                    'cost_usd' => number_format($costUsd, 6),
+                    'cost_cop' => number_format($costUsd * 4200, 2),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("[AI Voice Log] Error: " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'error' => 'No se pudo registrar el uso de voz',
+            ], 500);
+        }
+    }
+}

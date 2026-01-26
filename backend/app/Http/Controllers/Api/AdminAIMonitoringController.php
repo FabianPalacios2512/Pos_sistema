@@ -73,7 +73,12 @@ class AdminAIMonitoringController extends Controller
             'rate_limited' => 0,
             'errors' => 0,
             'total_tokens' => 0,
-            'avg_response_time_ms' => 0
+            'avg_response_time_ms' => 0,
+            'total_cost_usd' => 0,
+            'total_cost_cop' => 0,
+            'chat_requests' => 0,
+            'voice_requests' => 0,
+            'voice_minutes' => 0,
         ];
 
         $allRequests = [];
@@ -95,7 +100,10 @@ class AdminAIMonitoringController extends Controller
                         SUM(CASE WHEN status = 'rate_limited' THEN 1 ELSE 0 END) as rate_limited,
                         SUM(CASE WHEN status = 'error' THEN 1 ELSE 0 END) as errors,
                         COALESCE(SUM(total_tokens), 0) as tokens,
-                        COALESCE(AVG(response_time_ms), 0) as avg_time
+                        COALESCE(AVG(response_time_ms), 0) as avg_time,
+                        COALESCE(SUM(cost_usd), 0) as cost_usd,
+                        SUM(CASE WHEN request_type = 'voice' THEN 1 ELSE 0 END) as voice_count,
+                        COALESCE(SUM(voice_duration_seconds), 0) as voice_seconds
                     FROM {$dbName}.ai_usage_logs
                     {$dateFilter}
                 ")[0];
@@ -105,9 +113,13 @@ class AdminAIMonitoringController extends Controller
                 $summary['rate_limited'] += $stats->rate_limited;
                 $summary['errors'] += $stats->errors;
                 $summary['total_tokens'] += $stats->tokens;
+                $summary['total_cost_usd'] += floatval($stats->cost_usd);
+                $summary['voice_requests'] += $stats->voice_count;
+                $summary['voice_minutes'] += round($stats->voice_seconds / 60, 2);
+                $summary['chat_requests'] += ($stats->total - $stats->voice_count);
 
                 $requests = DB::select("
-                    SELECT user_message, total_tokens, status, created_at
+                    SELECT user_message, total_tokens, status, created_at, request_type, cost_usd, voice_duration_seconds
                     FROM {$dbName}.ai_usage_logs
                     {$dateFilter}
                     ORDER BY created_at DESC
@@ -120,6 +132,9 @@ class AdminAIMonitoringController extends Controller
                         'message' => substr($req->user_message, 0, 100),
                         'tokens' => $req->total_tokens,
                         'status' => $req->status,
+                        'type' => $req->request_type ?? 'chat',
+                        'cost_usd' => $req->cost_usd ?? 0,
+                        'voice_seconds' => $req->voice_duration_seconds,
                         'created_at' => $req->created_at
                     ];
                 }
@@ -131,6 +146,10 @@ class AdminAIMonitoringController extends Controller
         if ($summary['total_requests'] > 0) {
             $summary['success_rate'] = round(($summary['successful'] / $summary['total_requests']) * 100, 2);
         }
+        
+        // Calcular costo en COP
+        $summary['total_cost_usd'] = round($summary['total_cost_usd'], 6);
+        $summary['total_cost_cop'] = round($summary['total_cost_usd'] * 4200, 2);
 
         usort($allRequests, fn($a, $b) => strtotime($b['created_at']) - strtotime($a['created_at']));
 
@@ -185,6 +204,14 @@ class AdminAIMonitoringController extends Controller
 
         $totalTokens = (clone $query)->sum('total_tokens');
         $avgResponseTime = (clone $query)->avg('response_time_ms');
+        
+        // Estadísticas de costos
+        $totalCostUsd = (clone $query)->sum('cost_usd');
+        
+        // Estadísticas por tipo
+        $chatRequests = (clone $query)->whereIn('request_type', ['chat', 'chat_with_file'])->count();
+        $voiceRequests = (clone $query)->where('request_type', 'voice')->count();
+        $totalVoiceSeconds = (clone $query)->where('request_type', 'voice')->sum('voice_duration_seconds');
 
         return [
             'total_requests' => $total,
@@ -194,6 +221,12 @@ class AdminAIMonitoringController extends Controller
             'success_rate' => $total > 0 ? round(($successful / $total) * 100, 2) : 0,
             'total_tokens' => $totalTokens,
             'avg_response_time_ms' => round($avgResponseTime, 0),
+            // Nuevos campos
+            'total_cost_usd' => round($totalCostUsd, 6),
+            'total_cost_cop' => round($totalCostUsd * 4200, 2),
+            'chat_requests' => $chatRequests,
+            'voice_requests' => $voiceRequests,
+            'voice_minutes' => round($totalVoiceSeconds / 60, 2),
         ];
     }
 

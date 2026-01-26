@@ -96,6 +96,9 @@ Route::middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(functio
     Route::get('/check-domain/{domain}', [SuperAdminController::class, 'checkDomainAvailability']);
     Route::get('/check-cedula/{cedula}', [SuperAdminController::class, 'checkCedulaAvailability']);
     Route::get('/check-email/{email}', [SuperAdminController::class, 'checkEmailAvailability']);
+    
+    // AI Monitoring para Super Admin (todos los tenants)
+    Route::get('/admin/ai-monitoring/dashboard', [\App\Http\Controllers\Api\SuperAdminAIMonitoringController::class, 'dashboard']);
 });
 
 // ==================== SUPER ADMIN (GOD MODE) - Prefijo /admin/api/* ====================
@@ -106,6 +109,9 @@ Route::prefix('admin/api')->middleware(\App\Http\Middleware\PreventTenancyInit::
     Route::get('/tenants/{id}/users', [SuperAdminController::class, 'getTenantUsers']);
     Route::get('/tenants/{id}/products', [SuperAdminController::class, 'getTenantProducts']);
     Route::post('/tenants/{id}/users/{userId}/reset-password', [SuperAdminController::class, 'resetUserPassword']);
+    
+    // AI Monitoring para Super Admin (frontend usa /admin/api/*)
+    Route::get('/ai-monitoring/dashboard', [\App\Http\Controllers\Api\SuperAdminAIMonitoringController::class, 'dashboard']);
 });
 
 
@@ -261,12 +267,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'saveConfig']);
 });
 // ==================== FIN WEB CATALOG CONFIGURATION ====================
-
-// ==================== SUPER ADMIN - AI MONITORING ====================
-// Rutas para monitoreo global de IA (todos los tenants)
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/admin/ai-monitoring/dashboard', [\App\Http\Controllers\Api\SuperAdminAIMonitoringController::class, 'dashboard']);
-});
 
 // ==================== 🧪 TEST ROUTES - EXCEL IMPORT AI ====================
 // ⚠️ SOLO PARA DESARROLLO - Eliminar en producción

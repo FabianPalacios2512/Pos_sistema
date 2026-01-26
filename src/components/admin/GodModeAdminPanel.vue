@@ -595,7 +595,7 @@
 
       <!-- TAB: AI Monitoring -->
       <div v-show="activeTab === 'ai-monitoring'" class="space-y-6">
-        <!-- KPIs Resumen IA -->
+        <!-- KPIs Resumen IA - Primera fila -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
             <div class="flex items-center gap-3">
@@ -649,6 +649,70 @@
               <div class="flex-1 min-w-0">
                 <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Avg Response</p>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ aiMonitoring.summary?.avg_response_time_ms || 0 }}ms</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs Segunda fila - Costos y Voz -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Costo Total USD -->
+          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 dark:bg-emerald-950 border border-emerald-100 dark:border-emerald-800">
+                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Costo Total USD</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ (aiMonitoring.summary?.total_cost_usd || 0).toFixed(4) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Costo Total COP -->
+          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-800">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Costo Total COP</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatNumber(Math.round(aiMonitoring.summary?.total_cost_cop || 0)) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Requests -->
+          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-indigo-50 dark:bg-indigo-950 border border-indigo-100 dark:border-indigo-800">
+                <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Mensajes Chat</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ formatNumber(aiMonitoring.summary?.chat_requests || 0) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Voice Minutes -->
+          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-rose-50 dark:bg-rose-950 border border-rose-100 dark:border-rose-800">
+                <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Minutos de Voz</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ (aiMonitoring.summary?.voice_minutes || 0).toFixed(1) }} min</p>
+                <p class="text-xs text-zinc-400 dark:text-zinc-500">{{ aiMonitoring.summary?.voice_requests || 0 }} llamadas</p>
               </div>
             </div>
           </div>
@@ -742,8 +806,10 @@
                 <tr class="bg-white dark:bg-zinc-900">
                   <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Fecha/Hora</th>
                   <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Tenant</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Tipo</th>
                   <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Mensaje</th>
-                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Tokens</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Tokens/Duración</th>
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Costo</th>
                   <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Estado</th>
                 </tr>
               </thead>
@@ -761,12 +827,32 @@
                       {{ req.tenant?.replace('tenant', '') || 'N/A' }}
                     </span>
                   </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span 
+                      :class="[
+                        'px-2 py-1 rounded text-xs font-medium',
+                        req.type === 'voice' 
+                          ? 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border border-rose-100 dark:border-rose-800'
+                          : 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800'
+                      ]"
+                    >
+                      {{ req.type === 'voice' ? '🎤 Voz' : '💬 Chat' }}
+                    </span>
+                  </td>
                   <td class="px-6 py-4 text-sm text-gray-700 dark:text-zinc-300 max-w-md truncate">
-                    {{ req.message || 'Sin mensaje' }}
+                    {{ req.type === 'voice' ? `Llamada de ${req.voice_seconds || 0}s` : (req.message || 'Sin mensaje') }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2.5 py-1 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-800 text-xs font-bold rounded-full">
-                      {{ formatNumber(req.tokens || 0) }}
+                    <span v-if="req.type === 'voice'" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border border-rose-100 dark:border-rose-800 text-xs font-bold rounded-full">
+                      {{ req.voice_seconds || 0 }}s
+                    </span>
+                    <span v-else class="px-2.5 py-1 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-800 text-xs font-bold rounded-full">
+                      {{ formatNumber(req.tokens || 0) }} tokens
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="text-xs font-mono text-emerald-600 dark:text-emerald-400">
+                      ${{ (parseFloat(req.cost_usd) || 0).toFixed(6) }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
@@ -785,7 +871,7 @@
                   </td>
                 </tr>
                 <tr v-if="!aiMonitoring.recent_requests || aiMonitoring.recent_requests.length === 0">
-                  <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-zinc-400">
+                  <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-zinc-400">
                     No hay peticiones recientes en el período seleccionado
                   </td>
                 </tr>
@@ -1210,20 +1296,35 @@ const fetchData = async () => {
 }
 
 const fetchAIMonitoring = async () => {
-  // 🔧 En localhost, este endpoint no existe - skip
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    console.log('⚠️ [GodMode] Skipping AI Monitoring en localhost')
-    return
-  }
-  
   loading.value = true
   try {
-    const res = await axios.get(`/admin/api/ai-monitoring/dashboard?period=${aiPeriod.value}`)
+    // Super admin usa /admin/api/, tenant usa /api/admin/
+    const endpoint = `/admin/api/ai-monitoring/dashboard?period=${aiPeriod.value}`
+    console.log('📊 [GodMode] Fetching AI Monitoring:', endpoint)
+    
+    const res = await axios.get(endpoint)
     if (res.data) {
       aiMonitoring.value = res.data
+      console.log('✅ [GodMode] AI Monitoring cargado:', res.data)
     }
   } catch (error) {
-    console.error('Error al cargar AI Monitoring:', error)
+    console.error('❌ [GodMode] Error al cargar AI Monitoring:', error)
+    // No mostrar error al usuario, simplemente dejar vacío
+    aiMonitoring.value = {
+      summary: {
+        total_requests: 0,
+        successful: 0,
+        rate_limited: 0,
+        errors: 0,
+        total_tokens: 0,
+        total_cost_usd: 0,
+        total_cost_cop: 0,
+        chat_requests: 0,
+        voice_requests: 0,
+        voice_minutes: 0
+      },
+      recent_requests: []
+    }
   }
   loading.value = false
 }

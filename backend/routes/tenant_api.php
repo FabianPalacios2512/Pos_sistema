@@ -545,6 +545,9 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     
     // 📞 Live Call - Token efímero para WebSocket de Gemini Live API
     Route::post('/ai/live-token', [\App\Http\Controllers\Api\AIController::class, 'getLiveToken']);
+    
+    // 📊 Log de uso de voz (llamado desde frontend cuando termina una llamada)
+    Route::post('/ai/log-voice-usage', [\App\Http\Controllers\Api\AIController::class, 'logVoiceUsage']);
 
 });
 
