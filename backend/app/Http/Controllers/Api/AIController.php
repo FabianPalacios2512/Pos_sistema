@@ -281,7 +281,9 @@ class AIController extends Controller
             $this->cleanOldHistory($sessionId);
 
             // 2. Build lightweight system prompt (NO CONTEXT STUFFING!)
-            $systemPrompt = $this->buildSystemPrompt();
+            // 🧠 Agregar contexto de pantalla si está disponible
+            $screenContext = $request->input('screen_context', null);
+            $systemPrompt = $this->buildSystemPrompt($screenContext);
 
             // 3. Recuperar historial de conversación (reducido para evitar confusión)
             $conversationHistory = ConversationHistory::getRecentMessages($sessionId, 3);
@@ -671,15 +673,22 @@ class AIController extends Controller
 
     /**
      * Build lightweight system prompt (NO CONTEXT STUFFING!)
+     * @param string|null $screenContext - Contexto de pantalla del frontend (opcional)
      */
-    private function buildSystemPrompt()
+    private function buildSystemPrompt($screenContext = null)
     {
         $currentDate = now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY');
         $currentTime = now()->format('H:i');
+        
+        // 🧠 Agregar contexto de pantalla si está disponible
+        $screenContextBlock = '';
+        if (!empty($screenContext)) {
+            $screenContextBlock = "\n\n" . $screenContext . "\n";
+        }
 
         return <<<EOT
 Eres "105 IA", asistente virtual inteligente del sistema POS. Sé amigable, conversacional y muy útil.
-
+{$screenContextBlock}
 🎯 TUS CAPACIDADES:
 Tienes herramientas para consultar datos en tiempo real:
 • search_products(query, filter, limit) - Buscar productos

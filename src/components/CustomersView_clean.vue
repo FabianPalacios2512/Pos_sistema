@@ -1109,8 +1109,10 @@ import { useCreditienda } from '../composables/useCreditienda.js'
 import { useAutoRefresh } from '../composables/useRouteState.js'
 import { appStore } from '../store/appStore.js'
 import { useModuleNavigation } from '../composables/useModuleNavigation.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 
 const { navigateToModule } = useModuleNavigation()
+const uiContextStore = useUIContextStore()
 
 // ✅ Definir props y emits para heredar correctamente desde el padre
 const props = defineProps({
@@ -1264,11 +1266,9 @@ const loadUserPreferences = () => {
       viewMode.value = preferences.viewMode || 'table'
       itemsPerPage.value = preferences.itemsPerPage || 25
       statusFilter.value = preferences.statusFilter || ''
-      
-      console.log('✅ Preferencias del usuario cargadas:', preferences)
     }
   } catch (error) {
-    console.warn('⚠️ Error cargando preferencias del usuario:', error)
+    // Error silencioso al cargar preferencias
   }
 }
 
@@ -1283,10 +1283,8 @@ const saveUserPreferences = () => {
     }
     
     localStorage.setItem(USER_PREFERENCES_KEY, JSON.stringify(preferences))
-    console.log('💾 Preferencias guardadas:', preferences)
-    
   } catch (error) {
-    console.warn('⚠️ Error guardando preferencias:', error)
+    // Error silencioso al guardar preferencias
   }
 }
 
@@ -1437,10 +1435,7 @@ const loadCustomers = async () => {
   try {
     loading.value = true
     const response = await customersService.getAll()
-    console.log('Respuesta clientes:', response)
-    
     customers.value = response.data || []
-    console.log('Clientes cargados:', customers.value.length)
   } catch (error) {
     console.error('Error cargando clientes:', error)
     alert('Error al cargar los clientes')
@@ -1450,7 +1445,6 @@ const loadCustomers = async () => {
 }
 
 const refreshCustomers = async () => {
-  console.log('Refrescando clientes...')
   await loadCustomers()
 }
 
@@ -1769,7 +1763,6 @@ const getCustomerColor = (name) => {
 }
 
 const exportCustomers = () => {
-  console.log('Exportar clientes')
   alert('Funcionalidad de exportación próximamente')
 }
 
@@ -1814,6 +1807,276 @@ watch(statusFilter, (newValue, oldValue) => {
   }
 }, { immediate: false })
 
+// ========== CONTEXTO DE IA - CONCIENCIA DE PANTALLA ==========
+const instruccionesClientes = {
+  modulo: 'Módulo de Clientes: Vista Master-Detail que muestra la lista de clientes a la izquierda y los detalles del cliente seleccionado a la derecha.',
+  panelIzquierdo: 'Panel izquierdo: Lista de clientes con búsqueda, filtro por estado (activos/inactivos), nombre, documento, total de compras.',
+  panelDerecho: 'Panel derecho: Información del cliente seleccionado con tabs de Información General e Historial de Compras.',
+  informacionGeneral: 'Pestaña Información General: Datos personales (documento, dirección, ciudad, fecha nacimiento), Estado de Crédito (cupo, deuda actual, % utilizado).',
+  historialCompras: 'Pestaña Historial de Compras: Lista de facturas del cliente ordenadas por fecha, con número de factura, fecha, estado de pago y total.',
+  acciones: 'Acciones disponibles: Nuevo Cliente, Editar cliente, Eliminar cliente, Ver historial de compras, Buscar cliente.',
+  camposObligatorios: 'CAMPOS OBLIGATORIOS para crear cliente: 1) Nombre completo, 2) Número de documento (CC/cédula), 3) Teléfono, 4) Email. Sin estos 4 campos no se puede crear el cliente.',
+  flujoCreacion: 'Para crear un cliente: 1) Ejecutar crearNuevoCliente, 2) Usar llenarCampoCliente para CADA campo (nombre, documento, telefono, email), 3) Ejecutar guardarCliente cuando todos los campos estén llenos.'
+}
+
+// Watcher para actualizar contexto de IA cuando cambian los datos
+watch(
+  [customers, selectedCustomer, activeTab, customerInvoices, loading, showCustomerModal, customerForm],
+  () => {
+    // Datos base de clientes
+    const clientesData = {
+      totalClientes: customers.value.length,
+      clientesActivos: customers.value.filter(c => c.active).length,
+      clientesInactivos: customers.value.filter(c => !c.active).length,
+      totalVentas: customers.value.reduce((sum, c) => sum + parseFloat(c.total_purchases || 0), 0),
+      totalDeudas: customers.value.reduce((sum, c) => sum + parseFloat(c.current_debt || 0), 0),
+      cargando: loading.value,
+      filtroActivo: statusFilter.value || 'todos',
+      terminoBusqueda: searchTerm.value || '',
+      pestanaActiva: activeTab.value === 'info' ? 'Información General' : 'Historial de Compras',
+      
+      // Estado del modal de creación/edición
+      modalAbierto: showCustomerModal.value,
+      modoEdicion: isEditing.value,
+      
+      // Si el modal está abierto, mostrar datos del formulario
+      formularioActual: showCustomerModal.value ? {
+        nombre: customerForm.value.name || '(vacío)',
+        documento: customerForm.value.document_number || '(vacío)',
+        tipoDocumento: customerForm.value.document_type || 'CC',
+        email: customerForm.value.email || '(vacío)',
+        telefono: customerForm.value.phone || '(vacío)',
+        direccion: customerForm.value.address || '(vacío)',
+        ciudad: customerForm.value.city || '(vacío)',
+        camposCompletos: !!(customerForm.value.name && customerForm.value.document_number && customerForm.value.email && customerForm.value.phone),
+        camposFaltantes: [
+          !customerForm.value.name?.trim() ? 'nombre' : null,
+          !customerForm.value.document_number?.trim() ? 'documento/CC' : null,
+          !customerForm.value.email?.trim() ? 'email' : null,
+          !customerForm.value.phone?.trim() ? 'teléfono' : null
+        ].filter(Boolean)
+      } : null,
+      
+      // Lista de clientes (primeros 15 para no sobrecargar)
+      listaClientes: filteredCustomers.value.slice(0, 15).map(c => ({
+        id: c.id,
+        nombre: c.name,
+        documento: `${c.document_type}: ${c.document_number}`,
+        telefono: c.phone || 'Sin teléfono',
+        email: c.email || 'Sin email',
+        estado: c.active ? 'Activo' : 'Inactivo',
+        totalCompras: parseFloat(c.total_purchases || 0),
+        deudaActual: parseFloat(c.current_debt || 0),
+        ciudad: c.city || 'Sin ciudad'
+      })),
+      
+      instrucciones: instruccionesClientes
+    }
+    
+    // Si hay un cliente seleccionado, agregar sus detalles completos
+    if (selectedCustomer.value) {
+      const cliente = selectedCustomer.value
+      clientesData.clienteSeleccionado = {
+        id: cliente.id,
+        nombre: cliente.name,
+        documento: `${cliente.document_type}: ${cliente.document_number}`,
+        telefono: cliente.phone || 'Sin teléfono',
+        email: cliente.email || 'Sin email',
+        direccion: cliente.address || 'Sin dirección',
+        ciudad: cliente.city || 'Sin ciudad',
+        fechaNacimiento: cliente.birth_date || 'No registrada',
+        estado: cliente.active ? 'Activo' : 'Inactivo',
+        
+        // Estadísticas de compras
+        totalCompras: parseFloat(cliente.total_purchases || 0),
+        totalOrdenes: customerInvoices.value.length,
+        ticketPromedio: customerInvoices.value.length > 0 
+          ? customerInvoices.value.reduce((sum, inv) => sum + parseFloat(inv.total || 0), 0) / customerInvoices.value.length 
+          : 0,
+        
+        // Estado de crédito
+        credito: {
+          activo: cliente.credit_active || false,
+          cupoTotal: parseFloat(cliente.credit_limit || 0),
+          deudaActual: parseFloat(cliente.current_debt || 0),
+          porcentajeUsado: cliente.credit_limit > 0 
+            ? Math.round((parseFloat(cliente.current_debt || 0) / parseFloat(cliente.credit_limit)) * 100) 
+            : 0
+        },
+        
+        // Historial de compras (últimas 10)
+        historialCompras: customerInvoices.value.slice(0, 10).map(inv => ({
+          numeroFactura: inv.invoice_number || inv.id,
+          fecha: inv.date || inv.created_at,
+          estado: inv.payment_status || 'pendiente',
+          total: parseFloat(inv.total || 0),
+          items: inv.items?.length || 0
+        }))
+      }
+    }
+    
+    // Resumen rápido para respuestas comunes
+    clientesData.resumenRapido = {
+      cuantosClientes: `Hay ${clientesData.totalClientes} cliente(s) en total, ${clientesData.clientesActivos} activo(s) y ${clientesData.clientesInactivos} inactivo(s).`,
+      ventasTotales: `Las ventas totales a clientes suman $${clientesData.totalVentas.toLocaleString()}.`,
+      deudasTotales: `La deuda total de clientes es de $${clientesData.totalDeudas.toLocaleString()}.`,
+      clienteSeleccionado: selectedCustomer.value 
+        ? `Cliente seleccionado: ${selectedCustomer.value.name} con ${customerInvoices.value.length} compras registradas.`
+        : 'No hay cliente seleccionado. Selecciona uno de la lista para ver sus detalles.',
+      comoCrearCliente: 'Para crear un nuevo cliente: haz clic en el botón "Nuevo Cliente" en la esquina superior derecha.',
+      comoEditarCliente: 'Para editar un cliente: primero selecciónalo de la lista, luego haz clic en el botón "Editar" en su ficha de detalles.',
+      comoVerHistorial: 'Para ver el historial de compras: selecciona un cliente y haz clic en la pestaña "Historial de Compras".'
+    }
+
+    // Actualizar el contexto de pantalla para la IA
+    uiContextStore.setScreenData(clientesData)
+    
+    // Registrar acciones disponibles para la IA
+    uiContextStore.registerAction('seleccionarClientePorNombre', async ({ nombre }) => {
+      const cliente = customers.value.find(c => 
+        c.name.toLowerCase().includes(nombre.toLowerCase())
+      )
+      if (cliente) {
+        selectCustomer(cliente)
+        return { success: true, message: `Cliente "${cliente.name}" seleccionado` }
+      }
+      return { success: false, message: `No se encontró cliente con nombre "${nombre}"` }
+    })
+    
+    uiContextStore.registerAction('buscarCliente', ({ texto }) => {
+      searchTerm.value = texto
+      return { success: true, message: `Buscando clientes con: "${texto}"` }
+    })
+    
+    uiContextStore.registerAction('filtrarClientesPorEstado', ({ estado }) => {
+      if (estado === 'activos') {
+        statusFilter.value = 'active'
+      } else if (estado === 'inactivos') {
+        statusFilter.value = 'inactive'
+      } else {
+        statusFilter.value = ''
+      }
+      return { success: true, message: `Filtrando clientes por: ${estado}` }
+    })
+    
+    uiContextStore.registerAction('cambiarPestanaCliente', ({ pestana }) => {
+      if (pestana === 'info' || pestana === 'informacion' || pestana === 'general') {
+        activeTab.value = 'info'
+        return { success: true, message: 'Mostrando información general del cliente' }
+      } else if (pestana === 'historial' || pestana === 'compras') {
+        activeTab.value = 'history'
+        return { success: true, message: 'Mostrando historial de compras del cliente' }
+      }
+      return { success: false, message: 'Pestaña no reconocida. Usa "info" o "historial"' }
+    })
+    
+    uiContextStore.registerAction('editarClienteSeleccionado', () => {
+      if (selectedCustomer.value) {
+        editCustomer(selectedCustomer.value)
+        return { success: true, message: `Abriendo editor para ${selectedCustomer.value.name}` }
+      }
+      return { success: false, message: 'Primero selecciona un cliente para editar' }
+    })
+    
+    uiContextStore.registerAction('crearNuevoCliente', () => {
+      openCreateModal()
+      return { success: true, message: 'Formulario abierto. Ahora necesito los datos: nombre completo, número de documento (CC), teléfono y email son OBLIGATORIOS.' }
+    })
+    
+    // 📝 Acción para llenar campos del formulario visualmente
+    uiContextStore.registerAction('llenarCampoCliente', ({ campo, valor }) => {
+      if (!showCustomerModal.value) {
+        return { success: false, message: 'Primero abre el formulario con crearNuevoCliente' }
+      }
+      
+      const camposValidos = {
+        'nombre': 'name',
+        'name': 'name',
+        'email': 'email',
+        'correo': 'email',
+        'telefono': 'phone',
+        'phone': 'phone',
+        'celular': 'phone',
+        'direccion': 'address',
+        'address': 'address',
+        'ciudad': 'city',
+        'city': 'city',
+        'documento': 'document_number',
+        'document_number': 'document_number',
+        'cedula': 'document_number',
+        'cc': 'document_number',
+        'tipo_documento': 'document_type',
+        'document_type': 'document_type',
+        'fecha_nacimiento': 'birth_date',
+        'birth_date': 'birth_date',
+        'genero': 'gender',
+        'gender': 'gender',
+        'limite_credito': 'credit_limit',
+        'credit_limit': 'credit_limit'
+      }
+      
+      const campoNormalizado = campo.toLowerCase().trim()
+      const campoReal = camposValidos[campoNormalizado]
+      
+      if (!campoReal) {
+        return { success: false, message: `Campo "${campo}" no reconocido. Campos válidos: nombre, documento/cedula/cc, email, telefono, direccion, ciudad, genero, limite_credito` }
+      }
+      
+      // Actualizar el campo del formulario
+      customerForm.value[campoReal] = valor
+      
+      return { 
+        success: true, 
+        message: `Campo "${campo}" actualizado a "${valor}"`,
+        formularioActual: {
+          nombre: customerForm.value.name,
+          documento: customerForm.value.document_number,
+          email: customerForm.value.email,
+          telefono: customerForm.value.phone
+        }
+      }
+    })
+    
+    // 💾 Acción para guardar el cliente
+    uiContextStore.registerAction('guardarCliente', async () => {
+      if (!showCustomerModal.value) {
+        return { success: false, message: 'No hay formulario abierto para guardar' }
+      }
+      
+      // Verificar campos obligatorios
+      const faltantes = []
+      if (!customerForm.value.name?.trim()) faltantes.push('nombre')
+      if (!customerForm.value.document_number?.trim()) faltantes.push('número de documento (CC)')
+      if (!customerForm.value.email?.trim()) faltantes.push('email')
+      if (!customerForm.value.phone?.trim()) faltantes.push('teléfono')
+      
+      if (faltantes.length > 0) {
+        return { 
+          success: false, 
+          message: `Faltan campos obligatorios: ${faltantes.join(', ')}. Por favor proporciona estos datos.` 
+        }
+      }
+      
+      try {
+        await saveCustomer()
+        return { 
+          success: true, 
+          message: `Cliente "${customerForm.value.name}" creado exitosamente. La lista se ha actualizado.` 
+        }
+      } catch (error) {
+        return { success: false, message: `Error al guardar: ${error.message}` }
+      }
+    })
+    
+    // ❌ Acción para cerrar el modal
+    uiContextStore.registerAction('cerrarModalCliente', () => {
+      closeCustomerModal()
+      return { success: true, message: 'Modal cerrado' }
+    })
+  },
+  { immediate: true, deep: true }
+)
+
 // Inicialización
 onMounted(async () => {
   // 🔧 Cargar preferencias del usuario primero
@@ -1824,7 +2087,6 @@ onMounted(async () => {
 
 // 🔄 AUTO-REFRESH al reactivar el componente
 onActivated(async () => {
-  console.log('🔄 [CustomersView] Component activated - Refreshing data...')
   await loadCustomers()
 })
 </script>

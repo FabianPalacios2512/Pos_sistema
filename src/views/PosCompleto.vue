@@ -1623,6 +1623,10 @@ watch(posViewRef, async (newRef) => {
 
 // 🔄 Watcher para AUTO-REFRESH cuando entras al módulo POS
 watch(() => currentModule.value, async (newModule, oldModule) => {
+  // 🧠 ACTUALIZAR UI CONTEXT STORE PARA IA (sincronizar módulo actual)
+  console.log('📍 [PosCompleto] Módulo actual cambiado:', oldModule, '→', newModule)
+  uiContext.setCurrentModule(newModule)
+  
   if (newModule === 'pos' && oldModule !== 'pos') {
     // Acabas de entrar al POS desde otro módulo
     try {
@@ -1637,7 +1641,7 @@ watch(() => currentModule.value, async (newModule, oldModule) => {
       console.error('⚠️ Error en auto-refresh al entrar al POS:', error)
     }
   }
-})
+}, { immediate: true }) // 🔥 Ejecutar inmediatamente al cargar para sincronizar estado inicial
 
 // ===== MOUSE HANDLING (AUTO-HIDE MENU) =====
 

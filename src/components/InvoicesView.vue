@@ -1956,33 +1956,146 @@ const handleKeyDown = (event) => {
   }
 }
 
+// 🧠 Actualizar contexto de pantalla para IA de voz
+const updateScreenContextForAI = () => {
+  // Calcular estadísticas por estado (sin pasar la lista completa)
+  const facturasPagadas = props.invoices.filter(i => 
+    (i.status?.toLowerCase() === 'pagada' || i.status?.toLowerCase() === 'paid') &&
+    (i.type !== 'Cotización' && i.type !== 'quote')
+  ).length
+  
+  const facturasPendientes = props.invoices.filter(i => 
+    i.status?.toLowerCase() === 'pendiente' || i.status?.toLowerCase() === 'pending'
+  ).length
+  
+  const facturasAnuladas = props.invoices.filter(i => 
+    i.status?.toLowerCase() === 'anulada' || i.status?.toLowerCase() === 'cancelled'
+  ).length
+  
+  const facturasDevueltas = props.invoices.filter(i => 
+    i.status?.toLowerCase() === 'devuelta' || i.status?.toLowerCase() === 'returned'
+  ).length
+  
+  const cotizacionesPendientes = props.invoices.filter(i => 
+    (i.type === 'Cotización' || i.type === 'quote') &&
+    (i.status?.toLowerCase() !== 'cancelled' && i.status?.toLowerCase() !== 'anulada')
+  ).length
+  
+  // Datos resumidos para la IA (NO la lista completa)
+  const contextData = {
+    resumenFacturas: {
+      total: props.invoices.length,
+      facturasDelMes: monthlyInvoices.value,
+      totalFacturado: `$${formatCurrency(totalInvoiced.value)}`,
+      porEstado: {
+        pagadas: facturasPagadas,
+        pendientes: facturasPendientes,
+        anuladas: facturasAnuladas,
+        devueltas: facturasDevueltas
+      },
+      cotizaciones: cotizacionesPendientes
+    },
+    // Info de la factura seleccionada (si hay alguna)
+    facturaSeleccionada: selectedInvoice.value ? {
+      numero: selectedInvoice.value.number || selectedInvoice.value.invoiceNumber || `FV-${selectedInvoice.value.id}`,
+      tipo: isQuotation(selectedInvoice.value) ? 'Cotización' : 'Factura',
+      estado: getStatusLabel(selectedInvoice.value.status),
+      cliente: selectedInvoice.value.customer_name || selectedInvoice.value.customer || 'Cliente General',
+      total: `$${formatCurrency(selectedInvoice.value.total)}`,
+      fecha: formatDate(selectedInvoice.value.date),
+      // 🔥 Validación de datos de contacto para envíos
+      tieneEmail: !!(selectedInvoice.value.customer_email || selectedInvoice.value.email),
+      tieneTelefono: !!(selectedInvoice.value.customer_phone || selectedInvoice.value.phone),
+      email: selectedInvoice.value.customer_email || selectedInvoice.value.email || null,
+      telefono: selectedInvoice.value.customer_phone || selectedInvoice.value.phone || null
+    } : null,
+    // Instrucciones para la IA
+    instrucciones: {
+      enviarWhatsApp: selectedInvoice.value 
+        ? (selectedInvoice.value.customer_phone || selectedInvoice.value.phone 
+            ? 'Puedes enviar por WhatsApp - el cliente tiene teléfono registrado'
+            : '⚠️ El cliente NO tiene teléfono registrado. Pídele al usuario que ingrese el número manualmente o que actualice los datos del cliente primero')
+        : 'Primero debes seleccionar una factura',
+      enviarEmail: selectedInvoice.value 
+        ? (selectedInvoice.value.customer_email || selectedInvoice.value.email 
+            ? 'Puedes enviar por Email - el cliente tiene email registrado'
+            : '⚠️ El cliente NO tiene email registrado. Pídele al usuario que ingrese el email manualmente o que actualice los datos del cliente primero')
+        : 'Primero debes seleccionar una factura'
+    }
+  }
+  
+  // Actualizar el store de contexto
+  uiContext.setScreenData(contextData)
+}
+
 // Lifecycle
 onMounted(() => {
   document.addEventListener('click', closeActionsMenu)
   document.addEventListener('keydown', handleKeyDown)
   
-  // 🎯 Registrar callbacks de acciones para la IA de voz
+  // 🧠 Inicializar contexto de pantalla para IA
+  updateScreenContextForAI()
+  
+  // 🎯 Registrar callbacks de acciones para la IA de voz (mejorados con validación)
   uiContext.registerAction('sendEmail', async () => {
-    if (!selectedInvoice.value) throw new Error('No hay factura seleccionada')
+    if (!selectedInvoice.value) {
+      return { success: false, message: 'No hay factura seleccionada. Primero selecciona una factura de la lista.' }
+    }
+    // Verificar si tiene email
+    const hasEmail = selectedInvoice.value.customer_email || selectedInvoice.value.email
+    if (!hasEmail) {
+      return { 
+        success: false, 
+        message: `El cliente "${selectedInvoice.value.customer_name || 'Cliente General'}" no tiene email registrado. Dile al usuario que ingrese el email manualmente usando el botón de enviar, o que primero actualice los datos del cliente en el módulo de Clientes.`
+      }
+    }
     await sendByEmail(selectedInvoice.value)
+    return { success: true, message: 'Email enviado correctamente' }
   })
   
   uiContext.registerAction('sendWhatsApp', async () => {
-    if (!selectedInvoice.value) throw new Error('No hay factura seleccionada')
+    if (!selectedInvoice.value) {
+      return { success: false, message: 'No hay factura seleccionada. Primero selecciona una factura de la lista.' }
+    }
+    // Verificar si tiene teléfono
+    const hasPhone = selectedInvoice.value.customer_phone || selectedInvoice.value.phone
+    if (!hasPhone) {
+      return { 
+        success: false, 
+        message: `El cliente "${selectedInvoice.value.customer_name || 'Cliente General'}" no tiene teléfono registrado. Dile al usuario que ingrese el número manualmente usando el botón de WhatsApp, o que primero actualice los datos del cliente en el módulo de Clientes.`
+      }
+    }
     await handleSendWhatsApp()
+    return { success: true, message: 'WhatsApp enviado correctamente' }
   })
   
   uiContext.registerAction('downloadPDF', async () => {
-    if (!selectedInvoice.value) throw new Error('No hay factura seleccionada')
+    if (!selectedInvoice.value) {
+      return { success: false, message: 'No hay factura seleccionada. Primero selecciona una factura de la lista.' }
+    }
     await downloadPDF(selectedInvoice.value)
+    return { success: true, message: 'PDF descargado correctamente' }
   })
   
   uiContext.registerAction('printInvoice', async () => {
-    if (!selectedInvoice.value) throw new Error('No hay factura seleccionada')
+    if (!selectedInvoice.value) {
+      return { success: false, message: 'No hay factura seleccionada. Primero selecciona una factura de la lista.' }
+    }
     await viewAndPrintInvoice(selectedInvoice.value)
+    return { success: true, message: 'Documento listo para imprimir' }
   })
   
   // NO seleccionar automáticamente - dejar en blanco para que el usuario elija
+})
+
+// 🧠 Watcher para actualizar contexto cuando cambien las facturas
+watch(() => props.invoices.length, () => {
+  updateScreenContextForAI()
+})
+
+// 🧠 Watcher para actualizar contexto cuando cambie la factura seleccionada
+watch(selectedInvoice, () => {
+  updateScreenContextForAI()
 })
 
 onBeforeUnmount(() => {

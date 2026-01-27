@@ -270,11 +270,9 @@ const confirmModal = ref({
 });
 
 const fetchTransfers = async () => {
-  console.log('🔄 fetchTransfers iniciado...');
   loading.value = true;
   try {
     const response = await stockTransferService.getAll(filters.value);
-    console.log('📦 Respuesta del backend:', response);
     
     // Laravel devuelve paginación: { data: [...], current_page: 1, total: X }
     // Axios devuelve: { data: { data: [...], ... } }
@@ -287,15 +285,10 @@ const fetchTransfers = async () => {
       // Si es un objeto paginado de Laravel
       transfers.value = data.data;
     } else {
-      console.warn('⚠️ Formato de respuesta inesperado:', data);
       transfers.value = [];
     }
-    
-    console.log('✅ Traslados cargados:', transfers.value.length, 'traslados');
-    console.log('📋 Traslados:', transfers.value);
   } catch (error) {
-    console.error('❌ Error al cargar traslados:', error);
-    console.error('❌ Error details:', error.response?.data);
+    console.error('Error al cargar traslados:', error);
     transfers.value = [];
     alert('Error al cargar los traslados');
   } finally {
@@ -306,22 +299,19 @@ const fetchTransfers = async () => {
 const fetchWarehouses = async () => {
   try {
     const data = await warehouseService.getAll();
-    console.log('📦 Respuesta warehouses en traslados:', data);
     
     // El API devuelve { warehouses: [...], plan_info: {...} }
     if (data && data.warehouses && Array.isArray(data.warehouses)) {
       warehouses.value = data.warehouses;
-      console.log('✅ Sedes cargadas para traslados:', warehouses.value.length);
     } else if (data && data.data && Array.isArray(data.data)) {
       warehouses.value = data.data;
     } else if (Array.isArray(data)) {
       warehouses.value = data;
     } else {
       warehouses.value = [];
-      console.warn('⚠️ Formato inesperado de respuesta warehouses');
     }
   } catch (error) {
-    console.error('❌ Error al cargar sedes:', error);
+    console.error('Error al cargar sedes:', error);
     warehouses.value = [];
   }
 };
@@ -411,7 +401,6 @@ const clearFilters = () => {
 };
 
 const handleSaved = () => {
-  console.log('✅ handleSaved ejecutado - cerrando modal y recargando transferencias...');
   closeModal();
   // Pequeño delay para asegurar que la BD se actualice
   setTimeout(() => {

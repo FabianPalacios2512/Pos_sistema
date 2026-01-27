@@ -16,9 +16,6 @@ class StockTransferController extends Controller
      */
     public function index(Request $request)
     {
-        \Log::info('=== INDEX TRANSFERS ===');
-        \Log::info('Request params:', $request->all());
-
         $query = StockTransfer::with([
             'sourceWarehouse',
             'destinationWarehouse',
@@ -27,30 +24,19 @@ class StockTransferController extends Controller
         ]);
 
         // Filtros
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
-            \Log::info('Filtering by status:', $request->status);
         }
 
-        if ($request->has('source_warehouse_id')) {
+        if ($request->filled('source_warehouse_id')) {
             $query->where('source_warehouse_id', $request->source_warehouse_id);
-            \Log::info('Filtering by source:', $request->source_warehouse_id);
         }
 
-        if ($request->has('destination_warehouse_id')) {
+        if ($request->filled('destination_warehouse_id')) {
             $query->where('destination_warehouse_id', $request->destination_warehouse_id);
-            \Log::info('Filtering by destination:', $request->destination_warehouse_id);
         }
-
-        \Log::info('Query SQL:', ['sql' => $query->toSql()]);
 
         $transfers = $query->orderBy('created_at', 'desc')->paginate(20);
-
-        \Log::info('Query results:', [
-            'total' => $transfers->total(),
-            'count' => $transfers->count(),
-            'per_page' => $transfers->perPage()
-        ]);
 
         return response()->json($transfers);
     }

@@ -745,6 +745,15 @@ class ProductController extends Controller
                 'cost_price' => $costPrice,
             ];
 
+            // ✅ Actualizar current_stock si viene en el request (edición directa por IA o manual)
+            if ($request->has('current_stock')) {
+                $updateData['current_stock'] = (int) $request->input('current_stock');
+                \Log::info('📦 [ProductController@update] Actualizando stock directo:', [
+                    'product_id' => $product->id,
+                    'current_stock' => $updateData['current_stock']
+                ]);
+            }
+
             // ✅ Actualizar store_category si viene en el request (permite cambiar entre moda/general)
             if ($request->has('store_category')) {
                 $updateData['store_category'] = $request->input('store_category');

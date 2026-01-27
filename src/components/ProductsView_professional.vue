@@ -2317,6 +2317,7 @@ import { categoriesService } from '../services/categoriesService.js'
 import { warehouseService } from '../services/warehouseService.js'
 import { apiCall } from '../services/api.js' // 🏭 Para cargar proveedores
 import { appStore } from '../store/appStore.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 import { useAutoRefresh } from '../composables/useRouteState.js'
 import { useScreenScaling } from '../composables/useScreenScaling.js'
 import TablePaginator from './TablePaginator.vue'
@@ -2324,6 +2325,9 @@ import ContextualTour from './ContextualTour.vue'
 import ExcelImportModal from './ExcelImportModal.vue'
 import FashionProductForm from './FashionProductForm.vue'
 import FashionProductCard from './FashionProductCard.vue'
+
+// 🤖 Store de contexto para IA
+const uiContext = useUIContextStore()
 
 // Excel Import Modal state
 const showExcelImportModal = ref(false)
@@ -3197,6 +3201,544 @@ const uniqueCategories = computed(() => {
   const categoryIds = displayProducts.value.map(p => p.category_id).filter(Boolean)
   return new Set(categoryIds).size
 })
+
+// ═══════════════════════════════════════════════════════════════
+// 🤖 CONTEXTO PARA IA - Información visible en pantalla
+// ═══════════════════════════════════════════════════════════════
+const updateScreenContextForAI = () => {
+  // Obtener productos con stock bajo para alertas
+  const productosStockBajo = displayProducts.value
+    .filter(p => (p.current_stock || 0) <= (p.min_stock || 0))
+    .slice(0, 10)
+    .map(p => ({
+      nombre: p.name,
+      stockActual: p.current_stock || 0,
+      stockMinimo: p.min_stock || 0,
+      categoria: p.category_name || 'Sin categoría'
+    }))
+
+  // 🧠 IMPORTANTE: Obtener productos VISIBLES en pantalla (filtrados)
+  // Si hay pocos productos filtrados, incluirlos para que la IA sepa cuáles ve el usuario
+  const productosVisibles = filteredProducts.value.length <= 10 
+    ? filteredProducts.value.map(p => ({
+        id: p.id,
+        nombre: p.name,
+        sku: p.sku || '',
+        precio: p.sale_price,
+        costo: p.cost_price,
+        stock: p.current_stock || 0,
+        categoria: p.category_name || 'Sin categoría',
+        activo: getProductStatus(p) !== false
+      }))
+    : null // Si hay muchos, no los incluimos para no sobrecargar
+
+  // 🧠 Si hay exactamente 1 producto filtrado, automáticamente es el "producto en contexto"
+  const productoEnContexto = filteredProducts.value.length === 1 
+    ? filteredProducts.value[0] 
+    : selectedProduct.value
+
+  // Datos del contexto
+  const contextData = {
+    resumenProductos: {
+      total: displayProducts.value.length,
+      activos: activeProducts.value,
+      inactivos: displayProducts.value.length - activeProducts.value,
+      stockBajo: lowStockProducts.value,
+      valorInventario: totalValue.value,
+      categorias: uniqueCategories.value
+    },
+    tipoTienda: isFashionStore.value ? 'moda' : 'general',
+    filtrosActivos: {
+      busqueda: searchTerm.value || null,
+      categoria: categoryFilter.value || null,
+      estado: statusFilter.value || null,
+      ordenarPor: sortBy.value
+    },
+    vistaActual: viewMode.value, // 'table' o 'grid'
+    productosVisibles: productosVisibles, // 🧠 Lista de productos en pantalla (si son pocos)
+    cantidadFiltrada: filteredProducts.value.length, // 🧠 Cuántos productos ve el usuario
+    alertasStockBajo: productosStockBajo,
+    // 🧠 Usar productoEnContexto (automático si hay 1 filtrado, o el seleccionado)
+    productoSeleccionado: productoEnContexto ? {
+      id: productoEnContexto.id,
+      nombre: productoEnContexto.name,
+      sku: productoEnContexto.sku,
+      precio: productoEnContexto.sale_price,
+      costo: productoEnContexto.cost_price,
+      stock: productoEnContexto.current_stock,
+      categoria: productoEnContexto.category_name,
+      activo: getProductStatus(productoEnContexto)
+    } : null,
+    modalAbierto: showProductModal.value ? (isEditing.value ? 'editar' : 'crear') : null,
+    sedesDisponibles: availableWarehouses.value.map(w => ({ id: w.id, nombre: w.name })),
+    
+    // 📝 Categorías disponibles para crear productos
+    categoriasDisponibles: categories.value.map(c => ({ id: c.id, nombre: c.name })),
+    
+    // 📝 Estado del formulario cuando está abierto
+    formularioProducto: showProductModal.value ? {
+      nombre: productForm.value.name || '(vacío)',
+      precio: productForm.value.price || '(vacío)',
+      costo: productForm.value.cost || '(vacío)',
+      stock: productForm.value.stock || 0,
+      stockMinimo: productForm.value.min_stock || 5,
+      sku: productForm.value.sku || '(vacío)',
+      descripcion: productForm.value.description || '(vacío)',
+      categoriaSeleccionada: categories.value.find(c => c.id === productForm.value.category_id)?.name || '(sin categoría)',
+      modoEdicion: isEditing.value,
+      camposCompletos: !!(productForm.value.name && productForm.value.category_id && productForm.value.cost > 0 && productForm.value.price > 0),
+      camposFaltantes: [
+        !productForm.value.name?.trim() ? 'nombre' : null,
+        !productForm.value.category_id ? 'categoría' : null,
+        !productForm.value.cost || productForm.value.cost <= 0 ? 'precio de costo' : null,
+        !productForm.value.price || productForm.value.price <= 0 ? 'precio de venta' : null
+      ].filter(Boolean)
+    } : null,
+    
+    instrucciones: {
+      buscar: 'Puedo buscar productos por nombre, SKU o código de barras. Solo dime qué buscar.',
+      crear: isFashionStore.value 
+        ? 'Puedo ayudarte a crear un producto de moda con tallas y colores. Dime el nombre del producto.' 
+        : 'Puedo ayudarte a crear un producto. Dime el nombre y te guío paso a paso.',
+      camposObligatorios: 'Para crear un producto necesito: nombre, categoría, precio de costo y precio de venta. El stock es opcional (por defecto 0).',
+      flujoCreacion: 'Flujo: 1) Abro el modal, 2) Me dices los datos uno por uno, 3) Yo los voy llenando visualmente, 4) Cuando estén listos, guardo el producto.',
+      editar: productoEnContexto 
+        ? `Puedo editar "${productoEnContexto.name}" directamente. Dime qué campo cambiar (stock, precio, costo).` 
+        : 'Busca un producto o dime cuál quieres editar.',
+      filtrar: 'Puedo filtrar por productos inactivos, stock bajo, o por categoría.'
+    }
+  }
+
+  // 🧠 Función para normalizar términos de búsqueda (un litro → 1L, medio → 500, etc.)
+  const normalizarBusqueda = (texto) => {
+    let normalizado = texto.toLowerCase()
+    
+    // Normalizar unidades de medida
+    const reemplazos = [
+      // Litros
+      { patron: /\bun litro\b/gi, reemplazo: '1L' },
+      { patron: /\bun lt\b/gi, reemplazo: '1L' },
+      { patron: /\b1 litro\b/gi, reemplazo: '1L' },
+      { patron: /\bdos litros?\b/gi, reemplazo: '2L' },
+      { patron: /\b2 litros?\b/gi, reemplazo: '2L' },
+      { patron: /\bmedio litro\b/gi, reemplazo: '500ml' },
+      { patron: /\bcuarto de litro\b/gi, reemplazo: '250ml' },
+      // Mililitros
+      { patron: /\b(\d+)\s*mililitros?\b/gi, reemplazo: '$1ml' },
+      { patron: /\b(\d+)\s*ml\b/gi, reemplazo: '$1ml' },
+      // Gramos/Kilos
+      { patron: /\bun kilo\b/gi, reemplazo: '1kg' },
+      { patron: /\b1 kilo\b/gi, reemplazo: '1kg' },
+      { patron: /\b(\d+)\s*kilos?\b/gi, reemplazo: '$1kg' },
+      { patron: /\b(\d+)\s*gramos?\b/gi, reemplazo: '$1g' },
+      { patron: /\bmedio kilo\b/gi, reemplazo: '500g' },
+      // Unidades
+      { patron: /\buna unidad\b/gi, reemplazo: '1' },
+      { patron: /\b(\d+)\s*unidades?\b/gi, reemplazo: '$1' },
+    ]
+    
+    reemplazos.forEach(({ patron, reemplazo }) => {
+      normalizado = normalizado.replace(patron, reemplazo)
+    })
+    
+    return normalizado
+  }
+
+  // 🧠 Función para buscar con coincidencia flexible
+  const buscarProductoFlexible = (texto) => {
+    const textoNormalizado = normalizarBusqueda(texto)
+    const palabras = textoNormalizado.split(/\s+/).filter(p => p.length > 1)
+    
+    // Buscar productos que coincidan con TODAS las palabras importantes
+    const resultados = displayProducts.value.filter(producto => {
+      const nombreProducto = producto.name.toLowerCase()
+      const skuProducto = (producto.sku || '').toLowerCase()
+      const textoCompleto = `${nombreProducto} ${skuProducto}`
+      
+      // Verificar si todas las palabras están en el nombre/sku
+      return palabras.every(palabra => textoCompleto.includes(palabra))
+    })
+    
+    // Si no hay resultados exactos, buscar coincidencia parcial
+    if (resultados.length === 0) {
+      return displayProducts.value.filter(producto => {
+        const nombreProducto = producto.name.toLowerCase()
+        // Al menos el 60% de las palabras deben coincidir
+        const coincidencias = palabras.filter(p => nombreProducto.includes(p))
+        return coincidencias.length >= Math.ceil(palabras.length * 0.6)
+      })
+    }
+    
+    return resultados
+  }
+
+  // Registrar acciones disponibles
+  uiContext.registerAction('buscarProducto', async (params) => {
+    if (params?.texto) {
+      // Usar búsqueda normalizada
+      const textoNormalizado = normalizarBusqueda(params.texto)
+      searchTerm.value = textoNormalizado
+      
+      // Esperar un momento para que se actualice el filtro
+      await nextTick()
+      
+      const resultados = filteredProducts.value.length
+      
+      // Si no hay resultados con la búsqueda normalizada, intentar búsqueda flexible
+      if (resultados === 0) {
+        const resultadosFlexibles = buscarProductoFlexible(params.texto)
+        if (resultadosFlexibles.length > 0) {
+          // Buscar por el nombre del primer resultado
+          searchTerm.value = resultadosFlexibles[0].name.split(' ')[0]
+          await nextTick()
+          return { 
+            success: true, 
+            message: `Encontré "${resultadosFlexibles[0].name}" que podría ser lo que buscas`,
+            resultados: filteredProducts.value.length,
+            productoEncontrado: resultadosFlexibles[0].name
+          }
+        }
+      }
+      
+      return { success: true, message: `Buscando "${textoNormalizado}"...`, resultados }
+    }
+    return { success: false, message: 'Dime qué producto buscar' }
+  })
+
+  uiContext.registerAction('limpiarBusqueda', async () => {
+    searchTerm.value = ''
+    categoryFilter.value = ''
+    statusFilter.value = ''
+    return { success: true, message: 'Filtros limpiados' }
+  })
+
+  uiContext.registerAction('filtrarPorEstado', async (params) => {
+    if (params?.estado === 'inactivos') {
+      statusFilter.value = 'inactive'
+      return { success: true, message: 'Mostrando productos inactivos', cantidad: displayProducts.value.filter(p => !getProductStatus(p)).length }
+    } else if (params?.estado === 'activos') {
+      statusFilter.value = 'active'
+      return { success: true, message: 'Mostrando productos activos', cantidad: activeProducts.value }
+    } else if (params?.estado === 'stock_bajo') {
+      statusFilter.value = 'low-stock'
+      return { success: true, message: 'Mostrando productos con stock bajo', cantidad: lowStockProducts.value }
+    }
+    return { success: false, message: 'Estado no reconocido. Usa: activos, inactivos, stock_bajo' }
+  })
+
+  uiContext.registerAction('abrirCrearProducto', async () => {
+    await openCreateModal()
+    return { 
+      success: true, 
+      message: isFashionStore.value 
+        ? 'Modal de nuevo producto de moda abierto. ¿Cómo se llama el producto?' 
+        : 'Modal de nuevo producto abierto. ¿Cómo se llama el producto?'
+    }
+  })
+
+  uiContext.registerAction('seleccionarProducto', async (params) => {
+    if (params?.id) {
+      const producto = displayProducts.value.find(p => p.id === params.id)
+      if (producto) {
+        selectedProduct.value = producto
+        showViewModal.value = true
+        return { success: true, message: `Mostrando detalles de ${producto.name}` }
+      }
+    } else if (params?.nombre) {
+      // Usar búsqueda flexible para encontrar el producto
+      const resultados = buscarProductoFlexible(params.nombre)
+      if (resultados.length > 0) {
+        selectedProduct.value = resultados[0]
+        showViewModal.value = true
+        return { success: true, message: `Mostrando detalles de ${resultados[0].name}` }
+      }
+      return { success: false, message: `No encontré un producto con "${params.nombre}"` }
+    }
+    return { success: false, message: 'Dime el nombre o ID del producto' }
+  })
+
+  uiContext.registerAction('editarProductoSeleccionado', async () => {
+    if (selectedProduct.value) {
+      await editProduct(selectedProduct.value)
+      return { success: true, message: `Abriendo editor para ${selectedProduct.value.name}` }
+    }
+    return { success: false, message: 'Primero selecciona un producto' }
+  })
+
+  // 🔧 NUEVA ACCIÓN: Editar campo específico y guardar automáticamente
+  uiContext.registerAction('editarCampoProducto', async (params) => {
+    const { nombreProducto, campo, nuevoValor } = params || {}
+    
+    if (!campo || nuevoValor === undefined) {
+      return { success: false, message: 'Necesito saber qué campo cambiar y el nuevo valor' }
+    }
+    
+    // 🧠 INTELIGENCIA: Si no se especifica producto, usar el que está en contexto (filtrado único)
+    let producto = null
+    
+    if (nombreProducto) {
+      // Buscar el producto por nombre
+      const resultados = buscarProductoFlexible(nombreProducto)
+      if (resultados.length === 0) {
+        return { success: false, message: `No encontré el producto "${nombreProducto}"` }
+      }
+      producto = resultados[0]
+    } else {
+      // Si hay exactamente 1 producto filtrado, usar ese automáticamente
+      if (filteredProducts.value.length === 1) {
+        producto = filteredProducts.value[0]
+      } else if (selectedProduct.value) {
+        producto = selectedProduct.value
+      } else {
+        return { success: false, message: 'Hay varios productos. Dime cuál quieres editar por nombre.' }
+      }
+    }
+    
+    try {
+      // Mapear campos a los nombres del API
+      const campoMap = {
+        'stock': 'current_stock',
+        'precio': 'sale_price',
+        'costo': 'cost_price',
+        'nombre': 'name',
+        'descripcion': 'description',
+        'sku': 'sku'
+      }
+      
+      const campoAPI = campoMap[campo] || campo
+      
+      // 🔧 IMPORTANTE: Obtener datos completos del producto primero
+      const productoCompleto = await productsService.getById(producto.id)
+      
+      if (!productoCompleto.success || !productoCompleto.data) {
+        return { success: false, message: 'Error obteniendo datos del producto' }
+      }
+      
+      const datosOriginales = productoCompleto.data
+      
+      // Preparar datos COMPLETOS para actualizar (solo cambiando el campo necesario)
+      const datosActualizacion = {
+        name: datosOriginales.name,
+        description: datosOriginales.description || '',
+        sku: datosOriginales.sku || '',
+        category_id: datosOriginales.category_id,
+        supplier_id: datosOriginales.supplier_id,
+        cost_price: datosOriginales.cost_price,
+        sale_price: datosOriginales.sale_price,
+        current_stock: datosOriginales.current_stock,
+        min_stock: datosOriginales.min_stock,
+        max_stock: datosOriginales.max_stock,
+        is_active: datosOriginales.is_active ?? datosOriginales.active ?? true,
+        // Sobrescribir solo el campo que queremos cambiar
+        [campoAPI]: campo === 'stock' ? parseInt(nuevoValor) : 
+                    (campo === 'precio' || campo === 'costo') ? parseFloat(nuevoValor) : 
+                    nuevoValor
+      }
+      
+      // Llamar al API para actualizar
+      const response = await productsService.update(producto.id, datosActualizacion)
+      
+      if (response.success) {
+        // Refrescar la lista de productos
+        await loadProducts()
+        
+        // ⚠️ NO limpiar searchTerm - mantener el producto filtrado para ediciones consecutivas
+        // searchTerm.value = ''  // REMOVIDO: Esto causaba que el contexto se perdiera
+        
+        // Cerrar cualquier modal abierto
+        showProductModal.value = false
+        showViewModal.value = false
+        
+        const campoLabels = {
+          stock: 'stock',
+          precio: 'precio de venta',
+          costo: 'precio de costo',
+          nombre: 'nombre',
+          descripcion: 'descripción',
+          sku: 'SKU'
+        }
+        
+        return { 
+          success: true, 
+          message: `✅ Listo! Actualicé el ${campoLabels[campo] || campo} de "${producto.name}" a ${nuevoValor}. Puedes verificarlo en la lista.`
+        }
+      } else {
+        return { success: false, message: `Error al actualizar: ${response.message || 'Error desconocido'}` }
+      }
+    } catch (error) {
+      console.error('Error editando producto:', error)
+      return { success: false, message: `Error: ${error.message}` }
+    }
+  })
+
+  // Actualizar el store de contexto
+  uiContext.setScreenData(contextData)
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🧠 ACCIONES PARA CREAR PRODUCTOS - CONCIENCIA DE PANTALLA
+  // ═══════════════════════════════════════════════════════════════
+  
+  // Acción para llenar campos del formulario visualmente
+  uiContext.registerAction('llenarCampoProducto', ({ campo, valor }) => {
+    if (!showProductModal.value) {
+      return { success: false, message: 'Primero abre el modal con abrirCrearProducto' }
+    }
+    
+    const camposValidos = {
+      'nombre': 'name',
+      'name': 'name',
+      'precio': 'price',
+      'price': 'price',
+      'precio_venta': 'price',
+      'costo': 'cost',
+      'cost': 'cost',
+      'precio_costo': 'cost',
+      'descripcion': 'description',
+      'description': 'description',
+      'sku': 'sku',
+      'codigo': 'sku',
+      'barcode': 'barcode',
+      'codigo_barras': 'barcode',
+      'stock': 'stock',
+      'stock_inicial': 'stock',
+      'stock_minimo': 'min_stock',
+      'min_stock': 'min_stock',
+      'stock_maximo': 'max_stock',
+      'max_stock': 'max_stock',
+      'categoria': 'category_id',
+      'category': 'category_id',
+      'category_id': 'category_id'
+    }
+    
+    const campoReal = camposValidos[campo.toLowerCase().trim()]
+    
+    if (!campoReal) {
+      return { success: false, message: `Campo "${campo}" no reconocido. Campos válidos: nombre, precio, costo, descripcion, sku, codigo_barras, stock, stock_minimo, categoria` }
+    }
+    
+    // Si es categoría, buscar por nombre
+    if (campoReal === 'category_id') {
+      const categoria = categories.value.find(c => 
+        c.name.toLowerCase().includes(valor.toLowerCase())
+      )
+      if (categoria) {
+        productForm.value.category_id = categoria.id
+        return { 
+          success: true, 
+          message: `Categoría "${categoria.name}" seleccionada`,
+          formularioActual: {
+            nombre: productForm.value.name,
+            precio: productForm.value.price,
+            costo: productForm.value.cost,
+            categoria: categoria.name
+          }
+        }
+      } else {
+        // Listar categorías disponibles
+        const cats = categories.value.map(c => c.name).join(', ')
+        return { 
+          success: false, 
+          message: `No encontré categoría "${valor}". Categorías disponibles: ${cats}. ¿Quieres que cree una nueva categoría con ese nombre?`
+        }
+      }
+    }
+    
+    // Convertir valores numéricos
+    if (['price', 'cost', 'stock', 'min_stock', 'max_stock'].includes(campoReal)) {
+      productForm.value[campoReal] = parseFloat(valor) || 0
+    } else {
+      productForm.value[campoReal] = valor
+    }
+    
+    return { 
+      success: true, 
+      message: `Campo "${campo}" actualizado a "${valor}"`,
+      formularioActual: {
+        nombre: productForm.value.name || '(vacío)',
+        precio: productForm.value.price || '(vacío)',
+        costo: productForm.value.cost || '(vacío)',
+        stock: productForm.value.stock || 0,
+        categoria: categories.value.find(c => c.id === productForm.value.category_id)?.name || '(sin categoría)'
+      }
+    }
+  })
+  
+  // Acción para guardar el producto
+  uiContext.registerAction('guardarProducto', async () => {
+    if (!showProductModal.value) {
+      return { success: false, message: 'No hay formulario de producto abierto' }
+    }
+    
+    // Verificar campos obligatorios
+    const faltantes = []
+    if (!productForm.value.name?.trim()) faltantes.push('nombre')
+    if (!productForm.value.category_id) faltantes.push('categoría')
+    if (!productForm.value.cost || productForm.value.cost <= 0) faltantes.push('precio de costo')
+    if (!productForm.value.price || productForm.value.price <= 0) faltantes.push('precio de venta')
+    
+    if (faltantes.length > 0) {
+      return { 
+        success: false, 
+        message: `Faltan campos obligatorios: ${faltantes.join(', ')}. Por favor proporciona estos datos.` 
+      }
+    }
+    
+    try {
+      await saveProduct(true) // skip validation modal
+      return { 
+        success: true, 
+        message: `Producto "${productForm.value.name}" creado exitosamente.` 
+      }
+    } catch (error) {
+      return { success: false, message: `Error al guardar: ${error.message}` }
+    }
+  })
+  
+  // Acción para cerrar el modal
+  uiContext.registerAction('cerrarModalProducto', () => {
+    showProductModal.value = false
+    return { success: true, message: 'Modal cerrado' }
+  })
+  
+  // Acción para crear categoría rápida
+  uiContext.registerAction('crearCategoriaRapida', async ({ nombre }) => {
+    if (!nombre?.trim()) {
+      return { success: false, message: 'Debes proporcionar un nombre para la categoría' }
+    }
+    
+    try {
+      const response = await categoriesService.create({
+        name: nombre.trim(),
+        description: `Categoría creada por voz: ${nombre.trim()}`,
+        is_active: true
+      })
+      
+      if (response.success || response.data) {
+        // Recargar categorías
+        await loadCategories()
+        
+        // Si el modal está abierto, seleccionar la nueva categoría
+        const nuevaCat = categories.value.find(c => c.name.toLowerCase() === nombre.toLowerCase().trim())
+        if (nuevaCat && showProductModal.value) {
+          productForm.value.category_id = nuevaCat.id
+        }
+        
+        return { 
+          success: true, 
+          message: `Categoría "${nombre}" creada exitosamente${showProductModal.value ? ' y seleccionada en el formulario' : ''}` 
+        }
+      }
+      return { success: false, message: 'Error al crear la categoría' }
+    } catch (error) {
+      return { success: false, message: `Error: ${error.message}` }
+    }
+  })
+}
+
+// Watcher para actualizar contexto cuando cambian los productos o filtros
+watch([displayProducts, searchTerm, categoryFilter, statusFilter, selectedProduct, showProductModal, productForm], () => {
+  updateScreenContextForAI()
+}, { deep: true })
 
 // Métodos de utilidad
 const formatCurrency = (value) => {
@@ -5217,6 +5759,9 @@ onMounted(async () => {
       await loadProducts()
     }
   }
+  
+  // 🤖 Inicializar contexto para IA después de cargar datos
+  updateScreenContextForAI()
 })
 
 // Limpiar listener al desmontar componente

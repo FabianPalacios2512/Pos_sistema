@@ -744,6 +744,7 @@ import { useToast } from '../composables/useToast.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { productsService } from '../services/productsService.js'
 import { appStore } from '../store/appStore.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 import TablePaginator from './TablePaginator.vue'
 
 // Props y Emits
@@ -957,21 +958,16 @@ const categoriesWithProducts = computed(() =>
 
 // Métodos
 const loadCategories = async () => {
-  console.log('🔄 Iniciando carga de categorías...')
   loading.value = true
   try {
-    console.log('📡 Llamando a categoriesService.getAll()...')
     const response = await categoriesService.getAll()
-    console.log('✅ Respuesta recibida:', response)
     categories.value = response.data || []
-    console.log(`✅ Categorías cargadas: ${categories.value.length}`, categories.value)
   } catch (error) {
-    console.error('❌ Error cargando categorías:', error)
+    console.error('Error cargando categorías:', error)
     showToast('Error al cargar categorías', 'error')
     categories.value = []
   } finally {
     loading.value = false
-    console.log('✅ Carga de categorías finalizada. Loading:', loading.value)
   }
 }
 
@@ -1000,8 +996,6 @@ const viewCategoryProducts = async (category) => {
         stock: parseInt(product.current_stock || product.stock || 0),
         active: product.active !== false
       }))
-    
-    console.log(`Productos encontrados para ${category.name}:`, categoryProducts.value.length)
   } catch (error) {
     console.error('Error cargando productos:', error)
     showToast('Error al cargar productos', 'error')
@@ -1193,7 +1187,6 @@ const goToProductEdit = (product) => {
   
   showProductsModal.value = false
   emit('navigate', 'products')
-  console.log(`Navegando a gestión de productos para editar: ${product.name}`)
 }
 
 // Utilidades
@@ -1247,9 +1240,145 @@ watch([searchTerm, statusFilter], () => {
   currentPage.value = 1
 })
 
+// 🧠 CONCIENCIA DE PANTALLA PARA IA
+const updateScreenContextForAI = () => {
+  const uiContext = useUIContextStore()
+  
+  // Formatear moneda para la IA
+  const formatCurrencyForAI = (value) => {
+    return new Intl.NumberFormat('es-CO').format(value)
+  }
+  
+  // Lista de categorías visible (máximo 10 para no sobrecargar)
+  const categoriasVisibles = filteredCategories.value.slice(0, 10).map(cat => ({
+    id: cat.id,
+    nombre: cat.name,
+    productos: cat.products_count || 0,
+    ingresos: formatCurrencyForAI(cat.revenue || 0),
+    estado: cat.active ? 'activa' : 'inactiva',
+    fecha: formatDate(cat.created_at)
+  }))
+  
+  // Datos del contexto
+  const contextData = {
+    resumenCategorias: {
+      total: totalCategories.value,
+      productosTotal: totalProducts.value,
+      masPopular: mostPopularCategory.value?.name || 'N/A',
+      conProductos: categoriesWithProducts.value
+    },
+    filtrosActivos: {
+      busqueda: searchTerm.value || null,
+      estado: statusFilter.value || 'all'
+    },
+    vistaActual: viewMode.value, // 'table' o 'grid'
+    categoriasVisibles: categoriasVisibles,
+    cantidadFiltrada: filteredCategories.value.length,
+    categoriaSeleccionada: selectedCategory.value ? {
+      id: selectedCategory.value.id,
+      nombre: selectedCategory.value.name,
+      productos: selectedCategory.value.products_count,
+      activa: selectedCategory.value.active
+    } : null,
+    modalAbierto: showAddCategoryModal.value ? 'crear' : (showEditCategoryModal.value ? 'editar' : null),
+    instrucciones: {
+      buscar: 'Puedo buscar categorías por nombre. Solo dime qué buscar.',
+      crear: 'Puedo ayudarte a crear una categoría. Dime el nombre de la nueva categoría.',
+      editar: selectedCategory.value 
+        ? `Puedo editar "${selectedCategory.value.name}". Dime qué cambiar.` 
+        : 'Selecciona una categoría o dime cuál quieres editar.',
+      ver: 'Puedo mostrarte los productos de cualquier categoría.'
+    }
+  }
+  
+  // Registrar acciones disponibles
+  uiContext.registerAction('buscarCategoria', (params) => {
+    const texto = params?.texto || ''
+    searchTerm.value = texto
+    return { 
+      success: true, 
+      message: `Buscando "${texto}"...`,
+      resultados: filteredCategories.value.length
+    }
+  })
+  
+  uiContext.registerAction('limpiarBusquedaCategorias', () => {
+    searchTerm.value = ''
+    statusFilter.value = 'all'
+    return { success: true, message: 'Filtros limpiados' }
+  })
+  
+  uiContext.registerAction('filtrarCategorias', (params) => {
+    const filtro = params?.filtro || 'all'
+    statusFilter.value = filtro
+    return { 
+      success: true, 
+      message: `Filtrando por: ${filtro}`,
+      resultados: filteredCategories.value.length
+    }
+  })
+  
+  uiContext.registerAction('abrirCrearCategoria', () => {
+    showAddCategoryModal.value = true
+    return { success: true, message: 'Modal de crear categoría abierto. Escribe el nombre de la categoría.' }
+  })
+  
+  uiContext.registerAction('verProductosCategoria', async (params) => {
+    const nombreCategoria = params?.nombre
+    if (!nombreCategoria) {
+      return { success: false, message: 'Dime el nombre de la categoría' }
+    }
+    
+    // Buscar categoría por nombre
+    const categoria = categories.value.find(c => 
+      c.name.toLowerCase().includes(nombreCategoria.toLowerCase())
+    )
+    
+    if (!categoria) {
+      return { success: false, message: `No encontré la categoría "${nombreCategoria}"` }
+    }
+    
+    await viewCategoryProducts(categoria)
+    return { 
+      success: true, 
+      message: `Mostrando ${categoria.products_count || 0} productos de "${categoria.name}"` 
+    }
+  })
+  
+  uiContext.registerAction('editarCategoria', async (params) => {
+    const nombreCategoria = params?.nombre
+    if (!nombreCategoria) {
+      return { success: false, message: 'Dime el nombre de la categoría a editar' }
+    }
+    
+    const categoria = categories.value.find(c => 
+      c.name.toLowerCase().includes(nombreCategoria.toLowerCase())
+    )
+    
+    if (!categoria) {
+      return { success: false, message: `No encontré la categoría "${nombreCategoria}"` }
+    }
+    
+    editCategory(categoria)
+    return { success: true, message: `Abriendo editor para "${categoria.name}"` }
+  })
+  
+  // Actualizar el store de contexto
+  uiContext.setScreenData(contextData)
+}
+
+// Watcher para actualizar contexto cuando cambian las categorías o filtros
+watch([categories, searchTerm, statusFilter, selectedCategory, showAddCategoryModal, showEditCategoryModal], () => {
+  updateScreenContextForAI()
+}, { deep: true })
+
 // Lifecycle
 onMounted(() => {
   loadCategories()
+  // Inicializar contexto para IA después de cargar
+  setTimeout(() => {
+    updateScreenContextForAI()
+  }, 500)
 })
 </script>
 

@@ -283,7 +283,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Line, Doughnut } from 'vue-chartjs'
 import {
   Chart,
@@ -300,8 +300,20 @@ import {
 import { useCashSession } from '../services/cashSessionService.js'
 import { reportsService } from '../services/reportsService.js'
 import { cashReportsService } from '../services/cashReportsService.js'
+import { useScreenContext, formatDashboardContext } from '@/composables/useScreenContext'
+import { useUIContextStore } from '@/store/uiContextStore'
+import { useModuleNavigation } from '@/composables/useModuleNavigation'
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler)
+
+// 🧠 Composable para contexto de pantalla (IA Chat de texto)
+const { setContext, updateData } = useScreenContext()
+
+// 🧠 Store para contexto de IA de voz
+const uiContextStore = useUIContextStore()
+
+// 🧠 Navegación de módulos (para escuchar cambios de filtro)
+const { onModuleChange } = useModuleNavigation()
 
 // Props
 const props = defineProps({
@@ -756,6 +768,35 @@ const loadDashboardData = async (period = '24H') => {
       dashboardData.value.recent_sales = recentTransactions.data
     }
     
+    // 🌐 ACTUALIZAR DATOS GLOBALES DEL NEGOCIO
+    // Estos datos estarán disponibles para la IA desde CUALQUIER módulo
+    uiContextStore.updateGlobalBusinessSection('ventas', {
+      ventasHoy: dashboardData.value.summary.today_sales.amount,
+      transaccionesHoy: dashboardData.value.summary.today_sales.count,
+      ventasMes: dashboardData.value.summary.month_sales.amount,
+      transaccionesMes: dashboardData.value.summary.month_sales.count,
+      ticketPromedio: averageTicket.value
+    })
+    
+    uiContextStore.updateGlobalBusinessSection('caja', {
+      estado: hasOpenSession.value ? 'abierta' : 'cerrada',
+      montoActual: cashAmount.value
+    })
+    
+    uiContextStore.updateGlobalBusinessSection('alertas', {
+      productosStockBajo: (dashboardData.value.charts.low_stock_products || []).map(p => ({
+        nombre: p.name,
+        stock: p.current_stock || p.stock
+      }))
+    })
+    
+    uiContextStore.updateGlobalBusinessSection('rankings', {
+      topProductosHoy: (dashboardData.value.charts.top_products || []).slice(0, 5).map(p => ({
+        nombre: p.name || p.nombre,
+        ingresos: p.revenue || p.ingresos || 0
+      }))
+    })
+    
   } catch (err) {
     console.error('❌ Error cargando datos del dashboard:', err)
   } finally {
@@ -795,15 +836,167 @@ const handleGoToInventory = () => {
   emit('change-module', 'stock')
 }
 
+// 🧠 Función para actualizar el contexto de pantalla para la IA
+const updateScreenContextForAI = () => {
+  // Analizar tendencia de la gráfica
+  const chartData = weeklyDataComputed.value
+  let chartTrend = 'Sin datos de tendencia'
+  
+  if (chartData.length > 0) {
+    // Encontrar el día con más ventas
+    const maxSalesDay = chartData.reduce((prev, current) => 
+      (prev.sales > current.sales) ? prev : current
+    )
+    
+    if (maxSalesDay.sales > 0) {
+      chartTrend = `Pico de ventas el ${maxSalesDay.label} con $${formatCurrency(maxSalesDay.sales)}`
+    } else {
+      chartTrend = 'Sin ventas registradas en el período seleccionado'
+    }
+  }
+
+  // Formatear datos usando el helper
+  const contextData = formatDashboardContext({
+    hasOpenSession: hasOpenSession.value,
+    cashAmount: cashAmount.value,
+    todaySales: todaySalesData.value.revenue,
+    transactionsCount: todaySalesData.value.sales,
+    averageTicket: averageTicket.value,
+    lowStockCount: lowStockCount.value,
+    topProducts: topProductsComputed.value,
+    chartTrend,
+    recentTransactions: recentSalesComputed.value
+  })
+  
+  // Agregar período actual del gráfico al contexto
+  const periodoLabels = {
+    '24H': 'últimas 24 horas',
+    '7D': 'últimos 7 días',
+    '30D': 'últimos 30 días'
+  }
+  contextData.periodoGrafico = {
+    valor: selectedPeriod.value,
+    descripcion: periodoLabels[selectedPeriod.value] || selectedPeriod.value,
+    opcionesDisponibles: ['24H (hoy)', '7D (semana)', '30D (mes)']
+  }
+
+  // Establecer el contexto para IA de texto
+  setContext({
+    screen: 'Panel de Control',
+    description: 'Dashboard principal con métricas del negocio: estado de caja, ventas del día, alertas de stock, productos más vendidos y tendencias.',
+    data: contextData
+  })
+  
+  // 🧠 Actualizar también el store de UI para IA de voz
+  uiContextStore.setCurrentModule('dashboard')
+  uiContextStore.setScreenData(contextData)
+}
+
 // Watchers (solo uno)
 watch(selectedPeriod, async (newPeriod) => {
   await loadDashboardData(newPeriod)
 })
 
+// 🧠 Watcher para responder a comandos de la IA (queryParams)
+watch(
+  () => props.queryParams,
+  (newParams) => {
+    if (newParams?.filter) {
+      // Mapear filtros de texto a valores del período
+      const filterMap = {
+        '7 días': '7D',
+        '7 dias': '7D',
+        '7d': '7D',
+        'semana': '7D',
+        'semanal': '7D',
+        '30 días': '30D',
+        '30 dias': '30D',
+        '30d': '30D',
+        'mes': '30D',
+        'mensual': '30D',
+        '24 horas': '24H',
+        '24h': '24H',
+        'hoy': '24H',
+        'día': '24H',
+        'dia': '24H'
+      }
+      
+      const normalizedFilter = newParams.filter.toLowerCase().trim()
+      const mappedPeriod = filterMap[normalizedFilter]
+      
+      if (mappedPeriod) {
+        // Forzar el cambio aunque sea el mismo valor (por si el watcher no detectó)
+        if (mappedPeriod === selectedPeriod.value) {
+          // Forzar recarga de datos
+          loadDashboardData(mappedPeriod)
+        } else {
+          selectedPeriod.value = mappedPeriod
+        }
+      }
+    }
+  },
+  { immediate: true, deep: true }
+)
+
+// Watcher para actualizar contexto cuando cambien los datos del dashboard
+watch(
+  () => ({
+    sales: todaySalesData.value,
+    cash: cashAmount.value,
+    stock: lowStockCount.value,
+    products: topProductsComputed.value
+  }),
+  () => {
+    updateScreenContextForAI()
+  },
+  { deep: true }
+)
+
+// Función para aplicar filtro de período
+const applyPeriodFilter = (filter) => {
+  const filterMap = {
+    '7 días': '7D',
+    '7 dias': '7D',
+    '7d': '7D',
+    'semana': '7D',
+    'semanal': '7D',
+    '30 días': '30D',
+    '30 dias': '30D',
+    '30d': '30D',
+    'mes': '30D',
+    'mensual': '30D',
+    '24 horas': '24H',
+    '24h': '24H',
+    'hoy': '24H',
+    'día': '24H',
+    'dia': '24H'
+  }
+  
+  const normalizedFilter = filter.toLowerCase().trim()
+  const mappedPeriod = filterMap[normalizedFilter]
+  
+  if (mappedPeriod) {
+    console.log(`📊 [Dashboard] Aplicando filtro de período: ${filter} → ${mappedPeriod}`)
+    selectedPeriod.value = mappedPeriod
+    // Forzar recarga de datos
+    loadDashboardData(mappedPeriod)
+  }
+}
+
 // Lifecycle
 onMounted(async () => {
   await loadCurrentSession()
   await loadDashboardData(selectedPeriod.value)
+  
+  // 🧠 Establecer contexto inicial para la IA después de cargar datos
+  updateScreenContextForAI()
+  
+  // 🧠 Escuchar cambios de módulo/filtro desde la IA de voz
+  onModuleChange((moduleName, queryParams) => {
+    if (moduleName === 'dashboard' && queryParams?.filter) {
+      applyPeriodFilter(queryParams.filter)
+    }
+  })
 })
 </script>
 

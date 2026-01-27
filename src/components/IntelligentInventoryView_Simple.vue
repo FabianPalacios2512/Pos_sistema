@@ -2427,6 +2427,7 @@ import { API_CONFIG, apiCall } from '../services/api.js'
 import { getInitials } from '../utils/avatarUtils.js'
 import { appStore } from '../store/appStore'
 import { useModuleNavigation } from '../composables/useModuleNavigation'
+import { useUIContextStore } from '../store/uiContextStore.js'
 
 export default {
   name: 'IntelligentInventoryView',
@@ -3764,6 +3765,341 @@ export default {
       // })
     }
 
+    // 🧠 CONCIENCIA DE PANTALLA PARA IA - Inventario Inteligente
+    const updateScreenContextForAI = () => {
+      const uiContext = useUIContextStore()
+      
+      // Obtener nombres de sección legibles
+      const seccionesNombres = {
+        'overview': 'Vista General',
+        'products': 'Productos',
+        'movements': 'Movimientos',
+        'customers': 'Clientes',
+        'suppliers': 'Proveedores',
+        'alerts': 'Alertas',
+        'predictions': 'Predicciones'
+      }
+      
+      // Top productos vendidos
+      const topProductos = (overviewData.value?.data?.topSellingProducts || []).slice(0, 5).map(p => ({
+        nombre: p.name,
+        unidadesVendidas: p.total_quantity_sold,
+        ingresos: formatCurrency(p.total_revenue)
+      }))
+      
+      // Productos con stock bajo
+      const productosStockBajo = (overviewData.value?.data?.lowStockProductsList || []).slice(0, 5).map(p => ({
+        nombre: p.name,
+        stockActual: p.current_stock,
+        stockMinimo: p.min_stock,
+        categoria: p.category?.name || 'Sin categoría'
+      }))
+      
+      // Movimientos recientes
+      const movimientosRecientes = (overviewData.value?.data?.recentMovements || []).slice(0, 5).map(m => ({
+        producto: m.product_name || m.product?.name,
+        tipo: m.quantity > 0 ? 'entrada' : 'salida',
+        cantidad: Math.abs(m.quantity),
+        fuente: m.type
+      }))
+      
+      // Productos de la tabla (si estamos en pestaña productos)
+      const productosTabla = (paginatedProductsList.value || []).slice(0, 10).map(p => ({
+        nombre: p.name,
+        sku: p.sku,
+        categoria: p.category?.name || 'Sin categoría',
+        stock: p.current_stock,
+        precio: formatCurrency(p.sale_price),
+        costo: formatCurrency(p.cost_price),
+        rotacion: p.rotation_class || 'N/A',
+        margen: p.profit_margin ? `${p.profit_margin.toFixed(1)}%` : 'N/A'
+      }))
+      
+      // Datos de movimientos para pestaña movimientos
+      const movimientosDataLocal = movementsData.value || {}
+      const movimientosSummary = movimientosDataLocal.summary || {}
+      
+      // Datos del contexto
+      const contextData = {
+        seccionActiva: seccionesNombres[activeSection.value] || activeSection.value,
+        periodo: selectedPeriod.value === 'day' ? 'Hoy' :
+                 selectedPeriod.value === 'week' ? 'Esta Semana' :
+                 selectedPeriod.value === 'month' ? 'Este Mes' :
+                 selectedPeriod.value === 'year' ? 'Este Año' : 'Personalizado',
+        
+        // KPIs principales (Vista General)
+        kpis: {
+          productosActivos: metrics.activeProducts,
+          productosTotal: metrics.totalProducts,
+          valorInvertido: formatCurrency(metrics.totalInventoryValue),
+          valorPotencial: formatCurrency(metrics.totalSaleValue || 0),
+          gananciaEstimada: formatCurrency((metrics.totalSaleValue || 0) - (metrics.totalInventoryValue || 0)),
+          ventas: formatCurrency(metrics.monthlySales),
+          transacciones: monthlyTransactions.value,
+          stockBajo: metrics.lowStockProducts,
+          sinStock: metrics.outOfStockProducts,
+          ganancias: formatCurrency(metrics.monthlySales),
+          gastos: formatCurrency(metrics.totalExpenses),
+          gananciaNeta: formatCurrency(metrics.netProfit)
+        },
+        
+        // Datos de movimientos (para pestaña Movimientos)
+        resumenMovimientos: {
+          totalMovimientos: movimientosSummary.total_movements || 0,
+          entradas: movimientosSummary.total_entries || 0,
+          salidas: movimientosSummary.total_exits || 0,
+          valorEntradas: formatCurrency(movimientosSummary.total_entry_value || 0),
+          valorSalidas: formatCurrency(movimientosSummary.total_exit_value || 0),
+          balance: formatCurrency((movimientosSummary.total_entry_value || 0) - (movimientosSummary.total_exit_value || 0))
+        },
+        
+        // Listas de datos según la sección
+        topProductos: topProductos,
+        productosStockBajo: productosStockBajo,
+        movimientosRecientes: movimientosRecientes,
+        productosEnTabla: activeSection.value === 'products' ? productosTabla : [],
+        
+        // Filtros activos
+        filtrosActivos: {
+          busqueda: filters.search || null,
+          categoria: filters.category || null,
+          proveedor: filters.supplier || null
+        },
+        
+        // 👥 Datos de Clientes (pestaña Clientes)
+        clientes: activeSection.value === 'customers' && customersData.value ? {
+          totalClientes: customersData.value.summary?.total_customers || 0,
+          ingresos: formatCurrency(customersData.value.summary?.total_revenue || 0),
+          ganancia: formatCurrency(customersData.value.summary?.total_profit || 0),
+          promedioCliente: formatCurrency(customersData.value.summary?.avg_customer_value || 0),
+          descuentoPromedio: `${(customersData.value.summary?.avg_discount || 0).toFixed(1)}%`,
+          topCliente: customersData.value.summary?.top_customer?.name || 'N/A',
+          listaClientes: (customersData.value.customers || []).slice(0, 10).map(c => ({
+            nombre: c.name || c.customer_name || 'Sin nombre',
+            compras: c.total_purchases || 0,
+            gastado: formatCurrency(c.total_spent || 0),
+            productosUnicos: c.unique_products || 0,
+            items: c.total_items || 0,
+            frecuencia: c.avg_items_per_purchase ? `${c.avg_items_per_purchase.toFixed(1)} items/compra` : 'N/A'
+          }))
+        } : null,
+        
+        // 🏭 Datos de Proveedores (pestaña Proveedores)
+        proveedores: activeSection.value === 'suppliers' && suppliersData.value ? {
+          totalProveedores: suppliersData.value.summary?.total_suppliers || 0,
+          activos: suppliersData.value.summary?.active_suppliers || 0,
+          ordenesPendientes: suppliersData.value.summary?.total_pending_orders || 0,
+          deudaTotal: formatCurrency(suppliersData.value.summary?.total_debt || 0),
+          topProveedor: suppliersData.value.summary?.best_supplier?.name || 'N/A',
+          listaProveedores: (suppliersData.value.suppliers || []).slice(0, 10).map(s => ({
+            nombre: s.name,
+            productos: s.products_count || 0,
+            ordenes: s.orders_count || 0,
+            totalComprado: formatCurrency(s.total_purchased || 0),
+            estado: s.active !== false ? 'Activo' : 'Inactivo'
+          }))
+        } : null,
+        
+        // ⚠️ Datos de Alertas (pestaña Alertas)
+        alertas: activeSection.value === 'alerts' && alertsData.value ? {
+          criticas: alertsData.value.summary?.critical || 0,
+          advertencias: alertsData.value.summary?.warning || 0,
+          informativas: alertsData.value.summary?.info || 0,
+          totalAlertas: alertsData.value.summary?.total_alerts || 0,
+          listaAlertas: (alertsData.value.alerts || []).slice(0, 10).map(a => ({
+            tipo: a.type || 'info',
+            mensaje: a.message || a.title || 'Alerta',
+            cantidad: a.count || 1,
+            categoria: a.category || 'general'
+          }))
+        } : null,
+        
+        // 🔮 Datos de Predicciones (pestaña Predicciones) - MUY IMPORTANTE PARA LA IA
+        predicciones: activeSection.value === 'predictions' && predictionsData.value ? {
+          // Tendencias actuales vs anteriores
+          tendencias: {
+            ventas: {
+              actual: formatCurrency(predictionsData.value.trend_analysis?.sales?.current || 0),
+              anterior: formatCurrency(predictionsData.value.trend_analysis?.sales?.previous || 0),
+              variacion: `${predictionsData.value.trend_analysis?.sales?.growth_percentage || 0}%`,
+              tendencia: predictionsData.value.trend_analysis?.sales?.trend || 'stable'
+            },
+            transacciones: {
+              actual: predictionsData.value.trend_analysis?.transactions?.current || 0,
+              anterior: predictionsData.value.trend_analysis?.transactions?.previous || 0,
+              variacion: `${predictionsData.value.trend_analysis?.transactions?.growth_percentage || 0}%`
+            },
+            ticketPromedio: {
+              actual: formatCurrency(predictionsData.value.trend_analysis?.average_ticket?.current || 0),
+              anterior: formatCurrency(predictionsData.value.trend_analysis?.average_ticket?.previous || 0),
+              variacion: `${predictionsData.value.trend_analysis?.average_ticket?.growth_percentage || 0}%`
+            }
+          },
+          // Productos que se van a agotar pronto
+          productosAgotamiento: (predictionsData.value.stock_depletion || []).slice(0, 10).map(p => ({
+            nombre: p.product_name || p.name,
+            stockActual: p.current_stock,
+            consumoDiario: p.daily_consumption?.toFixed(2) || '0',
+            diasAgotamiento: p.days_until_depletion,
+            urgencia: p.days_until_depletion < 7 ? 'CRÍTICO' : p.days_until_depletion < 30 ? 'ATENCIÓN' : 'OK'
+          })),
+          // Pronóstico de ventas por producto (los más vendidos en el futuro)
+          pronosticoVentas: (predictionsData.value.sales_forecast || []).slice(0, 10).map(p => ({
+            nombre: p.product_name || p.name,
+            ventasHistoricas: p.historical_sales || 0,
+            pronosticoIA: p.predicted_sales || 0,
+            tendencia: p.trend || 'Estable',
+            confianza: p.confidence || 'MEDIA'
+          })),
+          // Resumen rápido para preguntas
+          resumenRapido: {
+            productoMasVendidoFuturo: (predictionsData.value.sales_forecast || [])[0]?.product_name || 'N/A',
+            productoMenosVendidoFuturo: (predictionsData.value.sales_forecast || []).slice(-1)[0]?.product_name || 'N/A',
+            productosAgotarsePronto: (predictionsData.value.stock_depletion || []).filter(p => p.days_until_depletion < 7).length,
+            horizontePronostico: predictionsFilters.forecastDays + ' días'
+          }
+        } : null,
+        
+        // Instrucciones para la IA
+        instrucciones: {
+          secciones: `Estoy en ${seccionesNombres[activeSection.value]}. Puedo ver: Vista General, Productos, Movimientos, Clientes, Proveedores, Alertas, Predicciones`,
+          vistaGeneral: 'En Vista General veo los KPIs principales, top productos vendidos, stock bajo y movimientos recientes',
+          productos: 'En Productos veo la tabla detallada con stock, precio, rotación y rentabilidad de cada producto',
+          movimientos: 'En Movimientos veo el historial de entradas y salidas con fechas, cantidades y fuentes',
+          clientes: 'En Clientes veo ranking de clientes con sus compras, gastos, productos únicos y frecuencia',
+          proveedores: 'En Proveedores veo lista de proveedores con sus productos, órdenes y total comprado',
+          alertas: 'En Alertas veo KPIs de alertas (críticas, advertencias, informativas) y lista de notificaciones agrupadas por tipo',
+          predicciones: 'En Predicciones veo tendencias de ventas, productos que se van a agotar, y pronóstico ML de qué productos se venderán más'
+        }
+      }
+      
+      // Registrar acciones disponibles
+      uiContext.registerAction('cambiarSeccionInventarioInteligente', (params) => {
+        const seccion = params?.seccion?.toLowerCase() || 'overview'
+        const mapeo = {
+          'general': 'overview', 'vista general': 'overview', 'overview': 'overview',
+          'productos': 'products', 'products': 'products',
+          'movimientos': 'movements', 'movements': 'movements',
+          'clientes': 'customers', 'customers': 'customers',
+          'proveedores': 'suppliers', 'suppliers': 'suppliers',
+          'alertas': 'alerts', 'alerts': 'alerts',
+          'predicciones': 'predictions', 'predictions': 'predictions'
+        }
+        const seccionId = mapeo[seccion] || 'overview'
+        switchToSection(seccionId)
+        return { 
+          success: true, 
+          message: `Cambiando a ${seccionesNombres[seccionId] || seccionId}`
+        }
+      })
+      
+      uiContext.registerAction('buscarProductoInventarioInteligente', (params) => {
+        const texto = params?.texto || ''
+        filters.search = texto
+        if (activeSection.value !== 'products') {
+          switchToSection('products')
+        }
+        return { 
+          success: true, 
+          message: `Buscando "${texto}" en productos`,
+          resultados: totalProductItems.value
+        }
+      })
+      
+      uiContext.registerAction('cambiarPeriodoInventarioInteligente', (params) => {
+        const periodo = params?.periodo?.toLowerCase() || 'month'
+        const mapeo = {
+          'hoy': 'day', 'day': 'day',
+          'semana': 'week', 'week': 'week',
+          'mes': 'month', 'month': 'month',
+          'año': 'year', 'year': 'year'
+        }
+        selectedPeriod.value = mapeo[periodo] || 'month'
+        handlePeriodChange()
+        return { 
+          success: true, 
+          message: `Período cambiado a ${periodo}`
+        }
+      })
+      
+      uiContext.registerAction('verAlertasInventarioInteligente', () => {
+        switchToSection('alerts')
+        return { 
+          success: true, 
+          message: `Mostrando alertas. Hay ${metrics.lowStockProducts} productos con stock bajo y ${metrics.outOfStockProducts} sin stock.`
+        }
+      })
+      
+      uiContext.registerAction('verPrediccionesInventarioInteligente', () => {
+        switchToSection('predictions')
+        return { 
+          success: true, 
+          message: 'Mostrando predicciones de inventario'
+        }
+      })
+      
+      // 👥 Acción para buscar cliente en Inventario Inteligente
+      uiContext.registerAction('buscarClienteInventarioInteligente', (params) => {
+        const texto = params?.texto || ''
+        if (activeSection.value !== 'customers') {
+          switchToSection('customers')
+        }
+        // Aquí se podría agregar filtro de búsqueda si la vista lo soporta
+        return { 
+          success: true, 
+          message: `Mostrando clientes. ${customersData.value?.summary?.total_customers || 0} clientes en total.`,
+          datos: customersData.value?.summary || {}
+        }
+      })
+      
+      // 🏭 Acción para buscar proveedor en Inventario Inteligente
+      uiContext.registerAction('buscarProveedorInventarioInteligente', (params) => {
+        const texto = params?.texto || ''
+        if (activeSection.value !== 'suppliers') {
+          switchToSection('suppliers')
+        }
+        // Aquí se podría agregar filtro de búsqueda si la vista lo soporta
+        return { 
+          success: true, 
+          message: `Mostrando proveedores. ${suppliersData.value?.summary?.total_suppliers || 0} proveedores registrados.`,
+          datos: suppliersData.value?.summary || {}
+        }
+      })
+      
+      // 🌐 ACTUALIZAR DATOS GLOBALES DEL NEGOCIO
+      // Estos datos estarán disponibles para la IA desde CUALQUIER módulo
+      uiContext.updateGlobalBusinessSection('inventario', {
+        productosActivos: metrics.activeProducts,
+        productosTotal: metrics.totalProducts,
+        valorInvertido: metrics.totalInventoryValue,
+        valorPotencial: metrics.totalSaleValue || 0,
+        gananciaEstimada: (metrics.totalSaleValue || 0) - (metrics.totalInventoryValue || 0),
+        stockBajo: metrics.lowStockProducts,
+        sinStock: metrics.outOfStockProducts
+      })
+      
+      uiContext.updateGlobalBusinessSection('ganancias', {
+        gananciaBrutaMes: metrics.monthlySales,
+        gananciaNeta: metrics.netProfit,
+        margenPromedio: Math.round(metrics.averageProfitMargin || 0)
+      })
+      
+      uiContext.updateGlobalBusinessSection('gastos', {
+        gastosMes: metrics.totalExpenses
+      })
+      
+      uiContext.updateGlobalBusinessSection('alertas', {
+        productosStockBajo: productosStockBajo.map(p => ({
+          nombre: p.nombre,
+          stock: p.stockActual
+        })),
+        productosSinStock: []
+      })
+      
+      // Actualizar el store de contexto
+      uiContext.setScreenData(contextData)
+    }
+
     // Cargar datos automáticamente al montar el componente
     onMounted(() => {
       // 💾 Primero cargar preferencias de paginador
@@ -3774,7 +4110,15 @@ export default {
       loadMovementsData()
       loadCustomersData()
       loadSuppliersData() // 🏭 Cargar proveedores
+      
+      // 🧠 Inicializar contexto para IA
+      setTimeout(() => updateScreenContextForAI(), 1000)
     })
+
+    // 🧠 Watcher para actualizar contexto cuando cambian los datos
+    watch([activeSection, overviewData, productsData, movementsData, customersData, suppliersData, alertsData, predictionsData], () => {
+      updateScreenContextForAI()
+    }, { deep: true })
 
     // 👁️ Watchers para guardar preferencias de paginador automáticamente
     watch(() => filters.itemsPerPage, (newValue) => {

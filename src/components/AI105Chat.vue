@@ -571,7 +571,7 @@
                           ? 'text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
                           : 'text-gray-300 dark:text-zinc-600 cursor-not-allowed'
                       ]"
-                      :title="canUseVoice ? `Llamada en vivo (${Math.floor(voiceSecondsRemaining / 60)}:${String(voiceSecondsRemaining % 60).padStart(2, '0')} restantes)` : 'Sin minutos de voz disponibles'"
+                      :title="canUseVoice ? (voiceLimitSeconds === 0 ? 'Llamada en vivo (ilimitado)' : `Llamada en vivo (${Math.floor(voiceSecondsRemaining / 60)}:${String(voiceSecondsRemaining % 60).padStart(2, '0')} restantes)`) : 'Sin minutos de voz disponibles'"
                     >
                       <!-- Indicador de tiempo restante (muestra si hay límite y ha usado algo) -->
                       <span 
@@ -690,6 +690,7 @@ import { useLiveCall } from '@/composables/useLiveCall'
 import { aiChatStore } from '@/store/aiChatStore'
 import { useRadioStore } from '@/store/radioStore'
 import { appStore } from '@/store/appStore'
+import { useAIContextStore } from '@/stores/aiContext'
 import api from '@/services/api'
 
 export default {
@@ -715,6 +716,9 @@ export default {
     const radioStore = useRadioStore()
     // appStore ya está importado directamente
     
+    // 🧠 Store de contexto de pantalla para la IA
+    const aiContextStore = useAIContextStore()
+    
     // 📞 Composable para llamada en vivo con Gemini Live API
     const liveCall = useLiveCall()
     
@@ -722,28 +726,33 @@ export default {
     // Todos tienen IA, pero con límites diferentes según el plan
     const tenantPlan = computed(() => appStore.tenantPlan || 'free_trial')
     
+    // ⚠️ MODO DESARROLLO - Cambiar a false en producción
+    const DEV_MODE_UNLIMITED = true
+    
     // Límites de mensajes de chat por día según plan
     const CHAT_LIMITS = {
-      'free_trial': 5,      // 5 mensajes/día - para que prueben
-      'basico': 15,         // 15 mensajes/día - uso básico
+      'free_trial': DEV_MODE_UNLIMITED ? 0 : 5,      // 5 mensajes/día - para que prueben
+      'basico': DEV_MODE_UNLIMITED ? 0 : 15,         // 15 mensajes/día - uso básico
       'premium': 0,         // 0 = ilimitado
       'enterprise': 0       // 0 = ilimitado
     }
     
     // Límites de voz en segundos por día según plan
     // Presupuesto máximo diario: Premium ~$285 COP, Enterprise ~$2,850 COP
+    // ⚠️ En producción: premium=180 (3min), enterprise=1800 (30min)
     const VOICE_LIMITS = {
-      'free_trial': 0,      // Sin voz
-      'basico': 0,          // Sin voz
-      'premium': 180,       // 3 minutos/día (~$285 COP)
-      'enterprise': 1800    // 30 minutos/día (~$2,850 COP) - protección de costos
+      'free_trial': DEV_MODE_UNLIMITED ? 0 : 0,      // Sin voz (0 = sin límite si DEV_MODE)
+      'basico': DEV_MODE_UNLIMITED ? 0 : 0,          // Sin voz
+      'premium': DEV_MODE_UNLIMITED ? 0 : 180,       // 3 minutos/día (~$285 COP) - 0 = ilimitado en dev
+      'enterprise': DEV_MODE_UNLIMITED ? 0 : 1800    // 30 minutos/día - 0 = ilimitado en dev
     }
     
     // Todos tienen acceso a IA (chat de texto)
     const hasAIAccess = computed(() => true)
     
-    // Solo Premium y Enterprise tienen voz
+    // Solo Premium y Enterprise tienen voz (en dev mode, todos tienen)
     const hasVoiceAccess = computed(() => {
+      if (DEV_MODE_UNLIMITED) return true
       const plan = tenantPlan.value.toLowerCase()
       return ['premium', 'enterprise'].includes(plan)
     })
@@ -786,12 +795,16 @@ export default {
     // ¿Puede usar voz?
     const canUseVoice = computed(() => {
       if (!hasVoiceAccess.value) return false
-      // Todos los planes con voz tienen límite ahora
+      // Si el límite es 0, significa ilimitado (DEV_MODE o plan premium/enterprise)
+      if (voiceLimitSeconds.value === 0) return true
+      // Si hay límite, verificar que no se haya excedido
       return voiceSecondsUsedToday.value < voiceLimitSeconds.value
     })
     
     const voiceSecondsRemaining = computed(() => {
-      // Todos los planes con voz tienen límite ahora
+      // Si es ilimitado (0), retornar un número grande para display
+      if (voiceLimitSeconds.value === 0) return 999999
+      // Si hay límite, calcular restantes
       return Math.max(0, voiceLimitSeconds.value - voiceSecondsUsedToday.value)
     })
     
@@ -1166,6 +1179,9 @@ export default {
 
       isTyping.value = true
       
+      // 🧠 Obtener contexto de pantalla para la IA
+      const screenContext = aiContextStore.getSystemPrompt()
+      
       try {
         let response
 
@@ -1175,6 +1191,8 @@ export default {
           formData.append('file', file)
           formData.append('provider', selectedProvider.value)
           if (sessionId.value) formData.append('session_id', sessionId.value)
+          // Agregar contexto de pantalla al FormData
+          if (screenContext) formData.append('screen_context', screenContext)
 
           response = await api.post('/ai/chat-with-file', formData, { headers: {} })
           clearFile()
@@ -1182,7 +1200,9 @@ export default {
           response = await api.post('/ai/chat', {
             message: userMessage,
             provider: selectedProvider.value,
-            session_id: sessionId.value
+            session_id: sessionId.value,
+            // 🧠 Enviar contexto de pantalla al backend
+            screen_context: screenContext || null
           })
         }
 

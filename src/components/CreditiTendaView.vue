@@ -1372,13 +1372,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { customersService } from '../services/customersService.js'
 import { useToast } from '../composables/useToast.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 import axiosInstance from '../services/apiClient.js'
 import axios from 'axios'
 
 const { showSuccess, showError } = useToast()
+const uiContextStore = useUIContextStore()
 
 // 🎯 Escape Key Handler - Limpiar filtros
 const handleEscape = (e) => {
@@ -2519,6 +2521,292 @@ const checkWhatsAppStatus = async () => {
     whatsappConnected.value = false
   }
 }
+
+// ========== CONTEXTO DE IA - CONCIENCIA DE PANTALLA ==========
+const instruccionesCrediTienda = {
+  modulo: 'Módulo CrediTienda: Sistema de gestión de créditos a clientes. Vista Master-Detail con lista de clientes con crédito activo a la izquierda y detalles del crédito a la derecha.',
+  panelIzquierdo: 'Panel izquierdo: Lista de clientes con crédito activo, mostrando nombre, documento, deuda actual y días de mora.',
+  panelDerecho: 'Panel derecho: Portal de Créditos con información del cliente seleccionado, historial de compras a crédito, historial de abonos y opción de registrar pagos.',
+  kpis: 'KPIs disponibles: Total por Cobrar, Clientes Activos con crédito, Recaudado Hoy, Mora Promedio en días.',
+  acciones: 'Acciones disponibles: Nuevo Crédito (habilitar crédito a cliente), Registrar Abono, Ver historial, Enviar recordatorio de pago.',
+  camposNuevoCredito: 'Para habilitar crédito: El usuario proporciona la CÉDULA/CC y el sistema busca automáticamente si el cliente existe. Si existe, auto-llena todos los datos. Solo falta definir el cupo de crédito.',
+  flujoCreacion: 'Flujo para nuevo crédito: 1) Abrir modal con crearNuevoCredito, 2) Pedir la cédula/CC al usuario, 3) Usar buscarClientePorDocumento para auto-llenar, 4) Si no existe, pedir los datos, 5) Definir cupo de crédito, 6) Guardar con guardarCredito.',
+  flujoAbono: 'Para registrar un abono: 1) Seleccionar cliente, 2) Abrir modal de abono, 3) Ingresar monto y método de pago, 4) Confirmar.'
+}
+
+// Watcher para actualizar contexto de IA cuando cambian los datos
+watch(
+  [customers, selectedCustomer, loading, showCreateCreditModal, showPaymentModal, customerForm],
+  () => {
+    // Datos base de CrediTienda
+    const crediTiendaData = {
+      // KPIs principales
+      totalPorCobrar: totalDebt.value,
+      clientesConCredito: customersWithDebt.value,
+      recaudadoHoy: todayPayments.value,
+      moraPromedio: averageDaysOverdue.value,
+      cargando: loading.value,
+      
+      // Estado de filtros y búsqueda
+      filtroActivo: statusFilter.value || 'todos',
+      terminoBusqueda: searchTerm.value || '',
+      
+      // Estado del modal de nuevo crédito
+      modalNuevoCreditoAbierto: showCreateCreditModal.value,
+      modalAbonoAbierto: showPaymentModal.value,
+      
+      // Si el modal está abierto, mostrar datos del formulario
+      formularioCredito: showCreateCreditModal.value ? {
+        documento: customerForm.value.document_number || '(vacío)',
+        tipoDocumento: customerForm.value.document_type || 'CC',
+        nombre: customerForm.value.name || '(vacío)',
+        email: customerForm.value.email || '(vacío)',
+        telefono: customerForm.value.phone || '(vacío)',
+        direccion: customerForm.value.address || '(vacío)',
+        ciudad: customerForm.value.city || '(vacío)',
+        cupoCredito: customerForm.value.credit_limit || 0,
+        clienteExistente: customerExists.value,
+        buscandoDocumento: checkingDocument.value,
+        mensajeEstado: customerExists.value 
+          ? 'Cliente encontrado, datos auto-llenados. Solo falta definir el cupo de crédito.'
+          : 'Ingresa la cédula para buscar el cliente o crear uno nuevo.'
+      } : null,
+      
+      // Lista de clientes con crédito (primeros 15)
+      listaClientesCredito: filteredCustomers.value.slice(0, 15).map(c => ({
+        id: c.id,
+        nombre: c.name,
+        documento: `${c.document_type || 'CC'}: ${c.document_number}`,
+        deudaActual: parseFloat(c.balance || c.current_debt || 0),
+        cupoCredito: parseFloat(c.credit_limit || 0),
+        diasMora: c.days_overdue || 0,
+        estado: c.balance > 0 ? 'Con deuda' : 'Al día'
+      })),
+      
+      instrucciones: instruccionesCrediTienda
+    }
+    
+    // Si hay un cliente seleccionado, agregar sus detalles completos
+    if (selectedCustomer.value) {
+      const cliente = selectedCustomer.value
+      crediTiendaData.clienteSeleccionado = {
+        id: cliente.id,
+        nombre: cliente.name,
+        documento: `${cliente.document_type || 'CC'}: ${cliente.document_number}`,
+        telefono: cliente.phone || 'Sin teléfono',
+        email: cliente.email || 'Sin email',
+        direccion: cliente.address || 'Sin dirección',
+        
+        // Información de crédito
+        cupoCredito: parseFloat(cliente.credit_limit || 0),
+        deudaActual: parseFloat(cliente.balance || cliente.current_debt || 0),
+        disponible: parseFloat(cliente.credit_limit || 0) - parseFloat(cliente.balance || cliente.current_debt || 0),
+        diasMora: cliente.days_overdue || 0,
+        
+        // Historial de compras a crédito
+        comprasCredito: creditInvoices.value.slice(0, 10).map(inv => ({
+          numero: inv.invoice_number || inv.id,
+          fecha: inv.created_at,
+          total: parseFloat(inv.total || 0),
+          estado: inv.payment_status
+        })),
+        
+        // Historial de abonos
+        abonos: creditPayments.value.slice(0, 10).map(pay => ({
+          fecha: pay.created_at,
+          monto: parseFloat(pay.amount || 0),
+          metodo: pay.method
+        }))
+      }
+    }
+    
+    // Resumen rápido para respuestas comunes
+    crediTiendaData.resumenRapido = {
+      cuantoMeDeben: `El total por cobrar es de $${formatCurrency(totalDebt.value)}. Hay ${customersWithDebt.value} cliente(s) con crédito activo.`,
+      recaudadoHoy: `Hoy se han recaudado $${formatCurrency(todayPayments.value)} en abonos.`,
+      moraPromedio: `La mora promedio es de ${averageDaysOverdue.value} días.`,
+      clienteSeleccionado: selectedCustomer.value 
+        ? `Cliente: ${selectedCustomer.value.name}. Deuda: $${formatCurrency(selectedCustomer.value.balance || 0)}. Cupo disponible: $${formatCurrency((selectedCustomer.value.credit_limit || 0) - (selectedCustomer.value.balance || 0))}.`
+        : 'No hay cliente seleccionado. Selecciona uno para ver sus detalles de crédito.',
+      comoHabilitarCredito: 'Para habilitar crédito: dime la cédula del cliente. Si ya existe, auto-lleno sus datos. Solo necesitamos definir el cupo.',
+      comoRegistrarAbono: 'Para registrar un abono: primero selecciona el cliente, luego indica el monto a abonar.'
+    }
+
+    uiContextStore.setScreenData(crediTiendaData)
+    
+    // Registrar acciones disponibles para la IA
+    uiContextStore.registerAction('seleccionarClienteCredito', async ({ nombre }) => {
+      const cliente = filteredCustomers.value.find(c => 
+        c.name.toLowerCase().includes(nombre.toLowerCase())
+      )
+      if (cliente) {
+        selectCustomer(cliente)
+        return { success: true, message: `Cliente "${cliente.name}" seleccionado. Deuda: $${formatCurrency(cliente.balance || 0)}` }
+      }
+      return { success: false, message: `No se encontró cliente con nombre "${nombre}" en CrediTienda` }
+    })
+    
+    uiContextStore.registerAction('buscarClienteCredito', ({ texto }) => {
+      searchTerm.value = texto
+      return { success: true, message: `Buscando clientes con crédito: "${texto}"` }
+    })
+    
+    uiContextStore.registerAction('crearNuevoCredito', () => {
+      openCreateCreditModal()
+      return { success: true, message: 'Modal abierto. Proporciona la CÉDULA del cliente para buscar si ya existe o crear uno nuevo.' }
+    })
+    
+    // Acción para llenar el documento y activar la búsqueda automática
+    uiContextStore.registerAction('buscarClientePorDocumento', async ({ documento }) => {
+      if (!showCreateCreditModal.value) {
+        openCreateCreditModal()
+        await new Promise(resolve => setTimeout(resolve, 300))
+      }
+      
+      customerForm.value.document_number = documento
+      
+      // Ejecutar la búsqueda
+      await checkDocumentExists()
+      
+      // Esperar un poco para que complete la búsqueda
+      await new Promise(resolve => setTimeout(resolve, 700))
+      
+      if (customerExists.value) {
+        return { 
+          success: true, 
+          message: `¡Cliente encontrado! ${customerForm.value.name}. Los datos se han auto-llenado. Solo falta definir el cupo de crédito.`,
+          clienteEncontrado: {
+            nombre: customerForm.value.name,
+            telefono: customerForm.value.phone,
+            email: customerForm.value.email
+          }
+        }
+      } else {
+        return { 
+          success: true, 
+          message: `Cliente no encontrado con documento ${documento}. Necesito los datos para crear uno nuevo: nombre completo, teléfono y email.` 
+        }
+      }
+    })
+    
+    // Acción para llenar campos del formulario
+    uiContextStore.registerAction('llenarCampoCredito', ({ campo, valor }) => {
+      if (!showCreateCreditModal.value) {
+        return { success: false, message: 'Primero abre el modal con crearNuevoCredito' }
+      }
+      
+      const camposValidos = {
+        'nombre': 'name',
+        'name': 'name',
+        'email': 'email',
+        'correo': 'email',
+        'telefono': 'phone',
+        'phone': 'phone',
+        'celular': 'phone',
+        'direccion': 'address',
+        'address': 'address',
+        'ciudad': 'city',
+        'city': 'city',
+        'documento': 'document_number',
+        'document_number': 'document_number',
+        'cedula': 'document_number',
+        'cc': 'document_number',
+        'cupo': 'credit_limit',
+        'cupo_credito': 'credit_limit',
+        'limite': 'credit_limit',
+        'credit_limit': 'credit_limit'
+      }
+      
+      const campoReal = camposValidos[campo.toLowerCase().trim()]
+      
+      if (!campoReal) {
+        return { success: false, message: `Campo "${campo}" no reconocido. Campos válidos: nombre, documento, email, telefono, direccion, ciudad, cupo/limite` }
+      }
+      
+      customerForm.value[campoReal] = campoReal === 'credit_limit' ? parseFloat(valor) || 0 : valor
+      
+      return { 
+        success: true, 
+        message: `Campo "${campo}" actualizado a "${valor}"`,
+        formularioActual: {
+          nombre: customerForm.value.name,
+          documento: customerForm.value.document_number,
+          cupo: customerForm.value.credit_limit
+        }
+      }
+    })
+    
+    uiContextStore.registerAction('guardarCredito', async () => {
+      if (!showCreateCreditModal.value) {
+        return { success: false, message: 'No hay formulario de crédito abierto' }
+      }
+      
+      // Validar campos obligatorios
+      if (!customerForm.value.document_number?.trim()) {
+        return { success: false, message: 'Falta el número de documento (cédula)' }
+      }
+      if (!customerForm.value.name?.trim()) {
+        return { success: false, message: 'Falta el nombre del cliente' }
+      }
+      
+      try {
+        await saveCustomerCredit()
+        return { success: true, message: `Crédito habilitado para ${customerForm.value.name}. Cupo: $${formatCurrency(customerForm.value.credit_limit)}` }
+      } catch (error) {
+        return { success: false, message: `Error al guardar: ${error.message}` }
+      }
+    })
+    
+    uiContextStore.registerAction('registrarAbono', async ({ monto, metodo }) => {
+      if (!selectedCustomer.value) {
+        return { success: false, message: 'Primero selecciona un cliente para registrar el abono' }
+      }
+      
+      const montoNum = parseFloat(monto) || 0
+      if (montoNum <= 0) {
+        return { success: false, message: 'El monto debe ser mayor a 0' }
+      }
+      
+      if (montoNum > (selectedCustomer.value.balance || 0)) {
+        return { success: false, message: `El monto ($${formatCurrency(montoNum)}) no puede ser mayor a la deuda ($${formatCurrency(selectedCustomer.value.balance || 0)})` }
+      }
+      
+      // Abrir modal de pago con los datos
+      openPaymentModal(selectedCustomer.value)
+      paymentForm.value.amount = montoNum
+      paymentForm.value.payment_method = metodo || 'cash'
+      
+      return { 
+        success: true, 
+        message: `Modal de abono abierto para ${selectedCustomer.value.name}. Monto: $${formatCurrency(montoNum)}. Confirma para procesar el pago.` 
+      }
+    })
+    
+    uiContextStore.registerAction('confirmarAbono', async () => {
+      if (!showPaymentModal.value || !paymentCustomer.value) {
+        return { success: false, message: 'No hay un abono pendiente de confirmar' }
+      }
+      
+      try {
+        await submitPayment()
+        return { success: true, message: 'Abono registrado exitosamente' }
+      } catch (error) {
+        return { success: false, message: `Error: ${error.message}` }
+      }
+    })
+    
+    uiContextStore.registerAction('cerrarModalCredito', () => {
+      if (showCreateCreditModal.value) {
+        showCreateCreditModal.value = false
+      }
+      if (showPaymentModal.value) {
+        closePaymentModal()
+      }
+      return { success: true, message: 'Modal cerrado' }
+    })
+  },
+  { immediate: true, deep: true }
+)
 
 // Initialization
 onMounted(() => {

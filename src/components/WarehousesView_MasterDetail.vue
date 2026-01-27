@@ -616,12 +616,24 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { warehouseService } from '@/services/warehouseService'
 import WarehouseModal from './warehouses/WarehouseModal.vue'
 import StockTransfersView from './StockTransfersView.vue'
 import ToastContainer from './ToastContainer.vue'
+import { useUIContextStore } from '@/store/uiContextStore'
+
+// Props y Emits para evitar warnings de Vue
+defineProps({
+  moduleName: String,
+  queryParams: Object
+})
+
+defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'openReturnInPos', 'refresh'])
+
+// Store de contexto UI
+const uiContextStore = useUIContextStore()
 
 // Estados
 const activeTab = ref('warehouses') // 'warehouses' o 'transfers'
@@ -659,18 +671,14 @@ const filteredProducts = computed(() => {
 const totalWarehouses = computed(() => warehouses.value.length)
 const activeWarehouses = computed(() => warehouses.value.filter(w => w.active).length)
 const totalProducts = computed(() => {
-  const total = warehouses.value.reduce((sum, w) => sum + (w.products_count || 0), 0)
-  console.log('📊 Total productos calculado:', total, 'warehouses:', warehouses.value.map(w => ({ name: w.name, count: w.products_count })))
-  return total
+  return warehouses.value.reduce((sum, w) => sum + (w.products_count || 0), 0)
 })
 const defaultWarehouse = computed(() => warehouses.value.find(w => w.is_default)?.name || '-')
 
 // Métodos
 const loadWarehouses = async () => {
   try {
-    console.log('🔄 Cargando warehouses...')
     const data = await warehouseService.getAll()
-    console.log('📦 Respuesta del servicio:', data)
     
     // El API devuelve { warehouses: [...], plan_info: {...} }
     if (data && data.warehouses && Array.isArray(data.warehouses)) {
@@ -678,19 +686,15 @@ const loadWarehouses = async () => {
       if (data.plan_info) {
         planInfo.value = data.plan_info
       }
-      console.log('✅ Warehouses cargados:', warehouses.value.length)
     } else if (data && data.data && Array.isArray(data.data)) {
       warehouses.value = data.data
-      console.log('✅ Warehouses cargados (desde data.data):', warehouses.value.length)
     } else if (Array.isArray(data)) {
       warehouses.value = data
-      console.log('✅ Warehouses cargados (array directo):', warehouses.value.length)
     } else {
       warehouses.value = []
-      console.warn('⚠️ Formato inesperado de respuesta:', data)
     }
   } catch (error) {
-    console.error('❌ Error loading warehouses:', error)
+    console.error('Error loading warehouses:', error)
     warehouses.value = []
   }
 }
@@ -705,7 +709,6 @@ const loadWarehouseProducts = async (warehouseId) => {
   loadingProducts.value = true
   try {
     const response = await warehouseService.getInventory(warehouseId)
-    console.log('📦 Respuesta inventory:', response)
     
     // El API devuelve { success, data: { warehouse, summary, products } }
     if (response && response.data) {
@@ -713,10 +716,8 @@ const loadWarehouseProducts = async (warehouseId) => {
     } else {
       warehouseDetails.value = response
     }
-    
-    console.log('✅ Detalles cargados:', warehouseDetails.value)
   } catch (error) {
-    console.error('❌ Error loading warehouse products:', error)
+    console.error('Error loading warehouse products:', error)
     warehouseDetails.value = null
   } finally {
     loadingProducts.value = false
@@ -793,7 +794,6 @@ const deleteWarehouse = async (warehouse) => {
 }
 
 const handleSaved = () => {
-  console.log('✅ handleSaved ejecutado - cerrando modal y recargando...')
   closeModal()
   setTimeout(() => {
     loadWarehouses()
@@ -820,6 +820,94 @@ const handleKeyDown = (event) => {
     warehouseDetails.value = null
   }
 }
+
+// ========== CONTEXTO DE IA - CONCIENCIA DE PANTALLA ==========
+const instrucciones = {
+  sedes: 'Pestaña de Sedes: Muestra todas las tiendas y bodegas del negocio con su estado (Activa/Inactiva), dirección, productos y si es sede principal.',
+  traslados: 'Pestaña de Traslados: Permite mover inventario entre sedes. Se selecciona sede origen, destino y los productos con cantidades a trasladar.',
+  kpis: 'Los KPIs muestran: Sedes Activas (número de sedes operativas), Stock Global (productos totales en todas las sedes), Sede Principal (cuál es la sede por defecto), Uso del Plan (cuántas sedes tiene vs límite del plan).',
+  acciones: 'Acciones disponibles: Crear nueva sede, editar sede existente, ver inventario de sede específica, eliminar sede, crear traslado entre sedes, ver historial de traslados.'
+}
+
+// Watcher para actualizar contexto de IA cuando cambian datos
+watch(
+  [warehouses, activeTab, selectedWarehouse, warehouseDetails, planInfo],
+  () => {
+    // Datos base de sedes
+    const sedesData = {
+      totalSedes: warehouses.value.length,
+      sedesActivas: warehouses.value.filter(w => w.active !== false).length,
+      stockGlobal: warehouses.value.reduce((sum, w) => sum + (w.products_count || 0), 0),
+      sedePrincipal: warehouses.value.find(w => w.is_default)?.name || 'No asignada',
+      pestanaActiva: activeTab.value === 'warehouses' ? 'Sedes' : 'Traslados',
+      planInfo: planInfo.value ? {
+        sedesUsadas: planInfo.value.used || 0,
+        sedesPermitidas: planInfo.value.limit || 1,
+        puedeCrearMas: planInfo.value.can_create !== false
+      } : null,
+      listaSedes: warehouses.value.slice(0, 10).map(w => ({
+        nombre: w.name,
+        estado: w.active !== false ? 'Activa' : 'Inactiva',
+        esPrincipal: w.is_default || false,
+        direccion: w.address || 'Sin dirección',
+        productos: w.products_count || 0
+      })),
+      instrucciones
+    }
+    
+    // Si hay una sede seleccionada, agregar sus detalles
+    if (selectedWarehouse.value && warehouseDetails.value) {
+      sedesData.sedeSeleccionada = {
+        nombre: selectedWarehouse.value.name,
+        direccion: selectedWarehouse.value.address || 'Sin dirección',
+        esPrincipal: selectedWarehouse.value.is_default || false,
+        resumenInventario: warehouseDetails.value.summary || null,
+        productosEnSede: (warehouseDetails.value.products || []).slice(0, 20).map(p => ({
+          nombre: p.name,
+          sku: p.sku,
+          stock: p.stock || p.quantity || 0,
+          precio: p.price || 0
+        }))
+      }
+    }
+    
+    // Resumen rápido para respuestas comunes
+    sedesData.resumenRapido = {
+      cuantasSedes: `Hay ${sedesData.totalSedes} sede(s) en total, ${sedesData.sedesActivas} activa(s).`,
+      stockTotal: `El stock global es de ${sedesData.stockGlobal} productos en todas las sedes.`,
+      sedePrincipal: `La sede principal es "${sedesData.sedePrincipal}".`,
+      comoCrearSede: 'Para crear una nueva sede: haz clic en el botón "Nueva Sede" en la esquina superior derecha.',
+      comoHacerTraslado: 'Para hacer un traslado: 1) Ve a la pestaña "Traslados", 2) Haz clic en "Nuevo Traslado", 3) Selecciona sede origen y destino, 4) Agrega los productos y cantidades, 5) Confirma el traslado.'
+    }
+
+    // Actualizar el contexto de pantalla para la IA
+    uiContextStore.setScreenData(sedesData)
+    
+    // Registrar acciones disponibles para la IA
+    uiContextStore.registerAction('cambiarPestanaSedes', ({ tab }) => {
+      if (tab === 'transfers' || tab === 'traslados') {
+        activeTab.value = 'transfers'
+        return { success: true, message: 'Cambiando a la pestaña de Traslados' }
+      } else if (tab === 'warehouses' || tab === 'sedes') {
+        activeTab.value = 'warehouses'
+        return { success: true, message: 'Cambiando a la pestaña de Sedes' }
+      }
+      return { success: false, message: 'Pestaña no reconocida' }
+    })
+    
+    uiContextStore.registerAction('crearNuevaSede', () => {
+      openCreateModal()
+      return { success: true, message: 'Abriendo el modal para crear una nueva sede' }
+    })
+    
+    uiContextStore.registerAction('crearNuevoTraslado', () => {
+      activeTab.value = 'transfers'
+      setTimeout(() => openTransferModal(), 100)
+      return { success: true, message: 'Abriendo el modal para crear un nuevo traslado' }
+    })
+  },
+  { immediate: true, deep: true }
+)
 
 // Lifecycle
 onMounted(() => {

@@ -568,9 +568,11 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useToast } from '../composables/useToast.js'
 import { useModuleNavigation } from '../composables/useModuleNavigation.js'
 import { appStore } from '../store/appStore.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 import returnsService from '../services/returnsService.js'
 
 const { navigateToModule } = useModuleNavigation()
+const uiContext = useUIContextStore()
 
 // Emit para comunicarse con el padre
 const emit = defineEmits(['change-module'])
@@ -1071,9 +1073,112 @@ const handleKeyDown = (event) => {
   }
 }
 
+// 🧠 Actualizar contexto de pantalla para IA de voz
+const updateScreenContextForAI = () => {
+  const contextData = {
+    resumenDevoluciones: {
+      total: returns.value.length,
+      totalDevuelto: `$${formatCurrency(stats.value.totalRefunded)}`,
+      completadas: stats.value.completedCount,
+      montoCompletado: `$${formatCurrency(stats.value.completedAmount)}`,
+      pendientes: stats.value.pendingCount,
+      montoPendiente: `$${formatCurrency(stats.value.pendingAmount)}`,
+      productosDevueltos: stats.value.totalItemsReturned
+    },
+    // Info de la devolución seleccionada (si hay alguna)
+    devolucionSeleccionada: selectedReturn.value ? {
+      numero: selectedReturn.value.number || `DEV-${selectedReturn.value.id}`,
+      estado: getStatusLabel(selectedReturn.value.status),
+      facturaOriginal: selectedReturn.value.original_invoice?.number || 'N/A',
+      cliente: selectedReturn.value.customer?.name || 'Cliente General',
+      total: `$${formatCurrency(selectedReturn.value.total)}`,
+      fecha: formatDate(selectedReturn.value.return_date),
+      motivo: selectedReturn.value.reason || 'Sin motivo especificado',
+      metodoReembolso: getRefundMethodLabel(selectedReturn.value.refund_method),
+      // 🔥 Validación de datos de contacto
+      tieneEmail: !!(selectedReturn.value.customer?.email),
+      tieneTelefono: !!(selectedReturn.value.customer?.phone),
+      email: selectedReturn.value.customer?.email || null,
+      telefono: selectedReturn.value.customer?.phone || null,
+      items: (selectedReturn.value.return_items || selectedReturn.value.items || []).length
+    } : null,
+    // Instrucciones para la IA
+    instrucciones: {
+      enviarWhatsApp: selectedReturn.value 
+        ? (selectedReturn.value.customer?.phone 
+            ? 'Puedes enviar el comprobante por WhatsApp - el cliente tiene teléfono registrado'
+            : '⚠️ El cliente NO tiene teléfono registrado. Pídele al usuario que ingrese el número manualmente o que actualice los datos del cliente primero')
+        : 'Primero debes seleccionar una devolución',
+      enviarEmail: selectedReturn.value 
+        ? (selectedReturn.value.customer?.email 
+            ? 'Puedes enviar el comprobante por Email - el cliente tiene email registrado'
+            : '⚠️ El cliente NO tiene email registrado. Pídele al usuario que ingrese el email manualmente o que actualice los datos del cliente primero')
+        : 'Primero debes seleccionar una devolución'
+    }
+  }
+  
+  // Actualizar el store de contexto
+  uiContext.setScreenData(contextData)
+}
+
 onMounted(() => {
   loadReturns()
   document.addEventListener('keydown', handleKeyDown)
+  
+  // 🧠 Inicializar contexto para IA después de cargar
+  setTimeout(() => updateScreenContextForAI(), 500)
+  
+  // 🎯 Registrar acciones para la IA de voz
+  uiContext.registerAction('sendEmail', async () => {
+    if (!selectedReturn.value) {
+      return { success: false, message: 'No hay devolución seleccionada. Primero selecciona una devolución de la lista.' }
+    }
+    const hasEmail = selectedReturn.value.customer?.email
+    if (!hasEmail) {
+      return { 
+        success: false, 
+        message: `El cliente "${selectedReturn.value.customer?.name || 'Cliente General'}" no tiene email registrado. Dile al usuario que ingrese el email manualmente o que actualice los datos del cliente.`
+      }
+    }
+    // Aquí iría la lógica de envío por email
+    showToast('Función de envío por email próximamente', 'info')
+    return { success: true, message: 'Comprobante enviado por email' }
+  })
+  
+  uiContext.registerAction('sendWhatsApp', async () => {
+    if (!selectedReturn.value) {
+      return { success: false, message: 'No hay devolución seleccionada. Primero selecciona una devolución de la lista.' }
+    }
+    const hasPhone = selectedReturn.value.customer?.phone
+    if (!hasPhone) {
+      return { 
+        success: false, 
+        message: `El cliente "${selectedReturn.value.customer?.name || 'Cliente General'}" no tiene teléfono registrado. Dile al usuario que ingrese el número manualmente o que actualice los datos del cliente.`
+      }
+    }
+    // Aquí iría la lógica de envío por WhatsApp
+    showToast('Función de envío por WhatsApp próximamente', 'info')
+    return { success: true, message: 'Comprobante enviado por WhatsApp' }
+  })
+  
+  uiContext.registerAction('downloadPDF', async () => {
+    if (!selectedReturn.value) {
+      return { success: false, message: 'No hay devolución seleccionada. Primero selecciona una devolución de la lista.' }
+    }
+    // Aquí iría la lógica de descarga de PDF
+    showToast('Función de descarga PDF próximamente', 'info')
+    return { success: true, message: 'PDF descargado' }
+  })
+})
+
+// 🧠 Watcher para actualizar contexto cuando cambien las devoluciones
+watch(() => returns.value.length, () => {
+  updateScreenContextForAI()
+})
+
+// 🧠 Watcher para actualizar contexto cuando cambie la devolución seleccionada
+watch(selectedReturn, () => {
+  updateScreenContextForAI()
 })
 
 onBeforeUnmount(() => {

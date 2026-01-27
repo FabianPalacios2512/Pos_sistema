@@ -1030,6 +1030,7 @@ import { notificationStore } from '../store/notifications.js'
 import { useToast } from '../composables/useToast.js'
 import { appStore } from '../store/appStore.js' // NUEVO: para obtener el plan
 import { useAutoRefresh } from '../composables/useRouteState.js'
+import { useUIContextStore } from '../store/uiContextStore.js' // 🧠 IA
 import MovementsSection from './inventory/sections/MovementsSection.vue'
 import TablePaginator from './TablePaginator.vue'
 
@@ -2221,6 +2222,11 @@ onMounted(async () => {
     await notificationStore.initializeLastVisited()
     await notificationStore.loadNotifications()
     notificationStore.startPolling(15000)
+    
+    // 🧠 Inicializar contexto para IA
+    setTimeout(() => {
+      updateScreenContextForAI()
+    }, 500)
   } catch (error) {
     console.error('Error en mounted:', error)
   } finally {
@@ -2253,7 +2259,238 @@ watch(activeTab, async (newTab) => {
   } else if (newTab === 'alerts') {
     await notificationStore.markAlertsAsViewed()
   }
+  // Actualizar contexto para IA cuando cambia el tab
+  updateScreenContextForAI()
 })
+
+// 🧠 CONCIENCIA DE PANTALLA PARA IA
+const updateScreenContextForAI = () => {
+  const uiContext = useUIContextStore()
+  
+  // Formatear moneda para la IA
+  const formatCurrencyForAI = (value) => {
+    return new Intl.NumberFormat('es-CO').format(value)
+  }
+  
+  // Productos con stock bajo (alerta)
+  const productosStockBajo = stockAlerts.value.slice(0, 10).map(p => ({
+    nombre: p.name,
+    stockActual: p.current_stock || 0,
+    stockMinimo: p.min_stock || 10,
+    categoria: p.category || 'Sin categoría'
+  }))
+  
+  // Productos visibles en la tabla actual
+  const productosVisibles = paginatedProducts.value.slice(0, 10).map(p => ({
+    id: p.id,
+    nombre: p.name,
+    categoria: p.category,
+    stock: p.current_stock || 0,
+    ventas: p.total_sold || 0,
+    ingresos: formatCurrencyForAI(p.total_revenue || 0),
+    estado: (p.current_stock || 0) <= (p.min_stock || 10) ? 'bajo_stock' : 'en_stock'
+  }))
+  
+  // Obtener datos de movimientos reales
+  const movimientosResumen = movementsData.value?.summary || {}
+  const totalMovimientos = movimientosResumen.total_movements || 0
+  const entradasHoy = movimientosResumen.total_entries || 0
+  const salidasHoy = movimientosResumen.total_exits || 0
+  const valorEntradas = movimientosResumen.total_entry_value || 0
+  const valorSalidas = movimientosResumen.total_exit_value || 0
+  
+  // Datos del contexto
+  const contextData = {
+    pestañaActiva: activeTab.value === 'stock' ? 'Stock Actual' : 
+                   activeTab.value === 'movements' ? 'Movimientos' : 'Alertas',
+    kpis: {
+      totalProductos: totalProducts.value,
+      stockBajo: lowStockProducts.value,
+      valorInventario: formatCurrencyForAI(totalInventoryValue.value),
+      movimientosHoy: totalMovimientos,
+      entradasHoy: entradasHoy,
+      salidasHoy: salidasHoy,
+      valorEntradas: formatCurrencyForAI(valorEntradas),
+      valorSalidas: formatCurrencyForAI(valorSalidas)
+    },
+    filtrosActivos: {
+      busqueda: searchTerm.value || null,
+      categoria: categoryFilter.value || null,
+      stock: stockFilter.value || null
+    },
+    bodegaSeleccionada: selectedWarehouse.value ? 
+      warehouses.value.find(w => w.id === selectedWarehouse.value)?.name : 'Todas las sedes',
+    alertasStock: productosStockBajo,
+    productosVisibles: productosVisibles,
+    cantidadFiltrada: filteredProducts.value.length,
+    instrucciones: {
+      pestañas: 'Puedo cambiar entre: Stock Actual, Movimientos, y Alertas',
+      buscar: 'Puedo buscar productos por nombre',
+      filtrar: 'Puedo filtrar por categoría o por nivel de stock (bajo, normal, alto)',
+      alertas: `Hay ${lowStockProducts.value} productos con stock bajo`,
+      ajustar: 'Puedo ajustar el stock de un producto directamente aquí'
+    }
+  }
+  
+  // Registrar acciones disponibles
+  uiContext.registerAction('cambiarTabInventario', (params) => {
+    const tab = params?.tab || 'stock'
+    const tabMap = { 'stock': 'stock', 'movimientos': 'movements', 'alertas': 'alerts' }
+    activeTab.value = tabMap[tab] || tab
+    return { 
+      success: true, 
+      message: `Cambiando a ${tab}`
+    }
+  })
+  
+  uiContext.registerAction('buscarInventario', (params) => {
+    const texto = params?.texto || ''
+    searchTerm.value = texto
+    return { 
+      success: true, 
+      message: `Buscando "${texto}"...`,
+      resultados: filteredProducts.value.length
+    }
+  })
+  
+  uiContext.registerAction('filtrarInventarioPorStock', (params) => {
+    const filtro = params?.filtro || ''
+    const filtroMap = { 'bajo': 'low', 'normal': 'normal', 'alto': 'high', 'todos': '' }
+    stockFilter.value = filtroMap[filtro] || filtro
+    return { 
+      success: true, 
+      message: filtro ? `Filtrando productos con stock ${filtro}` : 'Mostrando todos los productos',
+      resultados: filteredProducts.value.length
+    }
+  })
+  
+  uiContext.registerAction('filtrarInventarioPorCategoria', (params) => {
+    const categoria = params?.categoria || ''
+    categoryFilter.value = categoria
+    return { 
+      success: true, 
+      message: categoria ? `Filtrando por categoría: ${categoria}` : 'Mostrando todas las categorías',
+      resultados: filteredProducts.value.length
+    }
+  })
+  
+  uiContext.registerAction('limpiarFiltrosInventario', () => {
+    searchTerm.value = ''
+    categoryFilter.value = ''
+    stockFilter.value = ''
+    return { success: true, message: 'Filtros limpiados' }
+  })
+  
+  uiContext.registerAction('verAlertasInventario', () => {
+    activeTab.value = 'alerts'
+    return { 
+      success: true, 
+      message: `Mostrando ${lowStockProducts.value} productos con stock bajo`
+    }
+  })
+  
+  uiContext.registerAction('nuevoMovimiento', () => {
+    openMovementModal()
+    return { success: true, message: 'Modal de nuevo movimiento abierto' }
+  })
+  
+  // 🧠 ACCIÓN: Editar campo de producto (principalmente stock) desde inventario
+  uiContext.registerAction('editarCampoProducto', async (params) => {
+    const { nombreProducto, campo, nuevoValor } = params
+    
+    // Solo soportamos edición de stock en Inventario
+    const campoLower = campo?.toLowerCase() || ''
+    if (!campoLower.includes('stock') && !campoLower.includes('cantidad')) {
+      return { 
+        success: false, 
+        message: 'En Control de Inventario solo puedo ajustar el stock. Para otros campos, ve a Gestión de Productos.' 
+      }
+    }
+    
+    // Buscar el producto
+    let productoEncontrado = null
+    
+    if (nombreProducto) {
+      // Buscar por nombre
+      const nombreNormalizado = nombreProducto.toLowerCase().trim()
+      productoEncontrado = products.value.find(p => 
+        p.name.toLowerCase().includes(nombreNormalizado)
+      )
+    } else if (filteredProducts.value.length === 1) {
+      // Si hay solo un producto filtrado, usar ese
+      productoEncontrado = filteredProducts.value[0]
+    } else if (filteredProducts.value.length > 1) {
+      // Hay varios productos, necesitamos especificar cuál
+      return { 
+        success: false, 
+        message: `Hay ${filteredProducts.value.length} productos. ¿Cuál quieres ajustar? Dime el nombre exacto.` 
+      }
+    }
+    
+    if (!productoEncontrado) {
+      return { success: false, message: `No encontré el producto${nombreProducto ? ` "${nombreProducto}"` : ''}` }
+    }
+    
+    // Parsear el nuevo valor de stock
+    const nuevoStock = parseInt(nuevoValor)
+    if (isNaN(nuevoStock) || nuevoStock < 0) {
+      return { success: false, message: 'El stock debe ser un número válido mayor o igual a 0' }
+    }
+    
+    try {
+      // Hacer el ajuste de stock directamente
+      const response = await inventoryService.adjustStock(
+        productoEncontrado.id,
+        nuevoStock,
+        'Ajuste por asistente de voz',
+        selectedWarehouse.value,
+        null // No hay variant_id en ajuste simple
+      )
+      
+      if (response && response.success) {
+        // Recargar productos para actualizar la vista
+        await loadProducts()
+        
+        // Actualizar store global
+        await appStore.loadProducts(selectedWarehouse.value, 'general', true)
+        
+        // Emitir evento para otros módulos
+        window.dispatchEvent(new CustomEvent('products-updated', { 
+          detail: { 
+            source: 'inventory-voice-adjustment',
+            productId: productoEncontrado.id,
+            newStock: nuevoStock
+          } 
+        }))
+        
+        const stockAnterior = productoEncontrado.current_stock || 0
+        const diferencia = nuevoStock - stockAnterior
+        const tipoMovimiento = diferencia > 0 ? 'aumentó' : 'disminuyó'
+        
+        return { 
+          success: true, 
+          message: `Listo. El stock de ${productoEncontrado.name} ${tipoMovimiento} de ${stockAnterior} a ${nuevoStock} unidades.`,
+          producto: productoEncontrado.name,
+          stockAnterior,
+          stockNuevo: nuevoStock
+        }
+      } else {
+        return { success: false, message: 'No pude guardar el ajuste de stock' }
+      }
+    } catch (error) {
+      console.error('Error ajustando stock:', error)
+      return { success: false, message: 'Error al ajustar el stock' }
+    }
+  })
+  
+  // Actualizar el store de contexto
+  uiContext.setScreenData(contextData)
+}
+
+// Watcher para actualizar contexto cuando cambian los datos
+watch([products, searchTerm, categoryFilter, stockFilter, activeTab, movementsData], () => {
+  updateScreenContextForAI()
+}, { deep: true })
 </script>
 
 <style scoped>
