@@ -29,18 +29,18 @@
         <div class="flex items-center space-x-3">
           <!-- Botón Importar Excel (NUEVO) -->
           <button id="tour-import-excel" @click="showExcelImportModal = true"
-                  class="px-4 py-2.5 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 text-sm font-semibold rounded-xl border border-indigo-200 dark:border-indigo-800 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:border-indigo-300 dark:hover:border-indigo-700">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                  class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
             </svg>
             <span>Importar Excel</span>
           </button>
           
           <!-- Botón Neutro (Exportar) -->
           <button id="tour-export-products" @click="exportProducts"
-                  class="px-4 py-2.5 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-200 text-sm font-semibold rounded-xl border border-slate-200 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:border-slate-300 dark:hover:border-zinc-600">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
             <span>Exportar</span>
           </button>
@@ -48,10 +48,10 @@
           <!-- Botón Secundario (Actualizar) -->
           <button @click="refreshProducts"
                   :disabled="loading"
-                  class="px-4 py-2.5 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-200 text-sm font-semibold rounded-xl border border-slate-200 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:border-slate-300 dark:hover:border-zinc-600"
+                  class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2"
                   :class="{ 'opacity-50 cursor-not-allowed': loading }">
-            <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
             <span>{{ loading ? 'Sincronizando' : 'Actualizar' }}</span>
           </button>
@@ -59,9 +59,9 @@
           <!-- Botón Principal (Nuevo Producto) -->
           <button id="tour-new-product"
                   @click="openCreateModal"
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-slate-400/60 dark:hover:shadow-slate-900/70 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                  class="px-6 py-2.5 bg-[#1e1f20] dark:bg-[#8ab4f8] hover:bg-black dark:hover:bg-[#aecbfa] text-white dark:text-[#1e1f20] text-sm font-semibold rounded-full transition-all duration-200 flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
             </svg>
             <span>Nuevo Producto</span>
           </button>
@@ -92,76 +92,76 @@
       <!-- KPIs Standard (Con iconos) - Estilo fantasma profesional -->
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <!-- Total Productos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-slate-100 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700/50 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            <div class="w-11 h-11 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Total Productos</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{{ displayProducts.length }}</p>
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Total Productos</p>
+              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ displayProducts.length }}</p>
             </div>
           </div>
         </div>
 
         <!-- Productos Activos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Activos</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{{ activeProducts }}</p>
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Activos</p>
+              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ activeProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/50 border border-amber-100 dark:border-amber-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/40 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Stock Bajo</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{{ lowStockProducts }}</p>
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Stock Bajo</p>
+              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ lowStockProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Valor Total -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950/40 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Valor Total</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatCurrency(totalValue) }}</p>
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Valor Total</p>
+              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">${{ formatCurrency(totalValue) }}</p>
             </div>
           </div>
         </div>
 
         <!-- Categorías -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-200/60 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200 shadow-sm hover:shadow-md dark:shadow-black/20">
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Categorías</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white mt-0.5">{{ uniqueCategories }}</p>
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Categorías</p>
+              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ uniqueCategories }}</p>
             </div>
           </div>
         </div>
@@ -169,26 +169,26 @@
 
       <!-- Contenedor Principal Tour - Filtros + Productos -->
       <div id="tour-products-main">
-      <!-- Filtros - Diseño limpio y profesional -->
-    <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 mb-6 border border-gray-200 dark:border-zinc-800 shadow-sm transition-colors duration-300">
+      <!-- Filtros - Diseño Gemini limpio -->
+    <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl p-4 mb-6 transition-colors duration-200">
       <div class="flex flex-wrap items-center gap-4">
-        <!-- Búsqueda limpia (como Facturas) -->
+        <!-- Búsqueda limpia (Gemini style) -->
         <div id="tour-search-products" class="flex-1 min-w-[200px] relative">
-          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          <svg class="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
           <input
             v-model="searchTerm"
             type="text"
             placeholder="Buscar productos por nombre, SKU..."
-            class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300">
+            class="w-full pl-11 pr-4 py-3 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] dark:placeholder-[#9aa0a6] focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all duration-200">
         </div>
         
         <!-- Categoría -->
         <div id="tour-filter-category" class="min-w-[160px]">
           <select
             v-model="categoryFilter"
-            class="w-full px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
+            class="w-full px-4 py-3 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors duration-200 cursor-pointer">
             <option value="">Todas las categorías</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
           </select>
@@ -198,7 +198,7 @@
         <div id="tour-filter-status" class="min-w-[140px]">
           <select
             v-model="statusFilter"
-            class="w-full px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
+            class="w-full px-4 py-3 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors duration-200 cursor-pointer">
             <option value="">Todos los estados</option>
             <option value="active">Activos</option>
             <option value="inactive">Inactivos</option>
@@ -210,7 +210,7 @@
         <div class="min-w-[140px]">
           <select
             v-model="sortBy"
-            class="w-full px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
+            class="w-full px-4 py-3 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors duration-200 cursor-pointer">
             <option value="name">Por Nombre</option>
             <option value="price">Por Precio</option>
             <option value="stock">Por Stock</option>
@@ -218,18 +218,18 @@
           </select>
         </div>
         
-        <!-- Toggle Vista (Diseño limpio como Facturas) -->
-        <div id="tour-view-toggle" class="flex items-center bg-gray-50 dark:bg-zinc-800 rounded-lg p-1 border border-gray-200 dark:border-zinc-700">
+        <!-- Toggle Vista (Gemini pill style) -->
+        <div id="tour-view-toggle" class="flex items-center bg-white dark:bg-[#282a2c] rounded-full p-1">
           <button
             @click="setViewMode('grid')"
             :class="[
-              'flex items-center justify-center px-3 py-1.5 rounded-md transition-all text-xs font-medium',
+              'flex items-center justify-center px-3.5 py-1.5 rounded-full transition-all text-xs font-medium',
               viewMode === 'grid' 
-                ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm' 
-                : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+                ? 'bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8]' 
+                : 'text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f8f9fa] dark:hover:bg-[#3a3a3f]'
             ]">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
             </svg>
             Tarjetas
           </button>
@@ -237,13 +237,13 @@
           <button
             @click="setViewMode('table')"
             :class="[
-              'flex items-center justify-center px-3 py-1.5 rounded-md transition-all text-xs font-medium',
+              'flex items-center justify-center px-3.5 py-1.5 rounded-full transition-all text-xs font-medium',
               viewMode === 'table' 
-                ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm' 
-                : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+                ? 'bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8]' 
+                : 'text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f8f9fa] dark:hover:bg-[#3a3a3f]'
             ]">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
             </svg>
             Tabla
           </button>
@@ -306,19 +306,32 @@
           />
         </template>
         
-        <!-- 🛒 RETAIL CARD - Diseño minimalista profesional -->
+        <!-- 🛒 RETAIL CARD - Diseño Gemini minimalista -->
         <template v-else>
           <div v-for="product in paginatedProducts" 
                :key="product.id" 
                @click="viewProduct(product)"
-               class="bg-white dark:bg-zinc-900/90 rounded-2xl border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 hover:shadow-xl dark:hover:shadow-black/40 transition-all duration-300 overflow-hidden group cursor-pointer">
+               class="bg-white dark:bg-[#1e1f20] rounded-2xl hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-all duration-200 overflow-hidden group cursor-pointer">
           
             <!-- Imagen del producto con overlay en hover -->
-            <div class="relative aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
-              <img :src="getProductImage(product) || generateDynamicAvatar(product.name)" 
+            <div class="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1e1f20] dark:to-[#282a2c] overflow-hidden">
+              <!-- Si hay imagen real, mostrarla -->
+              <img v-if="getProductImage(product)"
+                   :src="getProductImage(product)" 
                    :alt="product.name" 
                    @error="(e) => handleImageError(e, product)"
                    class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
+              <!-- Placeholder elegante cuando NO hay imagen -->
+              <div v-else class="w-full h-full flex items-center justify-center">
+                <div class="flex flex-col items-center justify-center">
+                  <div class="w-16 h-16 rounded-2xl bg-gray-200/80 dark:bg-[#3a3a3f] flex items-center justify-center mb-2">
+                    <svg class="w-8 h-8 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
+                    </svg>
+                  </div>
+                  <span class="text-[11px] font-medium text-gray-400 dark:text-zinc-500">Sin imagen</span>
+                </div>
+              </div>
               
               <!-- Overlay con acciones en hover -->
               <div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
@@ -342,43 +355,43 @@
               <!-- Badge Estado - Esquina superior derecha -->
               <div class="absolute top-3 right-3">
                 <span :class="getProductStatus(product) 
-                  ? 'bg-emerald-500 text-white' 
-                  : 'bg-gray-500 text-white'" 
-                      class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide shadow-sm">
+                  ? 'bg-[#1e8e3e] text-white' 
+                  : 'bg-[#5f6368] text-white'" 
+                      class="px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wide">
                   {{ getProductStatus(product) ? 'Activo' : 'Inactivo' }}
                 </span>
               </div>
               
               <!-- Badge Stock Bajo - Esquina superior izquierda -->
               <div v-if="(product.current_stock || 0) <= (product.min_stock || 0)" class="absolute top-3 left-3">
-                <span class="bg-amber-500 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide shadow-sm">
+                <span class="bg-[#f9ab00] text-white px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wide">
                   Stock Bajo
                 </span>
               </div>
             </div>
 
-            <!-- Información del producto - Diseño limpio -->
+            <!-- Información del producto - Diseño Gemini limpio -->
             <div class="p-4">
               <!-- Nombre -->
-              <h3 class="font-semibold text-gray-900 dark:text-white text-[13px] leading-snug line-clamp-1 mb-1" :title="product.name">
+              <h3 class="font-medium text-[#1e1f20] dark:text-[#e3e3e3] text-sm leading-snug line-clamp-1 mb-1" :title="product.name">
                 {{ product.name }}
               </h3>
               
               <!-- Categoría -->
-              <p class="text-[11px] text-gray-500 dark:text-zinc-500 mb-3">
+              <p class="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] mb-3">
                 {{ product.category?.name || 'Sin categoría' }}
               </p>
               
               <!-- Precio y Stock en línea -->
               <div class="flex items-center justify-between">
-                <span class="font-bold text-gray-900 dark:text-white text-lg">
+                <span class="font-semibold text-[#1e1f20] dark:text-[#e3e3e3] text-lg">
                   ${{ formatCurrency(product.sale_price) }}
                 </span>
                 <span :class="[
-                  'text-sm font-medium px-2 py-0.5 rounded-md',
+                  'text-xs font-medium px-2.5 py-1 rounded-full',
                   (product.current_stock || 0) <= (product.min_stock || 0) 
-                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' 
-                    : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400'
+                    ? 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#e37400] dark:text-[#f9ab00]' 
+                    : 'bg-[#f8f9fa] dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6]'
                 ]">
                   {{ product.current_stock || 0 }} uds
                 </span>
@@ -401,66 +414,66 @@
       </div>
     </div>
 
-    <!-- Vista de Tabla - Diseño limpio y profesional -->
-  <div v-else class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg dark:shadow-black/40 border border-gray-200/80 dark:border-zinc-800/80 overflow-hidden transition-colors duration-300">
+    <!-- Vista de Tabla - Diseño Gemini limpio -->
+  <div v-else class="bg-white dark:bg-[#1e1f20] rounded-2xl overflow-hidden transition-colors duration-200">
       <!-- Header de tabla -->
-      <div class="bg-gray-50/50 dark:bg-zinc-800/30 border-b border-gray-100 dark:border-zinc-800/60 px-6 py-4 flex items-center justify-between">
+      <div class="bg-[#f8f9fa] dark:bg-[#282a2c] px-6 py-4 flex items-center justify-between">
         <div>
-          <h2 class="text-base font-bold text-gray-900 dark:text-white">Catálogo de Productos</h2>
-          <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ totalItems }} productos encontrados</p>
+          <h2 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Catálogo de Productos</h2>
+          <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">{{ totalItems }} productos encontrados</p>
         </div>
       </div>
       
       <!-- Tabla -->
       <table class="min-w-full">
         <thead>
-          <tr class="bg-slate-50/50 dark:bg-zinc-800/20 border-b border-gray-100 dark:border-zinc-800/60">
-            <th class="px-6 py-3.5 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+          <tr class="border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+            <th class="px-6 py-3.5 text-left text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
               Producto
             </th>
-            <th class="px-6 py-3.5 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-left text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
               Categoría
             </th>
-            <th class="px-6 py-3.5 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-left text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
               Proveedor
             </th>
-            <th class="px-6 py-3.5 text-right text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-right text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
               Precio
             </th>
             
             <!-- Columnas de Stock Dinámicas -->
             <template v-if="showMultipleStockColumns">
               <th v-for="warehouse in availableWarehouses" :key="warehouse.id"
-                  class="px-4 py-3.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+                  class="px-4 py-3.5 text-center text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
                 <div class="flex items-center justify-center space-x-1">
-                  <svg class="w-3 h-3 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  <svg class="w-3 h-3 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                   </svg>
                   <span>{{ warehouse.name }}</span>
                 </div>
               </th>
             </template>
             <template v-else>
-              <th class="px-6 py-3.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+              <th class="px-6 py-3.5 text-center text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
                 Stock
               </th>
             </template>
             
-            <th class="px-6 py-3.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-center text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
               Estado
             </th>
-            <th class="px-6 py-3.5 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+            <th class="px-6 py-3.5 text-center text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
               Acciones
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800/60">
+        <tbody class="bg-white dark:bg-[#1e1f20] divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
           <!-- Loading State -->
           <tr v-if="loading">
             <td :colspan="6 + availableWarehouses.length" class="px-4 py-12 text-center">
               <div class="flex flex-col items-center space-y-3">
-                <div class="w-8 h-8 border-4 border-slate-300 dark:border-zinc-600 border-t-slate-600 dark:border-t-slate-400 rounded-full animate-spin"></div>
-                <p class="text-sm text-gray-500 dark:text-zinc-500 font-medium">Cargando productos...</p>
+                <div class="w-8 h-8 border-4 border-[#e8eaed] dark:border-[#3a3a3f] border-t-[#1a73e8] dark:border-t-[#8ab4f8] rounded-full animate-spin"></div>
+                <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium">Cargando productos...</p>
               </div>
             </td>
           </tr>
@@ -496,32 +509,32 @@
             </td>
           </tr>
 
-          <!-- Product Rows - Diseño limpio y profesional -->
+          <!-- Product Rows - Diseño Gemini limpio -->
           <tr v-for="product in paginatedProducts" 
               :key="product.id"
               @click="viewProduct(product)"
-              class="hover:bg-slate-50/50 dark:hover:bg-zinc-800/30 transition-all duration-200 group cursor-pointer border-b border-gray-100 dark:border-zinc-800/50 last:border-0">
+              class="hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-all duration-200 group cursor-pointer">
             <!-- Columna Producto (La Estrella) -->
             <td class="px-6 py-4">
               <div class="flex items-center gap-4">
-                <div class="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden ring-1 ring-gray-200 dark:ring-zinc-700/50 group-hover:ring-gray-300 dark:group-hover:ring-zinc-600 transition-all" 
-                     :class="getProductImage(product) ? 'bg-white dark:bg-zinc-800' : 'bg-gray-100 dark:bg-zinc-800 flex items-center justify-center'">
+                <div class="relative w-12 h-12 flex-shrink-0 rounded-xl overflow-hidden bg-[#f8f9fa] dark:bg-[#282a2c]" 
+                     :class="!getProductImage(product) ? 'flex items-center justify-center' : ''">
                   <img v-if="getProductImage(product)"
                        :src="getProductImage(product)" 
                        :alt="product.name" 
                        class="w-full h-full object-cover">
-                  <svg v-else class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <svg v-else class="w-6 h-6 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
                   </svg>
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 mb-1">
-                    <div class="text-sm font-medium text-gray-800 dark:text-zinc-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors truncate">{{ product.name }}</div>
+                    <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors truncate">{{ product.name }}</div>
                     <!-- Badge "Producto con Variantes" -->
                     <span v-if="hasVariants(product)" 
-                          class="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800 rounded-md text-[10px] font-bold uppercase tracking-wide whitespace-nowrap">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                          class="inline-flex items-center gap-1 px-2 py-0.5 bg-[#f3e8fd] dark:bg-[#a142f4]/20 text-[#9334e6] dark:text-[#c58af9] rounded-full text-[10px] font-medium whitespace-nowrap">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                       </svg>
                       {{ getVariantsCount(product) }} Variantes
                     </span>
@@ -532,24 +545,24 @@
                 </div>
               </div>
             </td>
-            <!-- Columna Categoría (Badges/Pills) -->
+            <!-- Columna Categoría (Pills Gemini) -->
             <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs bg-slate-50 dark:bg-zinc-800/60 text-slate-600 dark:text-zinc-400 border border-slate-200/60 dark:border-zinc-700/40 font-medium">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-[#f8f9fa] dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6] font-medium">
                 {{ product.category?.name || 'Sin categoría' }}
               </span>
             </td>
             <!-- Columna Proveedor -->
             <td class="px-6 py-4">
-              <span v-if="product.supplier?.name" class="inline-flex items-center px-2.5 py-1 rounded-md text-xs bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100/60 dark:border-indigo-900/40 font-medium">
+              <span v-if="product.supplier?.name" class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8] font-medium">
                 {{ product.supplier.name }}
               </span>
-              <span v-else class="text-xs text-gray-400 dark:text-zinc-600 italic">
+              <span v-else class="text-xs text-[#9aa0a6] italic">
                 Sin proveedor
               </span>
             </td>
             <!-- Columna Precio (Con Rango para Variantes) -->
             <td class="px-6 py-4 text-right">
-              <div class="text-sm font-mono font-bold text-gray-900 dark:text-white tabular-nums">
+              <div class="text-sm font-mono font-semibold text-[#1e1f20] dark:text-[#e3e3e3] tabular-nums">
                 {{ getPriceRange(product) }}
               </div>
             </td>
@@ -1765,29 +1778,29 @@
         </div>
       </div>
       
-      <!-- Modal Simple para productos sin variantes (Original) -->
+      <!-- Modal Simple para productos sin variantes (Original) - Gemini Style -->
       <div v-else-if="selectedProduct"
-           class="bg-white dark:bg-zinc-900 rounded-lg w-full max-w-2xl shadow-xl max-h-[90vh] overflow-hidden border dark:border-zinc-800">
+           class="bg-white dark:bg-[#1e1f20] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         
-        <!-- Header -->
-        <div class="bg-gray-50 dark:bg-zinc-900 px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
+        <!-- Header (Gemini clean) -->
+        <div class="bg-[#f8f9fa] dark:bg-[#282a2c] px-6 py-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 bg-blue-100 dark:bg-blue-950 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                 </svg>
               </div>
               <div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Detalles del Producto</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Información completa del producto</p>
+                <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Detalles del Producto</h3>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Información completa del producto</p>
               </div>
             </div>
             <button @click="showViewModal = false" 
-                    class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
-              <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    class="p-2 hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] rounded-full transition-colors">
+              <svg class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
           </div>
@@ -1797,53 +1810,67 @@
           <!-- Imagen y detalles principales -->
           <div class="flex flex-col items-center mb-8">
             <div class="relative mb-4">
-              <img :src="getProductImage(selectedProduct)" @error="handleImageError" 
+              <!-- Si hay imagen real, mostrarla -->
+              <img v-if="getProductImage(selectedProduct)" 
+                   :src="getProductImage(selectedProduct)" 
+                   @error="handleImageError" 
                    :alt="selectedProduct.name" 
-                   class="w-40 h-40 object-cover rounded-lg shadow-sm border border-gray-200 dark:border-zinc-700">
+                   class="w-40 h-40 object-cover rounded-2xl border border-gray-100 dark:border-[#3a3a3f]">
+              <!-- Placeholder elegante cuando NO hay imagen -->
+              <div v-else class="w-40 h-40 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1e1f20] dark:to-[#282a2c] flex items-center justify-center border border-gray-100 dark:border-[#3a3a3f]">
+                <div class="flex flex-col items-center justify-center">
+                  <div class="w-14 h-14 rounded-xl bg-gray-200/80 dark:bg-[#3a3a3f] flex items-center justify-center mb-2">
+                    <svg class="w-7 h-7 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
+                    </svg>
+                  </div>
+                  <span class="text-[10px] font-medium text-gray-400 dark:text-zinc-500">Sin imagen</span>
+                </div>
+              </div>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ selectedProduct.name }}</h2>
+            <h2 class="text-xl font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">{{ selectedProduct.name }}</h2>
             <div class="flex items-center space-x-2 text-sm">
-              <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-medium">
+              <span class="px-3 py-1 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8] rounded-full text-xs font-medium">
                 {{ selectedProduct.category?.name || 'Sin categoría' }}
               </span>
               <span :class="[
                 'px-3 py-1 rounded-full text-xs font-medium',
                 getProductStatus(selectedProduct) 
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
-                  : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                  ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' 
+                  : 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]'
               ]">
                 {{ getProductStatus(selectedProduct) ? 'Activo' : 'Inactivo' }}
               </span>
               <span v-if="(selectedProduct.current_stock || 0) <= (selectedProduct.min_stock || 0)" 
-                    class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full text-xs font-medium">
+                    class="px-3 py-1 bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#e37400] dark:text-[#fdd663] rounded-full text-xs font-medium">
                 Stock Bajo
               </span>
             </div>
           </div>
           
-          <!-- Detalles en grid -->
+          <!-- Detalles en grid (Gemini style) -->
           <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-4">
-              <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">SKU</p>
-              <p class="text-base font-bold text-gray-900 dark:text-white">{{ selectedProduct.sku || 'Sin SKU' }}</p>
+            <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">SKU</p>
+              <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProduct.sku || 'Sin SKU' }}</p>
             </div>
-            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-4">
-              <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Precio</p>
-              <p class="text-base font-bold text-green-600 dark:text-green-400">${{ formatCurrency(selectedProduct.sale_price) }}</p>
+            <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Precio</p>
+              <p class="text-base font-semibold text-[#1e8e3e] dark:text-[#81c995]">${{ formatCurrency(selectedProduct.sale_price) }}</p>
             </div>
-            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-4">
-              <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Stock Actual</p>
-              <p class="text-base font-bold text-gray-900 dark:text-white">{{ selectedProduct.current_stock || 0 }}</p>
-              <div class="flex items-center mt-1 text-xs text-gray-500 dark:text-zinc-400">
+            <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Stock Actual</p>
+              <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProduct.current_stock || 0 }}</p>
+              <div class="flex items-center mt-1 text-xs text-[#5f6368] dark:text-[#9aa0a6]">
                 <span>Mín: {{ selectedProduct.min_stock || 0 }}</span>
                 <span class="mx-2">•</span>
                 <span>Máx: {{ selectedProduct.max_stock || 0 }}</span>
               </div>
             </div>
-            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-4">
-              <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Costo</p>
-              <p class="text-base font-bold text-gray-900 dark:text-white">${{ formatCurrency(selectedProduct.cost_price) }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">
+            <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
+              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Costo</p>
+              <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">${{ formatCurrency(selectedProduct.cost_price) }}</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">
                 Margen: {{ selectedProduct.sale_price && selectedProduct.cost_price ? 
                   ((selectedProduct.sale_price - selectedProduct.cost_price) / selectedProduct.cost_price * 100).toFixed(1) + '%' : 
                   '0%' }}
@@ -1852,27 +1879,27 @@
           </div>
           
           <!-- Sección de descripción -->
-          <div v-if="selectedProduct.description" class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-4 mb-6">
+          <div v-if="selectedProduct.description" class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4 mb-6">
             <div class="flex items-center mb-2 space-x-2">
-              <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+              <svg class="w-4 h-4 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/>
               </svg>
-              <h4 class="text-sm font-bold text-gray-900 dark:text-white">Descripción del Producto</h4>
+              <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Descripción del Producto</h4>
             </div>
-            <p class="text-sm text-gray-600 dark:text-zinc-300 leading-relaxed">{{ selectedProduct.description }}</p>
+            <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">{{ selectedProduct.description }}</p>
           </div>
 
-          <!-- Pie del modal con acciones -->
+          <!-- Pie del modal con acciones (Gemini style) -->
           <div class="flex items-center justify-end space-x-3">
             <button @click="editProduct(selectedProduct)" 
-                    class="px-4 py-2 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg text-sm font-medium inline-flex items-center space-x-2 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full text-sm font-medium inline-flex items-center gap-2 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
               <span>Editar Producto</span>
             </button>
             <button @click="showViewModal = false" 
-                    class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600 rounded-lg text-sm font-medium transition-colors">
+                    class="px-5 py-2.5 bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#1e1f20] hover:bg-[#1557b0] dark:hover:bg-[#aecbfa] rounded-full text-sm font-medium transition-colors">
               Cerrar
             </button>
           </div>

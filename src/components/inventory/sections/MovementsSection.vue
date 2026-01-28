@@ -1,102 +1,77 @@
 <template>
   <div class="movements-section animate-fade-in">
-    <!-- Tarjetas de Resumen - Estilo Ghost/Glass compacto -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-5" v-if="data && data.summary">
-      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-blue-50 dark:bg-blue-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Total</p>
-            <p class="text-lg font-bold text-gray-900 dark:text-white">{{ data.summary.total_movements }}</p>
+    <!-- Tarjetas de Resumen - Dentro de un contenedor -->
+    <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-4 mb-4" v-if="data && data.summary">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Resumen del Período</h3>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-xl px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Total</p>
+              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ data.summary.total_movements }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"></path>
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Entradas</p>
-            <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ data.summary.total_entries }}</p>
+        <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-xl px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"></path>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Entradas</p>
+              <p class="text-xl font-semibold text-[#1e8e3e] dark:text-[#81c995]">{{ data.summary.total_entries }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-rose-50 dark:bg-rose-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"></path>
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Salidas</p>
-            <p class="text-lg font-bold text-rose-600 dark:text-rose-400">{{ data.summary.total_exits }}</p>
+        <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-xl px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"></path>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Salidas</p>
+              <p class="text-xl font-semibold text-[#d93025] dark:text-[#f28b82]">{{ data.summary.total_exits }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">$ Entradas</p>
-            <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ formatCurrency(data.summary.total_entry_value) }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-orange-50 dark:bg-orange-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">$ Salidas</p>
-            <p class="text-lg font-bold text-orange-600 dark:text-orange-400">{{ formatCurrency(data.summary.total_exit_value) }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white/60 dark:bg-zinc-800/30  rounded-lg px-3 py-2.5 border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)]">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 bg-indigo-50 dark:bg-indigo-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"></path>
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Neto</p>
-            <p class="text-lg font-bold" :class="data.summary.net_movement >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
-              {{ formatCurrency(data.summary.net_movement) }}
-            </p>
+        <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-xl px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Valor Entradas</p>
+              <p class="text-xl font-semibold text-[#1e8e3e] dark:text-[#81c995]">{{ formatCurrency(data.summary.total_entry_value) }}</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Controles y Filtros - Compacto -->
-    <div class="bg-white/60 dark:bg-zinc-800/30  rounded-xl border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)] p-4 mb-4">
+    <!-- Controles y Filtros - Card separado -->
+    <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-4 mb-4">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base font-semibold text-gray-900 dark:text-white">Historial de Movimientos</h2>
+        <h2 class="text-sm font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Historial de Movimientos</h2>
         <button 
           @click="refreshData" 
           :disabled="loading"
-          class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 disabled:opacity-50 text-sm font-medium flex items-center gap-1.5 transition-colors"
+          class="text-[#1a73e8] dark:text-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/20 disabled:opacity-50 text-sm font-medium flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-full"
         >
           <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
@@ -105,14 +80,14 @@
         </button>
       </div>
       
-      <!-- Filtros en una línea -->
+      <!-- Filtros en una línea - Gemini Style -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div>
-          <label class="block text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Período</label>
+          <label class="block text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Período</label>
           <select 
             v-model="filters.period"
             @change="applyFilters"
-            class="w-full border-0 bg-gray-100 dark:bg-zinc-700/50 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 transition-colors"
+            class="w-full bg-[#f8f9fa] dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors cursor-pointer"
           >
             <option value="day">Hoy</option>
             <option value="week">Esta Semana</option>
@@ -122,11 +97,11 @@
         </div>
         
         <div>
-          <label class="block text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Tipo</label>
+          <label class="block text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Tipo</label>
           <select 
             v-model="filters.type"
             @change="applyFilters"
-            class="w-full border-0 bg-gray-100 dark:bg-zinc-700/50 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 transition-colors"
+            class="w-full bg-[#f8f9fa] dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors cursor-pointer"
           >
             <option value="">Todos</option>
             <option value="entry">Entradas</option>
@@ -136,11 +111,11 @@
         </div>
         
         <div>
-          <label class="block text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Usuario</label>
+          <label class="block text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Usuario</label>
           <select 
             v-model="filters.user"
             @change="applyFilters"
-            class="w-full border-0 bg-gray-100 dark:bg-zinc-700/50 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 transition-colors"
+            class="w-full bg-[#f8f9fa] dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors cursor-pointer"
           >
             <option value="">Todos</option>
             <option v-for="user in availableUsers" :key="user.id" :value="user.id">
@@ -150,88 +125,87 @@
         </div>
         
         <div>
-          <label class="block text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Producto</label>
+          <label class="block text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Producto</label>
           <input 
             v-model="filters.productSearch"
             @input="applyFilters"
             type="text" 
             placeholder="Buscar..."
-            class="w-full border-0 bg-gray-100 dark:bg-zinc-700/50 text-gray-900 dark:text-white rounded-lg px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 transition-colors"
+            class="w-full bg-[#f8f9fa] dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full px-4 py-2.5 text-sm placeholder-[#5f6368] dark:placeholder-[#9aa0a6] focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors"
           >
         </div>
       </div>
     </div>
 
-    <!-- Tabla de Movimientos - Estilo limpio -->
-    <div class="bg-white/60 dark:bg-zinc-800/30  rounded-xl border-0 shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.25)] overflow-hidden">
-      <div class="px-4 py-3 border-b border-gray-100 dark:border-zinc-700/50">
-        <h3 class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Detalle de Movimientos</h3>
-      </div>
-      
+    <!-- Tabla de Movimientos - Gemini Style -->
+    <div class="bg-white dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
       <div v-if="loading" class="flex items-center justify-center py-12">
-        <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
-        <span class="ml-3 text-sm text-gray-500 dark:text-zinc-400">Cargando...</span>
+        <svg class="animate-spin w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="ml-3 text-sm text-[#5f6368] dark:text-[#9aa0a6]">Cargando...</span>
       </div>
       
       <div v-else-if="!data || !data.movements || data.movements.length === 0" class="text-center py-12">
-        <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <svg class="w-12 h-12 text-[#5f6368] dark:text-[#9aa0a6] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
         </svg>
-        <p class="text-sm font-medium text-gray-500 dark:text-zinc-400">Sin movimientos</p>
-        <p class="text-xs text-gray-400 dark:text-zinc-500">No se encontraron registros con los filtros aplicados</p>
+        <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Sin movimientos</p>
+        <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">No se encontraron registros con los filtros aplicados</p>
       </div>
       
       <div v-else class="overflow-x-auto">
         <table class="min-w-full">
-          <thead class="bg-gray-50/50 dark:bg-zinc-800/50">
+          <thead class="bg-[#f8f9fa] dark:bg-[#282a2c]">
             <tr>
-              <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Fecha</th>
-              <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Tipo</th>
-              <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Producto</th>
-              <th class="px-4 py-3 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Cantidad</th>
-              <th class="px-4 py-3 text-right text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">P. Unit.</th>
-              <th class="px-4 py-3 text-right text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Total</th>
-              <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Usuario</th>
-              <th class="px-4 py-3 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Referencia</th>
+              <th class="px-4 py-3 text-left text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Fecha</th>
+              <th class="px-4 py-3 text-left text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Tipo</th>
+              <th class="px-4 py-3 text-left text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Producto</th>
+              <th class="px-4 py-3 text-center text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Cantidad</th>
+              <th class="px-4 py-3 text-right text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">P. Unit.</th>
+              <th class="px-4 py-3 text-right text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Total</th>
+              <th class="px-4 py-3 text-left text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Usuario</th>
+              <th class="px-4 py-3 text-left text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Referencia</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-zinc-700/50">
+          <tbody class="divide-y divide-[#e8eaed] dark:divide-[#3a3a3f] bg-white dark:bg-[#1e1f20]">
             <tr 
               v-for="movement in data.movements" 
               :key="movement.movement_id" 
-              class="hover:bg-gray-50/50 dark:hover:bg-zinc-700/20 transition-colors"
+              class="hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-colors"
             >
-              <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-600 dark:text-zinc-300">
+              <td class="px-4 py-3 whitespace-nowrap text-xs text-[#5f6368] dark:text-[#9aa0a6]">
                 {{ formatDate(movement.movement_date) }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <span 
-                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase"
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase"
                   :class="getMovementTypeClass(movement.movement_type)"
                 >
                   {{ formatMovementType(movement.movement_type) }}
                 </span>
               </td>
-              <td class="px-4 py-3 whitespace-nowrap text-xs font-medium text-gray-900 dark:text-white">
+              <td class="px-4 py-3 whitespace-nowrap text-xs font-medium text-[#1e1f20] dark:text-[#e3e3e3]">
                 {{ movement.product_name }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-center">
-                <span class="text-xs font-bold" :class="movement.quantity >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                <span class="text-xs font-semibold" :class="movement.quantity >= 0 ? 'text-[#1e8e3e] dark:text-[#81c995]' : 'text-[#d93025] dark:text-[#f28b82]'">
                   {{ movement.quantity >= 0 ? '+' : '' }}{{ Math.abs(movement.quantity) }}
                 </span>
               </td>
-              <td class="px-4 py-3 whitespace-nowrap text-right text-xs text-gray-500 dark:text-zinc-400">
+              <td class="px-4 py-3 whitespace-nowrap text-right text-xs text-[#5f6368] dark:text-[#9aa0a6]">
                 {{ formatCurrency(movement.unit_price) }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-right">
-                <span class="text-xs font-semibold" :class="movement.total_value >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                <span class="text-xs font-medium" :class="movement.total_value >= 0 ? 'text-[#1e8e3e] dark:text-[#81c995]' : 'text-[#d93025] dark:text-[#f28b82]'">
                   {{ formatCurrency(Math.abs(movement.total_value)) }}
                 </span>
               </td>
-              <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-500 dark:text-zinc-400">
+              <td class="px-4 py-3 whitespace-nowrap text-xs text-[#5f6368] dark:text-[#9aa0a6]">
                 {{ movement.user_name }}
               </td>
-              <td class="px-4 py-3 whitespace-nowrap text-xs text-gray-500 dark:text-zinc-400">
+              <td class="px-4 py-3 whitespace-nowrap text-xs text-[#5f6368] dark:text-[#9aa0a6]">
                 {{ movement.reference || '-' }}
               </td>
             </tr>
@@ -239,55 +213,55 @@
         </table>
       </div>
       
-      <!-- Paginación -->
-      <div v-if="data && data.pagination" class="bg-white dark:bg-zinc-900 px-4 py-3 border-t border-slate-200 dark:border-zinc-800 sm:px-6">
+      <!-- Paginación - Gemini Style -->
+      <div v-if="data && data.pagination" class="bg-white dark:bg-[#1e1f20] px-4 py-3 border-t border-[#e8eaed] dark:border-[#3a3a3f] sm:px-6">
         <div class="flex items-center justify-between">
           <div class="flex-1 flex justify-between sm:hidden">
             <button
               @click="changePage(currentPage - 1)"
               :disabled="currentPage <= 1"
-              class="relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-zinc-700 text-sm font-medium rounded-lg text-slate-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-[#1a73e8] dark:text-[#8ab4f8] bg-[#f8f9fa] dark:bg-[#282a2c] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Anterior
             </button>
             <button
               @click="changePage(currentPage + 1)"
               :disabled="currentPage >= totalPages"
-              class="ml-3 relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-zinc-700 text-sm font-medium rounded-lg text-slate-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-[#1a73e8] dark:text-[#8ab4f8] bg-[#f8f9fa] dark:bg-[#282a2c] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Siguiente
             </button>
           </div>
           <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
-              <p class="text-sm text-slate-700 dark:text-zinc-400">
+              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                 Mostrando
-                <span class="font-bold text-slate-900 dark:text-white">{{ startItem }}</span>
+                <span class="font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ startItem }}</span>
                 a
-                <span class="font-bold text-slate-900 dark:text-white">{{ endItem }}</span>
+                <span class="font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ endItem }}</span>
                 de
-                <span class="font-bold text-slate-900 dark:text-white">{{ totalItems }}</span>
+                <span class="font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ totalItems }}</span>
                 resultados
               </p>
             </div>
             <div>
-              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              <nav class="relative z-0 inline-flex rounded-full overflow-hidden" aria-label="Pagination">
                 <button
                   @click="changePage(1)"
                   :disabled="currentPage <= 1"
-                  class="relative inline-flex items-center px-2 py-2 rounded-l-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="relative inline-flex items-center px-3 py-2 bg-[#f8f9fa] dark:bg-[#282a2c] text-sm font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
                   </svg>
                 </button>
                 <button
                   @click="changePage(currentPage - 1)"
                   :disabled="currentPage <= 1"
-                  class="relative inline-flex items-center px-2 py-2 border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="relative inline-flex items-center px-3 py-2 bg-[#f8f9fa] dark:bg-[#282a2c] text-sm font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
                 
@@ -295,10 +269,10 @@
                   <button
                     @click="changePage(page)"
                     :class="[
-                      'relative inline-flex items-center px-4 py-2 border text-sm font-bold',
+                      'relative inline-flex items-center px-4 py-2 text-sm font-medium',
                       page === currentPage
-                        ? 'z-10 bg-slate-900 dark:bg-blue-600 border-slate-900 dark:border-blue-600 text-white'
-                        : 'bg-white dark:bg-zinc-800 border-slate-300 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700'
+                        ? 'z-10 bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#131314]'
+                        : 'bg-[#f8f9fa] dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f]'
                     ]"
                   >
                     {{ page }}
@@ -308,19 +282,19 @@
                 <button
                   @click="changePage(currentPage + 1)"
                   :disabled="currentPage >= totalPages"
-                  class="relative inline-flex items-center px-2 py-2 border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="relative inline-flex items-center px-3 py-2 bg-[#f8f9fa] dark:bg-[#282a2c] text-sm font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
                   </svg>
                 </button>
                 <button
                   @click="changePage(totalPages)"
                   :disabled="currentPage >= totalPages"
-                  class="relative inline-flex items-center px-2 py-2 rounded-r-lg border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-slate-500 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="relative inline-flex items-center px-3 py-2 bg-[#f8f9fa] dark:bg-[#282a2c] text-sm font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
                   </svg>
                 </button>
               </nav>
@@ -402,19 +376,19 @@ export default {
     
     const getMovementTypeClass = (type) => {
       const classes = {
-        'sale': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-        'purchase': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-        'adjustment': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-        'return': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-        'transfer': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-        'entry': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-        'exit': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',
-        'in': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',   // 🔄 Backend usa 'in'
-        'out': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400',             // 🔄 Backend usa 'out'
-        'manual_entry': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-        'manual_exit': 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400'
+        'sale': 'bg-[#fce8e6] text-[#d93025] dark:bg-[#d93025]/20 dark:text-[#f28b82]',
+        'purchase': 'bg-[#e6f4ea] text-[#1e8e3e] dark:bg-[#1e8e3e]/20 dark:text-[#81c995]',
+        'adjustment': 'bg-[#e8f0fe] text-[#1a73e8] dark:bg-[#1a73e8]/20 dark:text-[#8ab4f8]',
+        'return': 'bg-[#fef7e0] text-[#f9ab00] dark:bg-[#f9ab00]/20 dark:text-[#fdd663]',
+        'transfer': 'bg-[#f3e8ff] text-[#7c3aed] dark:bg-[#7c3aed]/20 dark:text-[#a78bfa]',
+        'entry': 'bg-[#e6f4ea] text-[#1e8e3e] dark:bg-[#1e8e3e]/20 dark:text-[#81c995]',
+        'exit': 'bg-[#fce8e6] text-[#d93025] dark:bg-[#d93025]/20 dark:text-[#f28b82]',
+        'in': 'bg-[#e6f4ea] text-[#1e8e3e] dark:bg-[#1e8e3e]/20 dark:text-[#81c995]',   // 🔄 Backend usa 'in'
+        'out': 'bg-[#fce8e6] text-[#d93025] dark:bg-[#d93025]/20 dark:text-[#f28b82]',             // 🔄 Backend usa 'out'
+        'manual_entry': 'bg-[#e6f4ea] text-[#1e8e3e] dark:bg-[#1e8e3e]/20 dark:text-[#81c995]',
+        'manual_exit': 'bg-[#fce8e6] text-[#d93025] dark:bg-[#d93025]/20 dark:text-[#f28b82]'
       }
-      return classes[type] || 'bg-gray-100 text-gray-800 dark:bg-zinc-800 dark:text-zinc-300'
+      return classes[type] || 'bg-[#f8f9fa] text-[#5f6368] dark:bg-[#3a3a3f] dark:text-[#9aa0a6]'
     }
     
     const getMovementIconPath = (type) => {

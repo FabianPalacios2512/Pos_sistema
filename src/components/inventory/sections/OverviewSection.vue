@@ -3,8 +3,11 @@
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center py-12">
       <div class="text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-        <p class="mt-4 text-gray-600">Cargando vista general...</p>
+        <svg class="animate-spin w-12 h-12 text-[#1a73e8] dark:text-[#8ab4f8] mx-auto" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="mt-4 text-[#5f6368] dark:text-[#9aa0a6]">Cargando vista general...</p>
       </div>
     </div>
 
@@ -50,16 +53,18 @@
       <!-- Gráficos y análisis -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Gráfico de tendencia de movimientos -->
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-6">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">
+            <h3 class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">
               Tendencia de Movimientos (30 días)
             </h3>
             <button
               @click="$emit('refresh')"
-              class="text-indigo-600 hover:text-indigo-800 text-sm"
+              class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[#1a73e8] dark:text-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/20 rounded-full transition-colors"
             >
-              <i class="fas fa-sync-alt mr-1"></i>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
               Actualizar
             </button>
           </div>
@@ -70,60 +75,65 @@
         </div>
 
         <!-- Top productos más vendidos -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-6">
+          <h3 class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mb-4">
             Productos Más Vendidos (Último Mes)
           </h3>
           <div class="space-y-3">
             <div
               v-for="(product, index) in data.topSellingProducts"
               :key="product.id"
-              class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              class="flex items-center justify-between p-3 bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl"
             >
               <div class="flex items-center space-x-3">
                 <div class="flex-shrink-0">
-                  <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-800 font-medium text-sm">
+                  <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] font-medium text-sm">
                     {{ index + 1 }}
                   </span>
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900">{{ product.name }}</p>
-                  <p class="text-sm text-gray-500">SKU: {{ product.sku }}</p>
+                  <p class="font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.name }}</p>
+                  <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">SKU: {{ product.sku }}</p>
                 </div>
               </div>
               <div class="text-right">
-                <p class="font-semibold text-gray-900">{{ product.total_sold || 0 }} unidades</p>
-                <p class="text-sm text-gray-500">{{ formatCurrency(product.sale_price) }}</p>
+                <p class="font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.total_sold || 0 }} unidades</p>
+                <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">{{ formatCurrency(product.sale_price) }}</p>
               </div>
             </div>
           </div>
           <div v-if="!data.topSellingProducts || data.topSellingProducts.length === 0" class="text-center py-6">
-            <i class="fas fa-chart-bar text-gray-400 text-3xl mb-2"></i>
-            <p class="text-gray-500">No hay datos de ventas en el último mes</p>
+            <svg class="w-10 h-10 text-[#5f6368] dark:text-[#9aa0a6] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"></path>
+            </svg>
+            <p class="text-[#5f6368] dark:text-[#9aa0a6]">No hay datos de ventas en el último mes</p>
           </div>
         </div>
       </div>
 
       <!-- Movimientos recientes -->
-      <div class="bg-white rounded-lg shadow">
-        <div class="px-6 py-4 border-b border-gray-200">
+      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">
+            <h3 class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">
               Movimientos Recientes (Últimos 7 días)
             </h3>
             <router-link
               to="/inventory/movements"
-              class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+              class="inline-flex items-center gap-1 text-sm font-medium text-[#1a73e8] dark:text-[#8ab4f8] hover:underline"
             >
-              Ver todos <i class="fas fa-arrow-right ml-1"></i>
+              Ver todos 
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"></path>
+              </svg>
             </router-link>
           </div>
         </div>
-        <div class="divide-y divide-gray-200">
+        <div class="divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
           <div
             v-for="movement in data.recentMovements"
             :key="movement.id"
-            class="px-6 py-4 hover:bg-gray-50"
+            class="px-6 py-4 hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-colors"
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4">
@@ -131,8 +141,8 @@
                   <MovementTypeIcon :type="movement.type" />
                 </div>
                 <div>
-                  <p class="font-medium text-gray-900">{{ movement.product?.name }}</p>
-                  <p class="text-sm text-gray-500">
+                  <p class="font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ movement.product?.name }}</p>
+                  <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                     {{ movement.type_description }} • 
                     {{ formatDate(movement.movement_date) }} • 
                     {{ movement.user?.name }}
@@ -143,7 +153,7 @@
                 <p class="font-semibold" :class="getQuantityClass(movement.quantity)">
                   {{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}
                 </p>
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                   {{ movement.previous_stock }} → {{ movement.new_stock }}
                 </p>
               </div>
@@ -151,20 +161,26 @@
           </div>
         </div>
         <div v-if="!data.recentMovements || data.recentMovements.length === 0" class="px-6 py-8 text-center">
-          <i class="fas fa-exchange-alt text-gray-400 text-3xl mb-2"></i>
-          <p class="text-gray-500">No hay movimientos recientes</p>
+          <svg class="w-10 h-10 text-[#5f6368] dark:text-[#9aa0a6] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
+          </svg>
+          <p class="text-[#5f6368] dark:text-[#9aa0a6]">No hay movimientos recientes</p>
         </div>
       </div>
     </div>
 
     <!-- Error State -->
     <div v-else class="text-center py-12">
-      <div class="text-red-500">
-        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
-        <p class="text-lg font-medium">Error al cargar los datos</p>
+      <div>
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-[#fce8e6] dark:bg-[#d93025]/20 flex items-center justify-center">
+          <svg class="w-8 h-8 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
+          </svg>
+        </div>
+        <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Error al cargar los datos</p>
         <button
           @click="$emit('refresh')"
-          class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          class="mt-4 px-6 py-2.5 bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#131314] text-sm font-medium rounded-full hover:bg-[#1557b0] dark:hover:bg-[#aecbfa] transition-colors"
         >
           Intentar de nuevo
         </button>
@@ -221,9 +237,9 @@ export default {
     }
 
     const getQuantityClass = (quantity) => {
-      if (quantity > 0) return 'text-green-600'
-      if (quantity < 0) return 'text-red-600'
-      return 'text-gray-600'
+      if (quantity > 0) return 'text-[#1e8e3e] dark:text-[#81c995]'
+      if (quantity < 0) return 'text-[#d93025] dark:text-[#f28b82]'
+      return 'text-[#5f6368] dark:text-[#9aa0a6]'
     }
 
     return {

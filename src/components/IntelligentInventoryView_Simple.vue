@@ -2,35 +2,35 @@
   <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
-      <!-- Header con Navegación Integrada -->
+      <!-- Header con Navegación Integrada - Gemini Style -->
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Inventario Inteligente</h1>
-          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">Sistema de análisis predictivo y gestión avanzada</p>
+          <h1 class="text-2xl font-medium text-[#1e1f20] dark:text-[#e3e3e3] tracking-tight">Inventario Inteligente</h1>
+          <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-1">Sistema de análisis predictivo y gestión avanzada</p>
         </div>
         
         <div class="flex items-center gap-3">
-          <!-- Navegación de Secciones - Estilo Tabs Profesional -->
-          <nav class="flex items-center bg-white/60 dark:bg-zinc-800/40  rounded-xl p-1">
+          <!-- Navegación de Secciones - Gemini Tabs -->
+          <nav class="flex items-center bg-[#f0f4f9] dark:bg-[#282a2c] rounded-full p-1">
             <button
               v-for="section in sections"
               :key="section.id"
               @click="switchToSection(section.id)"
               :class="[
-                'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+                'px-4 py-2 text-sm font-medium rounded-full transition-all duration-200',
                 activeSection === section.id
-                  ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-zinc-800/50'
+                  ? 'bg-white dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3]'
+                  : 'text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] hover:bg-white/60 dark:hover:bg-[#3a3a3f]/50'
               ]"
             >
               {{ section.name }}
             </button>
           </nav>
 
-          <!-- Botón Actualizar -->
+          <!-- Botón Actualizar - Gemini Black -->
           <button 
             @click="refreshCurrentSection"
-            class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
+            class="px-5 py-2.5 bg-[#1e1f20] dark:bg-[#3a3a3f] hover:bg-black dark:hover:bg-[#4a4a4f] text-white text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2"
           >
             <svg class="w-4 h-4" :class="{ 'animate-spin': connectionStatus === 'Cargando...' }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -44,24 +44,24 @@
       <!-- Vista General -->
       <div v-if="activeSection === 'overview'" class="space-y-4">
         
-        <!-- Solo mostrar errores -->
-        <div v-if="error" class="bg-rose-50 dark:bg-rose-950/30 rounded-xl p-3 border border-rose-200 dark:border-rose-900">
-          <div class="flex items-center gap-2 text-rose-600 dark:text-rose-400">
+        <!-- Solo mostrar errores - Gemini -->
+        <div v-if="error" class="bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-2xl p-3">
+          <div class="flex items-center gap-2 text-[#d93025] dark:text-[#f28b82]">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span class="text-sm font-semibold">{{ error }}</span>
+            <span class="text-sm font-medium">{{ error }}</span>
           </div>
         </div>
         
-        <!-- Filtros de Período (Compactos) - Sin bordes, integrado -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white/60 dark:bg-zinc-900/40  rounded-xl px-4 py-3">
-          <span class="text-sm font-medium text-gray-600 dark:text-zinc-400">Período:</span>
+        <!-- Filtros de Período - Gemini Style -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-4">
+          <span class="text-sm font-medium text-[#5f6368] dark:text-[#9aa0a6]">Período:</span>
           <div class="flex items-center gap-2 flex-wrap">
             <select 
               v-model="selectedPeriod"
               @change="handlePeriodChange"
-              class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-zinc-200 focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent min-w-[140px]"
+              class="bg-white dark:bg-[#282a2c] rounded-full px-4 py-2.5 text-sm text-[#1e1f20] dark:text-[#e3e3e3] focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8] focus:outline-none min-w-[140px] font-medium"
             >
               <option value="day">Hoy</option>
               <option value="week">Esta Semana</option>
@@ -76,251 +76,251 @@
                 v-model="customDateRange.start"
                 @change="loadDashboardData"
                 :max="new Date().toISOString().split('T')[0]"
-                class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-zinc-200 focus:ring-2 focus:ring-slate-500 min-w-[150px]"
+                class="bg-white dark:bg-[#282a2c] rounded-full px-4 py-2.5 text-sm text-[#1e1f20] dark:text-[#e3e3e3] focus:ring-2 focus:ring-[#1a73e8] focus:outline-none min-w-[150px]"
               >
             </template>
           </div>
         </div>
 
-        <!-- Dashboard Principal - KPIs con Glassmorphism SIN BORDES -->
+        <!-- Dashboard Principal - 4 KPIs Gemini Style -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- PRODUCTOS ACTIVOS -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-blue-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Productos Activos</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ metrics.activeProducts || 0 }}</p>
-                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">de {{ metrics.totalProducts || 0 }} totales</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Productos Activos</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ metrics.activeProducts || 0 }}</p>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">de {{ metrics.totalProducts || 0 }} totales</p>
               </div>
             </div>
           </div>
 
           <!-- VALOR INVERTIDO -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-emerald-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Valor Invertido</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ formatCurrency(metrics.totalInventoryValue) }}</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">costo × stock</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Valor Invertido</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ formatCurrency(metrics.totalInventoryValue) }}</p>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">costo × stock</p>
               </div>
             </div>
           </div>
 
           <!-- VALOR POTENCIAL -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-indigo-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#f3e8ff] dark:bg-[#7c3aed]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-[#7c3aed] dark:text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Valor Potencial</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ formatCurrency(metrics.totalSaleValue || 0) }}</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">precio × stock</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Valor Potencial</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ formatCurrency(metrics.totalSaleValue || 0) }}</p>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">precio × stock</p>
               </div>
             </div>
           </div>
 
           <!-- GANANCIA ESTIMADA -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl dark:hover:shadow-black/50 transition-all duration-200">
-            <div class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-purple-50 dark:bg-zinc-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#fef7e0] dark:bg-[#f9ab00]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-[#f9ab00] dark:text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Ganancia Est.</p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ formatCurrency((metrics.totalSaleValue || 0) - (metrics.totalInventoryValue || 0)) }}</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">venta - costo</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Ganancia Est.</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ formatCurrency((metrics.totalSaleValue || 0) - (metrics.totalInventoryValue || 0)) }}</p>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">venta - costo</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Métricas Secundarias Compactas (Una línea) - Sin bordes -->
-        <div class="bg-white/60 dark:bg-zinc-900/60  rounded-xl px-6 py-5">
+        <!-- Métricas Secundarias - Gemini Style -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-6 py-5">
           <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
             <!-- Ventas -->
             <div>
-              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ventas</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics.monthlySales || 0) }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500">{{ monthlyTransactions || 0 }} transacciones</p>
+              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Ventas</p>
+              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(metrics.monthlySales || 0) }}</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ monthlyTransactions || 0 }} transacciones</p>
             </div>
 
             <!-- Alertas Stock -->
             <div>
-              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Alertas Stock</p>
+              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Alertas Stock</p>
               <div class="flex items-baseline gap-1">
-                <span class="text-xl font-bold text-amber-600 dark:text-amber-400">{{ metrics.lowStockProducts || 0 }}</span>
-                <span class="text-xs text-gray-400 dark:text-zinc-500">/</span>
-                <span class="text-xl font-bold text-rose-600 dark:text-rose-400">{{ metrics.outOfStockProducts || 0 }}</span>
+                <span class="text-xl font-semibold text-[#f9ab00] dark:text-[#fdd663]">{{ metrics.lowStockProducts || 0 }}</span>
+                <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">/</span>
+                <span class="text-xl font-semibold text-[#d93025] dark:text-[#f28b82]">{{ metrics.outOfStockProducts || 0 }}</span>
               </div>
-              <p class="text-xs text-gray-500 dark:text-zinc-500">bajo / sin stock</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">bajo / sin stock</p>
             </div>
 
             <!-- Ganancias -->
             <div>
-              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ganancias</p>
-              <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">{{ formatCurrency(metrics.monthlySales || 0) }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500">{{ getPeriodLabel() }}</p>
+              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Ganancias</p>
+              <p class="text-xl font-semibold text-[#1e8e3e] dark:text-[#81c995]">{{ formatCurrency(metrics.monthlySales || 0) }}</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ getPeriodLabel() }}</p>
             </div>
 
             <!-- Gastos -->
             <div>
-              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Gastos</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(metrics.totalExpenses || 0) }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500">{{ getPeriodLabel() }}</p>
+              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Gastos</p>
+              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(metrics.totalExpenses || 0) }}</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ getPeriodLabel() }}</p>
             </div>
 
             <!-- Ganancia Neta -->
             <div>
-              <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1">Ganancia Neta</p>
-              <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400">{{ formatCurrency(metrics.netProfit || 0) }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500">ventas - gastos</p>
+              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Ganancia Neta</p>
+              <p class="text-xl font-semibold text-[#1e8e3e] dark:text-[#81c995]">{{ formatCurrency(metrics.netProfit || 0) }}</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">ventas - gastos</p>
             </div>
           </div>
         </div>
 
-        <!-- Sección de Productos y Movimientos - Cards sin bordes pesados -->
+        <!-- Sección de Productos y Movimientos - Gemini Cards -->
         <div v-if="overviewData" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           <!-- Top Productos -->
-          <div v-if="overviewData.data.topSellingProducts?.length > 0" class="bg-white/80 dark:bg-zinc-900/80  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div v-if="overviewData.data.topSellingProducts?.length > 0" class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
             <div class="px-5 py-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-[#fef7e0] dark:bg-[#f9ab00]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-[#f9ab00] dark:text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-gray-900 dark:text-white">Top Productos</h3>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500">Más vendidos del período</p>
+                  <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Top Productos</h3>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Más vendidos del período</p>
                 </div>
               </div>
             </div>
             <div class="px-5 pb-5 space-y-2">
               <div v-for="(product, index) in overviewData.data.topSellingProducts.slice(0, 5)" 
                    :key="product.id" 
-                   class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-zinc-800/30 hover:bg-gray-100/50 dark:hover:bg-zinc-800/50 rounded-xl transition-all duration-200">
+                   class="flex items-center gap-3 p-3 bg-white dark:bg-[#282a2c] hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] rounded-2xl transition-all duration-200">
                 <!-- Ranking Badge -->
-                <div class="w-8 h-8 bg-white dark:bg-zinc-800 rounded-lg flex items-center justify-center text-gray-700 dark:text-zinc-300 font-bold text-sm flex-shrink-0 shadow-sm">
+                <div class="w-8 h-8 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center text-[#1a73e8] dark:text-[#8ab4f8] font-semibold text-sm flex-shrink-0">
                   {{ index + 1 }}
                 </div>
                 
                 <!-- Imagen del producto -->
-                <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-[#f0f4f9] dark:bg-[#3a3a3f] flex items-center justify-center flex-shrink-0">
                   <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover" />
-                  <svg v-else class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-else class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                   </svg>
                 </div>
                 
                 <!-- Info del producto -->
                 <div class="flex-1 min-w-0">
-                  <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ product.name }}</p>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
+                  <p class="font-medium text-[#1e1f20] dark:text-[#e3e3e3] text-sm truncate">{{ product.name }}</p>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
                     {{ product.total_quantity_sold }} unidades vendidas
                   </p>
                 </div>
                 
                 <!-- Revenue -->
                 <div class="text-right flex-shrink-0">
-                  <p class="font-bold text-emerald-600 dark:text-emerald-400 text-sm">{{ formatCurrency(product.total_revenue) }}</p>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500">ingresos</p>
+                  <p class="font-semibold text-[#1e8e3e] dark:text-[#81c995] text-sm">{{ formatCurrency(product.total_revenue) }}</p>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">ingresos</p>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Stock Bajo -->
-          <div v-if="overviewData.data.lowStockProductsList?.length > 0" class="bg-white/80 dark:bg-zinc-900/80  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div v-if="overviewData.data.lowStockProductsList?.length > 0" class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
             <div class="px-5 py-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-rose-50 dark:bg-rose-950/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-gray-900 dark:text-white">Stock Bajo</h3>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500">Productos que necesitan reposición</p>
+                  <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Stock Bajo</h3>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Productos que necesitan reposición</p>
                 </div>
               </div>
             </div>
             <div class="px-5 pb-5 space-y-2">
               <div v-for="product in overviewData.data.lowStockProductsList.slice(0, 5)" 
                    :key="product.id" 
-                   class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-zinc-800/30 hover:bg-gray-100/50 dark:hover:bg-zinc-800/50 rounded-xl transition-all duration-200">
-                <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                   class="flex items-center gap-3 p-3 bg-white dark:bg-[#282a2c] hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] rounded-2xl transition-all duration-200">
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-[#f0f4f9] dark:bg-[#3a3a3f] flex items-center justify-center flex-shrink-0">
                   <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover" />
-                  <svg v-else class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-else class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                   </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ product.name }}</p>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">{{ product.category?.name || 'Sin categoría' }}</p>
+                  <p class="font-medium text-[#1e1f20] dark:text-[#e3e3e3] text-sm truncate">{{ product.name }}</p>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">{{ product.category?.name || 'Sin categoría' }}</p>
                 </div>
                 <div class="text-right flex-shrink-0">
                   <div class="flex items-center gap-1.5">
-                    <div class="w-1.5 h-1.5 rounded-full animate-pulse" :class="product.current_stock === 0 ? 'bg-rose-500' : 'bg-amber-500'"></div>
-                    <p class="font-bold text-sm" :class="product.current_stock === 0 ? 'text-rose-600 dark:text-rose-400' : 'text-amber-600 dark:text-amber-400'">
-                      {{ product.current_stock }}<span class="text-gray-400 dark:text-zinc-600">/</span>{{ product.min_stock }}
+                    <div class="w-1.5 h-1.5 rounded-full animate-pulse" :class="product.current_stock === 0 ? 'bg-[#d93025]' : 'bg-[#f9ab00]'"></div>
+                    <p class="font-semibold text-sm" :class="product.current_stock === 0 ? 'text-[#d93025] dark:text-[#f28b82]' : 'text-[#f9ab00] dark:text-[#fdd663]'">
+                      {{ product.current_stock }}<span class="text-[#9aa0a6]">/</span>{{ product.min_stock }}
                     </p>
                   </div>
-                  <p class="text-xs text-gray-500 dark:text-zinc-500">{{ product.current_stock === 0 ? 'Agotado' : 'Reponer' }}</p>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ product.current_stock === 0 ? 'Agotado' : 'Reponer' }}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Movimientos Recientes -->
-          <div v-if="overviewData.data.recentMovements?.length > 0" class="bg-white/80 dark:bg-zinc-900/80  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+          <div v-if="overviewData.data.recentMovements?.length > 0" class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
               <div class="px-5 py-4">
                 <div class="flex items-center gap-3 mb-4">
-                  <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
                     </svg>
                   </div>
                   <div>
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white">Movimientos</h3>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400">Actividad reciente</p>
+                    <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Movimientos</h3>
+                    <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Actividad reciente</p>
                   </div>
                 </div>
                 <div class="space-y-2">
                   <div v-for="movement in overviewData.data.recentMovements.slice(0, 5)" 
                        :key="movement.id" 
-                       class="flex items-center gap-3 p-3 bg-gray-50/50 dark:bg-zinc-800/30 hover:bg-gray-100/50 dark:hover:bg-zinc-800/50 transition-all duration-200 rounded-xl">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" :class="movement.quantity > 0 ? 'bg-emerald-100 dark:bg-emerald-950/50' : 'bg-rose-100 dark:bg-rose-950/50'">
-                      <svg v-if="movement.quantity > 0" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="flex items-center gap-3 p-3 bg-white dark:bg-[#282a2c] hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] transition-all duration-200 rounded-2xl">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" :class="movement.quantity > 0 ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20' : 'bg-[#fce8e6] dark:bg-[#d93025]/20'">
+                      <svg v-if="movement.quantity > 0" class="w-4 h-4 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                       </svg>
-                      <svg v-else class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg v-else class="w-4 h-4 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                       </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ movement.product_name || movement.product?.name }}</p>
-                      <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">{{ formatMovementType(movement.type) }}</p>
+                      <p class="font-medium text-[#1e1f20] dark:text-[#e3e3e3] text-sm truncate">{{ movement.product_name || movement.product?.name }}</p>
+                      <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">{{ formatMovementType(movement.type) }}</p>
                     </div>
                     <div class="text-right flex-shrink-0">
-                      <p class="font-bold text-sm" :class="movement.quantity > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                      <p class="font-semibold text-sm" :class="movement.quantity > 0 ? 'text-[#1e8e3e] dark:text-[#81c995]' : 'text-[#d93025] dark:text-[#f28b82]'">
                         {{ movement.quantity > 0 ? '+' : '' }}{{ movement.quantity }}
                       </p>
-                      <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">unidades</p>
+                      <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">unidades</p>
                     </div>
                   </div>
                 </div>
@@ -332,12 +332,12 @@
       <!-- Vista por Productos -->
       <div v-if="activeSection === 'products'" class="space-y-4">
         
-        <!-- Filtros Compactos -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-4">
+        <!-- Filtros Compactos - Gemini -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl p-4">
           <div class="flex flex-wrap items-center gap-3">
             <!-- Búsqueda -->
             <div class="flex-1 min-w-48 relative">
-              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
               <input
@@ -345,7 +345,7 @@
                 @input="debounceSearch"
                 type="text"
                 placeholder="Buscar productos..."
-                class="w-full pl-9 pr-3 py-3 text-sm border-2 border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent"
+                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#9aa0a6] focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8]"
               >
             </div>
             
@@ -353,7 +353,7 @@
             <select 
               v-model="selectedPeriod"
               @change="handlePeriodChange"
-              class="px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 min-w-36"
+              class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8] min-w-36"
             >
               <option value="day">Hoy</option>
               <option value="week">Esta Semana</option>
@@ -370,7 +370,7 @@
                   v-model="customDateRange.start"
                   @change="loadProductsData"
                   :max="new Date().toISOString().split('T')[0]"
-                  class="px-3 py-3 text-sm border-2 border-gray-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 focus:border-transparent min-w-[150px]"
+                  class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8] focus:outline-none min-w-[150px]"
                 >
               </div>
             </template>
@@ -379,7 +379,7 @@
             <select 
               v-model="filters.category"
               @change="loadProductsData"
-              class="px-3 py-3 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400 min-w-44"
+              class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8] min-w-44"
             >
               <option value="">Todas las categorías</option>
               <option v-for="cat in availableCategories" :key="cat.id" :value="cat.id">
@@ -392,7 +392,7 @@
               v-if="showWarehouseSelector"
               v-model="selectedWarehouse"
               @change="loadProductsData"
-              class="px-3 py-3 text-sm rounded-xl border-2 border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 min-w-48"
+              class="px-4 py-2.5 text-sm rounded-full bg-[#f3e8ff] dark:bg-[#7c3aed]/20 text-[#7c3aed] dark:text-[#a78bfa] font-medium focus:outline-none focus:ring-2 focus:ring-[#7c3aed] dark:focus:ring-[#a78bfa] min-w-48"
             >
               <option value="">📍 Todas las Sedes</option>
               <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">
@@ -403,7 +403,7 @@
             <!-- Botón Limpiar Filtros -->
             <button 
               @click="clearFilters" 
-              class="p-3 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl border border-transparent hover:border-red-100 dark:hover:border-red-900/30 transition-all"
+              class="p-2.5 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#d93025] dark:hover:text-[#f28b82] hover:bg-[#fce8e6] dark:hover:bg-[#d93025]/20 rounded-full transition-all"
               title="Limpiar filtros">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -412,164 +412,147 @@
           </div>
         </div>
 
-        <!-- KPIs de Productos con Glassmorphism -->
+        <!-- KPIs de Productos - Gemini -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- TOTAL PRODUCTOS -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-4">
-              <div class="bg-indigo-50 dark:bg-indigo-950/50 rounded-xl p-3">
-                <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#f3e8ff] dark:bg-[#7c3aed]/20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#7c3aed] dark:text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">TOTAL PRODUCTOS</h3>
-                  <span class="text-xs font-medium text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded-lg">
-                    en el sistema
-                  </span>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ productsMetrics.total }}</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">TOTAL PRODUCTOS</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ productsMetrics.total }}</p>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">en el sistema</p>
               </div>
             </div>
           </div>
 
           <!-- ACTIVOS -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-4">
-              <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-xl p-3">
-                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">ACTIVOS</h3>
-                  <span class="text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950 px-2 py-1 rounded-full">
-                    disponibles
-                  </span>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ productsMetrics.active }}</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">ACTIVOS</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ productsMetrics.active }}</p>
+                <p class="text-xs text-[#1e8e3e] dark:text-[#81c995]">disponibles</p>
               </div>
             </div>
           </div>
 
           <!-- SIN STOCK -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-4">
-              <div class="bg-gray-100 dark:bg-zinc-800/50 rounded-xl p-3">
-                <svg class="w-6 h-6 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#f0f4f9] dark:bg-[#3a3a3f] rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">SIN STOCK</h3>
-                  <span class="text-xs font-medium text-gray-600 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded-full">
-                    agotados
-                  </span>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ productsMetrics.outOfStock }}</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">SIN STOCK</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ productsMetrics.outOfStock }}</p>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">agotados</p>
               </div>
             </div>
           </div>
 
           <!-- VALOR TOTAL -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-xl px-4 py-3 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-4">
-              <div class="bg-purple-50 dark:bg-purple-950/50 rounded-xl p-3">
-                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wide">VALOR TOTAL</h3>
-                  <span class="text-xs font-medium text-gray-500 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-800 px-2 py-1 rounded-lg">
-                    Inventario
-                  </span>
-                </div>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ formatCurrency(productsMetrics.totalValueSale) }}</p>
-                <p class="text-sm text-gray-500 dark:text-zinc-400">Costo: {{ formatCurrency(productsMetrics.totalValueCost) }}</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">VALOR TOTAL</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ formatCurrency(productsMetrics.totalValueSale) }}</p>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Costo: {{ formatCurrency(productsMetrics.totalValueCost) }}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Tabla de Productos -->
-        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-4 bg-transparent">
+        <!-- Tabla de Productos - Gemini -->
+        <div v-if="productsData && productsData.products && productsData.products.length > 0" class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+          <div class="px-5 py-4">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="text-base font-bold text-gray-900 dark:text-white">Lista de Productos</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">{{ totalProductItems }} productos encontrados</p>
+                <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Lista de Productos</h3>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">{{ totalProductItems }} productos encontrados</p>
               </div>
             </div>
           </div>
           
           <div class="overflow-x-auto">
             <table class="min-w-full">
-              <thead class="bg-gray-50/80 dark:bg-zinc-800/50">
+              <thead class="bg-[#f8f9fa] dark:bg-[#282a2c]">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Producto</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Categoría</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Stock</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Precio</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Rotación</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Rentabilidad</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Producto</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Categoría</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Stock</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Precio</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Rotación</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Rentabilidad</th>
                 </tr>
               </thead>
-              <tbody class="bg-transparent">
+              <tbody class="bg-white dark:bg-[#1e1f20]">
                 <tr v-for="product in paginatedProductsList" :key="product.id"
-                    class="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors border-b border-gray-100 dark:border-zinc-800/30 last:border-b-0">
+                    class="hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-colors border-b border-[#e8eaed] dark:border-[#3a3a3f] last:border-b-0">
                   <td class="px-4 py-3">
-                    <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ product.name }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">SKU: {{ product.sku || 'N/A' }}</div>
+                    <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.name }}</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">SKU: {{ product.sku || 'N/A' }}</div>
                   </td>
                   <td class="px-4 py-3">
-                    <span class="inline-flex items-center bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 rounded-md px-2.5 py-0.5 text-xs font-medium">
+                    <span class="inline-flex items-center bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] rounded-full px-3 py-0.5 text-xs font-medium">
                       {{ product.category_name || product.category || 'Sin categoría' }}
                     </span>
                   </td>
                   <td class="px-4 py-3 text-center">
-                    <div class="font-mono text-base font-bold" :class="[
-                      product.current_stock <= 0 ? 'text-red-600 dark:text-red-400' :
-                      product.current_stock <= product.min_stock ? 'text-amber-600 dark:text-amber-400' :
-                      'text-gray-900 dark:text-white'
+                    <div class="font-mono text-base font-semibold" :class="[
+                      product.current_stock <= 0 ? 'text-[#d93025] dark:text-[#f28b82]' :
+                      product.current_stock <= product.min_stock ? 'text-[#f9ab00] dark:text-[#fdd663]' :
+                      'text-[#1e1f20] dark:text-[#e3e3e3]'
                     ]">
                       {{ product.current_stock }}
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
                       {{ getMeasurementUnitLabel(product.measurement_unit || product.unit) }}
                     </div>
                   </td>
                   <td class="px-4 py-3 text-center">
-                    <div class="font-mono text-base font-bold text-gray-900 dark:text-white">{{ formatCurrency(product.sale_price) }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Costo: {{ formatCurrency(product.cost_price) }}</div>
+                    <div class="font-mono text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(product.sale_price) }}</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Costo: {{ formatCurrency(product.cost_price) }}</div>
                   </td>
                   <td class="px-4 py-3 text-center">
                     <span 
                       :class="[
-                        'px-2.5 py-0.5 text-xs font-medium rounded-md border cursor-help',
-                        product.rotation_class === 'A' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20' :
-                        product.rotation_class === 'B' ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/20' :
-                        'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/20'
+                        'px-3 py-0.5 text-xs font-medium rounded-full cursor-help',
+                        product.rotation_class === 'A' ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' :
+                        product.rotation_class === 'B' ? 'bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8]' :
+                        'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#f9ab00] dark:text-[#fdd663]'
                       ]"
                       :title="getRotationTooltip(product.rotation_class || 'C')"
                     >
                       Clase {{ product.rotation_class || 'C' }}
                     </span>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-1">{{ product.units_sold || 0 }} unidades vendidas</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">{{ product.units_sold || 0 }} unidades vendidas</div>
                   </td>
                   <td class="px-4 py-3 text-center">
-                    <div class="font-mono text-lg font-bold" :class="[
-                      parseFloat(product.margin_percentage || 0) >= 40 ? 'text-green-600 dark:text-green-400' :
-                      parseFloat(product.margin_percentage || 0) >= 20 ? 'text-blue-600 dark:text-blue-400' :
-                      'text-amber-600 dark:text-amber-400'
+                    <div class="font-mono text-lg font-semibold" :class="[
+                      parseFloat(product.margin_percentage || 0) >= 40 ? 'text-[#1e8e3e] dark:text-[#81c995]' :
+                      parseFloat(product.margin_percentage || 0) >= 20 ? 'text-[#1a73e8] dark:text-[#8ab4f8]' :
+                      'text-[#f9ab00] dark:text-[#fdd663]'
                     ]">
                       {{ parseFloat(product.margin_percentage || 0).toFixed(1) }}%
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">margen</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">margen</div>
                   </td>
                 </tr>
               </tbody>
@@ -587,36 +570,36 @@
           />
         </div>
         
-        <!-- Estado Vacío -->
-        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
+        <!-- Estado Vacío - Gemini -->
+        <div v-else-if="productsData && productsData.products && productsData.products.length === 0" class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl p-12">
           <div class="text-center">
-            <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-zinc-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-16 h-16 mx-auto text-[#e8eaed] dark:text-[#3a3a3f] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
             </svg>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No hay productos</h3>
-            <p class="text-sm text-gray-500 dark:text-zinc-400">No se encontraron productos con los filtros seleccionados.</p>
+            <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">No hay productos</h3>
+            <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">No se encontraron productos con los filtros seleccionados.</p>
           </div>
         </div>
         
-        <!-- Cargando -->
-        <div v-else class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12">
+        <!-- Cargando - Gemini -->
+        <div v-else class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl p-12">
           <div class="text-center">
-            <svg class="w-16 h-16 mx-auto text-blue-500 dark:text-blue-400 animate-spin mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-16 h-16 mx-auto text-[#1a73e8] dark:text-[#8ab4f8] animate-spin mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Cargando productos...</h3>
-            <p class="text-sm text-gray-500 dark:text-zinc-400">Por favor espera un momento.</p>
+            <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Cargando productos...</h3>
+            <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Por favor espera un momento.</p>
           </div>
         </div>
       </div>
 
       <div v-if="activeSection === 'movements'" class="space-y-6 animate-fade-in">
-        <!-- Header y Filtros -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+        <!-- Header y Filtros - Gemini -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Movimientos de Inventario</h2>
-                    <p class="text-sm text-gray-500 dark:text-zinc-400">Registro detallado de entradas y salidas</p>
+                    <h2 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Movimientos de Inventario</h2>
+                    <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Registro detallado de entradas y salidas</p>
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-3">
@@ -624,7 +607,7 @@
                     <select 
                       v-model="selectedPeriod"
                       @change="handlePeriodChange"
-                      class="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 text-sm rounded-xl focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 block p-2.5"
+                      class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8]"
                     >
                       <option value="day">Hoy</option>
                       <option value="week">Esta Semana</option>
@@ -641,7 +624,7 @@
                           v-model="customDateRange.start"
                           @change="loadMovementsData"
                           :max="new Date().toISOString().split('T')[0]"
-                          class="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 text-sm rounded-xl focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 block p-2.5 min-w-[150px]"
+                          class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] focus:ring-2 focus:ring-[#1a73e8] focus:outline-none min-w-[150px]"
                         >
                       </div>
                     </template>
@@ -650,17 +633,17 @@
                     <select 
                       v-model="movementsFilters.type"
                       @change="loadMovementsData"
-                      class="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 text-sm rounded-xl focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 block p-2.5"
+                      class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8]"
                     >
                       <option value="">Todos los tipos</option>
                       <option value="entry">Solo Entradas</option>
                       <option value="exit">Solo Salidas</option>
                     </select>
         
-                    <!-- Botón Exportar -->
+                    <!-- Botón Exportar - Gemini Green -->
                     <button 
                       @click="exportMovements"
-                      class="text-white bg-emerald-600 dark:bg-emerald-700 hover:bg-emerald-700 dark:hover:bg-emerald-600 font-medium rounded-xl text-sm px-5 py-2.5 text-center inline-flex items-center transition-all duration-200 shadow-lg shadow-emerald-400/40 dark:shadow-emerald-900/50"
+                      class="px-5 py-2.5 text-sm font-medium text-[#1e8e3e] dark:text-[#81c995] bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 hover:bg-[#ceead6] dark:hover:bg-[#1e8e3e]/30 rounded-full transition-all inline-flex items-center"
                     >
                       <i class="fas fa-file-excel mr-2"></i>
                       Exportar
@@ -669,94 +652,66 @@
             </div>
         </div>
 
-        <!-- Tarjetas de Resumen - Diseño Limpio -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <!-- 4 KPIs principales - Gemini -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Total Movimientos -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="bg-indigo-50 dark:bg-indigo-950/50 rounded-xl p-3">
-                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Movimientos</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ movementsData?.summary?.total_movements || 0 }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Movimientos</p>
+                    <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ movementsData?.summary?.total_movements || 0 }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Entradas -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-xl p-3">
-                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Entradas</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ movementsData?.summary?.total_entries || 0 }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Entradas</p>
+                    <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ movementsData?.summary?.total_entries || 0 }}</p>
+                    <p class="text-xs text-[#1e8e3e] dark:text-[#81c995]">{{ formatCurrency(movementsData?.summary?.total_entry_value || 0) }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Salidas -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="bg-rose-50 dark:bg-rose-950/50 rounded-xl p-3">
-                    <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Salidas</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ movementsData?.summary?.total_exits || 0 }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Salidas</p>
+                    <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ movementsData?.summary?.total_exits || 0 }}</p>
+                    <p class="text-xs text-[#d93025] dark:text-[#f28b82]">{{ formatCurrency(movementsData?.summary?.total_exit_value || 0) }}</p>
                 </div>
             </div>
           </div>
 
-          <!-- Valor Entradas -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="bg-teal-50 dark:bg-teal-950/50 rounded-xl p-3">
-                    <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">V. Entradas</p>
-                    <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(movementsData?.summary?.total_entry_value || 0) }}</p>
-                </div>
-            </div>
-          </div>
-
-          <!-- Valor Salidas -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="bg-orange-50 dark:bg-orange-950/50 rounded-xl p-3">
-                    <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">V. Salidas</p>
-                    <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(movementsData?.summary?.total_exit_value || 0) }}</p>
-                </div>
-            </div>
-          </div>
-
-          <!-- Movimiento Neto -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="bg-purple-50 dark:bg-purple-950/50 rounded-xl p-3">
-                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Balance -->
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#f3e8ff] dark:bg-[#7c3aed]/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-[#7c3aed] dark:text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Balance</p>
-                    <p class="text-lg font-bold" :class="(movementsData?.summary?.net_movement || 0) >= 0 ? 'text-gray-900 dark:text-white' : 'text-red-600 dark:text-red-400'">
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Balance</p>
+                    <p class="text-2xl font-semibold" :class="(movementsData?.summary?.net_movement || 0) >= 0 ? 'text-[#1e8e3e] dark:text-[#81c995]' : 'text-[#d93025] dark:text-[#f28b82]'">
                       {{ formatCurrency(movementsData?.summary?.net_movement || 0) }}
                     </p>
                 </div>
@@ -764,52 +719,52 @@
           </div>
         </div>
 
-        <!-- Tabla de Movimientos -->
-        <div class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-4 bg-transparent flex items-center justify-between">
+        <!-- Tabla de Movimientos - Gemini -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+          <div class="px-6 py-4 flex items-center justify-between">
             <div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Historial de Movimientos</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Registro cronológico de operaciones</p>
+                <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Historial de Movimientos</h3>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">Registro cronológico de operaciones</p>
             </div>
-            <div class="flex items-center space-x-2">
-                <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-semibold rounded-xl">
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1.5 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] text-xs font-medium rounded-full">
                     {{ movementsData?.movements?.length || 0 }} registros
                 </span>
             </div>
           </div>
           <div class="overflow-x-auto">
             <table class="min-w-full">
-              <thead class="bg-gray-50/80 dark:bg-zinc-800/50">
+              <thead class="bg-[#f0f4f9] dark:bg-[#282a2c]">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Fecha</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Flujo</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Tipo Movimiento</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Producto</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Cantidad</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Precio Unit.</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Total</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Fuente</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Fecha</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Flujo</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Tipo Movimiento</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Producto</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Cantidad</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Precio Unit.</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Total</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Fuente</th>
                 </tr>
               </thead>
-              <tbody class="bg-transparent">
+              <tbody>
                 <!-- Movimientos con iconografía de flujo -->
                 <tr v-for="movement in movementsData?.movements || []" :key="movement.movement_id" 
-                    class="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors duration-150 border-b border-gray-100 dark:border-zinc-800/30 last:border-b-0"
-                    :class="movement.movement_type === 'entry' ? 'border-l-4 border-l-emerald-500 dark:border-l-emerald-400' : 'border-l-4 border-l-rose-500 dark:border-l-rose-400'">
+                    class="hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-colors duration-150 border-b border-[#e8eaed] dark:border-[#3a3a3f] last:border-b-0"
+                    :class="movement.movement_type === 'entry' ? 'border-l-4 border-l-[#1e8e3e] dark:border-l-[#81c995]' : 'border-l-4 border-l-[#d93025] dark:border-l-[#f28b82]'">
                   
                   <!-- Fecha -->
                   <td class="px-4 py-3 whitespace-nowrap">
-                    <div class="flex items-center space-x-2">
-                      <i class="fas fa-calendar-day text-gray-400 dark:text-zinc-500 text-xs"></i>
-                      <span class="text-sm text-gray-700 dark:text-zinc-300 font-medium">{{ formatDate(movement.movement_date) }}</span>
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-calendar-day text-[#9aa0a6] text-xs"></i>
+                      <span class="text-sm text-[#1e1f20] dark:text-[#e3e3e3] font-medium">{{ formatDate(movement.movement_date) }}</span>
                     </div>
                   </td>
                   
                   <!-- FLUJO - Flechas SVG Minimalistas -->
                   <td class="px-4 py-3 whitespace-nowrap">
-                    <!-- Entrada: Flecha hacia abajo-izquierda (Verde Esmeralda) -->
+                    <!-- Entrada: Flecha hacia abajo (Verde Gemini) -->
                     <svg v-if="movement.movement_type === 'entry'" 
-                         class="w-6 h-6 text-emerald-600 dark:text-emerald-400" 
+                         class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" 
                          fill="none" 
                          stroke="currentColor" 
                          viewBox="0 0 24 24"
@@ -819,9 +774,9 @@
                             stroke-width="2.5" 
                             d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                     </svg>
-                    <!-- Salida: Flecha hacia arriba-derecha (Rojo Suave) -->
+                    <!-- Salida: Flecha hacia arriba (Rojo Gemini) -->
                     <svg v-else-if="movement.movement_type === 'exit'" 
-                         class="w-6 h-6 text-rose-500 dark:text-rose-400" 
+                         class="w-6 h-6 text-[#d93025] dark:text-[#f28b82]" 
                          fill="none" 
                          stroke="currentColor" 
                          viewBox="0 0 24 24"
@@ -831,9 +786,9 @@
                             stroke-width="2.5" 
                             d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
                     </svg>
-                    <!-- Ajuste: Flecha bidireccional -->
+                    <!-- Ajuste: Flecha bidireccional (Azul Gemini) -->
                     <svg v-else 
-                         class="w-6 h-6 text-blue-500 dark:text-blue-400" 
+                         class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" 
                          fill="none" 
                          stroke="currentColor" 
                          viewBox="0 0 24 24"
@@ -847,56 +802,56 @@
                   
                   <!-- Tipo de Movimiento - Texto Limpio -->
                   <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">{{ movement.movement_reason }}</span>
+                    <span class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ movement.movement_reason }}</span>
                   </td>
                   
                   <!-- Producto - Solo Nombre -->
                   <td class="px-4 py-3">
-                    <span class="text-sm font-semibold text-gray-900 dark:text-white truncate max-w-xs">{{ movement.product_name }}</span>
+                    <span class="text-sm font-semibold text-[#1e1f20] dark:text-[#e3e3e3] truncate max-w-xs">{{ movement.product_name }}</span>
                   </td>
                   
-                  <!-- CANTIDAD - Con formato de color -->
+                  <!-- CANTIDAD - Con formato de color Gemini -->
                   <td class="px-4 py-3 whitespace-nowrap">
-                    <div class="flex items-center space-x-2">
+                    <div class="flex items-center gap-2">
                       <!-- Signo visual -->
                       <span v-if="movement.movement_type === 'entry'" 
-                            class="inline-flex items-center justify-center w-6 h-6 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-bold">
+                            class="inline-flex items-center justify-center w-6 h-6 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995] rounded-full text-xs font-semibold">
                         +
                       </span>
                       <span v-else-if="movement.movement_type === 'exit'" 
-                            class="inline-flex items-center justify-center w-6 h-6 bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 rounded-full text-xs font-bold">
+                            class="inline-flex items-center justify-center w-6 h-6 bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82] rounded-full text-xs font-semibold">
                         -
                       </span>
                       <span v-else 
-                            class="inline-flex items-center justify-center w-6 h-6 bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 rounded-full text-xs font-bold">
+                            class="inline-flex items-center justify-center w-6 h-6 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] rounded-full text-xs font-semibold">
                         =
                       </span>
                       
                       <!-- Número con color -->
-                      <span class="text-base font-bold" 
+                      <span class="text-base font-semibold" 
                             :class="movement.movement_type === 'entry' 
-                              ? 'text-emerald-600 dark:text-emerald-400' 
+                              ? 'text-[#1e8e3e] dark:text-[#81c995]' 
                               : movement.movement_type === 'exit' 
-                                ? 'text-rose-600 dark:text-rose-400' 
-                                : 'text-blue-600 dark:text-blue-400'">
+                                ? 'text-[#d93025] dark:text-[#f28b82]' 
+                                : 'text-[#1a73e8] dark:text-[#8ab4f8]'">
                         {{ Math.abs(movement.quantity) }}
                       </span>
                     </div>
                   </td>
                   
                   <!-- Precio Unitario -->
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-zinc-400 font-medium">
+                  <td class="px-4 py-3 whitespace-nowrap text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium">
                     {{ formatCurrency(movement.unit_price) }}
                   </td>
                   
                   <!-- Total con color -->
                   <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="text-sm font-bold" 
+                    <span class="text-sm font-semibold" 
                           :class="movement.movement_type === 'entry' 
-                            ? 'text-emerald-600 dark:text-emerald-400' 
+                            ? 'text-[#1e8e3e] dark:text-[#81c995]' 
                             : movement.movement_type === 'exit' 
-                              ? 'text-rose-600 dark:text-rose-400' 
-                              : 'text-blue-600 dark:text-blue-400'">
+                              ? 'text-[#d93025] dark:text-[#f28b82]' 
+                              : 'text-[#1a73e8] dark:text-[#8ab4f8]'">
                       {{ formatCurrency(Math.abs(movement.total_value)) }}
                     </span>
                   </td>
@@ -905,10 +860,10 @@
                   <td class="px-4 py-3 whitespace-nowrap">
                     <button v-if="movement.document_number && movement.document_number !== 'N/A'"
                             @click="viewMovementDocument(movement)"
-                            class="text-sm font-mono text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white hover:underline decoration-slate-400 dark:decoration-zinc-500 decoration-1 underline-offset-2 transition-all duration-150 cursor-pointer">
+                            class="text-sm font-mono text-[#1a73e8] dark:text-[#8ab4f8] hover:underline decoration-1 underline-offset-2 transition-all duration-150 cursor-pointer">
                       {{ movement.document_number }}
                     </button>
-                    <span v-else class="text-sm text-gray-400 dark:text-zinc-600 italic">
+                    <span v-else class="text-sm text-[#9aa0a6] italic">
                       —
                     </span>
                   </td>
@@ -918,11 +873,11 @@
                 <tr v-if="!movementsData?.movements || movementsData.movements.length === 0">
                   <td colspan="7" class="px-6 py-12 text-center">
                     <div class="flex flex-col items-center justify-center py-8">
-                      <div class="w-16 h-16 bg-gray-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-box-open text-gray-400 dark:text-zinc-500 text-2xl"></i>
+                      <div class="w-16 h-16 bg-[#f0f4f9] dark:bg-[#282a2c] rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-box-open text-[#9aa0a6] text-2xl"></i>
                       </div>
-                      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">No hay movimientos</h3>
-                      <p class="text-sm text-gray-500 dark:text-zinc-400">No se encontraron registros con los filtros seleccionados</p>
+                      <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-1">No hay movimientos</h3>
+                      <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">No se encontraron registros con los filtros seleccionados</p>
                     </div>
                   </td>
                 </tr>
@@ -930,44 +885,44 @@
             </table>
           </div>
           
-          <!-- Controles de Paginación para Movimientos -->
-          <div v-if="movementsData?.movements && movementsData.movements.length > 0" class="bg-gray-50 dark:bg-transparent px-6 py-3 border-t border-gray-200 dark:border-zinc-800">
+          <!-- Controles de Paginación para Movimientos - Gemini -->
+          <div v-if="movementsData?.movements && movementsData.movements.length > 0" class="bg-[#f0f4f9] dark:bg-[#282a2c] px-6 py-3 border-t border-[#e8eaed] dark:border-[#3a3a3f]">
             <div class="flex items-center justify-between">
               <!-- Items por página y información -->
-              <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                  <label class="text-sm text-gray-700 dark:text-zinc-300">Mostrar:</label>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <label class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Mostrar:</label>
                   <select v-model="movementsFilters.itemsPerPage" 
                           @change="movementsFilters.currentPage = 1; loadMovementsData()"
-                          class="text-sm bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 px-3 py-1.5">
+                          class="text-sm px-3 py-1.5 rounded-full bg-white dark:bg-[#1e1f20] text-[#1e1f20] dark:text-[#e3e3e3] focus:ring-2 focus:ring-[#1a73e8] focus:outline-none">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                   </select>
-                  <span class="text-sm text-gray-700 dark:text-zinc-300">por página</span>
+                  <span class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">por página</span>
                 </div>
                 
-                <div class="text-sm text-gray-700 dark:text-zinc-300">
+                <div class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                   Mostrando {{ movementsPaginationInfo.start }} a {{ movementsPaginationInfo.end }} de {{ movementsPaginationInfo.total }}
                 </div>
               </div>
               
-              <div class="flex items-center space-x-1">
+              <div class="flex items-center gap-1">
                 <button @click="movementsFilters.currentPage--; loadMovementsData()" 
                         :disabled="movementsFilters.currentPage === 1"
-                        class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#1e1f20] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                <span class="px-2.5 py-1 text-xs font-medium text-gray-900 dark:text-white">
+                <span class="px-3 py-1 text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">
                   {{ movementsFilters.currentPage }} / {{ movementsTotalPages }}
                 </span>
                 <button @click="movementsFilters.currentPage++; loadMovementsData()" 
                         :disabled="movementsFilters.currentPage >= movementsTotalPages"
-                        class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#1e1f20] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                   </svg>
                 </button>
@@ -979,12 +934,12 @@
 
       <!-- Vista por Cliente -->
       <div v-if="activeSection === 'customers'" class="space-y-6 animate-fade-in">
-        <!-- Header y Filtros -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+        <!-- Header y Filtros - Gemini -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Análisis por Cliente</h2>
-                    <p class="text-sm text-gray-500 dark:text-zinc-400">Comportamiento y valor de clientes</p>
+                    <h2 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Análisis por Cliente</h2>
+                    <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Comportamiento y valor de clientes</p>
                 </div>
                 
                 <div class="flex flex-wrap items-center gap-3">
@@ -992,7 +947,7 @@
                     <select 
                       v-model="selectedPeriod"
                       @change="handlePeriodChange"
-                      class="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 text-sm rounded-xl focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 block p-2.5"
+                      class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8]"
                     >
                       <option value="day">Hoy</option>
                       <option value="week">Esta Semana</option>
@@ -1009,7 +964,7 @@
                           v-model="customDateRange.start"
                           @change="loadCustomersData"
                           :max="new Date().toISOString().split('T')[0]"
-                          class="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 text-sm rounded-xl focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 block p-2.5 min-w-[150px]"
+                          class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] focus:ring-2 focus:ring-[#1a73e8] focus:outline-none min-w-[150px]"
                         >
                       </div>
                     </template>
@@ -1018,17 +973,17 @@
                     <select 
                       v-model="customersFilters.sortBy"
                       @change="loadCustomersData"
-                      class="bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 text-sm rounded-xl focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 block p-2.5"
+                      class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8]"
                     >
                       <option value="total_spent">Valor Total</option>
                       <option value="total_purchases">Más Compras</option>
                       <option value="unique_products_bought">Más Productos</option>
                     </select>
         
-                    <!-- Botón Exportar -->
+                    <!-- Botón Exportar - Gemini Green -->
                     <button 
                       @click="exportCustomers"
-                      class="text-white bg-emerald-600 dark:bg-emerald-700 hover:bg-emerald-700 dark:hover:bg-emerald-600 focus:ring-4 focus:ring-emerald-300 dark:focus:ring-emerald-900/50 font-medium rounded-xl text-sm px-5 py-2.5 text-center inline-flex items-center transition-all duration-200 shadow-lg shadow-emerald-400/40 dark:shadow-emerald-900/50"
+                      class="px-5 py-2.5 text-sm font-medium text-[#1e8e3e] dark:text-[#81c995] bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 hover:bg-[#ceead6] dark:hover:bg-[#1e8e3e]/30 rounded-full transition-all inline-flex items-center"
                     >
                       <i class="fas fa-file-excel mr-2"></i>
                       Exportar
@@ -1037,151 +992,151 @@
             </div>
         </div>
 
-        <!-- Tarjetas de Resumen -->
+        <!-- 6 KPIs de Clientes - Gemini -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4" v-if="customersData">
           <!-- Total Clientes -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Clientes</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ customersData.summary.total_customers }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Clientes</p>
+                    <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ customersData.summary.total_customers }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Ingresos Totales -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Ingresos</p>
-                    <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(customersData.summary.total_revenue) }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Ingresos</p>
+                    <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(customersData.summary.total_revenue) }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Ganancia Total -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-teal-50 dark:bg-teal-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Ganancia</p>
-                    <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(customersData.summary.total_profit) }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Ganancia</p>
+                    <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(customersData.summary.total_profit) }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Valor Promedio -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#f3e8ff] dark:bg-[#7c3aed]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#7c3aed] dark:text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Promedio</p>
-                    <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(customersData.summary.avg_customer_value) }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Promedio</p>
+                    <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(customersData.summary.avg_customer_value) }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Descuento Prom. -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-orange-50 dark:bg-orange-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-percentage text-orange-600 dark:text-orange-400"></i>
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#fef7e0] dark:bg-[#f9ab00]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-percentage text-[#f9ab00] dark:text-[#fdd663]"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Descuento</p>
-                    <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatPercentage(customersData.summary.avg_discount) }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Descuento</p>
+                    <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatPercentage(customersData.summary.avg_discount) }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Cliente Top -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#f3e8ff] dark:bg-[#7c3aed]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#7c3aed] dark:text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Top Cliente</p>
-                    <p class="text-sm font-bold text-gray-900 dark:text-white truncate" v-if="customersData.summary.top_customer">
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Top Cliente</p>
+                    <p class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3] truncate" v-if="customersData.summary.top_customer">
                       {{ customersData.summary.top_customer.name }}
                     </p>
-                    <p class="text-sm font-bold text-gray-900 dark:text-white" v-else>N/A</p>
+                    <p class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]" v-else>N/A</p>
                 </div>
             </div>
           </div>
         </div>
 
-        <!-- Tabla de Clientes -->
-        <div class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-4 bg-transparent flex items-center justify-between">
+        <!-- Tabla de Clientes - Gemini -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+          <div class="px-6 py-4 flex items-center justify-between">
             <div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Análisis de Clientes</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Ranking y comportamiento de compra</p>
+                <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Análisis de Clientes</h3>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">Ranking y comportamiento de compra</p>
             </div>
-            <div class="flex items-center space-x-2">
-                <span class="px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 text-xs font-semibold rounded-xl">
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1.5 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] text-xs font-medium rounded-full">
                     {{ customersData?.customers?.length || 0 }} clientes
                 </span>
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-              <thead class="bg-gray-50 dark:bg-transparent border-b border-gray-200 dark:border-zinc-800">
+            <table class="min-w-full">
+              <thead class="bg-[#f0f4f9] dark:bg-[#282a2c]">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Cliente</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Total Compras</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Total Gastado</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Cliente</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Total Compras</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Total Gastado</th>
                   <!-- Columna Crédito: Solo si es Premium/Enterprise -->
-                  <th v-if="isPremiumOrEnterprise" class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Crédito</th>
+                  <th v-if="isPremiumOrEnterprise" class="px-6 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Crédito</th>
                   <!-- Columna Puntos: Solo si es Premium/Enterprise -->
-                  <th v-if="isPremiumOrEnterprise" class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Puntos</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Productos Únicos</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Items Totales</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Frecuencia</th>
+                  <th v-if="isPremiumOrEnterprise" class="px-6 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Puntos</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Productos Únicos</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Items Totales</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Frecuencia</th>
                 </tr>
               </thead>
-              <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800" v-if="customersData && customersData.customers">
-                <tr v-for="customer in customersData.customers" :key="customer.customer_id" class="hover:bg-gray-50/80 dark:hover:bg-zinc-800/30 border-b border-gray-100 dark:border-zinc-800/50 transition-colors">
+              <tbody v-if="customersData && customersData.customers">
+                <tr v-for="customer in customersData.customers" :key="customer.customer_id" class="hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] border-b border-[#e8eaed] dark:border-[#3a3a3f] transition-colors">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
-                      <!-- AVATAR CON INICIALES (Visual Polish - Clientes) -->
-                      <div class="w-9 h-9 rounded-full flex items-center justify-center shadow-sm bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800">
-                        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">
+                      <!-- AVATAR CON INICIALES - Gemini -->
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f0fe] dark:bg-[#1a73e8]/20">
+                        <span class="text-sm font-medium text-[#1a73e8] dark:text-[#8ab4f8]">
                           {{ getInitials(customer.customer_name) }}
                         </span>
                       </div>
                       <div class="ml-3">
-                        <div class="text-sm font-bold text-gray-900 dark:text-white">{{ customer.customer_name }}</div>
-                        <div class="text-xs text-gray-500 dark:text-zinc-400" v-if="customer.email">{{ customer.email }}</div>
+                        <div class="text-sm font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ customer.customer_name }}</div>
+                        <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6]" v-if="customer.email">{{ customer.email }}</div>
                       </div>
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8]">
                       {{ customer.total_purchases }} compras
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-[#1e8e3e] dark:text-[#81c995]">
                     {{ formatCurrency(customer.total_spent) }}
                   </td>
                   
@@ -1189,40 +1144,40 @@
                   <td v-if="isPremiumOrEnterprise" class="px-6 py-4 whitespace-nowrap">
                     <div class="space-y-1">
                       <!-- Límite de crédito -->
-                      <div class="text-xs font-medium text-gray-500 dark:text-zinc-400">
-                        Límite: <span class="text-gray-900 dark:text-white font-bold">{{ formatCurrency(customer.credit_limit || 0) }}</span>
+                      <div class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">
+                        Límite: <span class="text-[#1e1f20] dark:text-[#e3e3e3] font-semibold">{{ formatCurrency(customer.credit_limit || 0) }}</span>
                       </div>
                       <!-- Deuda actual -->
-                      <div class="text-xs font-medium text-gray-500 dark:text-zinc-400">
-                        Debe: <span class="text-rose-600 dark:text-rose-400 font-bold">{{ formatCurrency(customer.current_debt || 0) }}</span>
+                      <div class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">
+                        Debe: <span class="text-[#d93025] dark:text-[#f28b82] font-semibold">{{ formatCurrency(customer.current_debt || 0) }}</span>
                       </div>
                     </div>
                   </td>
                   
                   <!-- COLUMNA PUNTOS: Solo si es Premium/Enterprise -->
                   <td v-if="isPremiumOrEnterprise" class="px-6 py-4 whitespace-nowrap text-center">
-                    <div class="inline-flex items-center px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
-                      <svg class="w-4 h-4 text-amber-500 dark:text-amber-400 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#fef7e0] dark:bg-[#f9ab00]/20">
+                      <svg class="w-4 h-4 text-[#f9ab00] dark:text-[#fdd663] mr-1.5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                       </svg>
-                      <span class="text-sm font-bold text-amber-700 dark:text-amber-400">
+                      <span class="text-sm font-semibold text-[#f9ab00] dark:text-[#fdd663]">
                         {{ customer.loyalty_points || 0 }}
                       </span>
                     </div>
                   </td>
                   
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-zinc-400">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                     {{ customer.unique_products_bought }} productos
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-zinc-400">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                     {{ customer.total_items_bought }} items
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
-                        <div class="text-sm font-medium text-gray-900 dark:text-white mr-2">
+                        <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mr-2">
                           {{ Math.round((customer.total_items_bought / customer.total_purchases) * 10) / 10 }}
                         </div>
-                        <span class="text-xs text-gray-500 dark:text-zinc-400">items/compra</span>
+                        <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">items/compra</span>
                     </div>
                   </td>
                 </tr>
@@ -1230,35 +1185,35 @@
             </table>
           </div>
           
-          <!-- Controles de Paginación para Clientes -->
-          <div v-if="customersData?.customers && customersData.customers.length > 0" class="bg-gray-50 dark:bg-transparent px-6 py-3 border-t border-gray-200 dark:border-zinc-800 rounded-b-lg">
+          <!-- Controles de Paginación para Clientes - Gemini -->
+          <div v-if="customersData?.customers && customersData.customers.length > 0" class="bg-[#f0f4f9] dark:bg-[#282a2c] px-6 py-3 border-t border-[#e8eaed] dark:border-[#3a3a3f] rounded-b-2xl">
             <div class="flex items-center justify-between">
               <!-- Items por página y información -->
-              <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                  <label class="text-sm text-gray-700 dark:text-zinc-300">Mostrar:</label>
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <label class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Mostrar:</label>
                   <select v-model="customersFilters.itemsPerPage" @change="customersFilters.currentPage = 1; loadCustomersData()" 
-                          class="text-sm bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500">
+                          class="text-sm px-3 py-1.5 rounded-full bg-white dark:bg-[#1e1f20] text-[#1e1f20] dark:text-[#e3e3e3] focus:ring-2 focus:ring-[#1a73e8] focus:outline-none">
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                   </select>
-                  <span class="text-sm text-gray-700 dark:text-zinc-300">por página</span>
+                  <span class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">por página</span>
                 </div>
                 
                 <!-- Información de paginación -->
-                <div class="text-sm text-gray-700 dark:text-zinc-300">
+                <div class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                   Mostrando {{ customersPaginationInfo.start }} a {{ customersPaginationInfo.end }} de {{ customersPaginationInfo.total }}
                 </div>
               </div>
               
               <!-- Controles de paginación -->
-              <div class="flex items-center space-x-2">
+              <div class="flex items-center gap-2">
                 <!-- Botón Primera página -->
                 <button @click="customersFilters.currentPage = 1; loadCustomersData()" 
                         :disabled="customersFilters.currentPage === 1"
-                        class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#1e1f20] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
                   </svg>
@@ -1267,33 +1222,33 @@
                 <!-- Botón Anterior -->
                 <button @click="customersFilters.currentPage--; loadCustomersData()" 
                         :disabled="customersFilters.currentPage === 1"
-                        class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#1e1f20] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
                 
                 <!-- Números de página -->
-                <div class="flex items-center space-x-1">
+                <div class="flex items-center gap-1">
                   <template v-for="page in customersTotalPages" :key="page">
                     <button v-if="page === 1 || page === customersTotalPages || Math.abs(page - customersFilters.currentPage) <= 2"
                             @click="customersFilters.currentPage = page; loadCustomersData()"
                             :class="[
-                              'px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                              'px-3 py-1.5 text-sm font-medium rounded-full transition-colors',
                               page === customersFilters.currentPage 
-                                ? 'bg-indigo-600 dark:bg-indigo-500 text-white border border-indigo-600 dark:border-indigo-500' 
-                                : 'text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'
+                                ? 'bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#1e1f20]' 
+                                : 'text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#1e1f20] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f]'
                             ]">
                       {{ page }}
                     </button>
-                    <span v-else-if="Math.abs(page - customersFilters.currentPage) === 3" class="px-2 text-gray-400 dark:text-zinc-500">...</span>
+                    <span v-else-if="Math.abs(page - customersFilters.currentPage) === 3" class="px-2 text-[#9aa0a6]">...</span>
                   </template>
                 </div>
                 
                 <!-- Botón Siguiente -->
                 <button @click="customersFilters.currentPage++; loadCustomersData()" 
                         :disabled="customersFilters.currentPage >= customersTotalPages"
-                        class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#1e1f20] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                   </svg>
@@ -1302,7 +1257,7 @@
                 <!-- Botón Última página -->
                 <button @click="customersFilters.currentPage = customersTotalPages; loadCustomersData()" 
                         :disabled="customersFilters.currentPage === customersTotalPages"
-                        class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-white dark:bg-[#1e1f20] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
                   </svg>
@@ -1313,71 +1268,71 @@
         </div>
       </div>
 
-      <!-- Vista de Proveedores - Rediseñada -->
+      <!-- Vista de Proveedores - Gemini Style -->
       <div v-if="activeSection === 'suppliers'" class="space-y-6 animate-fade-in">
         
-        <!-- Tarjetas de Resumen -->
+        <!-- 4 KPIs Gemini -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Total Proveedores -->
-          <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800">
-            <div class="flex items-center space-x-3">
-              <div class="w-11 h-11 bg-slate-100 dark:bg-slate-900/50 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase">Proveedores</p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">{{ suppliersData?.summary?.total_suppliers || 0 }}</p>
-                <p class="text-xs text-emerald-600 dark:text-emerald-400">{{ suppliersData?.summary?.active_suppliers || 0 }} activos</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Proveedores</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ suppliersData?.summary?.total_suppliers || 0 }}</p>
+                <p class="text-xs text-[#1e8e3e] dark:text-[#81c995]">{{ suppliersData?.summary?.active_suppliers || 0 }} activos</p>
               </div>
             </div>
           </div>
 
           <!-- Órdenes Pendientes -->
-          <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800">
-            <div class="flex items-center space-x-3">
-              <div class="w-11 h-11 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#fef7e0] dark:bg-[#f9ab00]/20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#f9ab00] dark:text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase">Órdenes Pendientes</p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">{{ suppliersData?.summary?.total_pending_orders || 0 }}</p>
-                <p class="text-xs text-amber-600 dark:text-amber-400">Por recibir</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Órdenes Pendientes</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ suppliersData?.summary?.total_pending_orders || 0 }}</p>
+                <p class="text-xs text-[#f9ab00] dark:text-[#fdd663]">Por recibir</p>
               </div>
             </div>
           </div>
 
           <!-- Cuentas por Pagar -->
-          <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800">
-            <div class="flex items-center space-x-3">
-              <div class="w-11 h-11 bg-rose-100 dark:bg-rose-900/30 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
               <div>
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase">Por Pagar</p>
-                <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(suppliersData?.summary?.total_debt || 0) }}</p>
-                <p class="text-xs text-rose-600 dark:text-rose-400">Deuda total</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Por Pagar</p>
+                <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(suppliersData?.summary?.total_debt || 0) }}</p>
+                <p class="text-xs text-[#d93025] dark:text-[#f28b82]">Deuda total</p>
               </div>
             </div>
           </div>
 
           <!-- Mejor Proveedor -->
-          <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800">
-            <div class="flex items-center space-x-3">
-              <div class="w-11 h-11 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase">Top Proveedor</p>
-                <p class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ suppliersData?.summary?.best_supplier?.name || 'N/A' }}</p>
-                <p class="text-xs text-emerald-600 dark:text-emerald-400" v-if="suppliersData?.summary?.best_supplier?.total_purchases">
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Top Proveedor</p>
+                <p class="text-sm font-semibold text-[#1e1f20] dark:text-[#e3e3e3] truncate">{{ suppliersData?.summary?.best_supplier?.name || 'N/A' }}</p>
+                <p class="text-xs text-[#1e8e3e] dark:text-[#81c995]" v-if="suppliersData?.summary?.best_supplier?.total_purchases">
                   {{ formatCurrency(suppliersData.summary.best_supplier.total_purchases) }} comprado
                 </p>
               </div>
@@ -1385,115 +1340,115 @@
           </div>
         </div>
 
-        <!-- Tabla de Proveedores -->
-        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
-          <div class="px-5 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
+        <!-- Tabla de Proveedores - Gemini -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 flex items-center justify-between">
             <div>
-              <h2 class="text-base font-bold text-gray-900 dark:text-white">Lista de Proveedores</h2>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ suppliersData?.suppliers?.length || 0 }} proveedores registrados</p>
+              <h2 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Lista de Proveedores</h2>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">{{ suppliersData?.suppliers?.length || 0 }} proveedores registrados</p>
             </div>
             <button 
               @click="navigateToSuppliers()"
-              class="px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 rounded-lg transition-colors"
+              class="px-4 py-2.5 text-sm font-medium text-[#1a73e8] dark:text-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#1a73e8]/20 hover:bg-[#d2e3fc] dark:hover:bg-[#1a73e8]/30 rounded-full transition-colors"
             >
               Gestionar Proveedores
             </button>
           </div>
 
           <div v-if="!suppliersData" class="p-12 text-center">
-            <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
-              <svg class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-[#f0f4f9] dark:bg-[#282a2c] rounded-full flex items-center justify-center mx-auto mb-3 animate-pulse">
+              <svg class="w-6 h-6 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Cargando proveedores...</p>
+            <p class="text-sm font-medium text-[#5f6368] dark:text-[#9aa0a6]">Cargando proveedores...</p>
           </div>
 
           <div v-else-if="suppliersData?.suppliers?.length === 0" class="text-center py-12">
-            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-16 h-16 bg-[#f0f4f9] dark:bg-[#282a2c] rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <p class="text-sm font-semibold text-gray-700 dark:text-white">No hay proveedores registrados</p>
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Ve a Gestión de Proveedores para agregar uno</p>
+            <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">No hay proveedores registrados</p>
+            <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">Ve a Gestión de Proveedores para agregar uno</p>
           </div>
 
           <div v-else class="overflow-x-auto">
             <table class="min-w-full">
-              <thead class="bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-800">
+              <thead class="bg-white/50 dark:bg-[#282a2c]/50">
                 <tr>
-                  <th class="px-5 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Proveedor</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Productos</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Órdenes</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Última Orden</th>
-                  <th class="px-4 py-3 text-right text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Total Comprado</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Estado</th>
-                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Acciones</th>
+                  <th class="px-5 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Proveedor</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Productos</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Órdenes</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Última Orden</th>
+                  <th class="px-4 py-3 text-right text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Total Comprado</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Estado</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
-                <tr v-for="supplier in paginatedSuppliers" :key="supplier.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors">
+              <tbody class="divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
+                <tr v-for="supplier in paginatedSuppliers" :key="supplier.id" class="hover:bg-white dark:hover:bg-[#282a2c] transition-colors">
                   <td class="px-5 py-4">
-                    <div class="flex items-center space-x-3">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm"
                            :style="{ backgroundColor: getSupplierColor(supplier.name) }">
                         {{ getInitials(supplier.name) }}
                       </div>
                       <div>
-                        <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ supplier.name }}</div>
-                        <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                        <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ supplier.name }}</div>
+                        <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
                           {{ supplier.contact_person || supplier.phone || supplier.email || 'Sin contacto' }}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8]">
                       {{ supplier.products_count || 0 }}
                     </span>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ supplier.total_orders || 0 }}</div>
-                    <div v-if="supplier.pending_orders > 0" class="text-xs text-amber-600 dark:text-amber-400">
+                    <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ supplier.total_orders || 0 }}</div>
+                    <div v-if="supplier.pending_orders > 0" class="text-xs text-[#f9ab00] dark:text-[#fdd663]">
                       {{ supplier.pending_orders }} pendiente{{ supplier.pending_orders > 1 ? 's' : '' }}
                     </div>
                   </td>
                   <td class="px-4 py-4 text-center">
                     <div v-if="supplier.last_order_date">
-                      <div class="text-sm text-gray-900 dark:text-white">{{ formatDate(supplier.last_order_date) }}</div>
-                      <div class="text-xs text-gray-500 dark:text-zinc-500">#{{ supplier.last_order_number }}</div>
+                      <div class="text-sm text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatDate(supplier.last_order_date) }}</div>
+                      <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">#{{ supplier.last_order_number }}</div>
                     </div>
-                    <div v-else class="text-xs text-gray-400 dark:text-zinc-500">Sin órdenes</div>
+                    <div v-else class="text-xs text-[#9aa0a6]">Sin órdenes</div>
                   </td>
                   <td class="px-4 py-4 text-right">
-                    <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ formatCurrency(supplier.total_purchased || 0) }}</div>
-                    <div v-if="supplier.current_debt > 0" class="text-xs text-rose-600 dark:text-rose-400">
+                    <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(supplier.total_purchased || 0) }}</div>
+                    <div v-if="supplier.current_debt > 0" class="text-xs text-[#d93025] dark:text-[#f28b82]">
                       Debe: {{ formatCurrency(supplier.current_debt) }}
                     </div>
                   </td>
                   <td class="px-4 py-4 text-center">
                     <span :class="[
-                      'px-2.5 py-1 text-xs font-semibold rounded-full border',
+                      'px-2.5 py-1 text-xs font-medium rounded-full',
                       supplier.active 
-                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20' 
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                        ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' 
+                        : 'bg-[#f0f4f9] dark:bg-[#3a3a3f] text-[#5f6368] dark:text-[#9aa0a6]'
                     ]">
                       {{ supplier.active ? 'Activo' : 'Inactivo' }}
                     </span>
                   </td>
                   <td class="px-4 py-4">
-                    <div class="flex items-center justify-center space-x-2">
+                    <div class="flex items-center justify-center gap-2">
                       <button 
                         @click="viewSupplierProducts(supplier)"
-                        class="px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-100 dark:border-blue-500/20 rounded-lg transition-colors"
+                        class="px-3 py-1.5 text-xs font-medium text-[#1a73e8] dark:text-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#1a73e8]/20 hover:bg-[#d2e3fc] dark:hover:bg-[#1a73e8]/30 rounded-full transition-colors"
                         title="Ver productos de este proveedor"
                       >
                         Ver Productos
                       </button>
                       <button 
                         @click="createOrderForSupplier(supplier)"
-                        class="px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-100 dark:border-emerald-500/20 rounded-lg transition-colors"
+                        class="px-3 py-1.5 text-xs font-medium text-[#1e8e3e] dark:text-[#81c995] bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 hover:bg-[#ceead6] dark:hover:bg-[#1e8e3e]/30 rounded-full transition-colors"
                         title="Crear nueva orden de compra"
                       >
                         Nueva Orden
@@ -1522,18 +1477,19 @@
       <div v-if="activeSection === 'alerts'" class="space-y-6 animate-fade-in">
         
         <!-- Header con Filtros -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-2xl p-5 shadow-lg shadow-gray-200/50 dark:shadow-black/30">
+        <!-- Header Alertas - Gemini -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-4">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Centro de Alertas</h2>
-                <p class="text-sm text-gray-500 dark:text-zinc-400">Monitoreo de salud del inventario</p>
+                <h2 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Centro de Alertas</h2>
+                <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Monitoreo de salud del inventario</p>
             </div>
             
             <div class="flex items-center gap-3">
               <select 
                 v-model="alertsFilters.severity"
                 @change="loadAlertsData"
-                class="px-3 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8]"
               >
                 <option value="">Todas las alertas</option>
                 <option value="critical">Críticas</option>
@@ -1543,7 +1499,7 @@
               
               <button 
                 @click="loadAlertsData"
-                class="p-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-300 rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all hover:shadow-md"
+                class="p-2.5 bg-white dark:bg-[#282a2c] hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] text-[#5f6368] dark:text-[#9aa0a6] rounded-full transition-all"
                 title="Actualizar"
               >
                 <i class="fas fa-sync-alt"></i>
@@ -1552,103 +1508,103 @@
           </div>
         </div>
 
-        <!-- 4 Tarjetas de Resumen Horizontales -->
+        <!-- 4 KPIs Alertas - Gemini -->
         <div v-if="alertsData" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Críticas (Rojo - Alerta) -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-rose-50 dark:bg-rose-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Críticas (Rojo) -->
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Críticas</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ alertsData.summary.critical || 0 }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Críticas</p>
+                    <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ alertsData.summary.critical || 0 }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Advertencias -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#fef7e0] dark:bg-[#f9ab00]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#f9ab00] dark:text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Advertencias</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ alertsData.summary.warning || 0 }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Advertencias</p>
+                    <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ alertsData.summary.warning || 0 }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Información -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-sky-50 dark:bg-sky-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Información</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ alertsData.summary.info || 0 }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Información</p>
+                    <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ alertsData.summary.info || 0 }}</p>
                 </div>
             </div>
           </div>
 
           <!-- Total -->
-          <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl p-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-200">
-            <div class="flex items-center space-x-3">
-                <div class="w-11 h-11 bg-slate-50 dark:bg-slate-950/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-5 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#f0f4f9] dark:bg-[#3a3a3f] rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                     </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Total Alertas</p>
-                    <p class="text-xl font-bold text-gray-900 dark:text-white">{{ alertsData.summary.total_alerts || 0 }}</p>
+                    <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Total Alertas</p>
+                    <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ alertsData.summary.total_alerts || 0 }}</p>
                 </div>
             </div>
           </div>
         </div>
 
-        <!-- Alertas del Sistema - DISEÑO TECHNICAL LIST -->
-        <div v-if="alertsData && alertsData.alerts?.length > 0" class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
+        <!-- Alertas del Sistema - Gemini -->
+        <div v-if="alertsData && alertsData.alerts?.length > 0" class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
           <div class="px-6 py-3.5 flex items-center justify-between">
             <div>
-              <h3 class="text-base font-bold text-gray-900 dark:text-white">Centro de Alertas</h3>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ alertsData.alerts.length }} notificaciones agrupadas</p>
+              <h3 class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Centro de Alertas</h3>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">{{ alertsData.alerts.length }} notificaciones agrupadas</p>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center gap-4">
               <button
                 @click="markAllAlertsAsReviewed"
-                class="text-xs font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-150"
+                class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] transition-colors duration-150"
               >
                 Marcar todas leídas
               </button>
             </div>
           </div>
           
-          <!-- Lista de Alertas Agrupadas - Technical List -->
-          <div class="divide-y divide-gray-100 dark:divide-zinc-800/30">
+          <!-- Lista de Alertas Agrupadas - Gemini -->
+          <div class="divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
             <div v-for="group in groupedAlerts" :key="group.category + group.severity" 
                  class="transition-colors duration-150">
               
               <!-- Header del Grupo (Acordeón Limpio) -->
-              <div class="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors duration-150">
+              <div class="px-6 py-3.5 flex items-center justify-between hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-colors duration-150">
                 <div 
                   @click="toggleAlertGroup(group.category, group.severity)"
-                  class="flex items-center space-x-3 flex-1 cursor-pointer"
+                  class="flex items-center gap-3 flex-1 cursor-pointer"
                 >
                   <!-- Icono SVG Lineal 16px (sin fondo) -->
                   <svg :class="[
                     'w-4 h-4 flex-shrink-0',
-                    group.severity === 'critical' ? 'text-red-600 dark:text-red-400' :
-                    group.severity === 'warning' ? 'text-amber-600 dark:text-amber-400' :
-                    'text-blue-600 dark:text-blue-400'
+                    group.severity === 'critical' ? 'text-[#d93025] dark:text-[#f28b82]' :
+                    group.severity === 'warning' ? 'text-[#f9ab00] dark:text-[#fdd663]' :
+                    'text-[#1a73e8] dark:text-[#8ab4f8]'
                   ]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path v-if="group.severity === 'critical'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     <path v-else-if="group.severity === 'warning'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1657,15 +1613,15 @@
                   
                   <!-- Información del grupo -->
                   <div class="flex-1 min-w-0">
-                    <div class="flex items-center space-x-2">
-                      <h4 class="text-sm font-semibold text-gray-900 dark:text-white">
+                    <div class="flex items-center gap-2">
+                      <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">
                         {{ getCategoryTitle(group.category) }}
                       </h4>
-                      <span class="text-xs text-gray-500 dark:text-zinc-400">
+                      <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">
                         ({{ group.alerts.length }})
                       </span>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                    <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
                       {{ group.alerts.length > 1 
                           ? `${group.alerts.length} ${getCategoryDescription(group.category)}` 
                           : group.alerts[0].message.substring(0, 60) + '...' }}
@@ -1674,7 +1630,7 @@
                   
                   <!-- Chevron gris sutil -->
                   <svg :class="[
-                    'w-3.5 h-3.5 text-gray-400 dark:text-zinc-500 transition-transform duration-200 flex-shrink-0',
+                    'w-3.5 h-3.5 text-[#9aa0a6] dark:text-[#5f6368] transition-transform duration-200 flex-shrink-0',
                     expandedGroups.includes(group.category + group.severity) ? 'rotate-90' : ''
                   ]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -1682,16 +1638,16 @@
                 </div>
                 
                 <!-- Acciones de texto sutiles -->
-                <div class="ml-4 flex items-center space-x-3 flex-shrink-0">
+                <div class="ml-4 flex items-center gap-3 flex-shrink-0">
                   <button
                     @click.stop="resolveAlertGroup(group)"
-                    class="text-xs font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-150"
+                    class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] transition-colors duration-150"
                   >
                     Marcar leídas
                   </button>
                   <button
                     @click.stop="toggleAlertGroup(group.category, group.severity)"
-                    class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-150"
+                    class="text-xs font-medium text-[#1a73e8] dark:text-[#8ab4f8] hover:text-[#1557b0] dark:hover:text-[#aecbfa] transition-colors duration-150"
                   >
                     Ver detalles
                   </button>
@@ -1701,19 +1657,19 @@
               <!-- Detalles del Grupo (Expandible) -->
               <transition name="expand">
                 <div v-if="expandedGroups.includes(group.category + group.severity)" 
-                     class="bg-gray-50 dark:bg-zinc-800/50">
+                     class="bg-[#f0f4f9] dark:bg-[#282a2c]">
                   <div class="pl-12 pr-6 py-3 space-y-2">
                     <!-- Cada alerta individual -->
                     <div v-for="alert in group.alerts" :key="alert.id"
-                         class="flex items-start justify-between py-2 border-b border-gray-100 dark:border-zinc-700 last:border-0 hover:bg-white/50 dark:hover:bg-zinc-900/50 px-3 -mx-3 rounded transition-colors duration-150">
+                         class="flex items-start justify-between py-2 border-b border-[#e8eaed] dark:border-[#3a3a3f] last:border-0 hover:bg-white/50 dark:hover:bg-[#1e1f20]/50 px-3 -mx-3 rounded transition-colors duration-150">
                       
                       <!-- Contenido de la alerta -->
                       <div class="flex-1 min-w-0 pr-4">
-                        <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-0.5">{{ alert.title }}</h5>
-                        <p class="text-xs text-gray-600 dark:text-zinc-400 leading-relaxed mb-1.5">{{ alert.message }}</p>
+                        <h5 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-0.5">{{ alert.title }}</h5>
+                        <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed mb-1.5">{{ alert.message }}</p>
                         
                         <!-- Metadata inline -->
-                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-zinc-400">
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#5f6368] dark:text-[#9aa0a6]">
                           <span class="flex items-center">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1732,25 +1688,25 @@
                             </svg>
                             {{ alert.invoice_number }}
                           </span>
-                          <span v-if="alert.discount_value" class="flex items-center font-semibold text-red-600">
+                          <span v-if="alert.discount_value" class="flex items-center font-medium text-[#d93025]">
                             {{ alert.discount_value }}
                           </span>
                         </div>
                       </div>
                       
                       <!-- Acciones de texto -->
-                      <div class="flex items-center space-x-3 flex-shrink-0">
+                      <div class="flex items-center gap-3 flex-shrink-0">
                         <button
                           v-if="alert.action_url || alert.invoice_id"
                           @click="viewAlertDetails(alert)"
-                          class="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors duration-150"
+                          class="text-xs font-medium text-[#1a73e8] dark:text-[#8ab4f8] hover:text-[#1557b0] dark:hover:text-[#aecbfa] transition-colors duration-150"
                         >
                           Ver detalles
                         </button>
                         
                         <button
                           @click="markAlertAsReviewed(alert)"
-                          class="text-xs font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-150"
+                          class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] transition-colors duration-150"
                         >
                           Marcar leída
                         </button>
@@ -1762,15 +1718,15 @@
             </div>
           </div>
           
-          <!-- Paginación (si hay muchos grupos) -->
-          <div v-if="groupedAlerts.length > 10" class="bg-gray-50 dark:bg-zinc-800/50 px-6 py-3 border-t border-gray-200 dark:border-zinc-800">
+          <!-- Paginación (si hay muchos grupos) - Gemini -->
+          <div v-if="groupedAlerts.length > 10" class="bg-[#f8f9fa] dark:bg-[#282a2c] px-6 py-3">
             <div class="flex items-center justify-between">
-              <div class="text-sm text-gray-700 dark:text-zinc-300">
+              <div class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                 {{ groupedAlerts.length }} grupos de alertas
               </div>
               <button
                 @click="loadAlertsData"
-                class="px-3 py-1.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-xs font-semibold rounded-xl border border-gray-300 dark:border-zinc-700 transition-all duration-200"
+                class="px-4 py-1.5 bg-white dark:bg-[#3a3a3f] hover:bg-[#f0f4f9] dark:hover:bg-[#4a4a4f] text-[#1e1f20] dark:text-[#e3e3e3] text-xs font-medium rounded-full transition-all duration-200"
               >
                 <i class="fas fa-sync-alt mr-1.5"></i>
                 Actualizar
@@ -1779,36 +1735,36 @@
           </div>
         </div>
 
-        <!-- Sin alertas -->
+        <!-- Sin alertas - Gemini -->
         <div v-else-if="alertsData && alertsData.alerts?.length === 0" 
-             class="bg-white/80 dark:bg-zinc-900/80  rounded-lg shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-12 text-center">
-          <div class="w-16 h-16 bg-green-100 dark:bg-green-950 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl p-12 text-center">
+          <div class="w-16 h-16 bg-[#1e8e3e] dark:bg-[#81c995] rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white dark:text-[#1e1f20]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">¡Todo en orden!</h3>
-          <p class="text-gray-600 dark:text-zinc-400">No hay alertas activas en este momento.</p>
+          <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">¡Todo en orden!</h3>
+          <p class="text-[#5f6368] dark:text-[#9aa0a6]">No hay alertas activas en este momento.</p>
         </div>
       </div>
 
-      <!-- Vista de Predicciones -->
+      <!-- Vista de Predicciones - Gemini -->
       <div v-if="activeSection === 'predictions'" class="space-y-4">
         
-        <!-- Filtros Ejecutivos de Predicciones -->
-        <div class="bg-white/80 dark:bg-zinc-900/60  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 p-4">
-          <div class="flex flex-wrap items-center gap-3 justify-between">
-            <div class="flex items-center gap-3">
+        <!-- Filtros Ejecutivos de Predicciones - Gemini -->
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-5 py-4">
+          <div class="flex flex-wrap items-center gap-4 justify-between">
+            <div class="flex items-center gap-4">
               <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
-                <span class="text-xs font-semibold text-gray-700 dark:text-zinc-300">Horizonte de Pronóstico:</span>
+                <span class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">Horizonte de Pronóstico:</span>
               </div>
               <select 
                 v-model="predictionsFilters.forecastDays"
                 @change="loadPredictionsData"
-                class="pl-3 pr-8 py-2 text-sm border border-gray-300 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 font-medium"
+                class="px-4 py-2.5 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8]"
               >
                 <option :value="7">7 días</option>
                 <option :value="14">14 días</option>
@@ -1817,15 +1773,15 @@
                 <option :value="90">90 días</option>
               </select>
               
-              <!-- Toggle para productos saludables -->
-              <div class="ml-4 flex items-center space-x-2 px-3 py-2 bg-gray-50 dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-zinc-700">
+              <!-- Toggle para productos saludables - Gemini -->
+              <div class="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-[#282a2c] rounded-full">
                 <input 
                   type="checkbox" 
                   id="showHealthy"
                   v-model="predictionsFilters.showHealthy"
-                  class="w-4 h-4 text-slate-600 dark:text-slate-400 rounded focus:ring-2 focus:ring-slate-500 dark:focus:ring-slate-400"
+                  class="w-4 h-4 text-[#1a73e8] rounded focus:ring-2 focus:ring-[#1a73e8]"
                 >
-                <label for="showHealthy" class="text-xs font-semibold text-gray-700 dark:text-zinc-300 cursor-pointer">
+                <label for="showHealthy" class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] cursor-pointer">
                   <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -1837,7 +1793,7 @@
             
             <button 
               @click="loadPredictionsData"
-              class="px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-200 flex items-center space-x-2"
+              class="px-5 py-2.5 bg-[#1e1f20] dark:bg-[#e3e3e3] hover:bg-black dark:hover:bg-white text-white dark:text-[#1e1f20] text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -1847,22 +1803,22 @@
           </div>
         </div>
 
-        <!-- Análisis de Tendencias - Ejecutivo Minimalista -->
-        <div v-if="predictionsData" class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-4 bg-gradient-to-r from-slate-50/80 to-blue-50/30 dark:from-zinc-800/50 dark:to-blue-950/30">
+        <!-- Análisis de Tendencias - Gemini -->
+        <div v-if="predictionsData" class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+          <div class="px-6 py-4">
             <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 rounded-xl flex items-center justify-center shadow-sm">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-gray-900 dark:text-white">Análisis de Tendencias IA</h3>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Predicciones basadas en Machine Learning</p>
+                  <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Análisis de Tendencias IA</h3>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Predicciones basadas en Machine Learning</p>
                 </div>
               </div>
-              <span class="px-2.5 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 text-blue-700 dark:text-blue-400 text-xs font-semibold rounded-xl border border-blue-100 dark:border-blue-900">
+              <span class="px-3 py-1.5 bg-[#f3e8ff] dark:bg-[#7c3aed]/20 text-[#7c3aed] dark:text-[#a78bfa] text-xs font-medium rounded-full">
                 <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                 </svg>
@@ -1871,45 +1827,45 @@
             </div>
           </div>
           
-          <!-- Tarjetas de Tendencias - Grid 3 Columnas -->
+          <!-- Tarjetas de Tendencias - Grid 3 Columnas - Gemini -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
             
             <!-- Tendencia Ventas -->
-            <div class="bg-white dark:bg-zinc-900/80 rounded-xl p-4 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 hover:shadow-lg dark:shadow-black/50 transition-all duration-200">
+            <div class="bg-white dark:bg-[#282a2c] rounded-2xl p-5 hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] transition-all duration-200">
               <div class="flex items-center justify-between mb-3">
-                <div class="flex items-center space-x-2">
-                  <div class="w-8 h-8 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                   </div>
-                  <h3 class="text-sm font-bold text-gray-900 dark:text-white">Ventas</h3>
+                  <h3 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Ventas</h3>
                 </div>
-                <div class="p-1.5 bg-gray-50 dark:bg-zinc-800 rounded-lg">
-                  <svg v-if="predictionsData.trend_analysis.sales.trend === 'positive'" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-2 bg-[#f0f4f9] dark:bg-[#1e1f20] rounded-full">
+                  <svg v-if="predictionsData.trend_analysis.sales.trend === 'positive'" class="w-4 h-4 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                   </svg>
-                  <svg v-else class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg v-else class="w-4 h-4 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path>
                   </svg>
                 </div>
               </div>
               <div class="space-y-2 text-xs">
                 <div class="flex justify-between items-center">
-                  <span class="text-gray-600 dark:text-zinc-400 font-medium">Actual:</span>
-                  <span class="font-bold text-gray-900 dark:text-white">{{ formatCurrency(predictionsData.trend_analysis.sales.current) }}</span>
+                  <span class="text-[#5f6368] dark:text-[#9aa0a6] font-medium">Actual:</span>
+                  <span class="font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(predictionsData.trend_analysis.sales.current) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="text-gray-500 dark:text-zinc-500">Anterior:</span>
-                  <span class="font-semibold text-gray-600 dark:text-zinc-400">{{ formatCurrency(predictionsData.trend_analysis.sales.previous) }}</span>
+                  <span class="text-[#5f6368] dark:text-[#9aa0a6]">Anterior:</span>
+                  <span class="font-medium text-[#5f6368] dark:text-[#9aa0a6]">{{ formatCurrency(predictionsData.trend_analysis.sales.previous) }}</span>
                 </div>
-                <div class="pt-2 mt-2 border-t border-gray-200 dark:border-zinc-700 flex justify-between items-center">
-                  <span class="text-gray-700 dark:text-zinc-300 font-semibold">Variación:</span>
+                <div class="pt-2 mt-2 border-t border-[#e8eaed] dark:border-[#3a3a3f] flex justify-between items-center">
+                  <span class="text-[#1e1f20] dark:text-[#e3e3e3] font-medium">Variación:</span>
                   <span :class="[
-                    'text-sm font-bold px-2 py-0.5 rounded-lg',
+                    'text-sm font-medium px-2.5 py-1 rounded-full',
                     predictionsData.trend_analysis.sales.growth_percentage >= 0 
-                      ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' 
-                      : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400'
+                      ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' 
+                      : 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]'
                   ]">
                     {{ predictionsData.trend_analysis.sales.growth_percentage >= 0 ? '+' : '' }}{{ predictionsData.trend_analysis.sales.growth_percentage }}%
                   </span>
@@ -1918,41 +1874,41 @@
             </div>
 
           <!-- Tendencia Transacciones -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl p-4 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 hover:shadow-lg dark:shadow-black/50 transition-all duration-200">
+          <div class="bg-white dark:bg-[#282a2c] rounded-2xl p-5 hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] transition-all duration-200">
             <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-sky-50 dark:bg-sky-950 rounded-lg flex items-center justify-center">
-                  <svg class="w-4 h-4 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                   </svg>
                 </div>
-                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Transacciones</h3>
+                <h3 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Transacciones</h3>
               </div>
-              <div class="p-1.5 bg-gray-50 dark:bg-zinc-800 rounded-lg">
-                <svg v-if="predictionsData.trend_analysis.transactions.trend === 'positive'" class="w-4 h-4 text-sky-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="p-2 bg-[#f0f4f9] dark:bg-[#1e1f20] rounded-full">
+                <svg v-if="predictionsData.trend_analysis.transactions.trend === 'positive'" class="w-4 h-4 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
-                <svg v-else class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="w-4 h-4 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path>
                 </svg>
               </div>
             </div>
             <div class="space-y-2 text-xs">
               <div class="flex justify-between items-center">
-                <span class="text-gray-600 dark:text-zinc-400 font-medium">Actual:</span>
-                <span class="font-bold text-gray-900 dark:text-white">{{ formatNumber(predictionsData.trend_analysis.transactions.current) }}</span>
+                <span class="text-[#5f6368] dark:text-[#9aa0a6] font-medium">Actual:</span>
+                <span class="font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatNumber(predictionsData.trend_analysis.transactions.current) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-500 dark:text-zinc-500">Anterior:</span>
-                <span class="font-semibold text-gray-600 dark:text-zinc-400">{{ formatNumber(predictionsData.trend_analysis.transactions.previous) }}</span>
+                <span class="text-[#5f6368] dark:text-[#9aa0a6]">Anterior:</span>
+                <span class="font-medium text-[#5f6368] dark:text-[#9aa0a6]">{{ formatNumber(predictionsData.trend_analysis.transactions.previous) }}</span>
               </div>
-              <div class="pt-2 mt-2 border-t border-gray-200 dark:border-zinc-700 flex justify-between items-center">
-                <span class="text-gray-700 dark:text-zinc-300 font-semibold">Variación:</span>
+              <div class="pt-2 mt-2 border-t border-[#e8eaed] dark:border-[#3a3a3f] flex justify-between items-center">
+                <span class="text-[#1e1f20] dark:text-[#e3e3e3] font-medium">Variación:</span>
                 <span :class="[
-                  'text-sm font-bold px-2 py-0.5 rounded-lg',
+                  'text-sm font-medium px-2.5 py-1 rounded-full',
                   predictionsData.trend_analysis.transactions.growth_percentage >= 0 
-                    ? 'bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-400' 
-                    : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400'
+                    ? 'bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8]' 
+                    : 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]'
                 ]">
                   {{ predictionsData.trend_analysis.transactions.growth_percentage >= 0 ? '+' : '' }}{{ predictionsData.trend_analysis.transactions.growth_percentage }}%
                 </span>
@@ -1960,42 +1916,42 @@
             </div>
           </div>
 
-          <!-- Tendencia Ticket Promedio -->
-          <div class="bg-white dark:bg-zinc-900/80 rounded-xl p-4 border border-gray-200 dark:border-white/5 hover:border-gray-300 dark:hover:border-white/10 hover:shadow-lg dark:shadow-black/50 transition-all duration-200">
+          <!-- Tendencia Ticket Promedio - Gemini -->
+          <div class="bg-white dark:bg-[#282a2c] rounded-2xl p-5 hover:bg-[#f0f4f9] dark:hover:bg-[#3a3a3f] transition-all duration-200">
             <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 bg-purple-50 dark:bg-purple-950 rounded-lg flex items-center justify-center">
-                  <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#f3e8ff] dark:bg-[#7c3aed]/20 rounded-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-[#7c3aed] dark:text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                   </svg>
                 </div>
-                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Ticket Promedio</h3>
+                <h3 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Ticket Promedio</h3>
               </div>
-              <div class="p-1.5 bg-gray-50 dark:bg-zinc-800 rounded-lg">
-                <svg v-if="predictionsData.trend_analysis.average_ticket.trend === 'positive'" class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="p-2 bg-[#f0f4f9] dark:bg-[#1e1f20] rounded-full">
+                <svg v-if="predictionsData.trend_analysis.average_ticket.trend === 'positive'" class="w-4 h-4 text-[#7c3aed] dark:text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
-                <svg v-else class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="w-4 h-4 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path>
                 </svg>
               </div>
             </div>
             <div class="space-y-2 text-xs">
               <div class="flex justify-between items-center">
-                <span class="text-gray-600 dark:text-zinc-400 font-medium">Actual:</span>
-                <span class="font-bold text-gray-900 dark:text-white">{{ formatCurrency(predictionsData.trend_analysis.average_ticket.current) }}</span>
+                <span class="text-[#5f6368] dark:text-[#9aa0a6] font-medium">Actual:</span>
+                <span class="font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(predictionsData.trend_analysis.average_ticket.current) }}</span>
               </div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-500 dark:text-zinc-500">Anterior:</span>
-                <span class="font-semibold text-gray-600 dark:text-zinc-400">{{ formatCurrency(predictionsData.trend_analysis.average_ticket.previous) }}</span>
+                <span class="text-[#5f6368] dark:text-[#9aa0a6]">Anterior:</span>
+                <span class="font-medium text-[#5f6368] dark:text-[#9aa0a6]">{{ formatCurrency(predictionsData.trend_analysis.average_ticket.previous) }}</span>
               </div>
-              <div class="pt-2 mt-2 border-t border-gray-200 dark:border-zinc-700 flex justify-between items-center">
-                <span class="text-gray-700 dark:text-zinc-300 font-semibold">Variación:</span>
+              <div class="pt-2 mt-2 border-t border-[#e8eaed] dark:border-[#3a3a3f] flex justify-between items-center">
+                <span class="text-[#1e1f20] dark:text-[#e3e3e3] font-medium">Variación:</span>
                 <span :class="[
-                  'text-sm font-bold px-2 py-0.5 rounded-lg',
+                  'text-sm font-medium px-2.5 py-1 rounded-full',
                   predictionsData.trend_analysis.average_ticket.growth_percentage >= 0 
-                    ? 'bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400' 
-                    : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400'
+                    ? 'bg-[#f3e8ff] dark:bg-[#7c3aed]/20 text-[#7c3aed] dark:text-[#a78bfa]' 
+                    : 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]'
                 ]">
                   {{ predictionsData.trend_analysis.average_ticket.growth_percentage >= 0 ? '+' : '' }}{{ predictionsData.trend_analysis.average_ticket.growth_percentage }}%
                 </span>
@@ -2005,31 +1961,31 @@
           </div>
         </div>
 
-        <!-- Predicción de Agotamiento de Stock con IA - DISEÑO ENTERPRISE CLEAN -->
+        <!-- Predicción de Agotamiento de Stock con IA - Gemini -->
         <div v-if="predictionsData && predictionsData.stock_depletion?.length > 0" 
-             class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-4 bg-transparent">
+             class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+          <div class="px-6 py-4">
             <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 dark:from-slate-500 dark:to-slate-600 rounded-xl flex items-center justify-center shadow-sm">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#f0f4f9] dark:bg-[#282a2c] rounded-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-gray-900 dark:text-white">Análisis de Inventario</h3>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Proyección de agotamiento de stock</p>
+                  <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Análisis de Inventario</h3>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Proyección de agotamiento de stock</p>
                 </div>
               </div>
-              <div class="flex items-center space-x-3">
-                <div class="flex items-center space-x-2 text-xs text-gray-600 dark:text-zinc-400">
-                  <span class="font-mono font-semibold text-red-600 dark:text-red-400">{{ criticalProductsCount }}</span>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 text-xs text-[#5f6368] dark:text-[#9aa0a6]">
+                  <span class="font-mono font-semibold text-[#d93025] dark:text-[#f28b82]">{{ criticalProductsCount }}</span>
                   <span>Críticos</span>
-                  <span class="mx-2 text-gray-300 dark:text-zinc-600">•</span>
-                  <span class="font-mono font-semibold text-amber-600 dark:text-amber-400">{{ warningProductsCount }}</span>
+                  <span class="mx-2 text-[#e8eaed] dark:text-[#3a3a3f]">•</span>
+                  <span class="font-mono font-semibold text-[#f9ab00] dark:text-[#fdd663]">{{ warningProductsCount }}</span>
                   <span>Atención</span>
-                  <span v-if="predictionsFilters.showHealthy" class="mx-2 text-gray-300 dark:text-zinc-600">•</span>
-                  <span v-if="predictionsFilters.showHealthy" class="font-mono font-semibold text-green-600 dark:text-green-400">{{ healthyProductsCount }}</span>
+                  <span v-if="predictionsFilters.showHealthy" class="mx-2 text-[#e8eaed] dark:text-[#3a3a3f]">•</span>
+                  <span v-if="predictionsFilters.showHealthy" class="font-mono font-semibold text-[#1e8e3e] dark:text-[#81c995]">{{ healthyProductsCount }}</span>
                   <span v-if="predictionsFilters.showHealthy">Saludables</span>
                 </div>
               </div>
@@ -2037,29 +1993,29 @@
           </div>
           <div class="overflow-x-auto">
             <table class="min-w-full">
-              <thead class="bg-white dark:bg-transparent border-b border-gray-200 dark:border-zinc-800">
+              <thead class="bg-[#f0f4f9] dark:bg-[#282a2c]">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Producto</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Stock Actual</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Consumo Diario</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Agotamiento</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Acción</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Producto</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Stock Actual</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Consumo Diario</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Agotamiento</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Acción</th>
                 </tr>
               </thead>
-              <tbody class="bg-white dark:bg-zinc-900">
+              <tbody>
                 <tr v-for="item in paginatedStockDepletion" :key="item.product_id"
-                    class="border-b border-gray-100 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors duration-150">
+                    class="border-b border-[#e8eaed] dark:border-[#3a3a3f] hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-colors duration-150">
                   <td class="px-4 py-4">
                     <div>
-                      <div class="text-sm font-semibold text-gray-900 dark:text-white mb-1.5">{{ item.product_name }}</div>
+                      <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-1.5">{{ item.product_name }}</div>
                       <!-- Barra de urgencia fina (4px) debajo del nombre -->
-                      <div class="w-full h-1 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                      <div class="w-full h-1 bg-[#e8eaed] dark:bg-[#3a3a3f] rounded-full overflow-hidden">
                         <div 
                           :class="[
                             'h-full transition-all duration-500',
-                            item.days_until_depletion < 7 ? 'bg-red-500 dark:bg-red-400' :
-                            item.days_until_depletion < 30 ? 'bg-amber-500 dark:bg-amber-400' :
-                            'bg-green-500 dark:bg-green-400'
+                            item.days_until_depletion < 7 ? 'bg-[#d93025]' :
+                            item.days_until_depletion < 30 ? 'bg-[#f9ab00]' :
+                            'bg-[#1e8e3e]'
                           ]"
                           :style="{ 
                             width: item.days_until_depletion < 7 ? '15%' :
@@ -2071,71 +2027,71 @@
                     </div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <div class="font-mono text-base font-bold text-gray-900 dark:text-white">{{ item.current_stock }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">unidades</div>
+                    <div class="font-mono text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.current_stock }}</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">unidades</div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <div class="font-mono text-sm font-semibold text-gray-700 dark:text-zinc-300">{{ item.daily_average_sales }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">un/día</div>
+                    <div class="font-mono text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.daily_average_sales }}</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">un/día</div>
                   </td>
                   <td class="px-4 py-4 text-center">
                     <!-- Fecha relativa limpia -->
                     <div v-if="item.days_until_depletion >= 30">
-                      <div class="text-sm font-semibold text-green-700 dark:text-green-400">{{ getRelativeTimeText(item.days_until_depletion) }}</div>
-                      <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Stock amplio</div>
+                      <div class="text-sm font-medium text-[#1e8e3e] dark:text-[#81c995]">{{ getRelativeTimeText(item.days_until_depletion) }}</div>
+                      <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Stock amplio</div>
                     </div>
                     <div v-else>
                       <div :class="[
-                        'text-sm font-bold mb-0.5',
-                        item.days_until_depletion < 7 ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'
+                        'text-sm font-semibold mb-0.5',
+                        item.days_until_depletion < 7 ? 'text-[#d93025] dark:text-[#f28b82]' : 'text-[#f9ab00] dark:text-[#fdd663]'
                       ]">
                         {{ getRelativeTimeText(item.days_until_depletion) }}
                       </div>
-                      <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                      <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
                         {{ formatDate(item.estimated_depletion_date) }}
                       </div>
                     </div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <!-- Botón outline 'Reponer' solo para críticos/advertencias -->
+                    <!-- Botón outline 'Reponer' solo para críticos/advertencias - Gemini -->
                     <button
                       v-if="item.days_until_depletion < 30"
                       @click="createPurchaseOrder(item)"
                       :class="[
-                        'px-3 py-1.5 text-xs font-semibold rounded-xl border-2 transition-all duration-150',
+                        'px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-150',
                         item.days_until_depletion < 7 
-                          ? 'border-red-500 dark:border-red-400 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950' 
-                          : 'border-amber-500 dark:border-amber-400 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950'
+                          ? 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82] hover:bg-[#f8d7da] dark:hover:bg-[#d93025]/30' 
+                          : 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#f9ab00] dark:text-[#fdd663] hover:bg-[#fef3cd] dark:hover:bg-[#f9ab00]/30'
                       ]"
                     >
                       Reponer
                     </button>
                     <!-- Sin acción para productos saludables -->
-                    <span v-else class="text-xs text-gray-400 dark:text-zinc-500">—</span>
+                    <span v-else class="text-xs text-[#9aa0a6]">—</span>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
           
-          <!-- Paginación Stock Depletion -->
-          <div v-if="predictionsData.stock_depletion.length > 10" class="bg-gray-50 dark:bg-zinc-800/50 px-6 py-3 border-t border-gray-200 dark:border-zinc-800">
+          <!-- Paginación Stock Depletion - Gemini -->
+          <div v-if="predictionsData.stock_depletion.length > 10" class="bg-[#f0f4f9] dark:bg-[#282a2c] px-6 py-3 border-t border-[#e8eaed] dark:border-[#3a3a3f]">
             <div class="flex items-center justify-between">
-              <div class="text-sm text-gray-700 dark:text-zinc-300">
+              <div class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                 Mostrando {{ ((predictionsCurrentPage - 1) * 10) + 1 }} - {{ Math.min(predictionsCurrentPage * 10, predictionsData.stock_depletion.length) }} de {{ predictionsData.stock_depletion.length }} productos
               </div>
-              <div class="flex items-center space-x-2">
+              <div class="flex items-center gap-2">
                 <button @click="predictionsCurrentPage--" 
                         :disabled="predictionsCurrentPage <= 1"
-                        class="px-3 py-1 text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 rounded hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-1.5 text-sm font-medium bg-white dark:bg-[#1e1f20] text-[#5f6368] dark:text-[#9aa0a6] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   Anterior
                 </button>
-                <span class="px-3 py-1 text-sm font-medium text-gray-900 dark:text-white">
+                <span class="px-3 py-1 text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">
                   {{ predictionsCurrentPage }} / {{ Math.ceil(predictionsData.stock_depletion.length / 10) }}
                 </span>
                 <button @click="predictionsCurrentPage++" 
                         :disabled="predictionsCurrentPage >= Math.ceil(predictionsData.stock_depletion.length / 10)"
-                        class="px-3 py-1 text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 rounded hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-1.5 text-sm font-medium bg-white dark:bg-[#1e1f20] text-[#5f6368] dark:text-[#9aa0a6] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   Siguiente
                 </button>
               </div>
@@ -2143,31 +2099,31 @@
           </div>
         </div>
         
-        <!-- Mensaje "¡Todo bajo control!" cuando NO hay productos críticos ni de atención -->
+        <!-- Mensaje "¡Todo bajo control!" cuando NO hay productos críticos ni de atención - Gemini -->
         <div v-else-if="predictionsData && criticalProductsCount === 0 && warningProductsCount === 0"
-             class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 rounded-2xl shadow-sm dark:shadow-black/50 border-2 border-green-200 dark:border-green-900 p-12 text-center">
-          <div class="flex flex-col items-center space-y-4">
-            <div class="w-20 h-20 bg-green-100 dark:bg-green-950 rounded-full flex items-center justify-center animate-bounce">
-              <svg class="w-10 h-10 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             class="bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-2xl p-12 text-center">
+          <div class="flex flex-col items-center gap-4">
+            <div class="w-20 h-20 bg-[#ceead6] dark:bg-[#1e8e3e]/30 rounded-full flex items-center justify-center">
+              <svg class="w-10 h-10 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div>
-              <h3 class="text-2xl font-bold text-green-900 dark:text-green-400 mb-2">¡Todo bajo control!</h3>
-              <p class="text-green-700 dark:text-green-400/80 text-sm max-w-md mx-auto">
+              <h3 class="text-2xl font-semibold text-[#1e8e3e] dark:text-[#81c995] mb-2">¡Todo bajo control!</h3>
+              <p class="text-[#1e8e3e]/80 dark:text-[#81c995]/80 text-sm max-w-md mx-auto">
                 No hay productos críticos ni en estado de atención. Tu inventario está en excelente estado.
               </p>
             </div>
-            <div class="flex items-center space-x-4 mt-4 text-sm">
-              <div class="flex items-center space-x-2 text-green-700 dark:text-green-400">
+            <div class="flex items-center gap-4 mt-4 text-sm">
+              <div class="flex items-center gap-2 text-[#1e8e3e] dark:text-[#81c995]">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
-                <span class="font-semibold">{{ healthyProductsCount }} productos saludables</span>
+                <span class="font-medium">{{ healthyProductsCount }} productos saludables</span>
               </div>
               <button
                 @click="predictionsFilters.showHealthy = true"
-                class="px-4 py-2 bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-600 text-white text-xs font-bold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                class="px-5 py-2 bg-[#1e8e3e] dark:bg-[#81c995] hover:bg-[#168936] dark:hover:bg-[#72b888] text-white dark:text-[#1e1f20] text-xs font-medium rounded-full transition-all duration-200"
               >
                 <svg class="w-3 h-3 inline mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -2179,74 +2135,74 @@
           </div>
         </div>
 
-        <!-- Recomendaciones de Compra con IA - DISEÑO URGENTE PROFESIONAL -->
+        <!-- Recomendaciones de Compra con IA - Gemini -->
         <div v-if="predictionsData && predictionsData.purchase_recommendations?.length > 0" 
-             class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm dark:shadow-black/50 border-2 border-red-200 dark:border-red-900 overflow-hidden">
-          <!-- Header urgente pero profesional -->
-          <div class="px-6 py-4 border-b border-red-200 dark:border-red-900 bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30">
+             class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+          <!-- Header urgente pero profesional - Gemini -->
+          <div class="px-6 py-4 bg-[#fce8e6] dark:bg-[#d93025]/20">
             <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-red-600 dark:bg-red-700 rounded-xl flex items-center justify-center shadow-sm">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-[#d93025] dark:bg-[#f28b82] rounded-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white dark:text-[#1e1f20]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-red-900 dark:text-red-400">Recomendaciones de Compra</h3>
-                  <p class="text-xs text-red-700 dark:text-red-400/80 mt-0.5">Productos que requieren reabastecimiento</p>
+                  <h3 class="text-base font-semibold text-[#d93025] dark:text-[#f28b82]">Recomendaciones de Compra</h3>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Productos que requieren reabastecimiento</p>
                 </div>
               </div>
-              <div class="flex items-center space-x-2">
-                <span class="px-2.5 py-1 bg-red-600 dark:bg-red-700 text-white text-xs font-bold rounded-lg">
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-[#d93025] dark:bg-[#f28b82] text-white dark:text-[#1e1f20] text-xs font-semibold rounded-full">
                   {{ predictionsData.purchase_recommendations.length }}
                 </span>
-                <span class="text-xs text-red-700 dark:text-red-400 font-semibold">urgentes</span>
+                <span class="text-xs text-[#d93025] dark:text-[#f28b82] font-medium">urgentes</span>
               </div>
             </div>
           </div>
           
           <div class="overflow-x-auto">
             <table class="min-w-full">
-              <thead class="bg-white dark:bg-transparent border-b border-red-100 dark:border-red-900">
+              <thead class="bg-[#f8f9fa] dark:bg-[#282a2c]">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Producto</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Stock</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Comprar</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Inversión</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Prioridad</th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-400 uppercase tracking-wider">Acción</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Producto</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Stock</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Comprar</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Inversión</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Prioridad</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Acción</th>
                 </tr>
               </thead>
-              <tbody class="bg-white dark:bg-zinc-900">
+              <tbody class="bg-white dark:bg-[#1e1f20]">
                 <tr v-for="item in paginatedPurchaseRecommendations" :key="item.product_id"
-                    class="border-b border-gray-100 dark:border-zinc-800 hover:bg-red-50/30 dark:hover:bg-red-950/20 transition-colors duration-150">
+                    class="border-b border-[#e8eaed] dark:border-[#3a3a3f] hover:bg-[#fce8e6]/30 dark:hover:bg-[#d93025]/10 transition-colors duration-150">
                   <td class="px-4 py-4">
                     <div>
-                      <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.product_name }}</div>
-                      <div class="text-xs text-gray-500 dark:text-zinc-400 mt-1">
+                      <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.product_name }}</div>
+                      <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">
                         <span class="font-mono">{{ item.daily_demand }}</span> un/día
                       </div>
                     </div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <div class="font-mono text-base font-bold" :class="[
-                      item.current_stock <= 10 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
+                    <div class="font-mono text-base font-semibold" :class="[
+                      item.current_stock <= 10 ? 'text-[#d93025] dark:text-[#f28b82]' : 'text-[#1e1f20] dark:text-[#e3e3e3]'
                     ]">{{ item.current_stock }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">unidades</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">unidades</div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <div class="font-mono text-lg font-bold text-red-600 dark:text-red-400">{{ item.recommended_purchase }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">unidades</div>
+                    <div class="font-mono text-lg font-semibold text-[#d93025] dark:text-[#f28b82]">{{ item.recommended_purchase }}</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">unidades</div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <div class="font-mono text-base font-bold text-gray-900 dark:text-white">{{ formatCurrency(item.estimated_cost) }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">estimado</div>
+                    <div class="font-mono text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ formatCurrency(item.estimated_cost) }}</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">estimado</div>
                   </td>
                   <td class="px-4 py-4 text-center">
-                    <span class="text-xs font-semibold" :class="[
-                      item.priority === 'critical' ? 'text-red-600 dark:text-red-400' :
-                      item.priority === 'high' ? 'text-amber-600 dark:text-amber-400' :
-                      'text-gray-600 dark:text-zinc-400'
+                    <span class="text-xs font-medium" :class="[
+                      item.priority === 'critical' ? 'text-[#d93025] dark:text-[#f28b82]' :
+                      item.priority === 'high' ? 'text-[#f9ab00] dark:text-[#fdd663]' :
+                      'text-[#5f6368] dark:text-[#9aa0a6]'
                     ]">
                       {{ item.priority === 'critical' ? 'Urgente' : 
                          item.priority === 'high' ? 'Alta' : 
@@ -2256,7 +2212,7 @@
                   <td class="px-4 py-4 text-center">
                     <button
                       @click="createPurchaseOrder(item)"
-                      class="px-3 py-1.5 bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-all duration-150"
+                      class="px-4 py-1.5 bg-[#d93025] hover:bg-[#c5221f] dark:bg-[#f28b82] dark:hover:bg-[#ee675c] text-white dark:text-[#1e1f20] text-xs font-medium rounded-full transition-all duration-150"
                     >
                       Reponer
                     </button>
@@ -2266,24 +2222,24 @@
             </table>
           </div>
           
-          <!-- Paginación Recomendaciones -->
-          <div v-if="predictionsData.purchase_recommendations.length > 10" class="bg-gray-50 dark:bg-zinc-800/50 px-6 py-3 border-t border-gray-200 dark:border-zinc-800">
+          <!-- Paginación Recomendaciones - Gemini -->
+          <div v-if="predictionsData.purchase_recommendations.length > 10" class="bg-[#f8f9fa] dark:bg-[#282a2c] px-6 py-3">
             <div class="flex items-center justify-between">
-              <div class="text-sm text-gray-700 dark:text-zinc-300">
+              <div class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                 Mostrando {{ ((predictionsCurrentPage - 1) * 10) + 1 }} - {{ Math.min(predictionsCurrentPage * 10, predictionsData.purchase_recommendations.length) }} de {{ predictionsData.purchase_recommendations.length }} recomendaciones
               </div>
-              <div class="flex items-center space-x-2">
+              <div class="flex items-center gap-2">
                 <button @click="predictionsCurrentPage--" 
                         :disabled="predictionsCurrentPage <= 1"
-                        class="px-3 py-1 text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 rounded hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-1.5 text-sm bg-white dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full hover:bg-[#f0f4f9] dark:hover:bg-[#4a4a4f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   Anterior
                 </button>
-                <span class="px-3 py-1 text-sm font-medium text-gray-900 dark:text-white">
+                <span class="px-3 py-1 text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">
                   {{ predictionsCurrentPage }} / {{ Math.ceil(predictionsData.purchase_recommendations.length / 10) }}
                 </span>
                 <button @click="predictionsCurrentPage++" 
                         :disabled="predictionsCurrentPage >= Math.ceil(predictionsData.purchase_recommendations.length / 10)"
-                        class="px-3 py-1 text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 rounded hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-1.5 text-sm bg-white dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full hover:bg-[#f0f4f9] dark:hover:bg-[#4a4a4f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   Siguiente
                 </button>
               </div>
@@ -2291,55 +2247,55 @@
           </div>
         </div>
 
-        <!-- Pronóstico de Ventas con Machine Learning - Ejecutivo -->
+        <!-- Pronóstico de Ventas con Machine Learning - Gemini -->
         <div v-if="predictionsData && predictionsData.sales_forecast?.length > 0" 
-             class="bg-white/90 dark:bg-zinc-900/90  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-4 bg-gradient-to-r from-emerald-50/80 to-green-50/50 dark:from-emerald-950/30 dark:to-green-950/30">
+             class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+          <div class="px-6 py-4 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20">
             <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
-                <div class="p-2.5 bg-white/60 dark:bg-emerald-900/50  rounded-xl shadow-sm">
-                  <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#1e8e3e] dark:bg-[#81c995] rounded-full flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white dark:text-[#1e1f20]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
                   </svg>
                 </div>
                 <div>
-                  <h3 class="text-base font-bold text-gray-900 dark:text-white">Pronóstico de Ventas con Machine Learning</h3>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Proyección para los próximos {{ predictionsFilters.forecastDays }} días</p>
+                  <h3 class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Pronóstico de Ventas con Machine Learning</h3>
+                  <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Proyección para los próximos {{ predictionsFilters.forecastDays }} días</p>
                 </div>
               </div>
-              <span class="px-2.5 py-1 bg-emerald-100/70 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-xs font-semibold rounded-xl">
+              <span class="px-3 py-1 bg-[#1e8e3e] dark:bg-[#81c995] text-white dark:text-[#1e1f20] text-xs font-medium rounded-full">
                 {{ predictionsFilters.forecastDays }} días
               </span>
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200/50 dark:divide-zinc-800/50">
-              <thead class="bg-gray-50/50 dark:bg-transparent">
+            <table class="min-w-full">
+              <thead class="bg-[#f8f9fa] dark:bg-[#282a2c]">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Producto</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Ventas Históricas</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Pronóstico IA</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Tendencia</th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Confianza</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Producto</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Ventas Históricas</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Pronóstico IA</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Tendencia</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Confianza</th>
                 </tr>
               </thead>
-              <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
+              <tbody class="bg-white dark:bg-[#1e1f20]">
                 <tr v-for="item in paginatedSalesForecast" :key="item.product_id"
-                    class="hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors">
+                    class="border-b border-[#e8eaed] dark:border-[#3a3a3f] hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-colors">
                   <td class="px-4 py-3">
-                    <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.product_name }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                    <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.product_name }}</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
                       <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                       </svg>{{ item.transactions }} transacciones
                     </div>
                   </td>
                   <td class="px-4 py-3">
-                    <span class="text-sm font-semibold text-gray-700 dark:text-zinc-200">{{ item.historical_sales }}</span>
-                    <span class="text-xs text-gray-500 dark:text-zinc-400 ml-1">unidades</span>
+                    <span class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.historical_sales }}</span>
+                    <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6] ml-1">unidades</span>
                   </td>
                   <td class="px-4 py-3">
-                    <span class="inline-flex items-center px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-lg">
+                    <span class="inline-flex items-center px-3 py-1 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995] text-xs font-medium rounded-full">
                       <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                       </svg>{{ Math.abs(item.forecast_sales) }} unidades
@@ -2347,10 +2303,10 @@
                   </td>
                   <td class="px-4 py-3">
                     <span :class="[
-                      'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold',
-                      item.trend === 'growing' ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400' :
-                      item.trend === 'declining' ? 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400' :
-                      'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-400'
+                      'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium',
+                      item.trend === 'growing' ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' :
+                      item.trend === 'declining' ? 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]' :
+                      'bg-[#f0f4f9] dark:bg-[#3a3a3f] text-[#5f6368] dark:text-[#9aa0a6]'
                     ]">
                       <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path v-if="item.trend === 'growing'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
@@ -2362,9 +2318,9 @@
                   </td>
                   <td class="px-4 py-3">
                     <span :class="[
-                      'px-2.5 py-1 text-xs font-semibold rounded-full',
-                      item.confidence === 'high' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' :
-                      'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400'
+                      'px-3 py-1 text-xs font-medium rounded-full',
+                      item.confidence === 'high' ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' :
+                      'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#f9ab00] dark:text-[#fdd663]'
                     ]">
                       {{ item.confidence === 'high' ? 'ALTA' : 'MEDIA' }}
                     </span>
@@ -2374,24 +2330,24 @@
             </table>
           </div>
           
-          <!-- Paginación Pronóstico -->
-          <div v-if="predictionsData.sales_forecast.length > 10" class="bg-gray-50 dark:bg-zinc-800/50 px-6 py-3 border-t border-gray-200 dark:border-zinc-800">
+          <!-- Paginación Pronóstico - Gemini -->
+          <div v-if="predictionsData.sales_forecast.length > 10" class="bg-[#f8f9fa] dark:bg-[#282a2c] px-6 py-3">
             <div class="flex items-center justify-between">
-              <div class="text-sm text-gray-700 dark:text-zinc-300">
+              <div class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
                 Mostrando {{ ((predictionsCurrentPage - 1) * 10) + 1 }} - {{ Math.min(predictionsCurrentPage * 10, predictionsData.sales_forecast.length) }} de {{ predictionsData.sales_forecast.length }} pronósticos
               </div>
-              <div class="flex items-center space-x-2">
+              <div class="flex items-center gap-2">
                 <button @click="predictionsCurrentPage--" 
                         :disabled="predictionsCurrentPage <= 1"
-                        class="px-3 py-1 text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 rounded hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-1.5 text-sm bg-white dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full hover:bg-[#f0f4f9] dark:hover:bg-[#4a4a4f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   Anterior
                 </button>
-                <span class="px-3 py-1 text-sm font-medium text-gray-900 dark:text-white">
+                <span class="px-3 py-1 text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">
                   {{ predictionsCurrentPage }} / {{ Math.ceil(predictionsData.sales_forecast.length / 10) }}
                 </span>
                 <button @click="predictionsCurrentPage++" 
                         :disabled="predictionsCurrentPage >= Math.ceil(predictionsData.sales_forecast.length / 10)"
-                        class="px-3 py-1 text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 rounded hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-4 py-1.5 text-sm bg-white dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full hover:bg-[#f0f4f9] dark:hover:bg-[#4a4a4f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   Siguiente
                 </button>
               </div>
@@ -2400,11 +2356,11 @@
         </div>
       </div>
 
-      <!-- Otras secciones (placeholder para las restantes) -->
-      <div v-if="!['overview', 'products', 'movements', 'customers', 'suppliers', 'alerts', 'predictions'].includes(activeSection)" class="bg-white rounded-lg shadow p-6">
-        <div class="text-center py-12 text-gray-500">
-          <i :class="getCurrentSectionIcon()" class="text-4xl mb-4 text-gray-300"></i>
-          <p class="text-lg font-medium">{{ getCurrentSectionName() }}</p>
+      <!-- Otras secciones (placeholder para las restantes) - Gemini -->
+      <div v-if="!['overview', 'products', 'movements', 'customers', 'suppliers', 'alerts', 'predictions'].includes(activeSection)" class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl p-6">
+        <div class="text-center py-12 text-[#5f6368] dark:text-[#9aa0a6]">
+          <i :class="getCurrentSectionIcon()" class="text-4xl mb-4 text-[#e8eaed] dark:text-[#3a3a3f]"></i>
+          <p class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ getCurrentSectionName() }}</p>
           <p class="text-sm">Esta sección estará disponible próximamente</p>
         </div>
       </div>
@@ -2653,9 +2609,9 @@ export default {
     }
 
     const getChangeClass = (change) => {
-      if (change > 0) return 'text-green-600'
-      if (change < 0) return 'text-red-600'
-      return 'text-gray-600'
+      if (change > 0) return 'text-[#1e8e3e] dark:text-[#81c995]'
+      if (change < 0) return 'text-[#d93025] dark:text-[#f28b82]'
+      return 'text-[#5f6368] dark:text-[#9aa0a6]'
     }
 
     const getRotationTooltip = (rotationClass) => {
@@ -2686,13 +2642,13 @@ export default {
 
     const getMovementTypeClass = (type) => {
       const classes = {
-        'sale': 'bg-red-500',
-        'purchase': 'bg-green-500',
-        'adjustment': 'bg-blue-500',
-        'return': 'bg-yellow-500',
-        'transfer': 'bg-purple-500'
+        'sale': 'bg-[#d93025]',
+        'purchase': 'bg-[#1e8e3e]',
+        'adjustment': 'bg-[#1a73e8]',
+        'return': 'bg-[#f9ab00]',
+        'transfer': 'bg-[#7c3aed]'
       }
-      return classes[type] || 'bg-gray-500'
+      return classes[type] || 'bg-[#5f6368]'
     }
 
     const getMovementTypeIcon = (type) => {
@@ -3676,12 +3632,12 @@ export default {
       loadProductsData()
     }
 
-    // Métodos de utilidad para productos
+    // Métodos de utilidad para productos - Gemini colors
     const getStockStatusClass = (status) => {
       switch (status) {
-        case 'out': return 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'
-        case 'low': return 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800'
-        default: return 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'
+        case 'out': return 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]'
+        case 'low': return 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#f9ab00] dark:text-[#fdd663]'
+        default: return 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]'
       }
     }
 
@@ -3694,10 +3650,10 @@ export default {
     }
 
     const getRotationClass = (days) => {
-      if (days === 999) return 'bg-gray-50 dark:bg-gray-950 text-gray-700 dark:text-gray-400 border-gray-100 dark:border-gray-800'
-      if (days > 60) return 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'
-      if (days > 30) return 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800'
-      return 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'
+      if (days === 999) return 'bg-[#f0f4f9] dark:bg-[#3a3a3f] text-[#5f6368] dark:text-[#9aa0a6]'
+      if (days > 60) return 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]'
+      if (days > 30) return 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#f9ab00] dark:text-[#fdd663]'
+      return 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]'
     }
 
     // Función para convertir días a texto relativo limpio

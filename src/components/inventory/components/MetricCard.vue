@@ -1,20 +1,20 @@
 <template>
   <div 
-    class="metric-card bg-white rounded-lg shadow p-6 transition-all duration-200 hover:shadow-lg"
-    :class="{ 'ring-2 ring-offset-2': alert, [alertRingColor]: alert }"
+    class="metric-card bg-white dark:bg-[#1e1f20] rounded-2xl p-5 transition-all duration-200 hover:shadow-md"
+    :class="{ 'ring-2 ring-offset-2 dark:ring-offset-[#131314]': alert, [alertRingColor]: alert }"
   >
     <div class="flex items-center justify-between">
       <div>
-        <p class="text-sm font-medium text-gray-600">{{ title }}</p>
+        <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">{{ title }}</p>
         <p 
-          class="text-2xl font-bold mt-1"
+          class="text-2xl font-semibold mt-1"
           :class="valueClass"
         >
           {{ displayValue }}
         </p>
       </div>
       <div 
-        class="flex-shrink-0 p-3 rounded-full"
+        class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
         :class="iconBgClass"
       >
         <i 
@@ -25,8 +25,10 @@
     </div>
     
     <!-- Indicador de alerta -->
-    <div v-if="alert" class="mt-3 flex items-center text-sm">
-      <i class="fas fa-exclamation-triangle mr-2" :class="alertTextColor"></i>
+    <div v-if="alert" class="mt-3 flex items-center text-xs">
+      <svg class="w-4 h-4 mr-1.5" :class="alertTextColor" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
+      </svg>
       <span :class="alertTextColor">Requiere atención</span>
     </div>
   </div>
@@ -67,46 +69,46 @@ export default {
   setup(props) {
     const colorClasses = {
       blue: {
-        iconBg: 'bg-blue-100',
-        iconColor: 'text-blue-600',
-        value: 'text-gray-900',
-        alertRing: 'ring-blue-500',
-        alertText: 'text-blue-600'
+        iconBg: 'bg-[#e8f0fe] dark:bg-[#1a73e8]/20',
+        iconColor: 'text-[#1a73e8] dark:text-[#8ab4f8]',
+        value: 'text-[#1e1f20] dark:text-[#e3e3e3]',
+        alertRing: 'ring-[#1a73e8]',
+        alertText: 'text-[#1a73e8] dark:text-[#8ab4f8]'
       },
       green: {
-        iconBg: 'bg-green-100',
-        iconColor: 'text-green-600',
-        value: 'text-gray-900',
-        alertRing: 'ring-green-500',
-        alertText: 'text-green-600'
+        iconBg: 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20',
+        iconColor: 'text-[#1e8e3e] dark:text-[#81c995]',
+        value: 'text-[#1e1f20] dark:text-[#e3e3e3]',
+        alertRing: 'ring-[#1e8e3e]',
+        alertText: 'text-[#1e8e3e] dark:text-[#81c995]'
       },
       yellow: {
-        iconBg: 'bg-yellow-100',
-        iconColor: 'text-yellow-600',
-        value: 'text-gray-900',
-        alertRing: 'ring-yellow-500',
-        alertText: 'text-yellow-600'
+        iconBg: 'bg-[#fef7e0] dark:bg-[#f9ab00]/20',
+        iconColor: 'text-[#f9ab00] dark:text-[#fdd663]',
+        value: 'text-[#1e1f20] dark:text-[#e3e3e3]',
+        alertRing: 'ring-[#f9ab00]',
+        alertText: 'text-[#f9ab00] dark:text-[#fdd663]'
       },
       red: {
-        iconBg: 'bg-red-100',
-        iconColor: 'text-red-600',
-        value: 'text-gray-900',
-        alertRing: 'ring-red-500',
-        alertText: 'text-red-600'
+        iconBg: 'bg-[#fce8e6] dark:bg-[#d93025]/20',
+        iconColor: 'text-[#d93025] dark:text-[#f28b82]',
+        value: 'text-[#1e1f20] dark:text-[#e3e3e3]',
+        alertRing: 'ring-[#d93025]',
+        alertText: 'text-[#d93025] dark:text-[#f28b82]'
       },
       purple: {
-        iconBg: 'bg-purple-100',
-        iconColor: 'text-purple-600',
-        value: 'text-gray-900',
-        alertRing: 'ring-purple-500',
-        alertText: 'text-purple-600'
+        iconBg: 'bg-[#f3e8ff] dark:bg-[#7c3aed]/20',
+        iconColor: 'text-[#7c3aed] dark:text-[#a78bfa]',
+        value: 'text-[#1e1f20] dark:text-[#e3e3e3]',
+        alertRing: 'ring-[#7c3aed]',
+        alertText: 'text-[#7c3aed] dark:text-[#a78bfa]'
       },
       indigo: {
-        iconBg: 'bg-indigo-100',
-        iconColor: 'text-indigo-600',
-        value: 'text-gray-900',
-        alertRing: 'ring-indigo-500',
-        alertText: 'text-indigo-600'
+        iconBg: 'bg-[#e8f0fe] dark:bg-[#4f46e5]/20',
+        iconColor: 'text-[#4f46e5] dark:text-[#818cf8]',
+        value: 'text-[#1e1f20] dark:text-[#e3e3e3]',
+        alertRing: 'ring-[#4f46e5]',
+        alertText: 'text-[#4f46e5] dark:text-[#818cf8]'
       }
     }
 

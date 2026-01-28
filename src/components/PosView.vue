@@ -95,7 +95,7 @@
     />
     
     <!-- BARRA DE HERRAMIENTAS EMPRESARIAL -->
-    <div class="sticky top-0 z-30 bg-gray-50/95 dark:bg-slate-900/95">
+    <div class="sticky top-0 z-30 bg-white/80 dark:bg-[#131314]/80 backdrop-blur-xl">
     
     <div class="px-4 lg:px-6 py-4">
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -104,10 +104,10 @@
           <!-- 📱 BOTÓN CAJA MÓVIL (Solo visible en móvil, al lado del buscador) -->
           <button 
             @click="hasOpenSession ? showCloseCashModal() : showOpenCashModal()"
-            class="lg:hidden flex-shrink-0 w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all duration-200 shadow-sm"
+            class="lg:hidden flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200"
             :class="hasOpenSession 
-              ? 'bg-emerald-500 border-emerald-500 text-white' 
-              : 'bg-white dark:bg-zinc-800 border-rose-300 dark:border-rose-700 text-rose-500 dark:text-rose-400 animate-pulse'"
+              ? 'bg-emerald-500 text-white' 
+              : 'bg-[#f8f9fa] dark:bg-[#1e1f20] text-rose-500 dark:text-rose-400'"
             :title="hasOpenSession ? 'Cerrar Caja' : '⚠️ Abrir Caja para vender'"
           >
             <svg v-if="hasOpenSession" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@
               v-model="searchTerm"
               type="text"
               placeholder="Buscar productos, SKU o escanear..."
-              class="block w-full h-10 pl-12 pr-32 text-sm font-semibold bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-zinc-400 rounded-xl shadow-md focus:border-slate-600 dark:focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20 dark:focus:ring-slate-400/20"
+              class="block w-full h-11 pl-12 pr-32 text-sm font-medium bg-[#f8f9fa] dark:bg-[#1e1f20] border border-gray-200 dark:border-zinc-700/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-2xl focus:bg-white dark:focus:bg-[#282a2c] focus:border-gray-300 dark:focus:border-zinc-600 focus:outline-none transition-all duration-200"
               :tabindex="showCustomerSelector ? -1 : 0"
               @keydown.escape="clearSearch"
               @keydown.enter.prevent="handleSearchEnter"
@@ -180,10 +180,10 @@
           <button
             v-if="shouldShowMultiWarehouseFeatures"
             @click="toggleGlobalSearch"
-            class="flex items-center gap-2 px-3 h-10 rounded-xl border-2 font-bold text-xs shadow-sm"
+            class="flex items-center gap-2 px-4 h-10 rounded-2xl text-[13px] font-medium transition-all duration-200"
             :class="globalSearch 
-              ? 'bg-blue-600 dark:bg-blue-700 border-blue-600 dark:border-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600' 
-              : 'bg-emerald-600 dark:bg-emerald-700 border-emerald-600 dark:border-emerald-700 text-white hover:bg-emerald-700 dark:hover:bg-emerald-600'"
+              ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40' 
+              : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'"
             :title="globalSearch ? '🌍 Buscando en TODAS las tiendas' : '🏪 Buscar SOLO en ' + (currentSession?.warehouse?.name || 'tienda actual')"
           >
             <svg v-if="globalSearch" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,34 +203,26 @@
           <button
             v-if="canUseWebOrders"
             @click="showLoadWebOrderModal = true" 
-            class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border group bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm"
+            class="hidden sm:flex items-center gap-2 px-4 h-10 rounded-2xl transition-all duration-200 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#282a2c] text-gray-700 dark:text-zinc-300"
             title="Cargar pedido web"
           >
-            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-              </svg>
-            </div>
-            <div class="flex flex-col text-left leading-none">
-              <span class="text-xs font-bold text-gray-900 dark:text-zinc-200">Pedido Web</span>
-            </div>
+            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <span class="text-[13px] font-medium">Pedido Web</span>
           </button>
 
           <button
             id="tour-pos-returns"
             @click="showReturnsModal = true"
             :disabled="quotationMode"
-            class="hidden sm:flex items-center gap-2 pl-1 pr-3 h-10 rounded-full border group"
-            :class="quotationMode ? 'bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-600' : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700 shadow-sm'"
+            class="hidden sm:flex items-center gap-2 px-4 h-10 rounded-2xl transition-all duration-200"
+            :class="quotationMode 
+              ? 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-600 cursor-not-allowed' 
+              : 'bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#282a2c] text-gray-700 dark:text-zinc-300'"
           >
-            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700"
-                 :class="quotationMode ? 'text-slate-400 dark:text-zinc-600' : 'text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300'">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
-            </div>
-            <div class="flex flex-col text-left leading-none">
-              
-              <span class="text-xs font-bold text-gray-900 dark:text-zinc-200">Devoluciones</span>
-            </div>
+            <svg class="w-4 h-4" :class="quotationMode ? 'text-gray-400' : 'text-blue-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+            <span class="text-[13px] font-medium">Devoluciones</span>
           </button>
           
           <!-- WhatsApp: Solo para Premium y Enterprise -->
@@ -239,23 +231,22 @@
           <button 
             id="tour-pos-cash-btn"
             @click="hasOpenSession ? showCloseCashModal() : showOpenCashModal()"
-            class="hidden sm:flex relative items-center gap-2 pl-1 pr-3 h-10 rounded-full border group"
+            class="hidden sm:flex items-center gap-2 px-4 h-10 rounded-2xl transition-all duration-200"
             :class="hasOpenSession 
-              ? 'bg-white dark:bg-zinc-900 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 shadow-sm' 
-              : 'bg-slate-100 dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 hover:bg-white dark:hover:bg-zinc-900 hover:border-rose-300 dark:hover:border-rose-700'"
+              ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40' 
+              : 'bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#282a2c] text-gray-700 dark:text-zinc-300'"
           >
-            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors"
-                 :class="hasOpenSession ? 'bg-emerald-500 dark:bg-emerald-600 text-white' : 'bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-600 group-hover:text-rose-500 dark:group-hover:text-rose-400'">
-              <svg v-if="hasOpenSession" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-              <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <div class="w-6 h-6 rounded-full flex items-center justify-center"
+                 :class="hasOpenSession ? 'bg-emerald-500 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400'">
+              <svg v-if="hasOpenSession" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+              <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             </div>
-            
             <div class="flex flex-col text-left leading-none">
-              <span class="text-[9px] font-black uppercase tracking-widest mb-1"
-                    :class="hasOpenSession ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-zinc-600 group-hover:text-rose-500 dark:group-hover:text-rose-400'">
+              <span class="text-[9px] font-semibold uppercase tracking-wider"
+                    :class="hasOpenSession ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-zinc-500'">
                 {{ hasOpenSession ? 'Turno Activo' : 'Cerrado' }}
               </span>
-              <span class="text-xs font-bold text-gray-900 dark:text-zinc-200">
+              <span class="text-[13px] font-medium">
                 {{ hasOpenSession ? 'Cerrar Caja' : 'Abrir Turno' }}
               </span>
             </div>
@@ -269,12 +260,12 @@
         <div class="flex items-center gap-1.5 min-w-max">
             <button 
                 @click="selectedCategory = null"
-                class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 flex items-center gap-2 hover:scale-105"
+                class="px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200 flex items-center gap-2"
                 :class="!selectedCategory 
-                    ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-800 dark:border-slate-700 shadow-lg shadow-slate-500/30' 
-                    : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 shadow-sm'"
+                    ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' 
+                    : 'bg-[#f8f9fa] dark:bg-[#1e1f20] text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-[#282a2c]'"
             >
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Todas
             </button>
 
@@ -282,10 +273,10 @@
                 v-for="cat in visibleCategories" 
                 :key="cat.id"
                 @click="selectedCategory = cat.id"
-                class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 whitespace-nowrap hover:scale-105 active:scale-95"
+                class="px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200 whitespace-nowrap"
                 :class="selectedCategory === cat.id
-                    ? 'bg-slate-800 dark:bg-slate-700 text-white border-slate-800 dark:border-slate-700 shadow-lg shadow-slate-500/30' 
-                    : 'bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border-slate-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 shadow-sm'"
+                    ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' 
+                    : 'bg-[#f8f9fa] dark:bg-[#1e1f20] text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-[#282a2c]'"
             >
                 {{ capitalizeText(cat.name) }}
             </button>
@@ -294,7 +285,7 @@
             <button 
                 v-if="hiddenCategoriesCount > 0"
                 @click="showAllCategories = !showAllCategories"
-                class="px-4 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 whitespace-nowrap hover:scale-105 active:scale-95 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-300 dark:border-indigo-700 hover:border-indigo-400 dark:hover:border-indigo-600 shadow-sm"
+                class="px-4 py-2 rounded-full text-[13px] font-medium transition-all duration-200 whitespace-nowrap bg-[#f8f9fa] dark:bg-[#1e1f20] text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-[#282a2c]"
             >
                 <span v-if="!showAllCategories" class="flex items-center gap-1">
                     +{{ hiddenCategoriesCount }} más
@@ -313,10 +304,10 @@
     <!-- 📱 BOTÓN FLOTANTE CARRITO MÓVIL -->
     <button 
       @click="showMobileCart = true"
-      class="lg:hidden fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 active:scale-95 shadow-2xl"
+      class="lg:hidden fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3.5 rounded-2xl font-medium text-sm transition-all duration-300 active:scale-95"
       :class="cart.items.length > 0 
-        ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/40' 
-        : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 shadow-black/10'"
+        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-xl' 
+        : 'bg-white dark:bg-[#1e1f20] text-gray-600 dark:text-zinc-300 shadow-lg'"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -937,16 +928,16 @@
         <div
           v-for="product in paginatedProducts"
           :key="product.id"
-          class="group bg-white dark:bg-zinc-900/80 rounded-xl overflow-hidden cursor-pointer border border-gray-200 dark:border-zinc-800/40 hover:ring-2 hover:ring-emerald-500/70 dark:hover:ring-emerald-400/50 hover:border-transparent shadow-sm hover:shadow-lg dark:shadow-black/30"
+          class="group bg-white dark:bg-[#1e1f20] rounded-2xl overflow-hidden cursor-pointer border border-gray-100 dark:border-zinc-800/30 hover:border-gray-200 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all duration-200"
           @click="addToCart(product)"
         >
           
           <!-- 🖼️ CONTENEDOR DE IMAGEN - OPTIMIZADO: Mayor área visual (p-2 → p-1) -->
-          <div class="aspect-square bg-gray-50 dark:bg-zinc-900/30 relative flex items-center justify-center p-1 border-b border-gray-100 dark:border-zinc-800/30">
+          <div class="aspect-square bg-[#f8f9fa] dark:bg-[#282a2c] relative flex items-center justify-center p-1">
              
              <!-- Badge de cantidad en carrito (gris oscuro profesional - menos ruido visual) -->
              <div v-if="getProductQuantityInCart(product.id) > 0" 
-                  class="absolute -top-0.5 -right-0.5 z-10 w-6 h-6 rounded-full bg-slate-800 dark:bg-zinc-200 text-white dark:text-zinc-900 text-[11px] font-bold shadow-md ring-2 ring-white dark:ring-zinc-800 flex items-center justify-center">
+                  class="absolute top-1.5 right-1.5 z-10 w-5 h-5 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-medium flex items-center justify-center">
                {{ getProductQuantityInCart(product.id) }}
              </div>
              
@@ -975,20 +966,20 @@
           </div>
 
           <!-- 📝 INFORMACIÓN - Altura fija para uniformidad -->
-          <div class="p-2.5 h-[72px] flex flex-col justify-between bg-white dark:bg-zinc-900/50">
+          <div class="p-3 h-[72px] flex flex-col justify-between bg-white dark:bg-[#1e1f20]">
             
             <!-- PRECIO PROTAGONISTA -->
-            <span class="text-lg font-bold text-slate-900 dark:text-white leading-none">
+            <span class="text-base font-semibold text-gray-900 dark:text-white leading-none">
               ${{ product.price.toLocaleString() }}
             </span>
             
             <!-- Nombre del producto (2 líneas máximo con line-clamp) -->
-            <h3 class="text-sm font-medium text-gray-700 dark:text-zinc-300 leading-tight line-clamp-2" :title="product.name">
+            <h3 class="text-[13px] text-gray-600 dark:text-zinc-400 leading-tight line-clamp-2" :title="product.name">
               {{ product.name }}
             </h3>
             
             <!-- Stock discreto -->
-            <span class="text-xs" :class="getTotalStock(product) <= 5 ? 'text-rose-500 dark:text-rose-400 font-medium' : 'text-gray-400 dark:text-zinc-500'">
+            <span class="text-xs" :class="getTotalStock(product) <= 5 ? 'text-rose-500 dark:text-rose-400' : 'text-gray-400 dark:text-zinc-500'">
               {{ getTotalStock(product) <= 5 ? '¡Solo ' + getTotalStock(product) + '!' : 'Stock: ' + getTotalStock(product) }}
             </span>
           </div>
@@ -999,13 +990,13 @@
       <div v-if="remainingProductsCount > 0" class="flex justify-center pb-20 pt-4">
         <button 
           @click="loadMoreProducts"
-          class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 rounded-xl font-semibold text-sm hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 shadow-sm hover:shadow-md"
+          class="flex items-center gap-2 px-5 py-2.5 bg-[#f8f9fa] dark:bg-[#1e1f20] text-gray-700 dark:text-zinc-300 rounded-full text-[13px] font-medium hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
           </svg>
           Cargar más productos
-          <span class="text-xs text-gray-400 dark:text-zinc-500">({{ remainingProductsCount }} restantes)</span>
+          <span class="text-gray-400 dark:text-zinc-500">({{ remainingProductsCount }})</span>
         </button>
       </div>
 
@@ -1018,7 +1009,7 @@
 
 <!-- Panel Derecho: Carrito/Ticket - OCULTO EN MÓVIL - 4 columnas (33%) -->
 <div :class="isFashionStore ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block overflow-hidden" style="max-height: 100%;">
-  <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg dark:shadow-xl dark:shadow-black/40 border border-gray-200 dark:border-zinc-800 flex flex-col overflow-hidden" style="height: 100%; max-height: 100%;">
+  <div class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-gray-100 dark:border-zinc-800/30 flex flex-col overflow-hidden" style="height: 100%; max-height: 100%;">
     
     <!-- 🏷️ HEADER TICKET -->
     <div class="px-4 py-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800">
@@ -1582,19 +1573,19 @@
     </div>
 
     <!-- FOOTER DE ACCIÓN -->
-    <div class="p-4 bg-gray-50 dark:bg-zinc-800 border-t border-gray-100 dark:border-zinc-700 flex-shrink-0 space-y-2 mt-auto">
+    <div class="p-4 bg-white dark:bg-[#1e1f20] border-t border-gray-100 dark:border-zinc-800/50 flex-shrink-0 space-y-3 mt-auto">
        
        <!-- Botones Secundarios - NEUTROS -->
        <div class="flex gap-2">
           <button @click="holdSale" :disabled="cart.items.length === 0" 
-                  class="flex-1 h-9 text-[10px] font-semibold bg-white dark:bg-zinc-700 text-gray-600 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-600 rounded-lg transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 border border-gray-200 dark:border-zinc-600">
-             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  class="flex-1 h-10 text-[13px] font-medium bg-[#f8f9fa] dark:bg-[#282a2c] text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-[#2d2f31] rounded-xl transition-all flex items-center justify-center gap-1.5 disabled:opacity-40">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
              <span>Cancelar</span>
           </button>
           
           <button @click="printQuote" :disabled="!canCreateQuotation" 
-                  class="flex-1 h-9 text-[10px] font-semibold bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-600 rounded-lg transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 border border-gray-200 dark:border-zinc-600">
-             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  class="flex-1 h-10 text-[13px] font-medium bg-[#f8f9fa] dark:bg-[#282a2c] text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-[#2d2f31] rounded-xl transition-all flex items-center justify-center gap-1.5 disabled:opacity-40">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
              <span>Cotizar</span>
           </button>
        </div>
@@ -1603,13 +1594,13 @@
        <button
           @click="handleCobrarClick"
           :disabled="!canShowPaymentModal || quotationMode || (selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))"
-          class="w-full h-16 rounded-2xl font-black text-lg shadow-2xl flex items-center justify-center gap-3 group relative overflow-hidden"
+          class="w-full h-14 rounded-2xl font-semibold text-base flex items-center justify-center gap-3 group relative overflow-hidden transition-all duration-200"
           :class="[
             (!canShowPaymentModal || quotationMode)
-              ? 'bg-slate-300 dark:bg-zinc-700 text-slate-500 dark:text-zinc-400 cursor-not-allowed shadow-none'
+              ? 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 cursor-not-allowed'
             : (selectedPaymentMethod === 'efectivo' && total > 0 && (!cashReceived || cashReceived < total))
-              ? 'bg-slate-400 dark:bg-zinc-600 text-slate-600 dark:text-zinc-300 cursor-not-allowed shadow-none'
-              : 'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-400 shadow-emerald-600/40 hover:shadow-emerald-600/60 hover:shadow-2xl cobrar-ready-pulse'
+              ? 'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400 cursor-not-allowed'
+              : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100'
           ]"
         >
           <!-- Efecto de brillo animado cuando está listo -->
@@ -1632,13 +1623,13 @@
           </span>
 
           <span v-else class="flex items-center justify-between w-full px-4">
-             <span class="flex items-center gap-3">
-               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-               <span class="text-xl font-black tracking-wide uppercase">Cobrar Ahora</span>
+             <span class="flex items-center gap-2">
+               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+               <span class="text-base font-semibold">Cobrar Ahora</span>
              </span>
-             <span class="flex items-center gap-2 text-2xl font-black tabular-nums">
+             <span class="flex items-center gap-2 text-lg font-semibold tabular-nums">
                ${{ total.toLocaleString() }}
-               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
              </span>
           </span>
         </button>

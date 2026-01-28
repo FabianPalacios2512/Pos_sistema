@@ -31,32 +31,32 @@ export default {
     const typeConfig = {
       purchase: {
         icon: 'fas fa-arrow-down',
-        bgClass: 'bg-green-100',
-        colorClass: 'text-green-600',
+        bgClass: 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20',
+        colorClass: 'text-[#1e8e3e] dark:text-[#81c995]',
         label: 'Compra'
       },
       sale: {
         icon: 'fas fa-arrow-up',
-        bgClass: 'bg-red-100',
-        colorClass: 'text-red-600',
+        bgClass: 'bg-[#fce8e6] dark:bg-[#d93025]/20',
+        colorClass: 'text-[#d93025] dark:text-[#f28b82]',
         label: 'Venta'
       },
       adjustment: {
         icon: 'fas fa-edit',
-        bgClass: 'bg-blue-100',
-        colorClass: 'text-blue-600',
+        bgClass: 'bg-[#e8f0fe] dark:bg-[#1a73e8]/20',
+        colorClass: 'text-[#1a73e8] dark:text-[#8ab4f8]',
         label: 'Ajuste'
       },
       return: {
         icon: 'fas fa-undo',
-        bgClass: 'bg-yellow-100',
-        colorClass: 'text-yellow-600',
+        bgClass: 'bg-[#fef7e0] dark:bg-[#f9ab00]/20',
+        colorClass: 'text-[#f9ab00] dark:text-[#fdd663]',
         label: 'Devolución'
       },
       transfer: {
         icon: 'fas fa-exchange-alt',
-        bgClass: 'bg-purple-100',
-        colorClass: 'text-purple-600',
+        bgClass: 'bg-[#f3e8ff] dark:bg-[#7c3aed]/20',
+        colorClass: 'text-[#7c3aed] dark:text-[#a78bfa]',
         label: 'Transferencia'
       }
     }

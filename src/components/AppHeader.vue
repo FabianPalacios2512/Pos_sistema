@@ -1,7 +1,7 @@
 <template>
   <!-- Header Empresarial Profesional - Diseño Limpio y Minimalista -->
-  <header class="sticky top-0 z-40 bg-white dark:bg-[#25252d] border-b border-gray-200 dark:border-zinc-700/50 transition-colors duration-300">
-    <div class="h-16 px-4 lg:px-6">
+  <header class="sticky top-0 z-40 bg-white/80 dark:bg-[#131314]/80 backdrop-blur-xl border-b border-gray-100 dark:border-zinc-800/50 transition-colors duration-300">
+    <div class="h-14 px-4 lg:px-6">
       <div class="flex items-center justify-between h-full">
         
         <!-- Sección Izquierda: Marca Minimalista -->
@@ -9,35 +9,35 @@
           <!-- 📱 Botón Hamburger (Solo móvil) -->
           <button
             @click="$emit('toggleSidebar')"
-            class="lg:hidden p-2 -ml-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-colors duration-200"
+            class="lg:hidden p-2 -ml-2 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-colors duration-200"
             title="Menú"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
           
           <div>
-            <h1 class="text-lg font-bold text-gray-900 dark:text-white transition-colors duration-300">105 POS Pro</h1>
-            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium transition-colors duration-300">Sistema de Gestión Empresarial</p>
+            <h1 class="text-base font-semibold text-gray-900 dark:text-white transition-colors duration-300">105 POS Pro</h1>
+            <p class="text-[11px] text-gray-400 dark:text-zinc-500 font-normal transition-colors duration-300">Sistema de Gestión Empresarial</p>
           </div>
         </div>
         
         <!-- Sección Derecha: Controles y Usuario -->
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-1">
           
           <!-- Notificaciones Compactas -->
           <div class="relative">
             <button
               @click="toggleNotifications"
-              class="relative p-2 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors duration-200"
+              class="relative p-2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] rounded-full transition-colors duration-200"
               title="Notificaciones"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
               </svg>
               <!-- Badge compacto -->
-              <span v-if="notificationCount > 0" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+              <span v-if="notificationCount > 0" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             
             <!-- Dropdown Notificaciones -->
@@ -148,12 +148,12 @@
           <button
             id="tour-video-button"
             @click="showVideoTutorial"
-            class="hidden md:flex p-2 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-lg transition-colors duration-200"
+            class="hidden md:flex p-2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] rounded-full transition-colors duration-200"
             title="Video tutorial"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
           </button>
           
@@ -164,10 +164,10 @@
               v-if="!isRadioActive"
               id="tour-voice-button"
               @click="$emit('toggle-radio')"
-              class="flex items-center space-x-1.5 px-3 py-2 rounded-lg transition-all duration-200 bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-400"
+              class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-all duration-200 hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] text-gray-500 dark:text-zinc-400"
               title="Abrir Radio"
             >
-              <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
               </svg>
               <span class="text-sm font-medium">Radio</span>
@@ -240,17 +240,17 @@
             </div>
           </div>
 
-          <!-- Botón 105 IA - 100% Ghost (ya corregido previamente) -->
+          <!-- Botón 105 IA - Destacado con estilo premium -->
           <button
             id="tour-ia-button"
             @click="toggleAIChat"
-            class="hidden md:flex items-center space-x-1.5 px-3 py-2 bg-transparent hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-400 rounded-lg transition-all duration-200"
+            class="hidden md:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl shadow-md shadow-violet-500/25 hover:shadow-lg hover:shadow-violet-500/30 transition-all duration-300 hover:scale-[1.02]"
             title="Asistente IA 105"
           >
-            <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/>
             </svg>
-            <span class="text-sm font-medium">105 IA</span>
+            <span class="text-sm font-semibold">105 IA</span>
           </button>
           
           <!-- Separador -->

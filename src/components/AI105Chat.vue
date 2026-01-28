@@ -300,11 +300,12 @@
             </button>
             <button 
               @click="closeChat"
-              class="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden"
+              class="w-10 h-10 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-all"
+              title="Cerrar chat"
             >
-              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                {{ userName.charAt(0).toUpperCase() }}
-              </div>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
             </button>
           </div>
         </div>

@@ -1,23 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gray-100 dark:bg-zinc-950 transition-colors duration-300">
+  <div class="min-h-screen bg-[#f8f9fa] dark:bg-[#131314] transition-colors duration-300">
     <div class="p-4 lg:p-6 space-y-6">
       
-      <!-- Header Elegante -->
-      <div class="flex items-center justify-between pb-4 border-b border-gray-300 dark:border-zinc-700">
-        <div class="flex items-center space-x-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Análisis de Productos</h1>
-            <p class="text-sm text-gray-600 dark:text-zinc-400">Rotación ABC y rentabilidad por producto</p>
-          </div>
+      <!-- Header Elegante - Gemini Style -->
+      <div class="flex items-center justify-between pb-4">
+        <div>
+          <h1 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Análisis de Productos</h1>
+          <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Rotación ABC y rentabilidad por producto</p>
         </div>
         
         <div class="flex items-center space-x-3">
-          <button @click="loadData" class="px-4 py-2.5 bg-slate-50 dark:bg-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-200 text-sm font-semibold rounded-xl border border-slate-200 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center space-x-2 hover:shadow-md hover:border-slate-300 dark:hover:border-zinc-600">
+          <button @click="loadData" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#f8f9fa] dark:bg-[#282a2c] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] text-sm font-medium rounded-full transition-all duration-200">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
@@ -26,216 +19,215 @@
         </div>
       </div>
 
-      <!-- Métricas Principales -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg">
+      <!-- Métricas Principales - Gemini Style -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 hover:shadow-md transition-all duration-200">
           <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-[#f8f9fa] dark:bg-[#282a2c] rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Total Productos</h3>
-              </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ summary.total_products || 0 }}</p>
-              <p class="text-sm text-gray-500 dark:text-zinc-400">Activos en sistema</p>
+              <h3 class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Total Productos</h3>
+              <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-1">{{ summary.total_products || 0 }}</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Activos en sistema</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg">
+        <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 hover:shadow-md transition-all duration-200">
           <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-green-50 dark:bg-green-950 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Clase A</h3>
-                <span class="text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950 px-2 py-1 rounded-lg border border-green-200 dark:border-green-800">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Clase A</h3>
+                <span class="text-[10px] font-medium text-[#1e8e3e] dark:text-[#81c995] bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 px-2 py-0.5 rounded-full">
                   Alta Rotación
                 </span>
               </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ summary.class_a_count || 0 }}</p>
-              <p class="text-sm text-gray-500 dark:text-zinc-400">Top performers</p>
+              <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-1">{{ summary.class_a_count || 0 }}</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Top performers</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg">
+        <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 hover:shadow-md transition-all duration-200">
           <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Clase B</h3>
-                <span class="text-xs font-medium text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950 px-2 py-1 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Clase B</h3>
+                <span class="text-[10px] font-medium text-[#1a73e8] dark:text-[#8ab4f8] bg-[#e8f0fe] dark:bg-[#1a73e8]/20 px-2 py-0.5 rounded-full">
                   Media
                 </span>
               </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ summary.class_b_count || 0 }}</p>
-              <p class="text-sm text-gray-500 dark:text-zinc-400">Rotación moderada</p>
+              <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-1">{{ summary.class_b_count || 0 }}</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Rotación moderada</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-lg">
+        <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 hover:shadow-md transition-all duration-200">
           <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 bg-amber-50 dark:bg-amber-950 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-[#fef7e0] dark:bg-[#f9ab00]/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#f9ab00] dark:text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Margen Promedio</h3>
-              </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ summary.avg_margin || 0 }}%</p>
-              <p class="text-sm text-gray-500 dark:text-zinc-400">Rentabilidad general</p>
+              <h3 class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Margen Promedio</h3>
+              <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-1">{{ summary.avg_margin || 0 }}%</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Rentabilidad general</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Tabla de Productos -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-300 dark:border-zinc-800 overflow-hidden">
-        <div class="bg-gray-50 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 px-5 py-4 flex items-center justify-between">
+      <!-- Tabla de Productos - Gemini Style -->
+      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
+        <div class="bg-[#f8f9fa] dark:bg-[#282a2c] border-b border-[#e8eaed] dark:border-[#3a3a3f] px-5 py-4 flex items-center justify-between">
           <div>
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Productos con Métricas de Rendimiento</h2>
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Rotación ABC y rentabilidad - Últimos {{ summary.analysis_period_days || 90 }} días</p>
+            <h2 class="text-sm font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Productos con Métricas de Rendimiento</h2>
+            <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Rotación ABC y rentabilidad - Últimos {{ summary.analysis_period_days || 90 }} días</p>
           </div>
         </div>
 
         <div v-if="loading" class="flex items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 dark:border-zinc-700 border-t-blue-600 dark:border-t-blue-500"></div>
+          <svg class="animate-spin w-10 h-10 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
         </div>
 
         <div v-else-if="products.length === 0" class="text-center py-12">
-          <div class="w-16 h-16 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-16 h-16 bg-[#f8f9fa] dark:bg-[#282a2c] rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
-          <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300">No hay productos</p>
-          <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Agrega productos para ver análisis</p>
+          <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">No hay productos</p>
+          <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">Agrega productos para ver análisis</p>
         </div>
 
         <div v-else class="overflow-x-auto">
           <table class="min-w-full">
-            <thead class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700">
+            <thead class="bg-[#f8f9fa] dark:bg-[#282a2c]">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Producto</th>
-                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Stock</th>
-                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Precio</th>
-                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Rotación</th>
-                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Rentabilidad</th>
-                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Ventas 90d</th>
+                <th class="px-4 py-3 text-left text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Producto</th>
+                <th class="px-4 py-3 text-center text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Stock</th>
+                <th class="px-4 py-3 text-center text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Precio</th>
+                <th class="px-4 py-3 text-center text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Rotación</th>
+                <th class="px-4 py-3 text-center text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Rentabilidad</th>
+                <th class="px-4 py-3 text-center text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Ventas 90d</th>
               </tr>
             </thead>
-            <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800">
-              <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors">
+            <tbody class="bg-white dark:bg-[#1e1f20] divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
+              <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-colors">
                 <td class="px-4 py-4">
                   <div>
-                    <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ product.name }}</div>
-                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                    <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.name }}</div>
+                    <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
                       <span class="font-mono">{{ product.sku }}</span>
                       <span v-if="product.category_name" class="ml-2">• {{ product.category_name }}</span>
                     </div>
                   </div>
                 </td>
                 <td class="px-4 py-4 text-center">
-                  <div class="font-mono text-base font-bold" :class="[
-                    product.current_stock <= product.min_stock ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
+                  <div class="font-mono text-base font-semibold" :class="[
+                    product.current_stock <= product.min_stock ? 'text-[#d93025] dark:text-[#f28b82]' : 'text-[#1e1f20] dark:text-[#e3e3e3]'
                   ]">{{ product.current_stock }}</div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ product.unit }}</div>
+                  <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">{{ product.unit }}</div>
                 </td>
                 <td class="px-4 py-4 text-center">
-                  <div class="font-mono text-base font-bold text-gray-900 dark:text-white">${{ formatNumber(product.sale_price) }}</div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Costo: ${{ formatNumber(product.cost_price) }}</div>
+                  <div class="font-mono text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">${{ formatNumber(product.sale_price) }}</div>
+                  <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Costo: ${{ formatNumber(product.cost_price) }}</div>
                 </td>
                 <td class="px-4 py-4 text-center">
                   <span :class="[
-                    'px-2.5 py-1 text-xs font-bold rounded-full',
-                    product.rotation_class === 'A' ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 border border-green-300 dark:border-green-800' :
-                    product.rotation_class === 'B' ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800' :
-                    'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800'
+                    'px-2.5 py-1 text-[10px] font-medium rounded-full',
+                    product.rotation_class === 'A' ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' :
+                    product.rotation_class === 'B' ? 'bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8]' :
+                    'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#f9ab00] dark:text-[#fdd663]'
                   ]">
                     Clase {{ product.rotation_class }}
                   </span>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 mt-1">{{ product.units_sold }} unidades</div>
+                  <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">{{ product.units_sold }} unidades</div>
                 </td>
                 <td class="px-4 py-4 text-center">
-                  <div class="font-mono text-lg font-bold" :class="[
-                    product.margin_percentage >= 40 ? 'text-green-600 dark:text-green-400' :
-                    product.margin_percentage >= 20 ? 'text-blue-600 dark:text-blue-400' :
-                    'text-amber-600 dark:text-amber-400'
+                  <div class="font-mono text-lg font-semibold" :class="[
+                    product.margin_percentage >= 40 ? 'text-[#1e8e3e] dark:text-[#81c995]' :
+                    product.margin_percentage >= 20 ? 'text-[#1a73e8] dark:text-[#8ab4f8]' :
+                    'text-[#f9ab00] dark:text-[#fdd663]'
                   ]">{{ product.margin_percentage }}%</div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">margen</div>
+                  <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">margen</div>
                 </td>
                 <td class="px-4 py-4 text-center">
-                  <div class="font-mono text-base font-bold text-gray-900 dark:text-white">{{ product.sales_count }}</div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">facturas</div>
+                  <div class="font-mono text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.sales_count }}</div>
+                  <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">facturas</div>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Paginación -->
-        <div v-if="products.length > itemsPerPage" class="bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-700 px-4 py-3 flex items-center justify-between">
+        <!-- Paginación - Gemini Style -->
+        <div v-if="products.length > itemsPerPage" class="bg-white dark:bg-[#1e1f20] border-t border-[#e8eaed] dark:border-[#3a3a3f] px-4 py-3 flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div class="flex items-center space-x-2">
-              <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Mostrar:</span>
-              <select v-model="itemsPerPage" @change="currentPage = 1" class="border border-gray-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600">
+              <span class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6]">Mostrar:</span>
+              <select v-model="itemsPerPage" @change="currentPage = 1" class="bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#8ab4f8]">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
               </select>
-              <span class="text-xs text-gray-700 dark:text-zinc-300">por página</span>
+              <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">por página</span>
             </div>
-            <div class="text-xs text-gray-700 dark:text-zinc-300">
+            <div class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">
               Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} a {{ Math.min(currentPage * itemsPerPage, products.length) }} de {{ products.length }}
             </div>
           </div>
           
           <div class="flex items-center space-x-1">
-            <button @click="currentPage = 1" :disabled="currentPage === 1" class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+            <button @click="currentPage = 1" :disabled="currentPage === 1" class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#282a2c] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
               </svg>
             </button>
-            <button @click="currentPage--" :disabled="currentPage === 1" class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            <button @click="currentPage--" :disabled="currentPage === 1" class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#282a2c] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
               </svg>
             </button>
             
             <div class="flex items-center space-x-1">
               <button v-for="page in totalPages" :key="page" @click="currentPage = page" :class="[
-                'px-2.5 py-1 text-xs font-medium rounded-lg transition-colors',
+                'px-3 py-1.5 text-xs font-medium rounded-full transition-colors',
                 page === currentPage 
-                  ? 'bg-blue-600 dark:bg-blue-500 text-white border border-blue-600 dark:border-blue-500' 
-                  : 'text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'
+                  ? 'bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#131314]' 
+                  : 'text-[#5f6368] dark:text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#282a2c] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f]'
               ]">
                 {{ page }}
               </button>
             </div>
             
-            <button @click="currentPage++" :disabled="currentPage === totalPages" class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            <button @click="currentPage++" :disabled="currentPage === totalPages" class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#282a2c] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
               </svg>
             </button>
-            <button @click="currentPage = totalPages" :disabled="currentPage === totalPages" class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+            <button @click="currentPage = totalPages" :disabled="currentPage === totalPages" class="p-2 text-[#5f6368] dark:text-[#9aa0a6] bg-[#f8f9fa] dark:bg-[#282a2c] rounded-full hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
               </svg>
             </button>
           </div>
