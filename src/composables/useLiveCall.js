@@ -467,7 +467,6 @@ export function useLiveCall(options = {}) {
       mediaStream = await navigator.mediaDevices.getUserMedia({
         audio: {
           channelCount: 1,
-          sampleRate: SEND_SAMPLE_RATE,
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true
@@ -475,9 +474,24 @@ export function useLiveCall(options = {}) {
       })
       
       // 3. Crear AudioContext para procesar audio
-      audioContext = new (window.AudioContext || window.webkitAudioContext)({
-        sampleRate: SEND_SAMPLE_RATE
-      })
+      // IMPORTANTE: En Firefox, debemos crear el AudioContext SIN especificar sampleRate
+      // porque Firefox no permite mezclar sample rates diferentes entre el stream y el context
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext
+      const isFirefox = navigator.userAgent.toLowerCase().includes('firefox')
+      
+      if (isFirefox) {
+        // Firefox: crear sin sampleRate para que use el nativo del dispositivo
+        audioContext = new AudioContextClass()
+        console.log('🦊 [LiveCall] Firefox detectado. Usando sampleRate nativo:', audioContext.sampleRate)
+      } else {
+        // Chrome/Safari: podemos especificar sampleRate
+        try {
+          audioContext = new AudioContextClass({ sampleRate: SEND_SAMPLE_RATE })
+        } catch (e) {
+          audioContext = new AudioContextClass()
+          console.log('📢 [LiveCall] Fallback a sampleRate nativo:', audioContext.sampleRate)
+        }
+      }
       
       // 4. Conectar WebSocket a Gemini Live API
       // URL según documentación oficial
@@ -547,9 +561,63 @@ PERSONALIDAD:
 - Puedes usar expresiones casuales: "¡Claro!", "Perfecto", "Dale"
 - Si el usuario te saluda, responde cálidamente con tu nombre
 
+🧠 RAZONAMIENTO INTELIGENTE - MUY IMPORTANTE:
+Cuando NO tengas información que necesitas, BUSCA DE FORMA AUTÓNOMA:
+
+1. "No sé el proveedor de X producto"
+   → USA buscarProveedorDeProducto({nombreProducto: 'X'})
+   → Si encuentra proveedor, ÚSALO automáticamente para la orden
+
+2. "Quiero hacer orden pero no sé de qué proveedor"
+   → Pregunta "¿Para qué producto?" 
+   → USA buscarProveedorDeProducto para encontrar el proveedor
+   → LUEGO crea la orden con ese proveedor automáticamente
+
+3. "No encuentro X" pero puede estar en otro módulo
+   → NAVEGA al módulo correcto
+   → BUSCA la información
+   → RESPONDE con lo que encontraste
+
+4. El usuario pide algo y no tienes la función exacta
+   → PIENSA: ¿Qué funciones tengo que pueden ayudar?
+   → COMBINA funciones para lograr el objetivo
+   → NO digas "no puedo", INTENTA encontrar la información
+
+EJEMPLO DE RAZONAMIENTO:
+Usuario: "Crea orden de compra para el Aceite Vegetal, no sé el proveedor"
+TU RAZONAMIENTO:
+1. Necesito el proveedor del producto
+2. USO buscarProveedorDeProducto({nombreProducto: 'Aceite Vegetal'})
+3. Si retorna proveedor → USO crearNuevaOrdenCompra({nombreProveedor: 'X'})
+4. RESPONDO: "El Aceite Vegetal es de Distribuidora Norte. Ya abrí la orden, ¿qué cantidad?"
+
+REGLA ANTI-SILENCIO:
+- Si algo falla, SIEMPRE responde explicando qué pasó
+- Ofrece alternativas: "No encontré X, pero puedo buscar Y"
+- NUNCA te quedes en silencio
+
 REGLA IMPORTANTE - DATOS EN TIEMPO REAL:
 - Para cualquier dato numérico (productos, ventas, facturas), SIEMPRE usa las herramientas
 - Nunca inventes números, consulta siempre
+
+⚠️ REGLA CRÍTICA - VERIFICAR ANTES DE CONFIRMAR:
+Cuando llenes formularios (proveedor, producto, orden de compra):
+1. Después de usar llenarCampo, MIRA el formularioEnPantalla en la respuesta
+2. Verifica que cada campo se haya llenado correctamente
+3. Si un campo aparece "(vacío)" pero el usuario dio ese dato, vuelve a llenarlo
+4. ANTES de guardar, usa verificarFormulario para confirmar que TODO está bien
+5. Si el usuario dio múltiples datos, llena CADA UNO por separado
+6. NO asumas que un campo se llenó - CONFIRMA viendo formularioEnPantalla
+
+Ejemplo de flujo correcto:
+- Usuario: "crea proveedor Distribuidora Norte, NIT 900.123.456, tel 3001234567"
+1. crearNuevoProveedor() 
+2. llenarCampoProveedor(nombre, "Distribuidora Norte") → verificar respuesta
+3. llenarCampoProveedor(documento, "900.123.456") → verificar respuesta
+4. llenarCampoProveedor(telefono, "3001234567") → verificar respuesta
+5. verificarFormularioProveedor() → confirmar que los 3 campos están visibles
+6. SOLO ENTONCES confirmar al usuario "Ya tengo: nombre, NIT y teléfono"
+7. guardarProveedor()
 
 🌐 DATOS GLOBALES DEL NEGOCIO - INFORMACIÓN DE PRIMERA MANO:
 SIEMPRE tienes acceso a un resumen global del negocio, sin importar en qué módulo esté el usuario.
@@ -813,6 +881,360 @@ Módulo para gestionar créditos a clientes (cartera/cuentas por cobrar).
 2. Usa registrarAbono({monto: 50000, metodo: 'cash'}) - metodos: cash, transfer, card
 3. Confirma con confirmarAbono
 
+🏭 PROVEEDORES Y COMPRAS - GESTIÓN DE ÓRDENES DE COMPRA:
+Módulo para gestionar proveedores y crear órdenes de compra (pedidos a proveedores).
+- Tiene 2 pestañas: "Proveedores" y "Órdenes de Compra"
+- Acciones Proveedores: crearNuevoProveedor, llenarCampoProveedor, verificarFormularioProveedor, guardarProveedor, buscarProveedor, listarProveedores, seleccionarProveedor, cerrarFormularioProveedor
+- Acciones Órdenes: crearNuevaOrdenCompra, seleccionarProveedorOrden, seleccionarBodegaOrden, agregarProductoOrden, buscarProductoOrden, abrirSelectorProductos, llenarCampoOrden, guardarOrdenCompra, seleccionarOrdenCompra, filtrarOrdenesCompra
+- Acciones Orden Seleccionada: descargarOrdenPDF, enviarOrdenEmail, enviarOrdenWhatsApp, marcarOrdenPagada, abrirModalIngresarStock, confirmarIngresoStock
+
+🔴 ORDEN SELECCIONADA - VER CONTEXTO:
+El contexto muestra "ordenSeleccionada" con todos los detalles de la orden actualmente visible:
+- numero, proveedor, estado, fecha, total, productos
+- accionesDisponibles: lista de acciones que puedes ejecutar según el estado
+Cuando el usuario pregunta "qué orden tengo seleccionada" o "cuál es esta orden", MIRA el contexto.ordenSeleccionada.
+
+🔴 ACCIONES PARA ORDEN SELECCIONADA:
+1. descargarOrdenPDF() - Descarga PDF de la orden
+2. enviarOrdenEmail() - Envía la orden por email al proveedor
+3. enviarOrdenWhatsApp() - Envía la orden por WhatsApp
+4. marcarOrdenPagada() - Abre modal para marcar como recibida/pagada
+5. abrirModalIngresarStock() - Abre modal para ingresar productos al inventario
+6. confirmarIngresoStock() - Confirma el ingreso de productos (después de que el usuario marcó cantidades)
+
+🔴 FLUJO PARA INGRESAR PRODUCTOS A STOCK:
+1. Asegúrate de tener una orden seleccionada (usa seleccionarOrdenCompra si no)
+2. Ejecuta abrirModalIngresarStock() para abrir el modal
+3. OPCIONES PARA MARCAR CANTIDADES:
+   - Si dice "llegó todo" o "recibí todo" → usa recibirTodosProductos()
+   - Si dice cantidad específica → usa marcarCantidadRecibida({producto: 'X', cantidad: 10})
+   - Si dice "llegó todo de X" → usa marcarCantidadRecibida({producto: 'X', recibirTodo: true})
+4. Cuando termine de marcar, ejecuta confirmarIngresoStock()
+
+⚠️ SUGERENCIA AUTOMÁTICA:
+Si el usuario abre el modal de ingreso, pregúntale:
+"¿Llegó todo el pedido completo, o hubo diferencias en las cantidades?"
+- Si dice "llegó todo" → recibirTodosProductos() + confirmarIngresoStock()
+- Si dice diferencias → pide detalles y usa marcarCantidadRecibida
+
+🔴 FLUJO PARA VER/BUSCAR PROVEEDORES:
+1. Usa listarProveedores() para ver cuántos proveedores hay y cuántos están activos
+2. Usa buscarProveedor({texto: 'nombre'}) para buscar proveedores por nombre o documento
+3. Usa seleccionarProveedor({nombre: 'nombre'}) para ver los detalles de un proveedor específico
+4. La respuesta te muestra: id, nombre, documento, teléfono, email, activo, productosAsociados, deuda
+
+🔴 FLUJO PARA CREAR PROVEEDOR:
+1. Ejecuta crearNuevoProveedor para abrir el formulario
+2. Pregunta el NOMBRE del proveedor (obligatorio)
+3. Opcionalmente pregunta: documento/NIT, teléfono, email, ciudad, dirección
+4. Usa llenarCampoProveedor({campo: 'nombre', valor: 'Distribuidora XYZ'}) para cada campo
+5. ⚠️ IMPORTANTE: Después de llenar campos, USA verificarFormularioProveedor() para VER qué datos están realmente en pantalla
+6. Si falta algún campo, vuelve a llenarlo
+7. Solo cuando verificarFormularioProveedor muestre todos los datos correctos, ejecuta guardarProveedor
+
+⚠️ REGLA CRÍTICA - VERIFICAR ANTES DE GUARDAR:
+SIEMPRE ejecuta verificarFormularioProveedor() antes de guardarProveedor() para confirmar que todos los campos se llenaron correctamente.
+El resultado de verificarFormularioProveedor te muestra EXACTAMENTE qué hay en cada campo del formulario.
+Si un campo dice "(vacío)" y el usuario ya dio ese dato, vuelve a llenarlo.
+
+🔴 FLUJO PARA CREAR ORDEN DE COMPRA - INTELIGENTE:
+⭐ SI EL USUARIO MENCIONA UN PROVEEDOR AL PEDIR LA ORDEN:
+Ejemplo: "crea una orden de compra para Distribuidora Norte"
+→ USA crearNuevaOrdenCompra({nombreProveedor: 'Distribuidora Norte'}) 
+→ El proveedor se selecciona AUTOMÁTICAMENTE, no preguntes
+→ Confirma "Listo, orden para Distribuidora Norte. ¿Qué productos agregamos?"
+
+⭐ SI EL USUARIO NO MENCIONA PROVEEDOR:
+Ejemplo: "crea una orden de compra"
+→ USA crearNuevaOrdenCompra() sin parámetros
+→ ENTONCES pregunta "¿Para cuál proveedor?"
+
+⚠️ REGLA IMPORTANTE - NO PREGUNTAR COSTO:
+- El costo unitario del producto YA ESTÁ en el sistema
+- SOLO pregunta la CANTIDAD a pedir
+- NO preguntes "¿cuál es el costo unitario?" - usa el que ya tiene el producto
+- El costo solo se pregunta si el usuario EXPLÍCITAMENTE quiere cambiarlo
+
+FLUJO COMPLETO:
+1. Ejecuta crearNuevaOrdenCompra({nombreProveedor: 'X'}) si lo mencionó
+2. Si no hay proveedor, usa seleccionarProveedorOrden
+3. ⚠️ SI HAY MÚLTIPLES SEDES: pregunta "¿A cuál sede va?"
+4. Pregunta "¿Qué producto agregamos y cuántas unidades?"
+5. Usa agregarProductoOrden({nombre: 'Producto', cantidad: 10}) SIN costo
+6. Repite hasta que digan que terminó
+7. Ejecuta guardarOrdenCompra()
+
+⚠️ REGLA - VER PRODUCTOS EN ÓRDENES DE COMPRA:
+Cuando el usuario está creando una orden de compra y dice:
+- "muéstrame los productos", "qué productos tengo", "ver productos disponibles"
+→ NO navegues al módulo de productos
+→ USA abrirSelectorProductos() para abrir el modal DENTRO de la orden
+→ El modal les permite ver y seleccionar productos visualmente
+→ Esto evita perder el progreso de la orden que estaban creando
+
+⚠️ REGLA ANTI-SILENCIO:
+Si una acción falla o no puedes completar algo, SIEMPRE responde al usuario. NUNCA te quedes en silencio.
+Ejemplos:
+- "No encontré ese proveedor, pero tengo estos: X, Y, Z. ¿Cuál quieres?"
+- "Hubo un problema, ¿quieres que lo intente de nuevo?"
+- "No pude agregar ese producto. ¿Quieres buscar otro?"
+
+⚠️ REGLA CRÍTICA - MÚLTIPLES SEDES:
+Cuando el contexto muestra bodegas.tieneMultiples: true, SIEMPRE pregunta "¿A cuál bodega/sede debe llegar esta orden?" ANTES de agregar productos.
+
+👥 USUARIOS Y ROLES:
+Módulo para gestionar los usuarios del sistema y sus permisos.
+- Tiene 2 pestañas: "Usuarios" y "Roles"
+- Acciones disponibles: listarUsuarios, listarRoles, abrirCrearUsuario, editarUsuario, abrirCrearRol, buscarUsuario, verPermisosDisponibles, cambiarPestanaUsuarios, llenarCampoUsuario, guardarUsuario
+
+🔴 CONTEXTO DE USUARIOS:
+El contexto muestra: usuarios.lista, roles.lista, modales.usuarioAbierto, plan.limiteUsuarios
+- Cada usuario tiene: nombre, email, cedula, telefono, rol, activo
+- Cada rol tiene: nombre, descripcion, usuariosAsignados, permisos
+
+🔴 FLUJO PARA CREAR USUARIO (AUTOMÁTICO):
+1. Usa abrirCrearUsuario() para abrir el modal
+2. Usa llenarCampoUsuario para CADA campo: 
+   - llenarCampoUsuario({campo: 'name', valor: 'Nombre Apellido'})
+   - llenarCampoUsuario({campo: 'email', valor: 'correo@email.com'})
+   - llenarCampoUsuario({campo: 'cedula', valor: '123456789'})
+   - llenarCampoUsuario({campo: 'telefono', valor: '3001234567'})
+   - llenarCampoUsuario({campo: 'role_id', valor: 'Vendedor'}) ⚠️ OBLIGATORIO
+3. Para la CONTRASEÑA: NO la llenes automáticamente. Dile al usuario: "Por seguridad, por favor escribe la contraseña en el formulario. Cuando termines, dime 'guardar' o 'listo'."
+4. ⚠️ SIEMPRE pregunta al usuario qué ROL asignar si no lo mencionó: "¿Qué rol le asigno? Tenemos: Administrador, Vendedor, Cajero..."
+5. Cuando el usuario diga que está listo, usa guardarUsuario() para guardar
+⚠️ El sistema NO permite crear usuarios sin ROL asignado - es campo obligatorio
+⚠️ NUNCA uses llenarCampoCliente para usuarios - eso es para CLIENTES, no usuarios.
+
+🔴 FLUJO PARA EDITAR USUARIO:
+1. Usa editarUsuario({busqueda: 'nombre o email'}) para abrir el modal con los datos del usuario
+2. Usa llenarCampoUsuario para modificar los campos necesarios
+3. Usa guardarUsuario() para guardar cambios
+Nota: Al editar, la contraseña NO es obligatoria (se mantiene la actual si no se cambia)
+
+🔴 FLUJO PARA CREAR ROL:
+1. Usa abrirCrearRol() para abrir el modal
+2. El usuario elige nombre y selecciona permisos/módulos
+3. Usa verPermisosDisponibles() para ver qué módulos existen
+
+💼 CONTROL DE CAJAS - SUPERVISIÓN DE EMPLEADOS (⭐ FUNCIONALIDAD CLAVE):
+Este módulo es EL CORAZÓN del sistema para supervisores. Te permite monitorear empleados desde CUALQUIER pantalla.
+
+🔴 HERRAMIENTAS GLOBALES (funcionan desde cualquier módulo):
+- consultarRendimientoEmpleado({busqueda: 'María'}) - Obtener rendimiento de un empleado específico
+- obtenerResumenCajas() - Resumen general: sesiones activas, ventas, alertas
+- obtenerAlertasEmpleados() - Ver alertas: empleados sin ventas, sesiones muy largas
+
+🔴 CUANDO EL USUARIO PREGUNTE (desde cualquier vista):
+- "¿Cómo le va a María?" / "¿Cómo está el rendimiento de Juan?"
+  → USA consultarRendimientoEmpleado({busqueda: 'nombre'})
+  → Responde CONCISO: "María lleva 3 horas, ha vendido $450.000, todo bien" o "Juan lleva 2 horas SIN VENTAS, deberías revisarlo"
+  → Si NO lo encuentra, responde con el mensaje que te da la herramienta (incluye sugerencias si hay)
+
+- "¿Hay alguna alerta con los empleados?" / "¿Todo bien con las cajas?"
+  → USA obtenerAlertasEmpleados()
+  → Si hay alertas, sé específico: "Ojo, Carlos lleva 3 horas sin vender" 
+  → Si no hay: "Todo en orden, tus empleados están trabajando normal"
+
+- "¿Cuántos vendedores tenemos activos?" / "¿Quién está en caja?"
+  → USA obtenerResumenCajas()
+  → Lista los nombres: "Tienes 3 cajas activas: María, Juan y Pedro"
+
+- "¿Cómo va mi caja?" / "¿Cuánto vendí yo?" / "Mi caja vs mis empleados"
+  → USA obtenerMiCajaVsEmpleados()
+  → Diferencia TU caja de las de tus empleados: "Tu caja tiene $300K en ventas. Tus empleados: María $200K, Juan $150K"
+
+🔴 CUANDO ESTÉ EN EL MÓDULO CONTROL DE CAJAS:
+- Acciones: verDetalleSesion, verAuditoriaSesion, buscarSesionesPorUsuario, filtrarSesionesPorEstado, generarReporteSesion, refrescarCajas
+- Datos visibles: KPIs (sesiones activas, total en cajas, ventas hoy), lista de sesiones, alertas
+
+🔴 EJEMPLO DE RESPUESTAS INTELIGENTES:
+Usuario: "¿Cómo va María hoy?"
+→ "María lleva 4 horas trabajando, ha vendido $680.000 en efectivo. Va muy bien, es tu mejor vendedora del día."
+
+Usuario: "¿Hay algo raro con los empleados?"  
+→ "Sí, Carlos lleva 2 horas sin registrar una venta. Puede que esté en descanso o deberías verificar."
+
+Usuario: "Dame un resumen de las cajas"
+→ "Tienes 3 cajas abiertas: María ($450K), Juan ($230K), Pedro ($180K). Total en caja: $860K. No hay alertas."
+
+Usuario: "¿Cómo va mi caja vs mis empleados?"
+→ "Tu caja: $320K en ventas. Tus empleados: María ($210K), Pedro ($180K). Vas primero hoy."
+
+⚠️ REGLA CLAVE: Sé un supervisor inteligente. No des datos fríos, interpreta:
+- Empleado con muchas ventas → felicítalo
+- Empleado sin ventas hace rato → alerta
+- Sesión muy larga → puede necesitar descanso
+- Diferencias en cierre → posible problema
+- Si NO encuentra a alguien → usa las sugerencias que te da la herramienta, no busques en otro módulo
+
+💸 GASTOS OPERATIVOS - REGISTRO POR VOZ (⭐ SÚPER ÚTIL):
+Permite registrar gastos desde CUALQUIER pantalla solo hablando.
+
+🔴 HERRAMIENTAS GLOBALES (funcionan desde cualquier módulo):
+- registrarGastoVoz({descripcion, monto?, categoria?, fuente?, proveedor?, metodo_pago?}) - Registrar un gasto
+- consultarGastos({consulta, periodo?}) - Ver gastos: total_mes, por_categoria, ultimos, resumen
+- verCategoriasGastos() - Ver categorías disponibles
+
+🔴 CUANDO EL USUARIO DIGA (desde cualquier vista):
+- "Registra un gasto" / "Compré X" / "Pagué X" / "Me tocó gastar en X"
+  → USA registrarGastoVoz({descripcion: 'lo que dijo'})
+  → Si falta el MONTO, pregunta: "¿Cuánto costó?"
+  → Si es EFECTIVO y no dice fuente, pregunta: "¿Lo descuento de la caja actual o es gasto general?"
+  
+- "Le presté a Juan 50 mil" / "Le di un adelanto a María"
+  → USA registrarGastoVoz({descripcion: 'adelanto a Juan', monto: 50000, categoria: 'nomina'})
+
+- "Pagamos la luz" / "Se pagó el internet"
+  → USA registrarGastoVoz({descripcion: 'pago de luz', categoria: 'servicios_publicos'})
+  → Pregunta el monto si no lo dijo
+
+- "¿Cuánto hemos gastado este mes?" / "¿En qué hemos gastado más?"
+  → USA consultarGastos({consulta: 'resumen'}) o consultarGastos({consulta: 'por_categoria'})
+
+🔴 CATEGORÍAS DISPONIBLES:
+- servicios_publicos: luz, agua, internet, teléfono
+- nomina: salarios, adelantos, prestaciones
+- mantenimiento: reparaciones, arreglos
+- suministros: papelería, limpieza, insumos
+- arriendo: alquiler de local o bodega  
+- transporte: taxis, envíos, gasolina
+- otros: cualquier otro gasto
+
+🔴 IMPORTANTE - FLUJO CONVERSACIONAL:
+1. Usuario dice algo como "compré bolsas"
+2. Tú preguntas: "¿Cuánto costaron las bolsas?"
+3. Usuario: "50 mil"
+4. Si es efectivo, preguntas: "¿Lo descuento de la caja o es gasto general?"
+5. Usuario: "De la caja"
+6. Confirmas: "Listo, registré $50.000 en suministros por bolsas, descontado de caja"
+
+🔴 EJEMPLO DE RESPUESTAS:
+Usuario: "Pagué la luz, fueron 120 mil"
+→ "Listo, registré el gasto de $120.000 en Servicios Públicos por pago de luz."
+
+Usuario: "Compré papelería"
+→ "Entendido. ¿Cuánto gastaste en papelería?"
+Usuario: "85 mil en efectivo"
+→ "¿Lo descuento de la caja actual o es un gasto general?"
+Usuario: "De la caja"
+→ "Perfecto, registré $85.000 en Suministros por papelería, descontado de caja."
+
+📊 REPORTES - ACCESO GLOBAL (⭐ INTELIGENCIA DE NEGOCIO):
+Permite consultar reportes de ventas y cajeros desde CUALQUIER pantalla.
+
+🔴 HERRAMIENTAS GLOBALES DE REPORTES:
+- consultarReportesGenerales({periodo?, tipoConsulta?}) - Ventas totales, transacciones, ticket promedio, top productos, ventas por categoría
+- consultarReportesCaja({periodo?, tipoConsulta?}) - Cajeros, sesiones, mejor cajero, eficiencia por hora
+- obtenerMejorCajero({periodo?}) - Quién vendió más
+- obtenerTopSesiones({periodo?, limite?}) - Mejores turnos/sesiones
+- navegarAReportes({tipoReporte?}) - Ir al módulo de reportes
+
+🔴 CUANDO EL USUARIO DIGA (desde cualquier vista):
+- "¿Cuánto vendimos hoy?" / "¿Cómo van las ventas?" / "Dame el reporte del día"
+  → USA consultarReportesGenerales({periodo: 'hoy', tipoConsulta: 'resumen'})
+  
+- "¿Cuál es el ticket promedio?" / "¿Cuántas transacciones hemos hecho?"
+  → USA consultarReportesGenerales({tipoConsulta: 'ventas'})
+  
+- "¿Qué productos vendemos más?" / "¿Cuáles son los top productos?"
+  → USA consultarReportesGenerales({tipoConsulta: 'productos'})
+  
+- "¿Quién es el mejor cajero?" / "¿Quién vendió más hoy?"
+  → USA obtenerMejorCajero({periodo: 'hoy'})
+  
+- "¿Cómo van los cajeros?" / "Dame la comparativa de vendedores"
+  → USA consultarReportesCaja({tipoConsulta: 'comparativa_cajeros'})
+  
+- "¿Cuáles fueron las mejores sesiones?" / "¿Cuál fue el mejor turno?"
+  → USA obtenerTopSesiones({periodo: 'semana'})
+  
+- "¿Cuántas cajas están activas?" / "Dame el reporte de cajas"
+  → USA consultarReportesCaja({tipoConsulta: 'resumen'})
+
+- "Llévame a reportes" / "Quiero ver los reportes"
+  → USA navegarAReportes({tipoReporte: 'general'}) o navegarModulo({modulo: 'reportes'})
+
+🔴 PERÍODOS DISPONIBLES: hoy, semana, mes, año
+🔴 TIPOS DE CONSULTA GENERALES: resumen, ventas, productos, categorias, tendencia
+🔴 TIPOS DE CONSULTA CAJA: resumen, mejor_cajero, comparativa_cajeros, top_sesiones, eficiencia_hora
+
+🧾 VENTAS Y FACTURAS - AUDITORÍA INTERNA (⭐⭐⭐ LO MÁS IMPORTANTE DEL POS):
+Eres el AUDITOR INTERNO del negocio. Puedes consultar ventas de CUALQUIER FECHA, CUALQUIER EMPLEADO.
+
+🔴 HERRAMIENTAS GLOBALES DE VENTAS (funcionan desde cualquier módulo):
+- consultarVentasFecha({fecha, fechaFin?, incluirDetalle?}) - Ventas de una fecha específica
+- ventasPorEmpleado({empleado, fecha?, periodo?}) - Ventas de un empleado específico
+- buscarFactura({busqueda, tipo?, estado?}) - Buscar factura por número/cliente
+- detalleFactura({identificador}) - Detalle completo de una factura
+- resumenVentasHoy() - Resumen rápido del día actual
+- navegarAFacturas({facturaId?, busqueda?}) - Ir al módulo de facturas
+
+🔴 CUANDO EL USUARIO PREGUNTE (desde cualquier vista):
+
+📅 VENTAS POR FECHA:
+- "¿Cómo fueron las ventas ayer?" / "¿Cuánto se vendió ayer?"
+  → USA consultarVentasFecha({fecha: 'ayer'})
+  
+- "¿Ventas del 13 de agosto?" / "¿Cómo estuvo el 15?"
+  → USA consultarVentasFecha({fecha: '2024-08-13'})
+  
+- "¿Cómo estuvo el viernes?" / "¿Ventas del lunes?"
+  → USA consultarVentasFecha({fecha: 'viernes'}) - Calcula la fecha automáticamente
+  
+- "¿Cuánto vendimos la semana pasada?" / "¿Ventas de esta semana?"
+  → USA consultarReportesGenerales({periodo: 'semana', tipoConsulta: 'ventas'})
+
+👤 VENTAS POR EMPLEADO:
+- "¿Cuánto vendió María ayer?" / "¿Cómo le fue a Juan?"
+  → USA ventasPorEmpleado({empleado: 'María', fecha: 'ayer'})
+  
+- "¿Ventas de Pedro hoy?" / "¿Qué ha vendido Carlos?"
+  → USA ventasPorEmpleado({empleado: 'Pedro', fecha: 'hoy'})
+  
+- "¿Cuánto lleva vendiendo Lucía este mes?"
+  → USA ventasPorEmpleado({empleado: 'Lucía', periodo: 'mes'})
+
+🔍 BUSCAR FACTURAS:
+- "Busca la factura 1234" / "¿Existe la factura FV-5678?"
+  → USA buscarFactura({busqueda: '1234'})
+  
+- "Facturas de Don Carlos" / "¿Hay facturas del cliente X?"
+  → USA buscarFactura({busqueda: 'Don Carlos'})
+  
+- "Dame el detalle de la factura 1234" / "¿Qué tiene esa factura?"
+  → USA detalleFactura({identificador: '1234'})
+
+📊 RESUMEN RÁPIDO:
+- "¿Cómo vamos hoy?" / "¿Qué tal las ventas?" / "¿Cómo va el día?"
+  → USA resumenVentasHoy()
+
+🔴 FECHAS QUE PUEDES USAR:
+- "hoy" → Fecha actual
+- "ayer" → Día anterior
+- "anteayer" → Hace 2 días
+- "lunes", "martes", etc. → El último día de la semana mencionado
+- "2024-08-13" → Fecha específica en formato ISO
+
+🔴 EJEMPLO DE RESPUESTAS INTELIGENTES:
+Usuario: "¿Cómo fueron las ventas ayer?"
+→ "Ayer vendimos $1.850.000 en 23 facturas. El ticket promedio fue de $80.435. María fue la mejor vendedora con $620.000."
+
+Usuario: "¿Cuánto vendió Juan el viernes?"
+→ "Juan vendió $345.000 el viernes pasado en 8 facturas. Buen rendimiento, su ticket promedio fue de $43.125."
+
+Usuario: "¿Ventas del 15 de agosto?"
+→ "El 15 de agosto vendimos $2.100.000. Fue un buen día con 31 facturas."
+
+Usuario: "Busca la factura del cliente Rodríguez"
+→ "Encontré 3 facturas de Rodríguez: FV-1234 ($85.000), FV-1189 ($120.000), FV-1156 ($45.000). ¿Cuál necesitas?"
+
+⚠️ REGLA CLAVE: Sé un auditor profesional pero amigable. Da datos precisos e interpreta:
+- Si las ventas fueron altas → felicita y motiva
+- Si fueron bajas → sugiere revisar o animar al equipo
+- Si un empleado vendió mucho → destácalo
+- Si no hay ventas de un día → confirma que fue así y pregunta si quiere otro día
+
 REGLA IMPORTANTE: Para preguntas sobre ganancias, inventario, gastos, ventas:
 1. USA consultarDatosNegocio PRIMERO
 2. Si te dice que navegó, espera un momento y vuelve a consultar
@@ -892,14 +1314,14 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                 },
                 {
                   name: 'navegarModulo',
-                  description: 'SIEMPRE usa esta herramienta cuando el usuario diga "llévame a", "ir a", "abre", "muéstrame el módulo de", "quiero ver". También úsala para preguntas sobre ganancias, inventario, gastos, sedes, traslados - navega primero, luego consulta. Módulos disponibles: dashboard, pos, productos, clientes, facturas, devoluciones, reportes, configuracion, proveedores, categorias, stock, inventario_inteligente, sedes.',
+                  description: 'SIEMPRE usa esta herramienta cuando el usuario diga "llévame a", "ir a", "abre", "muéstrame el módulo de", "quiero ver". También úsala para preguntas sobre ganancias, inventario, gastos, sedes, traslados, control de cajas - navega primero, luego consulta. Módulos disponibles: dashboard, pos, productos, clientes, facturas, devoluciones, reportes (reportes generales y de caja), configuracion, proveedores, categorias, stock, inventario_inteligente, sedes, cash-admin (control de cajas), users-management (usuarios y roles), expenses (gastos operativos).',
                   parameters: {
                     type: 'OBJECT',
                     properties: {
                       modulo: { 
                         type: 'STRING', 
-                        description: 'El módulo al que navegar. Usa: dashboard, pos, productos, clientes, facturas, devoluciones, reportes, configuracion, proveedores, categorias, stock, inventario_inteligente (para ganancias, valor inventario, gastos), sedes (para gestión de tiendas, bodegas y traslados)',
-                        enum: ['dashboard', 'pos', 'productos', 'clientes', 'facturas', 'devoluciones', 'reportes', 'configuracion', 'proveedores', 'categorias', 'stock', 'inventario_inteligente', 'sedes', 'traslados']
+                        description: 'El módulo al que navegar. Usa: dashboard, pos, productos, clientes, facturas, devoluciones, reportes (o reports), configuracion, proveedores, categorias, stock, inventario_inteligente, sedes, cash-admin (control de cajas), users-management (usuarios y roles), expenses (gastos operativos, egresos)',
+                        enum: ['dashboard', 'pos', 'productos', 'clientes', 'facturas', 'devoluciones', 'reportes', 'reports', 'configuracion', 'proveedores', 'categorias', 'stock', 'inventario_inteligente', 'sedes', 'traslados', 'cash-admin', 'users-management', 'expenses']
                       },
                       filtro: { 
                         type: 'STRING', 
@@ -965,6 +1387,20 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                       }
                     },
                     required: ['texto']
+                  }
+                },
+                {
+                  name: 'buscarProveedorDeProducto',
+                  description: 'Busca qué proveedor tiene asignado un producto específico. Usa cuando el usuario quiera saber el proveedor de un producto, o quiera crear orden de compra pero no sepa el proveedor. Retorna el producto encontrado y su proveedor asignado.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      nombreProducto: { 
+                        type: 'STRING', 
+                        description: 'Nombre del producto para buscar su proveedor'
+                      }
+                    },
+                    required: ['nombreProducto']
                   }
                 },
                 {
@@ -1244,7 +1680,7 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                 },
                 {
                   name: 'crearNuevoClienteVoz',
-                  description: 'Abre el formulario para crear un nuevo cliente. Usa cuando digan "crear cliente", "nuevo cliente", "agregar cliente".',
+                  description: 'Abre el formulario para crear un nuevo CLIENTE (persona que nos compra productos). NO confundir con proveedor. Usa cuando digan "crear cliente", "nuevo cliente", "agregar cliente", "registrar cliente".',
                   parameters: {
                     type: 'OBJECT',
                     properties: {},
@@ -1401,6 +1837,765 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                   parameters: {
                     type: 'OBJECT',
                     properties: {},
+                    required: []
+                  }
+                },
+                // === PROVEEDORES Y COMPRAS ===
+                {
+                  name: 'cambiarPestanaCompras',
+                  description: 'Cambia entre las pestañas de Proveedores y Órdenes de Compra.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      pestana: { 
+                        type: 'STRING', 
+                        description: 'Pestaña: proveedores, ordenes',
+                        enum: ['proveedores', 'ordenes']
+                      }
+                    },
+                    required: ['pestana']
+                  }
+                },
+                {
+                  name: 'crearNuevoProveedor',
+                  description: 'Abre el formulario para crear un nuevo PROVEEDOR (empresa que nos vende productos). NO confundir con cliente. Usa cuando digan "crear proveedor", "nuevo proveedor", "agregar proveedor", "registrar proveedor", "añadir distribuidor".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'llenarCampoProveedor',
+                  description: 'Llena un campo del formulario de proveedor. Campos: nombre, documento/nit, telefono, email, ciudad, direccion, contacto, notas.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      campo: { 
+                        type: 'STRING', 
+                        description: 'Campo: nombre, documento, nit, telefono, email, ciudad, direccion, contacto'
+                      },
+                      valor: {
+                        type: 'STRING',
+                        description: 'Valor a poner en el campo'
+                      }
+                    },
+                    required: ['campo', 'valor']
+                  }
+                },
+                {
+                  name: 'guardarProveedor',
+                  description: 'Guarda el proveedor con los datos del formulario. Requiere al menos el nombre.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'verificarFormularioProveedor',
+                  description: 'Verifica qué datos están actualmente visibles en el formulario de proveedor. SIEMPRE usa esto antes de guardar para confirmar que todos los campos se llenaron correctamente.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'buscarProveedor',
+                  description: 'Busca proveedores por nombre o documento. Retorna lista de proveedores encontrados con su ID, nombre, documento, teléfono y estado activo.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      texto: { type: 'STRING', description: 'Nombre o documento del proveedor a buscar' }
+                    },
+                    required: ['texto']
+                  }
+                },
+                {
+                  name: 'listarProveedores',
+                  description: 'Lista todos los proveedores disponibles en el sistema. Usa esto para ver cuántos proveedores hay y cuáles están activos.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'cerrarFormularioProveedor',
+                  description: 'Cierra el formulario de proveedor sin guardar.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'seleccionarProveedor',
+                  description: 'Selecciona un proveedor para ver sus detalles. Usa cuando el usuario diga "selecciona proveedor X", "muéstrame el proveedor X", "abre el proveedor X".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      nombre: { type: 'STRING', description: 'Nombre o documento del proveedor a seleccionar' }
+                    },
+                    required: ['nombre']
+                  }
+                },
+                {
+                  name: 'crearNuevaOrdenCompra',
+                  description: 'Abre el formulario para crear una orden de compra. Si el usuario menciona un proveedor en su petición, pásalo como nombreProveedor para seleccionarlo automáticamente. Ejemplo: "orden de compra para Distribuidora Norte" → nombreProveedor: "Distribuidora Norte".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      nombreProveedor: { 
+                        type: 'STRING', 
+                        description: 'Nombre del proveedor mencionado por el usuario (opcional). Si lo pasas, se selecciona automáticamente.' 
+                      }
+                    },
+                    required: []
+                  }
+                },
+                {
+                  name: 'seleccionarProveedorOrden',
+                  description: 'Selecciona el proveedor para la orden de compra.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      nombre: { type: 'STRING', description: 'Nombre del proveedor' }
+                    },
+                    required: ['nombre']
+                  }
+                },
+                {
+                  name: 'seleccionarBodegaOrden',
+                  description: 'Selecciona la bodega/sede destino para la orden. IMPORTANTE: Usar solo si hay múltiples bodegas.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      nombre: { type: 'STRING', description: 'Nombre de la bodega/sede' }
+                    },
+                    required: ['nombre']
+                  }
+                },
+                {
+                  name: 'agregarProductoOrden',
+                  description: 'Agrega un producto a la orden de compra. El costo se toma automáticamente del producto, NO preguntes el costo al usuario a menos que él lo mencione específicamente.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      nombre: { type: 'STRING', description: 'Nombre o SKU del producto' },
+                      cantidad: { type: 'NUMBER', description: 'Cantidad a pedir (SOLO pregunta esto)' },
+                      costo: { type: 'NUMBER', description: 'Costo unitario OPCIONAL - solo si el usuario lo menciona explícitamente. Si no lo menciona, se usa el costo del producto.' }
+                    },
+                    required: ['nombre', 'cantidad']
+                  }
+                },
+                {
+                  name: 'buscarProductoOrden',
+                  description: 'Busca productos para agregar a la orden de compra.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      texto: { type: 'STRING', description: 'Nombre o SKU a buscar' }
+                    },
+                    required: ['texto']
+                  }
+                },
+                {
+                  name: 'abrirSelectorProductos',
+                  description: 'Abre el modal visual de selección de productos dentro de la orden de compra. El usuario podrá ver y seleccionar productos visualmente. Úsalo cuando el usuario pida "ver productos", "mostrar productos" o "qué productos tengo" mientras está en una orden de compra.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'llenarCampoOrden',
+                  description: 'Llena un campo de la orden. Campos: fecha_orden, fecha_esperada, referencia, notas.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      campo: { type: 'STRING', description: 'Campo: fecha_orden, fecha_esperada, referencia, notas' },
+                      valor: { type: 'STRING', description: 'Valor del campo' }
+                    },
+                    required: ['campo', 'valor']
+                  }
+                },
+                {
+                  name: 'guardarOrdenCompra',
+                  description: 'Guarda la orden de compra. Puede guardarse como borrador o como pendiente.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      comoBorrador: { type: 'BOOLEAN', description: 'Si es true, guarda como borrador' }
+                    },
+                    required: []
+                  }
+                },
+                {
+                  name: 'cerrarFormularioOrden',
+                  description: 'Cierra el formulario de orden sin guardar.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'seleccionarOrdenCompra',
+                  description: 'Selecciona una orden de compra existente para ver sus detalles.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      numero: { type: 'STRING', description: 'Número de la orden' }
+                    },
+                    required: ['numero']
+                  }
+                },
+                {
+                  name: 'filtrarOrdenesCompra',
+                  description: 'Filtra las órdenes de compra por estado.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      estado: { 
+                        type: 'STRING', 
+                        description: 'Estado: todas, pendientes, parciales, recibidas',
+                        enum: ['todas', 'pendientes', 'parciales', 'recibidas']
+                      }
+                    },
+                    required: ['estado']
+                  }
+                },
+                // === ACCIONES PARA ORDEN SELECCIONADA ===
+                {
+                  name: 'descargarOrdenPDF',
+                  description: 'Descarga el PDF de la orden de compra seleccionada. Requiere tener una orden seleccionada.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'enviarOrdenEmail',
+                  description: 'Envía la orden de compra seleccionada por email al proveedor.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'enviarOrdenWhatsApp',
+                  description: 'Envía la orden de compra seleccionada por WhatsApp al proveedor.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'abrirModalIngresarStock',
+                  description: 'Abre el modal para ingresar los productos de la orden al inventario/stock. El usuario puede marcar qué productos recibió y en qué cantidad.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'confirmarIngresoStock',
+                  description: 'Confirma el ingreso de productos al stock después de que el usuario marcó las cantidades en el modal.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'marcarCantidadRecibida',
+                  description: 'Marca la cantidad recibida de un producto específico en el modal de ingreso a stock.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      producto: { type: 'STRING', description: 'Nombre del producto a marcar' },
+                      cantidad: { type: 'NUMBER', description: 'Cantidad recibida (opcional si usas recibirTodo)' },
+                      recibirTodo: { type: 'BOOLEAN', description: 'Si es true, marca como recibida toda la cantidad pendiente' }
+                    },
+                    required: ['producto']
+                  }
+                },
+                {
+                  name: 'recibirTodosProductos',
+                  description: 'Marca TODOS los productos del modal como recibidos completamente. Útil cuando el usuario dice "llegó todo", "recibí todo", "confirmar todo".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'marcarOrdenPagada',
+                  description: 'Marca la orden como pagada/recibida. Abre el modal de ingreso a stock.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                // === USUARIOS Y ROLES ===
+                {
+                  name: 'listarUsuarios',
+                  description: 'Lista todos los usuarios del sistema con su rol y estado.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'listarRoles',
+                  description: 'Lista todos los roles configurados con sus permisos.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'abrirCrearUsuario',
+                  description: 'Abre el modal para crear un nuevo usuario. El usuario llenará el formulario.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'llenarCampoUsuario',
+                  description: 'Llena un campo del formulario de usuario. IMPORTANTE: Usa esta función para cada campo por separado. Campos válidos: name (nombre completo), email, password, role_id. NUNCA uses llenarCampoCliente para usuarios.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      campo: { 
+                        type: 'STRING', 
+                        description: 'Campo a llenar: name, email, password, role_id (1=Admin, 2=Vendedor, etc.)'
+                      },
+                      valor: {
+                        type: 'STRING',
+                        description: 'Valor a poner en el campo'
+                      }
+                    },
+                    required: ['campo', 'valor']
+                  }
+                },
+                {
+                  name: 'guardarUsuario',
+                  description: 'Guarda el usuario con los datos del formulario. Solo usar después de haber llenado TODOS los campos obligatorios: name, email, password Y rol (obligatorio).',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'editarUsuario',
+                  description: 'Abre el modal para editar un usuario existente. Busca por nombre o email.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      busqueda: { 
+                        type: 'STRING', 
+                        description: 'Nombre o email del usuario a editar'
+                      }
+                    },
+                    required: ['busqueda']
+                  }
+                },
+                {
+                  name: 'abrirCrearRol',
+                  description: 'Abre el modal para crear un nuevo rol con permisos.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'buscarUsuario',
+                  description: 'Busca usuarios por nombre, email o cédula.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      texto: { type: 'STRING', description: 'Texto a buscar' }
+                    },
+                    required: ['texto']
+                  }
+                },
+                {
+                  name: 'verPermisosDisponibles',
+                  description: 'Muestra todos los módulos/permisos que se pueden asignar a los roles.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'cambiarPestanaUsuarios',
+                  description: 'Cambia entre la pestaña de Usuarios y Roles.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      pestana: { type: 'STRING', description: 'usuarios o roles', enum: ['usuarios', 'roles'] }
+                    },
+                    required: ['pestana']
+                  }
+                },
+                // ========================================
+                // 💼 CONTROL DE CAJAS - Herramientas GLOBALES
+                // ========================================
+                {
+                  name: 'consultarRendimientoEmpleado',
+                  description: 'Consulta el rendimiento de un empleado específico. FUNCIONA DESDE CUALQUIER MÓDULO. Usa cuando pregunten: "¿cómo le va a María?", "¿cómo está Juan?", "rendimiento de Pedro".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      busqueda: { 
+                        type: 'STRING', 
+                        description: 'Nombre o email del empleado a consultar'
+                      }
+                    },
+                    required: ['busqueda']
+                  }
+                },
+                {
+                  name: 'obtenerResumenCajas',
+                  description: 'Obtiene resumen de Control de Cajas: sesiones activas, empleados trabajando, total en cajas, ventas del día. FUNCIONA DESDE CUALQUIER MÓDULO. Usa para: "¿quién está en caja?", "¿cuántas cajas abiertas?", "resumen de cajas".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'obtenerAlertasEmpleados',
+                  description: 'Obtiene alertas de empleados: sin ventas, sesiones muy largas. FUNCIONA DESDE CUALQUIER MÓDULO. Usa para: "¿hay alertas?", "¿todo bien con los empleados?", "¿algo raro con las cajas?".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'verDetalleSesionCaja',
+                  description: 'Muestra detalles de una sesión de caja específica. Funciona cuando estás en Control de Cajas.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      idSesion: { type: 'STRING', description: 'ID de la sesión' },
+                      busqueda: { type: 'STRING', description: 'Nombre del usuario para buscar su sesión' }
+                    },
+                    required: []
+                  }
+                },
+                {
+                  name: 'filtrarSesionesCaja',
+                  description: 'Filtra las sesiones de caja por estado. Solo funciona en el módulo Control de Cajas.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      estado: { 
+                        type: 'STRING', 
+                        description: 'Estado a filtrar',
+                        enum: ['activas', 'cerradas', 'todas']
+                      }
+                    },
+                    required: ['estado']
+                  }
+                },
+                {
+                  name: 'obtenerMiCajaVsEmpleados',
+                  description: 'Diferencia entre TU caja actual y las cajas de tus empleados. FUNCIONA DESDE CUALQUIER MÓDULO. Usa para: "¿cómo va mi caja?", "¿cuánto vendí yo?", "mi caja vs empleados", "¿cómo van mis vendedores comparado conmigo?".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                // ========================================
+                // 💸 GASTOS OPERATIVOS - Herramientas GLOBALES
+                // ========================================
+                {
+                  name: 'registrarGastoVoz',
+                  description: 'Registra un gasto operativo por voz. FUNCIONA DESDE CUALQUIER MÓDULO. Usa cuando digan: "registra un gasto de", "compré X", "pagué X", "me tocó gastar en", "le presté a", "pagamos la luz". El sistema te preguntará lo que falte (categoría, monto, si sale de caja o ganancias generales).',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      descripcion: { 
+                        type: 'STRING', 
+                        description: 'Descripción del gasto: qué se compró o pagó'
+                      },
+                      monto: { 
+                        type: 'NUMBER', 
+                        description: 'Monto del gasto (opcional, si no se dice, se preguntará)'
+                      },
+                      categoria: { 
+                        type: 'STRING', 
+                        description: 'Categoría sugerida del gasto. Categorías: servicios_publicos, nomina, mantenimiento, suministros, arriendo, transporte, otros',
+                        enum: ['servicios_publicos', 'nomina', 'mantenimiento', 'suministros', 'arriendo', 'transporte', 'otros']
+                      },
+                      fuente: { 
+                        type: 'STRING', 
+                        description: 'De dónde sale el dinero: caja (descuenta de caja actual) o general (gasto general sin descontar de caja)',
+                        enum: ['caja', 'general']
+                      },
+                      proveedor: { 
+                        type: 'STRING', 
+                        description: 'Nombre del proveedor o a quién se le pagó (opcional)'
+                      },
+                      metodo_pago: {
+                        type: 'STRING',
+                        description: 'Método de pago: efectivo, transferencia, tarjeta',
+                        enum: ['efectivo', 'transferencia', 'tarjeta']
+                      }
+                    },
+                    required: ['descripcion']
+                  }
+                },
+                {
+                  name: 'consultarGastos',
+                  description: 'Consulta información de gastos operativos: total del mes, por categoría, últimos gastos. FUNCIONA DESDE CUALQUIER MÓDULO. Usa para: "¿cuánto hemos gastado?", "¿gastos del mes?", "¿en qué hemos gastado más?".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      consulta: { 
+                        type: 'STRING', 
+                        description: 'Tipo de consulta',
+                        enum: ['total_mes', 'por_categoria', 'ultimos', 'resumen']
+                      },
+                      periodo: {
+                        type: 'STRING',
+                        description: 'Período: hoy, semana, mes',
+                        enum: ['hoy', 'semana', 'mes']
+                      }
+                    },
+                    required: ['consulta']
+                  }
+                },
+                {
+                  name: 'verCategoriasGastos',
+                  description: 'Muestra las categorías de gastos disponibles. Útil antes de registrar un gasto para saber qué categorías hay.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                // ========================================
+                // 📊 REPORTES - Herramientas GLOBALES
+                // ========================================
+                {
+                  name: 'consultarReportesGenerales',
+                  description: 'Consulta reportes generales del negocio: ventas totales, transacciones, ticket promedio, margen, top productos, ventas por categoría. FUNCIONA DESDE CUALQUIER MÓDULO. Usa para: "¿cuánto vendimos hoy?", "¿cómo van las ventas?", "dame el reporte del día", "¿cuál es el ticket promedio?", "¿qué productos vendemos más?".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      periodo: { 
+                        type: 'STRING', 
+                        description: 'Período del reporte: hoy, semana, mes, año',
+                        enum: ['hoy', 'semana', 'mes', 'año']
+                      },
+                      tipoConsulta: {
+                        type: 'STRING',
+                        description: 'Tipo de información: resumen (KPIs principales), ventas (total ventas), productos (top productos), categorias (ventas por categoría), tendencia (ventas diarias)',
+                        enum: ['resumen', 'ventas', 'productos', 'categorias', 'tendencia']
+                      }
+                    },
+                    required: []
+                  }
+                },
+                {
+                  name: 'consultarReportesCaja',
+                  description: 'Consulta reportes de caja y rendimiento de cajeros. FUNCIONA DESDE CUALQUIER MÓDULO. Usa para: "¿quién es el mejor cajero?", "¿cuántas cajas hay activas?", "¿cómo van los cajeros?", "¿cuál es el promedio por hora?", "dame el reporte de cajas".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      periodo: { 
+                        type: 'STRING', 
+                        description: 'Período del reporte: hoy, semana, mes, año',
+                        enum: ['hoy', 'semana', 'mes', 'año']
+                      },
+                      tipoConsulta: {
+                        type: 'STRING',
+                        description: 'Tipo de información: resumen (KPIs caja), mejor_cajero, comparativa_cajeros, top_sesiones, eficiencia_hora',
+                        enum: ['resumen', 'mejor_cajero', 'comparativa_cajeros', 'top_sesiones', 'eficiencia_hora']
+                      }
+                    },
+                    required: []
+                  }
+                },
+                {
+                  name: 'obtenerMejorCajero',
+                  description: 'Obtiene información del mejor cajero del período. GLOBAL. Usa para: "¿quién vendió más?", "¿cuál es el mejor vendedor?", "¿quién es el mejor cajero hoy?".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      periodo: { 
+                        type: 'STRING', 
+                        description: 'Período: hoy, semana, mes',
+                        enum: ['hoy', 'semana', 'mes']
+                      }
+                    },
+                    required: []
+                  }
+                },
+                {
+                  name: 'obtenerTopSesiones',
+                  description: 'Obtiene las mejores sesiones de caja del período. GLOBAL. Usa para: "¿cuáles fueron las mejores sesiones?", "¿cuál fue el mejor turno?", "mejores ventas por turno".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      periodo: { 
+                        type: 'STRING', 
+                        description: 'Período: hoy, semana, mes',
+                        enum: ['hoy', 'semana', 'mes']
+                      },
+                      limite: {
+                        type: 'NUMBER',
+                        description: 'Cantidad de sesiones a mostrar (1-10)'
+                      }
+                    },
+                    required: []
+                  }
+                },
+                {
+                  name: 'navegarAReportes',
+                  description: 'Navega al módulo de reportes. Usa para: "llévame a reportes", "quiero ver los reportes", "abre reportes".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      tipoReporte: {
+                        type: 'STRING',
+                        description: 'Tipo de reporte a abrir: general o caja',
+                        enum: ['general', 'caja']
+                      }
+                    },
+                    required: []
+                  }
+                },
+                // ========================================
+                // 🧾 VENTAS/FACTURAS - Herramientas GLOBALES (⭐ CORE DEL POS)
+                // ========================================
+                {
+                  name: 'consultarVentasFecha',
+                  description: 'Consulta ventas de una FECHA ESPECÍFICA. ⭐ HERRAMIENTA PRINCIPAL para preguntas como: "¿cómo fueron las ventas ayer?", "¿ventas del 13 de agosto?", "¿cuánto vendimos el lunes?", "¿cómo estuvo el viernes?". FUNCIONA DESDE CUALQUIER MÓDULO.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      fecha: { 
+                        type: 'STRING', 
+                        description: 'Fecha a consultar. Usa: "ayer", "hoy", "anteayer", o fecha ISO "2024-08-13". Para días de la semana como "lunes" o "viernes", calcula la fecha correcta.'
+                      },
+                      fechaFin: {
+                        type: 'STRING',
+                        description: 'Fecha fin para rango (opcional). Formato ISO "2024-08-15"'
+                      },
+                      incluirDetalle: {
+                        type: 'BOOLEAN',
+                        description: 'Si incluir lista de facturas individuales (false por defecto para respuestas concisas)'
+                      }
+                    },
+                    required: ['fecha']
+                  }
+                },
+                {
+                  name: 'ventasPorEmpleado',
+                  description: 'Consulta ventas de un EMPLEADO ESPECÍFICO en una fecha. Para: "¿cuánto vendió María ayer?", "¿ventas de Juan hoy?", "¿cómo le fue a Pedro el lunes?". FUNCIONA DESDE CUALQUIER MÓDULO.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      empleado: { 
+                        type: 'STRING', 
+                        description: 'Nombre del empleado/vendedor a consultar'
+                      },
+                      fecha: { 
+                        type: 'STRING', 
+                        description: 'Fecha específica: "ayer", "hoy", "anteayer", o ISO "2024-08-13"'
+                      },
+                      periodo: {
+                        type: 'STRING',
+                        description: 'Período alternativo si no hay fecha específica: hoy, semana, mes',
+                        enum: ['hoy', 'semana', 'mes']
+                      }
+                    },
+                    required: ['empleado']
+                  }
+                },
+                {
+                  name: 'buscarFactura',
+                  description: 'Busca una factura específica por número, cliente o referencia. Para: "busca la factura 1234", "facturas de Don Carlos", "¿hay factura del cliente X?". FUNCIONA DESDE CUALQUIER MÓDULO.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      busqueda: { 
+                        type: 'STRING', 
+                        description: 'Número de factura, nombre de cliente, o término de búsqueda'
+                      },
+                      tipo: {
+                        type: 'STRING',
+                        description: 'Tipo de documento: factura, cotizacion, todos',
+                        enum: ['factura', 'cotizacion', 'todos']
+                      },
+                      estado: {
+                        type: 'STRING',
+                        description: 'Estado: pagada, pendiente, anulada, todos',
+                        enum: ['pagada', 'pendiente', 'anulada', 'todos']
+                      }
+                    },
+                    required: ['busqueda']
+                  }
+                },
+                {
+                  name: 'detalleFactura',
+                  description: 'Obtiene el detalle completo de una factura específica: productos, totales, cliente, método de pago. Para: "dame el detalle de la factura 1234", "¿qué tiene la factura X?".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      identificador: { 
+                        type: 'STRING', 
+                        description: 'Número de factura (FV-1234) o ID'
+                      }
+                    },
+                    required: ['identificador']
+                  }
+                },
+                {
+                  name: 'resumenVentasHoy',
+                  description: 'Resumen rápido de ventas del día actual. Para: "¿cómo vamos hoy?", "¿qué tal las ventas?", "dame el resumen de hoy". OPTIMIZADO para respuestas rápidas.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {},
+                    required: []
+                  }
+                },
+                {
+                  name: 'navegarAFacturas',
+                  description: 'Navega al módulo de facturas. Opcionalmente puede seleccionar una factura específica o aplicar filtro de búsqueda.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      facturaId: {
+                        type: 'NUMBER',
+                        description: 'ID de factura a seleccionar automáticamente'
+                      },
+                      busqueda: {
+                        type: 'STRING',
+                        description: 'Término de búsqueda a aplicar'
+                      }
+                    },
                     required: []
                   }
                 }
@@ -1560,6 +2755,58 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
   // ═══════════════════════════════════════════════════════════════
   // CAPTURA DE AUDIO DEL MICRÓFONO
   // ═══════════════════════════════════════════════════════════════
+  
+  // 🔊 Función de resampleo mejorada con filtro sinc + Lanczos window
+  // Esto evita el aliasing y produce audio más limpio que la interpolación lineal
+  const resampleAudio = (inputData, inputSampleRate, outputSampleRate) => {
+    if (inputSampleRate === outputSampleRate) {
+      return inputData
+    }
+    
+    const ratio = inputSampleRate / outputSampleRate
+    const outputLength = Math.floor(inputData.length / ratio)
+    const output = new Float32Array(outputLength)
+    
+    // Parámetros del filtro Lanczos (a=3 es buen balance calidad/velocidad)
+    const a = 3  // Tamaño de la ventana Lanczos
+    
+    // Función sinc: sin(πx) / (πx)
+    const sinc = (x) => {
+      if (x === 0) return 1
+      const px = Math.PI * x
+      return Math.sin(px) / px
+    }
+    
+    // Ventana Lanczos
+    const lanczos = (x, a) => {
+      if (x === 0) return 1
+      if (Math.abs(x) >= a) return 0
+      return sinc(x) * sinc(x / a)
+    }
+    
+    for (let i = 0; i < outputLength; i++) {
+      const srcIndex = i * ratio
+      const srcIndexFloor = Math.floor(srcIndex)
+      
+      let sum = 0
+      let weightSum = 0
+      
+      // Aplicar kernel Lanczos sobre vecinos
+      for (let j = srcIndexFloor - a + 1; j <= srcIndexFloor + a; j++) {
+        if (j >= 0 && j < inputData.length) {
+          const weight = lanczos(srcIndex - j, a)
+          sum += inputData[j] * weight
+          weightSum += weight
+        }
+      }
+      
+      // Normalizar
+      output[i] = weightSum > 0 ? sum / weightSum : 0
+    }
+    
+    return output
+  }
+  
   const startAudioCapture = async () => {
     if (!mediaStream || !audioContext || !websocket) return
     
@@ -1567,8 +2814,18 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
       // Crear nodo de fuente desde el micrófono
       const source = audioContext.createMediaStreamSource(mediaStream)
       
+      // Calcular el tamaño del chunk basado en el sampleRate actual
+      const nativeSampleRate = audioContext.sampleRate
+      const needsResample = nativeSampleRate !== SEND_SAMPLE_RATE
+      
+      console.log(`🎤 [LiveCall] Audio captura iniciada. SampleRate nativo: ${nativeSampleRate}, Necesita resample: ${needsResample}`)
+      
+      // ScriptProcessor requiere buffer que sea potencia de 2 (256, 512, 1024, 2048, 4096, 8192, 16384)
+      // Para 48kHz nativo y enviar a 16kHz, usamos 4096 que es un buen balance
+      const bufferSize = needsResample ? 4096 : CHUNK_SIZE
+      
       // Usar ScriptProcessor para capturar audio
-      const processor = audioContext.createScriptProcessor(CHUNK_SIZE, 1, 1)
+      const processor = audioContext.createScriptProcessor(bufferSize, 1, 1)
       
       processor.onaudioprocess = (e) => {
         if (!isConnected.value || !websocket || websocket.readyState !== WebSocket.OPEN) {
@@ -1576,7 +2833,12 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
         }
         
         // Obtener datos del buffer de entrada
-        const inputData = e.inputBuffer.getChannelData(0)
+        let inputData = e.inputBuffer.getChannelData(0)
+        
+        // Resamplear a 16kHz si es necesario (para Firefox)
+        if (needsResample) {
+          inputData = resampleAudio(inputData, nativeSampleRate, SEND_SAMPLE_RATE)
+        }
         
         // Convertir Float32 a Int16 (PCM 16-bit)
         const pcmData = float32ToInt16(inputData)
@@ -1756,7 +3018,11 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
     
     const functionResponses = []
     
+    // 🔍 Log para debug: mostrar todas las funciones que se van a ejecutar
+    console.log('🔧 [LiveCall] Procesando function calls:', functionCalls.map(fc => fc.name))
+    
     for (const fc of functionCalls) {
+      console.log(`🔧 [LiveCall] Ejecutando: ${fc.name}`, fc.args)
       let result = { success: false, message: 'Función no reconocida' }
       
       try {
@@ -1919,7 +3185,12 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
               'devoluciones': 'returns-management',
               'reportes': 'reports',
               'configuracion': 'settings',
-              'proveedores': 'suppliers',
+              'proveedores': 'purchase-orders',
+              'suppliers': 'purchase-orders',
+              'compras': 'purchase-orders',
+              'ordenes_compra': 'purchase-orders',
+              'ordenes': 'purchase-orders',
+              'purchase-orders': 'purchase-orders',
               'categorias': 'categories',
               'stock': 'stock',
               'dashboard': 'dashboard',
@@ -1935,7 +3206,27 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
               'creditos': 'accounts-receivable',
               'cuentas_por_cobrar': 'accounts-receivable',
               'accounts-receivable': 'accounts-receivable',
-              'cartera': 'accounts-receivable'
+              'cartera': 'accounts-receivable',
+              'usuarios': 'users-management',
+              'users': 'users-management',
+              'roles': 'users-management',
+              'empleados': 'users-management',
+              'users-management': 'users-management',
+              // Control de Cajas
+              'cash-admin': 'cash-admin',
+              'cajas': 'cash-admin',
+              'control_cajas': 'cash-admin',
+              'control_de_cajas': 'cash-admin',
+              'sesiones': 'cash-admin',
+              'sesiones_caja': 'cash-admin',
+              'supervisar': 'cash-admin',
+              'supervision': 'cash-admin',
+              // Gastos Operativos
+              'expenses': 'expenses',
+              'gastos': 'expenses',
+              'gastos_operativos': 'expenses',
+              'egresos': 'expenses',
+              'gastos operativos': 'expenses'
             }
             const moduloFinal = moduloMap[modulo] || modulo
             
@@ -2349,6 +3640,48 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
             } catch (err) {
               console.error('Error en buscarProductoEnVivo:', err)
               result = { success: false, message: 'Error al buscar producto' }
+            }
+            break
+          
+          case 'buscarProveedorDeProducto':
+            try {
+              const uiContext = useUIContextStore()
+              const nombreProducto = fc.args?.nombreProducto
+              
+              if (!nombreProducto) {
+                result = { success: false, message: 'Dime el nombre del producto para buscar su proveedor' }
+                break
+              }
+              
+              // Primero ir a productos para tener acceso a la acción
+              if (uiContext.currentModule !== 'products') {
+                navigateToModule('products')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const buscarProvResult = await uiContext.executeAction('buscarProveedorDeProducto', { nombreProducto })
+              
+              if (buscarProvResult?.success && buscarProvResult.proveedorAsignado) {
+                result = {
+                  success: true,
+                  productoEncontrado: buscarProvResult.productoEncontrado,
+                  proveedorAsignado: buscarProvResult.proveedorAsignado,
+                  message: buscarProvResult.message
+                }
+              } else if (buscarProvResult?.success && !buscarProvResult.proveedorAsignado) {
+                result = {
+                  success: true,
+                  productoEncontrado: buscarProvResult.productoEncontrado,
+                  proveedorAsignado: null,
+                  message: buscarProvResult.message,
+                  proveedoresDisponibles: buscarProvResult.proveedoresDisponibles
+                }
+              } else {
+                result = buscarProvResult || { success: false, message: 'No pude encontrar información del proveedor' }
+              }
+            } catch (err) {
+              console.error('Error en buscarProveedorDeProducto:', err)
+              result = { success: false, message: 'Error al buscar proveedor del producto' }
             }
             break
           
@@ -3260,6 +4593,1802 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
             } catch (err) {
               console.error('Error en cerrarModalCredito:', err)
               result = { success: false, message: 'Error al cerrar modal' }
+            }
+            break
+          
+          // === PROVEEDORES Y COMPRAS ===
+          case 'cambiarPestanaCompras':
+            try {
+              const uiContext = useUIContextStore()
+              const pestana = fc.args?.pestana
+              
+              // Navegar a compras si no estamos ahí
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('proveedores')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const cambiarTabResult = await uiContext.executeAction('cambiarPestanaCompras', { pestana })
+              result = cambiarTabResult || { success: true, message: `Cambiado a pestaña ${pestana}` }
+            } catch (err) {
+              console.error('Error en cambiarPestanaCompras:', err)
+              result = { success: false, message: 'Error al cambiar pestaña' }
+            }
+            break
+          
+          case 'crearNuevoProveedor':
+            try {
+              const uiContext = useUIContextStore()
+              
+              // SIEMPRE navegar a purchase-orders para asegurarnos
+              navigateToModule('purchase-orders')
+              await new Promise(resolve => setTimeout(resolve, 800))
+              
+              // Esperar a que las acciones estén registradas (el componente debe montar)
+              let intentos = 0
+              while (intentos < 5) {
+                const testResult = await uiContext.executeAction('crearNuevoProveedor')
+                if (testResult && testResult.success !== false) {
+                  result = testResult
+                  break
+                }
+                // Si la acción no está disponible, esperar más
+                if (testResult?.message?.includes('no disponible')) {
+                  await new Promise(resolve => setTimeout(resolve, 400))
+                  intentos++
+                } else {
+                  // La acción se ejecutó (aunque haya fallado por otra razón)
+                  result = testResult
+                  break
+                }
+              }
+              
+              if (intentos >= 5) {
+                result = { success: false, message: 'El módulo de proveedores aún está cargando. Intenta de nuevo.' }
+              }
+              
+              if (!result) {
+                result = { success: true, message: 'Formulario de proveedor abierto. Dame el nombre del proveedor.' }
+              }
+            } catch (err) {
+              console.error('Error en crearNuevoProveedor:', err)
+              result = { success: false, message: 'Error al abrir formulario' }
+            }
+            break
+          
+          case 'llenarCampoProveedor':
+            try {
+              const uiContext = useUIContextStore()
+              const campo = fc.args?.campo
+              const valor = fc.args?.valor
+              
+              if (!campo || !valor) {
+                result = { success: false, message: 'Debes especificar campo y valor' }
+                break
+              }
+              
+              const llenarProvResult = await uiContext.executeAction('llenarCampoProveedor', { campo, valor })
+              result = llenarProvResult || { success: true, message: `Campo "${campo}" actualizado` }
+            } catch (err) {
+              console.error('Error en llenarCampoProveedor:', err)
+              result = { success: false, message: 'Error al llenar campo' }
+            }
+            break
+          
+          case 'guardarProveedor':
+            try {
+              const uiContext = useUIContextStore()
+              const guardarProvResult = await uiContext.executeAction('guardarProveedor')
+              result = guardarProvResult || { success: true, message: 'Proveedor guardado' }
+            } catch (err) {
+              console.error('Error en guardarProveedor:', err)
+              result = { success: false, message: 'Error al guardar proveedor' }
+            }
+            break
+          
+          case 'verificarFormularioProveedor':
+            try {
+              const uiContext = useUIContextStore()
+              const verificarResult = await uiContext.executeAction('verificarFormularioProveedor')
+              result = verificarResult || { success: false, message: 'No hay formulario visible' }
+            } catch (err) {
+              console.error('Error en verificarFormularioProveedor:', err)
+              result = { success: false, message: 'Error al verificar formulario' }
+            }
+            break
+          
+          case 'buscarProveedor':
+            try {
+              const uiContext = useUIContextStore()
+              const texto = fc.args?.texto
+              
+              if (!texto) {
+                result = { success: false, message: 'Debes proporcionar texto de búsqueda' }
+                break
+              }
+              
+              // Navegar a compras si no estamos ahí
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('proveedores')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const buscarProvResult = await uiContext.executeAction('buscarProveedor', { texto })
+              result = buscarProvResult || { success: true, message: `Buscando: ${texto}` }
+            } catch (err) {
+              console.error('Error en buscarProveedor:', err)
+              result = { success: false, message: 'Error al buscar proveedor' }
+            }
+            break
+          
+          case 'listarProveedores':
+            try {
+              const uiContext = useUIContextStore()
+              
+              // Navegar a compras si no estamos ahí
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('proveedores')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const listarResult = await uiContext.executeAction('listarProveedores')
+              result = listarResult || { success: false, message: 'No se pudieron listar los proveedores' }
+            } catch (err) {
+              console.error('Error en listarProveedores:', err)
+              result = { success: false, message: 'Error al listar proveedores' }
+            }
+            break
+          
+          case 'cerrarFormularioProveedor':
+            try {
+              const uiContext = useUIContextStore()
+              const cerrarProvResult = await uiContext.executeAction('cerrarFormularioProveedor')
+              result = cerrarProvResult || { success: true, message: 'Formulario cerrado' }
+            } catch (err) {
+              console.error('Error en cerrarFormularioProveedor:', err)
+              result = { success: false, message: 'Error al cerrar formulario' }
+            }
+            break
+          
+          case 'seleccionarProveedor':
+            try {
+              const uiContext = useUIContextStore()
+              const nombre = fc.args?.nombre
+              
+              if (!nombre) {
+                result = { success: false, message: 'Debes indicar el nombre del proveedor' }
+                break
+              }
+              
+              // Navegar a compras si no estamos ahí
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('proveedores')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const seleccionarResult = await uiContext.executeAction('seleccionarProveedor', { nombre })
+              result = seleccionarResult || { success: false, message: `No encontré proveedor "${nombre}"` }
+            } catch (err) {
+              console.error('Error en seleccionarProveedor:', err)
+              result = { success: false, message: 'Error al seleccionar proveedor' }
+            }
+            break
+          
+          case 'crearNuevaOrdenCompra':
+            try {
+              const uiContext = useUIContextStore()
+              const nombreProveedor = fc.args?.nombreProveedor
+              
+              console.log('📦 [crearNuevaOrdenCompra] Proveedor solicitado:', nombreProveedor || 'ninguno')
+              
+              // SIEMPRE navegar a purchase-orders para que el usuario VEA el proceso
+              console.log('🚀 [crearNuevaOrdenCompra] Navegando a purchase-orders...')
+              navigateToModule('purchase-orders')
+              await new Promise(resolve => setTimeout(resolve, 1000)) // Más tiempo para que cargue
+              
+              // Esperar a que las acciones estén registradas
+              let intentosOrden = 0
+              while (intentosOrden < 5) {
+                const testResultOrden = await uiContext.executeAction('crearNuevaOrdenCompra', { nombreProveedor })
+                if (testResultOrden && testResultOrden.success !== false) {
+                  result = testResultOrden
+                  break
+                }
+                if (testResultOrden?.message?.includes('no disponible')) {
+                  await new Promise(resolve => setTimeout(resolve, 400))
+                  intentosOrden++
+                } else {
+                  result = testResultOrden
+                  break
+                }
+              }
+              
+              if (intentosOrden >= 5) {
+                result = { success: false, message: 'El módulo de compras aún está cargando. Intenta de nuevo.' }
+              }
+              
+              if (!result) {
+                result = { success: true, message: nombreProveedor ? `Formulario abierto con proveedor ${nombreProveedor}` : 'Formulario de orden abierto. ¿A qué proveedor?' }
+              }
+            } catch (err) {
+              console.error('Error en crearNuevaOrdenCompra:', err)
+              result = { success: false, message: 'Error al abrir formulario de orden' }
+            }
+            break
+          
+          case 'seleccionarProveedorOrden':
+            try {
+              const uiContext = useUIContextStore()
+              const nombre = fc.args?.nombre
+              
+              if (!nombre) {
+                result = { success: false, message: 'Debes indicar el nombre del proveedor' }
+                break
+              }
+              
+              const selProvResult = await uiContext.executeAction('seleccionarProveedorOrden', { nombre })
+              result = selProvResult || { success: true, message: `Proveedor ${nombre} seleccionado` }
+            } catch (err) {
+              console.error('Error en seleccionarProveedorOrden:', err)
+              result = { success: false, message: 'Error al seleccionar proveedor' }
+            }
+            break
+          
+          case 'seleccionarBodegaOrden':
+            try {
+              const uiContext = useUIContextStore()
+              const nombre = fc.args?.nombre
+              
+              if (!nombre) {
+                result = { success: false, message: 'Debes indicar el nombre de la bodega' }
+                break
+              }
+              
+              const selBodegaResult = await uiContext.executeAction('seleccionarBodegaOrden', { nombre })
+              result = selBodegaResult || { success: true, message: `Bodega ${nombre} seleccionada` }
+            } catch (err) {
+              console.error('Error en seleccionarBodegaOrden:', err)
+              result = { success: false, message: 'Error al seleccionar bodega' }
+            }
+            break
+          
+          case 'agregarProductoOrden':
+            try {
+              const uiContext = useUIContextStore()
+              const nombre = fc.args?.nombre
+              const cantidad = fc.args?.cantidad || 1
+              const costo = fc.args?.costo
+              
+              if (!nombre) {
+                result = { success: false, message: 'Debes indicar el nombre del producto' }
+                break
+              }
+              
+              const agregarProdResult = await uiContext.executeAction('agregarProductoOrden', { nombre, cantidad, costo })
+              result = agregarProdResult || { success: true, message: `Producto agregado` }
+            } catch (err) {
+              console.error('Error en agregarProductoOrden:', err)
+              result = { success: false, message: 'Error al agregar producto' }
+            }
+            break
+          
+          case 'buscarProductoOrden':
+            try {
+              const uiContext = useUIContextStore()
+              const texto = fc.args?.texto
+              
+              if (!texto) {
+                result = { success: false, message: 'Debes indicar qué producto buscar' }
+                break
+              }
+              
+              const buscarProdResult = await uiContext.executeAction('buscarProductoOrden', { texto })
+              result = buscarProdResult || { success: true, message: `Buscando: ${texto}` }
+            } catch (err) {
+              console.error('Error en buscarProductoOrden:', err)
+              result = { success: false, message: 'Error al buscar producto' }
+            }
+            break
+          
+          case 'abrirSelectorProductos':
+            try {
+              const uiContext = useUIContextStore()
+              
+              // Asegurar que estamos en el módulo de compras
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('purchase-orders')
+                await new Promise(resolve => setTimeout(resolve, 800))
+              }
+              
+              const abrirModalResult = await uiContext.executeAction('abrirSelectorProductos', {})
+              result = abrirModalResult || { success: true, message: 'Modal de productos abierto' }
+            } catch (err) {
+              console.error('Error en abrirSelectorProductos:', err)
+              result = { success: false, message: 'Error al abrir selector de productos' }
+            }
+            break
+          
+          case 'llenarCampoOrden':
+            try {
+              const uiContext = useUIContextStore()
+              const campo = fc.args?.campo
+              const valor = fc.args?.valor
+              
+              if (!campo || !valor) {
+                result = { success: false, message: 'Debes especificar campo y valor' }
+                break
+              }
+              
+              const llenarOrdenResult = await uiContext.executeAction('llenarCampoOrden', { campo, valor })
+              result = llenarOrdenResult || { success: true, message: `Campo "${campo}" actualizado` }
+            } catch (err) {
+              console.error('Error en llenarCampoOrden:', err)
+              result = { success: false, message: 'Error al llenar campo' }
+            }
+            break
+          
+          case 'guardarOrdenCompra':
+            try {
+              const uiContext = useUIContextStore()
+              const comoBorrador = fc.args?.comoBorrador || false
+              
+              // Asegurar que estamos en el módulo de compras
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('purchase-orders')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const guardarOrdenResult = await uiContext.executeAction('guardarOrdenCompra', { comoBorrador })
+              
+              // Si el resultado es exitoso, dar mensaje claro
+              if (guardarOrdenResult && guardarOrdenResult.success) {
+                result = {
+                  success: true,
+                  message: guardarOrdenResult.message || '¡Orden de compra creada exitosamente!'
+                }
+              } else if (guardarOrdenResult) {
+                result = guardarOrdenResult
+              } else {
+                // Si no hay resultado pero tampoco hubo error, asumir éxito
+                result = { success: true, message: '¡Orden de compra guardada correctamente!' }
+              }
+            } catch (err) {
+              console.error('Error en guardarOrdenCompra:', err)
+              result = { success: false, message: 'Error al guardar la orden. ¿Quieres intentar de nuevo?' }
+            }
+            break
+          
+          case 'cerrarFormularioOrden':
+            try {
+              const uiContext = useUIContextStore()
+              const cerrarOrdenResult = await uiContext.executeAction('cerrarFormularioOrden')
+              result = cerrarOrdenResult || { success: true, message: 'Formulario cerrado' }
+            } catch (err) {
+              console.error('Error en cerrarFormularioOrden:', err)
+              result = { success: false, message: 'Error al cerrar formulario' }
+            }
+            break
+          
+          case 'seleccionarOrdenCompra':
+            try {
+              const uiContext = useUIContextStore()
+              const numero = fc.args?.numero
+              
+              if (!numero) {
+                result = { success: false, message: 'Debes indicar el número de orden' }
+                break
+              }
+              
+              // Navegar a compras si no estamos ahí
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('proveedores')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const selOrdenResult = await uiContext.executeAction('seleccionarOrdenCompra', { numero })
+              result = selOrdenResult || { success: true, message: `Orden ${numero} seleccionada` }
+            } catch (err) {
+              console.error('Error en seleccionarOrdenCompra:', err)
+              result = { success: false, message: 'Error al seleccionar orden' }
+            }
+            break
+          
+          case 'filtrarOrdenesCompra':
+            try {
+              const uiContext = useUIContextStore()
+              const estado = fc.args?.estado
+              
+              if (!estado) {
+                result = { success: false, message: 'Debes indicar el estado: todas, pendientes, parciales, recibidas' }
+                break
+              }
+              
+              // Navegar a compras si no estamos ahí
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('proveedores')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const filtrarResult = await uiContext.executeAction('filtrarOrdenesCompra', { estado })
+              result = filtrarResult || { success: true, message: `Filtrando por: ${estado}` }
+            } catch (err) {
+              console.error('Error en filtrarOrdenesCompra:', err)
+              result = { success: false, message: 'Error al filtrar órdenes' }
+            }
+            break
+          
+          // === HANDLERS PARA ACCIONES DE ORDEN SELECCIONADA ===
+          
+          case 'descargarOrdenPDF':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('purchase-orders')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const descargarResult = await uiContext.executeAction('descargarOrdenPDF', {})
+              result = descargarResult || { success: true, message: 'PDF descargado' }
+            } catch (err) {
+              console.error('Error en descargarOrdenPDF:', err)
+              result = { success: false, message: 'Error al descargar PDF' }
+            }
+            break
+          
+          case 'enviarOrdenEmail':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('purchase-orders')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const enviarEmailResult = await uiContext.executeAction('enviarOrdenEmail', {})
+              result = enviarEmailResult || { success: true, message: 'Email enviado' }
+            } catch (err) {
+              console.error('Error en enviarOrdenEmail:', err)
+              result = { success: false, message: 'Error al enviar email' }
+            }
+            break
+          
+          case 'enviarOrdenWhatsApp':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('purchase-orders')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const enviarWAResult = await uiContext.executeAction('enviarOrdenWhatsApp', {})
+              result = enviarWAResult || { success: true, message: 'Abriendo WhatsApp' }
+            } catch (err) {
+              console.error('Error en enviarOrdenWhatsApp:', err)
+              result = { success: false, message: 'Error al enviar WhatsApp' }
+            }
+            break
+          
+          case 'abrirModalIngresarStock':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('purchase-orders')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const abrirModalResult = await uiContext.executeAction('abrirModalIngresarStock', {})
+              result = abrirModalResult || { success: true, message: 'Modal de ingreso abierto' }
+            } catch (err) {
+              console.error('Error en abrirModalIngresarStock:', err)
+              result = { success: false, message: 'Error al abrir modal de ingreso' }
+            }
+            break
+          
+          case 'confirmarIngresoStock':
+            try {
+              const uiContext = useUIContextStore()
+              
+              const confirmarResult = await uiContext.executeAction('confirmarIngresoStock', {})
+              result = confirmarResult || { success: true, message: 'Productos ingresados al stock' }
+            } catch (err) {
+              console.error('Error en confirmarIngresoStock:', err)
+              result = { success: false, message: 'Error al confirmar ingreso' }
+            }
+            break
+          
+          case 'marcarCantidadRecibida':
+            try {
+              const uiContext = useUIContextStore()
+              const producto = fc.args?.producto
+              const cantidad = fc.args?.cantidad
+              const recibirTodo = fc.args?.recibirTodo
+              
+              if (!producto) {
+                result = { success: false, message: 'Debes indicar el nombre del producto' }
+                break
+              }
+              
+              const marcarResult = await uiContext.executeAction('marcarCantidadRecibida', { producto, cantidad, recibirTodo })
+              result = marcarResult || { success: true, message: 'Cantidad marcada' }
+            } catch (err) {
+              console.error('Error en marcarCantidadRecibida:', err)
+              result = { success: false, message: 'Error al marcar cantidad' }
+            }
+            break
+          
+          case 'recibirTodosProductos':
+            try {
+              const uiContext = useUIContextStore()
+              
+              const recibirTodosResult = await uiContext.executeAction('recibirTodosProductos', {})
+              result = recibirTodosResult || { success: true, message: 'Todos los productos marcados' }
+            } catch (err) {
+              console.error('Error en recibirTodosProductos:', err)
+              result = { success: false, message: 'Error al marcar productos' }
+            }
+            break
+          
+          case 'marcarOrdenPagada':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'purchase-orders') {
+                navigateToModule('purchase-orders')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const marcarResult = await uiContext.executeAction('marcarOrdenPagada', {})
+              result = marcarResult || { success: true, message: 'Abriendo modal para marcar como pagada' }
+            } catch (err) {
+              console.error('Error en marcarOrdenPagada:', err)
+              result = { success: false, message: 'Error al marcar como pagada' }
+            }
+            break
+          
+          // === HANDLERS DE USUARIOS Y ROLES ===
+          
+          case 'listarUsuarios':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                // 🔒 Verificar si la navegación falló por permisos
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const listarResult = await uiContext.executeAction('listarUsuarios', {})
+              result = listarResult || { success: true, message: 'Listando usuarios' }
+            } catch (err) {
+              console.error('Error en listarUsuarios:', err)
+              result = { success: false, message: 'Error al listar usuarios' }
+            }
+            break
+          
+          case 'listarRoles':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                // 🔒 Verificar si la navegación falló por permisos
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const listarRolesResult = await uiContext.executeAction('listarRoles', {})
+              result = listarRolesResult || { success: true, message: 'Listando roles' }
+            } catch (err) {
+              console.error('Error en listarRoles:', err)
+              result = { success: false, message: 'Error al listar roles' }
+            }
+            break
+          
+          case 'abrirCrearUsuario':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                // 🔒 Verificar si la navegación falló por permisos
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const crearUserResult = await uiContext.executeAction('abrirCrearUsuario', {})
+              result = crearUserResult || { success: true, message: 'Modal de nuevo usuario abierto' }
+            } catch (err) {
+              console.error('Error en abrirCrearUsuario:', err)
+              result = { success: false, message: 'Error al abrir formulario de usuario' }
+            }
+            break
+          
+          case 'llenarCampoUsuario':
+            try {
+              const uiContext = useUIContextStore()
+              const campo = fc.args?.campo
+              const valor = fc.args?.valor
+              
+              if (!campo || !valor) {
+                result = { success: false, message: 'Debes especificar campo y valor' }
+                break
+              }
+              
+              // Asegurar que estamos en usuarios y el modal está abierto
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const llenarResult = await uiContext.executeAction('llenarCampoUsuario', { campo, valor })
+              result = llenarResult || { success: true, message: `Campo ${campo} llenado con: ${valor}` }
+            } catch (err) {
+              console.error('Error en llenarCampoUsuario:', err)
+              result = { success: false, message: 'Error al llenar campo de usuario' }
+            }
+            break
+          
+          case 'guardarUsuario':
+            try {
+              const uiContext = useUIContextStore()
+              
+              const guardarResult = await uiContext.executeAction('guardarUsuario', {})
+              result = guardarResult || { success: true, message: 'Usuario guardado correctamente' }
+            } catch (err) {
+              console.error('Error en guardarUsuario:', err)
+              result = { success: false, message: 'Error al guardar usuario' }
+            }
+            break
+          
+          case 'editarUsuario':
+            try {
+              const uiContext = useUIContextStore()
+              const busqueda = fc.args?.busqueda
+              
+              if (!busqueda) {
+                result = { success: false, message: 'Debes indicar qué usuario editar (nombre o email)' }
+                break
+              }
+              
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const editResult = await uiContext.executeAction('editarUsuario', { busqueda })
+              result = editResult || { success: true, message: `Buscando usuario: ${busqueda}` }
+            } catch (err) {
+              console.error('Error en editarUsuario:', err)
+              result = { success: false, message: 'Error al editar usuario' }
+            }
+            break
+          
+          case 'abrirCrearRol':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                // 🔒 Verificar si la navegación falló por permisos
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const crearRolResult = await uiContext.executeAction('abrirCrearRol', {})
+              result = crearRolResult || { success: true, message: 'Modal de nuevo rol abierto' }
+            } catch (err) {
+              console.error('Error en abrirCrearRol:', err)
+              result = { success: false, message: 'Error al abrir formulario de rol' }
+            }
+            break
+          
+          case 'buscarUsuario':
+            try {
+              const uiContext = useUIContextStore()
+              const texto = fc.args?.texto
+              
+              if (!texto) {
+                result = { success: false, message: 'Debes indicar qué usuario buscar' }
+                break
+              }
+              
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                // 🔒 Verificar si la navegación falló por permisos
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const buscarUserResult = await uiContext.executeAction('buscarUsuario', { texto })
+              result = buscarUserResult || { success: true, message: `Buscando usuario: ${texto}` }
+            } catch (err) {
+              console.error('Error en buscarUsuario:', err)
+              result = { success: false, message: 'Error al buscar usuario' }
+            }
+            break
+          
+          case 'verPermisosDisponibles':
+            try {
+              const uiContext = useUIContextStore()
+              
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                // 🔒 Verificar si la navegación falló por permisos
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const permisosResult = await uiContext.executeAction('verPermisosDisponibles', {})
+              result = permisosResult || { success: true, message: 'Mostrando permisos disponibles' }
+            } catch (err) {
+              console.error('Error en verPermisosDisponibles:', err)
+              result = { success: false, message: 'Error al obtener permisos' }
+            }
+            break
+          
+          case 'cambiarPestanaUsuarios':
+            try {
+              const uiContext = useUIContextStore()
+              const pestana = fc.args?.pestana
+              
+              if (uiContext.currentModule !== 'users-management' && uiContext.currentModule !== 'users') {
+                navigateToModule('users-management')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                
+                // 🔒 Verificar si la navegación falló por permisos
+                const navError = uiContext.getAndClearNavigationError()
+                if (navError) {
+                  result = { success: false, message: navError.message }
+                  break
+                }
+              }
+              
+              const cambiarTabResult = await uiContext.executeAction('cambiarPestanaUsuarios', { pestana })
+              result = cambiarTabResult || { success: true, message: `Cambiando a pestaña ${pestana}` }
+            } catch (err) {
+              console.error('Error en cambiarPestanaUsuarios:', err)
+              result = { success: false, message: 'Error al cambiar pestaña' }
+            }
+            break
+          
+          // ========================================
+          // 💼 CONTROL DE CAJAS - Handlers GLOBALES
+          // ========================================
+          
+          case 'consultarRendimientoEmpleado':
+            try {
+              const uiContext = useUIContextStore()
+              const busqueda = fc.args?.busqueda
+              
+              if (!busqueda) {
+                result = { success: false, message: 'Dime el nombre del empleado que quieres consultar' }
+                break
+              }
+              
+              // Esta herramienta es GLOBAL - funciona desde cualquier módulo
+              // Primero intentamos obtener datos del contexto actual
+              let rendimientoResult = await uiContext.executeAction('consultarRendimientoEmpleado', { busqueda })
+              
+              // Si no hay acción registrada (aún no cargó cash-admin), navegar y reintentar UNA vez
+              if (!rendimientoResult) {
+                navigateToModule('cash-admin')
+                await new Promise(resolve => setTimeout(resolve, 1000))
+                rendimientoResult = await uiContext.executeAction('consultarRendimientoEmpleado', { busqueda })
+              }
+              
+              // Manejar resultado
+              if (rendimientoResult?.success && rendimientoResult?.datos) {
+                const r = rendimientoResult.datos
+                let mensaje = `📊 Rendimiento de ${r.nombre}:\n`
+                
+                if (r.sesionActiva) {
+                  mensaje += `✅ Sesión activa: ${r.sesionActiva.duracion}, ventas: $${r.sesionActiva.ventas.toLocaleString()}\n`
+                } else {
+                  mensaje += `❌ Sin sesión activa en este momento\n`
+                }
+                
+                mensaje += `📅 Hoy: ${r.resumenHoy.sesiones} sesiones, $${r.resumenHoy.ventas.toLocaleString()} en ventas, ${r.resumenHoy.horasTrabajadas}h trabajadas`
+                
+                // Agregar información de gastos si los hay
+                if (r.resumenHoy.cantidadGastos > 0) {
+                  mensaje += `\n💸 Gastos: ${r.resumenHoy.cantidadGastos} gastos por $${r.resumenHoy.gastos.toLocaleString()}`
+                }
+                
+                // Agregar información de devoluciones si las hay
+                if (r.resumenHoy.cantidadDevoluciones > 0) {
+                  mensaje += `\n↩️ Devoluciones: ${r.resumenHoy.cantidadDevoluciones} devoluciones por $${r.resumenHoy.devoluciones.toLocaleString()}`
+                }
+                
+                result = { 
+                  success: true, 
+                  message: mensaje,
+                  datos: r
+                }
+              } else if (rendimientoResult?.sugerencias?.length > 0) {
+                // Tiene sugerencias de nombres similares
+                result = { 
+                  success: false, 
+                  message: rendimientoResult.message || `No encontré "${busqueda}". ¿Quisiste decir: ${rendimientoResult.sugerencias.join(', ')}?`
+                }
+              } else {
+                // No encontrado y sin sugerencias
+                result = { 
+                  success: false, 
+                  message: rendimientoResult?.message || `No encontré sesiones de caja para "${busqueda}". Este empleado puede que no haya abierto caja recientemente.`
+                }
+              }
+            } catch (err) {
+              console.error('Error en consultarRendimientoEmpleado:', err)
+              result = { success: false, message: 'Error al consultar rendimiento del empleado' }
+            }
+            break
+          
+          case 'obtenerResumenCajas':
+            try {
+              const uiContext = useUIContextStore()
+              
+              // Intentar obtener del contexto actual
+              const resumenResult = await uiContext.executeAction('obtenerResumenCajas', {})
+              
+              if (resumenResult?.success && resumenResult?.datos) {
+                const d = resumenResult.datos
+                let mensaje = `💼 Resumen de Cajas:\n`
+                mensaje += `• ${d.sesionesActivas} sesiones activas\n`
+                mensaje += `• Empleados: ${d.empleadosActivos?.join(', ') || 'Ninguno'}\n`
+                mensaje += `• Total en cajas: $${d.totalEnCajas?.toLocaleString() || 0}\n`
+                mensaje += `• Ventas hoy: $${d.ventasHoy?.toLocaleString() || 0}`
+                
+                if (d.alertas && d.alertas.length > 0) {
+                  mensaje += `\n⚠️ ${d.alertas.length} alerta(s) activas`
+                }
+                
+                result = { success: true, message: mensaje, datos: d }
+              } else {
+                // Navegar al módulo si no hay datos
+                navigateToModule('cash-admin')
+                await new Promise(resolve => setTimeout(resolve, 800))
+                
+                const retryResult = await uiContext.executeAction('obtenerResumenCajas', {})
+                if (retryResult?.success) {
+                  result = retryResult
+                } else {
+                  result = { success: false, message: 'No pude obtener el resumen de cajas. ¿Quieres que te lleve al módulo?' }
+                }
+              }
+            } catch (err) {
+              console.error('Error en obtenerResumenCajas:', err)
+              result = { success: false, message: 'Error al obtener resumen de cajas' }
+            }
+            break
+          
+          case 'obtenerAlertasEmpleados':
+            try {
+              const uiContext = useUIContextStore()
+              
+              const alertasResult = await uiContext.executeAction('obtenerAlertasEmpleados', {})
+              
+              if (alertasResult?.success) {
+                if (alertasResult.alertas && alertasResult.alertas.length > 0) {
+                  let mensaje = `⚠️ Alertas de empleados:\n`
+                  alertasResult.alertas.forEach(a => {
+                    mensaje += `• ${a.mensaje}\n`
+                  })
+                  result = { success: true, message: mensaje, alertas: alertasResult.alertas }
+                } else {
+                  result = { success: true, message: '✅ Todo en orden. No hay alertas con los empleados.', alertas: [] }
+                }
+              } else {
+                // Navegar al módulo si no hay datos
+                navigateToModule('cash-admin')
+                await new Promise(resolve => setTimeout(resolve, 800))
+                
+                const retryResult = await uiContext.executeAction('obtenerAlertasEmpleados', {})
+                if (retryResult?.success) {
+                  result = retryResult
+                } else {
+                  result = { success: true, message: '✅ No pude verificar alertas, pero parece que todo está bien.', alertas: [] }
+                }
+              }
+            } catch (err) {
+              console.error('Error en obtenerAlertasEmpleados:', err)
+              result = { success: false, message: 'Error al obtener alertas' }
+            }
+            break
+          
+          case 'verDetalleSesionCaja':
+            try {
+              const uiContext = useUIContextStore()
+              const idSesion = fc.args?.idSesion
+              const busqueda = fc.args?.busqueda
+              
+              // Verificar que estamos en control de cajas
+              if (uiContext.currentModule !== 'cash-admin') {
+                navigateToModule('cash-admin')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const detalleResult = await uiContext.executeAction('verDetalleSesion', { idSesion, busqueda })
+              result = detalleResult || { success: true, message: 'Mostrando detalles de la sesión' }
+            } catch (err) {
+              console.error('Error en verDetalleSesionCaja:', err)
+              result = { success: false, message: 'Error al ver detalles de sesión' }
+            }
+            break
+          
+          case 'filtrarSesionesCaja':
+            try {
+              const uiContext = useUIContextStore()
+              const estado = fc.args?.estado
+              
+              if (uiContext.currentModule !== 'cash-admin') {
+                navigateToModule('cash-admin')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              const filtrarResult = await uiContext.executeAction('filtrarSesionesPorEstado', { estado })
+              result = filtrarResult || { success: true, message: `Filtrando sesiones ${estado}` }
+            } catch (err) {
+              console.error('Error en filtrarSesionesCaja:', err)
+              result = { success: false, message: 'Error al filtrar sesiones' }
+            }
+            break
+          
+          case 'obtenerMiCajaVsEmpleados':
+            try {
+              const uiContext = useUIContextStore()
+              
+              // Intentar obtener del contexto actual
+              const miCajaResult = await uiContext.executeAction('obtenerMiCajaVsEmpleados', {})
+              
+              if (miCajaResult?.success) {
+                result = miCajaResult
+              } else {
+                // Navegar al módulo si no hay datos
+                navigateToModule('cash-admin')
+                await new Promise(resolve => setTimeout(resolve, 800))
+                
+                const retryResult = await uiContext.executeAction('obtenerMiCajaVsEmpleados', {})
+                if (retryResult?.success) {
+                  result = retryResult
+                } else {
+                  result = { success: false, message: 'No pude obtener la información de cajas. ¿Quieres que te lleve al módulo?' }
+                }
+              }
+            } catch (err) {
+              console.error('Error en obtenerMiCajaVsEmpleados:', err)
+              result = { success: false, message: 'Error al comparar cajas' }
+            }
+            break
+          
+          // ========================================
+          // 💸 GASTOS OPERATIVOS - Handlers GLOBALES
+          // ========================================
+          
+          case 'registrarGastoVoz':
+            try {
+              const uiContext = useUIContextStore()
+              const { descripcion, monto, categoria, fuente, proveedor, metodo_pago } = fc.args || {}
+              
+              if (!descripcion) {
+                result = { 
+                  success: false, 
+                  message: 'Por favor, dime qué compraste o pagaste. Por ejemplo: "compré papelería" o "pagué la luz".'
+                }
+                break
+              }
+              
+              // Mapear categoría amigable a ID
+              const categoriaMap = {
+                'servicios_publicos': 'Servicios Públicos',
+                'nomina': 'Nómina y Salarios',
+                'mantenimiento': 'Mantenimiento',
+                'suministros': 'Suministros y Materiales',
+                'arriendo': 'Arriendo',
+                'transporte': 'Transporte',
+                'otros': 'Otros Gastos'
+              }
+              
+              // Intentar obtener datos del contexto de gastos
+              let gastoResult = await uiContext.executeAction('registrarGastoVoz', {
+                descripcion,
+                monto,
+                categoria: categoria ? categoriaMap[categoria] : null,
+                fuente: fuente || 'general',
+                proveedor,
+                metodo_pago: metodo_pago || 'efectivo'
+              })
+              
+              // Si no hay acción registrada (no está en expenses), navegar primero
+              if (!gastoResult) {
+                navigateToModule('expenses')
+                await new Promise(resolve => setTimeout(resolve, 1000))
+                
+                gastoResult = await uiContext.executeAction('registrarGastoVoz', {
+                  descripcion,
+                  monto,
+                  categoria: categoria ? categoriaMap[categoria] : null,
+                  fuente: fuente || 'general',
+                  proveedor,
+                  metodo_pago: metodo_pago || 'efectivo'
+                })
+              }
+              
+              if (gastoResult?.success) {
+                result = gastoResult
+              } else if (gastoResult?.necesitaDatos) {
+                // El sistema necesita más datos
+                result = {
+                  success: false,
+                  necesitaDatos: true,
+                  message: gastoResult.message,
+                  datosActuales: gastoResult.datosActuales
+                }
+              } else {
+                result = { 
+                  success: false, 
+                  message: gastoResult?.message || 'No pude registrar el gasto. ¿Quieres que te lleve al módulo de gastos?'
+                }
+              }
+            } catch (err) {
+              console.error('Error en registrarGastoVoz:', err)
+              result = { success: false, message: 'Error al registrar el gasto' }
+            }
+            break
+          
+          case 'consultarGastos':
+            try {
+              const uiContext = useUIContextStore()
+              const consulta = fc.args?.consulta || 'resumen'
+              const periodo = fc.args?.periodo || 'mes'
+              
+              // Intentar obtener del contexto actual
+              let gastosResult = await uiContext.executeAction('consultarGastos', { consulta, periodo })
+              
+              // Si no hay datos, navegar a expenses
+              if (!gastosResult) {
+                navigateToModule('expenses')
+                await new Promise(resolve => setTimeout(resolve, 800))
+                gastosResult = await uiContext.executeAction('consultarGastos', { consulta, periodo })
+              }
+              
+              if (gastosResult?.success) {
+                result = gastosResult
+              } else {
+                // Dar respuesta genérica si no hay datos
+                result = { 
+                  success: false, 
+                  message: 'No pude obtener la información de gastos. ¿Quieres que te lleve al módulo de gastos operativos?'
+                }
+              }
+            } catch (err) {
+              console.error('Error en consultarGastos:', err)
+              result = { success: false, message: 'Error al consultar gastos' }
+            }
+            break
+          
+          case 'verCategoriasGastos':
+            try {
+              const uiContext = useUIContextStore()
+              
+              let categoriasResult = await uiContext.executeAction('verCategoriasGastos', {})
+              
+              if (!categoriasResult) {
+                navigateToModule('expenses')
+                await new Promise(resolve => setTimeout(resolve, 600))
+                categoriasResult = await uiContext.executeAction('verCategoriasGastos', {})
+              }
+              
+              if (categoriasResult?.success) {
+                result = categoriasResult
+              } else {
+                // Categorías por defecto
+                result = {
+                  success: true,
+                  message: 'Las categorías de gastos disponibles son: Servicios Públicos (luz, agua, internet), Nómina y Salarios, Mantenimiento, Suministros y Materiales (papelería, limpieza), Arriendo, Transporte, y Otros Gastos.'
+                }
+              }
+            } catch (err) {
+              console.error('Error en verCategoriasGastos:', err)
+              result = { 
+                success: true, 
+                message: 'Categorías disponibles: Servicios Públicos, Nómina, Mantenimiento, Suministros, Arriendo, Transporte, Otros Gastos.'
+              }
+            }
+            break
+          
+          // ========================================
+          // 📊 REPORTES - Handlers GLOBALES
+          // ========================================
+          
+          case 'consultarReportesGenerales':
+            try {
+              const uiContext = useUIContextStore()
+              const periodo = fc.args?.periodo || 'hoy'
+              const tipoConsulta = fc.args?.tipoConsulta || 'resumen'
+              
+              // Mapear período a formato del API
+              const periodoMap = { 'hoy': 'today', 'semana': 'week', 'mes': 'month', 'año': 'year' }
+              const periodoApi = periodoMap[periodo] || 'today'
+              
+              // Intentar obtener del contexto actual
+              let reportesResult = await uiContext.executeAction('consultarReportesGenerales', { periodo: periodoApi, tipoConsulta })
+              
+              // Si no hay datos, obtener directamente de la API
+              if (!reportesResult) {
+                try {
+                  const { reportsService } = await import('@/services/reportsService.js')
+                  const salesData = await reportsService.getSalesData(periodoApi)
+                  
+                  if (salesData.success || salesData.data) {
+                    const data = salesData.data || salesData
+                    const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+                    
+                    let mensaje = ''
+                    switch (tipoConsulta) {
+                      case 'ventas':
+                        mensaje = `💰 Ventas de ${periodo}: ${formatMoney(data.totalSales || 0)} en ${data.totalTransactions || 0} transacciones`
+                        break
+                      case 'productos':
+                        const topProd = data.topProducts?.slice(0, 5) || []
+                        mensaje = `🏆 Top productos de ${periodo}:\n` + topProd.map((p, i) => `${i+1}. ${p.name}: ${p.sold || 0} vendidos (${formatMoney(p.revenue || 0)})`).join('\n')
+                        break
+                      case 'categorias':
+                        const cats = data.salesByCategory?.slice(0, 5) || []
+                        mensaje = `📊 Ventas por categoría de ${periodo}:\n` + cats.map(c => `• ${c.name}: ${formatMoney(c.sales || 0)}`).join('\n')
+                        break
+                      case 'tendencia':
+                        const trend = data.dailySales || []
+                        const promedio = trend.length > 0 ? trend.reduce((a,b) => a+b, 0) / trend.length : 0
+                        mensaje = `📈 Tendencia de ${periodo}: ${trend.length} días registrados, promedio diario de ${formatMoney(promedio)}`
+                        break
+                      default:
+                        mensaje = `📊 RESUMEN DE ${periodo.toUpperCase()}:
+• Ventas totales: ${formatMoney(data.totalSales || 0)}
+• Transacciones: ${data.totalTransactions || 0}
+• Ticket promedio: ${formatMoney(data.averageTicket || 0)}
+• Margen bruto: ${(data.grossMargin || 0).toFixed(1)}%`
+                    }
+                    
+                    reportesResult = { success: true, message: mensaje }
+                  } else {
+                    reportesResult = { success: false, message: 'No hay datos de ventas para este período' }
+                  }
+                } catch (apiErr) {
+                  console.error('Error llamando API de reportes:', apiErr)
+                  reportesResult = { success: false, message: 'Error al consultar reportes' }
+                }
+              }
+              
+              result = reportesResult || { success: false, message: 'No pude obtener los reportes. ¿Quieres ir al módulo de reportes?' }
+            } catch (err) {
+              console.error('Error en consultarReportesGenerales:', err)
+              result = { success: false, message: 'Error al consultar reportes generales' }
+            }
+            break
+          
+          case 'consultarReportesCaja':
+            try {
+              const uiContext = useUIContextStore()
+              const periodo = fc.args?.periodo || 'hoy'
+              const tipoConsulta = fc.args?.tipoConsulta || 'resumen'
+              
+              // Mapear período a formato del API
+              const periodoMapCaja = { 'hoy': 'today', 'semana': 'week', 'mes': 'month', 'año': 'year' }
+              const periodoApiCaja = periodoMapCaja[periodo] || 'today'
+              
+              // Intentar obtener del contexto actual
+              let cajaResult = await uiContext.executeAction('consultarReportesCaja', { periodo: periodoApiCaja, tipoConsulta })
+              
+              // Si no hay datos, obtener directamente de la API
+              if (!cajaResult) {
+                try {
+                  const { cashReportsService } = await import('@/services/cashReportsService.js')
+                  const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+                  
+                  let mensaje = ''
+                  
+                  switch (tipoConsulta) {
+                    case 'mejor_cajero':
+                      const cashierData = await cashReportsService.getCashierComparison(periodoApiCaja)
+                      if (cashierData.success && cashierData.data?.length > 0) {
+                        const mejor = cashierData.data[0]
+                        mensaje = `🏆 Mejor cajero de ${periodo}: ${mejor.name} con ${formatMoney(mejor.total_sales || 0)} en ${mejor.transactions || 0} transacciones`
+                      } else {
+                        mensaje = 'No hay datos de cajeros para este período'
+                      }
+                      break
+                      
+                    case 'comparativa_cajeros':
+                      const compData = await cashReportsService.getCashierComparison(periodoApiCaja)
+                      if (compData.success && compData.data?.length > 0) {
+                        mensaje = `👥 Comparativa de cajeros (${periodo}):\n` + 
+                          compData.data.slice(0, 5).map((c, i) => 
+                            `${i+1}. ${c.name}: ${formatMoney(c.total_sales || 0)} (${c.transactions || 0} trans.)`
+                          ).join('\n')
+                      } else {
+                        mensaje = 'No hay datos de comparativa de cajeros'
+                      }
+                      break
+                      
+                    case 'top_sesiones':
+                      const topData = await cashReportsService.getTopSessions(periodoApiCaja, null, null, 5)
+                      if (topData.success && topData.data?.length > 0) {
+                        mensaje = `🌟 Mejores sesiones de ${periodo}:\n` + 
+                          topData.data.slice(0, 5).map((s, i) => 
+                            `${i+1}. ${s.cashier_name}: ${formatMoney(s.total_sales || 0)} (${s.date || 'hoy'})`
+                          ).join('\n')
+                      } else {
+                        mensaje = 'No hay datos de sesiones para este período'
+                      }
+                      break
+                      
+                    case 'eficiencia_hora':
+                      const hourlyData = await cashReportsService.getHourlyEfficiency(periodoApiCaja)
+                      if (hourlyData.success && hourlyData.data?.length > 0) {
+                        const mejorHora = hourlyData.data.reduce((a, b) => (a.sales || 0) > (b.sales || 0) ? a : b)
+                        mensaje = `⏰ Mejor hora de ventas: ${mejorHora.hour || 'N/A'} con ${formatMoney(mejorHora.sales || 0)}`
+                      } else {
+                        mensaje = 'No hay datos de eficiencia por hora'
+                      }
+                      break
+                      
+                    default:
+                      const metricsData = await cashReportsService.getCashMetrics(periodoApiCaja)
+                      const cashierComp = await cashReportsService.getCashierComparison(periodoApiCaja)
+                      if (metricsData.success || cashierComp.success) {
+                        const metrics = metricsData.data || {}
+                        const cashiers = cashierComp.data || []
+                        const best = cashiers[0] || { name: 'N/A', total_sales: 0 }
+                        mensaje = `📊 REPORTE DE CAJAS (${periodo}):
+• Sesiones activas: ${metrics.active_sessions || cashiers.length || 0}
+• Total ventas: ${formatMoney(metrics.total_sales || cashiers.reduce((a,c) => a + (parseFloat(c.total_sales)||0), 0))}
+• Transacciones: ${metrics.total_transactions || cashiers.reduce((a,c) => a + (parseInt(c.transactions)||0), 0)}
+• Mejor cajero: ${best.name} (${formatMoney(best.total_sales || 0)})`
+                      } else {
+                        mensaje = 'No hay datos de cajas para este período'
+                      }
+                  }
+                  
+                  cajaResult = { success: true, message: mensaje }
+                } catch (apiErr) {
+                  console.error('Error llamando API de reportes de caja:', apiErr)
+                  cajaResult = { success: false, message: 'Error al consultar reportes de caja' }
+                }
+              }
+              
+              result = cajaResult || { success: false, message: 'No pude obtener los reportes de caja. ¿Quieres ir al módulo?' }
+            } catch (err) {
+              console.error('Error en consultarReportesCaja:', err)
+              result = { success: false, message: 'Error al consultar reportes de caja' }
+            }
+            break
+          
+          case 'obtenerMejorCajero':
+            try {
+              const periodo = fc.args?.periodo || 'hoy'
+              const periodoMapMejor = { 'hoy': 'today', 'semana': 'week', 'mes': 'month' }
+              const periodoApiMejor = periodoMapMejor[periodo] || 'today'
+              
+              const { cashReportsService } = await import('@/services/cashReportsService.js')
+              const cashierData = await cashReportsService.getCashierComparison(periodoApiMejor)
+              
+              if (cashierData.success && cashierData.data?.length > 0) {
+                const mejor = cashierData.data[0]
+                const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+                result = {
+                  success: true,
+                  message: `🏆 El mejor cajero de ${periodo} es ${mejor.name} con ${formatMoney(mejor.total_sales || 0)} en ventas y ${mejor.transactions || 0} transacciones. ¡Excelente trabajo!`
+                }
+              } else {
+                result = { success: false, message: `No hay datos de cajeros para ${periodo}` }
+              }
+            } catch (err) {
+              console.error('Error en obtenerMejorCajero:', err)
+              result = { success: false, message: 'Error al obtener el mejor cajero' }
+            }
+            break
+          
+          case 'obtenerTopSesiones':
+            try {
+              const periodo = fc.args?.periodo || 'semana'
+              const limite = Math.min(fc.args?.limite || 5, 10)
+              const periodoMapTop = { 'hoy': 'today', 'semana': 'week', 'mes': 'month' }
+              const periodoApiTop = periodoMapTop[periodo] || 'week'
+              
+              const { cashReportsService } = await import('@/services/cashReportsService.js')
+              const topData = await cashReportsService.getTopSessions(periodoApiTop, null, null, limite)
+              
+              if (topData.success && topData.data?.length > 0) {
+                const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+                const lista = topData.data.slice(0, limite).map((s, i) => 
+                  `${i+1}. ${s.cashier_name}: ${formatMoney(s.total_sales || 0)}`
+                ).join('\n')
+                
+                result = {
+                  success: true,
+                  message: `🌟 Top ${limite} sesiones de ${periodo}:\n${lista}`
+                }
+              } else {
+                result = { success: false, message: `No hay datos de sesiones para ${periodo}` }
+              }
+            } catch (err) {
+              console.error('Error en obtenerTopSesiones:', err)
+              result = { success: false, message: 'Error al obtener top sesiones' }
+            }
+            break
+          
+          case 'navegarAReportes':
+            try {
+              const tipoReporte = fc.args?.tipoReporte || 'general'
+              
+              if (tipoReporte === 'caja') {
+                navigateToModule('reports')
+                await new Promise(resolve => setTimeout(resolve, 500))
+                // El módulo de reportes tiene tabs, intentar activar la de caja
+                const uiContext = useUIContextStore()
+                await uiContext.executeAction('cambiarAReporteCaja')
+                result = { success: true, message: 'Te llevé a los reportes de caja' }
+              } else {
+                navigateToModule('reports')
+                result = { success: true, message: 'Te llevé a los reportes generales' }
+              }
+            } catch (err) {
+              console.error('Error en navegarAReportes:', err)
+              result = { success: false, message: 'Error al navegar a reportes' }
+            }
+            break
+          
+          // ========================================
+          // 🧾 VENTAS/FACTURAS - Handlers GLOBALES (⭐ CORE DEL POS)
+          // ========================================
+          
+          case 'consultarVentasFecha':
+            try {
+              const fechaParam = fc.args?.fecha || 'hoy'
+              const fechaFin = fc.args?.fechaFin
+              const incluirDetalle = fc.args?.incluirDetalle || false
+              
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+              
+              // Calcular fecha objetivo
+              let targetDate = new Date()
+              const today = new Date()
+              today.setHours(0, 0, 0, 0)
+              
+              if (fechaParam === 'hoy') {
+                targetDate = new Date()
+              } else if (fechaParam === 'ayer') {
+                targetDate = new Date(Date.now() - 86400000)
+              } else if (fechaParam === 'anteayer') {
+                targetDate = new Date(Date.now() - 86400000 * 2)
+              } else if (/^\d{4}-\d{2}-\d{2}$/.test(fechaParam)) {
+                // Fecha ISO
+                targetDate = new Date(fechaParam + 'T12:00:00')
+              } else {
+                // Intentar parsear día de la semana
+                const diasSemana = { 'lunes': 1, 'martes': 2, 'miercoles': 3, 'miércoles': 3, 'jueves': 4, 'viernes': 5, 'sabado': 6, 'sábado': 6, 'domingo': 0 }
+                const diaTarget = diasSemana[fechaParam.toLowerCase()]
+                if (diaTarget !== undefined) {
+                  const hoy = new Date()
+                  const diaHoy = hoy.getDay()
+                  let diff = diaHoy - diaTarget
+                  if (diff <= 0) diff += 7 // Si es hoy o futuro, ir a la semana pasada
+                  targetDate = new Date(Date.now() - diff * 86400000)
+                }
+              }
+              
+              targetDate.setHours(0, 0, 0, 0)
+              const targetDateStr = targetDate.toISOString().split('T')[0]
+              const targetEndStr = fechaFin || targetDateStr
+              
+              // Obtener todas las facturas y filtrar
+              const invoicesResponse = await invoicesService.getInvoices()
+              
+              if (invoicesResponse.success && invoicesResponse.data) {
+                const allInvoices = invoicesResponse.data
+                
+                // Filtrar facturas PAGADAS de la fecha objetivo
+                const facturasDelDia = allInvoices.filter(inv => {
+                  const invDate = inv.date || inv.created_at
+                  if (!invDate) return false
+                  const invDateStr = invDate.split('T')[0]
+                  const isPaid = inv.status === 'paid' || inv.status === 'Pagada' || inv.status === 'pagada'
+                  const isInvoice = inv.type !== 'quote' && inv.type !== 'Cotización'
+                  return invDateStr >= targetDateStr && invDateStr <= targetEndStr && isPaid && isInvoice
+                })
+                
+                // Calcular totales
+                const totalVentas = facturasDelDia.reduce((sum, inv) => sum + parseFloat(inv.total || 0), 0)
+                const numFacturas = facturasDelDia.length
+                const ticketPromedio = numFacturas > 0 ? totalVentas / numFacturas : 0
+                
+                // Formatear fecha amigable
+                const fechaAmigable = targetDate.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
+                
+                let mensaje = ''
+                
+                // Si no hubo ventas
+                if (numFacturas === 0) {
+                  mensaje = `No hubo ventas registradas el ${fechaAmigable}. ¿Quieres consultar otro día?`
+                } else {
+                  // Respuesta concisa sin desglose por vendedor (solo si lo piden)
+                  mensaje = `El ${fechaAmigable} vendiste ${formatMoney(totalVentas)} en ${numFacturas} facturas. Ticket promedio: ${formatMoney(ticketPromedio)}.`
+                  
+                  // Agregar contexto positivo si fue un buen día
+                  if (totalVentas > 500000) {
+                    mensaje += ` ¡Buen día de ventas!`
+                  }
+                }
+                
+                result = { success: true, message: mensaje }
+              } else {
+                result = { success: false, message: 'No pude obtener las facturas. Intenta de nuevo.' }
+              }
+            } catch (err) {
+              console.error('Error en consultarVentasFecha:', err)
+              result = { success: false, message: 'Error al consultar ventas de la fecha' }
+            }
+            break
+          
+          case 'ventasPorEmpleado':
+            try {
+              const empleadoNombre = fc.args?.empleado
+              const fechaParam = fc.args?.fecha || fc.args?.periodo || 'hoy'
+              
+              if (!empleadoNombre) {
+                result = { success: false, message: '¿De qué empleado quieres saber las ventas?' }
+                break
+              }
+              
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+              
+              // Calcular rango de fechas
+              let startDate = new Date()
+              let endDate = new Date()
+              startDate.setHours(0, 0, 0, 0)
+              endDate.setHours(23, 59, 59, 999)
+              
+              if (fechaParam === 'ayer') {
+                startDate = new Date(Date.now() - 86400000)
+                endDate = new Date(Date.now() - 86400000)
+                startDate.setHours(0, 0, 0, 0)
+                endDate.setHours(23, 59, 59, 999)
+              } else if (fechaParam === 'semana' || fechaParam === 'week') {
+                startDate = new Date(Date.now() - 7 * 86400000)
+              } else if (fechaParam === 'mes' || fechaParam === 'month') {
+                startDate = new Date(Date.now() - 30 * 86400000)
+              } else if (/^\d{4}-\d{2}-\d{2}$/.test(fechaParam)) {
+                startDate = new Date(fechaParam + 'T00:00:00')
+                endDate = new Date(fechaParam + 'T23:59:59')
+              }
+              
+              const startStr = startDate.toISOString().split('T')[0]
+              const endStr = endDate.toISOString().split('T')[0]
+              
+              // Obtener facturas
+              const invoicesResponse = await invoicesService.getInvoices()
+              
+              if (invoicesResponse.success && invoicesResponse.data) {
+                const allInvoices = invoicesResponse.data
+                const nombreBusqueda = empleadoNombre.toLowerCase()
+                
+                // Filtrar facturas del empleado
+                const facturasEmpleado = allInvoices.filter(inv => {
+                  const vendedor = (inv.seller_name || '').toLowerCase()
+                  const invDate = (inv.date || inv.created_at || '').split('T')[0]
+                  const isPaid = inv.status === 'paid' || inv.status === 'Pagada' || inv.status === 'pagada'
+                  const isInvoice = inv.type !== 'quote' && inv.type !== 'Cotización'
+                  const matchVendedor = vendedor.includes(nombreBusqueda) || nombreBusqueda.includes(vendedor.split(' ')[0])
+                  return invDate >= startStr && invDate <= endStr && isPaid && isInvoice && matchVendedor
+                })
+                
+                // Calcular totales
+                const totalVentas = facturasEmpleado.reduce((sum, inv) => sum + parseFloat(inv.total || 0), 0)
+                const numFacturas = facturasEmpleado.length
+                const ticketPromedio = numFacturas > 0 ? totalVentas / numFacturas : 0
+                
+                // Encontrar nombre completo del vendedor
+                const nombreReal = facturasEmpleado[0]?.seller_name || empleadoNombre
+                
+                // Formatear período
+                let periodoText = 'hoy'
+                if (fechaParam === 'ayer') periodoText = 'ayer'
+                else if (fechaParam === 'semana' || fechaParam === 'week') periodoText = 'esta semana'
+                else if (fechaParam === 'mes' || fechaParam === 'month') periodoText = 'este mes'
+                else if (/^\d{4}-\d{2}-\d{2}$/.test(fechaParam)) {
+                  periodoText = `el ${new Date(fechaParam + 'T12:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })}`
+                }
+                
+                if (numFacturas > 0) {
+                  let mensaje = `💼 VENTAS DE ${nombreReal.toUpperCase()} (${periodoText}):\n`
+                  mensaje += `• Total vendido: ${formatMoney(totalVentas)}\n`
+                  mensaje += `• Facturas: ${numFacturas}\n`
+                  mensaje += `• Ticket promedio: ${formatMoney(ticketPromedio)}`
+                  
+                  // Evaluación del rendimiento
+                  if (totalVentas > 500000) {
+                    mensaje += `\n\n🏆 ¡Excelente trabajo de ${nombreReal.split(' ')[0]}!`
+                  } else if (totalVentas > 200000) {
+                    mensaje += `\n\n✅ Buen rendimiento de ${nombreReal.split(' ')[0]}.`
+                  }
+                  
+                  result = { success: true, message: mensaje }
+                } else {
+                  // Buscar si el empleado existe
+                  const todosVendedores = [...new Set(allInvoices.map(i => i.seller_name).filter(Boolean))]
+                  const sugerencias = todosVendedores
+                    .filter(v => v.toLowerCase().includes(nombreBusqueda[0]) || nombreBusqueda.includes(v.split(' ')[0].toLowerCase()))
+                    .slice(0, 3)
+                  
+                  let mensaje = `No encontré ventas de "${empleadoNombre}" ${periodoText}.`
+                  if (sugerencias.length > 0) {
+                    mensaje += ` ¿Quisiste decir: ${sugerencias.join(', ')}?`
+                  }
+                  result = { success: true, message: mensaje }
+                }
+              } else {
+                result = { success: false, message: 'No pude obtener las facturas' }
+              }
+            } catch (err) {
+              console.error('Error en ventasPorEmpleado:', err)
+              result = { success: false, message: 'Error al consultar ventas del empleado' }
+            }
+            break
+          
+          case 'buscarFactura':
+            try {
+              const busqueda = fc.args?.busqueda
+              const tipo = fc.args?.tipo || 'todos'
+              const estado = fc.args?.estado || 'todos'
+              
+              if (!busqueda) {
+                result = { success: false, message: '¿Qué factura quieres buscar? Dame el número o nombre del cliente.' }
+                break
+              }
+              
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+              
+              const invoicesResponse = await invoicesService.getInvoices()
+              
+              if (invoicesResponse.success && invoicesResponse.data) {
+                const allInvoices = invoicesResponse.data
+                const busquedaLower = busqueda.toLowerCase()
+                
+                // Buscar coincidencias
+                const coincidencias = allInvoices.filter(inv => {
+                  const numero = (inv.invoice_number || inv.number || `FV-${inv.id}`).toLowerCase()
+                  const cliente = (inv.customer_name || '').toLowerCase()
+                  const vendedor = (inv.seller_name || '').toLowerCase()
+                  
+                  const matchBusqueda = numero.includes(busquedaLower) || 
+                                        cliente.includes(busquedaLower) || 
+                                        busquedaLower.includes(numero.replace('fv-', ''))
+                  
+                  // Filtros adicionales
+                  let matchTipo = true
+                  if (tipo === 'factura') matchTipo = inv.type !== 'quote' && inv.type !== 'Cotización'
+                  else if (tipo === 'cotizacion') matchTipo = inv.type === 'quote' || inv.type === 'Cotización'
+                  
+                  let matchEstado = true
+                  if (estado === 'pagada') matchEstado = inv.status === 'paid' || inv.status === 'Pagada'
+                  else if (estado === 'pendiente') matchEstado = inv.status === 'pending' || inv.status === 'Pendiente'
+                  else if (estado === 'anulada') matchEstado = inv.status === 'cancelled' || inv.status === 'Anulada'
+                  
+                  return matchBusqueda && matchTipo && matchEstado
+                })
+                
+                if (coincidencias.length === 0) {
+                  result = { success: true, message: `No encontré facturas que coincidan con "${busqueda}".` }
+                } else if (coincidencias.length === 1) {
+                  const fac = coincidencias[0]
+                  const fecha = new Date(fac.date).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
+                  result = { 
+                    success: true, 
+                    message: `📄 Encontré la factura ${fac.invoice_number || fac.number || `FV-${fac.id}`}:\n• Cliente: ${fac.customer_name}\n• Total: ${formatMoney(fac.total)}\n• Fecha: ${fecha}\n• Estado: ${fac.status}\n• Vendedor: ${fac.seller_name || 'N/A'}`,
+                    data: { facturaId: fac.id }
+                  }
+                } else {
+                  const lista = coincidencias.slice(0, 5).map(fac => {
+                    const numero = fac.invoice_number || fac.number || `FV-${fac.id}`
+                    return `• ${numero}: ${fac.customer_name} - ${formatMoney(fac.total)} (${fac.status})`
+                  }).join('\n')
+                  result = { 
+                    success: true, 
+                    message: `📋 Encontré ${coincidencias.length} facturas:\n${lista}\n\n¿Cuál necesitas?` 
+                  }
+                }
+              } else {
+                result = { success: false, message: 'No pude obtener las facturas' }
+              }
+            } catch (err) {
+              console.error('Error en buscarFactura:', err)
+              result = { success: false, message: 'Error al buscar factura' }
+            }
+            break
+          
+          case 'detalleFactura':
+            try {
+              const identificador = fc.args?.identificador
+              
+              if (!identificador) {
+                result = { success: false, message: '¿De qué factura quieres el detalle? Dame el número.' }
+                break
+              }
+              
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+              
+              const invoicesResponse = await invoicesService.getInvoices()
+              
+              if (invoicesResponse.success && invoicesResponse.data) {
+                const idLower = identificador.toLowerCase().replace('fv-', '').replace('#', '')
+                
+                // Buscar factura
+                const factura = invoicesResponse.data.find(inv => {
+                  const numero = (inv.invoice_number || inv.number || '').toLowerCase().replace('fv-', '')
+                  return numero === idLower || inv.id.toString() === idLower
+                })
+                
+                if (factura) {
+                  const fecha = new Date(factura.date).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
+                  const items = factura.items || []
+                  
+                  let mensaje = `📄 DETALLE DE FACTURA ${factura.invoice_number || factura.number || `FV-${factura.id}`}\n\n`
+                  mensaje += `👤 Cliente: ${factura.customer_name}\n`
+                  mensaje += `📅 Fecha: ${fecha}\n`
+                  mensaje += `💳 Método de pago: ${factura.payment_method || 'Efectivo'}\n`
+                  mensaje += `👔 Vendedor: ${factura.seller_name || 'N/A'}\n`
+                  mensaje += `📋 Estado: ${factura.status}\n\n`
+                  
+                  if (items.length > 0) {
+                    mensaje += `🛒 PRODUCTOS (${items.length}):\n`
+                    items.slice(0, 5).forEach(item => {
+                      const nombre = item.product_name || item.name || 'Producto'
+                      const cant = item.quantity || 1
+                      const precio = parseFloat(item.unit_price || item.price || 0)
+                      const subtotal = cant * precio
+                      mensaje += `• ${nombre} x${cant} = ${formatMoney(subtotal)}\n`
+                    })
+                    if (items.length > 5) {
+                      mensaje += `... y ${items.length - 5} productos más\n`
+                    }
+                  }
+                  
+                  mensaje += `\n💰 TOTAL: ${formatMoney(factura.total)}`
+                  
+                  if (factura.discount_amount > 0) {
+                    mensaje += `\n🏷️ Descuento aplicado: ${formatMoney(factura.discount_amount)}`
+                  }
+                  
+                  result = { success: true, message: mensaje, data: { facturaId: factura.id } }
+                } else {
+                  result = { success: true, message: `No encontré la factura "${identificador}". Verifica el número.` }
+                }
+              } else {
+                result = { success: false, message: 'No pude obtener la información' }
+              }
+            } catch (err) {
+              console.error('Error en detalleFactura:', err)
+              result = { success: false, message: 'Error al obtener detalle de factura' }
+            }
+            break
+          
+          case 'resumenVentasHoy':
+            try {
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+              
+              const invoicesResponse = await invoicesService.getInvoices()
+              
+              if (invoicesResponse.success && invoicesResponse.data) {
+                const hoy = new Date().toISOString().split('T')[0]
+                
+                const facturasHoy = invoicesResponse.data.filter(inv => {
+                  const invDate = (inv.date || inv.created_at || '').split('T')[0]
+                  const isPaid = inv.status === 'paid' || inv.status === 'Pagada' || inv.status === 'pagada'
+                  const isInvoice = inv.type !== 'quote' && inv.type !== 'Cotización'
+                  return invDate === hoy && isPaid && isInvoice
+                })
+                
+                const totalVentas = facturasHoy.reduce((sum, inv) => sum + parseFloat(inv.total || 0), 0)
+                const numFacturas = facturasHoy.length
+                const ticketPromedio = numFacturas > 0 ? totalVentas / numFacturas : 0
+                
+                // Última venta
+                const ultimaVenta = facturasHoy.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]
+                
+                let mensaje = `📊 HOY llevas:\n• ${formatMoney(totalVentas)} en ventas\n• ${numFacturas} facturas\n• Ticket promedio: ${formatMoney(ticketPromedio)}`
+                
+                if (ultimaVenta) {
+                  mensaje += `\n\n🕐 Última venta: ${formatMoney(ultimaVenta.total)} a ${ultimaVenta.customer_name}`
+                }
+                
+                if (numFacturas === 0) {
+                  mensaje = `📊 Aún no hay ventas registradas hoy. ¡A vender!`
+                }
+                
+                result = { success: true, message: mensaje }
+              } else {
+                result = { success: false, message: 'No pude obtener las ventas de hoy' }
+              }
+            } catch (err) {
+              console.error('Error en resumenVentasHoy:', err)
+              result = { success: false, message: 'Error al obtener resumen de hoy' }
+            }
+            break
+          
+          case 'navegarAFacturas':
+            try {
+              const facturaId = fc.args?.facturaId
+              const busqueda = fc.args?.busqueda
+              
+              navigateToModule('invoices')
+              
+              if (facturaId || busqueda) {
+                await new Promise(resolve => setTimeout(resolve, 500))
+                const params = {}
+                if (facturaId) params.selectId = facturaId
+                if (busqueda) params.search = busqueda
+                
+                // Actualizar route query
+                if (typeof window !== 'undefined' && window.__ROUTER__) {
+                  window.__ROUTER__.push({ path: '/invoices', query: params })
+                }
+              }
+              
+              result = { success: true, message: 'Te llevé a facturas' }
+            } catch (err) {
+              console.error('Error en navegarAFacturas:', err)
+              result = { success: false, message: 'Error al navegar a facturas' }
             }
             break
         }

@@ -164,7 +164,8 @@
 </template>
 
 <script setup>
-import { ref, defineAsyncComponent } from 'vue'
+import { ref, defineAsyncComponent, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useUIContextStore } from '@/store/uiContextStore'
 
 // Componentes lazy loading
 const ReportsView = defineAsyncComponent(() => import('./ReportsView.vue'))
@@ -173,10 +174,70 @@ const ReportesCajaView = defineAsyncComponent(() => import('./ReportesCajaView.v
 // Estado reactivo
 const activeReport = ref('general')
 
+// Store de contexto IA
+const uiContextStore = useUIContextStore()
+
 // Métodos
 const setActiveReport = (report) => {
   activeReport.value = report
 }
+
+// ═══════════════════════════════════════════════════════════════
+// 🤖 CONTEXTO IA - Menú de Reportes
+// ═══════════════════════════════════════════════════════════════
+
+// Actualizar contexto para la IA
+const actualizarContextoIA = () => {
+  uiContextStore.setScreenData('reports-menu', {
+    modulo: 'Reportes',
+    descripcion: 'Menú principal de reportes con acceso a Reportes Generales y Reportes de Caja',
+    reporteActivo: activeReport.value,
+    reportesDisponibles: ['general', 'caja'],
+    reporteActivoNombre: activeReport.value === 'general' ? 'Reportes Generales' : 
+                         activeReport.value === 'caja' ? 'Reportes de Caja' : 'Otro'
+  })
+}
+
+// Registrar acciones disponibles para la IA
+const registrarAccionesIA = () => {
+  // Cambiar a reporte de caja
+  uiContextStore.registerAction('cambiarAReporteCaja', async () => {
+    activeReport.value = 'caja'
+    return { success: true, message: 'Cambiado a Reportes de Caja' }
+  })
+  
+  // Cambiar a reporte general
+  uiContextStore.registerAction('cambiarAReporteGeneral', async () => {
+    activeReport.value = 'general'
+    return { success: true, message: 'Cambiado a Reportes Generales' }
+  })
+  
+  // Cambiar tipo de reporte
+  uiContextStore.registerAction('cambiarTipoReporte', async ({ tipo }) => {
+    if (tipo === 'caja' || tipo === 'cajeros') {
+      activeReport.value = 'caja'
+      return { success: true, message: 'Cambiado a Reportes de Caja' }
+    } else if (tipo === 'general' || tipo === 'ventas') {
+      activeReport.value = 'general'
+      return { success: true, message: 'Cambiado a Reportes Generales' }
+    }
+    return { success: false, message: 'Tipo de reporte no válido. Usa "general" o "caja".' }
+  })
+}
+
+onMounted(() => {
+  registrarAccionesIA()
+  actualizarContextoIA()
+})
+
+onBeforeUnmount(() => {
+  uiContextStore.clearSelection()
+})
+
+// Actualizar contexto cuando cambia el reporte activo
+watch(activeReport, () => {
+  actualizarContextoIA()
+})
 </script>
 
 <style scoped>

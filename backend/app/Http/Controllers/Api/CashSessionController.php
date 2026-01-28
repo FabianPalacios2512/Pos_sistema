@@ -357,6 +357,11 @@ class CashSessionController extends Controller
                 ->with(['customer', 'originalInvoice'])
                 ->get();
 
+            // Obtener todos los gastos de esta sesión
+            $expenses = \App\Models\Expense::where('cash_session_id', $sessionId)
+                ->with(['category', 'user'])
+                ->get();
+
             // Crear timeline de eventos
             $timeline = [];
 
@@ -432,6 +437,25 @@ class CashSessionController extends Controller
                 ];
             }
 
+            // Eventos de gastos
+            foreach ($expenses as $expense) {
+                $timeline[] = [
+                    'type' => 'expense',
+                    'timestamp' => $expense->created_at,
+                    'description' => "Gasto: {$expense->description}",
+                    'amount' => -$expense->amount, // Negativo porque es un egreso
+                    'details' => [
+                        'expense_id' => $expense->id,
+                        'category' => $expense->category->name ?? 'Sin categoría',
+                        'category_color' => $expense->category->color ?? '#6B7280',
+                        'payment_method' => $expense->payment_method,
+                        'supplier' => $expense->supplier,
+                        'receipt_number' => $expense->receipt_number,
+                        'user' => $expense->user->name ?? 'Usuario'
+                    ]
+                ];
+            }
+
             // Ordenar timeline cronológicamente (excluyendo apertura que debe estar primera)
             $opening = array_shift($timeline); // Remover apertura temporalmente
             usort($timeline, function($a, $b) {
@@ -466,6 +490,10 @@ class CashSessionController extends Controller
             // Estadísticas de la sesión
             $stats = [
                 'total_transactions' => $invoices->count(),
+                'total_returns' => $returns->count(),
+                'total_returns_amount' => $returns->sum('total'),
+                'total_expenses' => $expenses->count(),
+                'total_expenses_amount' => $expenses->sum('amount'),
                 'payment_methods_breakdown' => $invoices->groupBy('payment_method')->map(function($group) {
                     return [
                         'count' => $group->count(),
@@ -483,7 +511,9 @@ class CashSessionController extends Controller
                 'session' => $session,
                 'timeline' => $timeline,
                 'statistics' => $stats,
-                'invoices' => $invoices
+                'invoices' => $invoices,
+                'returns' => $returns,
+                'expenses' => $expenses
             ]);
 
         } catch (\Exception $e) {

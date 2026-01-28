@@ -42,6 +42,10 @@ export const useUIContextStore = defineStore('uiContext', () => {
   // Estructura libre según el módulo. Ej para Dashboard:
   // { estadoCaja: {...}, ventasHoy: {...}, topProductos: [...], alertasStock: {...} }
   
+  // 🔒 Último error de navegación (para notificar a la IA cuando no tiene permisos)
+  const lastNavigationError = ref(null)
+  // Estructura: { module: 'users', moduleName: 'Usuarios', roleName: 'Vendedor', message: '...' }
+  
   // ═══════════════════════════════════════════════════════════════
   // 🌐 DATOS GLOBALES DEL NEGOCIO (SIEMPRE DISPONIBLES PARA LA IA)
   // ═══════════════════════════════════════════════════════════════
@@ -121,11 +125,21 @@ export const useUIContextStore = defineStore('uiContext', () => {
       'stock': 'Control de Stock',
       'returns-management': 'Devoluciones',
       'reports': 'Reportes',
+      'reportes': 'Reportes',
+      'reports-general': 'Reportes Generales',
+      'reportes-generales': 'Reportes Generales',
+      'reports-caja': 'Reportes de Caja',
+      'reportes-caja': 'Reportes de Caja',
       'settings': 'Configuración',
       'warehouses': 'Bodegas',
       'intelligent_inventory': 'Inventario Inteligente',
       'operational-expenses': 'Gastos Operativos',
-      'cash-register': 'Control de Caja'
+      'expenses': 'Gastos Operativos',
+      'gastos': 'Gastos Operativos',
+      'cash-register': 'Control de Caja',
+      'cash-admin': 'Control de Cajas',
+      'users-management': 'Usuarios y Roles',
+      'users': 'Usuarios y Roles'
     }
     
     let summary = `Estás en: ${moduleNames[currentModule.value] || currentModule.value}`
@@ -379,6 +393,18 @@ export const useUIContextStore = defineStore('uiContext', () => {
     screenData.value = { ...screenData.value, ...partialData }
   }
   
+  // 🔒 Establecer error de navegación (para la IA)
+  const setLastNavigationError = (error) => {
+    lastNavigationError.value = error
+  }
+  
+  // 🔒 Obtener y limpiar error de navegación (para la IA)
+  const getAndClearNavigationError = () => {
+    const error = lastNavigationError.value
+    lastNavigationError.value = null
+    return error
+  }
+  
   // ═══════════════════════════════════════════════════════════════
   // 🌐 FUNCIONES PARA DATOS GLOBALES DEL NEGOCIO
   // ═══════════════════════════════════════════════════════════════
@@ -545,6 +571,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
     availableActions,
     screenData, // 🧠 Exponer datos de pantalla
     globalBusinessData, // 🌐 Exponer datos globales
+    lastNavigationError, // 🔒 Error de navegación por permisos
     
     // Computed
     contextSummary,
@@ -560,6 +587,8 @@ export const useUIContextStore = defineStore('uiContext', () => {
     getContextForAI,
     setScreenData,     // 🧠 Nueva función
     updateScreenData,  // 🧠 Nueva función
+    setLastNavigationError, // 🔒 Error de navegación
+    getAndClearNavigationError, // 🔒 Obtener y limpiar error
     
     // 🌐 Datos Globales del Negocio
     setGlobalBusinessData,

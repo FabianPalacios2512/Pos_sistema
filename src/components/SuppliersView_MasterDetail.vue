@@ -835,7 +835,7 @@ import { useModuleNavigation } from '../composables/useModuleNavigation'
 
 export default {
   name: 'SuppliersViewMasterDetail',
-  emits: ['supplier-created'],
+  emits: ['supplier-created', 'supplier-selected'],
   data() {
     return {
       loading: false,
@@ -966,6 +966,7 @@ export default {
       this.selectedSupplier = supplier
       this.viewMode = 'detail'
       this.loadSupplierProducts(supplier.id)
+      this.$emit('supplier-selected', supplier) // Notificar al padre
     },
     
     showCreateForm() {

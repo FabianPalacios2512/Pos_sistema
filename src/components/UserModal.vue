@@ -262,6 +262,41 @@ const handleSubmit = async () => {
     loading.value = false
   }
 }
+
+// 🤖 Exponer form y métodos para que la IA pueda llenar campos
+const setFieldValue = (campo, valor) => {
+  const campoMap = {
+    'name': 'name',
+    'nombre': 'name',
+    'email': 'email',
+    'correo': 'email',
+    'password': 'password',
+    'contraseña': 'password',
+    'clave': 'password',
+    'cc': 'cc',
+    'cedula': 'cc',
+    'documento': 'cc',
+    'phone': 'phone',
+    'telefono': 'phone',
+    'role_id': 'role_id',
+    'rol': 'role_id'
+  }
+  
+  const campoReal = campoMap[campo.toLowerCase()] || campo
+  
+  if (campoReal in form.value) {
+    form.value[campoReal] = valor
+    return true
+  }
+  return false
+}
+
+defineExpose({
+  form,
+  setFieldValue,
+  handleSubmit,
+  resetForm
+})
 </script>
 
 <style scoped>

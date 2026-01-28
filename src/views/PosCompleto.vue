@@ -431,7 +431,12 @@ const hasModulePermission = (module) => {
     'accounts-receivable': 'customers.view',  // Cuentas por Cobrar → permiso de ver clientes
     'warehouses': 'stock.view',               // Gestión de Sedes → permiso de ver stock
     'stock-transfers': 'stock.transfer',      // Traslados → permiso de transferir stock
-    'purchase-orders': 'suppliers.view'       // Órdenes de Compra → permiso de ver proveedores
+    'purchase-orders': 'suppliers.view',      // Órdenes de Compra → permiso de ver proveedores
+    'users-management': 'users.view',         // Usuarios y Roles → permiso de ver usuarios (desde IA)
+    'users': 'users.view',                    // Usuarios (desde menú) → permiso de ver usuarios
+    'roles': 'users.view',                    // Roles → permiso de ver usuarios
+    'intelligent_inventory': 'products.view', // Inventario Inteligente → permiso de ver productos
+    'categories': 'categories.view'           // Categorías → permiso de ver categorías
   }
   
   // Si el módulo tiene un mapeo especial, verificar ese permiso específico
@@ -1221,6 +1226,7 @@ const currentModuleComponent = computed(() => {
     invoices: InvoicesView,
     'accounts-receivable': AccountsReceivableView,
     users: UsersManagementView,
+    'users-management': UsersManagementView,  // Alias para navegación desde IA
     roles: RolesView,
     reports: ReportsMenuView,
     settings: SettingsView,
@@ -1257,15 +1263,49 @@ const setCurrentModule = (module, options = {}) => {
   // SOLO si el usuario ya está cargado (evitar check durante inicialización)
   // Y si NO es un módulo público
   if (currentUser.value && currentUser.value.name !== 'Cargando...' && !publicModules.includes(module) && !hasModulePermission(module)) {
-    alert('No tienes permisos para acceder a este módulo')
-    return
+    // Obtener nombre del rol para mensaje informativo
+    const roleName = currentUser.value?.role?.name || 'tu rol actual'
+    const moduleNames = {
+      'users': 'Usuarios y Roles',
+      'users-management': 'Usuarios y Roles',
+      'roles': 'Gestión de Roles',
+      'categories': 'Categorías',
+      'intelligent_inventory': 'Inventario Inteligente',
+      'purchase-orders': 'Proveedores',
+      'warehouses': 'Sedes y Bodegas',
+      'accounts-receivable': 'Creditienda',
+      'returns-management': 'Devoluciones',
+      'cash-admin': 'Panel Administrativo',
+      'reports': 'Reportes',
+      'settings': 'Configuración'
+    }
+    const moduleFriendlyName = moduleNames[module] || module
+    
+    // 🔒 Notificar al contexto UI del error de permisos (para que la IA pueda responder)
+    uiContext.setLastNavigationError({
+      module: module,
+      moduleName: moduleFriendlyName,
+      roleName: roleName,
+      message: `No tienes permiso para acceder a ${moduleFriendlyName}. Tu rol de "${roleName}" no incluye este módulo.`
+    })
+    
+    console.log(`🚫 [PosCompleto] Navegación denegada a ${module}. Rol: ${roleName}`)
+    
+    // Solo mostrar alert si NO viene de navegación por IA (options.fromAI)
+    if (!options.fromAI) {
+      alert('No tienes permisos para acceder a este módulo')
+    }
+    return false
   }
+  
+  // Limpiar cualquier error de navegación previo
+  uiContext.setLastNavigationError(null)
   
   // Si está en POS y hay productos en el carrito, mostrar confirmación
   if (currentModule.value === 'pos' && cartHasItems.value && module !== 'pos') {
     pendingModule.value = module
     showCartWarningModal.value = true
-    return
+    return false
   }
 
   currentModule.value = module
@@ -1764,7 +1804,8 @@ onMounted(() => {
   // Registrar listener para navegación global (desde chat AI u otros componentes)
   onModuleChange((moduleName, queryParams = {}) => {
     console.log('🎯 [PosCompleto] Recibido cambio de módulo global:', moduleName, 'Query:', queryParams)
-    setCurrentModule(moduleName)
+    // Pasar fromAI: true para que NO muestre alert() cuando falla por permisos
+    setCurrentModule(moduleName, { fromAI: true })
     
     // Si hay query params (filtros), almacenarlos para que los módulos los usen
     if (Object.keys(queryParams).length > 0) {

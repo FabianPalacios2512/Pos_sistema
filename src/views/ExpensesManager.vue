@@ -690,6 +690,7 @@
 
 <script>
 import apiClient from '@/services/apiClient';
+import { useUIContextStore } from '@/store/uiContextStore';
 
 export default {
   name: 'ExpensesManager',
@@ -732,15 +733,324 @@ export default {
         notes: '',
       },
       selectedExpense: null,
-      expenseToDelete: null
+      expenseToDelete: null,
+      // Contexto IA
+      uiContext: null,
+      pendingExpense: null // Para gastos por voz que necesitan confirmación
     };
   },
   mounted() {
+    // Inicializar contexto IA
+    this.uiContext = useUIContextStore();
+    
     this.loadCategories();
     this.loadExpenses();
     this.loadStatistics();
+    
+    // Actualizar contexto IA cuando los datos estén listos
+    this.$nextTick(() => {
+      this.actualizarContextoIA();
+    });
+  },
+  beforeUnmount() {
+    // Limpiar contexto al salir del módulo
+    if (this.uiContext) {
+      this.uiContext.clearSelection();
+    }
   },
   methods: {
+    // ========================================
+    // 🤖 CONTEXTO DE IA - Gastos Operativos
+    // ========================================
+    actualizarContextoIA() {
+      if (!this.uiContext) return;
+      
+      const screenData = {
+        modulo: 'expenses',
+        titulo: 'Gastos Operativos',
+        descripcion: 'Gestión de gastos y egresos del negocio',
+        
+        // KPIs principales
+        kpis: {
+          totalMesActual: this.statistics.current_month || 0,
+          cambioVsMesAnterior: this.statistics.percentage_change || 0,
+          gastosPorMetodo: this.statistics.by_payment_method || [],
+          totalGastos: this.expenses.total || 0
+        },
+        
+        // Categorías disponibles (muy importante para registro por voz)
+        categoriasDisponibles: this.categories.map(c => ({
+          id: c.id,
+          nombre: c.name,
+          color: c.color,
+          descripcion: c.description
+        })),
+        
+        // Últimos gastos para referencia
+        ultimosGastos: (this.expenses.data || []).slice(0, 5).map(g => ({
+          id: g.id,
+          fecha: g.date,
+          categoria: g.category?.name,
+          descripcion: g.description,
+          monto: g.amount,
+          metodoPago: g.payment_method,
+          usuario: g.user?.name
+        })),
+        
+        // Estado de filtros
+        filtrosActivos: {
+          busqueda: this.filters.search,
+          categoria: this.filters.category_id,
+          metodoPago: this.filters.payment_method,
+          fechaInicio: this.filters.start_date,
+          fechaFin: this.filters.end_date
+        },
+        
+        // Modal abierto
+        modalAbierto: this.showModal ? 'formulario_gasto' : null,
+        editando: this.isEditing,
+        
+        // Guía para la IA
+        guiaIA: `
+          Estás en Gastos Operativos. Puedes:
+          1. Registrar gastos por voz: "registra un gasto de $50.000 en servicios públicos"
+          2. Consultar gastos: "¿cuánto hemos gastado este mes?", "¿en qué gastamos más?"
+          3. Ver categorías: Las categorías son ${this.categories.map(c => c.name).join(', ')}
+          4. Filtrar gastos por categoría, método de pago o fecha
+          
+          IMPORTANTE: Al registrar un gasto, siempre pregunta:
+          - Si falta el monto
+          - Si debe salir de la caja actual o de ganancias generales (para efectivo)
+        `
+      };
+      
+      this.uiContext.setScreenData(screenData);
+      this.registrarAccionesIA();
+    },
+    
+    registrarAccionesIA() {
+      if (!this.uiContext) return;
+      
+      // Registrar gasto por voz - acción principal
+      this.uiContext.registerAction('registrarGastoVoz', async (params) => {
+        const { descripcion, monto, categoria, fuente, proveedor, metodo_pago } = params;
+        
+        // Si no tenemos monto, pedirlo
+        if (!monto) {
+          return {
+            success: false,
+            necesitaDatos: true,
+            message: `Entendido: "${descripcion}". ¿Cuánto costó?`,
+            datosActuales: { descripcion, categoria, proveedor, fuente, metodo_pago }
+          };
+        }
+        
+        // Buscar categoría por nombre
+        let categoriaId = null;
+        if (categoria) {
+          const cat = this.categories.find(c => 
+            c.name.toLowerCase().includes(categoria.toLowerCase()) ||
+            categoria.toLowerCase().includes(c.name.toLowerCase())
+          );
+          if (cat) {
+            categoriaId = cat.id;
+          } else {
+            // Categoría no encontrada, usar "Otros Gastos"
+            const otros = this.categories.find(c => c.name.includes('Otros'));
+            categoriaId = otros?.id;
+          }
+        } else {
+          // Sin categoría especificada - inferir o usar "Otros"
+          categoriaId = this.inferirCategoria(descripcion);
+        }
+        
+        if (!categoriaId) {
+          const otros = this.categories.find(c => c.name.includes('Otros'));
+          categoriaId = otros?.id || this.categories[0]?.id;
+        }
+        
+        // Si es efectivo y no especificó fuente, preguntar
+        const metodoPagoFinal = metodo_pago || 'efectivo';
+        if (metodoPagoFinal === 'efectivo' && !fuente) {
+          return {
+            success: false,
+            necesitaDatos: true,
+            message: `Un gasto de $${monto.toLocaleString()} por "${descripcion}". ¿Quieres descontarlo de la caja actual o es un gasto general?`,
+            datosActuales: { descripcion, monto, categoria: categoriaId, proveedor, metodo_pago: metodoPagoFinal }
+          };
+        }
+        
+        // Tenemos todos los datos, crear el gasto
+        try {
+          const formData = {
+            category_id: categoriaId,
+            amount: parseFloat(monto),
+            description: descripcion,
+            payment_method: metodoPagoFinal,
+            expense_source: metodoPagoFinal === 'efectivo' ? (fuente || 'general') : null,
+            supplier: proveedor || '',
+            date: new Date().toISOString().split('T')[0],
+            notes: 'Registrado por voz'
+          };
+          
+          const response = await apiClient.post('/expenses', formData);
+          
+          if (response.data.success) {
+            this.$toast?.success('Gasto registrado exitosamente');
+            this.loadExpenses();
+            this.loadStatistics();
+            this.actualizarContextoIA();
+            
+            const categoriaName = this.categories.find(c => c.id === categoriaId)?.name || 'Sin categoría';
+            return {
+              success: true,
+              message: `✅ Listo! Registré el gasto: $${monto.toLocaleString()} en "${categoriaName}" por "${descripcion}".`
+            };
+          } else {
+            return { success: false, message: response.data.message || 'Error al registrar el gasto' };
+          }
+        } catch (error) {
+          console.error('Error al registrar gasto por voz:', error);
+          return { 
+            success: false, 
+            message: error.response?.data?.message || 'Error al registrar el gasto. Intenta de nuevo.'
+          };
+        }
+      });
+      
+      // Consultar gastos
+      this.uiContext.registerAction('consultarGastos', async (params) => {
+        const { consulta, periodo } = params;
+        
+        // Recargar datos si es necesario
+        if (!this.statistics.current_month && this.statistics.current_month !== 0) {
+          await this.loadStatistics();
+        }
+        
+        let mensaje = '';
+        
+        switch(consulta) {
+          case 'total_mes':
+            mensaje = `📊 Total de gastos este mes: $${this.formatNumber(this.statistics.current_month || 0)}`;
+            if (this.statistics.percentage_change !== undefined) {
+              const trend = this.statistics.percentage_change > 0 ? '📈 +' : '📉 ';
+              mensaje += ` (${trend}${this.statistics.percentage_change}% vs mes anterior)`;
+            }
+            break;
+            
+          case 'por_categoria':
+            if (this.statistics.by_category && this.statistics.by_category.length > 0) {
+              mensaje = '📊 Gastos por categoría este mes:\n';
+              this.statistics.by_category.forEach(cat => {
+                mensaje += `• ${cat.category}: $${this.formatNumber(cat.total)}\n`;
+              });
+            } else {
+              mensaje = 'No tengo desglose por categoría disponible.';
+            }
+            break;
+            
+          case 'ultimos':
+            if (this.expenses.data && this.expenses.data.length > 0) {
+              mensaje = '📋 Últimos gastos registrados:\n';
+              this.expenses.data.slice(0, 5).forEach(g => {
+                mensaje += `• ${g.description}: $${this.formatNumber(g.amount)} (${g.category?.name})\n`;
+              });
+            } else {
+              mensaje = 'No hay gastos registrados todavía.';
+            }
+            break;
+            
+          case 'resumen':
+          default:
+            mensaje = `📊 Resumen de gastos:\n`;
+            mensaje += `• Total mes: $${this.formatNumber(this.statistics.current_month || 0)}\n`;
+            mensaje += `• Cantidad: ${this.expenses.total || 0} gastos registrados\n`;
+            
+            if (this.statistics.by_payment_method) {
+              mensaje += `• Por método: `;
+              const metodos = this.statistics.by_payment_method.map(m => 
+                `${m.payment_method}: $${this.formatNumber(m.total)}`
+              ).join(', ');
+              mensaje += metodos || 'Sin datos';
+            }
+            break;
+        }
+        
+        return { success: true, message: mensaje, datos: this.statistics };
+      });
+      
+      // Ver categorías de gastos
+      this.uiContext.registerAction('verCategoriasGastos', async () => {
+        if (this.categories.length === 0) {
+          await this.loadCategories();
+        }
+        
+        const categorias = this.categories.map(c => {
+          let desc = c.name;
+          if (c.description) desc += ` (${c.description})`;
+          return desc;
+        }).join(', ');
+        
+        return {
+          success: true,
+          message: `Las categorías de gastos disponibles son: ${categorias}.`,
+          categorias: this.categories
+        };
+      });
+      
+      // Abrir modal de crear gasto
+      this.uiContext.registerAction('abrirCrearGasto', () => {
+        this.openCreateModal();
+        return { success: true, message: 'Abriendo formulario de nuevo gasto' };
+      });
+      
+      // Filtrar gastos por categoría
+      this.uiContext.registerAction('filtrarPorCategoria', (params) => {
+        const { categoria } = params;
+        const cat = this.categories.find(c => 
+          c.name.toLowerCase().includes(categoria.toLowerCase())
+        );
+        if (cat) {
+          this.filters.category_id = cat.id;
+          this.loadExpenses();
+          return { success: true, message: `Filtrando por ${cat.name}` };
+        }
+        return { success: false, message: `No encontré la categoría "${categoria}"` };
+      });
+      
+      // Limpiar filtros
+      this.uiContext.registerAction('limpiarFiltros', () => {
+        this.clearFilters();
+        return { success: true, message: 'Filtros limpiados' };
+      });
+    },
+    
+    // Inferir categoría basada en palabras clave
+    inferirCategoria(descripcion) {
+      const desc = descripcion.toLowerCase();
+      
+      // Mapeo de palabras clave a categorías
+      const keywords = {
+        'Servicios Públicos': ['luz', 'agua', 'gas', 'internet', 'telefono', 'teléfono', 'electricidad', 'servicios', 'epm', 'claro', 'movistar'],
+        'Nómina y Salarios': ['salario', 'nomina', 'nómina', 'sueldo', 'prestaciones', 'empleado', 'pago personal', 'trabajador'],
+        'Mantenimiento': ['reparacion', 'reparación', 'arreglo', 'mantenimiento', 'técnico', 'tecnico', 'daño'],
+        'Suministros y Materiales': ['papeleria', 'papelería', 'materiales', 'insumos', 'limpieza', 'aseo', 'oficina', 'bolsas', 'papel'],
+        'Arriendo': ['arriendo', 'alquiler', 'renta', 'local', 'bodega'],
+        'Transporte': ['transporte', 'taxi', 'uber', 'gasolina', 'combustible', 'envio', 'envío', 'domicilio', 'flete']
+      };
+      
+      for (const [catName, words] of Object.entries(keywords)) {
+        if (words.some(w => desc.includes(w))) {
+          const cat = this.categories.find(c => c.name === catName);
+          if (cat) return cat.id;
+        }
+      }
+      
+      // Por defecto, usar "Otros Gastos"
+      const otros = this.categories.find(c => c.name.includes('Otros'));
+      return otros?.id;
+    },
+
     async loadExpenses() {
       this.loading = true;
       try {
@@ -778,6 +1088,8 @@ export default {
         const response = await apiClient.get('/expenses/statistics');
         if (response.data.success) {
           this.statistics = response.data.data;
+          // Actualizar contexto IA con nuevos datos
+          this.$nextTick(() => this.actualizarContextoIA());
         }
       } catch (error) {
         console.error('Error al cargar estadísticas:', error);

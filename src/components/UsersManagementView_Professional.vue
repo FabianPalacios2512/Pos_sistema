@@ -238,6 +238,7 @@
 
     <!-- MODAL: Crear/Editar Usuario -->
     <UserModal 
+      ref="userModalRef"
       :show="showUserModal"
       :user="selectedUser"
       :roles="roles"
@@ -266,15 +267,22 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import usersService from '../services/usersService.js'
 import rolesService from '../services/rolesService.js'
 import { appStore } from '../store/appStore.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 import UsersTable from './UsersTable.vue'
 import RolesTable from './RolesTable.vue'
 import UserModal from './UserModal.vue'
 import RoleModal from './RoleModal.vue'
 import PasswordModal from './PasswordModal.vue'
+
+// ===== CONTEXTO AI =====
+const uiContextStore = useUIContextStore()
+
+// ===== REFS A MODALES =====
+const userModalRef = ref(null)
 
 // ===== ESTADO REACTIVO =====
 const loading = ref(false)
@@ -684,9 +692,302 @@ const savePassword = async (passwordData) => {
   }
 }
 
+// ===== CONTEXTO AI =====
+const updateAIContext = () => {
+  const contextData = {
+    modulo: 'usuarios',
+    pestanaActual: activeTab.value === 'users' ? 'Usuarios' : 'Roles',
+    
+    // Información de usuarios
+    usuarios: {
+      total: users.value.length,
+      activos: activeUsersCount.value,
+      inactivos: inactiveUsersCount.value,
+      limite: maxUsersAllowed.value,
+      puedeCrearMas: canCreateMoreUsers.value,
+      espaciosDisponibles: remainingUserSlots.value,
+      lista: users.value.map(u => ({
+        id: u.id,
+        nombre: u.name,
+        email: u.email,
+        cedula: u.document,
+        telefono: u.phone,
+        rol: u.role?.name || 'Sin rol',
+        rolId: u.role_id,
+        activo: u.active
+      }))
+    },
+    
+    // Información de roles
+    roles: {
+      total: roles.value.length,
+      enUso: activeRolesCount.value,
+      lista: roles.value.map(r => ({
+        id: r.id,
+        nombre: r.name,
+        descripcion: r.description,
+        usuariosAsignados: r.users_count || 0,
+        permisos: r.permissions || []
+      }))
+    },
+    
+    // Permisos disponibles (módulos)
+    permisosDisponibles: permissionsModules.value.map(p => ({
+      id: p.id,
+      nombre: p.name,
+      descripcion: p.description
+    })),
+    
+    // Estado de modales
+    modales: {
+      usuarioAbierto: showUserModal.value,
+      rolAbierto: showRoleModal.value,
+      passwordAbierto: showPasswordModal.value,
+      usuarioEditando: selectedUser.value ? {
+        id: selectedUser.value.id,
+        nombre: selectedUser.value.name
+      } : null,
+      rolEditando: selectedRole.value ? {
+        id: selectedRole.value.id,
+        nombre: selectedRole.value.name
+      } : null
+    },
+    
+    // Plan actual
+    plan: {
+      nombre: currentPlan.value,
+      limiteUsuarios: maxUsersAllowed.value
+    }
+  }
+  
+  uiContextStore.setScreenData(contextData)
+}
+
+const registerAIActions = () => {
+  // Cambiar pestaña
+  uiContextStore.registerAction('cambiarPestanaUsuarios', ({ pestana }) => {
+    const tab = pestana.toLowerCase().includes('rol') ? 'roles' : 'users'
+    activeTab.value = tab
+    updateAIContext()
+    return { success: true, message: `Cambiado a pestaña de ${tab === 'roles' ? 'Roles' : 'Usuarios'}` }
+  })
+  
+  // Listar usuarios
+  uiContextStore.registerAction('listarUsuarios', () => {
+    const lista = users.value.map(u => ({
+      nombre: u.name,
+      email: u.email,
+      rol: u.role?.name || 'Sin rol',
+      activo: u.active ? 'Sí' : 'No'
+    }))
+    return {
+      success: true,
+      message: `Hay ${users.value.length} usuarios registrados.`,
+      usuarios: lista
+    }
+  })
+  
+  // Listar roles
+  uiContextStore.registerAction('listarRoles', () => {
+    const lista = roles.value.map(r => ({
+      nombre: r.name,
+      descripcion: r.description,
+      usuariosAsignados: r.users_count || 0,
+      permisos: (r.permissions || []).length
+    }))
+    return {
+      success: true,
+      message: `Hay ${roles.value.length} roles configurados.`,
+      roles: lista
+    }
+  })
+  
+  // Abrir modal crear usuario
+  uiContextStore.registerAction('abrirCrearUsuario', () => {
+    if (!canCreateMoreUsers.value) {
+      return { 
+        success: false, 
+        message: `Has alcanzado el límite de ${maxUsersAllowed.value} usuarios. Actualiza tu plan para agregar más.` 
+      }
+    }
+    openCreateUserModal()
+    updateAIContext()
+    return { 
+      success: true, 
+      message: 'Modal de nuevo usuario abierto. Campos: nombre, email, cédula, teléfono, contraseña, rol.' 
+    }
+  })
+  
+  // Abrir modal crear rol
+  uiContextStore.registerAction('abrirCrearRol', () => {
+    openCreateRoleModal()
+    updateAIContext()
+    return { 
+      success: true, 
+      message: 'Modal de nuevo rol abierto. Debes indicar nombre y seleccionar los permisos/módulos.' 
+    }
+  })
+  
+  // Cerrar modales
+  uiContextStore.registerAction('cerrarModalUsuario', () => {
+    closeUserModal()
+    updateAIContext()
+    return { success: true, message: 'Modal de usuario cerrado.' }
+  })
+  
+  uiContextStore.registerAction('cerrarModalRol', () => {
+    closeRoleModal()
+    updateAIContext()
+    return { success: true, message: 'Modal de rol cerrado.' }
+  })
+  
+  // Llenar campo de usuario
+  uiContextStore.registerAction('llenarCampoUsuario', ({ campo, valor }) => {
+    if (!showUserModal.value) {
+      return { success: false, message: 'Primero debes abrir el modal de crear usuario.' }
+    }
+    
+    // Usar el ref del modal para llenar el campo
+    if (!userModalRef.value) {
+      return { success: false, message: 'Modal no disponible.' }
+    }
+    
+    // Mapear rol por nombre si es necesario
+    if (campo.toLowerCase() === 'rol' || campo.toLowerCase() === 'role_id') {
+      const rolEncontrado = roles.value.find(r => 
+        r.id.toString() === valor || 
+        r.name.toLowerCase() === valor.toLowerCase()
+      )
+      if (rolEncontrado) {
+        userModalRef.value.setFieldValue('role_id', rolEncontrado.id)
+        return { success: true, message: `Rol asignado: ${rolEncontrado.name}` }
+      } else {
+        return { success: false, message: `No encontré el rol "${valor}". Roles disponibles: ${roles.value.map(r => r.name).join(', ')}` }
+      }
+    }
+    
+    const result = userModalRef.value.setFieldValue(campo, valor)
+    if (result) {
+      return { success: true, message: `Campo ${campo} establecido: ${campo === 'password' ? '***' : valor}` }
+    }
+    
+    return { success: false, message: `Campo "${campo}" no reconocido. Usa: nombre, email, password, rol, cedula, telefono` }
+  })
+  
+  // Guardar usuario
+  uiContextStore.registerAction('guardarUsuario', async () => {
+    if (!showUserModal.value) {
+      return { success: false, message: 'No hay modal de usuario abierto.' }
+    }
+    
+    if (!userModalRef.value) {
+      return { success: false, message: 'Modal no disponible.' }
+    }
+    
+    const form = userModalRef.value.form
+    
+    // Validar campos requeridos (incluyendo ROL como obligatorio)
+    const faltantes = []
+    if (!form.name) faltantes.push('nombre')
+    if (!form.email) faltantes.push('email')
+    if (!form.password && !selectedUser.value) faltantes.push('contraseña') // Solo requerido para nuevos usuarios
+    if (!form.role_id) faltantes.push('rol')
+    
+    if (faltantes.length > 0) {
+      return { success: false, message: `Faltan campos obligatorios: ${faltantes.join(', ')}. El ROL es obligatorio.` }
+    }
+    
+    try {
+      // Llamar handleSubmit del modal que emite el evento save
+      userModalRef.value.handleSubmit()
+      return { success: true, message: `Usuario "${form.name}" ${selectedUser.value ? 'actualizándose' : 'creándose'}...` }
+    } catch (err) {
+      return { success: false, message: `Error al guardar usuario: ${err.message || 'Error desconocido'}` }
+    }
+  })
+  
+  // Editar usuario existente
+  uiContextStore.registerAction('editarUsuario', ({ busqueda }) => {
+    // Buscar usuario por nombre o email
+    const usuario = users.value.find(u => 
+      u.name?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      u.email?.toLowerCase().includes(busqueda.toLowerCase())
+    )
+    
+    if (!usuario) {
+      return { success: false, message: `No encontré usuario con "${busqueda}". Usuarios disponibles: ${users.value.slice(0, 5).map(u => u.name).join(', ')}...` }
+    }
+    
+    // Abrir modal de edición
+    openEditUserModal(usuario)
+    updateAIContext()
+    
+    return { 
+      success: true, 
+      message: `Abrí el formulario para editar a "${usuario.name}". Puedes modificar los campos con llenarCampoUsuario.`,
+      usuario: {
+        nombre: usuario.name,
+        email: usuario.email,
+        rol: usuario.role?.name,
+        activo: usuario.active
+      }
+    }
+  })
+  
+  // Buscar usuario
+  uiContextStore.registerAction('buscarUsuario', ({ texto }) => {
+    const encontrados = users.value.filter(u => 
+      u.name?.toLowerCase().includes(texto.toLowerCase()) ||
+      u.email?.toLowerCase().includes(texto.toLowerCase()) ||
+      u.document?.includes(texto)
+    )
+    
+    if (encontrados.length === 0) {
+      return { success: true, message: `No encontré usuarios con "${texto}".` }
+    }
+    
+    return {
+      success: true,
+      message: `Encontré ${encontrados.length} usuario(s):`,
+      usuarios: encontrados.map(u => ({
+        nombre: u.name,
+        email: u.email,
+        cedula: u.document,
+        rol: u.role?.name,
+        activo: u.active
+      }))
+    }
+  })
+  
+  // Ver permisos disponibles
+  uiContextStore.registerAction('verPermisosDisponibles', () => {
+    return {
+      success: true,
+      message: `Hay ${permissionsModules.value.length} módulos/permisos disponibles:`,
+      permisos: permissionsModules.value.map(p => ({
+        id: p.id,
+        nombre: p.name,
+        descripcion: p.description
+      }))
+    }
+  })
+}
+
+// Observar cambios para actualizar contexto
+watch([users, roles, activeTab, showUserModal, showRoleModal], () => {
+  updateAIContext()
+}, { deep: true })
+
 // ===== LIFECYCLE =====
 onMounted(() => {
   refreshData()
+  registerAIActions()
+  updateAIContext()
+})
+
+onUnmounted(() => {
+  // Limpiar acciones registradas al salir del módulo
+  uiContextStore.clearSelection()
 })
 </script>
 

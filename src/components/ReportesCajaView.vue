@@ -394,12 +394,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { Bar, Line, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, Tooltip, Legend } from 'chart.js'
 import { cashReportsService } from '../services/cashReportsService.js'
 import { exportService } from '../services/exportService.js'
 import { useToast } from '../composables/useToast.js'
+import { useUIContextStore } from '@/store/uiContextStore'
 
 // Registrar componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, ArcElement, Title, Tooltip, Legend)
@@ -979,10 +980,155 @@ watch(selectedPeriod, () => {
   loadCashReportsData()
 })
 
+// ═══════════════════════════════════════════════════════════════
+// 🤖 CONTEXTO IA - Reportes de Caja
+// ═══════════════════════════════════════════════════════════════
+const uiContextStore = useUIContextStore()
+
+// Actualizar contexto para la IA
+const actualizarContextoIA = () => {
+  const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+  
+  // KPIs principales
+  const kpis = {
+    sesionesActivas: activeSessions.value?.length || 0,
+    mejorCajero: bestCashierData.value.name,
+    mejorCajeroVentas: formatMoney(bestCashierData.value.sales),
+    promedioHora: formatMoney(averageSalesPerHour.value),
+    totalVentas: formatMoney(totalSalesAmount.value),
+    totalTransacciones: totalTransactions.value,
+    periodo: selectedPeriod.value
+  }
+  
+  // Comparativa de cajeros
+  const cajerosResumen = (cashierComparison.value || []).slice(0, 5).map(c => ({
+    nombre: c.name,
+    ventas: formatMoney(parseFloat(c.total_sales) || 0),
+    transacciones: parseInt(c.transactions) || 0,
+    ticketPromedio: formatMoney(parseFloat(c.average_ticket) || 0)
+  }))
+  
+  // Top sesiones
+  const topSesionesResumen = (topSessions.value || []).slice(0, 5).map(s => ({
+    cajero: s.cashier_name,
+    ventas: formatMoney(parseFloat(s.total_sales) || 0),
+    fecha: s.date || 'N/A'
+  }))
+  
+  // Alertas
+  const alertasResumen = (alerts.value || []).map(a => ({
+    tipo: a.type,
+    titulo: a.title,
+    mensaje: a.message
+  }))
+  
+  uiContextStore.setScreenData('reports-caja', {
+    modulo: 'Reportes de Caja',
+    descripcion: 'Análisis avanzado por cajero con rendimiento, comparativas y eficiencia por hora',
+    kpis,
+    cajeros: cajerosResumen,
+    topSesiones: topSesionesResumen,
+    alertas: alertasResumen,
+    periodoActual: getPeriodLabel(),
+    ultimaActualizacion: new Date().toLocaleTimeString('es-CO')
+  })
+}
+
+// Registrar acciones disponibles para la IA
+const registrarAccionesIA = () => {
+  // Consultar reportes de caja
+  uiContextStore.registerAction('consultarReportesCaja', async ({ periodo, tipoConsulta }) => {
+    try {
+      const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+      
+      let mensaje = ''
+      switch (tipoConsulta) {
+        case 'mejor_cajero':
+          mensaje = `🏆 Mejor cajero del ${getPeriodLabel()}: ${bestCashierData.value.name} con ${formatMoney(bestCashierData.value.sales)} en ventas`
+          break
+          
+        case 'comparativa_cajeros':
+          const cajeros = cashierComparison.value.slice(0, 5)
+          mensaje = `👥 Comparativa de cajeros (${getPeriodLabel()}):\n` + 
+            cajeros.map((c, i) => `${i+1}. ${c.name}: ${formatMoney(parseFloat(c.total_sales) || 0)} (${c.transactions || 0} trans.)`).join('\n')
+          break
+          
+        case 'top_sesiones':
+          const sesiones = topSessions.value.slice(0, 5)
+          mensaje = `🌟 Mejores sesiones del ${getPeriodLabel()}:\n` + 
+            sesiones.map((s, i) => `${i+1}. ${s.cashier_name}: ${formatMoney(parseFloat(s.total_sales) || 0)}`).join('\n')
+          break
+          
+        case 'eficiencia_hora':
+          mensaje = `⏰ Promedio de ventas por hora: ${formatMoney(averageSalesPerHour.value)}`
+          break
+          
+        default:
+          mensaje = `📊 REPORTE DE CAJAS (${getPeriodLabel()}):
+• Sesiones activas: ${activeSessions.value?.length || 0}
+• Total ventas: ${formatMoney(totalSalesAmount.value)}
+• Transacciones: ${totalTransactions.value}
+• Mejor cajero: ${bestCashierData.value.name} (${formatMoney(bestCashierData.value.sales)})
+• Promedio/hora: ${formatMoney(averageSalesPerHour.value)}`
+      }
+      
+      return { success: true, message: mensaje }
+    } catch (err) {
+      console.error('Error en consultarReportesCaja:', err)
+      return { success: false, message: 'Error al consultar reportes de caja' }
+    }
+  })
+  
+  // Cambiar período
+  uiContextStore.registerAction('cambiarPeriodoReportesCaja', async ({ periodo }) => {
+    const periodoMap = { 'hoy': 'today', 'semana': 'week', 'mes': 'month', 'año': 'year' }
+    const nuevoPeriodo = periodoMap[periodo] || periodo
+    if (['today', 'week', 'month', 'year'].includes(nuevoPeriodo)) {
+      selectedPeriod.value = nuevoPeriodo
+      return { success: true, message: `Período cambiado a ${periodo}` }
+    }
+    return { success: false, message: 'Período no válido' }
+  })
+  
+  // Cambiar a reporte de caja (desde reportes generales)
+  uiContextStore.registerAction('cambiarAReporteCaja', async () => {
+    // Este componente ya ES el reporte de caja
+    return { success: true, message: 'Ya estás en los reportes de caja' }
+  })
+  
+  // Exportar reporte
+  uiContextStore.registerAction('exportarReporteCaja', async () => {
+    try {
+      await exportCashReport()
+      return { success: true, message: 'Reporte de caja exportado exitosamente' }
+    } catch (err) {
+      return { success: false, message: 'Error al exportar reporte de caja' }
+    }
+  })
+}
+
 // Cargar datos al montar
 onMounted(() => {
   loadCashReportsData()
+  
+  // Registrar acciones IA
+  registrarAccionesIA()
+  
+  // Actualizar contexto después de cargar datos
+  setTimeout(() => {
+    actualizarContextoIA()
+  }, 1000)
 })
+
+// Limpiar al desmontar
+onBeforeUnmount(() => {
+  uiContextStore.clearSelection()
+})
+
+// Actualizar contexto cuando cambian los datos
+watch([totalSalesAmount, cashierComparison, topSessions, bestCashierData], () => {
+  actualizarContextoIA()
+}, { deep: true })
 </script>
 
 <style scoped>

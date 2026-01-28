@@ -271,9 +271,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { reportsService } from '../services/reportsService.js'
 import { cashReportsService } from '../services/cashReportsService.js' // NUEVO: Para datos por horas
+import { useUIContextStore } from '@/store/uiContextStore'
 
 // IMPORTACIONES DE GRÁFICOS ADICIONALES
 import { Line, Bar, Radar, PolarArea } from 'vue-chartjs'
@@ -541,6 +542,133 @@ watch(selectedPeriod, () => {
   }
 })
 
+// ═══════════════════════════════════════════════════════════════
+// 🤖 CONTEXTO IA - Reportes Generales
+// ═══════════════════════════════════════════════════════════════
+const uiContextStore = useUIContextStore()
+
+// Actualizar contexto para la IA
+const actualizarContextoIA = () => {
+  const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+  
+  // KPIs principales
+  const kpis = {
+    ventasTotales: formatMoney(totalSales.value),
+    ventasTotalesNumero: totalSales.value,
+    transacciones: totalTransactions.value,
+    ticketPromedio: formatMoney(averageTicket.value),
+    ticketPromedioNumero: averageTicket.value,
+    margenBruto: `${(grossMargin.value || 0).toFixed(1)}%`,
+    periodo: selectedPeriod.value
+  }
+  
+  // Top productos
+  const topProductosResumen = (topProducts.value || []).slice(0, 5).map(p => ({
+    nombre: p.name,
+    vendidos: p.sold || 0,
+    ingresos: formatMoney(p.revenue || 0)
+  }))
+  
+  // Ventas por categoría
+  const categoriasResumen = (salesByCategory.value || []).slice(0, 5).map(c => ({
+    nombre: c.name,
+    ventas: formatMoney(c.sales || 0)
+  }))
+  
+  // Productos con stock bajo
+  const stockBajoResumen = (lowStockProducts.value || []).slice(0, 5).map(p => ({
+    nombre: p.name,
+    stock: p.quantity || p.stock || 0
+  }))
+  
+  uiContextStore.setScreenData('reports-general', {
+    modulo: 'Reportes Generales',
+    descripcion: 'Dashboard ejecutivo con análisis de ventas, productos más vendidos, categorías y alertas de stock',
+    kpis,
+    topProductos: topProductosResumen,
+    ventasPorCategoria: categoriasResumen,
+    productosStockBajo: stockBajoResumen,
+    periodoActual: getPeriodLabel(),
+    tendenciaVentas: dailySales.value?.length || 0,
+    ultimaActualizacion: new Date().toLocaleTimeString('es-CO')
+  })
+}
+
+// Registrar acciones disponibles para la IA
+const registrarAccionesIA = () => {
+  // Consultar reportes generales
+  uiContextStore.registerAction('consultarReportesGenerales', async ({ periodo, tipoConsulta }) => {
+    try {
+      const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+      
+      // Si se pide cambiar período, actualizar
+      if (periodo && periodo !== selectedPeriod.value) {
+        const periodoMap = { 'today': 'today', 'week': 'week', 'month': 'month', 'year': 'year' }
+        if (periodoMap[periodo]) {
+          selectedPeriod.value = periodoMap[periodo]
+          await new Promise(resolve => setTimeout(resolve, 500))
+        }
+      }
+      
+      let mensaje = ''
+      switch (tipoConsulta) {
+        case 'ventas':
+          mensaje = `💰 Ventas totales del ${getPeriodLabel()}: ${formatMoney(totalSales.value)} en ${totalTransactions.value} transacciones`
+          break
+        case 'productos':
+          const topProd = topProducts.value.slice(0, 5)
+          mensaje = `🏆 Top productos del ${getPeriodLabel()}:\n` + topProd.map((p, i) => 
+            `${i+1}. ${p.name}: ${p.sold} vendidos (${formatMoney(p.revenue)})`
+          ).join('\n')
+          break
+        case 'categorias':
+          const cats = salesByCategory.value.slice(0, 5)
+          mensaje = `📊 Ventas por categoría del ${getPeriodLabel()}:\n` + cats.map(c => 
+            `• ${c.name}: ${formatMoney(c.sales)}`
+          ).join('\n')
+          break
+        case 'tendencia':
+          const dias = dailySales.value.length
+          const promedio = dias > 0 ? dailySales.value.reduce((a,b) => a+b, 0) / dias : 0
+          mensaje = `📈 Tendencia del ${getPeriodLabel()}: ${dias} ${selectedPeriod.value === 'today' ? 'horas' : 'días'} registrados, promedio de ${formatMoney(promedio)}`
+          break
+        default:
+          mensaje = `📊 RESUMEN DEL ${getPeriodLabel().toUpperCase()}:
+• Ventas totales: ${formatMoney(totalSales.value)}
+• Transacciones: ${totalTransactions.value}
+• Ticket promedio: ${formatMoney(averageTicket.value)}
+• Margen bruto: ${(grossMargin.value || 0).toFixed(1)}%`
+      }
+      
+      return { success: true, message: mensaje }
+    } catch (err) {
+      console.error('Error en consultarReportesGenerales:', err)
+      return { success: false, message: 'Error al consultar reportes' }
+    }
+  })
+  
+  // Cambiar período
+  uiContextStore.registerAction('cambiarPeriodoReportes', async ({ periodo }) => {
+    const periodoMap = { 'hoy': 'today', 'semana': 'week', 'mes': 'month', 'año': 'year' }
+    const nuevoPeriodo = periodoMap[periodo] || periodo
+    if (['today', 'week', 'month', 'year'].includes(nuevoPeriodo)) {
+      selectedPeriod.value = nuevoPeriodo
+      return { success: true, message: `Período cambiado a ${periodo}` }
+    }
+    return { success: false, message: 'Período no válido' }
+  })
+  
+  // Exportar reporte
+  uiContextStore.registerAction('exportarReporte', async () => {
+    try {
+      exportReport()
+      return { success: true, message: 'Reporte exportado exitosamente' }
+    } catch (err) {
+      return { success: false, message: 'Error al exportar reporte' }
+    }
+  })
+}
+
 // Cargar datos al montar el componente
 onMounted(() => {
   if (selectedPeriod.value === 'today') {
@@ -548,7 +676,25 @@ onMounted(() => {
   } else {
     loadReportsData()
   }
+  
+  // Registrar acciones IA
+  registrarAccionesIA()
+  
+  // Actualizar contexto después de cargar datos
+  setTimeout(() => {
+    actualizarContextoIA()
+  }, 1000)
 })
+
+// Limpiar al desmontar
+onBeforeUnmount(() => {
+  uiContextStore.clearSelection()
+})
+
+// Actualizar contexto cuando cambian los datos
+watch([totalSales, totalTransactions, topProducts, salesByCategory], () => {
+  actualizarContextoIA()
+}, { deep: true })
 
 // ------------------ Helpers de export / utilidades ------------------
 const toCSV = (headers, rows) => {

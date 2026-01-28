@@ -77,7 +77,7 @@
       <div v-if="activeTab === 'suppliers'" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
         <!-- Mostrar lista de proveedores -->
         <div v-if="viewMode === 'list'" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
-          <SuppliersViewMasterDetail ref="suppliersView" />
+          <SuppliersViewMasterDetail ref="suppliersView" @supplier-selected="onSupplierSelected" />
         </div>
 
         <!-- Crear nuevo proveedor (inline form) -->
@@ -1215,12 +1215,16 @@ import { invoicesService } from '../services/invoicesService.js'
 import { whatsappService } from '../services/whatsappService.js'
 import { useModuleNavigation } from '../composables/useModuleNavigation.js'
 import { useToast } from '../composables/useToast.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 
 // Obtener función de navegación
 const { navigateToModule } = useModuleNavigation()
 
 // Obtener funciones de toast (global)
 const { showToast, showSuccess, showError, showWarning, showInfo } = useToast()
+
+// Store de contexto para IA
+const uiContextStore = useUIContextStore()
 
 export default {
   name: 'PurchaseOrdersViewMasterDetail',
@@ -1402,6 +1406,9 @@ export default {
         this.processNavigationParams()
       }
     })
+    
+    // 🤖 CONTEXTO IA: Inicializar context awareness
+    this.setupAIContext()
   },
   beforeUnmount() {
     window.removeEventListener('products-updated', this.handleProductsUpdate)
@@ -1474,6 +1481,12 @@ export default {
 
     selectOrder(order) {
       this.selectedOrder = order
+      this.updateAIContext() // Actualizar contexto para que la IA vea la orden seleccionada
+    },
+
+    // Cuando se selecciona un proveedor en el componente hijo
+    onSupplierSelected(supplier) {
+      this.updateAIContext() // Actualizar contexto para que la IA vea el proveedor seleccionado
     },
 
     openReceiveModal() {
@@ -1499,6 +1512,7 @@ export default {
     closeReceiveModal() {
       this.showReceiveModal = false
       this.receiveForm.items = []
+      this.updateAIContext() // Actualizar contexto al cerrar
     },
 
     handleCheckboxChange(item) {
@@ -1633,6 +1647,10 @@ export default {
         const response = await apiCall('/suppliers/analytics')
         if (response.success) {
           this.suppliers = response.data.suppliers
+          
+          // Debug: ver proveedores cargados
+          const activos = this.suppliers.filter(s => s.active !== false && s.active !== 0)
+          console.log(`✅ Proveedores cargados: ${this.suppliers.length} (${activos.length} activos)`)
           
           // 🔗 Si hay queryParams pendientes, procesarlos después de cargar
           if (this.navigationParams) {
@@ -2307,6 +2325,8 @@ export default {
           if (this.$refs.suppliersView) {
             this.$refs.suppliersView.loadSuppliers?.()
           }
+          // Actualizar contexto IA
+          this.updateAIContext()
         }
       } catch (error) {
         console.error('Error guardando proveedor:', error)
@@ -2314,6 +2334,986 @@ export default {
       } finally {
         this.savingSupplier = false
       }
+    },
+    
+    // ========== 🤖 CONTEXTO IA - SCREEN AWARENESS ==========
+    
+    setupAIContext() {
+      // Inicializar contexto
+      this.updateAIContext()
+      
+      // Registrar acciones disponibles para la IA
+      this.registerAIActions()
+    },
+    
+    updateAIContext() {
+      const formatCurrency = (val) => Number(val || 0).toLocaleString('es-CO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+      
+      // Datos del contexto de compras
+      const comprasData = {
+        modulo: 'compras',
+        pestanaActual: this.activeTab === 'suppliers' ? 'Proveedores' : 'Órdenes de Compra',
+        modoVista: this.viewMode,
+        
+        // Tab Proveedores
+        proveedores: {
+          total: this.suppliers.length,
+          // Considerar activo si active es true, 1 o undefined (no explícitamente false o 0)
+          activos: this.suppliers.filter(s => s.active !== false && s.active !== 0).length,
+          inactivos: this.suppliers.filter(s => s.active === false || s.active === 0).length,
+          listaProveedores: this.suppliers.slice(0, 20).map(s => ({
+            id: s.id,
+            nombre: s.name,
+            documento: s.document,
+            telefono: s.phone,
+            email: s.email,
+            activo: s.active !== false && s.active !== 0,
+            productosAsociados: s.products_count || 0,
+            deuda: s.current_debt || 0
+          }))
+        },
+        
+        // Proveedor seleccionado (del componente hijo)
+        proveedorSeleccionado: (() => {
+          const suppView = this.$refs.suppliersView
+          if (suppView && suppView.selectedSupplier) {
+            const s = suppView.selectedSupplier
+            return {
+              id: s.id,
+              nombre: s.name,
+              documento: s.document,
+              telefono: s.phone,
+              email: s.email,
+              activo: s.active !== false && s.active !== 0,
+              totalCompras: s.total_purchases_amount || 0,
+              ordenesCompra: s.purchase_orders_count || 0,
+              productosAsociados: s.products_count || 0,
+              deuda: s.current_debt || 0,
+              productosLista: (suppView.supplierProducts || []).slice(0, 10).map(p => ({
+                nombre: p.name,
+                sku: p.sku,
+                precioCompra: p.cost_price,
+                precioVenta: p.price,
+                stock: p.current_stock
+              }))
+            }
+          }
+          return null
+        })(),
+        
+        // Tab Órdenes de Compra
+        ordenes: {
+          total: this.orders.length,
+          pendientes: this.orders.filter(o => o.status === 'pending').length,
+          parciales: this.orders.filter(o => o.status === 'partial').length,
+          recibidas: this.orders.filter(o => o.status === 'received').length,
+          listaOrdenes: this.orders.slice(0, 15).map(o => ({
+            id: o.id,
+            numero: o.order_number,
+            proveedor: o.supplier?.name,
+            fecha: o.order_date,
+            estado: o.status,
+            total: o.total,
+            items: o.items?.length || 0
+          }))
+        },
+        
+        // Bodegas disponibles
+        bodegas: {
+          tieneMultiples: this.warehouses.length > 1,
+          lista: this.warehouses.map(w => ({
+            id: w.id,
+            nombre: w.name,
+            principal: w.is_main || false
+          }))
+        },
+        
+        // Formulario de proveedor (si está abierto)
+        formularioProveedor: this.viewMode === 'create-supplier' ? {
+          abierto: true,
+          datos: {
+            nombre: this.supplierForm.name,
+            documento: this.supplierForm.document,
+            telefono: this.supplierForm.phone,
+            email: this.supplierForm.email,
+            ciudad: this.supplierForm.city,
+            direccion: this.supplierForm.address,
+            contacto: this.supplierForm.contact_name,
+            telefonoContacto: this.supplierForm.contact_phone
+          }
+        } : { abierto: false },
+        
+        // Formulario de orden (si está abierto)
+        formularioOrden: this.viewMode === 'create' ? {
+          abierto: true,
+          modalProductosAbierto: this.showProductSelector,
+          datos: {
+            proveedorId: this.orderForm.supplier_id,
+            proveedorNombre: this.suppliers.find(s => s.id == this.orderForm.supplier_id)?.name || '',
+            bodegaId: this.orderForm.warehouse_id,
+            bodegaNombre: this.warehouses.find(w => w.id == this.orderForm.warehouse_id)?.name || '',
+            fechaOrden: this.orderForm.order_date,
+            fechaEsperada: this.orderForm.expected_date,
+            referencia: this.orderForm.reference,
+            notas: this.orderForm.notes,
+            productos: this.orderForm.items.map(item => ({
+              id: item.product_id,
+              nombre: item.product?.name,
+              cantidad: item.quantity,
+              costoUnitario: item.unit_cost,
+              subtotal: item.quantity * item.unit_cost
+            })),
+            subtotal: this.orderSubtotal
+          }
+        } : { abierto: false },
+        
+        // Productos disponibles para agregar
+        productosDisponibles: this.products.slice(0, 50).map(p => ({
+          id: p.id,
+          nombre: p.name,
+          sku: p.sku,
+          stockActual: p.current_stock || 0,
+          costoBase: p.cost_price || 0,
+          proveedorId: p.supplier_id
+        })),
+        
+        // 🔴 ORDEN SELECCIONADA (para ver detalles y acciones)
+        ordenSeleccionada: this.selectedOrder ? {
+          id: this.selectedOrder.id,
+          numero: this.selectedOrder.order_number,
+          proveedor: this.selectedOrder.supplier?.name,
+          proveedorEmail: this.selectedOrder.supplier?.email,
+          proveedorTelefono: this.selectedOrder.supplier?.phone,
+          fecha: this.selectedOrder.order_date,
+          fechaEsperada: this.selectedOrder.expected_date,
+          estado: this.selectedOrder.status,
+          total: this.selectedOrder.total,
+          bodega: this.selectedOrder.warehouse?.name,
+          productos: (this.selectedOrder.items || []).map(item => ({
+            nombre: item.product?.name || item.product_name,
+            cantidad: item.quantity_ordered || item.quantity,
+            recibido: item.quantity_received || 0,
+            costo: item.unit_cost,
+            subtotal: (item.quantity_ordered || item.quantity) * item.unit_cost
+          })),
+          // Acciones disponibles según estado
+          accionesDisponibles: this.selectedOrder.status === 'pending' 
+            ? ['descargarPDF', 'enviarEmail', 'enviarWhatsApp', 'marcarPagada', 'ingresarProductosStock']
+            : this.selectedOrder.status === 'partial'
+              ? ['descargarPDF', 'ingresarProductosStock']
+              : ['descargarPDF']
+        } : null,
+        
+        // Modal de recepción de productos
+        modalRecepcion: {
+          abierto: this.showReceiveModal,
+          productos: this.receiveForm.items.map(item => ({
+            nombre: item.product_name,
+            ordenado: item.quantity_ordered,
+            recibidoPrevio: item.quantity_received,
+            porRecibir: item.quantity_to_receive
+          }))
+        }
+      }
+      
+      // Resumen rápido para respuestas comunes
+      comprasData.resumenRapido = {
+        cuantosProveedores: `Hay ${this.suppliers.length} proveedores registrados, ${this.suppliers.filter(s => s.active !== false).length} activos.`,
+        ordenesPendientes: `Hay ${this.orders.filter(o => o.status === 'pending').length} órdenes de compra pendientes de recibir.`,
+        comoCrearProveedor: 'Para crear un proveedor, dame el nombre y opcionalmente documento, teléfono, email, ciudad y dirección.',
+        comoCrearOrden: 'Para crear una orden: 1) Selecciona el proveedor, 2) Agrega productos con cantidad y costo, 3) Si hay múltiples sedes, selecciona la bodega destino.',
+        tieneMultiplesSedes: this.warehouses.length > 1 ? `Tiene ${this.warehouses.length} sedes/bodegas. Al crear orden de compra, preguntaré a qué sede va.` : 'Solo tiene una sede.',
+        verProductos: 'Para ver productos disponibles DURANTE la orden, usa abrirSelectorProductos() - NO navegues al módulo de productos.'
+      }
+      
+      uiContextStore.setScreenData(comprasData)
+    },
+    
+    registerAIActions() {
+      const self = this
+      
+      // === ACCIONES DE PROVEEDORES ===
+      
+      uiContextStore.registerAction('cambiarPestanaCompras', ({ pestana }) => {
+        const tab = pestana.toLowerCase().includes('orden') || pestana.toLowerCase().includes('compra') 
+          ? 'orders' 
+          : 'suppliers'
+        self.changeTab(tab)
+        self.updateAIContext()
+        return { success: true, message: `Cambiado a pestaña de ${tab === 'orders' ? 'Órdenes de Compra' : 'Proveedores'}` }
+      })
+      
+      uiContextStore.registerAction('crearNuevoProveedor', async () => {
+        // Asegurar que estamos en tab suppliers
+        if (self.activeTab !== 'suppliers') {
+          self.changeTab('suppliers')
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+        self.viewMode = 'create-supplier'
+        self.resetSupplierForm()
+        
+        // Esperar a que Vue renderice el formulario
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        self.updateAIContext()
+        
+        return { 
+          success: true, 
+          message: 'Formulario de proveedor abierto. Dame los datos: nombre del proveedor (obligatorio), documento/NIT, teléfono, email, ciudad, dirección.',
+          vistaActual: 'create-supplier',
+          formularioVisible: true,
+          camposDelFormulario: ['nombre (obligatorio)', 'documento/NIT', 'telefono', 'email', 'ciudad', 'direccion', 'contacto', 'notas']
+        }
+      })
+      
+      // Acción para verificar qué hay en el formulario actualmente
+      uiContextStore.registerAction('verificarFormularioProveedor', () => {
+        if (self.viewMode !== 'create-supplier' && self.viewMode !== 'edit-supplier') {
+          return { 
+            success: false, 
+            message: 'No hay formulario de proveedor visible',
+            vistaActual: self.viewMode
+          }
+        }
+        
+        return {
+          success: true,
+          vistaActual: self.viewMode,
+          formularioEnPantalla: {
+            nombre: self.supplierForm.name || '(vacío)',
+            documento: self.supplierForm.document || '(vacío)',
+            telefono: self.supplierForm.phone || '(vacío)',
+            email: self.supplierForm.email || '(vacío)',
+            ciudad: self.supplierForm.city || '(vacío)',
+            direccion: self.supplierForm.address || '(vacío)',
+            contacto: self.supplierForm.contact_name || '(vacío)',
+            telefonoContacto: self.supplierForm.contact_phone || '(vacío)',
+            notas: self.supplierForm.notes || '(vacío)'
+          },
+          camposConDatos: Object.entries(self.supplierForm)
+            .filter(([k, v]) => v && v.toString().trim())
+            .map(([k]) => k),
+          listoParaGuardar: !!self.supplierForm.name
+        }
+      })
+      
+      uiContextStore.registerAction('llenarCampoProveedor', async ({ campo, valor }) => {
+        if (self.viewMode !== 'create-supplier' && self.viewMode !== 'edit-supplier') {
+          return { success: false, message: 'Primero abre el formulario con crearNuevoProveedor' }
+        }
+        
+        const camposValidos = {
+          'nombre': 'name',
+          'name': 'name',
+          'razon_social': 'name',
+          'documento': 'document',
+          'nit': 'document',
+          'rut': 'document',
+          'telefono': 'phone',
+          'phone': 'phone',
+          'celular': 'phone',
+          'email': 'email',
+          'correo': 'email',
+          'ciudad': 'city',
+          'city': 'city',
+          'direccion': 'address',
+          'address': 'address',
+          'contacto': 'contact_name',
+          'persona_contacto': 'contact_name',
+          'contact_name': 'contact_name',
+          'telefono_contacto': 'contact_phone',
+          'notas': 'notes',
+          'notes': 'notes'
+        }
+        
+        const campoReal = camposValidos[campo.toLowerCase().trim()]
+        
+        if (!campoReal) {
+          return { success: false, message: `Campo "${campo}" no reconocido. Campos válidos: nombre, documento/nit, telefono, email, ciudad, direccion, contacto, notas` }
+        }
+        
+        // Guardar valor anterior para verificar
+        const valorAnterior = self.supplierForm[campoReal]
+        
+        // Asignar nuevo valor
+        self.supplierForm[campoReal] = valor
+        
+        // Esperar un tick para que Vue actualice
+        await new Promise(resolve => setTimeout(resolve, 50))
+        
+        // Verificar que el valor se guardó correctamente
+        const valorActual = self.supplierForm[campoReal]
+        const seGuardo = valorActual === valor
+        
+        self.updateAIContext()
+        
+        // Retornar estado COMPLETO del formulario para que la IA pueda ver TODO
+        return { 
+          success: seGuardo, 
+          message: seGuardo 
+            ? `✅ Campo "${campo}" ahora muestra: "${valor}"`
+            : `⚠️ Error: El campo no se actualizó correctamente`,
+          campoActualizado: campo,
+          valorPuesto: valor,
+          seGuardoCorrectamente: seGuardo,
+          // Estado completo del formulario visible en pantalla
+          formularioEnPantalla: {
+            nombre: self.supplierForm.name || '(vacío)',
+            documento: self.supplierForm.document || '(vacío)',
+            telefono: self.supplierForm.phone || '(vacío)',
+            email: self.supplierForm.email || '(vacío)',
+            ciudad: self.supplierForm.city || '(vacío)',
+            direccion: self.supplierForm.address || '(vacío)',
+            contacto: self.supplierForm.contact_name || '(vacío)',
+            telefonoContacto: self.supplierForm.contact_phone || '(vacío)',
+            notas: self.supplierForm.notes || '(vacío)'
+          },
+          // Campos que faltan por llenar
+          camposFaltantes: [
+            !self.supplierForm.name && 'nombre (obligatorio)',
+          ].filter(Boolean)
+        }
+      })
+      
+      uiContextStore.registerAction('guardarProveedor', async () => {
+        if (self.viewMode !== 'create-supplier') {
+          return { success: false, message: 'No hay formulario de proveedor abierto' }
+        }
+        
+        if (!self.supplierForm.name?.trim()) {
+          return { success: false, message: 'Falta el nombre del proveedor (obligatorio)' }
+        }
+        
+        try {
+          await self.saveSupplier()
+          return { success: true, message: `Proveedor "${self.supplierForm.name}" creado exitosamente.` }
+        } catch (error) {
+          return { success: false, message: `Error al guardar: ${error.message}` }
+        }
+      })
+      
+      uiContextStore.registerAction('cerrarFormularioProveedor', () => {
+        if (self.viewMode === 'create-supplier') {
+          self.cancelCreateSupplier()
+          self.updateAIContext()
+          return { success: true, message: 'Formulario de proveedor cerrado' }
+        }
+        return { success: false, message: 'No hay formulario de proveedor abierto' }
+      })
+      
+      uiContextStore.registerAction('buscarProveedor', ({ texto }) => {
+        // Buscar proveedores que coincidan
+        const textoLower = texto.toLowerCase().trim()
+        const proveedoresEncontrados = self.suppliers.filter(s => 
+          s.name.toLowerCase().includes(textoLower) ||
+          (s.document && s.document.toLowerCase().includes(textoLower))
+        )
+        
+        // Activar el filtro visual si hay ref
+        if (self.$refs.suppliersView) {
+          self.$refs.suppliersView.searchQuery = texto
+        }
+        
+        if (proveedoresEncontrados.length === 0) {
+          return { 
+            success: false, 
+            message: `No encontré proveedores con "${texto}". Hay ${self.suppliers.length} proveedores en total.`,
+            proveedoresDisponibles: self.suppliers.slice(0, 10).map(s => s.name)
+          }
+        }
+        
+        return { 
+          success: true, 
+          message: `Encontré ${proveedoresEncontrados.length} proveedor(es) que coinciden con "${texto}"`,
+          proveedoresEncontrados: proveedoresEncontrados.map(s => ({
+            id: s.id,
+            nombre: s.name,
+            documento: s.document,
+            telefono: s.phone,
+            activo: s.active !== false && s.active !== 0
+          }))
+        }
+      })
+      
+      // Acción para listar todos los proveedores disponibles
+      uiContextStore.registerAction('listarProveedores', () => {
+        const proveedoresActivos = self.suppliers.filter(s => s.active !== false && s.active !== 0)
+        const proveedoresInactivos = self.suppliers.filter(s => s.active === false || s.active === 0)
+        
+        return {
+          success: true,
+          totalProveedores: self.suppliers.length,
+          activos: proveedoresActivos.length,
+          inactivos: proveedoresInactivos.length,
+          listaProveedores: self.suppliers.slice(0, 20).map(s => ({
+            id: s.id,
+            nombre: s.name,
+            documento: s.document,
+            telefono: s.phone,
+            activo: s.active !== false && s.active !== 0,
+            productosAsociados: s.products_count || 0
+          }))
+        }
+      })
+      
+      // Acción para seleccionar/ver un proveedor específico
+      uiContextStore.registerAction('seleccionarProveedor', async ({ nombre }) => {
+        // Buscar el proveedor por nombre
+        const nombreLower = nombre.toLowerCase().trim()
+        const proveedor = self.suppliers.find(s => 
+          s.name.toLowerCase().includes(nombreLower) ||
+          (s.document && s.document.toLowerCase().includes(nombreLower))
+        )
+        
+        if (!proveedor) {
+          return {
+            success: false,
+            message: `No encontré proveedor "${nombre}"`,
+            proveedoresDisponibles: self.suppliers.slice(0, 10).map(s => s.name)
+          }
+        }
+        
+        // Cambiar a tab de proveedores si no estamos ahí
+        if (self.activeTab !== 'suppliers') {
+          self.changeTab('suppliers')
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+        
+        // Si hay ref al componente hijo, seleccionar el proveedor
+        if (self.$refs.suppliersView && self.$refs.suppliersView.selectSupplier) {
+          self.$refs.suppliersView.selectSupplier(proveedor)
+        }
+        
+        self.updateAIContext()
+        
+        return {
+          success: true,
+          message: `Proveedor "${proveedor.name}" seleccionado`,
+          datosProveedor: {
+            id: proveedor.id,
+            nombre: proveedor.name,
+            documento: proveedor.document,
+            telefono: proveedor.phone,
+            email: proveedor.email,
+            direccion: proveedor.address,
+            ciudad: proveedor.city,
+            activo: proveedor.active !== false && proveedor.active !== 0,
+            productosAsociados: proveedor.products_count || 0,
+            deuda: proveedor.current_debt || 0,
+            totalComprado: proveedor.total_purchased || 0
+          }
+        }
+      })
+      
+      // === ACCIONES DE ÓRDENES DE COMPRA ===
+      
+      // Acción mejorada que acepta proveedor opcional
+      uiContextStore.registerAction('crearNuevaOrdenCompra', async ({ nombreProveedor } = {}) => {
+        // Asegurar que estamos en tab orders
+        if (self.activeTab !== 'orders') {
+          self.changeTab('orders')
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+        self.viewMode = 'create'
+        self.resetOrderForm()
+        
+        let mensajeProveedor = ''
+        let proveedorSeleccionado = null
+        
+        // Si se proporcionó nombre de proveedor, seleccionarlo automáticamente
+        if (nombreProveedor) {
+          const proveedor = self.suppliers.find(s => 
+            s.name.toLowerCase().includes(nombreProveedor.toLowerCase())
+          )
+          
+          if (proveedor) {
+            self.orderForm.supplier_id = proveedor.id
+            proveedorSeleccionado = proveedor
+            mensajeProveedor = `Proveedor "${proveedor.name}" ya seleccionado.`
+          } else {
+            mensajeProveedor = `No encontré proveedor "${nombreProveedor}". Dime cuál quieres.`
+          }
+        }
+        
+        self.updateAIContext()
+        
+        // Mensaje personalizado según bodegas
+        const msgBodega = self.warehouses.length > 1 
+          ? ` Hay ${self.warehouses.length} sedes, ¿a cuál va?` 
+          : ''
+        
+        // Mensaje según si se seleccionó proveedor o no
+        const mensaje = proveedorSeleccionado 
+          ? `Formulario abierto. ${mensajeProveedor}${msgBodega} ¿Qué productos agregamos?`
+          : `Formulario de orden abierto.${msgBodega} ¿Para cuál proveedor?`
+        
+        return { 
+          success: true, 
+          message: mensaje,
+          proveedorSeleccionado: proveedorSeleccionado ? {
+            id: proveedorSeleccionado.id,
+            nombre: proveedorSeleccionado.name
+          } : null,
+          proveedoresDisponibles: self.suppliers.slice(0, 10).map(s => s.name)
+        }
+      })
+      
+      uiContextStore.registerAction('seleccionarProveedorOrden', async ({ nombre }) => {
+        if (self.viewMode !== 'create') {
+          return { success: false, message: 'Primero abre el formulario de orden con crearNuevaOrdenCompra' }
+        }
+        
+        const proveedor = self.suppliers.find(s => 
+          s.name.toLowerCase().includes(nombre.toLowerCase())
+        )
+        
+        if (!proveedor) {
+          return { 
+            success: false, 
+            message: `No encontré proveedor "${nombre}". Proveedores disponibles: ${self.suppliers.slice(0, 5).map(s => s.name).join(', ')}` 
+          }
+        }
+        
+        self.orderForm.supplier_id = proveedor.id
+        self.updateAIContext()
+        
+        // Filtrar productos de este proveedor
+        const productosProveedor = self.products.filter(p => p.supplier_id == proveedor.id)
+        
+        return { 
+          success: true, 
+          message: `Proveedor "${proveedor.name}" seleccionado. Tiene ${productosProveedor.length} productos asociados. ¿Qué productos quieres agregar a la orden?`,
+          productosDelProveedor: productosProveedor.slice(0, 10).map(p => ({
+            nombre: p.name,
+            sku: p.sku,
+            stock: p.current_stock,
+            costo: p.cost_price
+          }))
+        }
+      })
+      
+      uiContextStore.registerAction('seleccionarBodegaOrden', ({ nombre }) => {
+        if (self.viewMode !== 'create') {
+          return { success: false, message: 'Primero abre el formulario de orden' }
+        }
+        
+        if (self.warehouses.length <= 1) {
+          return { success: true, message: 'Solo hay una bodega, ya está seleccionada automáticamente.' }
+        }
+        
+        const bodega = self.warehouses.find(w => 
+          w.name.toLowerCase().includes(nombre.toLowerCase())
+        )
+        
+        if (!bodega) {
+          return { 
+            success: false, 
+            message: `No encontré bodega "${nombre}". Bodegas disponibles: ${self.warehouses.map(w => w.name).join(', ')}` 
+          }
+        }
+        
+        self.orderForm.warehouse_id = bodega.id
+        self.updateAIContext()
+        
+        return { success: true, message: `Bodega "${bodega.name}" seleccionada como destino de la orden.` }
+      })
+      
+      uiContextStore.registerAction('agregarProductoOrden', async ({ nombre, cantidad, costo }) => {
+        console.log('📦 [agregarProductoOrden] viewMode:', self.viewMode, 'items:', self.orderForm.items.length)
+        
+        // Si no estamos en modo crear, intentar abrir el formulario primero
+        if (self.viewMode !== 'create') {
+          self.viewMode = 'create'
+          await new Promise(resolve => setTimeout(resolve, 100))
+        }
+        
+        // Buscar producto
+        const producto = self.products.find(p => 
+          p.name.toLowerCase().includes(nombre.toLowerCase()) ||
+          p.sku?.toLowerCase().includes(nombre.toLowerCase())
+        )
+        
+        if (!producto) {
+          return { 
+            success: false, 
+            message: `No encontré producto "${nombre}". Intenta buscar con otro nombre o SKU.`,
+            productosDisponibles: self.products.slice(0, 10).map(p => p.name)
+          }
+        }
+        
+        // Verificar si ya existe en la orden
+        const existente = self.orderForm.items.find(i => i.product_id === producto.id && !i.variant_id)
+        if (existente) {
+          existente.quantity += parseInt(cantidad) || 1
+          self.updateAIContext()
+          return { 
+            success: true, 
+            message: `Cantidad actualizada. Ahora hay ${existente.quantity} unidades de "${producto.name}" en la orden.`,
+            productosEnOrden: self.orderForm.items.map(i => ({
+              nombre: i.product?.name,
+              cantidad: i.quantity,
+              costo: i.unit_cost
+            }))
+          }
+        }
+        
+        // Agregar nuevo producto
+        const costoFinal = parseFloat(costo) || producto.cost_price || 0
+        const cantidadFinal = parseInt(cantidad) || 1
+        
+        self.orderForm.items.push({
+          product_id: producto.id,
+          variant_id: null,
+          variant_options: null,
+          product: producto,
+          quantity: cantidadFinal,
+          unit_cost: costoFinal,
+          notes: ''
+        })
+        
+        console.log('✅ [agregarProductoOrden] Producto agregado, total items:', self.orderForm.items.length)
+        
+        self.updateAIContext()
+        
+        return { 
+          success: true, 
+          message: `Agregado: ${cantidadFinal} x "${producto.name}" a $${costoFinal.toLocaleString('es-CO')} c/u. Subtotal: $${(cantidadFinal * costoFinal).toLocaleString('es-CO')}. ¿Agregar más productos?`,
+          productosEnOrden: self.orderForm.items.map(i => ({
+            nombre: i.product?.name,
+            cantidad: i.quantity,
+            costo: i.unit_cost
+          })),
+          ordenActual: {
+            productos: self.orderForm.items.length,
+            subtotal: self.orderSubtotal
+          }
+        }
+      })
+      
+      uiContextStore.registerAction('buscarProductoOrden', ({ texto }) => {
+        if (self.viewMode !== 'create') {
+          return { success: false, message: 'Primero abre el formulario de orden' }
+        }
+        
+        self.productSearch = texto
+        const resultados = self.filteredProducts.slice(0, 10)
+        
+        if (resultados.length === 0) {
+          return { success: true, message: `No encontré productos con "${texto}".` }
+        }
+        
+        return {
+          success: true,
+          message: `Encontré ${resultados.length} productos:`,
+          productos: resultados.map(p => ({
+            nombre: p.name,
+            sku: p.sku,
+            stock: p.current_stock,
+            costo: p.cost_price
+          }))
+        }
+      })
+      
+      // Acción para abrir el modal de selector de productos
+      uiContextStore.registerAction('abrirSelectorProductos', () => {
+        if (self.viewMode !== 'create') {
+          return { success: false, message: 'Primero debes abrir el formulario de orden de compra con crearNuevaOrdenCompra' }
+        }
+        
+        self.showProductSelector = true
+        self.productSearch = ''
+        
+        // Retornar lista de productos disponibles
+        const productosDisponibles = self.products.slice(0, 20).map(p => ({
+          nombre: p.name,
+          sku: p.sku,
+          stock: p.current_stock,
+          costo: p.cost_price,
+          proveedor: p.supplier?.name || 'Sin proveedor'
+        }))
+        
+        return {
+          success: true,
+          message: `Modal de productos abierto. Hay ${self.products.length} productos disponibles. El usuario puede buscar y seleccionar visualmente.`,
+          productosVisibles: productosDisponibles
+        }
+      })
+      
+      uiContextStore.registerAction('llenarCampoOrden', ({ campo, valor }) => {
+        if (self.viewMode !== 'create') {
+          return { success: false, message: 'Primero abre el formulario de orden' }
+        }
+        
+        const camposValidos = {
+          'fecha_orden': 'order_date',
+          'fecha_esperada': 'expected_date',
+          'fecha_entrega': 'expected_date',
+          'referencia': 'reference',
+          'notas': 'notes',
+          'observaciones': 'notes'
+        }
+        
+        const campoReal = camposValidos[campo.toLowerCase().trim()]
+        
+        if (!campoReal) {
+          return { success: false, message: `Campo "${campo}" no reconocido. Campos válidos: fecha_orden, fecha_esperada, referencia, notas` }
+        }
+        
+        self.orderForm[campoReal] = valor
+        self.updateAIContext()
+        
+        return { success: true, message: `Campo "${campo}" actualizado a "${valor}"` }
+      })
+      
+      uiContextStore.registerAction('guardarOrdenCompra', async ({ comoBorrador }) => {
+        if (self.viewMode !== 'create') {
+          return { success: false, message: 'No hay formulario de orden abierto' }
+        }
+        
+        if (!self.orderForm.supplier_id) {
+          return { success: false, message: 'Falta seleccionar el proveedor' }
+        }
+        
+        if (self.orderForm.items.length === 0) {
+          return { success: false, message: 'Agrega al menos un producto a la orden' }
+        }
+        
+        try {
+          if (comoBorrador) {
+            await self.saveOrderAsDraft()
+            return { success: true, message: 'Orden guardada como borrador.' }
+          } else {
+            await self.saveOrderAsPending()
+            return { 
+              success: true, 
+              message: `Orden de compra creada con ${self.orderForm.items.length} productos. Total: $${self.orderSubtotal.toLocaleString('es-CO')}. ¿Quieres enviarla al proveedor por email o WhatsApp?` 
+            }
+          }
+        } catch (error) {
+          return { success: false, message: `Error al guardar: ${error.message}` }
+        }
+      })
+      
+      uiContextStore.registerAction('cerrarFormularioOrden', () => {
+        if (self.viewMode === 'create') {
+          self.cancelCreateOrder()
+          self.updateAIContext()
+          return { success: true, message: 'Formulario de orden cerrado' }
+        }
+        return { success: false, message: 'No hay formulario de orden abierto' }
+      })
+      
+      uiContextStore.registerAction('seleccionarOrdenCompra', ({ numero }) => {
+        const orden = self.orders.find(o => 
+          o.order_number?.toLowerCase().includes(numero.toLowerCase())
+        )
+        
+        if (!orden) {
+          return { success: false, message: `No encontré orden con número "${numero}"` }
+        }
+        
+        self.selectOrder(orden)
+        self.updateAIContext()
+        
+        return {
+          success: true,
+          message: `Orden ${orden.order_number} seleccionada. Proveedor: ${orden.supplier?.name}. Total: $${Number(orden.total || 0).toLocaleString('es-CO')}. Estado: ${self.getStatusLabel(orden.status)}.`
+        }
+      })
+      
+      uiContextStore.registerAction('filtrarOrdenesCompra', ({ estado }) => {
+        const estadoMap = {
+          'todas': 'all',
+          'all': 'all',
+          'pendientes': 'pending',
+          'pending': 'pending',
+          'parciales': 'partial',
+          'partial': 'partial',
+          'recibidas': 'received',
+          'received': 'received',
+          'completadas': 'received'
+        }
+        
+        const filtro = estadoMap[estado.toLowerCase()] || 'all'
+        self.filterStatus = filtro
+        self.updateAIContext()
+        
+        const count = filtro === 'all' ? self.orders.length : self.orders.filter(o => o.status === filtro).length
+        return { success: true, message: `Mostrando ${count} órdenes con estado: ${estado}` }
+      })
+      
+      // === ACCIONES PARA ORDEN SELECCIONADA ===
+      
+      uiContextStore.registerAction('descargarOrdenPDF', async () => {
+        if (!self.selectedOrder) {
+          return { success: false, message: 'No hay orden seleccionada. Primero selecciona una orden con seleccionarOrdenCompra.' }
+        }
+        
+        try {
+          await self.downloadOrderPDF()
+          return { success: true, message: `PDF de la orden ${self.selectedOrder.order_number} descargado correctamente.` }
+        } catch (error) {
+          return { success: false, message: `Error al descargar PDF: ${error.message}` }
+        }
+      })
+      
+      uiContextStore.registerAction('enviarOrdenEmail', async () => {
+        if (!self.selectedOrder) {
+          return { success: false, message: 'No hay orden seleccionada. Primero selecciona una orden.' }
+        }
+        
+        if (self.selectedOrder.status !== 'pending') {
+          return { success: false, message: 'Solo se pueden enviar por email las órdenes pendientes.' }
+        }
+        
+        try {
+          await self.sendOrderByEmail()
+          return { success: true, message: `Orden ${self.selectedOrder.order_number} enviada por email al proveedor.` }
+        } catch (error) {
+          return { success: false, message: `Error al enviar email: ${error.message}` }
+        }
+      })
+      
+      uiContextStore.registerAction('enviarOrdenWhatsApp', async () => {
+        if (!self.selectedOrder) {
+          return { success: false, message: 'No hay orden seleccionada. Primero selecciona una orden.' }
+        }
+        
+        if (self.selectedOrder.status !== 'pending') {
+          return { success: false, message: 'Solo se pueden enviar por WhatsApp las órdenes pendientes.' }
+        }
+        
+        try {
+          await self.sendOrderByWhatsApp()
+          return { success: true, message: `Abriendo WhatsApp para enviar orden ${self.selectedOrder.order_number} al proveedor.` }
+        } catch (error) {
+          return { success: false, message: `Error al enviar WhatsApp: ${error.message}` }
+        }
+      })
+      
+      uiContextStore.registerAction('abrirModalIngresarStock', () => {
+        if (!self.selectedOrder) {
+          return { success: false, message: 'No hay orden seleccionada. Primero selecciona una orden.' }
+        }
+        
+        if (self.selectedOrder.status !== 'pending' && self.selectedOrder.status !== 'partial') {
+          return { success: false, message: 'Esta orden ya fue recibida completamente.' }
+        }
+        
+        self.openReceiveModal()
+        self.updateAIContext()
+        
+        return {
+          success: true,
+          message: `Modal de ingreso a stock abierto para orden ${self.selectedOrder.order_number}. El usuario puede marcar los productos recibidos y las cantidades.`,
+          productosParaRecibir: self.receiveForm.items.map(item => ({
+            nombre: item.product_name,
+            ordenado: item.quantity_ordered,
+            yRecibido: item.quantity_received,
+            pendiente: item.quantity_ordered - item.quantity_received
+          }))
+        }
+      })
+      
+      uiContextStore.registerAction('confirmarIngresoStock', async () => {
+        if (!self.showReceiveModal) {
+          return { success: false, message: 'El modal de ingreso a stock no está abierto. Usa abrirModalIngresarStock primero.' }
+        }
+        
+        const itemsConCantidad = self.receiveForm.items.filter(item => item.quantity_to_receive > 0)
+        
+        if (itemsConCantidad.length === 0) {
+          return { success: false, message: 'No hay productos con cantidad a recibir. El usuario debe marcar los checkbox o ingresar cantidades.' }
+        }
+        
+        try {
+          await self.confirmReceive()
+          self.updateAIContext() // Actualizar después de confirmar
+          return {
+            success: true,
+            message: `Productos ingresados al stock correctamente. Se recibieron ${itemsConCantidad.length} productos.`
+          }
+        } catch (error) {
+          return { success: false, message: `Error al ingresar productos: ${error.message}` }
+        }
+      })
+      
+      // Acción para marcar cantidades recibidas en el modal
+      uiContextStore.registerAction('marcarCantidadRecibida', ({ producto, cantidad, recibirTodo }) => {
+        if (!self.showReceiveModal) {
+          return { success: false, message: 'El modal de ingreso no está abierto.' }
+        }
+        
+        // Buscar el producto en el formulario
+        const item = self.receiveForm.items.find(i => 
+          i.product_name.toLowerCase().includes(producto.toLowerCase())
+        )
+        
+        if (!item) {
+          const disponibles = self.receiveForm.items.map(i => i.product_name).join(', ')
+          return { success: false, message: `No encontré "${producto}". Productos disponibles: ${disponibles}` }
+        }
+        
+        const pendiente = item.quantity_ordered - item.quantity_received
+        
+        if (recibirTodo) {
+          item.received_all = true
+          item.quantity_to_receive = pendiente
+          self.updateAIContext()
+          return { success: true, message: `Marcado ${item.product_name}: recibir todo (${pendiente} unidades)` }
+        }
+        
+        if (cantidad !== undefined) {
+          if (cantidad > pendiente) {
+            return { success: false, message: `Máximo ${pendiente} unidades pendientes para ${item.product_name}` }
+          }
+          item.quantity_to_receive = cantidad
+          item.received_all = cantidad === pendiente
+          self.updateAIContext()
+          return { success: true, message: `Marcado ${item.product_name}: ${cantidad} unidades` }
+        }
+        
+        return { success: false, message: 'Debes indicar cantidad o recibirTodo: true' }
+      })
+      
+      // Acción para marcar TODOS los productos como recibidos
+      uiContextStore.registerAction('recibirTodosProductos', () => {
+        if (!self.showReceiveModal) {
+          return { success: false, message: 'El modal de ingreso no está abierto.' }
+        }
+        
+        let totalMarcados = 0
+        self.receiveForm.items.forEach(item => {
+          const pendiente = item.quantity_ordered - item.quantity_received
+          if (pendiente > 0) {
+            item.received_all = true
+            item.quantity_to_receive = pendiente
+            totalMarcados++
+          }
+        })
+        
+        self.updateAIContext()
+        return { success: true, message: `Marcados ${totalMarcados} productos para recibir todo. Ahora confirma con confirmarIngresoStock.` }
+      })
+      
+      uiContextStore.registerAction('marcarOrdenPagada', async () => {
+        if (!self.selectedOrder) {
+          return { success: false, message: 'No hay orden seleccionada.' }
+        }
+        
+        if (self.selectedOrder.status !== 'pending') {
+          return { success: false, message: 'Solo se pueden marcar como pagadas las órdenes pendientes.' }
+        }
+        
+        // Esto abre el modal de recepción
+        self.openReceiveModal()
+        self.updateAIContext()
+        
+        return {
+          success: true,
+          message: `Modal de ingreso a stock abierto. Para marcar como pagada, el usuario debe confirmar los productos recibidos.`
+        }
+      })
     }
   }
 }

@@ -708,11 +708,11 @@
         </div>
 
         <div class="p-6">
-          <!-- Estadísticas -->
-          <div v-if="auditData?.statistics" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <!-- Estadísticas principales -->
+          <div v-if="auditData?.statistics" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
             <div class="bg-blue-50 dark:bg-blue-950 p-3 rounded-xl border border-blue-200 dark:border-blue-800 text-center">
               <p class="text-xl font-bold text-blue-900 dark:text-blue-300">{{ auditData.statistics.total_transactions }}</p>
-              <p class="text-xs font-medium text-blue-700 dark:text-blue-400">Transacciones</p>
+              <p class="text-xs font-medium text-blue-700 dark:text-blue-400">Ventas</p>
             </div>
             <div class="bg-emerald-50 dark:bg-emerald-950 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 text-center">
               <p class="text-xl font-bold text-emerald-900 dark:text-emerald-300">${{ parseFloat(auditData.statistics.average_sale || 0).toLocaleString() }}</p>
@@ -728,6 +728,20 @@
             </div>
           </div>
 
+          <!-- Estadísticas de devoluciones y gastos (si existen) -->
+          <div v-if="auditData?.statistics && (auditData.statistics.total_returns > 0 || auditData.statistics.total_expenses > 0)" class="grid grid-cols-2 gap-3 mb-6">
+            <div v-if="auditData.statistics.total_returns > 0" class="bg-amber-50 dark:bg-amber-950 p-3 rounded-xl border border-amber-200 dark:border-amber-800 text-center">
+              <p class="text-xl font-bold text-amber-900 dark:text-amber-300">{{ auditData.statistics.total_returns }}</p>
+              <p class="text-xs font-medium text-amber-700 dark:text-amber-400">Devoluciones</p>
+              <p class="text-xs text-amber-600 dark:text-amber-500">-${{ parseFloat(auditData.statistics.total_returns_amount || 0).toLocaleString() }}</p>
+            </div>
+            <div v-if="auditData.statistics.total_expenses > 0" class="bg-rose-50 dark:bg-rose-950 p-3 rounded-xl border border-rose-200 dark:border-rose-800 text-center">
+              <p class="text-xl font-bold text-rose-900 dark:text-rose-300">{{ auditData.statistics.total_expenses }}</p>
+              <p class="text-xs font-medium text-rose-700 dark:text-rose-400">Gastos</p>
+              <p class="text-xs text-rose-600 dark:text-rose-500">-${{ parseFloat(auditData.statistics.total_expenses_amount || 0).toLocaleString() }}</p>
+            </div>
+          </div>
+
           <!-- Timeline -->
           <div v-if="auditData?.timeline" class="mb-6">
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Timeline de Eventos</h3>
@@ -739,6 +753,7 @@
                     <path v-if="event.type === 'opening'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                     <path v-else-if="event.type === 'sale'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                     <path v-else-if="event.type === 'return'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                    <path v-else-if="event.type === 'expense'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
                     <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </div>
@@ -758,6 +773,18 @@
                   </div>
                   <div v-if="event.type === 'return' && event.details.reason" class="text-sm text-gray-500 dark:text-zinc-500 italic">
                     Razón: {{ event.details.reason }}
+                  </div>
+                  <!-- Detalles de gastos -->
+                  <div v-if="event.type === 'expense' && event.details.category" class="text-sm text-gray-600 dark:text-zinc-400">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" :style="{ backgroundColor: event.details.category_color + '20', color: event.details.category_color }">
+                      {{ event.details.category }}
+                    </span>
+                  </div>
+                  <div v-if="event.type === 'expense' && event.details.supplier" class="text-sm text-gray-500 dark:text-zinc-500">
+                    Proveedor: {{ event.details.supplier }}
+                  </div>
+                  <div v-if="event.type === 'expense' && event.details.payment_method" class="text-xs text-gray-400 dark:text-zinc-600">
+                    Método: {{ event.details.payment_method }}
                   </div>
                 </div>
               </div>
@@ -822,15 +849,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { apiCall } from '../services/api.js'
 import { useToast } from '../composables/useToast.js'
 import { appStore } from '../store/appStore.js'
+import { useUIContextStore } from '../store/uiContextStore.js'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 
+// 🎯 Props y Emits para evitar warnings de Vue
+defineProps({
+  moduleName: { type: String, default: '' },
+  queryParams: { type: Object, default: () => ({}) }
+})
+
+defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'openReturnInPos', 'refresh'])
+
 // Toast system
 const { showSuccess, showError, showInfo, showWarning } = useToast()
+
+// 🧠 IA Context Store
+const uiContext = useUIContextStore()
 
 // Data
 const sessions = ref([])
@@ -1150,6 +1189,7 @@ const getEventIconClass = (type) => {
     opening: 'bg-green-500',
     sale: 'bg-blue-500', 
     return: 'bg-orange-500',
+    expense: 'bg-rose-500',
     closing: 'bg-red-500'
   }
   return classes[type] || 'bg-gray-500'
@@ -1404,10 +1444,459 @@ const generateReport = async (session) => {
   }
 }
 
+// 🧠 ================================
+// IA CONTEXT - Control de Cajas
+// ================================
+
+// Función para calcular alertas de empleados
+const calcularAlertasEmpleados = () => {
+  const alertas = []
+  const now = new Date()
+  
+  activeSessions.value.forEach(session => {
+    const userName = session.user?.name || 'Usuario desconocido'
+    const ventas = parseFloat(session.total_sales || 0)
+    
+    // Calcular duración de la sesión
+    let horasSesion = 0
+    if (session.created_at || session.opened_at) {
+      const openedAt = new Date(session.created_at || session.opened_at)
+      horasSesion = (now - openedAt) / (1000 * 60 * 60)
+    }
+    
+    // Alerta: Más de 2 horas sin ventas (si tiene sesión abierta)
+    if (horasSesion > 2 && ventas === 0) {
+      alertas.push({
+        tipo: 'sin_ventas',
+        usuario: userName,
+        mensaje: `${userName} lleva ${Math.floor(horasSesion)} horas sin registrar ventas`,
+        severidad: 'alta'
+      })
+    }
+    
+    // Alerta: Sesión muy larga (más de 10 horas)
+    if (horasSesion > 10) {
+      alertas.push({
+        tipo: 'sesion_larga',
+        usuario: userName,
+        mensaje: `${userName} tiene sesión abierta por más de ${Math.floor(horasSesion)} horas`,
+        severidad: 'media'
+      })
+    }
+  })
+  
+  return alertas
+}
+
+// Función para obtener resumen de rendimiento por empleado (incluye gastos y devoluciones)
+const obtenerRendimientoEmpleado = async (busqueda) => {
+  const searchTerm = busqueda?.toLowerCase() || ''
+  
+  // Buscar en todas las sesiones (activas y cerradas)
+  const sesionesEmpleado = sessions.value.filter(s => 
+    s.user?.name?.toLowerCase().includes(searchTerm) ||
+    s.user?.email?.toLowerCase().includes(searchTerm)
+  )
+  
+  if (sesionesEmpleado.length === 0) {
+    // Buscar si al menos existe alguien con ese nombre en las sesiones para sugerir
+    const todosLosEmpleados = [...new Set(sessions.value.map(s => s.user?.name).filter(Boolean))]
+    
+    // Buscar nombres similares (al menos 3 caracteres coinciden)
+    const sugerencias = todosLosEmpleados.filter(nombre => {
+      const nombreLower = nombre.toLowerCase()
+      return nombreLower.includes(searchTerm.substring(0, 3)) || 
+             searchTerm.includes(nombreLower.substring(0, 3))
+    })
+    
+    return {
+      noEncontrado: true,
+      busqueda: busqueda,
+      sugerencias: sugerencias.slice(0, 3),
+      mensaje: sugerencias.length > 0 
+        ? `No encontré sesiones de "${busqueda}". ¿Quisiste decir: ${sugerencias.join(', ')}?`
+        : `No encontré sesiones de caja para "${busqueda}". Este empleado no ha abierto caja recientemente.`
+    }
+  }
+  
+  const empleado = sesionesEmpleado[0].user
+  const sesionesHoy = sesionesEmpleado.filter(s => {
+    const today = new Date().toISOString().split('T')[0]
+    return s.opening_date?.startsWith(today) || s.created_at?.startsWith(today)
+  })
+  
+  const sesionActiva = sesionesEmpleado.find(s => s.status === 'open')
+  const ventasTotalesHoy = sesionesHoy.reduce((sum, s) => sum + parseFloat(s.total_sales || 0), 0)
+  const transaccionesHoy = sesionesHoy.length
+  
+  // Calcular tiempo activo hoy
+  let tiempoActivoHoy = 0
+  sesionesHoy.forEach(s => {
+    const inicio = new Date(s.created_at || s.opened_at)
+    const fin = s.status === 'open' ? new Date() : new Date(s.closed_at || s.updated_at)
+    tiempoActivoHoy += (fin - inicio) / (1000 * 60 * 60)
+  })
+  
+  // Obtener gastos y devoluciones de las sesiones de hoy
+  let gastosHoy = 0
+  let cantidadGastos = 0
+  let devolucionesHoy = 0
+  let cantidadDevoluciones = 0
+  
+  // Para cada sesión de hoy, obtener los gastos y devoluciones
+  for (const sesion of sesionesHoy) {
+    try {
+      const response = await apiClient.get(`/cash-sessions/${sesion.id}/audit`)
+      if (response.data.success) {
+        const stats = response.data.statistics
+        gastosHoy += parseFloat(stats.total_expenses_amount || 0)
+        cantidadGastos += stats.total_expenses || 0
+        devolucionesHoy += parseFloat(stats.total_returns_amount || 0)
+        cantidadDevoluciones += stats.total_returns || 0
+      }
+    } catch (err) {
+      // Silenciar errores, continuar con siguientes sesiones
+    }
+  }
+  
+  return {
+    noEncontrado: false,
+    nombre: empleado?.name,
+    email: empleado?.email,
+    sesionActiva: sesionActiva ? {
+      id: sesionActiva.id,
+      duracion: getSessionDuration(sesionActiva),
+      ventas: parseFloat(sesionActiva.total_sales || 0),
+      montoInicial: parseFloat(sesionActiva.opening_amount || 0)
+    } : null,
+    resumenHoy: {
+      ventas: ventasTotalesHoy,
+      sesiones: transaccionesHoy,
+      horasTrabajadas: Math.round(tiempoActivoHoy * 10) / 10,
+      // Nuevos campos: gastos y devoluciones
+      gastos: gastosHoy,
+      cantidadGastos: cantidadGastos,
+      devoluciones: devolucionesHoy,
+      cantidadDevoluciones: cantidadDevoluciones
+    },
+    historial: sesionesEmpleado.slice(0, 5).map(s => ({
+      id: s.id,
+      fecha: formatDate(s.opening_date || s.created_at),
+      estado: s.status === 'open' ? 'Activa' : 'Cerrada',
+      ventas: parseFloat(s.total_sales || 0),
+      estadoCierre: s.closing_status ? getClosingStatusText(s.closing_status) : '-'
+    }))
+  }
+}
+
+// 🏦 Función para distinguir "mi caja" vs "cajas de empleados"
+const obtenerMiCajaVsEmpleados = () => {
+  const currentUser = appStore.user
+  const currentUserId = currentUser?.id
+  
+  // Buscar MI caja (del usuario actual)
+  const miSesion = activeSessions.value.find(s => s.user_id === currentUserId)
+  
+  // Cajas de otros empleados
+  const cajasEmpleados = activeSessions.value.filter(s => s.user_id !== currentUserId)
+  
+  return {
+    miCaja: miSesion ? {
+      id: miSesion.id,
+      estado: 'Activa',
+      duracion: getSessionDuration(miSesion),
+      montoInicial: parseFloat(miSesion.opening_amount || 0),
+      ventas: parseFloat(miSesion.total_sales || 0),
+      efectivo: parseFloat(miSesion.cash_sales || 0),
+      totalEnCaja: parseFloat(miSesion.opening_amount || 0) + parseFloat(miSesion.total_sales || 0)
+    } : null,
+    cajasEmpleados: cajasEmpleados.map(s => ({
+      id: s.id,
+      empleado: s.user?.name || 'Desconocido',
+      duracion: getSessionDuration(s),
+      ventas: parseFloat(s.total_sales || 0),
+      montoInicial: parseFloat(s.opening_amount || 0)
+    })),
+    resumen: {
+      tengoCajaAbierta: !!miSesion,
+      empleadosActivos: cajasEmpleados.length,
+      totalVentasEmpleados: cajasEmpleados.reduce((sum, s) => sum + parseFloat(s.total_sales || 0), 0)
+    }
+  }
+}
+
+// Función para actualizar contexto de IA
+const actualizarContextoIA = () => {
+  const alertas = calcularAlertasEmpleados()
+  
+  // Construir lista de sesiones para la IA (resumida)
+  const sesionesResumidas = paginatedSessions.value.map(s => ({
+    id: s.id,
+    usuario: s.user?.name || 'Desconocido',
+    estado: s.status === 'open' ? 'Activa' : 'Cerrada',
+    ventas: `$${parseFloat(s.total_sales || 0).toLocaleString()}`,
+    duracion: getSessionDuration(s),
+    montoInicial: `$${parseFloat(s.opening_amount || 0).toLocaleString()}`,
+    estadoCierre: s.status === 'closed' ? getClosingStatusText(s.closing_status) : 'En curso'
+  }))
+  
+  uiContext.setScreenData({
+    kpis: {
+      sesionesActivas: activeSessions.value.length,
+      totalEnCajas: `$${totalCashAmount.value.toLocaleString()}`,
+      ventasHoy: `$${totalSalesToday.value.toLocaleString()}`,
+      empleadosConCajaAbierta: activeSessions.value.map(s => s.user?.name).filter(Boolean)
+    },
+    sesiones: {
+      lista: sesionesResumidas,
+      totalRegistros: filteredSessions.value.length,
+      filtroActual: statusFilter.value || 'todos'
+    },
+    alertasEmpleados: alertas,
+    detalleSeleccionado: selectedSession.value ? {
+      id: selectedSession.value.id,
+      usuario: selectedSession.value.user?.name,
+      estado: selectedSession.value.status,
+      montoInicial: parseFloat(selectedSession.value.opening_amount || 0),
+      ventas: parseFloat(selectedSession.value.total_sales || 0),
+      efectivo: parseFloat(selectedSession.value.cash_sales || 0)
+    } : null,
+    modales: {
+      detalleAbierto: !!selectedSession.value,
+      cierreAbierto: showCloseSessionModal.value,
+      auditoriaAbierta: showAuditModal.value
+    }
+  })
+}
+
+// Registrar acciones para la IA
+const registrarAccionesIA = () => {
+  // Ver detalles de sesión
+  uiContext.registerAction('verDetalleSesion', async ({ idSesion, busqueda }) => {
+    let session = null
+    
+    if (idSesion) {
+      session = sessions.value.find(s => s.id === parseInt(idSesion))
+    } else if (busqueda) {
+      session = sessions.value.find(s => 
+        s.user?.name?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        s.id.toString() === busqueda
+      )
+    }
+    
+    if (session) {
+      viewSessionDetails(session)
+      return { 
+        success: true, 
+        message: `Mostrando detalles de la sesión de ${session.user?.name}`,
+        datos: {
+          usuario: session.user?.name,
+          estado: session.status === 'open' ? 'Activa' : 'Cerrada',
+          ventas: parseFloat(session.total_sales || 0),
+          montoInicial: parseFloat(session.opening_amount || 0)
+        }
+      }
+    }
+    return { success: false, message: 'No encontré esa sesión' }
+  })
+  
+  // Ver auditoría de sesión
+  uiContext.registerAction('verAuditoriaSesion', async ({ idSesion, busqueda }) => {
+    let session = null
+    
+    if (idSesion) {
+      session = sessions.value.find(s => s.id === parseInt(idSesion))
+    } else if (busqueda) {
+      session = sessions.value.find(s => 
+        s.user?.name?.toLowerCase().includes(busqueda.toLowerCase())
+      )
+    }
+    
+    if (session) {
+      await viewSessionAudit(session)
+      return { success: true, message: `Mostrando auditoría de ${session.user?.name}` }
+    }
+    return { success: false, message: 'No encontré esa sesión' }
+  })
+  
+  // Buscar sesiones por usuario
+  uiContext.registerAction('buscarSesionesPorUsuario', async ({ nombre }) => {
+    if (!nombre) {
+      return { success: false, message: 'Dime el nombre del usuario a buscar' }
+    }
+    
+    searchQuery.value = nombre
+    await new Promise(resolve => setTimeout(resolve, 100))
+    actualizarContextoIA()
+    
+    return { 
+      success: true, 
+      message: `Filtrando sesiones de "${nombre}". ${filteredSessions.value.length} resultados encontrados.`
+    }
+  })
+  
+  // Filtrar por estado
+  uiContext.registerAction('filtrarSesionesPorEstado', async ({ estado }) => {
+    const estadoMap = {
+      'activas': 'open',
+      'abiertas': 'open', 
+      'open': 'open',
+      'cerradas': 'closed',
+      'closed': 'closed',
+      'todas': '',
+      'todos': ''
+    }
+    
+    statusFilter.value = estadoMap[estado?.toLowerCase()] ?? ''
+    await new Promise(resolve => setTimeout(resolve, 100))
+    actualizarContextoIA()
+    
+    return { 
+      success: true, 
+      message: `Mostrando sesiones ${estado || 'todas'}. ${filteredSessions.value.length} resultados.`
+    }
+  })
+  
+  // Consultar rendimiento de empleado (GLOBAL - funciona desde cualquier módulo)
+  uiContext.registerAction('consultarRendimientoEmpleado', async ({ busqueda }) => {
+    if (!busqueda) {
+      return { success: false, message: 'Dime el nombre del empleado que quieres consultar' }
+    }
+    
+    // Ahora es async, incluye gastos y devoluciones
+    const rendimiento = await obtenerRendimientoEmpleado(busqueda)
+    
+    // Manejar caso de no encontrado con sugerencias
+    if (rendimiento?.noEncontrado) {
+      return { 
+        success: false, 
+        message: rendimiento.mensaje,
+        sugerencias: rendimiento.sugerencias
+      }
+    }
+    
+    if (!rendimiento) {
+      return { success: false, message: `No encontré información de "${busqueda}" en las sesiones de caja` }
+    }
+    
+    return {
+      success: true,
+      message: `Rendimiento de ${rendimiento.nombre}`,
+      datos: rendimiento
+    }
+  })
+  
+  // 🏦 Mi caja vs cajas de empleados (GLOBAL)
+  uiContext.registerAction('obtenerMiCajaVsEmpleados', async () => {
+    const info = obtenerMiCajaVsEmpleados()
+    
+    let mensaje = ''
+    if (info.miCaja) {
+      mensaje = `Tu caja está abierta: $${info.miCaja.ventas.toLocaleString()} en ventas, ${info.miCaja.duracion}. `
+    } else {
+      mensaje = 'No tienes caja abierta. '
+    }
+    
+    if (info.cajasEmpleados.length > 0) {
+      mensaje += `Tus empleados (${info.cajasEmpleados.length}): ${info.cajasEmpleados.map(c => `${c.empleado} ($${c.ventas.toLocaleString()})`).join(', ')}`
+    } else {
+      mensaje += 'No hay empleados con caja abierta.'
+    }
+    
+    return {
+      success: true,
+      message: mensaje,
+      datos: info
+    }
+  })
+  
+  // Obtener alertas de empleados
+  uiContext.registerAction('obtenerAlertasEmpleados', async () => {
+    const alertas = calcularAlertasEmpleados()
+    
+    if (alertas.length === 0) {
+      return { 
+        success: true, 
+        message: 'Todo bien, no hay alertas de empleados en este momento.',
+        alertas: []
+      }
+    }
+    
+    return {
+      success: true,
+      message: `Hay ${alertas.length} alerta(s) de empleados`,
+      alertas
+    }
+  })
+  
+  // Obtener resumen de cajas (GLOBAL)
+  uiContext.registerAction('obtenerResumenCajas', async () => {
+    // Incluir info de mi caja vs empleados
+    const miCajaInfo = obtenerMiCajaVsEmpleados()
+    
+    return {
+      success: true,
+      message: 'Resumen de Control de Cajas',
+      datos: {
+        sesionesActivas: activeSessions.value.length,
+        empleadosActivos: activeSessions.value.map(s => s.user?.name).filter(Boolean),
+        totalEnCajas: totalCashAmount.value,
+        ventasHoy: totalSalesToday.value,
+        alertas: calcularAlertasEmpleados(),
+        miCaja: miCajaInfo.miCaja,
+        cajasEmpleados: miCajaInfo.cajasEmpleados
+      }
+    }
+  })
+  
+  // Generar reporte de sesión
+  uiContext.registerAction('generarReporteSesion', async ({ idSesion, busqueda }) => {
+    let session = null
+    
+    if (idSesion) {
+      session = sessions.value.find(s => s.id === parseInt(idSesion))
+    } else if (busqueda) {
+      session = sessions.value.find(s => 
+        s.user?.name?.toLowerCase().includes(busqueda.toLowerCase())
+      )
+    }
+    
+    if (session) {
+      await generateReport(session)
+      return { success: true, message: `Reporte generado para sesión #${session.id}` }
+    }
+    return { success: false, message: 'No encontré esa sesión' }
+  })
+  
+  // Refrescar datos
+  uiContext.registerAction('refrescarCajas', async () => {
+    await refreshSessions()
+    actualizarContextoIA()
+    return { success: true, message: 'Datos de cajas actualizados' }
+  })
+}
+
 // Lifecycle
 onMounted(() => {
   refreshSessions()
-  // Sin mensaje inicial - la vista carga silenciosamente
+  
+  // Registrar acciones para IA
+  registrarAccionesIA()
+  
+  // Actualizar contexto inicial (después de cargar datos)
+  setTimeout(() => {
+    actualizarContextoIA()
+  }, 1000)
+})
+
+// Watch para actualizar contexto cuando cambien los datos
+watch([sessions, activeSessions, statusFilter, searchQuery, selectedSession], () => {
+  actualizarContextoIA()
+}, { deep: true })
+
+// Cleanup al desmontar
+onUnmounted(() => {
+  uiContext.clearSelection()
 })
 </script>
 

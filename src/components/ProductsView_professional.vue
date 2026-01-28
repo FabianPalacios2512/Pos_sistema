@@ -3219,6 +3219,13 @@ const updateScreenContextForAI = () => {
 
   // 🧠 IMPORTANTE: Obtener productos VISIBLES en pantalla (filtrados)
   // Si hay pocos productos filtrados, incluirlos para que la IA sepa cuáles ve el usuario
+  // Helper para obtener nombre del proveedor
+  const getSupplierName = (supplierId) => {
+    if (!supplierId) return null
+    const supplier = suppliers.value.find(s => s.id === supplierId)
+    return supplier ? supplier.name : null
+  }
+  
   const productosVisibles = filteredProducts.value.length <= 10 
     ? filteredProducts.value.map(p => ({
         id: p.id,
@@ -3228,6 +3235,8 @@ const updateScreenContextForAI = () => {
         costo: p.cost_price,
         stock: p.current_stock || 0,
         categoria: p.category_name || 'Sin categoría',
+        proveedor: getSupplierName(p.supplier_id) || 'Sin proveedor asignado',
+        proveedorId: p.supplier_id || null,
         activo: getProductStatus(p) !== false
       }))
     : null // Si hay muchos, no los incluimos para no sobrecargar
@@ -3267,8 +3276,13 @@ const updateScreenContextForAI = () => {
       costo: productoEnContexto.cost_price,
       stock: productoEnContexto.current_stock,
       categoria: productoEnContexto.category_name,
+      proveedor: getSupplierName(productoEnContexto.supplier_id) || 'Sin proveedor asignado',
+      proveedorId: productoEnContexto.supplier_id || null,
       activo: getProductStatus(productoEnContexto)
     } : null,
+    
+    // 🏭 Lista de proveedores disponibles (para que la IA pueda sugerir)
+    proveedoresDisponibles: suppliers.value.slice(0, 15).map(s => ({ id: s.id, nombre: s.name })),
     modalAbierto: showProductModal.value ? (isEditing.value ? 'editar' : 'crear') : null,
     sedesDisponibles: availableWarehouses.value.map(w => ({ id: w.id, nombre: w.name })),
     
@@ -3424,6 +3438,49 @@ const updateScreenContextForAI = () => {
       return { success: true, message: 'Mostrando productos con stock bajo', cantidad: lowStockProducts.value }
     }
     return { success: false, message: 'Estado no reconocido. Usa: activos, inactivos, stock_bajo' }
+  })
+
+  // 🧠 NUEVA ACCIÓN: Buscar proveedor de un producto
+  uiContext.registerAction('buscarProveedorDeProducto', ({ nombreProducto }) => {
+    if (!nombreProducto) {
+      return { success: false, message: 'Dime el nombre del producto para buscar su proveedor' }
+    }
+    
+    // Buscar el producto
+    const resultados = buscarProductoFlexible(nombreProducto)
+    
+    if (resultados.length === 0) {
+      return { 
+        success: false, 
+        message: `No encontré el producto "${nombreProducto}"`,
+        productosDisponibles: displayProducts.value.slice(0, 10).map(p => p.name)
+      }
+    }
+    
+    const producto = resultados[0]
+    const proveedor = suppliers.value.find(s => s.id === producto.supplier_id)
+    
+    if (proveedor) {
+      return {
+        success: true,
+        productoEncontrado: producto.name,
+        proveedorAsignado: {
+          id: proveedor.id,
+          nombre: proveedor.name,
+          telefono: proveedor.phone,
+          email: proveedor.email
+        },
+        message: `El producto "${producto.name}" es de "${proveedor.name}". ¿Quieres crear una orden de compra para este proveedor?`
+      }
+    } else {
+      return {
+        success: true,
+        productoEncontrado: producto.name,
+        proveedorAsignado: null,
+        message: `El producto "${producto.name}" no tiene proveedor asignado. ¿Quieres asignarle uno?`,
+        proveedoresDisponibles: suppliers.value.slice(0, 10).map(s => s.name)
+      }
+    }
   })
 
   uiContext.registerAction('abrirCrearProducto', async () => {
