@@ -91,6 +91,34 @@ class BiometricService {
   }
 
   /**
+   * Obtener todos los descriptores de perfiles activos (para identificación 1:N)
+   */
+  async getAllDescriptors() {
+    try {
+      const response = await apiClient.get(`${BIOMETRIC_ENDPOINT}/all-descriptors`)
+      return response.data
+    } catch (error) {
+      console.error('Error fetching all descriptors:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Buscar usuario por cédula (CC) y verificar estado de enrolamiento
+   */
+  async lookupUserByCC(cc) {
+    try {
+      const response = await apiClient.get(`${BIOMETRIC_ENDPOINT}/lookup-user`, {
+        params: { cc }
+      })
+      return response.data
+    } catch (error) {
+      console.error('Error looking up user by CC:', error)
+      throw error
+    }
+  }
+
+  /**
    * Eliminar perfil biométrico de un usuario
    */
   async deleteProfile(userId) {

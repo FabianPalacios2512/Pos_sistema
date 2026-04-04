@@ -779,9 +779,10 @@ export const reportsService = {
   },
 
   // Obtener ventas reales de hoy desde el backend corregido (hora Colombia)
-  async getVentasHoyColombia() {
+  async getVentasHoyColombia(userId = null) {
     try {
-      const response = await apiClient.get('/dashboard/ventas-hoy')
+      const params = userId ? { user_id: userId } : {}
+      const response = await apiClient.get('/dashboard/ventas-hoy', { params })
       const data = response.data
       return {
         total: data.total || 0,

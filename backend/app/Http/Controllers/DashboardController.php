@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -15,11 +16,19 @@ class DashboardController extends Controller
         // Fecha de hoy en Colombia
         $fechaColombia = now('America/Bogota')->format('Y-m-d');
 
-        // Query: filtrar por campo 'date' (fecha de la factura)
-        $ventas = DB::table('invoices')
+        $query = DB::table('invoices')
             ->where('status', 'paid')
-            ->whereDate('date', $fechaColombia)
-            ->select(DB::raw('COUNT(*) as transacciones, COALESCE(SUM(total),0) as total'))
+            ->whereDate('date', $fechaColombia);
+
+        // Si se pasa user_id (para vendedor), filtrar por sesión de caja
+        if ($request->has('user_id')) {
+            $query->whereIn('cash_session_id', function ($sub) use ($request) {
+                $sub->select('id')->from('cash_sessions')
+                    ->where('user_id', $request->user_id);
+            });
+        }
+
+        $ventas = $query->select(DB::raw('COUNT(*) as transacciones, COALESCE(SUM(total),0) as total'))
             ->first();
 
         return response()->json([

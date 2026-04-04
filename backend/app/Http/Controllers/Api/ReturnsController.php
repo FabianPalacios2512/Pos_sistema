@@ -18,6 +18,17 @@ use Illuminate\Support\Facades\Validator;
 class ReturnsController extends Controller
 {
     /**
+     * Check if current user has vendedor role
+     */
+    private function isVendedor(): bool
+    {
+        $user = Auth::user();
+        if (!$user) return false;
+        $user->load('role');
+        return $user->role && strtolower($user->role->name) === 'vendedor';
+    }
+
+    /**
      * Obtener lista de devoluciones
      */
     public function index(Request $request): JsonResponse
@@ -26,6 +37,11 @@ class ReturnsController extends Controller
             // No incluir returnItems.product ya que no existe la tabla return_items
             $query = ProductReturn::with(['originalInvoice', 'customer', 'user', 'cashSession'])
                 ->orderBy('created_at', 'desc');
+
+            // Vendedor: solo sus devoluciones
+            if ($this->isVendedor()) {
+                $query->where('user_id', Auth::id());
+            }
 
             // Filtros
             if ($request->has('date_from') && $request->has('date_to')) {
@@ -804,6 +820,11 @@ class ReturnsController extends Controller
             // Calcular métricas de devoluciones
             $returns = ProductReturn::where('status', 'completed')
                 ->whereBetween('return_date', [$startDate, $endDate]);
+
+            // Vendedor: solo sus métricas
+            if ($this->isVendedor()) {
+                $returns->where('user_id', Auth::id());
+            }
 
             $totalReturns = $returns->sum('total');
             $returnsCount = $returns->count();

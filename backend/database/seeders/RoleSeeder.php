@@ -38,7 +38,10 @@ class RoleSeeder extends Seeder
                     'inventory.view',
                     'sales.view', 'sales.create',
                     'customers.view', 'customers.create',
-                    'reports.view', 'reports.sales'
+                    'invoices.view',
+                    'returns.view',
+                    'accounts-receivable.view',
+                    'pos.view', 'pos.create_sale', 'pos.apply_discount', 'pos.cancel_sale'
                 ],
                 'active' => true
             ],

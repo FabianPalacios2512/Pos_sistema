@@ -299,6 +299,12 @@ const StockTransfersView = defineAsyncComponent(() => import('../components/Stoc
 // Mi Perfil
 const MyProfileView = defineAsyncComponent(() => import('../components/MyProfileView.vue'))
 
+// Punteo Biométrico
+const AttendanceCheckView = defineAsyncComponent(() => import('../components/AttendanceCheckView.vue'))
+
+// Mi Jornada (asistencia personal para vendedores)
+const MyAttendanceView = defineAsyncComponent(() => import('../components/MyAttendanceView.vue'))
+
 // Componentes temporales para módulos no desarrollados aún
 const PlaceholderView = defineAsyncComponent(() => import('../components/PlaceholderView.vue'))
 
@@ -461,6 +467,7 @@ const hasModulePermission = (module) => {
     'purchase-orders': 'suppliers.view',      // Órdenes de Compra → permiso de ver proveedores
     'users-management': 'users.view',         // Usuarios y Roles → permiso de ver usuarios (desde IA)
     'users': 'users.view',                    // Usuarios (desde menú) → permiso de ver usuarios
+    'attendance': 'users.view',                 // Punteo Biométrico → permiso de ver usuarios
     'roles': 'users.view',                    // Roles → permiso de ver usuarios
     'intelligent_inventory': 'products.view', // Inventario Inteligente → permiso de ver productos
     'categories': 'categories.view'           // Categorías → permiso de ver categorías
@@ -1256,7 +1263,9 @@ const currentModuleComponent = computed(() => {
     warehouses: WarehousesView,
     'stock-transfers': StockTransfersView,
     'web-catalog-config': WebCatalogConfig,
-    'my-profile': MyProfileView
+    'my-profile': MyProfileView,
+    'attendance': AttendanceCheckView,
+    'my-attendance': MyAttendanceView
   }
   return moduleComponents[currentModule.value] || null
 })
@@ -1287,7 +1296,7 @@ const toggleSidebar = () => {
 // Cambiar módulo actual
 const setCurrentModule = (module, options = {}) => {
   // Módulos especiales accesibles para todos los usuarios (sin verificación de permisos)
-  const publicModules = ['my-profile', 'dashboard', 'pos']
+  const publicModules = ['my-profile', 'dashboard', 'pos', 'my-attendance']
   
   // Verificar permisos antes de cambiar módulo
   // SOLO si el usuario ya está cargado (evitar check durante inicialización)
@@ -1594,7 +1603,9 @@ const getModuleDescription = () => {
     'accounts-receivable': 'CreditiTenda • Gestión completa de créditos',
     warehouses: 'Gestión de Sedes • Control multisede',
     'cash-admin': 'Control de Cajas • Supervisión de turnos',
-    'my-profile': 'Mi Perfil • Información personal y seguridad'
+    'my-profile': 'Mi Perfil • Información personal y seguridad',
+    'attendance': 'Punteo de Jornada • Control biométrico de asistencia',
+    'my-attendance': 'Mi Jornada • Control de asistencia personal'
   }
   return descriptions[currentModule.value] || '✨ Sistema de gestión empresarial avanzado'
 }

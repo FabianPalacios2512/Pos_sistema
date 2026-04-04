@@ -406,6 +406,8 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::get('/users-dashboard/plan-info', [\App\Http\Controllers\Api\UserDashboardController::class, 'planInfo']);
 
     // Biométrico - Punteo de Jornada
+    Route::get('/biometric/lookup-user', [\App\Http\Controllers\Api\BiometricController::class, 'lookupUser']);
+    Route::get('/biometric/all-descriptors', [\App\Http\Controllers\Api\BiometricController::class, 'getAllDescriptors']);
     Route::post('/biometric/enroll', [\App\Http\Controllers\Api\BiometricController::class, 'enroll']);
     Route::get('/biometric/{userId}/descriptor', [\App\Http\Controllers\Api\BiometricController::class, 'getDescriptor']);
     Route::get('/biometric/{userId}/check', [\App\Http\Controllers\Api\BiometricController::class, 'checkEnrollment']);

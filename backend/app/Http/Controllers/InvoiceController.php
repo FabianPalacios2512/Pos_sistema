@@ -58,6 +58,17 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Check if current user has vendedor role
+     */
+    private function isVendedor(): bool
+    {
+        $user = Auth::user();
+        if (!$user) return false;
+        $user->load('role');
+        return $user->role && strtolower($user->role->name) === 'vendedor';
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request): JsonResponse
@@ -65,6 +76,14 @@ class InvoiceController extends Controller
         try {
             $query = Invoice::with(['customer', 'items.product', 'cashSession.user'])
                 ->orderBy('created_at', 'desc');
+
+            // Vendedor: solo sus facturas de hoy
+            if ($this->isVendedor()) {
+                $userId = Auth::id();
+                $query->whereHas('cashSession', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })->whereDate('date', now()->format('Y-m-d'));
+            }
 
             // Filter by customer_id if provided
             if ($request->has('customer_id')) {
@@ -744,16 +763,25 @@ class InvoiceController extends Controller
     {
         try {
             $currentMonth = now()->format('Y-m');
+            $isVendedor = $this->isVendedor();
+            $userId = Auth::id();
+
+            $baseQuery = Invoice::query();
+            if ($isVendedor) {
+                $baseQuery->whereHas('cashSession', function ($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })->whereDate('date', now()->format('Y-m-d'));
+            }
 
             $stats = [
-                'monthly_invoices' => Invoice::where('type', 'invoice')
-                    ->whereRaw('DATE_FORMAT(date, "%Y-%m") = ?', [$currentMonth])
+                'monthly_invoices' => (clone $baseQuery)->where('type', 'invoice')
+                    ->when(!$isVendedor, fn($q) => $q->whereRaw('DATE_FORMAT(date, "%Y-%m") = ?', [$currentMonth]))
                     ->count(),
-                'total_invoiced' => Invoice::where('type', 'invoice')
+                'total_invoiced' => (clone $baseQuery)->where('type', 'invoice')
                     ->where('status', '!=', 'cancelled')
                     ->sum('total'),
-                'pending_invoices' => Invoice::where('status', 'sent')->count(),
-                'quotations' => Invoice::where('type', 'quote')->count(),
+                'pending_invoices' => (clone $baseQuery)->where('status', 'sent')->count(),
+                'quotations' => (clone $baseQuery)->where('type', 'quote')->count(),
             ];
 
             return response()->json([

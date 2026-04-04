@@ -9,9 +9,35 @@ use App\Models\Customer;
 use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    /**
+     * Check if current user has vendedor role
+     */
+    private function isVendedor(): bool
+    {
+        $user = Auth::user();
+        if (!$user) return false;
+        $user->load('role');
+        return $user->role && strtolower($user->role->name) === 'vendedor';
+    }
+
+    /**
+     * Apply vendedor scope to invoice query
+     */
+    private function applyVendedorScope($query)
+    {
+        if ($this->isVendedor()) {
+            $userId = Auth::id();
+            $query->whereHas('cashSession', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
+        }
+        return $query;
+    }
+
     public function stats()
     {
         try {
@@ -19,20 +45,18 @@ class DashboardController extends Controller
             $thisMonth = Carbon::now()->startOfMonth();
 
             // Ventas de hoy
-            $todaySales = Invoice::whereDate('date', $today)
-                ->where('status', 'paid')
-                ->sum('total');
-            $todaySalesCount = Invoice::whereDate('date', $today)
-                ->where('status', 'paid')
-                ->count();
+            $todaySalesQuery = Invoice::whereDate('date', $today)
+                ->where('status', 'paid');
+            $this->applyVendedorScope($todaySalesQuery);
+            $todaySales = (clone $todaySalesQuery)->sum('total');
+            $todaySalesCount = (clone $todaySalesQuery)->count();
 
             // Ventas del mes
-            $monthSales = Invoice::where('date', '>=', $thisMonth)
-                ->where('status', 'paid')
-                ->sum('total');
-            $monthSalesCount = Invoice::where('date', '>=', $thisMonth)
-                ->where('status', 'paid')
-                ->count();
+            $monthSalesQuery = Invoice::where('date', '>=', $thisMonth)
+                ->where('status', 'paid');
+            $this->applyVendedorScope($monthSalesQuery);
+            $monthSales = (clone $monthSalesQuery)->sum('total');
+            $monthSalesCount = (clone $monthSalesQuery)->count();
 
             // Productos con stock bajo
             $lowStockProducts = Product::whereRaw('current_stock <= min_stock')

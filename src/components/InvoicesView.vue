@@ -9,7 +9,7 @@
             <!-- Título y Subtítulo -->
             <div>
               <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Facturas</h1>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Gestión de documentos y cotizaciones</p>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">{{ isVendedor ? 'Mis facturas de hoy' : 'Gestión de documentos y cotizaciones' }}</p>
             </div>
         
         <!-- Botones de Acción -->
@@ -24,6 +24,7 @@
           </button>
           
           <button
+            v-if="!isVendedor"
             @click="navigateToPos"
             class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-[13px] font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,7 +261,7 @@
             </div>
 
             <!-- Acciones rápidas -->
-            <div class="relative z-10 flex items-center gap-3 mb-8">
+            <div v-if="!isVendedor" class="relative z-10 flex items-center gap-3 mb-8">
               <button
                 @click="navigateToPos"
                 class="px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
@@ -373,7 +374,7 @@
                 <div class="flex items-center gap-1.5">
                   <!-- Botón principal: Facturar en POS (solo para cotizaciones) -->
                   <button
-                    v-if="selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote'"
+                    v-if="!isVendedor && (selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote')"
                     @click="openInPos(selectedInvoice)"
                     class="px-5 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-[13px] font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
                     title="Convertir a factura">
@@ -425,7 +426,7 @@
                   </button>
                   
                   <!-- Menú de más acciones -->
-                  <div class="relative" @click.stop="">
+                  <div v-if="!isVendedor" class="relative" @click.stop="">
                     <button
                       @click="toggleActionsMenu(selectedInvoice.id)"
                       class="p-2 rounded-xl text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 border border-transparent hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200"
@@ -865,6 +866,9 @@ const emit = defineEmits(['changeModule', 'open-quotation-in-pos', 'navigate', '
 // Composables
 const { showToast, showSuccess, showError } = useToast()
 const auth = useAuth()
+
+// Vendedor restriction
+const isVendedor = computed(() => auth.hasRole('Vendedor'))
 
 // Computed para IVA
 const displayTaxRate = computed(() => {

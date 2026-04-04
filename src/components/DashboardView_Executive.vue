@@ -9,11 +9,11 @@
       <div class="flex items-center justify-between">
         <div class="space-y-1.5">
           <h1 class="text-2xl lg:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
-            Panel de Control
+            {{ isVendedor ? 'Mi Panel' : 'Panel de Control' }}
           </h1>
           <p class="text-sm text-gray-500 dark:text-zinc-500 font-normal flex items-center gap-2">
             <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Sistema Operativo • {{ currentDate }}
+            {{ isVendedor ? 'Resumen personal' : 'Sistema Operativo' }} • {{ currentDate }}
           </p>
         </div>
         
@@ -86,7 +86,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between mb-1">
-                <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Ventas Hoy</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide">{{ isVendedor ? 'Mis Ventas Hoy' : 'Ventas Hoy' }}</p>
                 <span 
                   class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold rounded-md"
                   :class="growthPercentage >= 0 
@@ -118,7 +118,7 @@
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1">Transacciones</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1">{{ isVendedor ? 'Mis Transacciones' : 'Transacciones' }}</p>
               <p class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                 {{ todaySalesData.sales }}
               </p>
@@ -303,8 +303,13 @@ import { cashReportsService } from '../services/cashReportsService.js'
 import { useScreenContext, formatDashboardContext } from '@/composables/useScreenContext'
 import { useUIContextStore } from '@/store/uiContextStore'
 import { useModuleNavigation } from '@/composables/useModuleNavigation'
+import { useAuth } from '../store/auth.js'
 
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Title, Tooltip, Legend, Filler)
+
+const auth = useAuth()
+const isVendedor = computed(() => auth.hasRole('Vendedor'))
+const vendedorUserId = computed(() => isVendedor.value ? auth.user.value?.id : null)
 
 // 🧠 Composable para contexto de pantalla (IA Chat de texto)
 const { setContext, updateData } = useScreenContext()
@@ -678,7 +683,7 @@ const loadDashboardData = async (period = '24H') => {
     ])
     
     // Actualizar ventas de hoy - SIEMPRE llamar a getVentasHoyColombia
-    const ventasHoyColombia = await reportsService.getVentasHoyColombia()
+    const ventasHoyColombia = await reportsService.getVentasHoyColombia(vendedorUserId.value)
     dashboardData.value.summary.today_sales = {
       amount: ventasHoyColombia.total || 0,
       count: ventasHoyColombia.transacciones || 0

@@ -36,6 +36,35 @@ class BiometricController extends Controller
 
         try {
             $userId = $request->user_id;
+            $newDescriptors = $request->descriptors;
+
+            // Duplicate face check: compare against all active profiles of OTHER users
+            $existingProfiles = BiometricProfile::where('active', true)
+                ->where('user_id', '!=', $userId)
+                ->with('user:id,name,cc')
+                ->get();
+
+            foreach ($existingProfiles as $profile) {
+                $existing = $profile->descriptors_json;
+                if (!is_array($existing) || count($existing) !== count($newDescriptors)) continue;
+
+                // Euclidean distance
+                $sum = 0;
+                for ($i = 0; $i < count($newDescriptors); $i++) {
+                    $diff = ($newDescriptors[$i] ?? 0) - ($existing[$i] ?? 0);
+                    $sum += $diff * $diff;
+                }
+                $distance = sqrt($sum);
+
+                if ($distance < 0.4) {
+                    $userName = $profile->user->name ?? 'Desconocido';
+                    $userCC = $profile->user->cc ?? 'N/A';
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Este rostro ya está registrado como \"{$userName}\" (CC: {$userCC}). No se puede enrolar la misma cara bajo otro usuario.",
+                    ], 409);
+                }
+            }
 
             // Desactivar perfiles anteriores del mismo usuario
             BiometricProfile::where('user_id', $userId)->update(['active' => false]);
@@ -136,7 +165,7 @@ class BiometricController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'user_id'            => 'required|exists:users,id',
-            'event_type'         => 'required|in:entry,exit',
+            'event_type'         => 'required|in:entry,exit,break_start,break_end',
             'verification_score' => 'required|numeric|min:0|max:1',
             'image'              => 'nullable|string', // Base64 de la captura de auditoría
         ]);
@@ -179,8 +208,66 @@ class BiometricController extends Controller
             if ($recentLog) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Ya registraste tu ' . ($request->event_type === 'entry' ? 'entrada' : 'salida') . ' hace menos de 5 minutos.',
+                    'message' => 'Ya se registró este evento hace menos de 5 minutos.',
                 ], 429);
+            }
+
+            // Validar secuencia lógica del turno
+            $todayLogs = AttendanceLog::where('user_id', $request->user_id)
+                ->whereDate('event_at', today())
+                ->pluck('event_type')
+                ->toArray();
+
+            $hasEntry = in_array('entry', $todayLogs);
+            $hasExit = in_array('exit', $todayLogs);
+            $breakStarts = count(array_filter($todayLogs, fn($t) => $t === 'break_start'));
+            $breakEnds = count(array_filter($todayLogs, fn($t) => $t === 'break_end'));
+            $onBreak = $breakStarts > $breakEnds;
+
+            $eventType = $request->event_type;
+
+            // Jornada completa: no permitir más punteos
+            if ($hasEntry && $hasExit) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La jornada ya fue completada hoy (entrada y salida registradas).',
+                ], 422);
+            }
+
+            // Validaciones por tipo de evento
+            if ($eventType === 'entry' && $hasEntry) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ya se registró la entrada hoy. No puede iniciar otra jornada.',
+                ], 422);
+            }
+
+            if (in_array($eventType, ['exit', 'break_start', 'break_end']) && !$hasEntry) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Debe registrar la entrada primero antes de esta acción.',
+                ], 422);
+            }
+
+            if ($eventType === 'break_start' && $onBreak) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ya hay un break en curso. Debe finalizarlo primero.',
+                ], 422);
+            }
+
+            if ($eventType === 'break_end' && !$onBreak) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay un break activo para finalizar.',
+                ], 422);
+            }
+
+            if ($eventType === 'exit' && $onBreak) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Debe finalizar el break antes de registrar la salida.',
+                ], 422);
             }
 
             // Guardar imagen de auditoría
@@ -204,7 +291,13 @@ class BiometricController extends Controller
                 'user_agent'          => $request->userAgent(),
             ]);
 
-            $eventLabel = $request->event_type === 'entry' ? 'Entrada' : 'Salida';
+            $eventLabels = [
+                'entry'       => 'Entrada',
+                'exit'        => 'Salida',
+                'break_start' => 'Inicio de break',
+                'break_end'   => 'Fin de break',
+            ];
+            $eventLabel = $eventLabels[$request->event_type] ?? $request->event_type;
 
             return response()->json([
                 'success' => true,
@@ -330,6 +423,98 @@ class BiometricController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar perfil biométrico',
+                'error'   => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Obtener todos los descriptores de perfiles biométricos activos
+     * para identificación 1:N en el frontend
+     */
+    public function getAllDescriptors()
+    {
+        try {
+            $profiles = BiometricProfile::where('active', true)
+                ->with('user:id,name,cc')
+                ->get(['id', 'user_id', 'descriptors_json']);
+
+            $data = $profiles->map(function ($profile) {
+                return [
+                    'user_id'     => $profile->user_id,
+                    'name'        => $profile->user->name ?? 'Desconocido',
+                    'cc'          => $profile->user->cc ?? '',
+                    'descriptors' => $profile->descriptors_json,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data'    => $data,
+                'count'   => $data->count(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener descriptores',
+                'error'   => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Buscar usuario por cédula (CC) y retornar estado de enrolamiento
+     */
+    public function lookupUser(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'cc' => 'required|string|min:3',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Debe proporcionar un número de cédula válido',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $user = User::with('role:id,name')
+                ->where('cc', $request->cc)
+                ->where('active', true)
+                ->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontró un empleado activo con la cédula proporcionada',
+                    'found'   => false,
+                ]);
+            }
+
+            $profile = BiometricProfile::where('user_id', $user->id)
+                ->active()
+                ->latest('enrolled_at')
+                ->first();
+
+            return response()->json([
+                'success' => true,
+                'found'   => true,
+                'data'    => [
+                    'id'          => $user->id,
+                    'name'        => $user->name,
+                    'cc'          => $user->cc,
+                    'email'       => $user->email,
+                    'role'        => $user->role?->name ?? 'Sin rol',
+                    'enrolled'    => !!$profile,
+                    'enrolled_at' => $profile?->enrolled_at,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al buscar el usuario',
                 'error'   => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
