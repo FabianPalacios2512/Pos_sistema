@@ -1,24 +1,47 @@
 <template>
-  <!-- Layout con Sidebar Profesional -->
+  <!-- Layout con Sidebar Profesional - 100% MOBILE RESPONSIVE -->
   <div class="flex min-h-screen font-sans">
     
+    <!-- ========== OVERLAY MÓVIL (cuando sidebar está abierto) ========== -->
+    <div 
+      v-if="sidebarOpen" 
+      @click="sidebarOpen = false"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+    ></div>
+    
     <!-- ========== SIDEBAR IZQUIERDO ========== -->
-    <aside class="w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col fixed left-0 top-0 h-screen z-40">
+    <aside 
+      :class="[
+        'w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col fixed left-0 top-0 h-screen z-50 transition-transform duration-300',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      ]"
+    >
       <!-- Logo/Brand -->
-      <div class="p-6 border-b border-gray-200 dark:border-zinc-800">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-700 dark:to-slate-900 flex items-center justify-center shadow-lg">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-lg font-bold text-gray-900 dark:text-white">105POS</h1>
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs text-gray-500 dark:text-zinc-400">Admin</span>
-              <span class="px-1.5 py-0.5 bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 text-[9px] font-bold rounded uppercase animate-pulse">GOD</span>
+      <div class="p-4 lg:p-6 border-b border-gray-200 dark:border-zinc-800">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-700 dark:to-slate-900 flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-lg font-bold text-gray-900 dark:text-white">105POS</h1>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs text-gray-500 dark:text-zinc-400">Admin</span>
+                <span class="px-1.5 py-0.5 bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400 text-[9px] font-bold rounded uppercase animate-pulse">GOD</span>
+              </div>
             </div>
           </div>
+          <!-- Botón cerrar sidebar en móvil -->
+          <button 
+            @click="sidebarOpen = false"
+            class="lg:hidden p-2 text-gray-500 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-white"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -27,7 +50,7 @@
         <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest px-3 mb-3">Principal</p>
         
         <button 
-          @click="activeTab = 'dashboard'"
+          @click="activeTab = 'dashboard'; sidebarOpen = false"
           :class="[
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
             activeTab === 'dashboard' 
@@ -42,7 +65,7 @@
         </button>
 
         <button 
-          @click="activeTab = 'clientes'"
+          @click="activeTab = 'clientes'; sidebarOpen = false"
           :class="[
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
             activeTab === 'clientes' 
@@ -60,7 +83,7 @@
         <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest px-3 mb-3 mt-6">Monitoreo</p>
 
         <button 
-          @click="activeTab = 'ai-monitoring'"
+          @click="activeTab = 'ai-monitoring'; sidebarOpen = false"
           :class="[
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
             activeTab === 'ai-monitoring' 
@@ -75,7 +98,7 @@
         </button>
 
         <button 
-          @click="activeTab = 'logs'"
+          @click="activeTab = 'logs'; sidebarOpen = false"
           :class="[
             'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
             activeTab === 'logs' 
@@ -105,22 +128,33 @@
     </aside>
 
     <!-- ========== CONTENIDO PRINCIPAL ========== -->
-    <main class="ml-64 flex-1 bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300">
-      <div class="p-6 lg:p-8 space-y-6 animate-fade-in">
+    <main class="lg:ml-64 flex-1 bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 min-h-screen">
+      <div class="p-4 lg:p-6 xl:p-8 space-y-4 lg:space-y-6 animate-fade-in">
         
-        <!-- Header con Título y Acciones -->
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-              {{ activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'clientes' ? 'Gestión de Clientes' : activeTab === 'ai-monitoring' ? 'AI Monitoring' : 'System Logs' }}
-            </h1>
-            <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1 flex items-center gap-2">
-              <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Sistema operativo • {{ currentDateTime }}
-            </p>
+        <!-- Header con Título y Acciones - MOBILE OPTIMIZADO -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <!-- Hamburger Menu para móvil -->
+            <button 
+              @click="sidebarOpen = true"
+              class="lg:hidden p-2.5 bg-white dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm"
+            >
+              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+            <div>
+              <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
+                {{ activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'clientes' ? 'Clientes' : activeTab === 'ai-monitoring' ? 'AI Monitor' : 'Logs' }}
+              </h1>
+              <p class="text-xs lg:text-sm text-gray-600 dark:text-zinc-400 mt-0.5 flex items-center gap-2">
+                <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="hidden sm:inline">Sistema operativo •</span> {{ currentDateTime }}
+              </p>
+            </div>
           </div>
           
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 lg:gap-3">
             <!-- Botón Refrescar -->
             <button 
               @click="fetchData" 
@@ -135,31 +169,31 @@
             <!-- Botón Generar Enlace -->
             <button 
               @click="showLinkModal = true"
-              class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all"
+              class="inline-flex items-center gap-2 px-3 lg:px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
               </svg>
-              Generar Enlace
+              <span class="hidden sm:inline">Generar Enlace</span>
             </button>
           </div>
         </div>
 
         <!-- TAB: Dashboard -->
-        <div v-show="activeTab === 'dashboard'" class="space-y-6">
+        <div v-show="activeTab === 'dashboard'" class="space-y-4 lg:space-y-6">
           
-          <!-- KPIs Principales - Primera Fila -->
-          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <!-- KPIs Principales - Primera Fila - MOBILE GRID 2x2 -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             
             <!-- MRR Total -->
-            <div class="bg-white dark:bg-zinc-900/80  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
-              <div class="flex items-start justify-between mb-3">
-                <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
-                  <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white dark:bg-zinc-900/80 rounded-xl lg:rounded-2xl p-3 lg:p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+              <div class="flex items-start justify-between mb-2 lg:mb-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
+                  <svg class="w-5 h-5 lg:w-6 lg:h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </div>
-                <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400">
+                <span class="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                   </svg>
@@ -167,155 +201,155 @@
                 </span>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">MRR Total</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">${{ formatNumber(kpis.mrr || 0) }}</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Ingreso recurrente mensual</p>
+                <p class="text-[10px] lg:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">MRR</p>
+                <p class="text-xl lg:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">${{ formatNumber(kpis.mrr || 0) }}</p>
+                <p class="text-[10px] lg:text-xs text-gray-500 dark:text-zinc-500 mt-0.5 lg:mt-1 hidden sm:block">Ingreso mensual</p>
               </div>
             </div>
 
             <!-- Clientes Activos -->
-            <div class="bg-white dark:bg-zinc-900/80  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
-              <div class="flex items-start justify-between mb-3">
-                <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
-                  <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white dark:bg-zinc-900/80 rounded-xl lg:rounded-2xl p-3 lg:p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+              <div class="flex items-start justify-between mb-2 lg:mb-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
+                  <svg class="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
                 </div>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Clientes Activos</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{{ kpis.total_active_clients || 0 }}</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Suscripciones activas</p>
+                <p class="text-[10px] lg:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Activos</p>
+                <p class="text-xl lg:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{{ kpis.total_active_clients || 0 }}</p>
+                <p class="text-[10px] lg:text-xs text-gray-500 dark:text-zinc-500 mt-0.5 lg:mt-1 hidden sm:block">Suscripciones</p>
               </div>
             </div>
 
             <!-- Nuevos Este Mes -->
-            <div class="bg-white dark:bg-zinc-900/80  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
-              <div class="flex items-start justify-between mb-3">
-                <div class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
-                  <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white dark:bg-zinc-900/80 rounded-xl lg:rounded-2xl p-3 lg:p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+              <div class="flex items-start justify-between mb-2 lg:mb-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
+                  <svg class="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                   </svg>
                 </div>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Nuevos Este Mes</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{{ kpis.clients_this_month || kpis.clients_created_today || 0 }}</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">{{ kpis.clients_created_today || 0 }} hoy</p>
+                <p class="text-[10px] lg:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Nuevos</p>
+                <p class="text-xl lg:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{{ kpis.clients_this_month || kpis.clients_created_today || 0 }}</p>
+                <p class="text-[10px] lg:text-xs text-gray-500 dark:text-zinc-500 mt-0.5 lg:mt-1 hidden sm:block">{{ kpis.clients_created_today || 0 }} hoy</p>
               </div>
             </div>
 
             <!-- ARR Proyectado -->
-            <div class="bg-white dark:bg-zinc-900/80  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
-              <div class="flex items-start justify-between mb-3">
-                <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
-                  <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white dark:bg-zinc-900/80 rounded-xl lg:rounded-2xl p-3 lg:p-5 border border-gray-200 dark:border-zinc-800/60 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
+              <div class="flex items-start justify-between mb-2 lg:mb-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-lg lg:rounded-xl bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center transition-transform group-hover:scale-105">
+                  <svg class="w-5 h-5 lg:w-6 lg:h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                   </svg>
                 </div>
               </div>
               <div>
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">ARR Proyectado</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">${{ formatNumber((kpis.mrr || 0) * 12) }}</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Ingreso anual recurrente</p>
+                <p class="text-[10px] lg:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">ARR</p>
+                <p class="text-xl lg:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">${{ formatNumber((kpis.mrr || 0) * 12) }}</p>
+                <p class="text-[10px] lg:text-xs text-gray-500 dark:text-zinc-500 mt-0.5 lg:mt-1 hidden sm:block">Anual</p>
               </div>
             </div>
           </div>
 
-          <!-- Segunda Fila: Ingresos por Plan + Métricas -->
-          <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <!-- Segunda Fila: Ingresos por Plan + Métricas - MOBILE STACKED -->
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 lg:gap-6">
             
             <!-- Ingresos por Plan -->
-            <div class="xl:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
+            <div class="xl:col-span-2 bg-white dark:bg-zinc-900 rounded-xl lg:rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-4 lg:px-6 py-3 lg:py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
                 <div>
-                  <h3 class="text-base font-bold text-gray-900 dark:text-white">Distribución de Ingresos</h3>
-                  <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">MRR por tipo de plan</p>
+                  <h3 class="text-sm lg:text-base font-bold text-gray-900 dark:text-white">Distribución</h3>
+                  <p class="text-[10px] lg:text-xs text-gray-600 dark:text-zinc-400 mt-0.5">MRR por plan</p>
                 </div>
               </div>
-              <div class="p-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="p-3 lg:p-6">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-4">
                   <!-- Free Trial -->
-                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
-                    <div class="flex items-center gap-2 mb-3">
-                      <span class="w-3 h-3 rounded-full bg-gray-400"></span>
-                      <span class="text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Free Trial</span>
+                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg lg:rounded-xl p-3 lg:p-4 border border-gray-200 dark:border-zinc-700">
+                    <div class="flex items-center gap-2 mb-2 lg:mb-3">
+                      <span class="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-gray-400"></span>
+                      <span class="text-[10px] lg:text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase">Trial</span>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ planStats.free_trial?.count || 0 }}</p>
-                    <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">$0/mes</p>
+                    <p class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">{{ planStats.free_trial?.count || 0 }}</p>
+                    <p class="text-[10px] lg:text-xs text-gray-500 dark:text-zinc-500 mt-1">$0/mes</p>
                   </div>
                   
                   <!-- Basic -->
-                  <div class="bg-blue-50 dark:bg-blue-950/30 rounded-xl p-4 border border-blue-200 dark:border-blue-900">
-                    <div class="flex items-center gap-2 mb-3">
-                      <span class="w-3 h-3 rounded-full bg-blue-500"></span>
-                      <span class="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase">Basic</span>
+                  <div class="bg-blue-50 dark:bg-blue-950/30 rounded-lg lg:rounded-xl p-3 lg:p-4 border border-blue-200 dark:border-blue-900">
+                    <div class="flex items-center gap-2 mb-2 lg:mb-3">
+                      <span class="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-blue-500"></span>
+                      <span class="text-[10px] lg:text-xs font-bold text-blue-700 dark:text-blue-400 uppercase">Basic</span>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ planStats.basic?.count || 0 }}</p>
-                    <p class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-medium">${{ formatNumber(planStats.basic?.mrr || 0) }}/mes</p>
+                    <p class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">{{ planStats.basic?.count || 0 }}</p>
+                    <p class="text-[10px] lg:text-xs text-blue-600 dark:text-blue-400 mt-1 font-medium">${{ formatNumber(planStats.basic?.mrr || 0) }}</p>
                   </div>
                   
                   <!-- Premium -->
-                  <div class="bg-purple-50 dark:bg-purple-950/30 rounded-xl p-4 border border-purple-200 dark:border-purple-900">
-                    <div class="flex items-center gap-2 mb-3">
-                      <span class="w-3 h-3 rounded-full bg-purple-500"></span>
-                      <span class="text-xs font-bold text-purple-700 dark:text-purple-400 uppercase">Premium</span>
+                  <div class="bg-purple-50 dark:bg-purple-950/30 rounded-lg lg:rounded-xl p-3 lg:p-4 border border-purple-200 dark:border-purple-900">
+                    <div class="flex items-center gap-2 mb-2 lg:mb-3">
+                      <span class="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-purple-500"></span>
+                      <span class="text-[10px] lg:text-xs font-bold text-purple-700 dark:text-purple-400 uppercase">Premium</span>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ planStats.premium?.count || 0 }}</p>
-                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-1 font-medium">${{ formatNumber(planStats.premium?.mrr || 0) }}/mes</p>
+                    <p class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">{{ planStats.premium?.count || 0 }}</p>
+                    <p class="text-[10px] lg:text-xs text-purple-600 dark:text-purple-400 mt-1 font-medium">${{ formatNumber(planStats.premium?.mrr || 0) }}</p>
                   </div>
                   
                   <!-- Enterprise -->
-                  <div class="bg-amber-50 dark:bg-amber-950/30 rounded-xl p-4 border border-amber-200 dark:border-amber-900">
-                    <div class="flex items-center gap-2 mb-3">
-                      <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                      <span class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase">Enterprise</span>
+                  <div class="bg-amber-50 dark:bg-amber-950/30 rounded-lg lg:rounded-xl p-3 lg:p-4 border border-amber-200 dark:border-amber-900">
+                    <div class="flex items-center gap-2 mb-2 lg:mb-3">
+                      <span class="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-amber-500"></span>
+                      <span class="text-[10px] lg:text-xs font-bold text-amber-700 dark:text-amber-400 uppercase">Enterprise</span>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ planStats.enterprise?.count || 0 }}</p>
-                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">${{ formatNumber(planStats.enterprise?.mrr || 0) }}/mes</p>
+                    <p class="text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">{{ planStats.enterprise?.count || 0 }}</p>
+                    <p class="text-[10px] lg:text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">${{ formatNumber(planStats.enterprise?.mrr || 0) }}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- Métricas IA Resumen -->
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 overflow-hidden">
-              <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
-                <h3 class="text-base font-bold text-gray-900 dark:text-white">Uso de IA</h3>
-                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Consumo este mes</p>
+            <div class="bg-white dark:bg-zinc-900 rounded-xl lg:rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+              <div class="px-4 lg:px-6 py-3 lg:py-4 border-b border-gray-200 dark:border-zinc-800">
+                <h3 class="text-sm lg:text-base font-bold text-gray-900 dark:text-white">Uso de IA</h3>
+                <p class="text-[10px] lg:text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Este mes</p>
               </div>
-              <div class="p-6 space-y-4">
+              <div class="p-4 lg:p-6 space-y-3 lg:space-y-4">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-950/50 flex items-center justify-center">
-                      <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-lg bg-purple-100 dark:bg-purple-950/50 flex items-center justify-center">
+                      <svg class="w-4 h-4 lg:w-5 lg:h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                       </svg>
                     </div>
                     <div>
-                      <p class="text-xs text-gray-500 dark:text-zinc-400">Tokens Usados</p>
-                      <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatNumber(kpis.ai_tokens_this_month || 0) }}</p>
+                      <p class="text-[10px] lg:text-xs text-gray-500 dark:text-zinc-400">Tokens</p>
+                      <p class="text-base lg:text-lg font-bold text-gray-900 dark:text-white">{{ formatNumber(kpis.ai_tokens_this_month || 0) }}</p>
                     </div>
                   </div>
                 </div>
                 
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/50 flex items-center justify-center">
-                      <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-9 h-9 lg:w-10 lg:h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/50 flex items-center justify-center">
+                      <svg class="w-4 h-4 lg:w-5 lg:h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
                     </div>
                     <div>
-                      <p class="text-xs text-gray-500 dark:text-zinc-400">Costo Estimado</p>
-                      <p class="text-lg font-bold text-gray-900 dark:text-white">${{ formatNumber(kpis.ai_cost_this_month || 0) }}</p>
+                      <p class="text-[10px] lg:text-xs text-gray-500 dark:text-zinc-400">Costo</p>
+                      <p class="text-base lg:text-lg font-bold text-gray-900 dark:text-white">${{ formatNumber(kpis.ai_cost_this_month || 0) }}</p>
                     </div>
                   </div>
                 </div>
 
                 <button 
                   @click="activeTab = 'ai-monitoring'"
-                  class="w-full mt-2 px-4 py-2.5 text-sm font-medium bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 rounded-xl hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all"
+                  class="w-full mt-2 px-4 py-2 lg:py-2.5 text-xs lg:text-sm font-medium bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 rounded-lg lg:rounded-xl hover:bg-gray-200 dark:hover:bg-zinc-700 transition-all"
                 >
                   Ver Detalles →
                 </button>
@@ -389,57 +423,135 @@
           </div>
         </div>
 
-      <!-- TAB: Clientes -->
-      <div v-show="activeTab === 'clientes'" class="space-y-6">
+      <!-- TAB: Clientes - MOBILE OPTIMIZADO -->
+      <div v-show="activeTab === 'clientes'" class="space-y-4 lg:space-y-6">
         <!-- Panel de tabla -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800">
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
-            <div class="flex items-center justify-between">
+        <div class="bg-white dark:bg-zinc-900 rounded-xl lg:rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-800">
+          <div class="px-4 lg:px-6 py-3 lg:py-4 border-b border-gray-200 dark:border-zinc-800">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Todos los Clientes</h2>
-                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">{{ filteredTenants.length }} tenants en el sistema</p>
+                <h2 class="text-base lg:text-lg font-bold text-gray-900 dark:text-white">Clientes</h2>
+                <p class="text-xs lg:text-sm text-gray-600 dark:text-zinc-400 mt-0.5">{{ filteredTenants.length }} tenants</p>
               </div>
-              <button @click="showCreateModal = true" class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all flex items-center gap-2">
+              <button @click="showCreateModal = true" class="px-4 lg:px-5 py-2 lg:py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                Nuevo Cliente
+                <span class="sm:inline">Nuevo</span>
               </button>
             </div>
           </div>
 
-          <!-- Filtros -->
-          <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-900/50 border-b border-gray-200 dark:border-zinc-800">
-            <div class="flex items-center gap-4">
+          <!-- Filtros - MOBILE STACKED -->
+          <div class="px-4 lg:px-6 py-3 lg:py-4 bg-gray-50 dark:bg-zinc-900/50 border-b border-gray-200 dark:border-zinc-800">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 lg:gap-4">
               <div class="flex-1 relative">
                 <input 
                   v-model="searchQuery" 
                   type="text" 
-                  placeholder="Buscar por nombre, ID o dominio..." 
-                  class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                  placeholder="Buscar..." 
+                  class="w-full pl-9 lg:pl-10 pr-4 py-2 lg:py-2.5 text-sm rounded-lg lg:rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
                 >
-                <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500 absolute left-3 lg:left-3.5 top-2.5 lg:top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
               </div>
-              <select v-model="filterPlan" class="px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-                <option value="">Todos los planes</option>
-                <option value="free_trial">Free Trial</option>
-                <option value="basic">Basic</option>
-                <option value="premium">Premium</option>
-                <option value="enterprise">Enterprise</option>
-              </select>
-              <select v-model="filterStatus" class="px-4 py-2.5 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
-                <option value="">Todos los estados</option>
-                <option value="active">Activos</option>
-                <option value="paused">Pausados</option>
-                <option value="suspended">Suspendidos</option>
-              </select>
+              <div class="flex gap-2">
+                <select v-model="filterPlan" class="flex-1 sm:flex-none px-3 lg:px-4 py-2 lg:py-2.5 text-sm rounded-lg lg:rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
+                  <option value="">Plan</option>
+                  <option value="free_trial">Trial</option>
+                  <option value="basic">Basic</option>
+                  <option value="premium">Premium</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+                <select v-model="filterStatus" class="flex-1 sm:flex-none px-3 lg:px-4 py-2 lg:py-2.5 text-sm rounded-lg lg:rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30">
+                  <option value="">Estado</option>
+                  <option value="active">Activos</option>
+                  <option value="paused">Pausados</option>
+                  <option value="suspended">Suspendidos</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <!-- Tabla -->
-          <div class="overflow-visible">
+          <!-- MÓVIL: Vista de Cards -->
+          <div class="lg:hidden p-3 space-y-3">
+            <div 
+              v-for="tenant in filteredTenantsWithFilters" 
+              :key="tenant.id"
+              class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700"
+            >
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-zinc-700 dark:to-zinc-800 flex items-center justify-center flex-shrink-0">
+                    <span class="text-sm font-bold text-slate-600 dark:text-zinc-300">{{ (tenant.name || 'N')[0].toUpperCase() }}</span>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ tenant.name }}</p>
+                    <p class="text-xs text-blue-600 dark:text-blue-400 truncate">{{ tenant.domain }}</p>
+                  </div>
+                </div>
+                <span 
+                  class="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  :class="{
+                    'bg-emerald-500': tenant.status === 'active',
+                    'bg-amber-500': tenant.status === 'paused',
+                    'bg-rose-500': tenant.status === 'suspended'
+                  }"
+                ></span>
+              </div>
+              
+              <div class="flex items-center justify-between text-xs mb-3">
+                <span :class="getPlanBadge(tenant.plan)" class="px-2 py-1 rounded-lg font-bold border">
+                  {{ tenant.plan ? tenant.plan.replace('_', ' ').toUpperCase() : 'N/A' }}
+                </span>
+                <span class="text-gray-500 dark:text-zinc-400">
+                  Vence: {{ tenant.subscription_end ? new Date(tenant.subscription_end).toLocaleDateString('es-ES') : 'N/A' }}
+                </span>
+              </div>
+              
+              <div class="flex items-center gap-2 pt-3 border-t border-gray-200 dark:border-zinc-700">
+                <a 
+                  :href="'https://' + tenant.domain + '/login'" 
+                  target="_blank" 
+                  class="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-lg"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                  Acceder
+                </a>
+                <button 
+                  @click="viewTenantDetails(tenant)"
+                  class="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-lg"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  Ver
+                </button>
+                <button 
+                  @click="openStoreConfig(tenant)"
+                  class="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 rounded-lg"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                  </svg>
+                  Config
+                </button>
+              </div>
+            </div>
+            
+            <div v-if="filteredTenantsWithFilters.length === 0" class="py-8 text-center">
+              <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+              <p class="text-sm text-gray-500 dark:text-zinc-400">Sin clientes</p>
+            </div>
+          </div>
+
+          <!-- DESKTOP: Tabla -->
+          <div class="hidden lg:block overflow-visible">
             <table class="w-full">
               <thead class="bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-800">
                 <tr>
@@ -593,11 +705,11 @@
         </div>
       </div>
 
-      <!-- TAB: AI Monitoring -->
-      <div v-show="activeTab === 'ai-monitoring'" class="space-y-6">
-        <!-- KPIs Resumen IA - Primera fila -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+      <!-- TAB: AI Monitoring - MOBILE OPTIMIZADO -->
+      <div v-show="activeTab === 'ai-monitoring'" class="space-y-4 lg:space-y-6">
+        <!-- KPIs Resumen IA - Primera fila - GRID 2x2 MOBILE -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+          <div class="bg-white dark:bg-zinc-900/80 rounded-xl px-3 lg:px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
                 <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1136,6 +1248,7 @@ import StoreConfigModal from './StoreConfigModal.vue'
 // Estados
 const loading = ref(false)
 const activeTab = ref('dashboard')
+const sidebarOpen = ref(false) // 📱 MOBILE: Control del sidebar
 const kpis = ref({ 
   total_active_clients: 0, 
   clients_created_today: 0, 
@@ -1399,229 +1512,269 @@ const generateCredentialsPDF = async (data) => {
   const pageHeight = pdf.internal.pageSize.getHeight()
   const margin = 20
   const contentWidth = pageWidth - (margin * 2)
+  const colMid = pageWidth / 2
   
-  // Colores corporativos
-  const darkSlate = [15, 23, 42]
-  const emerald = [16, 185, 129]
-  const blue = [59, 130, 246]
-  const gray = [100, 116, 139]
-  const lightGray = [248, 250, 252]
+  // 🎨 PALETA CORPORATIVA ENTERPRISE
+  const brandNavy = [15, 23, 42]       // Azul oscuro principal
+  const brandGold = [180, 145, 70]     // Dorado elegante (líneas decorativas)
+  const textBlack = [17, 24, 39]       // Negro para datos importantes
+  const textGray = [75, 85, 99]        // Gris oscuro para etiquetas
+  const textMuted = [107, 114, 128]    // Gris medio
+  const bgLight = [249, 250, 251]      // Fondo gris pálido
+  const accentBlue = [37, 99, 235]     // Azul para links
+  const borderCard = [59, 130, 246]    // Borde azul tarjeta
+  const successGreen = [22, 163, 74]   // Verde estado activo
+  const white = [255, 255, 255]
   
-  // ==================== HEADER ====================
-  pdf.setFillColor(...darkSlate)
-  pdf.rect(0, 0, pageWidth, 55, 'F')
+  // ==================== HEADER CORPORATIVO ====================
+  // Franja azul oscuro
+  pdf.setFillColor(...brandNavy)
+  pdf.rect(0, 0, pageWidth, 38, 'F')
   
-  // Línea de acento
-  pdf.setFillColor(...emerald)
-  pdf.rect(0, 55, pageWidth, 4, 'F')
+  // Línea dorada decorativa superior
+  pdf.setFillColor(...brandGold)
+  pdf.rect(0, 38, pageWidth, 2, 'F')
   
-  // Logo
-  pdf.setTextColor(255, 255, 255)
-  pdf.setFontSize(32)
+  // Logo a la izquierda
+  pdf.setTextColor(...white)
+  pdf.setFontSize(28)
   pdf.setFont('helvetica', 'bold')
-  pdf.text('105POS', pageWidth / 2, 25, { align: 'center' })
+  pdf.text('105POS', margin, 22)
   
-  pdf.setFontSize(11)
+  pdf.setFontSize(8)
   pdf.setFont('helvetica', 'normal')
-  pdf.text('Sistema de Punto de Venta Profesional', pageWidth / 2, 35, { align: 'center' })
+  pdf.setTextColor(180, 190, 210)
+  pdf.text('Plataforma Empresarial de Punto de Venta', margin, 30)
   
-  pdf.setFontSize(9)
-  pdf.setTextColor(148, 163, 184)
-  pdf.text('DOCUMENTO DE CREDENCIALES', pageWidth / 2, 47, { align: 'center' })
+  // "Documento Confidencial" a la derecha
+  pdf.setFontSize(8)
+  pdf.setTextColor(150, 160, 180)
+  pdf.text('DOCUMENTO CONFIDENCIAL', pageWidth - margin, 25, { align: 'right' })
   
-  let yPos = 70
+  let yPos = 52
   
-  // ==================== INFORMACIÓN DEL CLIENTE ====================
-  // Card container
-  pdf.setFillColor(...lightGray)
-  pdf.roundedRect(margin, yPos, contentWidth, 50, 3, 3, 'F')
-  pdf.setDrawColor(226, 232, 240)
-  pdf.setLineWidth(0.3)
-  pdf.roundedRect(margin, yPos, contentWidth, 50, 3, 3, 'S')
-  
-  // Título de sección
-  pdf.setFillColor(...blue)
-  pdf.rect(margin, yPos, 5, 50, 'F')
-  
-  yPos += 12
-  pdf.setTextColor(...blue)
-  pdf.setFontSize(12)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text('DATOS DEL CLIENTE', margin + 12, yPos)
-  
-  yPos += 10
-  pdf.setFontSize(10)
-  
-  // Fila 1: Propietario y Cedula
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...gray)
-  pdf.text('Propietario:', margin + 12, yPos)
-  pdf.setTextColor(...darkSlate)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(data.owner_name || 'N/A', margin + 45, yPos)
-  
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...gray)
-  pdf.text('Cedula:', margin + 100, yPos)
-  pdf.setTextColor(...darkSlate)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(data.cedula || 'N/A', margin + 120, yPos)
-  
-  yPos += 8
-  // Fila 2: Negocio y ID
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...gray)
-  pdf.text('Negocio:', margin + 12, yPos)
-  pdf.setTextColor(...darkSlate)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(data.business_name || data.tenant_id, margin + 45, yPos)
-  
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...gray)
-  pdf.text('ID:', margin + 100, yPos)
-  pdf.setTextColor(...gray)
-  pdf.setFont('courier', 'normal')
-  pdf.setFontSize(9)
-  pdf.text(data.tenant_id || 'N/A', margin + 110, yPos)
-  
-  yPos += 25
-  
-  // ==================== CREDENCIALES ====================
-  pdf.setFillColor(254, 252, 232) // yellow-50
-  pdf.roundedRect(margin, yPos, contentWidth, 55, 3, 3, 'F')
-  pdf.setDrawColor(253, 224, 71)
-  pdf.roundedRect(margin, yPos, contentWidth, 55, 3, 3, 'S')
-  
-  // Borde izquierdo
-  pdf.setFillColor(234, 179, 8) // yellow-500
-  pdf.rect(margin, yPos, 5, 55, 'F')
-  
-  yPos += 12
-  pdf.setTextColor(161, 98, 7)
-  pdf.setFontSize(12)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text('CREDENCIALES DE ACCESO', margin + 12, yPos)
-  
-  yPos += 12
-  pdf.setFontSize(10)
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...gray)
-  pdf.text('URL de Acceso:', margin + 12, yPos)
-  
-  const loginUrl = data.login_url || `https://${data.domain || data.tenant_id + '.105pos.pro'}/login`
-  pdf.setTextColor(37, 99, 235)
-  pdf.setFont('helvetica', 'bold')
-  pdf.textWithLink(loginUrl, margin + 50, yPos, { url: loginUrl })
-  
-  yPos += 10
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...gray)
-  pdf.text('Usuario (Email):', margin + 12, yPos)
-  pdf.setTextColor(...darkSlate)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(data.credentials.email, margin + 50, yPos)
-  
-  yPos += 10
-  pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...gray)
-  pdf.text('Contrasena:', margin + 12, yPos)
-  pdf.setTextColor(220, 38, 38)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(data.credentials.password, margin + 50, yPos)
-  
-  yPos += 20
-  
-  // ==================== PLAN ====================
-  const planNames = {
-    free: 'Plan Free (Gratis)',
-    free_trial: 'Prueba Gratis 3 Dias',
-    basic: 'Plan Basic - $29/mes',
-    premium: 'Plan Premium - $59/mes',
-    enterprise: 'Plan Enterprise - $99/mes'
-  }
-  
-  const planColors = {
-    free: [107, 114, 128],
-    free_trial: [16, 185, 129],
-    basic: [59, 130, 246],
-    premium: [168, 85, 247],
-    enterprise: [245, 158, 11]
-  }
-  
-  const planColor = planColors[data.plan] || planColors.basic
-  
-  pdf.setFillColor(...planColor)
-  pdf.roundedRect(margin, yPos, contentWidth, 35, 3, 3, 'F')
-  
-  yPos += 14
-  pdf.setTextColor(255, 255, 255)
-  pdf.setFontSize(10)
-  pdf.setFont('helvetica', 'normal')
-  pdf.text('PLAN CONTRATADO', margin + 12, yPos)
-  
-  yPos += 10
-  pdf.setFontSize(16)
-  pdf.setFont('helvetica', 'bold')
-  pdf.text(planNames[data.plan] || data.plan.toUpperCase(), margin + 12, yPos)
-  
-  pdf.setFontSize(10)
-  pdf.setFont('helvetica', 'normal')
-  const fechaVence = new Date(data.subscription_end).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
-  pdf.text(`Valido hasta: ${fechaVence}`, margin + 120, yPos)
-  
-  yPos += 20
-  
-  // ==================== PRIMEROS PASOS ====================
-  pdf.setFillColor(236, 253, 245) // emerald-50
+  // ==================== SECCIÓN: INFORMACIÓN DEL CLIENTE (2 Columnas) ====================
+  // Fondo gris pálido
+  pdf.setFillColor(...bgLight)
   pdf.roundedRect(margin, yPos, contentWidth, 42, 3, 3, 'F')
-  pdf.setDrawColor(167, 243, 208)
-  pdf.roundedRect(margin, yPos, contentWidth, 42, 3, 3, 'S')
-  
-  pdf.setFillColor(...emerald)
-  pdf.rect(margin, yPos, 5, 42, 'F')
   
   yPos += 10
-  pdf.setTextColor(4, 120, 87)
-  pdf.setFontSize(11)
+  
+  // COLUMNA IZQUIERDA: Datos del Titular
+  const colLeft = margin + 8
+  const colRight = colMid + 5
+  
+  pdf.setFontSize(8)
   pdf.setFont('helvetica', 'bold')
-  pdf.text('PRIMEROS PASOS', margin + 12, yPos)
+  pdf.setTextColor(...textGray)
+  pdf.text('TITULAR DE LA CUENTA', colLeft, yPos)
   
   yPos += 8
+  pdf.setFontSize(13)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...textBlack)
+  pdf.text(data.owner_name || 'N/A', colLeft, yPos)
+  
+  yPos += 7
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...textGray)
+  pdf.text('Negocio:', colLeft, yPos)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...textBlack)
+  pdf.text(data.business_name || data.tenant_id, colLeft + 18, yPos)
+  
+  yPos += 6
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...textGray)
+  pdf.text('CC:', colLeft, yPos)
+  pdf.setTextColor(...textBlack)
+  pdf.text(data.cedula || 'N/A', colLeft + 8, yPos)
+  
+  // COLUMNA DERECHA: Datos del Servicio
+  let yPosRight = 62
+  
+  pdf.setFontSize(8)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...textGray)
+  pdf.text('SERVICIO CONTRATADO', colRight, yPosRight)
+  
+  yPosRight += 8
+  const planLabels = {
+    free: 'Plan Gratuito',
+    free_trial: 'Prueba Gratuita',
+    basic: 'Plan Básico',
+    premium: 'Plan Premium',
+    enterprise: 'Plan Empresarial'
+  }
+  pdf.setFontSize(13)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...textBlack)
+  pdf.text(planLabels[data.plan] || data.plan, colRight, yPosRight)
+  
+  yPosRight += 7
+  const fechaVence = new Date(data.subscription_end).toLocaleDateString('es-ES', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  })
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...textGray)
+  pdf.text('Vigente hasta:', colRight, yPosRight)
+  pdf.setTextColor(...textBlack)
+  pdf.text(fechaVence, colRight + 26, yPosRight)
+  
+  yPosRight += 6
+  // Estado: Activo (con color verde)
+  pdf.setTextColor(...textGray)
+  pdf.text('Estado:', colRight, yPosRight)
+  pdf.setTextColor(...successGreen)
+  pdf.setFont('helvetica', 'bold')
+  pdf.text('Activo', colRight + 14, yPosRight)
+  
+  yPos = 105
+  
+  // ==================== TARJETA DE ACCESO (Hero Section) ====================
+  // Borde azul con fondo blanco - altura aumentada para que no se corte
+  pdf.setDrawColor(...borderCard)
+  pdf.setLineWidth(1.5)
+  pdf.setFillColor(...white)
+  pdf.roundedRect(margin, yPos, contentWidth, 70, 4, 4, 'FD')
+  
+  // Línea dorada superior dentro de la tarjeta (más corta para no pegar al borde)
+  pdf.setFillColor(...brandGold)
+  pdf.rect(margin + 4, yPos + 1, contentWidth - 8, 3, 'F')
+  
+  yPos += 15
+  
+  // Título de la tarjeta
+  pdf.setFontSize(11)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...brandNavy)
+  pdf.text('CREDENCIALES DE ACCESO', pageWidth / 2, yPos, { align: 'center' })
+  
+  yPos += 12
+  
+  // URL (grande, azul, clickeable)
   pdf.setFontSize(9)
   pdf.setFont('helvetica', 'normal')
-  pdf.setTextColor(...gray)
+  pdf.setTextColor(...textGray)
+  pdf.text('Dirección de acceso:', margin + 10, yPos)
   
+  yPos += 7
+  const loginUrl = data.login_url || `https://${data.domain || data.tenant_id + '.105pos.pro'}/login`
+  pdf.setFontSize(12)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...accentBlue)
+  pdf.textWithLink(loginUrl, margin + 10, yPos, { url: loginUrl })
+  // Subrayado del link
+  const urlWidth = pdf.getTextWidth(loginUrl)
+  pdf.setDrawColor(...accentBlue)
+  pdf.setLineWidth(0.3)
+  pdf.line(margin + 10, yPos + 1, margin + 10 + urlWidth, yPos + 1)
+  
+  yPos += 12
+  
+  // Caja interna para Usuario y Contraseña
+  pdf.setFillColor(248, 250, 252)
+  pdf.roundedRect(margin + 10, yPos - 4, contentWidth - 20, 22, 2, 2, 'F')
+  
+  // Usuario
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...textGray)
+  pdf.text('Usuario:', margin + 15, yPos + 4)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...textBlack)
+  pdf.text(data.credentials.email, margin + 35, yPos + 4)
+  
+  // Contraseña (tipografía monoespaciada)
+  pdf.setFont('helvetica', 'normal')
+  pdf.setTextColor(...textGray)
+  pdf.text('Contraseña:', margin + 15, yPos + 12)
+  pdf.setFont('courier', 'bold')  // Monoespaciada para distinguir 0 de O
+  pdf.setFontSize(11)
+  pdf.setTextColor(...textBlack)
+  pdf.text(data.credentials.password, margin + 40, yPos + 12)
+  
+  yPos = 188
+  
+  // ==================== PRIMEROS PASOS (3 Columnas Horizontales) ====================
+  pdf.setFontSize(10)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...brandNavy)
+  pdf.text('PRIMEROS PASOS', pageWidth / 2, yPos, { align: 'center' })
+  
+  yPos += 12
+  
+  // 3 columnas con pasos
+  const stepWidth = contentWidth / 3
+  const stepY = yPos
   const steps = [
-    '1. Ingresa a la URL indicada arriba en tu navegador',
-    '2. Usa el email y contrasena proporcionados para iniciar sesion',
-    '3. Completa el asistente de configuracion inicial de tu negocio',
-    '4. Comienza a registrar productos y vender!'
+    { num: '1', icon: '🌐', title: 'INGRESE', desc: 'Abra la URL en\nsu navegador' },
+    { num: '2', icon: '🔑', title: 'ACCEDA', desc: 'Use sus credenciales\npara iniciar sesión' },
+    { num: '3', icon: '🏪', title: 'VENDA', desc: 'Configure su negocio\ny comience a vender' }
   ]
   
-  steps.forEach(step => {
-    pdf.text(step, margin + 12, yPos)
-    yPos += 6
+  steps.forEach((step, index) => {
+    const stepX = margin + (stepWidth * index) + (stepWidth / 2)
+    
+    // Número del paso en círculo
+    pdf.setFillColor(...brandNavy)
+    pdf.circle(stepX, stepY, 6, 'F')
+    pdf.setFontSize(10)
+    pdf.setFont('helvetica', 'bold')
+    pdf.setTextColor(...white)
+    pdf.text(step.num, stepX, stepY + 2.2, { align: 'center' })
+    
+    // Título
+    pdf.setFontSize(9)
+    pdf.setFont('helvetica', 'bold')
+    pdf.setTextColor(...textBlack)
+    pdf.text(step.title, stepX, stepY + 15, { align: 'center' })
+    
+    // Descripción
+    pdf.setFontSize(8)
+    pdf.setFont('helvetica', 'normal')
+    pdf.setTextColor(...textMuted)
+    const descLines = step.desc.split('\n')
+    descLines.forEach((line, lineIdx) => {
+      pdf.text(line, stepX, stepY + 21 + (lineIdx * 4), { align: 'center' })
+    })
   })
   
-  // ==================== FOOTER ====================
-  const footerY = pageHeight - 25
+  // ==================== FOOTER CORPORATIVO (Franja azul) ====================
+  const footerHeight = 28
+  const footerY = pageHeight - footerHeight
   
-  pdf.setDrawColor(226, 232, 240)
-  pdf.setLineWidth(0.5)
-  pdf.line(margin, footerY, pageWidth - margin, footerY)
+  // Franja azul oscuro
+  pdf.setFillColor(...brandNavy)
+  pdf.rect(0, footerY, pageWidth, footerHeight, 'F')
   
-  pdf.setTextColor(...gray)
+  // Línea dorada superior
+  pdf.setFillColor(...brandGold)
+  pdf.rect(0, footerY, pageWidth, 1.5, 'F')
+  
+  // Información de soporte centrada
+  pdf.setFontSize(9)
+  pdf.setFont('helvetica', 'bold')
+  pdf.setTextColor(...white)
+  pdf.text('SOPORTE TÉCNICO', pageWidth / 2, footerY + 10, { align: 'center' })
+  
   pdf.setFontSize(8)
-  pdf.setFont('helvetica', 'italic')
-  pdf.text('Este documento contiene informacion confidencial. Mantenlo en un lugar seguro.', pageWidth / 2, footerY + 8, { align: 'center' })
-  
   pdf.setFont('helvetica', 'normal')
-  pdf.setFontSize(7)
-  pdf.text(`105POS ${new Date().getFullYear()} - Sistema de Punto de Venta Profesional | Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2, footerY + 14, { align: 'center' })
+  pdf.setTextColor(180, 190, 210)
+  pdf.text('soporte@105pos.pro   •   www.105pos.pro/ayuda   •   WhatsApp: +57 312 738 8130', pageWidth / 2, footerY + 17, { align: 'center' })
+  
+  // ID y fecha pequeños
+  pdf.setFontSize(6)
+  pdf.setTextColor(120, 130, 150)
+  pdf.text(`ID: ${data.tenant_id}  |  Generado: ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2, footerY + 24, { align: 'center' })
   
   // Descargar
-  const fileName = `105POS_Credenciales_${data.business_name.replace(/\s+/g, '_')}_${Date.now()}.pdf`
-  pdf.save(fileName)
+  const businessSlug = (data.business_name || 'cliente').replace(/\s+/g, '-').toLowerCase()
+  pdf.save(`105POS_Credenciales_${businessSlug}.pdf`)
 }
 
 const openStoreConfig = async (tenant) => {

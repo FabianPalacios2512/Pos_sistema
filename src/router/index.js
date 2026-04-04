@@ -18,6 +18,8 @@ const PosCompleto = () => import('../views/PosCompleto.vue')
 const AdminDashboardView = () => import('../views/AdminDashboardView.vue')
 const GodModeAdminPanel = () => import('../components/admin/GodModeAdminPanel.vue')
 const PublicCatalog = () => import('../views/PublicCatalog.vue')
+const ProductDetailPage = () => import('../components/catalog/ProductDetailPage.vue')
+const CartBagPage = () => import('../components/catalog/CartBagPage.vue')
 
 const routes = [
   // Ruta de Pantalla de Bienvenida (Intro)
@@ -50,7 +52,29 @@ const routes = [
     meta: {
       title: 'Catálogo Online - Tienda',
       requiresAuth: false,
-      public: true // Marca como ruta pública
+      public: true
+    }
+  },
+  // Ruta Pública: Detalle de Producto (slug SEO-friendly)
+  {
+    path: '/catalog/producto/:slug',
+    name: 'ProductDetail',
+    component: ProductDetailPage,
+    meta: {
+      title: 'Producto - Tienda',
+      requiresAuth: false,
+      public: true
+    }
+  },
+  // Ruta Pública: Bolsa / Carrito
+  {
+    path: '/catalog/bolsa',
+    name: 'CartBag',
+    component: CartBagPage,
+    meta: {
+      title: 'Tu Bolsa - Tienda',
+      requiresAuth: false,
+      public: true
     }
   },
 
@@ -196,9 +220,13 @@ const routes = [
     path: '/',
     redirect: (to) => {
       if (authService.isAuthenticated()) {
-        return '/pos' // Si ya está autenticado, va al POS
+        return '/pos'
       }
-      return '/register' // Landing page = Registro
+      // En subdominios llevar a login (register borra tokens residuales)
+      const hostname = window.location.hostname
+      const mainDomains = ['localhost', '127.0.0.1', '105pos.pro', 'www.105pos.pro']
+      const isMainDomain = mainDomains.includes(hostname)
+      return isMainDomain ? '/register' : '/login'
     }
   },
 
@@ -401,7 +429,7 @@ router.beforeEach(async (to, from, next) => {
   ]
   
   // Si es ruta pública, no verificar plan
-  if (publicRoutes.includes(to.path) || to.path.startsWith('/payment/')) {
+  if (publicRoutes.includes(to.path) || to.path.startsWith('/payment/') || to.path.startsWith('/catalog')) {
     next()
     return
   }
@@ -435,14 +463,17 @@ router.beforeEach(async (to, from, next) => {
     if (!validPlans.includes(planType) || subscriptionStatus === 'pending' || planType === 'pending') {
       console.log('🚨 [Router Guard] Tenant sin plan válido, redirigiendo a select-plan')
       
-      const subdomain = tenant?.id || tenant?.subdomain || ''
+      // Extraer el subdominio REAL del hostname actual (no del tenant.id que puede tener underscores)
+      const hostnameParts = window.location.hostname.split('.')
+      const actualSubdomain = hostnameParts[0] || ''
+      const tenantIdValue = tenant?.id || actualSubdomain
       const companyName = tenant?.company_name || tenant?.business_name || tenant?.name || ''
       
       const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
       const baseUrl = isLocalhost ? `http://localhost:${window.location.port || 3000}` : 'https://105pos.pro'
       const params = new URLSearchParams()
-      if (subdomain) params.append('tenant_id', subdomain)
-      if (subdomain) params.append('subdomain', subdomain)
+      if (tenantIdValue) params.append('tenant_id', tenantIdValue)
+      if (actualSubdomain) params.append('subdomain', actualSubdomain)
       if (companyName) params.append('company', companyName)
       
       // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
@@ -491,12 +522,10 @@ router.beforeEach(async (to, from, next) => {
   ]
   
   // Si es una ruta pública real, permitir acceso sin verificar onboarding
-  if (publicRoutes.includes(to.path)) {
+  if (publicRoutes.includes(to.path) || to.path.startsWith('/catalog')) {
     next()
     return
   }
-
-  // Si está autenticado, verificar el flujo welcome → onboarding
   if (authService.isAuthenticated()) {
     // ✅ EXCEPCIÓN: Super admins NO pasan por onboarding (no tienen tenant)
     const user = authService.getUser()

@@ -1,21 +1,22 @@
 <template>
   <!-- Layout Full Height estilo WhatsApp Web - Sin doble scroll -->
-  <div class="h-full font-sans bg-white dark:bg-[#131314] transition-colors duration-300 overflow-hidden flex flex-col">
-    <div class="flex-none px-4 lg:px-6 pt-4 pb-3 space-y-4 animate-fade-in">
+  <div class="h-full font-sans bg-[#f8fafc] dark:bg-[#131314] transition-colors duration-300 overflow-hidden flex flex-col">
+    <div class="flex-none px-4 lg:px-6 pt-4 pb-2.5 space-y-3 animate-fade-in">
       
       <!-- NIVEL 1: Header con Título y Botones de Acción -->
           <div class="flex items-center justify-between">
             
             <!-- Título y Subtítulo -->
             <div>
-              <h1 class="text-xl font-semibold text-gray-900 dark:text-white tracking-tight">Facturas</h1>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Facturas</h1>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Gestión de documentos y cotizaciones</p>
             </div>
         
         <!-- Botones de Acción -->
         <div class="flex items-center gap-2">
           <button
             @click="loadInvoices"
-            class="px-4 py-2 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#282a2c] text-gray-600 dark:text-zinc-300 text-[13px] font-medium rounded-full transition-all duration-200 flex items-center gap-2">
+            class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-[13px] font-semibold rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -24,7 +25,7 @@
           
           <button
             @click="navigateToPos"
-            class="px-5 py-2 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-medium rounded-full transition-all duration-200 flex items-center gap-2">
+            class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-[13px] font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -34,50 +35,65 @@
         
       </div>
 
-      <!-- NIVEL 2: KPIs Compactos - Ribbon horizontal tipo dashboard moderno -->
-      <div class="flex items-center gap-3">
+      <!-- NIVEL 2: KPIs Enterprise - Compactas, value-first -->
+      <div class="grid grid-cols-4 gap-2.5">
         
         <!-- KPI: Facturas del Mes -->
-        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-blue-100 dark:border-blue-900/40">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Facturas del Mes</p>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">{{ monthlyInvoices }}</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">{{ monthlyInvoices }}</p>
+              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Facturas del mes</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Total Facturado -->
-        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-100 dark:border-emerald-900/40">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Total Facturado</p>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">${{ formatCurrency(totalInvoiced) }}</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">${{ formatCurrency(totalInvoiced) }}</p>
+              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Total facturado</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI: Pendientes -->
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-amber-100 dark:border-amber-900/40">
+              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">{{ pendingInvoices }}</p>
+              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Pendientes</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Cotizaciones -->
-        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-purple-100 dark:border-purple-900/40">
+              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Cotizaciones</p>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">{{ quotations }}</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">{{ quotations }}</p>
+              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Cotizaciones</p>
             </div>
           </div>
         </div>
@@ -86,33 +102,31 @@
 
     </div>
     
-    <!-- Master-Detail Layout WhatsApp Web Style - Ocupa todo el espacio restante -->
-    <div class="flex-1 mx-3 lg:mx-4 rounded-2xl overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-[#282a2c]">
+    <!-- Master-Detail Layout - Workspace Unificado -->
+    <div class="flex-1 mx-3 lg:mx-4 mb-3 rounded-2xl overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
       <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
-        <!-- PANEL IZQUIERDO: Lista con fondo gris sutil (Master) -->
-        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-[#f8f9fa] dark:bg-[#1a1a1d] border-r border-gray-200 dark:border-[#282a2c] transition-colors duration-300">
+        <!-- PANEL IZQUIERDO: Lista refinada (Master) -->
+        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
           
-          <!-- Header compacto con búsqueda y filtros en UNA línea -->
-          <div class="p-3 border-b border-gray-200 dark:border-[#282a2c] bg-[#f8f9fa] dark:bg-[#1a1a1d]">
-            <!-- Búsqueda + Filtros en una sola fila -->
+          <!-- Toolbar: búsqueda y filtros -->
+          <div class="px-4 pt-5 pb-4 bg-white dark:bg-zinc-900 space-y-3">
+            <!-- Búsqueda -->
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                v-model="searchTerm"
+                type="text"
+                placeholder="Buscar factura, cliente..."
+                class="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-gray-50 dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent shadow-sm transition-all duration-200">
+            </div>
+            <!-- Filtros -->
             <div class="flex items-center gap-2">
-              <!-- Búsqueda -->
-              <div class="relative flex-1">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                <input
-                  v-model="searchTerm"
-                  type="text"
-                  placeholder="Buscar..."
-                  class="w-full pl-9 pr-3 py-2 text-[13px] rounded-xl bg-white dark:bg-[#282a2c] border-none text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-zinc-600 transition-all duration-200">
-              </div>
-              
-              <!-- Filtros compactos -->
               <select
                 v-model="typeFilter"
-                class="px-3 py-2 text-[13px] rounded-xl bg-white dark:bg-[#282a2c] border-none text-gray-600 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-zinc-600 transition-colors duration-200">
+                class="flex-1 px-3 py-2.5 text-[13px] rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 shadow-sm transition-colors duration-200 cursor-pointer">
                 <option value="">Todos</option>
                 <option value="invoice">Facturas</option>
                 <option value="quote">Cotizaciones</option>
@@ -120,7 +134,7 @@
               
               <select
                 v-model="statusFilter"
-                class="px-3 py-2 text-[13px] rounded-xl bg-white dark:bg-[#282a2c] border-none text-gray-600 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-zinc-600 transition-colors duration-200">
+                class="flex-1 px-3 py-2.5 text-[13px] rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 shadow-sm transition-colors duration-200 cursor-pointer">
                 <option value="">Estado</option>
                 <option value="Pendiente">Pendiente</option>
                 <option value="Pagada">Pagada</option>
@@ -128,156 +142,197 @@
               </select>
             </div>
           </div>
+
+          <!-- Separador sutil -->
+          <div class="h-px bg-gray-200 dark:bg-zinc-800 mx-4"></div>
           
-          <!-- Lista con scroll independiente - Fondo diferenciado -->
-          <div class="flex-1 overflow-y-auto bg-[#f8f9fa] dark:bg-[#1a1a1d] px-2 py-1">
+          <!-- Lista con scroll independiente -->
+          <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 px-2 pt-2 pb-2">
             
             <div
               v-for="invoice in displayedInvoices"
               :key="invoice.id"
               @click="selectInvoice(invoice)"
-              class="px-3 py-3 my-1 cursor-pointer transition-all rounded-xl group relative"
+              class="px-3 py-2.5 mb-0.5 cursor-pointer transition-all duration-150 rounded-lg group relative"
               :class="[
                 selectedInvoice?.id === invoice.id 
-                  ? 'bg-white dark:bg-[#282a2c] shadow-sm' 
-                  : 'hover:bg-white dark:hover:bg-[#252528]'
+                  ? 'bg-blue-50 dark:bg-blue-950/40 ring-1 ring-blue-200 dark:ring-blue-800/50 border-l-[3px] border-blue-500 dark:border-blue-400' 
+                  : 'hover:bg-gray-50 dark:hover:bg-zinc-800/40 border-l-[3px] border-transparent'
               ]"
             >
-              <!-- Borde izquierdo de selección -->
-              <div 
-                v-if="selectedInvoice?.id === invoice.id"
-                class="absolute left-0 top-2 bottom-2 w-1 bg-gray-900 dark:bg-white rounded-r-full"
-              ></div>
-              
               <div class="flex items-center justify-between gap-3">
                 <!-- Info principal -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <p class="text-[13px] font-medium text-gray-800 dark:text-zinc-200 truncate">
+                    <p class="text-sm font-bold text-gray-900 dark:text-zinc-100 truncate leading-tight">
                       {{ invoice.invoiceNumber || invoice.number || `DOC-${String(invoice.id).padStart(4, '0')}` }}
                     </p>
-                    <span class="text-[9px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
+                    <span class="text-[9px] font-bold px-1.5 py-[2px] rounded flex-shrink-0 uppercase tracking-wider leading-none border"
                           :class="getStatusClasses(invoice.status)">
                       {{ getStatusLabel(invoice.status) }}
                     </span>
                   </div>
                   <div class="flex items-center gap-2 mt-1">
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">
+                    <p class="text-xs text-gray-600 dark:text-zinc-400 truncate font-medium">
                       {{ invoice.customer || invoice.customer_name || 'Cliente General' }}
                     </p>
-                    <span class="text-[10px] text-gray-400 dark:text-zinc-500">•</span>
-                    <span class="text-[10px] text-gray-400 dark:text-zinc-500 flex-shrink-0">
+                    <span class="text-gray-300 dark:text-zinc-600">&middot;</span>
+                    <span class="text-[11px] text-gray-400 dark:text-zinc-500 font-medium flex-shrink-0">
                       {{ formatDateSmart(invoice.date) }}
                     </span>
                   </div>
                 </div>
-                <!-- Precio a la derecha -->
-                <span class="text-[13px] font-medium text-gray-700 dark:text-zinc-300 flex-shrink-0">
-                  ${{ formatCurrency(invoice.total) }}
-                </span>
+                <!-- Monto -->
+                <div class="flex-shrink-0">
+                  <span class="text-sm font-extrabold text-gray-900 dark:text-white tabular-nums leading-tight">
+                    ${{ formatCurrency(invoice.total) }}
+                  </span>
+                </div>
               </div>
             </div>
             
             <!-- Botón Cargar Más -->
-            <div v-if="hasMoreInvoices" class="p-3 border-t border-gray-200 dark:border-[#282a2c] bg-[#f8f9fa] dark:bg-[#1a1a1d]">
+            <div v-if="hasMoreInvoices" class="px-1 pb-2 pt-1">
               <button
                 @click="loadMoreInvoices"
-                class="w-full py-2.5 text-xs font-medium rounded-full transition-all flex items-center justify-center gap-2 bg-white dark:bg-[#282a2c] hover:bg-gray-50 dark:hover:bg-[#333338] text-gray-600 dark:text-zinc-400 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                class="w-full py-2.5 text-xs font-medium rounded-xl transition-all flex items-center justify-center gap-1.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-500 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                 </svg>
-                Cargar más facturas... ({{ filteredInvoices.length - displayedInvoicesCount }} restantes)
+                Cargar más ({{ filteredInvoices.length - displayedInvoicesCount }})
               </button>
             </div>
             
             <!-- Estado vacío -->
-            <div v-if="filteredInvoices.length === 0" class="flex flex-col items-center justify-center py-8 text-center">
-              <svg class="w-8 h-8 text-gray-300 dark:text-zinc-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-              <p class="text-xs font-medium text-gray-600 dark:text-zinc-300">Sin resultados</p>
+            <div v-if="filteredInvoices.length === 0" class="flex flex-col items-center justify-center py-12 px-4 text-center">
+              <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mb-3 border border-gray-200 dark:border-zinc-700">
+                <svg class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Sin resultados</p>
               <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Intenta con otros filtros</p>
             </div>
           </div>
         </div>
 
         <!-- PANEL DERECHO: Detalle con fondo blanco prominente (efecto "encima") -->
-        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-white dark:bg-[#212124] transition-colors duration-300">
+        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-[#fafbfc] dark:bg-[#1a1a1d] transition-colors duration-300">
           
-          <!-- Estado: No seleccionado - Empty State estilo WhatsApp Web -->
-          <div v-if="!selectedInvoice" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-[#212124] relative">
+          <!-- Estado: No seleccionado - Empty State Premium -->
+          <div v-if="!selectedInvoice" class="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 text-center bg-[#fafbfc] dark:bg-[#1a1a1d] relative overflow-y-auto">
             
-            <!-- Ilustración SVG profesional y limpia -->
-            <div class="mb-8 relative">
-              <!-- Efecto glow suave de fondo -->
-              <div class="absolute inset-0 bg-gradient-to-br from-emerald-200/30 via-transparent to-blue-200/30 dark:from-emerald-500/10 dark:to-blue-500/10 rounded-3xl blur-3xl scale-150"></div>
+            <!-- Ilustración SVG refinada -->
+            <div class="mb-6 relative">
+              <!-- Efecto glow -->
+              <div class="absolute inset-0 bg-gradient-to-br from-blue-200/20 via-transparent to-purple-200/20 dark:from-blue-500/5 dark:to-purple-500/5 rounded-3xl blur-3xl scale-150"></div>
               
-              <!-- Ilustración principal -->
-              <svg class="w-48 h-48 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Sombra del documento -->
+              <svg class="w-36 h-36 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="48" y="38" width="88" height="110" rx="6" class="fill-gray-200/50 dark:fill-zinc-700/30"/>
-                
-                <!-- Documento principal -->
                 <rect x="44" y="32" width="88" height="110" rx="6" class="fill-white dark:fill-zinc-800" stroke-width="0"/>
                 <rect x="44" y="32" width="88" height="110" rx="6" class="fill-none stroke-gray-200 dark:stroke-zinc-700" stroke-width="1.5"/>
-                
-                <!-- Encabezado del documento -->
                 <rect x="54" y="44" width="40" height="5" rx="2.5" class="fill-gray-300 dark:fill-zinc-600"/>
                 <rect x="54" y="54" width="68" height="3" rx="1.5" class="fill-gray-100 dark:fill-zinc-700"/>
                 <rect x="54" y="62" width="55" height="3" rx="1.5" class="fill-gray-100 dark:fill-zinc-700"/>
                 <rect x="54" y="70" width="62" height="3" rx="1.5" class="fill-gray-100 dark:fill-zinc-700"/>
-                
-                <!-- Línea separadora -->
                 <line x1="54" y1="82" x2="122" y2="82" class="stroke-gray-200 dark:stroke-zinc-700" stroke-width="1"/>
-                
-                <!-- Área de totales -->
                 <rect x="54" y="90" width="30" height="3" rx="1.5" class="fill-gray-200 dark:fill-zinc-600"/>
                 <rect x="94" y="88" width="28" height="7" rx="3.5" class="fill-emerald-100 dark:fill-emerald-500/20"/>
                 <rect x="98" y="90" width="20" height="3" rx="1.5" class="fill-emerald-500 dark:fill-emerald-400"/>
-                
-                <!-- Segunda línea de total -->
                 <rect x="54" y="102" width="25" height="3" rx="1.5" class="fill-gray-200 dark:fill-zinc-600"/>
                 <rect x="94" y="100" width="28" height="7" rx="3.5" class="fill-gray-100 dark:fill-zinc-700"/>
-                
-                <!-- Total grande -->
                 <rect x="54" y="118" width="35" height="4" rx="2" class="fill-gray-300 dark:fill-zinc-500"/>
                 <rect x="94" y="116" width="28" height="8" rx="4" class="fill-emerald-500 dark:fill-emerald-400"/>
-                
-                <!-- Sello de verificación (check) -->
                 <circle cx="120" cy="48" r="14" class="fill-emerald-100 dark:fill-emerald-500/20"/>
                 <circle cx="120" cy="48" r="10" class="fill-emerald-500 dark:fill-emerald-400"/>
                 <path d="M115 48L118 51L126 43" class="stroke-white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                
-                <!-- Moneda principal -->
-                <circle cx="148" cy="115" r="18" class="fill-amber-100 dark:fill-amber-500/20"/>
-                <circle cx="148" cy="115" r="14" class="fill-amber-400 dark:fill-amber-500"/>
-                <text x="148" y="120" text-anchor="middle" class="fill-white font-bold" style="font-size: 14px; font-family: system-ui;">$</text>
-                
-                <!-- Moneda secundaria -->
-                <circle cx="158" cy="132" r="12" class="fill-amber-100 dark:fill-amber-500/15"/>
-                <circle cx="158" cy="132" r="9" class="fill-amber-300 dark:fill-amber-400"/>
-                <text x="158" y="136" text-anchor="middle" class="fill-white font-bold" style="font-size: 10px; font-family: system-ui;">$</text>
-                
-                <!-- Gráfico de línea -->
-                <path d="M22 130 L32 115 L44 120 L56 100 L68 108 L80 88" class="stroke-blue-400 dark:stroke-blue-400" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                <circle cx="80" cy="88" r="4" class="fill-blue-500 dark:fill-blue-400"/>
-                
-                <!-- Punto de datos -->
-                <circle cx="56" cy="100" r="3" class="fill-blue-400/50 dark:fill-blue-400/50"/>
-                <circle cx="44" cy="120" r="2.5" class="fill-blue-300/50 dark:fill-blue-400/30"/>
               </svg>
             </div>
             
-            <!-- Texto de bienvenida profesional -->
-            <div class="relative z-10 max-w-md">
-              <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-3">
+            <!-- Texto de bienvenida -->
+            <div class="relative z-10 max-w-sm mb-8">
+              <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Centro de Facturación
               </h3>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
-                Selecciona una factura o cotización del panel izquierdo para visualizar el desglose completo, imprimir o exportar a PDF.
+              <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
+                Selecciona una factura del panel izquierdo para ver su desglose completo, imprimir o exportar.
               </p>
-              <p class="text-xs text-gray-400 dark:text-zinc-500">
-                Gestiona tus documentos fiscales de forma rápida y segura.
+            </div>
+
+            <!-- Acciones rápidas -->
+            <div class="relative z-10 flex items-center gap-3 mb-8">
+              <button
+                @click="navigateToPos"
+                class="px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Crear nueva factura
+              </button>
+            </div>
+
+            <!-- Capacidades del módulo - Grid informativo -->
+            <div class="relative z-10 w-full max-w-lg">
+              <div class="grid grid-cols-2 gap-3">
+                <!-- Capability 1 -->
+                <div class="flex items-start gap-3 bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3.5 text-left border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-sm">
+                  <div class="w-9 h-9 bg-blue-50 dark:bg-blue-950/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-blue-100 dark:border-blue-900/40">
+                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">Ver detalle</p>
+                    <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 leading-snug">Desglose completo de productos y totales</p>
+                  </div>
+                </div>
+                <!-- Capability 2 -->
+                <div class="flex items-start gap-3 bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3.5 text-left border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-sm">
+                  <div class="w-9 h-9 bg-emerald-50 dark:bg-emerald-950/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-100 dark:border-emerald-900/40">
+                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">Imprimir</p>
+                    <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 leading-snug">Impresión directa de facturas y cotizaciones</p>
+                  </div>
+                </div>
+                <!-- Capability 3 -->
+                <div class="flex items-start gap-3 bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3.5 text-left border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-sm">
+                  <div class="w-9 h-9 bg-purple-50 dark:bg-purple-950/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-purple-100 dark:border-purple-900/40">
+                    <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">Exportar PDF</p>
+                    <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 leading-snug">Descarga documentos en formato PDF</p>
+                  </div>
+                </div>
+                <!-- Capability 4 -->
+                <div class="flex items-start gap-3 bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3.5 text-left border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-sm">
+                  <div class="w-9 h-9 bg-amber-50 dark:bg-amber-950/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-amber-100 dark:border-amber-900/40">
+                    <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">Enviar</p>
+                    <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 leading-snug">Email y WhatsApp directo al cliente</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hint inferior -->
+            <div class="relative z-10 mt-8">
+              <p class="text-[11px] text-gray-500 dark:text-zinc-500 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Haz clic en cualquier factura de la lista para comenzar
               </p>
             </div>
           </div>
@@ -286,52 +341,41 @@
           <div v-else class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#212124] transition-colors duration-300">
             
             <!-- Header del detalle con acciones contextuales -->
-            <div class="px-5 py-3 border-b border-gray-100 dark:border-[#282a2c] bg-white dark:bg-[#212124]">
-              <div class="flex items-start justify-between">
-                <div class="flex-1">
-                  <div class="flex items-center gap-3 mb-2">
-                    <h2 class="text-2xl font-semibold text-gray-900 dark:text-zinc-200 tracking-tight">
-                      {{ selectedInvoice.invoiceNumber || selectedInvoice.number || `DOC-${String(selectedInvoice.id).padStart(4, '0')}` }}
-                    </h2>
-                    <span
-                      class="px-3 py-1 rounded-full text-xs font-medium"
-                      :class="getStatusClasses(selectedInvoice.status)">
-                      {{ getStatusLabel(selectedInvoice.status) }}
-                    </span>
-                    <span v-if="selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote'" 
-                          class="px-3 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400">
-                      COTIZACIÓN
-                    </span>
-                  </div>
-                  <div class="flex items-center gap-6 text-sm text-gray-500 dark:text-zinc-400 font-medium">
-                    <span class="flex items-center gap-2">
-                      <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
-                      {{ formatDate(selectedInvoice.date) }}
-                    </span>
-                    <span class="flex items-center gap-2">
-                      <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                      </svg>
-                      {{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}
-                    </span>
-                    <span class="flex items-center gap-2">
-                      <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      {{ selectedInvoice.seller_name || 'Vendedor' }}
-                    </span>
+            <div class="px-6 py-3.5 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div>
+                    <div class="flex items-center gap-3">
+                      <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-none font-mono">
+                        {{ selectedInvoice.invoiceNumber || selectedInvoice.number || `DOC-${String(selectedInvoice.id).padStart(4, '0')}` }}
+                      </h2>
+                      <span
+                        class="px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide border"
+                        :class="getStatusClasses(selectedInvoice.status)">
+                        {{ getStatusLabel(selectedInvoice.status) }}
+                      </span>
+                      <span v-if="selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote'" 
+                            class="px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-800">
+                        COTIZACIÓN
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2.5 mt-1.5 text-[13px] text-gray-500 dark:text-zinc-400 font-medium">
+                      <span>{{ formatDate(selectedInvoice.date) }}</span>
+                      <span class="text-gray-300 dark:text-zinc-600">|</span>
+                      <span>{{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}</span>
+                      <span class="text-gray-300 dark:text-zinc-600">|</span>
+                      <span>{{ selectedInvoice.seller_name || 'Vendedor' }}</span>
+                    </div>
                   </div>
                 </div>
                 
-                <!-- Acciones contextuales - AQUÍ va 'Facturar en POS' para cotizaciones -->
-                <div class="flex items-center gap-2">
+                <!-- Acciones contextuales -->
+                <div class="flex items-center gap-1.5">
                   <!-- Botón principal: Facturar en POS (solo para cotizaciones) -->
                   <button
                     v-if="selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote'"
                     @click="openInPos(selectedInvoice)"
-                    class="px-5 py-2 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2"
+                    class="px-5 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-[13px] font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
                     title="Convertir a factura">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -339,12 +383,12 @@
                     Facturar en POS
                   </button>
                   
-                  <!-- Botones de acción con texto descriptivo -->
+                  <!-- Botones ghost con borde -->
                   <button
                     @click="viewAndPrintInvoice(selectedInvoice)"
-                    class="px-3 py-2 rounded-full transition-all flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c]"
+                    class="px-3.5 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white border border-transparent hover:border-gray-200 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                     </svg>
                     Imprimir
@@ -352,9 +396,9 @@
                   
                   <button
                     @click="downloadPDF(selectedInvoice)"
-                    class="px-3 py-2 rounded-full transition-all flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c]"
+                    class="px-3.5 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white border border-transparent hover:border-gray-200 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Descargar
@@ -362,9 +406,9 @@
                   
                   <button
                     @click="sendByEmail(selectedInvoice)"
-                    class="px-3 py-2 rounded-full transition-all flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c]"
+                    class="px-3.5 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white border border-transparent hover:border-gray-200 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
                     Email
@@ -372,9 +416,9 @@
                   
                   <button
                     @click="sendByWhatsApp(selectedInvoice)"
-                    class="px-3 py-2 rounded-full transition-all flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                    class="px-3.5 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
                   >
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                     </svg>
                     WhatsApp
@@ -384,7 +428,7 @@
                   <div class="relative" @click.stop="">
                     <button
                       @click="toggleActionsMenu(selectedInvoice.id)"
-                      class="p-2 rounded-full text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-all"
+                      class="p-2 rounded-xl text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 border border-transparent hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200"
                       title="Más opciones">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
@@ -393,9 +437,9 @@
                     
                     <!-- Dropdown menu -->
                     <div v-if="activeMenuId === selectedInvoice.id" 
-                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-[#282a2c] rounded-2xl border border-gray-100 dark:border-[#3a3a3f] z-50 py-1 overflow-hidden">
+                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xl dark:shadow-black/50 z-50 py-1 overflow-hidden">
                       <button @click="editInvoice(selectedInvoice); closeActionsMenu()" 
-                              class="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-zinc-300 hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] flex items-center gap-2 transition-colors">
+                              class="w-full text-left px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
                         <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
@@ -408,102 +452,104 @@
             </div>
 
             <!-- Contenido scrollable - Con scroll independiente -->
-            <div class="flex-1 overflow-y-auto p-3 bg-[#f8f9fa] dark:bg-[#1a1a1d]">
+            <div class="flex-1 overflow-y-auto p-5 bg-[#f5f7fa] dark:bg-[#141416]">
               
-              <!-- Factura digital ocupa todo el ancho -->
-              <div class="bg-white dark:bg-[#282a2c] rounded-2xl border border-gray-100 dark:border-[#3a3a3f] p-4">
+              <!-- Factura digital -->
+              <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm dark:shadow-black/30 overflow-hidden">
                 
                 <!-- Encabezado de la factura digital -->
-                <div class="pb-4 mb-4 border-b border-gray-100 dark:border-[#282a2c]">
-                  <div class="grid grid-cols-2 gap-4">
+                <div class="p-5 border-b border-gray-200 dark:border-zinc-800">
+                  <div class="grid grid-cols-2 gap-5">
                     <div>
-                      <h4 class="text-xs font-medium uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Información del Cliente</h4>
-                      <p class="text-sm font-medium text-gray-900 dark:text-zinc-200">{{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}</p>
-                      <p class="text-xs mt-1 text-gray-500 dark:text-zinc-400">ID Cliente: {{ selectedInvoice.customer_id || 'N/A' }}</p>
+                      <h4 class="text-[10px] font-bold uppercase mb-2.5 text-gray-400 dark:text-zinc-500 tracking-widest">Información del Cliente</h4>
+                      <p class="text-base font-bold text-gray-900 dark:text-white">{{ selectedInvoice.customer || selectedInvoice.customer_name || 'Cliente General' }}</p>
+                      <p class="text-sm mt-1 text-gray-500 dark:text-zinc-400">ID Cliente: {{ selectedInvoice.customer_id || 'N/A' }}</p>
                     </div>
                     
                     <div class="text-right">
-                      <h4 class="text-xs font-medium uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Información del Documento</h4>
-                      <p class="text-sm font-medium text-gray-900 dark:text-zinc-200">Documento: {{ selectedInvoice.invoiceNumber || selectedInvoice.number }}</p>
-                      <p class="text-xs mt-1 text-gray-500 dark:text-zinc-400">Fecha: {{ formatDate(selectedInvoice.date) }}</p>
-                      <p class="text-xs text-gray-500 dark:text-zinc-400">Vencimiento: {{ formatDate(selectedInvoice.due_date) }}</p>
+                      <h4 class="text-[10px] font-bold uppercase mb-2.5 text-gray-400 dark:text-zinc-500 tracking-widest">Información del Documento</h4>
+                      <p class="text-base font-bold text-gray-900 dark:text-white font-mono">{{ selectedInvoice.invoiceNumber || selectedInvoice.number }}</p>
+                      <p class="text-sm mt-1 text-gray-500 dark:text-zinc-400">Fecha: {{ formatDate(selectedInvoice.date) }}</p>
+                      <p class="text-sm text-gray-500 dark:text-zinc-400">Vencimiento: {{ formatDate(selectedInvoice.due_date) }}</p>
                       <p v-if="selectedInvoice.status === 'returned' && selectedInvoice.return_reference" 
-                         class="text-xs mt-2 px-2 py-1 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 rounded-md inline-block font-medium">
-                        🔁 Devuelta: {{ selectedInvoice.return_reference }}
+                         class="text-xs mt-2 px-2.5 py-1 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 rounded inline-block font-bold border border-purple-100 dark:border-purple-800">
+                        Devuelta: {{ selectedInvoice.return_reference }}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <!-- Productos - Tabla limpia y espaciosa -->
-                <div class="mb-4">
-                  <h4 class="text-xs font-medium mb-3 uppercase text-gray-900 dark:text-zinc-300" style="letter-spacing: 0.05em;">Productos / Servicios</h4>
+                <!-- Productos - Tabla contable -->
+                <div class="border-b border-gray-200 dark:border-zinc-800">
+                  <div class="px-5 py-3 bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-700">
+                    <h4 class="text-[10px] font-bold uppercase text-gray-500 dark:text-zinc-400 tracking-widest">Productos / Servicios</h4>
+                  </div>
                   
-                  <div class="bg-white dark:bg-[#282a2c] rounded-xl overflow-hidden">
-                    <table class="min-w-full">
-                      <thead>
-                        <tr class="bg-[#f8f9fa] dark:bg-[#282a2c] border-b border-gray-100 dark:border-[#282a2c]">
-                          <th class="text-left text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">#</th>
-                          <th class="text-left text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">Descripción</th>
-                          <th class="text-center text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">Cant.</th>
-                          <th class="text-right text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">Precio</th>
-                          <th class="text-right text-[10px] font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider px-6 py-3">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-gray-50 dark:divide-[#282a2c]">
-                        <tr v-if="!selectedInvoice.items || selectedInvoice.items.length === 0">
-                          <td colspan="5" class="px-6 py-12 text-center">
-                            <p class="text-sm text-gray-400 dark:text-zinc-500">No hay productos registrados</p>
-                          </td>
-                        </tr>
-                        <tr v-else v-for="(item, index) in selectedInvoice.items" :key="`item-${index}`" class="hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-colors">
-                          <td class="px-4 py-2.5 text-xs text-gray-400 dark:text-zinc-500 font-medium">{{ index + 1 }}</td>
-                          <td class="px-4 py-2.5">
-                            <p class="text-sm font-medium text-gray-800 dark:text-white">{{ item.product_name || item.name || 'N/A' }}</p>
-                            <p class="text-[10px] text-gray-500 dark:text-zinc-400">SKU: {{ item.product_code || item.code || 'N/A' }}</p>
-                          </td>
-                          <td class="text-center px-4 py-2.5">
-                            <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-[#f8f9fa] dark:bg-[#282a2c] text-gray-600 dark:text-zinc-300">
-                              {{ formatQuantity(item.quantity) }}
-                            </span>
-                          </td>
-                          <td class="text-right px-4 py-2.5 text-sm font-medium text-gray-600 dark:text-zinc-300">
-                            ${{ formatCurrency(item.price || item.unit_price) }}
-                          </td>
-                          <td class="text-right px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-zinc-300">
-                            ${{ formatCurrency(item.subtotal || (item.quantity * (item.price || item.unit_price))) }}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    
-                    <!-- Totales dentro de la factura digital -->
-                    <div class="px-4 py-3 border-t border-gray-100 dark:border-[#282a2c] bg-[#f8f9fa] dark:bg-[#282a2c]">
-                      <div class="flex justify-end">
-                        <div class="w-64 space-y-1.5 text-sm">
-                          <div class="flex justify-between">
-                            <span class="text-gray-500 dark:text-zinc-400">Subtotal:</span>
-                            <span class="font-medium text-gray-900 dark:text-zinc-300">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
-                          </div>
-                          <!-- Descuento aplicado -->
-                          <div v-if="selectedInvoice.discount_amount && selectedInvoice.discount_amount > 0" class="flex justify-between">
-                            <span class="text-rose-600 dark:text-rose-400 font-medium">Descuento:</span>
-                            <span class="font-medium text-rose-600 dark:text-rose-400">-${{ formatCurrency(selectedInvoice.discount_amount) }}</span>
-                          </div>
-                          <div class="flex justify-between">
-                            <span class="text-gray-500 dark:text-zinc-400">IVA ({{ displayTaxRate }}%):</span>
-                            <span class="font-medium text-gray-900 dark:text-zinc-300">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
-                          </div>
-                          <!-- Recargo por crédito -->
-                          <div v-if="selectedInvoice.surcharge_amount && selectedInvoice.surcharge_amount > 0" class="flex justify-between">
-                            <span class="text-amber-600 dark:text-amber-400 font-medium">Recargo Crédito:</span>
-                            <span class="font-medium text-amber-600 dark:text-amber-400">+${{ formatCurrency(selectedInvoice.surcharge_amount) }}</span>
-                          </div>
-                          <div class="pt-2 mt-1.5 border-t border-gray-200 dark:border-[#282a2c]">
-                            <div class="flex justify-between items-center">
-                              <span class="text-sm font-medium text-gray-900 dark:text-zinc-200">TOTAL:</span>
-                              <span class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">${{ formatCurrency(selectedInvoice.total) }}</span>
-                            </div>
+                  <table class="min-w-full">
+                    <thead>
+                      <tr class="border-b-2 border-gray-300 dark:border-zinc-600">
+                        <th class="text-left text-[10px] font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest px-5 py-3 w-12">#</th>
+                        <th class="text-left text-[10px] font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest px-5 py-3">Descripción</th>
+                        <th class="text-center text-[10px] font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest px-5 py-3 w-20">Cant.</th>
+                        <th class="text-right text-[10px] font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest px-5 py-3 w-32">Precio</th>
+                        <th class="text-right text-[10px] font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest px-5 py-3 w-32">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-if="!selectedInvoice.items || selectedInvoice.items.length === 0">
+                        <td colspan="5" class="px-5 py-12 text-center">
+                          <p class="text-sm text-gray-400 dark:text-zinc-500">No hay productos registrados</p>
+                        </td>
+                      </tr>
+                      <tr v-else v-for="(item, index) in selectedInvoice.items" :key="`item-${index}`" class="border-b border-gray-100 dark:border-zinc-800 last:border-b-0 hover:bg-gray-50/60 dark:hover:bg-zinc-800/30 transition-colors duration-100">
+                        <td class="px-5 py-3.5 text-sm text-gray-400 dark:text-zinc-500 font-medium tabular-nums">{{ index + 1 }}</td>
+                        <td class="px-5 py-3.5">
+                          <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.product_name || item.name || 'N/A' }}</p>
+                          <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-0.5">SKU: {{ item.product_code || item.code || 'N/A' }}</p>
+                        </td>
+                        <td class="text-center px-5 py-3.5">
+                          <span class="text-sm font-bold text-gray-800 dark:text-zinc-200 tabular-nums">
+                            {{ formatQuantity(item.quantity) }}
+                          </span>
+                        </td>
+                        <td class="text-right px-5 py-3.5 text-sm font-medium text-gray-600 dark:text-zinc-300 tabular-nums">
+                          ${{ formatCurrency(item.price || item.unit_price) }}
+                        </td>
+                        <td class="text-right px-5 py-3.5 text-sm font-bold text-gray-900 dark:text-white tabular-nums">
+                          ${{ formatCurrency(item.subtotal || (item.quantity * (item.price || item.unit_price))) }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <!-- TOTALES -->
+                <div class="p-5">
+                  <div class="flex justify-end">
+                    <div class="w-80">
+                      <div class="space-y-2 text-sm">
+                        <div class="flex justify-between items-center py-1">
+                          <span class="text-gray-500 dark:text-zinc-400">Subtotal</span>
+                          <span class="font-semibold text-gray-800 dark:text-zinc-200 tabular-nums">${{ formatCurrency(selectedInvoice.subtotal || selectedInvoice.total) }}</span>
+                        </div>
+                        <!-- Descuento aplicado -->
+                        <div v-if="selectedInvoice.discount_amount && selectedInvoice.discount_amount > 0" class="flex justify-between items-center py-1">
+                          <span class="text-rose-600 dark:text-rose-400 font-medium">Descuento</span>
+                          <span class="font-bold text-rose-600 dark:text-rose-400 tabular-nums">-${{ formatCurrency(selectedInvoice.discount_amount) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-1">
+                          <span class="text-gray-500 dark:text-zinc-400">IVA ({{ displayTaxRate }}%)</span>
+                          <span class="font-semibold text-gray-800 dark:text-zinc-200 tabular-nums">${{ formatCurrency(selectedInvoice.tax || 0) }}</span>
+                        </div>
+                        <!-- Recargo por crédito -->
+                        <div v-if="selectedInvoice.surcharge_amount && selectedInvoice.surcharge_amount > 0" class="flex justify-between items-center py-1">
+                          <span class="text-amber-600 dark:text-amber-400 font-medium">Recargo Crédito</span>
+                          <span class="font-bold text-amber-600 dark:text-amber-400 tabular-nums">+${{ formatCurrency(selectedInvoice.surcharge_amount) }}</span>
+                        </div>
+                        <div class="pt-3 mt-3 border-t-2 border-gray-900 dark:border-zinc-400">
+                          <div class="flex justify-between items-baseline">
+                            <span class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">Total</span>
+                            <span class="text-3xl font-extrabold text-gray-900 dark:text-white tabular-nums leading-none">${{ formatCurrency(selectedInvoice.total) }}</span>
                           </div>
                         </div>
                       </div>
@@ -512,27 +558,27 @@
                 </div>
 
                 <!-- Información adicional -->
-                <div class="grid grid-cols-2 gap-4 pt-3 border-t border-gray-100 dark:border-[#282a2c]">
-                  <div>
-                    <h4 class="text-xs font-medium uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Método de Pago</h4>
-                    <p class="text-sm text-gray-900 dark:text-zinc-200">
-                      <span v-if="selectedInvoice.payment_method === 'credit'" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400">
+                <div class="grid grid-cols-2 border-t border-gray-200 dark:border-zinc-800">
+                  <div class="px-5 py-4 border-r border-gray-200 dark:border-zinc-800">
+                    <h4 class="text-[10px] font-bold uppercase mb-1.5 text-gray-400 dark:text-zinc-500 tracking-widest">Método de Pago</h4>
+                    <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200">
+                      <span v-if="selectedInvoice.payment_method === 'credit'" class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800">
                         Crédito
                       </span>
                       <span v-else>{{ getPaymentMethodName(selectedInvoice.payment_method) }}</span>
                     </p>
                   </div>
                   
-                  <div>
-                    <h4 class="text-xs font-medium uppercase mb-2 text-gray-500 dark:text-zinc-400" style="letter-spacing: 0.05em;">Vendedor</h4>
-                    <p class="text-sm text-gray-900 dark:text-zinc-200">{{ selectedInvoice.seller_name || 'Vendedor' }}</p>
+                  <div class="px-5 py-4">
+                    <h4 class="text-[10px] font-bold uppercase mb-1.5 text-gray-400 dark:text-zinc-500 tracking-widest">Vendedor</h4>
+                    <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200">{{ selectedInvoice.seller_name || 'Vendedor' }}</p>
                   </div>
                 </div>
 
                 <!-- Nota/Observaciones si existen -->
-                <div v-if="selectedInvoice.notes" class="mt-3 pt-3 border-t border-gray-100 dark:border-[#282a2c]">
-                  <h4 class="text-xs font-medium uppercase mb-1.5 text-gray-600 dark:text-zinc-400 tracking-wider">Observaciones</h4>
-                  <p class="text-sm p-2 rounded-xl text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#282a2c]">{{ selectedInvoice.notes }}</p>
+                <div v-if="selectedInvoice.notes" class="border-t border-gray-200 dark:border-zinc-800 px-5 py-4">
+                  <h4 class="text-[10px] font-bold uppercase mb-2 text-gray-400 dark:text-zinc-500 tracking-widest">Observaciones</h4>
+                  <p class="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">{{ selectedInvoice.notes }}</p>
                 </div>
               </div>
 
@@ -1958,6 +2004,8 @@ const handleKeyDown = (event) => {
 
 // 🧠 Actualizar contexto de pantalla para IA de voz
 const updateScreenContextForAI = () => {
+  const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
+  
   // Calcular estadísticas por estado (sin pasar la lista completa)
   const facturasPagadas = props.invoices.filter(i => 
     (i.status?.toLowerCase() === 'pagada' || i.status?.toLowerCase() === 'paid') &&
@@ -1981,8 +2029,39 @@ const updateScreenContextForAI = () => {
     (i.status?.toLowerCase() !== 'cancelled' && i.status?.toLowerCase() !== 'anulada')
   ).length
   
-  // Datos resumidos para la IA (NO la lista completa)
+  // Obtener las últimas 10 facturas ordenadas por fecha (más reciente primero)
+  const facturasOrdenadas = [...props.invoices]
+    .filter(i => i.status !== 'cancelled')
+    .sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))
+  
+  const ultimasFacturas = facturasOrdenadas.slice(0, 10).map(f => ({
+    id: f.id,
+    numero: f.invoice_number || f.number || `FV-${f.id}`,
+    cliente: f.customer_name || f.customer || 'Cliente General',
+    total: formatMoney(f.total),
+    fecha: formatDate(f.date || f.created_at),
+    estado: getStatusLabel(f.status),
+    tipo: (f.type === 'Cotización' || f.type === 'quote') ? 'Cotización' : 'Factura',
+    vendedor: f.seller_name || 'N/A'
+  }))
+  
+  // Primera y última factura del período visible
+  const primeraFactura = facturasOrdenadas.length > 0 ? facturasOrdenadas[facturasOrdenadas.length - 1] : null
+  const ultimaFactura = facturasOrdenadas.length > 0 ? facturasOrdenadas[0] : null
+  
+  // Facturas de hoy - usar fecha local, no UTC
+  const ahora = new Date()
+  const hoy = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`
+  const facturasHoy = facturasOrdenadas.filter(f => {
+    const fecha = (f.date || f.created_at)?.split('T')[0]?.split(' ')[0]
+    return fecha === hoy
+  })
+  
+  // Datos resumidos para la IA
   const contextData = {
+    tipoReporte: 'invoices',
+    modulo: 'Facturas y Cotizaciones',
+    descripcion: 'Vista de facturas con lista detallada, búsqueda y acciones de envío',
     resumenFacturas: {
       total: props.invoices.length,
       facturasDelMes: monthlyInvoices.value,
@@ -1995,14 +2074,48 @@ const updateScreenContextForAI = () => {
       },
       cotizaciones: cotizacionesPendientes
     },
+    // Lista de últimas facturas para que la IA pueda consultarlas
+    ultimasFacturas,
+    facturasHoy: {
+      cantidad: facturasHoy.length,
+      total: formatMoney(facturasHoy.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)),
+      lista: facturasHoy.slice(0, 5).map(f => ({
+        numero: f.invoice_number || f.number || `FV-${f.id}`,
+        cliente: f.customer_name || 'Cliente General',
+        total: formatMoney(f.total)
+      }))
+    },
+    // Primera y última factura del período
+    primeraFacturaPeriodo: primeraFactura ? {
+      numero: primeraFactura.invoice_number || primeraFactura.number || `FV-${primeraFactura.id}`,
+      cliente: primeraFactura.customer_name || 'Cliente General',
+      total: formatMoney(primeraFactura.total),
+      fecha: formatDate(primeraFactura.date)
+    } : null,
+    ultimaFacturaPeriodo: ultimaFactura ? {
+      numero: ultimaFactura.invoice_number || ultimaFactura.number || `FV-${ultimaFactura.id}`,
+      cliente: ultimaFactura.customer_name || 'Cliente General',
+      total: formatMoney(ultimaFactura.total),
+      fecha: formatDate(ultimaFactura.date)
+    } : null,
+    // Filtros activos
+    filtrosActivos: {
+      busqueda: searchTerm.value || null,
+      estado: statusFilter.value || null,
+      tipo: typeFilter.value || null
+    },
     // Info de la factura seleccionada (si hay alguna)
     facturaSeleccionada: selectedInvoice.value ? {
+      id: selectedInvoice.value.id,
       numero: selectedInvoice.value.number || selectedInvoice.value.invoiceNumber || `FV-${selectedInvoice.value.id}`,
       tipo: isQuotation(selectedInvoice.value) ? 'Cotización' : 'Factura',
       estado: getStatusLabel(selectedInvoice.value.status),
       cliente: selectedInvoice.value.customer_name || selectedInvoice.value.customer || 'Cliente General',
       total: `$${formatCurrency(selectedInvoice.value.total)}`,
       fecha: formatDate(selectedInvoice.value.date),
+      vendedor: selectedInvoice.value.seller_name || 'N/A',
+      metodoPago: selectedInvoice.value.payment_method || 'Efectivo',
+      items: (selectedInvoice.value.items || []).length,
       // 🔥 Validación de datos de contacto para envíos
       tieneEmail: !!(selectedInvoice.value.customer_email || selectedInvoice.value.email),
       tieneTelefono: !!(selectedInvoice.value.customer_phone || selectedInvoice.value.phone),
@@ -2032,6 +2145,9 @@ const updateScreenContextForAI = () => {
 onMounted(() => {
   document.addEventListener('click', closeActionsMenu)
   document.addEventListener('keydown', handleKeyDown)
+  
+  // 🧠 Establecer módulo actual para la IA
+  uiContext.setCurrentModule('invoices')
   
   // 🧠 Inicializar contexto de pantalla para IA
   updateScreenContextForAI()
@@ -2083,6 +2199,193 @@ onMounted(() => {
     }
     await viewAndPrintInvoice(selectedInvoice.value)
     return { success: true, message: 'Documento listo para imprimir' }
+  })
+  
+  // 🧾 Seleccionar factura por número o posición
+  uiContext.registerAction('seleccionarFactura', async ({ numero, posicion }) => {
+    const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
+    
+    let factura = null
+    
+    if (numero) {
+      // Limpiar el número: quitar FV-, #, ceros a la izquierda
+      const numeroLimpio = numero.toString().toLowerCase()
+        .replace('fv-', '')
+        .replace('#', '')
+        .replace(/^0+/, '') // Quitar ceros a la izquierda (13 = 000013)
+      
+      // Buscar factura de forma inteligente
+      factura = props.invoices.find(f => {
+        const numFactura = (f.invoice_number || f.number || `FV-${f.id}`).toLowerCase().replace('fv-', '')
+        const numSinCeros = numFactura.replace(/^0+/, '') // 000013 -> 13
+        
+        // Coincidencia exacta (con o sin ceros)
+        if (numFactura === numeroLimpio || numSinCeros === numeroLimpio) return true
+        
+        // Coincidencia por ID
+        if (f.id.toString() === numeroLimpio) return true
+        
+        // Coincidencia parcial: últimos dígitos coinciden
+        // Ej: buscar "13" encuentra "000013"
+        if (numSinCeros.endsWith(numeroLimpio) || numeroLimpio.endsWith(numSinCeros)) return true
+        
+        // El número de factura contiene el número buscado
+        if (numFactura.includes(numeroLimpio)) return true
+        
+        return false
+      })
+    } else if (posicion) {
+      // Buscar por posición (1 = más reciente)
+      const facturasOrdenadas = [...props.invoices]
+        .filter(i => i.status !== 'cancelled')
+        .sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))
+      
+      const pos = parseInt(posicion) - 1
+      if (pos >= 0 && pos < facturasOrdenadas.length) {
+        factura = facturasOrdenadas[pos]
+      }
+    }
+    
+    if (factura) {
+      selectedInvoice.value = factura
+      const numeroFac = factura.invoice_number || factura.number || `FV-${factura.id}`
+      return { 
+        success: true, 
+        message: `Seleccioné la factura ${numeroFac} de ${factura.customer_name || 'Cliente General'} por ${formatMoney(factura.total)}. ¿Qué quieres hacer con ella?`
+      }
+    }
+    
+    return { success: false, message: 'No encontré esa factura. ¿Podrías darme el número exacto o el nombre del cliente?' }
+  })
+  
+  // 🧾 Consultar facturas de hoy
+  uiContext.registerAction('consultarFacturasHoy', async () => {
+    const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
+    // Usar fecha local, no UTC
+    const ahora = new Date()
+    const hoy = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`
+    
+    const facturasHoy = props.invoices.filter(f => {
+      const fecha = (f.date || f.created_at)?.split('T')[0]?.split(' ')[0]
+      return fecha === hoy && f.status !== 'cancelled'
+    }).sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))
+    
+    if (facturasHoy.length === 0) {
+      return { success: true, message: 'No hay facturas registradas hoy todavía.' }
+    }
+    
+    const total = facturasHoy.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
+    let mensaje = `📋 Hoy tienes ${facturasHoy.length} factura${facturasHoy.length > 1 ? 's' : ''} por ${formatMoney(total)}:\n\n`
+    
+    facturasHoy.slice(0, 5).forEach((f, i) => {
+      const num = f.invoice_number || f.number || `FV-${f.id}`
+      mensaje += `${i+1}. ${num}: ${f.customer_name || 'Cliente General'} - ${formatMoney(f.total)} (${f.status})\n`
+    })
+    
+    if (facturasHoy.length > 5) {
+      mensaje += `\n... y ${facturasHoy.length - 5} más`
+    }
+    
+    return { success: true, message: mensaje }
+  })
+  
+  // 🧾 Ver primera o última factura
+  uiContext.registerAction('consultarFacturaEspecial', async ({ tipo, periodo }) => {
+    const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
+    
+    let facturasFiltradas = [...props.invoices].filter(i => i.status !== 'cancelled')
+    
+    // Filtrar por período si se especifica - usar fecha local
+    if (periodo) {
+      const ahora = new Date()
+      const hoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`
+      
+      let fechaInicioStr = hoyStr
+      if (periodo === 'semana') {
+        const fechaInicio = new Date(ahora)
+        fechaInicio.setDate(ahora.getDate() - 7)
+        fechaInicioStr = `${fechaInicio.getFullYear()}-${String(fechaInicio.getMonth() + 1).padStart(2, '0')}-${String(fechaInicio.getDate()).padStart(2, '0')}`
+      } else if (periodo === 'mes') {
+        fechaInicioStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-01`
+      }
+      
+      facturasFiltradas = facturasFiltradas.filter(f => {
+        const fechaStr = (f.date || f.created_at)?.split('T')[0]?.split(' ')[0]
+        return fechaStr >= fechaInicioStr && fechaStr <= hoyStr
+      })
+    }
+    
+    // Ordenar por fecha
+    facturasFiltradas.sort((a, b) => new Date(a.date || a.created_at) - new Date(b.date || b.created_at))
+    
+    if (facturasFiltradas.length === 0) {
+      return { success: true, message: `No hay facturas en el período especificado.` }
+    }
+    
+    let factura = null
+    let descripcion = ''
+    
+    if (tipo === 'primera') {
+      factura = facturasFiltradas[0]
+      descripcion = periodo ? `primera del ${periodo}` : 'primera'
+    } else if (tipo === 'ultima') {
+      factura = facturasFiltradas[facturasFiltradas.length - 1]
+      descripcion = periodo ? `última del ${periodo}` : 'última'
+    }
+    
+    if (factura) {
+      const num = factura.invoice_number || factura.number || `FV-${factura.id}`
+      const fecha = new Date(factura.date || factura.created_at).toLocaleDateString('es-CO', { 
+        weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' 
+      })
+      
+      selectedInvoice.value = factura
+      
+      return { 
+        success: true, 
+        message: `📄 La factura ${descripcion} es la ${num}:\n• Cliente: ${factura.customer_name || 'Cliente General'}\n• Total: ${formatMoney(factura.total)}\n• Fecha: ${fecha}\n• Estado: ${factura.status}\n• Vendedor: ${factura.seller_name || 'N/A'}\n\nYa la seleccioné por si quieres hacer algo con ella.`
+      }
+    }
+    
+    return { success: false, message: 'No encontré facturas.' }
+  })
+  
+  // 🧾 Buscar facturas por cliente
+  uiContext.registerAction('buscarFacturasPorCliente', async ({ cliente }) => {
+    const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
+    
+    if (!cliente) {
+      return { success: false, message: '¿De qué cliente quieres ver las facturas?' }
+    }
+    
+    const clienteLower = cliente.toLowerCase()
+    const facturasCliente = props.invoices.filter(f => {
+      const nombreCliente = (f.customer_name || f.customer || '').toLowerCase()
+      return nombreCliente.includes(clienteLower) && f.status !== 'cancelled'
+    }).sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))
+    
+    if (facturasCliente.length === 0) {
+      return { success: true, message: `No encontré facturas del cliente "${cliente}".` }
+    }
+    
+    const total = facturasCliente.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
+    let mensaje = `📋 Encontré ${facturasCliente.length} factura${facturasCliente.length > 1 ? 's' : ''} de "${cliente}" por ${formatMoney(total)} total:\n\n`
+    
+    facturasCliente.slice(0, 5).forEach((f, i) => {
+      const num = f.invoice_number || f.number || `FV-${f.id}`
+      const fecha = new Date(f.date || f.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
+      mensaje += `${i+1}. ${num}: ${formatMoney(f.total)} - ${fecha} (${f.status})\n`
+    })
+    
+    if (facturasCliente.length > 5) {
+      mensaje += `\n... y ${facturasCliente.length - 5} más`
+    }
+    
+    // Seleccionar la más reciente automáticamente
+    selectedInvoice.value = facturasCliente[0]
+    mensaje += `\n\nSeleccioné la más reciente (${facturasCliente[0].invoice_number || facturasCliente[0].number}).`
+    
+    return { success: true, message: mensaje }
   })
   
   // NO seleccionar automáticamente - dejar en blanco para que el usuario elija

@@ -4,7 +4,7 @@
     <div class="flex items-center justify-center min-h-screen">
       <div class="flex flex-col items-center space-y-4">
         <div class="w-16 h-16 border-4 border-slate-200 dark:border-zinc-700 border-t-slate-900 dark:border-t-slate-500 rounded-full animate-spin"></div>
-        <p class="text-sm text-gray-600 dark:text-zinc-400 font-medium">Cargando productos...</p>
+        <p class="text-base text-gray-600 dark:text-zinc-400 font-medium">Cargando productos...</p>
       </div>
     </div>
   </div>
@@ -18,18 +18,18 @@
         <!-- Título Fashion (Tipografía elegante) -->
         <div v-if="isFashionStore">
           <h1 class="text-3xl font-light text-gray-900 dark:text-white tracking-tight">Colección</h1>
-          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1 font-light">Explora nuestros productos</p>
+          <p class="text-base text-gray-500 dark:text-zinc-400 mt-1 font-light">Explora nuestros productos</p>
         </div>
         <!-- Título Standard -->
         <div v-else>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Productos</h1>
-          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">Gestiona tu inventario y catálogo</p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Productos</h1>
+          <p class="text-base text-gray-600 dark:text-zinc-400 mt-1 font-normal">Gestiona tu inventario y catalogo</p>
         </div>
         
         <div class="flex items-center space-x-3">
           <!-- Botón Importar Excel (NUEVO) -->
           <button id="tour-import-excel" @click="showExcelImportModal = true"
-                  class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2">
+                  class="px-4 py-2 bg-white dark:bg-zinc-900/60 hover:bg-gray-50 dark:hover:bg-zinc-800/60 text-gray-600 dark:text-zinc-300 text-[15px] font-medium rounded-lg border border-gray-200 dark:border-zinc-700/60 transition-all duration-200 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
             </svg>
@@ -38,7 +38,7 @@
           
           <!-- Botón Neutro (Exportar) -->
           <button id="tour-export-products" @click="exportProducts"
-                  class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2">
+                  class="px-4 py-2 bg-white dark:bg-zinc-900/60 hover:bg-gray-50 dark:hover:bg-zinc-800/60 text-gray-600 dark:text-zinc-300 text-[15px] font-medium rounded-lg border border-gray-200 dark:border-zinc-700/60 transition-all duration-200 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
@@ -48,7 +48,7 @@
           <!-- Botón Secundario (Actualizar) -->
           <button @click="refreshProducts"
                   :disabled="loading"
-                  class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2"
+                  class="px-4 py-2 bg-white dark:bg-zinc-900/60 hover:bg-gray-50 dark:hover:bg-zinc-800/60 text-gray-600 dark:text-zinc-300 text-[15px] font-medium rounded-lg border border-gray-200 dark:border-zinc-700/60 transition-all duration-200 flex items-center gap-2"
                   :class="{ 'opacity-50 cursor-not-allowed': loading }">
             <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -56,10 +56,10 @@
             <span>{{ loading ? 'Sincronizando' : 'Actualizar' }}</span>
           </button>
           
-          <!-- Botón Principal (Nuevo Producto) -->
+          <!-- Bot�n Principal (Nuevo Producto) -->
           <button id="tour-new-product"
                   @click="openCreateModal"
-                  class="px-6 py-2.5 bg-[#1e1f20] dark:bg-[#8ab4f8] hover:bg-black dark:hover:bg-[#aecbfa] text-white dark:text-[#1e1f20] text-sm font-semibold rounded-full transition-all duration-200 flex items-center gap-2">
+                  class="px-5 py-2 bg-gray-900 dark:bg-white/10 hover:bg-black dark:hover:bg-white/15 text-white text-[15px] font-semibold rounded-lg shadow-sm transition-all duration-200 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -68,137 +68,137 @@
         </div>
       </div>
 
-      <!-- Métricas Principales - Condicional Fashion/Standard -->
-      <div v-if="isFashionStore" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <!-- M�tricas Principales - Condicional Fashion/Standard -->
+      <div v-if="isFashionStore" class="flex items-center gap-10 mb-6 flex-wrap">
         <!-- KPIs Minimalistas Fashion (Sin iconos) -->
-        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
-          <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Total</p>
-          <p class="text-3xl font-light text-gray-900 dark:text-white">{{ displayProducts.length }}</p>
+        <div>
+          <p class="text-sm font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-0.5">Total</p>
+          <p class="text-2xl font-light text-gray-900 dark:text-white">{{ products.length }}</p>
         </div>
-        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
-          <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Activos</p>
-          <p class="text-3xl font-light text-gray-900 dark:text-white">{{ activeProducts }}</p>
+        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
+        <div>
+          <p class="text-sm font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-0.5">Activos</p>
+          <p class="text-2xl font-light text-gray-900 dark:text-white">{{ activeProducts }}</p>
         </div>
-        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
-          <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Stock Bajo</p>
-          <p class="text-3xl font-light text-gray-900 dark:text-white">{{ lowStockProducts }}</p>
+        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
+        <div>
+          <p class="text-sm font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-0.5">Stock Bajo</p>
+          <p class="text-2xl font-light text-gray-900 dark:text-white">{{ lowStockProducts }}</p>
         </div>
-        <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
-          <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Valor Inventario</p>
-          <p class="text-3xl font-light text-gray-900 dark:text-white">${{ formatCurrency(totalValue) }}</p>
+        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
+        <div>
+          <p class="text-sm font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-0.5">Valor Inventario</p>
+          <p class="text-2xl font-light text-gray-900 dark:text-white">${{ formatCurrency(totalValue) }}</p>
         </div>
       </div>
       
-      <!-- KPIs Standard (Con iconos) - Estilo fantasma profesional -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <!-- KPIs Standard - Inline metrics (Stripe-style) -->
+      <div v-else class="flex items-center gap-8 mb-2 flex-wrap">
         <!-- Total Productos -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Total Productos</p>
-              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ displayProducts.length }}</p>
-            </div>
+        <div class="flex items-center gap-2.5 group">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-500/10">
+            <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Total Productos</p>
+            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">{{ products.length }}</p>
           </div>
         </div>
+
+        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
 
         <!-- Productos Activos -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Activos</p>
-              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ activeProducts }}</p>
-            </div>
+        <div class="flex items-center gap-2.5 group">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-emerald-50 dark:bg-emerald-500/10">
+            <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Activos</p>
+            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">{{ activeProducts }}</p>
           </div>
         </div>
+
+        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
 
         <!-- Stock Bajo -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/40 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Stock Bajo</p>
-              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ lowStockProducts }}</p>
-            </div>
+        <div class="flex items-center gap-2.5 group">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-50 dark:bg-amber-500/10">
+            <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Stock Bajo</p>
+            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">{{ lowStockProducts }}</p>
           </div>
         </div>
+
+        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
 
         <!-- Valor Total -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-950/40 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Valor Total</p>
-              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">${{ formatCurrency(totalValue) }}</p>
-            </div>
+        <div class="flex items-center gap-2.5 group">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-500/10">
+            <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Valor Total</p>
+            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">${{ formatCurrency(totalValue) }}</p>
           </div>
         </div>
 
+        <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800 hidden md:block"></div>
+
         <!-- Categorías -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Categorías</p>
-              <p class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ uniqueCategories }}</p>
-            </div>
+        <div class="flex items-center gap-2.5 group">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-indigo-50 dark:bg-indigo-500/10">
+            <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-[13px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider leading-none">Categorías</p>
+            <p class="text-base font-semibold text-[#374151] dark:text-zinc-300 leading-tight">{{ uniqueCategories }}</p>
           </div>
         </div>
       </div>
 
       <!-- Contenedor Principal Tour - Filtros + Productos -->
       <div id="tour-products-main">
-      <!-- Filtros - Diseño Gemini limpio -->
-    <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl p-4 mb-6 transition-colors duration-200">
-      <div class="flex flex-wrap items-center gap-4">
-        <!-- Búsqueda limpia (Gemini style) -->
-        <div id="tour-search-products" class="flex-1 min-w-[200px] relative">
-          <svg class="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+      <!-- Filtros - Sin card contenedora, directamente en el layout -->
+      <div class="flex flex-wrap items-center gap-3 mb-5">
+        <!-- B�squeda -->
+        <div id="tour-search-products" class="flex-1 min-w-[220px] relative">
+          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
           <input
             v-model="searchTerm"
             type="text"
             placeholder="Buscar productos por nombre, SKU..."
-            class="w-full pl-11 pr-4 py-3 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] dark:placeholder-[#9aa0a6] focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all duration-200">
+            class="w-full pl-9 pr-4 py-2.5 text-[15px] rounded-lg border border-gray-200 dark:border-zinc-700/60 bg-white dark:bg-zinc-900/60 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200">
         </div>
         
-        <!-- Categoría -->
-        <div id="tour-filter-category" class="min-w-[160px]">
+        <!-- Categor�a -->
+        <div id="tour-filter-category">
           <select
             v-model="categoryFilter"
-            class="w-full px-4 py-3 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors duration-200 cursor-pointer">
+            class="px-3 py-2.5 text-[15px] rounded-lg border border-gray-200 dark:border-zinc-700/60 bg-white dark:bg-zinc-900/60 text-gray-600 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-200 cursor-pointer">
             <option value="">Todas las categorías</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
           </select>
         </div>
         
         <!-- Estado -->
-        <div id="tour-filter-status" class="min-w-[140px]">
+        <div id="tour-filter-status">
           <select
             v-model="statusFilter"
-            class="w-full px-4 py-3 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors duration-200 cursor-pointer">
+            class="px-3 py-2.5 text-[15px] rounded-lg border border-gray-200 dark:border-zinc-700/60 bg-white dark:bg-zinc-900/60 text-gray-600 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-200 cursor-pointer">
             <option value="">Todos los estados</option>
             <option value="active">Activos</option>
             <option value="inactive">Inactivos</option>
@@ -207,10 +207,10 @@
         </div>
         
         <!-- Ordenar -->
-        <div class="min-w-[140px]">
+        <div>
           <select
             v-model="sortBy"
-            class="w-full px-4 py-3 text-sm rounded-full bg-white dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-colors duration-200 cursor-pointer">
+            class="px-3 py-2.5 text-[15px] rounded-lg border border-gray-200 dark:border-zinc-700/60 bg-white dark:bg-zinc-900/60 text-gray-600 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-200 cursor-pointer">
             <option value="name">Por Nombre</option>
             <option value="price">Por Precio</option>
             <option value="stock">Por Stock</option>
@@ -218,17 +218,17 @@
           </select>
         </div>
         
-        <!-- Toggle Vista (Gemini pill style) -->
-        <div id="tour-view-toggle" class="flex items-center bg-white dark:bg-[#282a2c] rounded-full p-1">
+        <!-- Toggle Vista -->
+        <div id="tour-view-toggle" class="flex items-center bg-gray-100/60 dark:bg-zinc-800/40 rounded-lg p-0.5 h-[38px]">
           <button
             @click="setViewMode('grid')"
             :class="[
-              'flex items-center justify-center px-3.5 py-1.5 rounded-full transition-all text-xs font-medium',
+              'flex items-center justify-center px-3 py-1.5 rounded-md transition-all text-sm font-medium',
               viewMode === 'grid' 
-                ? 'bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8]' 
-                : 'text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f8f9fa] dark:hover:bg-[#3a3a3f]'
+                ? 'bg-white dark:bg-zinc-700/60 text-gray-900 dark:text-white shadow-sm' 
+                : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
             ]">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
             </svg>
             Tarjetas
@@ -237,19 +237,18 @@
           <button
             @click="setViewMode('table')"
             :class="[
-              'flex items-center justify-center px-3.5 py-1.5 rounded-full transition-all text-xs font-medium',
+              'flex items-center justify-center px-3 py-1.5 rounded-md transition-all text-sm font-medium',
               viewMode === 'table' 
-                ? 'bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8]' 
-                : 'text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f8f9fa] dark:hover:bg-[#3a3a3f]'
+                ? 'bg-white dark:bg-zinc-700/60 text-gray-900 dark:text-white shadow-sm' 
+                : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
             ]">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
             </svg>
             Tabla
           </button>
         </div>
       </div>
-    </div>
 
     <!-- Vista de Tarjetas -->
     <div v-if="viewMode === 'grid'">
@@ -257,7 +256,7 @@
       <div v-if="loading" class="flex justify-center items-center py-20">
         <div class="flex flex-col items-center space-y-3">
           <div class="w-12 h-12 border-4 border-blue-200 dark:border-zinc-700 border-t-blue-600 dark:border-t-blue-500 rounded-full animate-spin"></div>
-          <p class="text-sm text-gray-500 dark:text-zinc-400">Cargando productos...</p>
+          <p class="text-[15px] text-gray-500 dark:text-zinc-400">Cargando productos...</p>
         </div>
       </div>
 
@@ -275,15 +274,15 @@
           <!-- Texto -->
           <div class="relative z-10 text-center">
             <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center">Tu inventario está vacío</h3>
-            <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-1">
+            <p class="text-base text-gray-500 dark:text-zinc-400 leading-relaxed mb-1">
               {{ searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda' : 'Comienza agregando productos para gestionar tu catálogo' }}
             </p>
-            <p v-if="!searchTerm" class="text-xs text-gray-400 dark:text-zinc-500">Puedes agregar productos manualmente o importar desde Excel</p>
+            <p v-if="!searchTerm" class="text-sm text-gray-400 dark:text-zinc-500">Puedes agregar productos manualmente o importar desde Excel</p>
           </div>
           
           <button v-if="!searchTerm" 
                   @click="openCreateModal" 
-                  class="mt-6 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 inline-flex items-center gap-2">
+                  class="mt-6 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-[15px] font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 inline-flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
@@ -295,7 +294,7 @@
       <!-- Grid de productos -->
       <div v-else class="grid" :class="isFashionStore ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6'">
         
-        <!-- 👗 FASHION CARD - Para tiendas de MODA (estilo Lookbook) -->
+        <!-- �x FASHION CARD - Para tiendas de MODA (estilo Lookbook) -->
         <template v-if="isFashionStore">
           <FashionProductCard
             v-for="product in paginatedProducts"
@@ -306,7 +305,7 @@
           />
         </template>
         
-        <!-- 🛒 RETAIL CARD - Diseño Gemini minimalista -->
+        <!-- �x: RETAIL CARD - Diseño Gemini minimalista -->
         <template v-else>
           <div v-for="product in paginatedProducts" 
                :key="product.id" 
@@ -329,7 +328,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
                     </svg>
                   </div>
-                  <span class="text-[11px] font-medium text-gray-400 dark:text-zinc-500">Sin imagen</span>
+                  <span class="text-[13px] font-medium text-gray-400 dark:text-zinc-500">Sin imagen</span>
                 </div>
               </div>
               
@@ -350,6 +349,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                   </svg>
                 </button>
+                <button @click.stop="deleteProduct(product)" 
+                        class="w-9 h-9 rounded-full bg-white/95 hover:bg-rose-500 text-gray-700 hover:text-white flex items-center justify-center shadow-lg transform scale-90 group-hover:scale-100 transition-all duration-200 delay-150"
+                        title="Eliminar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
               </div>
               
               <!-- Badge Estado - Esquina superior derecha -->
@@ -357,14 +363,14 @@
                 <span :class="getProductStatus(product) 
                   ? 'bg-[#1e8e3e] text-white' 
                   : 'bg-[#5f6368] text-white'" 
-                      class="px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wide">
+                      class="px-2.5 py-1 rounded-full text-[13px] font-medium uppercase tracking-wide">
                   {{ getProductStatus(product) ? 'Activo' : 'Inactivo' }}
                 </span>
               </div>
               
               <!-- Badge Stock Bajo - Esquina superior izquierda -->
               <div v-if="(product.current_stock || 0) <= (product.min_stock || 0)" class="absolute top-3 left-3">
-                <span class="bg-[#f9ab00] text-white px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wide">
+                <span class="bg-[#f9ab00] text-white px-2.5 py-1 rounded-full text-[13px] font-medium uppercase tracking-wide">
                   Stock Bajo
                 </span>
               </div>
@@ -373,12 +379,12 @@
             <!-- Información del producto - Diseño Gemini limpio -->
             <div class="p-4">
               <!-- Nombre -->
-              <h3 class="font-medium text-[#1e1f20] dark:text-[#e3e3e3] text-sm leading-snug line-clamp-1 mb-1" :title="product.name">
+              <h3 class="font-medium text-[#1e1f20] dark:text-[#e3e3e3] text-base leading-snug line-clamp-1 mb-1" :title="product.name">
                 {{ product.name }}
               </h3>
               
               <!-- Categoría -->
-              <p class="text-[11px] text-[#5f6368] dark:text-[#9aa0a6] mb-3">
+              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mb-3">
                 {{ product.category?.name || 'Sin categoría' }}
               </p>
               
@@ -388,7 +394,7 @@
                   ${{ formatCurrency(product.sale_price) }}
                 </span>
                 <span :class="[
-                  'text-xs font-medium px-2.5 py-1 rounded-full',
+                  'text-sm font-medium px-2.5 py-1 rounded-full',
                   (product.current_stock || 0) <= (product.min_stock || 0) 
                     ? 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#e37400] dark:text-[#f9ab00]' 
                     : 'bg-[#f8f9fa] dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6]'
@@ -414,39 +420,40 @@
       </div>
     </div>
 
-    <!-- Vista de Tabla - Diseño Gemini limpio -->
-  <div v-else class="bg-white dark:bg-[#1e1f20] rounded-2xl overflow-hidden transition-colors duration-200">
-      <!-- Header de tabla -->
-      <div class="bg-[#f8f9fa] dark:bg-[#282a2c] px-6 py-4 flex items-center justify-between">
+    <!-- Vista de Tabla - Integrada al layout, sin card pesada -->
+  <div v-else>
+      <!-- Header de tabla - Inline, sin contenedor -->
+      <div class="flex items-center justify-between mb-3">
         <div>
-          <h2 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Catálogo de Productos</h2>
-          <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">{{ totalItems }} productos encontrados</p>
+          <h2 class="text-[15px] font-semibold text-[#111827] dark:text-white">Catalogo de Productos</h2>
+          <p class="text-[13px] text-[#6B7280] dark:text-zinc-500 mt-0.5">{{ totalItems }} productos encontrados</p>
         </div>
       </div>
       
-      <!-- Tabla -->
+      <!-- Tabla con borde sutil -->
+      <div class="mt-4 bg-white dark:bg-zinc-900 rounded-[10px] overflow-hidden border border-[#E5E7EB] dark:border-zinc-800">
       <table class="min-w-full">
         <thead>
-          <tr class="border-b border-[#e8eaed] dark:border-[#3a3a3f]">
-            <th class="px-6 py-3.5 text-left text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
+          <tr class="bg-gray-50 dark:bg-zinc-900/80 border-b border-[#E5E7EB] dark:border-zinc-800">
+            <th class="px-6 py-3.5 text-left text-[13px] font-semibold text-[#374151] dark:text-zinc-400 uppercase tracking-[0.04em]">
               Producto
             </th>
-            <th class="px-6 py-3.5 text-left text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
+            <th class="px-6 py-3.5 text-left text-[13px] font-semibold text-[#374151] dark:text-zinc-400 uppercase tracking-[0.04em]">
               Categoría
             </th>
-            <th class="px-6 py-3.5 text-left text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
+            <th class="px-6 py-3.5 text-left text-[13px] font-semibold text-[#374151] dark:text-zinc-400 uppercase tracking-[0.04em]">
               Proveedor
             </th>
-            <th class="px-6 py-3.5 text-right text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
+            <th class="px-6 py-3.5 text-right text-[13px] font-semibold text-[#374151] dark:text-zinc-400 uppercase tracking-[0.04em]">
               Precio
             </th>
             
             <!-- Columnas de Stock Dinámicas -->
             <template v-if="showMultipleStockColumns">
               <th v-for="warehouse in availableWarehouses" :key="warehouse.id"
-                  class="px-4 py-3.5 text-center text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
+                  class="px-4 py-3.5 text-center text-[13px] font-semibold text-[#374151] dark:text-zinc-400 uppercase tracking-[0.04em]">
                 <div class="flex items-center justify-center space-x-1">
-                  <svg class="w-3 h-3 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <svg class="w-3 h-3 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                   </svg>
                   <span>{{ warehouse.name }}</span>
@@ -454,26 +461,26 @@
               </th>
             </template>
             <template v-else>
-              <th class="px-6 py-3.5 text-center text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
+              <th class="px-6 py-3.5 text-center text-[13px] font-semibold text-[#374151] dark:text-zinc-400 uppercase tracking-[0.04em]">
                 Stock
               </th>
             </template>
             
-            <th class="px-6 py-3.5 text-center text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
+            <th class="px-6 py-3.5 text-center text-[13px] font-semibold text-[#374151] dark:text-zinc-400 uppercase tracking-[0.04em]">
               Estado
             </th>
-            <th class="px-6 py-3.5 text-center text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
+            <th class="px-6 py-3.5 text-center text-[13px] font-semibold text-[#374151] dark:text-zinc-400 uppercase tracking-[0.04em]">
               Acciones
             </th>
           </tr>
         </thead>
-        <tbody class="bg-white dark:bg-[#1e1f20] divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
+        <tbody class="bg-white dark:bg-zinc-900 divide-y divide-[#E5E7EB] dark:divide-zinc-800">
           <!-- Loading State -->
           <tr v-if="loading">
             <td :colspan="6 + availableWarehouses.length" class="px-4 py-12 text-center">
               <div class="flex flex-col items-center space-y-3">
-                <div class="w-8 h-8 border-4 border-[#e8eaed] dark:border-[#3a3a3f] border-t-[#1a73e8] dark:border-t-[#8ab4f8] rounded-full animate-spin"></div>
-                <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium">Cargando productos...</p>
+                <div class="w-8 h-8 border-4 border-gray-200 dark:border-zinc-700 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></div>
+                <p class="text-[15px] text-gray-500 dark:text-zinc-400 font-medium">Cargando productos...</p>
               </div>
             </td>
           </tr>
@@ -492,14 +499,14 @@
                 
                 <div class="relative z-10 text-center">
                   <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center">Tu inventario está vacío</h3>
-                  <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed">
+                  <p class="text-base text-gray-500 dark:text-zinc-400 leading-relaxed">
                     {{ searchTerm ? 'No se encontraron productos que coincidan con tu búsqueda' : 'Comienza agregando productos para gestionar tu catálogo' }}
                   </p>
                 </div>
                 
                 <button v-if="!searchTerm" 
                         @click="openCreateModal" 
-                        class="mt-5 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 inline-flex items-center gap-2">
+                        class="mt-5 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-[15px] font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 inline-flex items-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                   </svg>
@@ -509,87 +516,88 @@
             </td>
           </tr>
 
-          <!-- Product Rows - Diseño Gemini limpio -->
-          <tr v-for="product in paginatedProducts" 
+          <!-- Product Rows -->
+          <tr v-for="(product, index) in paginatedProducts" 
               :key="product.id"
               @click="viewProduct(product)"
-              class="hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-all duration-200 group cursor-pointer">
+              :class="[index % 2 === 1 ? 'bg-[#FAFAFA] dark:bg-zinc-900/60' : 'bg-white dark:bg-zinc-900']"
+              class="hover:bg-[#F1F5F9] dark:hover:bg-zinc-800/50 transition-colors duration-150 group cursor-pointer">
             <!-- Columna Producto (La Estrella) -->
-            <td class="px-6 py-4">
+            <td class="px-6 py-[16px]">
               <div class="flex items-center gap-4">
-                <div class="relative w-12 h-12 flex-shrink-0 rounded-xl overflow-hidden bg-[#f8f9fa] dark:bg-[#282a2c]" 
+                <div class="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800/60" 
                      :class="!getProductImage(product) ? 'flex items-center justify-center' : ''">
                   <img v-if="getProductImage(product)"
                        :src="getProductImage(product)" 
                        :alt="product.name" 
                        class="w-full h-full object-cover">
-                  <svg v-else class="w-6 h-6 text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <svg v-else class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
                   </svg>
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="flex items-center gap-2 mb-1">
-                    <div class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] group-hover:text-[#1a73e8] dark:group-hover:text-[#8ab4f8] transition-colors truncate">{{ product.name }}</div>
+                    <div class="text-[16px] font-semibold text-[#111827] dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">{{ product.name }}</div>
                     <!-- Badge "Producto con Variantes" -->
                     <span v-if="hasVariants(product)" 
-                          class="inline-flex items-center gap-1 px-2 py-0.5 bg-[#f3e8fd] dark:bg-[#a142f4]/20 text-[#9334e6] dark:text-[#c58af9] rounded-full text-[10px] font-medium whitespace-nowrap">
+                          class="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 rounded-full text-[13px] font-bold whitespace-nowrap border border-purple-100 dark:border-purple-800">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                       </svg>
                       {{ getVariantsCount(product) }} Variantes
                     </span>
                   </div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-400 font-mono">
+                  <div class="text-[13px] text-[#6B7280] dark:text-zinc-400 font-mono">
                     {{ hasVariants(product) ? 'Múltiples SKUs' : (product.sku || 'SIN SKU') }}
                   </div>
                 </div>
               </div>
             </td>
             <!-- Columna Categoría (Pills Gemini) -->
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-[#f8f9fa] dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6] font-medium">
+            <td class="px-6 py-[16px]">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[14px] bg-gray-100/80 dark:bg-zinc-800/60 text-[#374151] dark:text-zinc-300 font-medium">
                 {{ product.category?.name || 'Sin categoría' }}
               </span>
             </td>
             <!-- Columna Proveedor -->
-            <td class="px-6 py-4">
-              <span v-if="product.supplier?.name" class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8] font-medium">
+            <td class="px-6 py-[16px]">
+              <span v-if="product.supplier?.name" class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[14px] bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-medium">
                 {{ product.supplier.name }}
               </span>
-              <span v-else class="text-xs text-[#9aa0a6] italic">
+              <span v-else class="text-[13px] text-[#6B7280] dark:text-zinc-500">
                 Sin proveedor
               </span>
             </td>
             <!-- Columna Precio (Con Rango para Variantes) -->
-            <td class="px-6 py-4 text-right">
-              <div class="text-sm font-mono font-semibold text-[#1e1f20] dark:text-[#e3e3e3] tabular-nums">
+            <td class="px-6 py-[16px] text-right">
+              <div class="text-[17px] font-mono font-bold text-[#111827] dark:text-white tabular-nums">
                 {{ getPriceRange(product) }}
               </div>
             </td>
             <!-- Columnas de Stock Dinámicas -->
             <template v-if="showMultipleStockColumns">
               <td v-for="warehouse in availableWarehouses" :key="warehouse.id"
-                  class="px-4 py-4 text-center">
+                  class="px-4 py-[16px] text-center">
                 <div v-if="getWarehouseStock(product, warehouse.id) !== null" class="flex flex-col items-center">
-                  <!-- ✅ Producto EXISTE en esta sede -->
+                  <!-- �S& Producto EXISTE en esta sede -->
                   <span :class="[
-                    'text-sm font-mono font-semibold tabular-nums',
-                    getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0) ? 'text-amber-600 dark:text-amber-500' : 'text-gray-900 dark:text-zinc-200'
+                    'text-[15px] font-mono font-semibold tabular-nums',
+                    getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0) ? 'text-amber-500 dark:text-amber-400' : 'text-green-600 dark:text-green-400'
                   ]">
                     {{ getWarehouseStock(product, warehouse.id) }}
                   </span>
                   <!-- Alerta de stock bajo para esta bodega -->
                   <span v-if="getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0)" 
-                        class="text-[10px] font-semibold text-amber-600 dark:text-amber-500 mt-0.5">
+                        class="text-[13px] font-semibold text-amber-500 dark:text-amber-400 mt-0.5">
                     Bajo
                   </span>
                 </div>
                 <div v-else class="flex flex-col items-center">
-                  <!-- ❌ Producto NO existe en esta sede -->
-                  <span class="text-xs font-medium text-gray-400 dark:text-zinc-600 italic">
+                  <!-- �R Producto NO existe en esta sede -->
+                  <span class="text-[15px] font-medium text-gray-500 dark:text-zinc-600 italic">
                     N/A
                   </span>
-                  <span class="text-[10px] text-gray-400 dark:text-zinc-600">
+                  <span class="text-[13px] text-gray-500 dark:text-zinc-600">
                     No aplica
                   </span>
                 </div>
@@ -597,23 +605,25 @@
             </template>
             <template v-else>
               <!-- Columna Stock (Con Resumen para Variantes) -->
-              <td class="px-6 py-4 text-center">
+              <td class="px-6 py-[16px] text-center">
                 <div class="flex flex-col items-center relative group/stock">
                   <span :class="[
-                    'text-base font-mono font-semibold tabular-nums',
-                    getTotalStock(product) <= (product.min_stock || 0) ? 'text-amber-600 dark:text-amber-500' : 'text-gray-900 dark:text-zinc-200'
+                    'inline-flex items-center justify-center min-w-[2.5rem] px-2 py-0.5 rounded-md text-[15px] font-mono font-semibold tabular-nums',
+                    getTotalStock(product) === 0 ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400' :
+                    getTotalStock(product) <= (product.min_stock || 0) ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-500 dark:text-amber-400' : 
+                    'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400'
                   ]">
                     {{ hasVariants(product) ? getStockSummary(product).total : getTotalStock(product) }}
                   </span>
                   <!-- Resumen si tiene variantes -->
-                  <span v-if="hasVariants(product)" class="text-[10px] text-gray-500 dark:text-zinc-400 mt-0.5">
+                  <span v-if="hasVariants(product)" class="text-[13px] text-gray-500 dark:text-zinc-400 mt-0.5">
                     ({{ getStockSummary(product).variants }} variantes)
                   </span>
                   
                   <!-- Tooltip con desglose -->
                   <div v-if="hasVariants(product) && getStockBreakdown(product)" 
                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover/stock:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
-                    <div class="bg-gray-900 dark:bg-zinc-800 text-white text-xs px-3 py-2 rounded-lg shadow-xl border border-gray-700 dark:border-zinc-600">
+                    <div class="bg-gray-900 dark:bg-zinc-800 text-white text-[15px] px-3 py-2 rounded-lg shadow-xl border border-gray-700 dark:border-zinc-600">
                       {{ getStockBreakdown(product) }}
                       <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
                         <div class="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-zinc-800"></div>
@@ -623,18 +633,18 @@
                 </div>
               </td>
             </template>
-            <td class="px-6 py-4 text-center">
+            <td class="px-6 py-[16px] text-center">
               <span :class="getProductStatus(product) ? 
-                'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' : 
-                'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'" 
-                class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide">
+                'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 
+                'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'" 
+                class="px-2 py-0.5 rounded-md text-[13px] font-semibold uppercase tracking-wide">
                 {{ getProductStatus(product) ? 'Activo' : 'Inactivo' }}
               </span>
             </td>
-            <td class="px-6 py-4">
-              <div class="flex items-center justify-center gap-2">
+            <td class="px-6 py-[16px]">
+              <div class="flex items-center justify-center gap-1">
                 <button @click.stop="viewProduct(product)" 
-                  class="p-2.5 text-slate-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 rounded-lg transition-all"
+                  class="p-1.5 text-gray-900 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-zinc-700/40 rounded-md transition-all"
                   title="Ver detalles">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -642,17 +652,17 @@
                   </svg>
                 </button>
                 <button @click.stop="editProduct(product)" 
-                  class="p-2.5 text-slate-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950 rounded-lg transition-all"
+                  class="p-1.5 text-gray-900 dark:text-zinc-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-zinc-700/40 rounded-md transition-all"
                   title="Editar producto">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                   </svg>
                 </button>
                 <button @click.stop="toggleProductStatus(product)" 
-                  class="p-2.5 rounded-lg transition-all"
+                  class="p-1.5 rounded-md transition-all"
                   :class="getProductStatus(product) !== false 
-                    ? 'text-slate-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950' 
-                    : 'text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950'"
+                    ? 'text-gray-900 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-zinc-700/40' 
+                    : 'text-gray-900 dark:text-zinc-300 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-zinc-700/40'"
                   :title="getProductStatus(product) !== false ? 'Desactivar producto' : 'Activar producto'">
                   <!-- Activo: Toggle ON (verde cuando hover) -->
                   <svg v-if="getProductStatus(product) !== false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -663,14 +673,22 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </button>
+                <button @click.stop="deleteProduct(product)" 
+                  class="p-1.5 text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-md transition-all"
+                  title="Eliminar producto">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
+      </div>
       
-      <!-- Paginador con margen inferior -->
-      <div class="mb-6">
+      <!-- Paginador -->
+      <div class="mt-4 mb-6">
         <TablePaginator
           v-if="filteredProducts.length > 10"
           v-model:currentPage="currentPage"
@@ -711,8 +729,8 @@
             </svg>
           </div>
           <div class="ml-3 flex-1">
-            <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-            <p class="text-sm text-gray-500" v-if="notification.message">{{ notification.message }}</p>
+            <p class="text-[15px] font-medium text-gray-900">{{ notification.title }}</p>
+            <p class="text-[15px] text-gray-500" v-if="notification.message">{{ notification.message }}</p>
           </div>
           <button @click="removeNotification(notification.id)" 
                   class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600">
@@ -758,7 +776,7 @@
                   <h3 class="text-lg font-bold text-gray-900 dark:text-white">
                     {{ pendingStatusChange?.newStatus ? 'Habilitar Producto' : 'Deshabilitar Producto' }}
                   </h3>
-                  <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">
+                  <p class="text-[15px] text-gray-600 dark:text-zinc-400 mt-1">
                     Esta acción modificará el estado del producto
                   </p>
                 </div>
@@ -769,9 +787,9 @@
             <div class="px-6 pb-6">
               <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
                 <p class="font-semibold text-gray-900 dark:text-white">{{ pendingStatusChange?.product?.name }}</p>
-                <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">SKU: {{ pendingStatusChange?.product?.sku || 'N/A' }}</p>
+                <p class="text-[15px] text-gray-500 dark:text-zinc-400 mt-1">SKU: {{ pendingStatusChange?.product?.sku || 'N/A' }}</p>
               </div>
-              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-4">
+              <p class="text-[15px] text-gray-600 dark:text-zinc-400 mt-4">
                 {{ pendingStatusChange?.newStatus 
                   ? 'El producto estará disponible para la venta.' 
                   : 'El producto no estará disponible para la venta.' }}
@@ -781,15 +799,88 @@
             <!-- Actions -->
             <div class="bg-gray-50 dark:bg-zinc-900 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-zinc-800">
               <button @click="showStatusConfirmModal = false" 
-                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
+                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-[15px] font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
                 Cancelar
               </button>
               <button @click="confirmStatusChange" 
                       :class="pendingStatusChange?.newStatus 
                         ? 'bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-700' 
                         : 'bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700'"
-                      class="px-6 py-2.5 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-200">
+                      class="px-6 py-2.5 text-white text-[15px] font-bold rounded-xl shadow-lg transition-all duration-200">
                 Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Modal Confirmar Eliminación de Producto -->
+    <Teleport to="body">
+      <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-200" leave-to-class="opacity-0">
+        <div v-if="showDeleteConfirmModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showDeleteConfirmModal = false"></div>
+          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-md w-full overflow-hidden border border-gray-200 dark:border-zinc-800">
+            <!-- Header -->
+            <div class="px-6 pt-6 pb-4">
+              <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-100 dark:bg-red-950/60 border border-red-200 dark:border-red-800/50">
+                  <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-bold text-red-700 dark:text-red-400">Eliminar Producto</h3>
+                  <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">
+                    Esta acción moverá el producto a la papelera
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product info -->
+            <div class="px-6 pb-4">
+              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
+                <p class="font-bold text-gray-900 dark:text-white text-base">{{ pendingDelete?.name }}</p>
+                <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">SKU: {{ pendingDelete?.sku || 'N/A' }}</p>
+              </div>
+
+              <!-- Reason textarea -->
+              <div class="mt-4">
+                <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-2">Motivo de eliminación <span class="text-gray-400 dark:text-zinc-500 font-normal">(opcional)</span></label>
+                <textarea v-model="deleteReason" rows="3"
+                  placeholder="Ej: Producto descontinuado, error de carga, duplicado..."
+                  class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 resize-none"></textarea>
+              </div>
+
+              <!-- Warning callout -->
+              <div class="mt-4 bg-amber-50 dark:bg-amber-950/30 rounded-xl p-3.5 border border-amber-200 dark:border-amber-800/50">
+                <div class="flex items-start gap-2.5">
+                  <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                  </svg>
+                  <div class="text-sm text-amber-800 dark:text-amber-300">
+                    <p>Las facturas y movimientos de inventario asociados se mantendrán en el historial.</p>
+                    <p class="mt-1 font-medium">Podrás restaurar el producto desde <span class="underline">Configuración → Papelera</span>.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-gray-50 dark:bg-zinc-900/80 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-zinc-800">
+              <button @click="showDeleteConfirmModal = false; deleteReason = ''"
+                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
+                Cancelar
+              </button>
+              <button @click="confirmDeleteProduct"
+                      :disabled="deletingProduct"
+                      class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-red-500/25 dark:shadow-red-900/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                <svg v-if="!deletingProduct" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                <div v-else class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                {{ deletingProduct ? 'Eliminando...' : 'Eliminar Producto' }}
               </button>
             </div>
           </div>
@@ -812,7 +903,7 @@
             </div>
             <div>
               <h3 class="text-lg font-bold text-white">Categoría Inactiva</h3>
-              <p class="text-sm text-white/80">La categoría debe estar activa primero</p>
+              <p class="text-[15px] text-white/80">La categoría debe estar activa primero</p>
             </div>
           </div>
         </div>
@@ -829,10 +920,10 @@
               </svg>
               <p class="font-bold text-blue-900 dark:text-blue-300">{{ pendingStatusChange?.category?.name }}</p>
             </div>
-            <p class="text-sm text-blue-700 dark:text-blue-400">Estado: Inactiva</p>
+            <p class="text-[15px] text-blue-700 dark:text-blue-400">Estado: Inactiva</p>
           </div>
           <div class="bg-green-50 dark:bg-green-950 rounded-lg p-4 border border-green-200 dark:border-green-800">
-            <p class="text-sm text-green-800 dark:text-green-300">
+            <p class="text-[15px] text-green-800 dark:text-green-300">
               <strong>Solución:</strong> Al activar la categoría, este producto se reactivará automáticamente junto con todos los demás productos que fueron desactivados con ella.
             </p>
           </div>
@@ -861,26 +952,20 @@
       <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden border border-gray-300 dark:border-zinc-800 mx-4 flex flex-col">
         
         <!-- Header -->
-        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-8 py-5 flex-shrink-0">
+        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-8 py-3 flex-shrink-0">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center border border-gray-200 dark:border-zinc-700">
-                <svg class="w-6 h-6 text-gray-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                </svg>
-              </div>
-              <div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                  {{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}
-                </h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
-                  {{ isEditing ? 'Modifica la información del producto' : 'Agrega un nuevo producto al inventario' }}
-                </p>
-              </div>
+            <div class="flex items-center gap-3">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                {{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}
+              </h3>
+              <span class="text-sm text-gray-400 dark:text-zinc-500">—</span>
+              <p class="text-sm text-gray-500 dark:text-zinc-400">
+                {{ isEditing ? 'Modifica la información del producto' : 'Agrega un nuevo producto al inventario' }}
+              </p>
             </div>
             <button @click="showProductModal = false" 
-                    class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all">
-              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all text-gray-400 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
@@ -889,9 +974,9 @@
 
         <div class="flex flex-1 overflow-hidden">
           <!-- Formulario Principal -->
-          <div class="flex-1 overflow-y-auto" :class="isFashionMode ? 'bg-white dark:bg-zinc-900 p-8' : 'bg-gray-50 dark:bg-zinc-950 p-6'">
+          <div class="flex-1 overflow-y-auto" :class="isFashionMode ? 'bg-[#FAFBFC] dark:bg-zinc-950 p-8' : 'bg-[#F9FAFB] dark:bg-zinc-950 p-6'">
             
-            <!-- 👗 Formulario Fashion (integrado sin header ni footer propio) -->
+            <!-- �x Formulario Fashion (integrado sin header ni footer propio) -->
             <div v-if="isFashionMode">
               <FashionProductForm 
                 ref="fashionFormRef"
@@ -905,60 +990,61 @@
               />
             </div>
 
-            <form v-else @submit.prevent="saveProduct" class="space-y-5">
+            <form v-else @submit.prevent="saveProduct" class="space-y-6">
               
-              <!-- ═══════════════════════════════════════════════════════════════ -->
+              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- SECCI�N 1: INFORMACI�N BÁSICA (Compacta) -->
               <!-- SECCIÓN 1: INFORMACIÓN BÁSICA (Compacta) -->
-              <!-- ═══════════════════════════════════════════════════════════════ -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-[#E5E7EB] dark:border-zinc-800">
+                <h4 class="text-[14px] font-semibold text-[#374151] dark:text-zinc-300 uppercase tracking-wide mb-5">Información Básica</h4>
                 
                 <!-- Nombre del Producto (Full width) -->
-                <div class="mb-4">
-                  <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                <div class="mb-5">
+                  <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">
                     Nombre del Producto <span class="text-rose-500">*</span>
                   </label>
                   <input v-model="productForm.name" 
                          type="text" 
                          required
-                         class="w-full px-4 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 focus:border-transparent text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
+                         class="w-full px-4 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] text-[15px] bg-white dark:bg-zinc-800 text-[#111827] dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 transition-all"
                          placeholder="Ej: iPhone 13 Pro Max">
                 </div>
 
                 <!-- Fila 1: Categoría + SKU + Código de Barras -->
-                <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="grid grid-cols-3 gap-4 mb-5">
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Categoría *</label>
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">Categoría *</label>
                     <select v-model="productForm.category_id" 
                             required
                             @change="handleCategoryChange"
-                            class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white transition-all">
+                            class="w-full px-3 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] text-[14px] bg-white dark:bg-zinc-800 text-[#111827] dark:text-white transition-all">
                       <option value="">Seleccionar</option>
                       <option v-for="category in categories" :key="category.id" :value="category.id">
                         {{ category.name }}
                       </option>
-                      <option value="__new__" class="font-medium text-blue-600">＋ Nueva</option>
+                      <option value="__new__" class="font-medium text-blue-600">+ Nueva</option>
                     </select>
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">SKU</label>
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">SKU</label>
                     <input v-model="productForm.sku" 
                            type="text" 
-                           class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm bg-gray-50 dark:bg-zinc-800/50 text-gray-600 dark:text-zinc-400 font-mono placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 transition-all"
+                           class="w-full px-3 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg text-[14px] bg-[#F9FAFB] dark:bg-zinc-800/50 text-[#6B7280] dark:text-zinc-400 font-mono placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] transition-all"
                            placeholder="Auto-generado">
                   </div>
                   
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Código de Barras</label>
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">Código de Barras</label>
                     <div class="relative">
                       <input v-model="productForm.barcode" 
                              type="text" 
-                             class="w-full px-3 pr-9 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 transition-all"
+                             class="w-full px-3 pr-9 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg text-[14px] bg-white dark:bg-zinc-800 text-[#111827] dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] transition-all"
                              placeholder="Escanear o generar">
                       <button type="button" 
                               @click="generateBarcode"
                               title="Generar código"
-                              class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
+                              class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#6B7280] hover:text-[#374151] dark:hover:text-zinc-300 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
@@ -968,43 +1054,42 @@
                 </div>
 
                 <!-- Fila 2: Proveedor + Descripción -->
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-3 gap-4">
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Proveedor</label>
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">Proveedor</label>
                     <select v-model="productForm.supplier_id" 
                             @change="handleSupplierChange"
-                            class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 transition-all">
+                            class="w-full px-3 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg text-[14px] bg-white dark:bg-zinc-800 text-[#111827] dark:text-white focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] transition-all">
                       <option :value="null">Sin proveedor</option>
                       <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">
                         {{ supplier.name }}
                       </option>
-                      <option value="__new__" class="font-medium text-blue-600">＋ Nuevo</option>
+                      <option value="__new__" class="font-medium text-blue-600">+ Nuevo</option>
                     </select>
                   </div>
                   
                   <div class="col-span-2">
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Descripción</label>
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">Descripción</label>
                     <input v-model="productForm.description" 
                            type="text"
-                           class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 transition-all"
+                           class="w-full px-3 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg text-[14px] bg-white dark:bg-zinc-800 text-[#111827] dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] transition-all"
                            placeholder="Descripción breve del producto">
                   </div>
                 </div>
               </div>
 
-              <!-- ═══════════════════════════════════════════════════════════════ -->
               <!-- SECCIÓN 2: UNIDAD DE MEDIDA (Compacta) -->
-              <!-- ═══════════════════════════════════════════════════════════════ -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-[#E5E7EB] dark:border-zinc-800">
+                <h4 class="text-[13px] font-semibold text-[#374151] dark:text-zinc-300 mb-4 uppercase tracking-wide">Unidad de Medida</h4>
                 <div class="flex items-center gap-4">
                   <div class="flex-1">
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">
                       ¿Cómo se vende? <span class="text-rose-500">*</span>
                     </label>
                     <select
                       v-model="productForm.measurement_unit"
                       @change="updateAllowDecimal"
-                      class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm text-gray-900 dark:text-white transition-all"
+                      class="w-full px-3 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-lg focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] text-[14px] text-[#111827] dark:text-white transition-all"
                     >
                       <option value="unit">Unidades (und) - celular, TV</option>
                       <option value="kg">Kilogramos (kg) - carne, papas</option>
@@ -1017,10 +1102,10 @@
                   </div>
                   
                   <!-- Toggle Decimales -->
-                  <div class="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-zinc-700">
+                  <div class="flex items-center gap-3 px-4 py-3 bg-[#F9FAFB] dark:bg-zinc-800 rounded-lg border border-[#E5E7EB] dark:border-zinc-700">
                     <div>
-                      <span class="text-xs font-semibold text-gray-700 dark:text-zinc-300 block">Decimales</span>
-                      <span class="text-[10px] text-gray-500 dark:text-zinc-500">{{ productForm.allow_decimal ? '0.5, 1.25...' : '1, 2, 3...' }}</span>
+                      <span class="text-[13px] font-medium text-[#374151] dark:text-zinc-300 block">Decimales</span>
+                      <span class="text-[12px] text-[#6B7280] dark:text-zinc-500">{{ productForm.allow_decimal ? '0.5, 1.25...' : '1, 2, 3...' }}</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" v-model="productForm.allow_decimal" class="sr-only peer">
@@ -1030,56 +1115,57 @@
                 </div>
               </div>
 
-              <!-- ═══════════════════════════════════════════════════════════════ -->
-              <!-- SECCIÓN 3: PRECIOS + STOCK (Todo en uno) -->
-              <!-- ═══════════════════════════════════════════════════════════════ -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- SECCI�N 3: PRECIOS + STOCK (Todo en uno) -->
+              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-[#E5E7EB] dark:border-zinc-800">
+                <h4 class="text-[14px] font-semibold text-[#111827] dark:text-white mb-4 flex items-center gap-2">
                   <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                   </svg>
                   Precios y Stock
                 </h4>
                 
-                <div class="grid grid-cols-4 gap-3">
+                <div class="grid grid-cols-4 gap-4">
                   <!-- Costo -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
-                      Costo <span class="text-rose-500">*</span>
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">
+                      Costo {{ getUnitLabel(productForm.measurement_unit) }} <span class="text-rose-500">*</span>
                     </label>
                     <div class="relative">
-                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] text-[#6B7280] dark:text-zinc-500 font-medium">$</span>
                       <input v-model="productForm.cost" 
                              type="number" 
                              step="0.01"
                              min="0"
                              required
-                             class="w-full pl-8 pr-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white tabular-nums transition-all"
-                             placeholder="0">
+                             class="w-full pl-8 pr-3 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] text-[14px] bg-white dark:bg-zinc-800 text-[#111827] dark:text-white tabular-nums transition-all"
+                             :placeholder="getUnitPlaceholder(productForm.measurement_unit)">
                     </div>
                   </div>
                   
                   <!-- Precio de Venta -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
-                      Precio Venta <span class="text-rose-500">*</span>
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">
+                      Precio venta {{ getUnitLabel(productForm.measurement_unit) }} <span class="text-rose-500">*</span>
                     </label>
                     <div class="relative">
-                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] text-[#6B7280] dark:text-zinc-500 font-medium">$</span>
                       <input v-model="productForm.price" 
                              type="number" 
                              step="0.01"
                              min="0"
                              required
-                             class="w-full pl-8 pr-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums transition-all"
-                             placeholder="0">
+                             class="w-full pl-8 pr-3 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] text-[14px] bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums transition-all"
+                             :placeholder="getUnitPlaceholder(productForm.measurement_unit)">
                     </div>
+                    <p class="text-[11px] text-[#9CA3AF] dark:text-zinc-500 mt-1">Precio final que verá el cliente {{ getUnitLabel(productForm.measurement_unit) }}</p>
                   </div>
                   
                   <!-- Margen -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">Margen</label>
-                    <div class="px-3 py-2.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm font-bold text-center tabular-nums"
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">Margen</label>
+                    <div class="px-3 py-2.5 bg-[#F9FAFB] dark:bg-zinc-800 border border-[#E5E7EB] dark:border-zinc-700 rounded-lg text-[14px] font-bold text-center tabular-nums"
                          :class="productForm.price && productForm.cost && ((productForm.price - productForm.cost) / productForm.cost * 100) >= 20 
                            ? 'text-emerald-600 dark:text-emerald-400' 
                            : productForm.price && productForm.cost && ((productForm.price - productForm.cost) / productForm.cost * 100) >= 10 
@@ -1093,17 +1179,17 @@
 
                   <!-- Stock Inicial (Solo si hay 1 bodega) -->
                   <div v-if="availableWarehouses.length === 1">
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
-                      Stock <span class="text-rose-500">*</span>
+                    <label class="block text-[13px] font-medium text-[#374151] dark:text-zinc-300 mb-1.5">
+                      Stock disponible ({{ getUnitAbbreviation(productForm.measurement_unit) }}) <span class="text-rose-500">*</span>
                     </label>
                     <div class="relative">
                       <input v-model="productForm.stock" 
                              type="number" 
                              :step="productForm.allow_decimal ? '0.01' : '1'"
                              min="0"
-                             class="w-full px-3 pr-12 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-center font-semibold tabular-nums transition-all"
+                             class="w-full px-3 pr-12 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] text-[14px] bg-white dark:bg-zinc-800 text-[#111827] dark:text-white text-center font-semibold tabular-nums transition-all"
                              :placeholder="productForm.allow_decimal ? '0.00' : '0'">
-                      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-zinc-500 font-medium">
+                      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#6B7280] dark:text-zinc-500 font-medium">
                         {{ getUnitAbbreviation(productForm.measurement_unit) }}
                       </span>
                     </div>
@@ -1111,19 +1197,19 @@
                 </div>
               </div>
 
-              <!-- ═══════════════════════════════════════════════════════════════ -->
-              <!-- SECCIÓN 4: STOCK MULTI-BODEGA (Solo si hay 2+ bodegas) -->
-              <!-- ═══════════════════════════════════════════════════════════════ -->
-              <div v-if="availableWarehouses.length >= 2" class="bg-white dark:bg-zinc-900 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-zinc-800">
+              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- SECCI�N 4: STOCK MULTI-BODEGA (Solo si hay 2+ bodegas) -->
+              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <div v-if="availableWarehouses.length >= 2" class="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-[#E5E7EB] dark:border-zinc-800">
                 <div class="flex items-center justify-between mb-4">
-                  <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <h4 class="text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
                     <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
                     Stock por Sede
-                    <span class="text-xs font-normal text-gray-400 dark:text-zinc-500">({{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
+                    <span class="text-[13px] font-normal text-gray-400 dark:text-zinc-500">({{ getUnitAbbreviation(productForm.measurement_unit) }})</span>
                   </h4>
-                  <span class="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-lg">
+                  <span class="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 text-[13px] font-bold rounded-lg">
                     Total: {{ calculateTotalStock() }} {{ getUnitAbbreviation(productForm.measurement_unit) }}
                   </span>
                 </div>
@@ -1143,8 +1229,8 @@
                         type="checkbox"
                         class="w-4 h-4 text-blue-600 bg-white dark:bg-zinc-700 border-gray-300 dark:border-zinc-600 rounded focus:ring-blue-500"
                       />
-                      <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ warehouse.name }}</span>
-                      <span v-if="warehouse.is_default" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-1.5 py-0.5 rounded">PRINCIPAL</span>
+                      <span class="text-[15px] font-semibold text-gray-900 dark:text-white truncate">{{ warehouse.name }}</span>
+                      <span v-if="warehouse.is_default" class="text-[12px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-1.5 py-0.5 rounded">PRINCIPAL</span>
                     </label>
                     
                     <!-- Input Stock -->
@@ -1156,31 +1242,31 @@
                           :step="productForm.allow_decimal ? '0.01' : '1'"
                           min="0"
                           :placeholder="productForm.allow_decimal ? '0.00' : '0'"
-                          class="w-full px-3 pr-10 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm font-semibold text-center bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-400 transition-all"
+                          class="w-full px-3 pr-10 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg text-[15px] font-semibold text-center bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-400 transition-all"
                         />
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-zinc-500">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-gray-400 dark:text-zinc-500">
                           {{ getUnitAbbreviation(productForm.measurement_unit) }}
                         </span>
                       </div>
                     </div>
                     <div v-else class="text-center py-2">
-                      <span class="text-xs text-gray-400 dark:text-zinc-500">No disponible</span>
+                      <span class="text-[13px] text-gray-400 dark:text-zinc-500">No disponible</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- ═══════════════════════════════════════════════════════════════ -->
-              <!-- SECCIÓN 5: ESTADO (Inline compacto) -->
-              <!-- ═══════════════════════════════════════════════════════════════ -->
-              <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-zinc-800">
+              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- SECCI�N 5: ESTADO (Inline compacto) -->
+              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl p-5 border border-[#E5E7EB] dark:border-zinc-800">
                 <div class="flex items-center gap-3">
                   <svg class="w-5 h-5" :class="productForm.active ? 'text-emerald-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                   <div>
-                    <span class="text-sm font-bold text-gray-900 dark:text-white">Producto {{ productForm.active ? 'Activo' : 'Inactivo' }}</span>
-                    <p class="text-xs text-gray-500 dark:text-zinc-400">{{ productForm.active ? 'Disponible para la venta' : 'No aparecerá en el POS' }}</p>
+                    <span class="text-[15px] font-bold text-gray-900 dark:text-white">Producto {{ productForm.active ? 'Activo' : 'Inactivo' }}</span>
+                    <p class="text-[13px] text-gray-500 dark:text-zinc-400">{{ productForm.active ? 'Disponible para la venta' : 'No aparecerá en el POS' }}</p>
                   </div>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer">
@@ -1192,7 +1278,7 @@
           </div>
           
           <!-- Sidebar para Imagen (Compacto) -->
-          <div v-if="!isFashionMode" class="w-72 bg-gray-50 dark:bg-zinc-900 border-l border-gray-200 dark:border-zinc-800 p-5 flex flex-col">
+          <div v-if="!isFashionMode" class="w-72 bg-[#FAFAFA] dark:bg-zinc-900 border-l border-[#E5E7EB] dark:border-zinc-800 p-6 flex flex-col">
             
             <!-- Header -->
             <div class="flex items-center gap-2 mb-4">
@@ -1202,8 +1288,8 @@
                 </svg>
               </div>
               <div>
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white">Imagen</h4>
-                <p class="text-[10px] text-gray-500 dark:text-zinc-400">Foto del producto</p>
+                <h4 class="text-[14px] font-semibold text-[#111827] dark:text-white">Imagen</h4>
+                <p class="text-[12px] text-[#6B7280] dark:text-zinc-400">Foto del producto</p>
               </div>
             </div>
             
@@ -1212,9 +1298,9 @@
             <div v-if="isEditing && currentProductImage && !previewImage" class="mb-4">
               <div class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl p-3">
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-semibold text-gray-600 dark:text-zinc-400">🖼️ Imagen actual</span>
+                  <span class="text-[13px] font-semibold text-gray-600 dark:text-zinc-400">�x�️ Imagen actual</span>
                   <button type="button" @click="deleteProductImage" :disabled="deletingImage"
-                          class="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold flex items-center gap-1 disabled:opacity-50">
+                          class="text-[13px] text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold flex items-center gap-1 disabled:opacity-50">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
@@ -1227,7 +1313,7 @@
                        @error="currentProductImage = null"
                        alt="Imagen actual">
                 </div>
-                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-2 text-center">Cambia el método abajo para reemplazar</p>
+                <p class="text-[12px] text-gray-500 dark:text-zinc-500 mt-2 text-center">Cambia el método abajo para reemplazar</p>
               </div>
             </div>
             
@@ -1236,7 +1322,7 @@
               <button type="button"
                       @click="changeImageMethod('url')"
                       :class="[
-                        'flex-1 px-2 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1',
+                        'flex-1 px-2 py-1.5 rounded-md text-[13px] font-semibold transition-all flex items-center justify-center gap-1',
                         imageUploadMethod === 'url' 
                           ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
                           : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
@@ -1249,7 +1335,7 @@
               <button type="button"
                       @click="changeImageMethod('file')"
                       :class="[
-                        'flex-1 px-2 py-1.5 rounded-md text-xs font-semibold transition-all flex items-center justify-center gap-1',
+                        'flex-1 px-2 py-1.5 rounded-md text-[13px] font-semibold transition-all flex items-center justify-center gap-1',
                         imageUploadMethod === 'file' 
                           ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm' 
                           : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
@@ -1276,8 +1362,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                       </svg>
                     </div>
-                    <p class="text-xs font-medium text-gray-600 dark:text-zinc-400">Haz clic o arrastra</p>
-                    <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">PNG, JPG hasta 5MB</p>
+                    <p class="text-[13px] font-medium text-gray-600 dark:text-zinc-400">Haz clic o arrastra</p>
+                    <p class="text-[12px] text-gray-400 dark:text-zinc-500 mt-0.5">PNG, JPG hasta 5MB</p>
                   </div>
                   
                   <!-- Preview -->
@@ -1296,12 +1382,12 @@
               <!-- URL web -->
               <div v-if="imageUploadMethod === 'url'" class="space-y-3">
                 <input v-model="productForm.image" 
-                       type="url" 
-                       class="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-slate-400 dark:focus:ring-zinc-500 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500"
+                       type="text" 
+                       class="w-full px-3 py-2.5 border border-[#D1D5DB] dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-blue-600/10 focus:border-[#2563EB] text-[14px] bg-white dark:bg-zinc-800 text-[#111827] dark:text-white placeholder-gray-400 dark:placeholder-zinc-500"
                        placeholder="https://ejemplo.com/imagen.jpg">
                 
                 <!-- Preview de URL -->
-                <div v-if="productForm.image && isValidUrl(productForm.image)" class="text-center">
+                <div v-if="productForm.image && (productForm.image.startsWith('data:image') || isValidUrl(productForm.image))" class="text-center">
                   <div class="inline-block relative">
                     <img :src="productForm.image" 
                          @error="imageLoadError = true"
@@ -1323,19 +1409,19 @@
               <button v-if="isFashionMode" type="button"
                       @click="saveFashionProduct"
                       :disabled="loading"
-                      class="w-full px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-bold text-sm shadow-lg transition-all disabled:opacity-50">
+                      class="w-full px-4 h-[44px] bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-semibold text-[15px] shadow-lg transition-all disabled:opacity-50">
                 {{ loading ? 'Guardando...' : 'Crear Producto' }}
               </button>
               
               <button v-else type="button" 
                       @click="saveProduct"
                       :disabled="loading"
-                      class="w-full px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-bold text-sm shadow-lg transition-all disabled:opacity-50">
+                      class="w-full px-4 h-[44px] bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-semibold text-[15px] shadow-lg transition-all disabled:opacity-50">
                 {{ loading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear Producto') }}
               </button>
               
               <button type="button" @click="showProductModal = false"
-                      class="w-full px-4 py-2 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 rounded-xl font-medium text-sm transition-colors border border-gray-200 dark:border-zinc-700">
+                      class="w-full px-4 h-[40px] bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-[#374151] dark:text-zinc-300 rounded-xl font-medium text-[14px] transition-colors border border-[#D1D5DB] dark:border-zinc-700">
                 Cancelar
               </button>
             </div>
@@ -1343,17 +1429,17 @@
         </div>
         
         <!-- Footer con botones (solo para fashion mode) -->
-        <div v-if="isFashionMode" class="flex-shrink-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-8 py-4 flex items-center justify-end gap-3">
+        <div v-if="isFashionMode" class="flex-shrink-0 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-8 py-2.5 flex items-center justify-between">
           <button type="button" 
                   @click="showProductModal = false"
-                  class="px-6 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-lg font-semibold transition-colors border border-gray-300 dark:border-zinc-700">
+                  class="px-6 py-2 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 rounded-xl font-bold text-sm transition-colors border border-gray-300 dark:border-zinc-600">
             Cancelar
           </button>
           
           <button type="button" 
                   @click="saveFashionProduct"
                   :disabled="loading"
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-lg font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  class="px-8 py-2 bg-[#0f172a] dark:bg-slate-700 hover:bg-[#020617] dark:hover:bg-slate-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
             {{ loading ? 'Guardando...' : (isEditing ? 'Actualizar Producto' : 'Crear Producto') }}
           </button>
         </div>
@@ -1361,7 +1447,7 @@
       </div>
     </Teleport>
 
-    <!-- ⚠️ Modal de Confirmación: Producto sin Stock -->
+    <!-- �a�️ Modal de Confirmación: Producto sin Stock -->
     <div v-if="showStockWarningModal" 
          class="fixed inset-0 bg-gray-900/70 dark:bg-black/80  flex items-center justify-center p-4 z-[60]"
          @click.self="showStockWarningModal = false">
@@ -1377,14 +1463,14 @@
             </div>
             <div class="flex-1">
               <h3 class="text-xl font-bold text-gray-900 dark:text-white">Datos Incompletos</h3>
-              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Aún faltan datos importantes por llenar</p>
+              <p class="text-[15px] text-gray-600 dark:text-zinc-400 mt-0.5">Aún faltan datos importantes por llenar</p>
             </div>
           </div>
         </div>
         
         <!-- Contenido -->
         <div class="p-6">
-          <p class="text-sm text-gray-700 dark:text-zinc-300 mb-4">
+          <p class="text-[15px] text-gray-700 dark:text-zinc-300 mb-4">
             Detectamos que algunos campos importantes no han sido completados:
           </p>
           
@@ -1409,7 +1495,7 @@
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-bold"
+                <p class="text-[15px] font-bold"
                    :class="{
                      'text-red-900 dark:text-red-300': item.severity === 'high',
                      'text-amber-900 dark:text-amber-300': item.severity === 'medium',
@@ -1417,7 +1503,7 @@
                    }">
                   {{ item.field }}
                 </p>
-                <p class="text-xs mt-0.5"
+                <p class="text-[13px] mt-0.5"
                    :class="{
                      'text-red-700 dark:text-red-400': item.severity === 'high',
                      'text-amber-700 dark:text-amber-400': item.severity === 'medium',
@@ -1435,8 +1521,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
               </svg>
               <div>
-                <p class="text-sm font-semibold text-blue-900 dark:text-blue-300">Recomendación</p>
-                <p class="text-xs text-blue-700 dark:text-blue-400 mt-1">
+                <p class="text-[15px] font-semibold text-blue-900 dark:text-blue-300">Recomendación</p>
+                <p class="text-[13px] text-blue-700 dark:text-blue-400 mt-1">
                   Te sugerimos completar estos datos ahora para tener un control preciso de tu inventario desde el inicio.
                 </p>
               </div>
@@ -1489,11 +1575,11 @@
               <div>
                 <div class="flex items-center gap-3">
                   <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedProduct.name }}</h3>
-                  <span class="px-2.5 py-1 bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50 rounded-lg text-[10px] font-bold uppercase tracking-wide">
+                  <span class="px-2.5 py-1 bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50 rounded-lg text-[12px] font-bold uppercase tracking-wide">
                     Moda/Variantes
                   </span>
                 </div>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Gestión de Inventario por Variante</p>
+                <p class="text-[13px] text-gray-500 dark:text-zinc-500 mt-0.5">Gestión de Inventario por Variante</p>
               </div>
             </div>
             <button @click="showViewModal = false" 
@@ -1506,7 +1592,7 @@
         </div>
         
         <div class="p-6 overflow-y-auto flex-1 bg-gray-50 dark:bg-zinc-900/50">
-          <!-- SECCIÓN SUPERIOR: Galería + Resumen Global -->
+          <!-- SECCI�N SUPERIOR: Galería + Resumen Global -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <!-- Galería de Imágenes -->
             <div class="lg:col-span-1">
@@ -1527,7 +1613,7 @@
                           {{ (selectedProduct.name || 'P').substring(0, 2).toUpperCase() }}
                         </span>
                       </div>
-                      <p class="text-xs text-gray-400 dark:text-zinc-500">Sin imagen</p>
+                      <p class="text-[13px] text-gray-400 dark:text-zinc-500">Sin imagen</p>
                     </div>
                   </div>
                 </div>
@@ -1561,7 +1647,7 @@
             <!-- Resumen Global (Estadísticas) -->
             <div class="lg:col-span-2 flex flex-col">
               <div class="flex-1 bg-white dark:bg-zinc-900/60  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800 shadow-sm">
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <h4 class="text-[15px] font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                   </svg>
@@ -1576,9 +1662,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                       </svg>
                     </div>
-                    <p class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Stock Total</p>
+                    <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Stock Total</p>
                     <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ formatNumber(getStockSummary(selectedProduct).total) }}</p>
-                    <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-0.5">unidades</p>
+                    <p class="text-[12px] text-gray-500 dark:text-zinc-500 mt-0.5">unidades</p>
                   </div>
                   
                   <!-- Valor Total Inventario -->
@@ -1588,9 +1674,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                       </svg>
                     </div>
-                    <p class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Valor Total</p>
+                    <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Valor Total</p>
                     <p class="text-xl font-black text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(getTotalInventoryValue(selectedProduct)) }}</p>
-                    <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-0.5">inventario</p>
+                    <p class="text-[12px] text-gray-500 dark:text-zinc-500 mt-0.5">inventario</p>
                   </div>
                   
                   <!-- Total Variantes -->
@@ -1600,9 +1686,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                       </svg>
                     </div>
-                    <p class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Variantes</p>
+                    <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Variantes</p>
                     <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ getVariantsCount(selectedProduct) }}</p>
-                    <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-0.5">combinaciones</p>
+                    <p class="text-[12px] text-gray-500 dark:text-zinc-500 mt-0.5">combinaciones</p>
                   </div>
                 </div>
               </div>
@@ -1612,7 +1698,7 @@
           <!-- TABLA EXCEL-STYLE: Edición en Línea -->
           <div class="bg-white dark:bg-zinc-900/60  rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm dark:shadow-none">
             <div class="bg-gray-50 dark:bg-zinc-800/50 px-5 py-3 border-b border-gray-200 dark:border-zinc-700/50">
-              <h4 class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <h4 class="text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
                 </svg>
@@ -1625,11 +1711,11 @@
               <table class="w-full">
                 <thead>
                   <tr class="bg-gray-50 dark:bg-zinc-800/30 border-b border-gray-200 dark:border-zinc-700/50">
-                    <th class="px-5 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Variante</th>
-                    <th class="px-4 py-3 text-left text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-32">SKU</th>
-                    <th class="px-4 py-3 text-center text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-40">Costo Unit.</th>
-                    <th class="px-4 py-3 text-center text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-40">Precio Venta</th>
-                    <th class="px-4 py-3 text-center text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-36">Stock</th>
+                    <th class="px-5 py-3 text-left text-[12px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Variante</th>
+                    <th class="px-4 py-3 text-left text-[12px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-32">SKU</th>
+                    <th class="px-4 py-3 text-center text-[12px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-40">Costo Unit.</th>
+                    <th class="px-4 py-3 text-center text-[12px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-40">Precio Venta</th>
+                    <th class="px-4 py-3 text-center text-[12px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider w-36">Stock</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-zinc-800/50 bg-white dark:bg-transparent">
@@ -1650,11 +1736,11 @@
                         </div>
                         <div v-else 
                              class="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-950/50 dark:to-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <span class="text-xs font-black text-purple-600 dark:text-purple-400">
+                          <span class="text-[13px] font-black text-purple-600 dark:text-purple-400">
                             {{ (selectedProduct.name || 'P').substring(0, 2).toUpperCase() }}
                           </span>
                         </div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        <p class="text-[15px] font-medium text-gray-900 dark:text-white">
                           <span v-if="variant.options_summary">
                             {{ formatVariantOptions(variant.options_summary) }}
                           </span>
@@ -1665,18 +1751,18 @@
                     
                     <!-- SKU -->
                     <td class="px-4 py-3">
-                      <span class="font-mono text-xs text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800/50 px-2 py-1 rounded">{{ variant.sku }}</span>
+                      <span class="font-mono text-[13px] text-gray-600 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800/50 px-2 py-1 rounded">{{ variant.sku }}</span>
                     </td>
                     
                     <!-- Costo Unitario (Input Editable) -->
                     <td class="px-4 py-3">
                       <div class="flex items-center justify-center gap-1">
-                        <span class="text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
+                        <span class="text-[15px] text-gray-400 dark:text-zinc-500 font-medium">$</span>
                         <input type="text" 
                                :value="formatInputNumber(variant.editableCost)"
                                @input="handleCostInput($event, variant)"
                                @focus="$event.target.select()"
-                               class="w-28 px-3 py-2 text-center text-sm font-semibold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all tabular-nums"
+                               class="w-28 px-3 py-2 text-center text-[15px] font-semibold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all tabular-nums"
                                :class="variantChanges[variant.id]?.cost ? 'ring-2 ring-amber-500 border-amber-500' : ''">
                       </div>
                     </td>
@@ -1684,12 +1770,12 @@
                     <!-- Precio Venta (Input Editable) -->
                     <td class="px-4 py-3">
                       <div class="flex items-center justify-center gap-1">
-                        <span class="text-sm text-gray-400 dark:text-zinc-500 font-medium">$</span>
+                        <span class="text-[15px] text-gray-400 dark:text-zinc-500 font-medium">$</span>
                         <input type="text" 
                                :value="formatInputNumber(variant.editablePrice)"
                                @input="handlePriceInput($event, variant)"
                                @focus="$event.target.select()"
-                               class="w-28 px-3 py-2 text-center text-sm font-bold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-emerald-600 dark:text-emerald-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all tabular-nums"
+                               class="w-28 px-3 py-2 text-center text-[15px] font-bold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-emerald-600 dark:text-emerald-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all tabular-nums"
                                :class="variantChanges[variant.id]?.price ? 'ring-2 ring-amber-500 border-amber-500' : ''">
                       </div>
                     </td>
@@ -1698,8 +1784,8 @@
                     <td class="px-4 py-3">
                       <div class="flex items-center justify-center gap-1">
                         <button @click="decrementStock(variant)" 
-                                class="w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded text-gray-700 dark:text-zinc-300 font-bold text-sm transition-colors">
-                          −
+                                class="w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded text-gray-700 dark:text-zinc-300 font-bold text-[15px] transition-colors">
+                          ��
                         </button>
                         <input type="number" 
                                v-model.number="variant.editableStock"
@@ -1710,7 +1796,7 @@
                                  variant.editableStock <= 5 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
                                ]">
                         <button @click="incrementStock(variant)" 
-                                class="w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded text-gray-700 dark:text-zinc-300 font-bold text-sm transition-colors">
+                                class="w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded text-gray-700 dark:text-zinc-300 font-bold text-[15px] transition-colors">
                           +
                         </button>
                       </div>
@@ -1724,17 +1810,17 @@
             <div v-else class="p-5">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
-                  <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-1 uppercase tracking-wide font-bold">SKU</p>
+                  <p class="text-[12px] text-gray-500 dark:text-zinc-500 mb-1 uppercase tracking-wide font-bold">SKU</p>
                   <p class="text-base font-bold text-gray-900 dark:text-white font-mono">{{ selectedProduct.sku || 'No definido' }}</p>
                 </div>
                 
                 <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
-                  <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-1 uppercase tracking-wide font-bold">Precio Venta</p>
+                  <p class="text-[12px] text-gray-500 dark:text-zinc-500 mb-1 uppercase tracking-wide font-bold">Precio Venta</p>
                   <p class="text-base font-bold text-emerald-600 dark:text-emerald-400">${{ formatCurrency(selectedProduct.sale_price) }}</p>
                 </div>
                 
                 <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
-                  <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-1 uppercase tracking-wide font-bold">Stock Actual</p>
+                  <p class="text-[12px] text-gray-500 dark:text-zinc-500 mb-1 uppercase tracking-wide font-bold">Stock Actual</p>
                   <p class="text-base font-bold text-gray-900 dark:text-white">{{ formatNumber(selectedProduct.current_stock || 0) }} unidades</p>
                 </div>
               </div>
@@ -1748,19 +1834,19 @@
             <!-- Indicador de Cambios + Cerrar -->
             <div class="flex items-center gap-3">
               <button @click="showViewModal = false" 
-                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-700 rounded-xl text-sm font-medium transition-colors">
+                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-700 rounded-xl text-[15px] font-medium transition-colors">
                 Cerrar
               </button>
               <div v-if="hasUnsavedChanges" class="flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg">
                 <div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-                <span class="text-xs font-medium text-amber-600 dark:text-amber-400">{{ changesCount }} cambio(s) sin guardar</span>
+                <span class="text-[13px] font-medium text-amber-600 dark:text-amber-400">{{ changesCount }} cambio(s) sin guardar</span>
               </div>
             </div>
             
             <!-- Botón Principal -->
             <button v-if="hasUnsavedChanges"
                     @click="saveInventoryChanges" 
-                    class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-500/30 transition-all inline-flex items-center gap-2">
+                    class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-[15px] font-bold shadow-lg shadow-blue-500/30 transition-all inline-flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
                 </svg>
@@ -1768,7 +1854,7 @@
             </button>
             <button v-else
                     @click="editProduct(selectedProduct)" 
-                    class="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-bold shadow-lg transition-all inline-flex items-center gap-2">
+                    class="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-[15px] font-bold shadow-lg transition-all inline-flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
@@ -1794,7 +1880,7 @@
               </div>
               <div>
                 <h3 class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Detalles del Producto</h3>
-                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Información completa del producto</p>
+                <p class="text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Información completa del producto</p>
               </div>
             </div>
             <button @click="showViewModal = false" 
@@ -1824,17 +1910,17 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
                     </svg>
                   </div>
-                  <span class="text-[10px] font-medium text-gray-400 dark:text-zinc-500">Sin imagen</span>
+                  <span class="text-[12px] font-medium text-gray-400 dark:text-zinc-500">Sin imagen</span>
                 </div>
               </div>
             </div>
             <h2 class="text-xl font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">{{ selectedProduct.name }}</h2>
-            <div class="flex items-center space-x-2 text-sm">
-              <span class="px-3 py-1 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8] rounded-full text-xs font-medium">
+            <div class="flex items-center space-x-2 text-[15px]">
+              <span class="px-3 py-1 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 text-[#1a73e8] dark:text-[#8ab4f8] rounded-full text-[13px] font-medium">
                 {{ selectedProduct.category?.name || 'Sin categoría' }}
               </span>
               <span :class="[
-                'px-3 py-1 rounded-full text-xs font-medium',
+                'px-3 py-1 rounded-full text-[13px] font-medium',
                 getProductStatus(selectedProduct) 
                   ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' 
                   : 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]'
@@ -1842,7 +1928,7 @@
                 {{ getProductStatus(selectedProduct) ? 'Activo' : 'Inactivo' }}
               </span>
               <span v-if="(selectedProduct.current_stock || 0) <= (selectedProduct.min_stock || 0)" 
-                    class="px-3 py-1 bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#e37400] dark:text-[#fdd663] rounded-full text-xs font-medium">
+                    class="px-3 py-1 bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#e37400] dark:text-[#fdd663] rounded-full text-[13px] font-medium">
                 Stock Bajo
               </span>
             </div>
@@ -1851,26 +1937,26 @@
           <!-- Detalles en grid (Gemini style) -->
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">SKU</p>
+              <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">SKU</p>
               <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProduct.sku || 'Sin SKU' }}</p>
             </div>
             <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Precio</p>
+              <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Precio</p>
               <p class="text-base font-semibold text-[#1e8e3e] dark:text-[#81c995]">${{ formatCurrency(selectedProduct.sale_price) }}</p>
             </div>
             <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Stock Actual</p>
+              <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Stock Actual</p>
               <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProduct.current_stock || 0 }}</p>
-              <div class="flex items-center mt-1 text-xs text-[#5f6368] dark:text-[#9aa0a6]">
+              <div class="flex items-center mt-1 text-[13px] text-[#5f6368] dark:text-[#9aa0a6]">
                 <span>Mín: {{ selectedProduct.min_stock || 0 }}</span>
-                <span class="mx-2">•</span>
+                <span class="mx-2">⬢</span>
                 <span>Máx: {{ selectedProduct.max_stock || 0 }}</span>
               </div>
             </div>
             <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
-              <p class="text-[11px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Costo</p>
+              <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Costo</p>
               <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">${{ formatCurrency(selectedProduct.cost_price) }}</p>
-              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">
+              <p class="text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-1">
                 Margen: {{ selectedProduct.sale_price && selectedProduct.cost_price ? 
                   ((selectedProduct.sale_price - selectedProduct.cost_price) / selectedProduct.cost_price * 100).toFixed(1) + '%' : 
                   '0%' }}
@@ -1884,22 +1970,22 @@
               <svg class="w-4 h-4 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/>
               </svg>
-              <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Descripción del Producto</h4>
+              <h4 class="text-[15px] font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Descripción del Producto</h4>
             </div>
-            <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">{{ selectedProduct.description }}</p>
+            <p class="text-[15px] text-[#5f6368] dark:text-[#9aa0a6] leading-relaxed">{{ selectedProduct.description }}</p>
           </div>
 
           <!-- Pie del modal con acciones (Gemini style) -->
           <div class="flex items-center justify-end space-x-3">
             <button @click="editProduct(selectedProduct)" 
-                    class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full text-sm font-medium inline-flex items-center gap-2 transition-colors">
+                    class="px-5 py-2.5 bg-[#f0f4f9] dark:bg-[#1e1f20] hover:bg-[#e4e9ef] dark:hover:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] rounded-full text-[15px] font-medium inline-flex items-center gap-2 transition-colors">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
               <span>Editar Producto</span>
             </button>
             <button @click="showViewModal = false" 
-                    class="px-5 py-2.5 bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#1e1f20] hover:bg-[#1557b0] dark:hover:bg-[#aecbfa] rounded-full text-sm font-medium transition-colors">
+                    class="px-5 py-2.5 bg-[#1a73e8] dark:bg-[#8ab4f8] text-white dark:text-[#1e1f20] hover:bg-[#1557b0] dark:hover:bg-[#aecbfa] rounded-full text-[15px] font-medium transition-colors">
               Cerrar
             </button>
           </div>
@@ -1937,7 +2023,7 @@
 
       <form @submit.prevent="saveSupplier" class="p-6 space-y-4">
         <div>
-          <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">Nombre del Proveedor *</label>
+          <label class="block text-[15px] font-bold text-gray-900 dark:text-white mb-2">Nombre del Proveedor *</label>
           <input v-model="supplierForm.name" 
                  type="text" 
                  required
@@ -1946,7 +2032,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">Documento (NIT/CC) *</label>
+          <label class="block text-[15px] font-bold text-gray-900 dark:text-white mb-2">Documento (NIT/CC) *</label>
           <input v-model="supplierForm.document" 
                  type="text" 
                  required
@@ -1955,7 +2041,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">Persona de Contacto</label>
+          <label class="block text-[15px] font-bold text-gray-900 dark:text-white mb-2">Persona de Contacto</label>
           <input v-model="supplierForm.contact_name" 
                  type="text"
                  class="w-full px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -1964,7 +2050,7 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">Teléfono</label>
+            <label class="block text-[15px] font-bold text-gray-900 dark:text-white mb-2">Teléfono</label>
             <input v-model="supplierForm.phone" 
                    type="tel"
                    class="w-full px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -1972,7 +2058,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">Email</label>
+            <label class="block text-[15px] font-bold text-gray-900 dark:text-white mb-2">Email</label>
             <input v-model="supplierForm.email" 
                    type="email"
                    class="w-full px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -1996,198 +2082,7 @@
     </div>
   </div>
 
-  <!-- TOUR FINAL ÉPICO -->
-  <ContextualTour
-    ref="productsTourRef"
-    module-name="products"
-    :steps="productsTourSteps"
-    :auto-start="false"
-    @complete="handleProductsTourComplete"
-    @skip="handleProductsTourSkip"
-  />
-
-  <!-- Modal de Bienvenida al Tour Final -->
-  <Teleport to="body">
-    <Transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div v-if="showProductsWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 ">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-lg w-full overflow-hidden border border-gray-300 dark:border-zinc-800">
-          <!-- Header con diseño profesional -->
-          <div class="bg-gradient-to-br from-slate-800 via-slate-900 to-black dark:from-zinc-800 dark:via-zinc-900 dark:to-black px-8 py-8 text-center border-b border-slate-700 dark:border-zinc-700">
-            <div class="w-20 h-20 bg-white/10  rounded-2xl flex items-center justify-center mx-auto mb-5 border border-white/20 shadow-lg shadow-black/20">
-              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-              </svg>
-            </div>
-            <h2 class="text-2xl font-bold text-white mb-2">Gestión de Productos</h2>
-            <p class="text-slate-300 dark:text-zinc-400 text-sm">Tu inventario, tu control total</p>
-          </div>
-          
-          <div class="px-8 py-6">
-            <p class="text-gray-600 dark:text-zinc-400 text-center mb-6 leading-relaxed">
-              Te mostraremos las herramientas clave para gestionar tu catálogo de forma eficiente y profesional.
-            </p>
-            
-            <!-- Cards de características -->
-            <div class="grid grid-cols-2 gap-3 mb-6">
-              <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-4 border border-blue-100 dark:border-blue-900/50">
-                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center mb-2">
-                  <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                  </svg>
-                </div>
-                <p class="text-xs font-semibold text-blue-900 dark:text-blue-300">Búsqueda Inteligente</p>
-              </div>
-              
-              <div class="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-xl p-4 border border-emerald-100 dark:border-emerald-900/50">
-                <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center mb-2">
-                  <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                  </svg>
-                </div>
-                <p class="text-xs font-semibold text-emerald-900 dark:text-emerald-300">Importar Excel</p>
-              </div>
-              
-              <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl p-4 border border-amber-100 dark:border-amber-900/50">
-                <div class="w-8 h-8 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex items-center justify-center mb-2">
-                  <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                  </svg>
-                </div>
-                <p class="text-xs font-semibold text-amber-900 dark:text-amber-300">Filtros Avanzados</p>
-              </div>
-              
-              <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 rounded-xl p-4 border border-purple-100 dark:border-purple-900/50">
-                <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center mb-2">
-                  <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                  </svg>
-                </div>
-                <p class="text-xs font-semibold text-purple-900 dark:text-purple-300">Múltiples Vistas</p>
-              </div>
-            </div>
-            
-            <!-- Tiempo estimado -->
-            <div class="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-zinc-500 mb-6">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <span>Tour rápido: ~30 segundos</span>
-            </div>
-            
-            <div class="flex gap-3">
-              <button
-                @click="handleProductsWelcomeSkip"
-                class="flex-1 px-5 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-300 text-sm font-semibold rounded-xl border border-gray-200 dark:border-zinc-700 transition-all duration-200"
-              >
-                Omitir
-              </button>
-              <button
-                @click="handleProductsWelcomeStart"
-                class="flex-1 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                <span>Comenzar Tour</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Transition>
-  </Teleport>
-
-  <!-- Modal de Finalización del Tour -->
-  <Teleport to="body">
-    <Transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0 scale-95"
-      enter-to-class="opacity-100 scale-100"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100 scale-100"
-      leave-to-class="opacity-0 scale-95"
-    >
-      <div v-if="showFinalModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-md w-full overflow-hidden border border-gray-300 dark:border-zinc-800">
-          <!-- Header con diseño profesional y gradiente -->
-          <div class="bg-gradient-to-br from-slate-800 via-slate-900 to-black dark:from-zinc-800 dark:via-zinc-900 dark:to-black px-8 py-8 text-center border-b border-slate-700 dark:border-zinc-700 relative overflow-hidden">
-            <!-- Efecto de brillo -->
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 animate-pulse"></div>
-            
-            <div class="relative">
-              <div class="w-20 h-20 bg-emerald-500/20  rounded-2xl flex items-center justify-center mx-auto mb-5 border border-emerald-500/30 shadow-lg shadow-emerald-500/20">
-                <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <h2 class="text-2xl font-bold text-white mb-2">¡Excelente Trabajo!</h2>
-              <p class="text-slate-300 dark:text-zinc-400 text-sm">Has completado el tour de Productos</p>
-            </div>
-          </div>
-          
-          <div class="px-8 py-6">
-            <p class="text-gray-600 dark:text-zinc-400 text-center mb-6 leading-relaxed">
-              Ya conoces todas las herramientas para gestionar tu inventario de forma profesional.
-            </p>
-            
-            <!-- Próximos pasos -->
-            <div class="space-y-3 mb-6">
-              <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Próximos pasos:</p>
-              
-              <div class="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-100 dark:border-blue-900/50">
-                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span class="text-sm font-bold text-blue-600 dark:text-blue-400">1</span>
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-blue-900 dark:text-blue-300">Agrega tu primer producto</p>
-                  <p class="text-xs text-blue-700/70 dark:text-blue-400/70">Haz clic en "Nuevo Producto" para empezar</p>
-                </div>
-              </div>
-              
-              <div class="flex items-start gap-3 p-3 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl border border-emerald-100 dark:border-emerald-900/50">
-                <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">2</span>
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-emerald-900 dark:text-emerald-300">O importa desde Excel</p>
-                  <p class="text-xs text-emerald-700/70 dark:text-emerald-400/70">Carga masiva con detección automática de IA</p>
-                </div>
-              </div>
-              
-              <div class="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-100 dark:border-purple-900/50">
-                <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span class="text-sm font-bold text-purple-600 dark:text-purple-400">3</span>
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-purple-900 dark:text-purple-300">¡Empieza a vender!</p>
-                  <p class="text-xs text-purple-700/70 dark:text-purple-400/70">Dirígete al POS y realiza tu primera venta</p>
-                </div>
-              </div>
-            </div>
-            
-            <button
-              @click="closeFinalModal"
-              class="w-full px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all duration-300 flex items-center justify-center gap-2"
-            >
-              <span>Comenzar a Gestionar</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </Transition>
-  </Teleport>
-
-  <!-- 🏭 Tooltip: Stock por Bodega -->
+  <!-- �x�� Tooltip: Stock por Bodega -->
   <Teleport to="body">
     <div v-if="stockTooltip.visible" 
          class="fixed z-[9999] bg-white dark:bg-zinc-900 shadow-xl rounded-xl border border-gray-300 dark:border-zinc-700 p-3 min-w-[200px]"
@@ -2196,10 +2091,10 @@
         <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
         </svg>
-        <h4 class="text-sm font-bold text-gray-900 dark:text-white">Stock por Bodega</h4>
+        <h4 class="text-[15px] font-bold text-gray-900 dark:text-white">Stock por Bodega</h4>
       </div>
       <div v-if="stockTooltip.warehouses && stockTooltip.warehouses.length > 0" class="space-y-2">
-        <div v-for="wh in stockTooltip.warehouses" :key="wh.id" class="flex items-center justify-between text-sm">
+        <div v-for="wh in stockTooltip.warehouses" :key="wh.id" class="flex items-center justify-between text-[15px]">
           <div class="flex items-center space-x-2">
             <span class="w-2 h-2 bg-blue-500 dark:bg-blue-400 rounded-full"></span>
             <span class="text-gray-700 dark:text-zinc-300">{{ wh.name }}</span>
@@ -2207,7 +2102,7 @@
           <span class="font-bold text-gray-900 dark:text-white">{{ wh.pivot.stock }}</span>
         </div>
       </div>
-      <div v-else class="text-xs text-gray-500 dark:text-zinc-400 text-center py-2">
+      <div v-else class="text-[13px] text-gray-500 dark:text-zinc-400 text-center py-2">
         Sin stock asignado
       </div>
     </div>
@@ -2274,7 +2169,7 @@
 
         <form @submit.prevent="saveCategory" class="p-6 space-y-4">
           <div>
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Nombre de la Categoría *</label>
+            <label class="block text-[15px] font-bold text-gray-700 dark:text-zinc-300 mb-2">Nombre de la Categoría *</label>
             <input v-model="categoryForm.name" 
                    type="text" 
                    required
@@ -2283,7 +2178,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Descripción</label>
+            <label class="block text-[15px] font-bold text-gray-700 dark:text-zinc-300 mb-2">Descripción</label>
             <textarea v-model="categoryForm.description" 
                       rows="2"
                       class="w-full px-4 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -2293,7 +2188,7 @@
 
           <!-- Selector de Color -->
           <div>
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">Color de la Categoría</label>
+            <label class="block text-[15px] font-bold text-gray-700 dark:text-zinc-300 mb-2">Color de la Categoría</label>
             <div class="flex items-center gap-3">
               <input 
                 v-model="categoryForm.color" 
@@ -2342,7 +2237,7 @@ import apiClient from '../services/apiClient'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { warehouseService } from '../services/warehouseService.js'
-import { apiCall } from '../services/api.js' // 🏭 Para cargar proveedores
+import { apiCall } from '../services/api.js' // �x�� Para cargar proveedores
 import { appStore } from '../store/appStore.js'
 import { useUIContextStore } from '../store/uiContextStore.js'
 import { useAutoRefresh } from '../composables/useRouteState.js'
@@ -2353,7 +2248,7 @@ import ExcelImportModal from './ExcelImportModal.vue'
 import FashionProductForm from './FashionProductForm.vue'
 import FashionProductCard from './FashionProductCard.vue'
 
-// 🤖 Store de contexto para IA
+// �x� Store de contexto para IA
 const uiContext = useUIContextStore()
 
 // Excel Import Modal state
@@ -2394,7 +2289,7 @@ const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuot
 const route = useRoute()
 const router = useRouter()
 
-// 🖼️ Función utilitaria para manejo inteligente de imágenes
+// �x�️ Función utilitaria para manejo inteligente de imágenes
 const getProductImage = (product) => {
   // Usar el origen actual (mismo puerto que el frontend/proxy)
   const baseUrl = window.location.origin
@@ -2448,7 +2343,7 @@ const getProductImage = (product) => {
   return null
 }
 
-// 🎨 Generar avatar dinámico SVG con iniciales del producto
+// �x}� Generar avatar dinámico SVG con iniciales del producto
 const generateDynamicAvatar = (name) => {
   // Obtener las primeras 2 letras del nombre
   const initials = (name || 'P')
@@ -2481,7 +2376,7 @@ const generateDynamicAvatar = (name) => {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
 
-// 🚨 Manejar errores de carga de imagen
+// �xa� Manejar errores de carga de imagen
 const handleImageError = (event, product) => {
   // Evitar bucle infinito
   if (event.target.dataset.errorHandled) return
@@ -2496,402 +2391,18 @@ const handleImageError = (event, product) => {
 const loading = ref(true) // Iniciar en true para evitar parpadeo al cargar
 const products = ref([])
 const categories = ref([])
-const suppliers = ref([]) // 🏭 Lista de proveedores
+const suppliers = ref([]) // �x�� Lista de proveedores
 const searchTerm = ref('')
 const categoryFilter = ref('')
 const statusFilter = ref('')
 const sortBy = ref('name')
 const viewMode = ref('table')
 
-// 🎓 TOUR FINAL ÉPICO - Prueba final antes de empezar a vender
-const DEV_MODE_PRODUCTS = false // false = Tour solo primera vez | true = Tour siempre
-const isFirstVisitProducts = ref(DEV_MODE_PRODUCTS || !localStorage.getItem('products_tour_completed'))
-const showProductsWelcomeModal = ref(false)
-const productsTourRef = ref(null)
-const isTourActive = ref(false)
-
-// 👻 PRODUCTOS FANTASMA para demostración del tour
-const demoProducts = ref([
-  {
-    id: 'demo-1',
-    name: 'Coca Cola 350ml',
-    sku: 'BEB-001',
-    barcode: '7891234567890',
-    description: 'Bebida gaseosa sabor cola',
-    sale_price: 2500,
-    cost_price: 1500,
-    current_stock: 150,
-    min_stock: 20,
-    max_stock: 300,
-    category_id: 1,
-    category_name: 'Bebidas',
-    image_url: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400',
-    active: true
-  },
-  {
-    id: 'demo-2',
-    name: 'Pan Integral',
-    sku: 'PAN-002',
-    barcode: '7899876543210',
-    description: 'Pan de molde integral 500g',
-    sale_price: 4200,
-    cost_price: 2800,
-    current_stock: 45,
-    min_stock: 10,
-    max_stock: 80,
-    category_id: 2,
-    category_name: 'Panadería',
-    image_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400',
-    active: true
-  },
-  {
-    id: 'demo-3',
-    name: 'Leche Entera 1L',
-    sku: 'LAC-003',
-    barcode: '7891111222333',
-    description: 'Leche entera pasteurizada',
-    sale_price: 3800,
-    cost_price: 2500,
-    current_stock: 85,
-    min_stock: 15,
-    max_stock: 150,
-    category_id: 3,
-    category_name: 'Lácteos',
-    image_url: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400',
-    active: true
-  },
-  {
-    id: 'demo-4',
-    name: 'Arroz Diana 500g',
-    sku: 'GRA-004',
-    barcode: '7894444555666',
-    description: 'Arroz blanco premium',
-    sale_price: 3200,
-    cost_price: 2000,
-    current_stock: 120,
-    min_stock: 25,
-    max_stock: 200,
-    category_id: 4,
-    category_name: 'Granos',
-    image_url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400',
-    active: true
-  },
-  {
-    id: 'demo-5',
-    name: 'Aceite Girasol 900ml',
-    sku: 'ACE-005',
-    barcode: '7897777888999',
-    description: 'Aceite vegetal de girasol',
-    sale_price: 8500,
-    cost_price: 5500,
-    current_stock: 35,
-    min_stock: 8,
-    max_stock: 60,
-    category_id: 5,
-    category_name: 'Aceites',
-    image_url: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400',
-    active: true
-  },
-  {
-    id: 'demo-6',
-    name: 'Huevos AA x30',
-    sku: 'HUE-006',
-    barcode: '7892222333444',
-    description: 'Huevos frescos cubeta x30',
-    sale_price: 12000,
-    cost_price: 8000,
-    current_stock: 25,
-    min_stock: 5,
-    max_stock: 40,
-    category_id: 3,
-    category_name: 'Lácteos',
-    image_url: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400',
-    active: true
-  }
-])
-
-// Computed para mostrar productos reales o fantasma según el tour
-const displayProducts = computed(() => {
-  if (isTourActive.value && products.value.length === 0) {
-    return demoProducts.value
-  }
-  return products.value
-})
-
-const productsTourSteps = ref([
-  {
-    selector: '#tour-search-products',
-    title: 'Buscador Inteligente',
-    content: `
-      <p>Encuentra productos al instante. Busca por:</p>
-      <div class="flex flex-wrap gap-2 mt-3">
-        <span class="px-2.5 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700">Nombre</span>
-        <span class="px-2.5 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700">SKU</span>
-        <span class="px-2.5 py-1 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700">Código de barras</span>
-      </div>
-      <p class="mt-3 text-xs text-gray-500">Tip: Conecta un escáner de códigos para búsqueda instantánea.</p>
-    `,
-    position: 'bottom'
-  },
-  {
-    selector: '#tour-filter-category',
-    title: 'Filtrar por Categoría',
-    content: `
-      <p>Organiza tu catálogo filtrando por <strong>categorías</strong>. Ideal para tiendas con amplio inventario.</p>
-      <p class="mt-2 text-xs text-gray-500">Las categorías se crean automáticamente al agregar productos.</p>
-    `,
-    position: 'bottom'
-  },
-  {
-    selector: '#tour-filter-status',
-    title: 'Estados de Producto',
-    content: `
-      <p>Filtra productos por su estado actual:</p>
-      <div class="space-y-2 mt-3">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-          <span class="text-xs text-gray-600 dark:text-zinc-400"><strong>Activos:</strong> Disponibles para venta</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-          <span class="text-xs text-gray-600 dark:text-zinc-400"><strong>Inactivos:</strong> Ocultos del POS</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
-          <span class="text-xs text-gray-600 dark:text-zinc-400"><strong>Stock Bajo:</strong> Requieren reabastecimiento</span>
-        </div>
-      </div>
-    `,
-    position: 'bottom'
-  },
-  {
-    selector: '#tour-view-toggle',
-    title: 'Cambia tu Vista',
-    content: `
-      <p>Elige cómo visualizar tu catálogo:</p>
-      <div class="grid grid-cols-2 gap-3 mt-3">
-        <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-3 text-center border border-gray-200 dark:border-zinc-700">
-          <svg class="w-6 h-6 mx-auto mb-1 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"/></svg>
-          <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Tarjetas</span>
-          <p class="text-[10px] text-gray-500 mt-0.5">Visual + Imágenes</p>
-        </div>
-        <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-3 text-center border border-gray-200 dark:border-zinc-700">
-          <svg class="w-6 h-6 mx-auto mb-1 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-          <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Tabla</span>
-          <p class="text-[10px] text-gray-500 mt-0.5">Datos compactos</p>
-        </div>
-      </div>
-      <p class="text-xs text-gray-500 mt-3 italic">Observa el cambio automático...</p>
-    `,
-    position: 'bottom'
-  },
-  {
-    selector: '#tour-import-excel',
-    title: 'Importación con IA',
-    content: `
-      <p><span class="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 text-xs font-semibold border border-indigo-200 dark:border-indigo-800">Powered by AI</span></p>
-      <p class="mt-2">Carga masiva de productos desde Excel. Nuestra <strong>IA detecta automáticamente</strong> las columnas y mapea los datos.</p>
-      <p class="mt-2 text-xs text-gray-500">Soporta formatos: .xlsx, .xls, .csv</p>
-    `,
-    position: 'left'
-  },
-  {
-    selector: '#tour-export-products',
-    title: 'Exportar Catálogo',
-    content: `
-      <p>Descarga tu inventario completo en formato Excel para:</p>
-      <ul class="mt-2 space-y-1 text-xs text-gray-600 dark:text-zinc-400">
-        <li class="flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          Respaldo de datos
-        </li>
-        <li class="flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          Análisis en hojas de cálculo
-        </li>
-        <li class="flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          Compartir con proveedores
-        </li>
-      </ul>
-    `,
-    position: 'left'
-  },
-  {
-    selector: '#tour-new-product',
-    title: 'Crear Nuevo Producto',
-    content: `
-      <p>Agrega productos a tu inventario con toda la información necesaria:</p>
-      <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
-        <div class="flex items-center gap-1.5 text-gray-600 dark:text-zinc-400">
-          <svg class="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-          Nombre y descripción
-        </div>
-        <div class="flex items-center gap-1.5 text-gray-600 dark:text-zinc-400">
-          <svg class="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-          Precios y costos
-        </div>
-        <div class="flex items-center gap-1.5 text-gray-600 dark:text-zinc-400">
-          <svg class="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-          Stock inicial
-        </div>
-        <div class="flex items-center gap-1.5 text-gray-600 dark:text-zinc-400">
-          <svg class="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-          Código de barras
-        </div>
-      </div>
-      <div class="mt-3 p-2 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-100 dark:border-blue-900/50">
-        <p class="text-xs text-blue-700 dark:text-blue-400">
-          <strong>Pro tip:</strong> Puedes generar códigos de barras automáticamente.
-        </p>
-      </div>
-    `,
-    position: 'left'
-  }
-])
-
-// Variable para guardar la vista original del usuario
-const originalViewMode = ref('table')
-let viewChangeTimeout = null
-
-// 🚫 Usuario omite el tour
-const handleProductsWelcomeSkip = () => {
-  showProductsWelcomeModal.value = false
-  isTourActive.value = false
-  // Marcar como completado para no mostrar de nuevo
-  if (!DEV_MODE_PRODUCTS) {
-    localStorage.setItem('products_tour_completed', 'true')
-  }
-}
-
-// ▶️ Usuario inicia el tour
-const handleProductsWelcomeStart = () => {
-  showProductsWelcomeModal.value = false
-  isTourActive.value = true // Activar productos fantasma
-  loading.value = false // Desactivar loading para mostrar productos
-  
-  // Guardar vista original del usuario
-  originalViewMode.value = viewMode.value
-  
-  productsTourRef.value.startTourConfirmed()
-  
-  // 🎬 Demo AUTOMÁTICA: cambiar vista cuando llegue al paso de "Cambia tu Vista" (paso 4)
-  // El tour tardará aprox 12 segundos en llegar al paso 4 (3 pasos x 4 segundos cada uno)
-  viewChangeTimeout = setTimeout(() => {
-    // Cambiar a la vista contraria para demostrar
-    viewMode.value = originalViewMode.value === 'table' ? 'grid' : 'table'
-  }, 12000)
-}
-
-const showFinalModal = ref(false)
-
-// 🎉 Función para crear efecto de confeti ÉPICO
-const triggerConfetti = () => {
-  const duration = 3000
-  const animationEnd = Date.now() + duration
-  const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#ef4444']
-  
-  // 🎯 Obtener factor de compensación de escalado
-  const { appliedZoom, isCompensating } = useScreenScaling()
-  const zoomFactor = isCompensating.value ? appliedZoom.value : 1
-
-  function randomInRange(min, max) {
-    return Math.random() * (max - min) + min
-  }
-
-  // Explosión inicial desde el centro
-  if (window.confetti) {
-    window.confetti({
-      particleCount: 150,
-      spread: 180,
-      origin: { y: 0.5 },
-      colors: colors,
-      zIndex: 9999
-    })
-
-    // Ráfagas continuas desde los lados
-    const interval = setInterval(function() {
-      const timeLeft = animationEnd - Date.now()
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval)
-      }
-
-      const particleCount = 30 * (timeLeft / duration)
-
-      // Desde la izquierda (no necesita compensación, x:0 siempre es el borde izquierdo)
-      window.confetti({
-        particleCount,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.6 },
-        colors: colors,
-        zIndex: 9999
-      })
-      
-      // Desde la derecha (compensar para pantallas escaladas)
-      // Si está escalado, ajustamos la posición para que salga del borde real
-      window.confetti({
-        particleCount,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 / zoomFactor, y: 0.6 },
-        colors: colors,
-        zIndex: 9999
-      })
-    }, 250)
-  }
-}
-
-const handleProductsTourComplete = () => {
-  // Limpiar timeout de cambio de vista si existe
-  if (viewChangeTimeout) {
-    clearTimeout(viewChangeTimeout)
-    viewChangeTimeout = null
-  }
-  
-  // Mostrar modal de finalización
-  showFinalModal.value = true
-  isTourActive.value = false // Desactivar productos fantasma
-  
-  // 🎉 EFECTO DE CONFETI AL COMPLETAR EL TOUR
-  triggerConfetti()
-  
-  // Restaurar vista original del usuario
-  viewMode.value = originalViewMode.value
-}
-
-const handleProductsTourSkip = () => {
-  // Limpiar timeout de cambio de vista si existe
-  if (viewChangeTimeout) {
-    clearTimeout(viewChangeTimeout)
-    viewChangeTimeout = null
-  }
-  
-  isTourActive.value = false // Desactivar productos fantasma
-  
-  // Restaurar vista original del usuario
-  viewMode.value = originalViewMode.value
-  
-  // Refrescar productos reales
-  refreshProducts()
-}
-
-const closeFinalModal = () => {
-  showFinalModal.value = false
-  localStorage.setItem('products_tour_completed', 'true')
-  isFirstVisitProducts.value = false
-  
-  // 🔥 IMPORTANTE: Marcar tour del POS como completado también
-  // Esto asegura que el modal de bloqueo de caja ahora SÍ aparezca
-  localStorage.setItem('pos_tour_completed', 'true')
-}
-
 // Sistema de notificaciones
 const notifications = ref([])
 let notificationId = 0
 
-// 💾 Sistema de Preferencias del Usuario
+// �x� Sistema de Preferencias del Usuario
 const USER_PREFERENCES_KEY = 'products_user_preferences'
 
 // Cargar preferencias del usuario
@@ -2905,11 +2416,9 @@ const loadUserPreferences = () => {
       viewMode.value = preferences.viewMode || 'table'
       itemsPerPage.value = preferences.itemsPerPage || 25
       sortBy.value = preferences.sortBy || 'name'
-      
-      console.log('✅ Preferencias del usuario cargadas:', preferences)
     }
   } catch (error) {
-    console.warn('⚠️ Error cargando preferencias del usuario:', error)
+    console.warn('�a�️ Error cargando preferencias del usuario:', error)
   }
 }
 
@@ -2924,12 +2433,11 @@ const saveUserPreferences = () => {
     }
     
     localStorage.setItem(USER_PREFERENCES_KEY, JSON.stringify(preferences))
-    console.log('💾 Preferencias guardadas:', preferences)
     
   } catch (error) {
-    console.warn('⚠️ Error guardando preferencias:', error)
+    console.warn('�a�️ Error guardando preferencias:', error)
     showNotification(
-      '⚠️ Error guardando',
+      '�a�️ Error guardando',
       'No se pudieron guardar las preferencias',
       'error',
       2000
@@ -2943,7 +2451,7 @@ const setViewMode = (mode) => {
   saveUserPreferences()
 }
 
-// 🔧 Función helper para normalizar el estado del producto
+// �x� Función helper para normalizar el estado del producto
 const getProductStatus = (product) => {
   // La base de datos puede devolver 'active' o 'is_active'
   return product?.is_active !== undefined ? product.is_active : product?.active
@@ -2961,15 +2469,15 @@ const showCategoryModal = ref(false)
 const showSupplierModal = ref(false)
 const isEditing = ref(false)
 const selectedProduct = ref(null)
-const isFashionMode = ref(false) // 👗 Modo Ropa/Variantes (para formulario)
-const isInitializing = ref(true) // 🔄 Control de inicialización para evitar parpadeo
+const isFashionMode = ref(false) // �x Modo Ropa/Variantes (para formulario)
+const isInitializing = ref(true) // �x Control de inicialización para evitar parpadeo
 
-// 📊 Sistema de Edición en Línea para Modal de Inventario
+// �x` Sistema de Edición en Línea para Modal de Inventario
 const variantChanges = ref({}) // Objeto: { variantId: { stock: true, price: true, cost: true } }
 const hasUnsavedChanges = computed(() => Object.keys(variantChanges.value).length > 0)
 const changesCount = computed(() => Object.keys(variantChanges.value).length)
 
-// 🏪 Computed: Detectar si la tienda es de tipo Fashion (para vista de tarjetas)
+// �x�� Computed: Detectar si la tienda es de tipo Fashion (para vista de tarjetas)
 const isFashionStore = computed(() => {
   const storeType = appStore.systemSettings?.store_type
   return storeType === 'fashion' || storeType === 'moda'
@@ -2992,127 +2500,127 @@ const supplierForm = ref({
   email: ''
 })
 
-// 🎨 Lista de iconos disponibles (95 iconos) - sincronizada con CategoriesView
+// �x}� Lista de iconos disponibles (95 iconos) - sincronizada con CategoriesView
 const availableIcons = [
   // General
-  { id: 'shopping-bag', emoji: '🛍️', name: 'Compras', category: 'general' },
-  { id: 'gift', emoji: '🎁', name: 'Regalos', category: 'general' },
-  { id: 'package', emoji: '📦', name: 'Paquetería', category: 'general' },
-  { id: 'money', emoji: '💰', name: 'Finanzas', category: 'general' },
+  { id: 'shopping-bag', emoji: '�x:�️', name: 'Compras', category: 'general' },
+  { id: 'gift', emoji: '�x}�', name: 'Regalos', category: 'general' },
+  { id: 'package', emoji: '�x�', name: 'Paquetería', category: 'general' },
+  { id: 'money', emoji: '�x�', name: 'Finanzas', category: 'general' },
   // Comida y Bebidas
-  { id: 'food', emoji: '🍽️', name: 'Comida', category: 'food' },
-  { id: 'drink', emoji: '🥤', name: 'Bebidas', category: 'food' },
-  { id: 'coffee', emoji: '☕', name: 'Café', category: 'food' },
-  { id: 'wine', emoji: '🍷', name: 'Vino/Licor', category: 'food' },
-  { id: 'beer', emoji: '🍺', name: 'Cerveza', category: 'food' },
-  { id: 'bread', emoji: '🍞', name: 'Panadería', category: 'food' },
-  { id: 'meat', emoji: '🥩', name: 'Carnes', category: 'food' },
-  { id: 'fruit', emoji: '🍎', name: 'Frutas', category: 'food' },
-  { id: 'vegetable', emoji: '🥬', name: 'Verduras', category: 'food' },
-  { id: 'candy', emoji: '🍬', name: 'Dulces', category: 'food' },
-  { id: 'ice-cream', emoji: '🍦', name: 'Helados', category: 'food' },
-  { id: 'pizza', emoji: '🍕', name: 'Pizza', category: 'food' },
-  { id: 'burger', emoji: '🍔', name: 'Hamburguesas', category: 'food' },
-  { id: 'chicken', emoji: '🍗', name: 'Pollo', category: 'food' },
-  { id: 'fish', emoji: '🐟', name: 'Pescado', category: 'food' },
-  { id: 'cheese', emoji: '🧀', name: 'Lácteos', category: 'food' },
+  { id: 'food', emoji: '�x��️', name: 'Comida', category: 'food' },
+  { id: 'drink', emoji: '�x��', name: 'Bebidas', category: 'food' },
+  { id: 'coffee', emoji: '��"', name: 'Café', category: 'food' },
+  { id: 'wine', emoji: '�x��', name: 'Vino/Licor', category: 'food' },
+  { id: 'beer', emoji: '�x��', name: 'Cerveza', category: 'food' },
+  { id: 'bread', emoji: '�x�~', name: 'Panadería', category: 'food' },
+  { id: 'meat', emoji: '�x��', name: 'Carnes', category: 'food' },
+  { id: 'fruit', emoji: '�x�}', name: 'Frutas', category: 'food' },
+  { id: 'vegetable', emoji: '�x��', name: 'Verduras', category: 'food' },
+  { id: 'candy', emoji: '�x��', name: 'Dulces', category: 'food' },
+  { id: 'ice-cream', emoji: '�x��', name: 'Helados', category: 'food' },
+  { id: 'pizza', emoji: '�x�"', name: 'Pizza', category: 'food' },
+  { id: 'burger', emoji: '�x�', name: 'Hamburguesas', category: 'food' },
+  { id: 'chicken', emoji: '�x�', name: 'Pollo', category: 'food' },
+  { id: 'fish', emoji: '�x�x', name: 'Pescado', category: 'food' },
+  { id: 'cheese', emoji: '�x��', name: 'Lácteos', category: 'food' },
   // Belleza y Cuidado Personal
-  { id: 'perfume', emoji: '💐', name: 'Perfumes', category: 'beauty' },
-  { id: 'cosmetics', emoji: '💄', name: 'Cosméticos', category: 'beauty' },
-  { id: 'nail', emoji: '💅', name: 'Manicura', category: 'beauty' },
-  { id: 'haircut', emoji: '💇', name: 'Peluquería', category: 'beauty' },
-  { id: 'mirror', emoji: '🪞', name: 'Espejos', category: 'beauty' },
+  { id: 'perfume', emoji: '�x�', name: 'Perfumes', category: 'beauty' },
+  { id: 'cosmetics', emoji: '�x', name: 'Cosméticos', category: 'beauty' },
+  { id: 'nail', emoji: '�x&', name: 'Manicura', category: 'beauty' },
+  { id: 'haircut', emoji: '�x!', name: 'Peluquería', category: 'beauty' },
+  { id: 'mirror', emoji: '�x�~', name: 'Espejos', category: 'beauty' },
   // Limpieza
-  { id: 'soap', emoji: '🧼', name: 'Jabones', category: 'cleaning' },
-  { id: 'cleaning', emoji: '🧹', name: 'Limpieza', category: 'cleaning' },
-  { id: 'toilet', emoji: '🚽', name: 'Baño', category: 'cleaning' },
+  { id: 'soap', emoji: '�x��', name: 'Jabones', category: 'cleaning' },
+  { id: 'cleaning', emoji: '�x��', name: 'Limpieza', category: 'cleaning' },
+  { id: 'toilet', emoji: '�xa�', name: 'Baño', category: 'cleaning' },
   // Papelería y Oficina
-  { id: 'book', emoji: '📚', name: 'Libros', category: 'office' },
-  { id: 'pencil', emoji: '✏️', name: 'Papelería', category: 'office' },
-  { id: 'scissors', emoji: '✂️', name: 'Artículos Escolares', category: 'office' },
-  { id: 'printer', emoji: '🖨️', name: 'Impresión', category: 'office' },
-  { id: 'folder', emoji: '📁', name: 'Archivos', category: 'office' },
+  { id: 'book', emoji: '�xa', name: 'Libros', category: 'office' },
+  { id: 'pencil', emoji: '�S�️', name: 'Papelería', category: 'office' },
+  { id: 'scissors', emoji: '�S️', name: 'Artículos Escolares', category: 'office' },
+  { id: 'printer', emoji: '�x�️', name: 'Impresión', category: 'office' },
+  { id: 'folder', emoji: '�x�', name: 'Archivos', category: 'office' },
   // Moda y Ropa
-  { id: 'tshirt', emoji: '👕', name: 'Ropa', category: 'fashion' },
-  { id: 'dress', emoji: '👗', name: 'Vestidos', category: 'fashion' },
-  { id: 'jeans', emoji: '👖', name: 'Pantalones', category: 'fashion' },
-  { id: 'shoe', emoji: '👟', name: 'Calzado', category: 'fashion' },
-  { id: 'heels', emoji: '👠', name: 'Tacones', category: 'fashion' },
-  { id: 'hat', emoji: '🎩', name: 'Sombreros', category: 'fashion' },
-  { id: 'watch', emoji: '⌚', name: 'Relojes', category: 'fashion' },
-  { id: 'glasses', emoji: '👓', name: 'Gafas', category: 'fashion' },
-  { id: 'bag', emoji: '👜', name: 'Bolsos', category: 'fashion' },
-  { id: 'jewelry', emoji: '💍', name: 'Joyería', category: 'fashion' },
-  { id: 'necktie', emoji: '👔', name: 'Corbatas', category: 'fashion' },
+  { id: 'tshirt', emoji: '�x"', name: 'Ropa', category: 'fashion' },
+  { id: 'dress', emoji: '�x', name: 'Vestidos', category: 'fashion' },
+  { id: 'jeans', emoji: '�x', name: 'Pantalones', category: 'fashion' },
+  { id: 'shoe', emoji: '�xx', name: 'Calzado', category: 'fashion' },
+  { id: 'heels', emoji: '�x�', name: 'Tacones', category: 'fashion' },
+  { id: 'hat', emoji: '�x}�', name: 'Sombreros', category: 'fashion' },
+  { id: 'watch', emoji: '�Ra', name: 'Relojes', category: 'fashion' },
+  { id: 'glasses', emoji: '�x', name: 'Gafas', category: 'fashion' },
+  { id: 'bag', emoji: '�xS', name: 'Bolsos', category: 'fashion' },
+  { id: 'jewelry', emoji: '�x�', name: 'Joyería', category: 'fashion' },
+  { id: 'necktie', emoji: '�x', name: 'Corbatas', category: 'fashion' },
   // Salud y Farmacia
-  { id: 'pill', emoji: '💊', name: 'Medicamentos', category: 'health' },
-  { id: 'medical', emoji: '⚕️', name: 'Salud', category: 'health' },
-  { id: 'syringe', emoji: '💉', name: 'Inyectables', category: 'health' },
-  { id: 'thermometer', emoji: '🌡️', name: 'Instrumentos', category: 'health' },
+  { id: 'pill', emoji: '�x`', name: 'Medicamentos', category: 'health' },
+  { id: 'medical', emoji: '�a"️', name: 'Salud', category: 'health' },
+  { id: 'syringe', emoji: '�x0', name: 'Inyectables', category: 'health' },
+  { id: 'thermometer', emoji: '�xR�️', name: 'Instrumentos', category: 'health' },
   // Niños y Bebés
-  { id: 'toy', emoji: '🧸', name: 'Juguetes', category: 'kids' },
-  { id: 'baby', emoji: '👶', name: 'Bebés', category: 'kids' },
-  { id: 'bottle', emoji: '🍼', name: 'Biberones', category: 'kids' },
-  { id: 'stroller', emoji: '🍼', name: 'Carriolas', category: 'kids' },
+  { id: 'toy', emoji: '�x��', name: 'Juguetes', category: 'kids' },
+  { id: 'baby', emoji: '�x�', name: 'Bebés', category: 'kids' },
+  { id: 'bottle', emoji: '�x��', name: 'Biberones', category: 'kids' },
+  { id: 'stroller', emoji: '�x��', name: 'Carriolas', category: 'kids' },
   // Tecnología y Electrónica
-  { id: 'electronics', emoji: '📱', name: 'Electrónica', category: 'tech' },
-  { id: 'computer', emoji: '💻', name: 'Computadoras', category: 'tech' },
-  { id: 'camera', emoji: '📷', name: 'Cámaras', category: 'tech' },
-  { id: 'headphones', emoji: '🎧', name: 'Audífonos', category: 'tech' },
-  { id: 'keyboard', emoji: '⌨️', name: 'Teclados', category: 'tech' },
-  { id: 'mouse', emoji: '🖱️', name: 'Mouse', category: 'tech' },
-  { id: 'tv', emoji: '📺', name: 'Televisores', category: 'tech' },
-  { id: 'game', emoji: '🎮', name: 'Videojuegos', category: 'tech' },
+  { id: 'electronics', emoji: '�x�', name: 'Electrónica', category: 'tech' },
+  { id: 'computer', emoji: '�x�', name: 'Computadoras', category: 'tech' },
+  { id: 'camera', emoji: '�x�', name: 'Cámaras', category: 'tech' },
+  { id: 'headphones', emoji: '�x}�', name: 'Audífonos', category: 'tech' },
+  { id: 'keyboard', emoji: '�R�️', name: 'Teclados', category: 'tech' },
+  { id: 'mouse', emoji: '�x�️', name: 'Mouse', category: 'tech' },
+  { id: 'tv', emoji: '�x�', name: 'Televisores', category: 'tech' },
+  { id: 'game', emoji: '�x}�', name: 'Videojuegos', category: 'tech' },
   // Ferretería y Herramientas
-  { id: 'tools', emoji: '🔧', name: 'Herramientas', category: 'hardware' },
-  { id: 'hammer', emoji: '🔨', name: 'Construcción', category: 'hardware' },
-  { id: 'saw', emoji: '🪚', name: 'Carpintería', category: 'hardware' },
-  { id: 'wrench', emoji: '🔩', name: 'Tornillería', category: 'hardware' },
-  { id: 'paint', emoji: '🎨', name: 'Pintura', category: 'hardware' },
+  { id: 'tools', emoji: '�x�', name: 'Herramientas', category: 'hardware' },
+  { id: 'hammer', emoji: '�x�', name: 'Construcción', category: 'hardware' },
+  { id: 'saw', emoji: '�x�a', name: 'Carpintería', category: 'hardware' },
+  { id: 'wrench', emoji: '�x�', name: 'Tornillería', category: 'hardware' },
+  { id: 'paint', emoji: '�x}�', name: 'Pintura', category: 'hardware' },
   // Mascotas
-  { id: 'pet', emoji: '🐾', name: 'Mascotas', category: 'pets' },
-  { id: 'dog', emoji: '🐕', name: 'Perros', category: 'pets' },
-  { id: 'cat', emoji: '🐈', name: 'Gatos', category: 'pets' },
-  { id: 'fish-pet', emoji: '🐠', name: 'Peces', category: 'pets' },
-  { id: 'bird', emoji: '🦜', name: 'Aves', category: 'pets' },
+  { id: 'pet', emoji: '�x��', name: 'Mascotas', category: 'pets' },
+  { id: 'dog', emoji: '�x�"', name: 'Perros', category: 'pets' },
+  { id: 'cat', emoji: '�x��', name: 'Gatos', category: 'pets' },
+  { id: 'fish-pet', emoji: '�x��', name: 'Peces', category: 'pets' },
+  { id: 'bird', emoji: '�x�S', name: 'Aves', category: 'pets' },
   // Jardín y Plantas
-  { id: 'plant', emoji: '🌱', name: 'Plantas', category: 'garden' },
-  { id: 'flower', emoji: '🌸', name: 'Flores', category: 'garden' },
-  { id: 'tree', emoji: '🌳', name: 'Árboles', category: 'garden' },
-  { id: 'garden-tools', emoji: '🌿', name: 'Jardinería', category: 'garden' },
+  { id: 'plant', emoji: '�xR�', name: 'Plantas', category: 'garden' },
+  { id: 'flower', emoji: '�xR�', name: 'Flores', category: 'garden' },
+  { id: 'tree', emoji: '�xR�', name: 'Árboles', category: 'garden' },
+  { id: 'garden-tools', emoji: '�xR�', name: 'Jardinería', category: 'garden' },
   // Deportes
-  { id: 'sport', emoji: '⚽', name: 'Deportes', category: 'sports' },
-  { id: 'basketball', emoji: '🏀', name: 'Basketball', category: 'sports' },
-  { id: 'tennis', emoji: '🎾', name: 'Tenis', category: 'sports' },
-  { id: 'gym', emoji: '💪', name: 'Gimnasio', category: 'sports' },
-  { id: 'bike', emoji: '🚴', name: 'Ciclismo', category: 'sports' },
+  { id: 'sport', emoji: '�a�', name: 'Deportes', category: 'sports' },
+  { id: 'basketball', emoji: '�x��', name: 'Basketball', category: 'sports' },
+  { id: 'tennis', emoji: '�x}�', name: 'Tenis', category: 'sports' },
+  { id: 'gym', emoji: '�x�', name: 'Gimnasio', category: 'sports' },
+  { id: 'bike', emoji: '�xa�', name: 'Ciclismo', category: 'sports' },
   // Automotriz
-  { id: 'car', emoji: '🚗', name: 'Automotriz', category: 'automotive' },
-  { id: 'motorcycle', emoji: '🏍️', name: 'Motocicletas', category: 'automotive' },
-  { id: 'tire', emoji: '🛞', name: 'Llantas', category: 'automotive' },
-  { id: 'gas', emoji: '⛽', name: 'Combustible', category: 'automotive' },
+  { id: 'car', emoji: '�xa', name: 'Automotriz', category: 'automotive' },
+  { id: 'motorcycle', emoji: '�x��️', name: 'Motocicletas', category: 'automotive' },
+  { id: 'tire', emoji: '�x:~', name: 'Llantas', category: 'automotive' },
+  { id: 'gas', emoji: '�:�', name: 'Combustible', category: 'automotive' },
   // Hogar y Muebles
-  { id: 'home', emoji: '🏠', name: 'Hogar', category: 'home' },
-  { id: 'furniture', emoji: '🛋️', name: 'Muebles', category: 'home' },
-  { id: 'bed', emoji: '🛏️', name: 'Colchones', category: 'home' },
-  { id: 'lamp', emoji: '💡', name: 'Iluminación', category: 'home' },
-  { id: 'kitchen', emoji: '🍳', name: 'Cocina', category: 'home' },
-  { id: 'decoration', emoji: '🖼️', name: 'Decoración', category: 'home' },
-  { id: 'door', emoji: '🚪', name: 'Puertas', category: 'home' },
-  { id: 'key', emoji: '🔑', name: 'Cerrajería', category: 'home' }
+  { id: 'home', emoji: '�x��', name: 'Hogar', category: 'home' },
+  { id: 'furniture', emoji: '�x:9️', name: 'Muebles', category: 'home' },
+  { id: 'bed', emoji: '�x:�️', name: 'Colchones', category: 'home' },
+  { id: 'lamp', emoji: '�x�', name: 'Iluminación', category: 'home' },
+  { id: 'kitchen', emoji: '�x��', name: 'Cocina', category: 'home' },
+  { id: 'decoration', emoji: '�x�️', name: 'Decoración', category: 'home' },
+  { id: 'door', emoji: '�xa�', name: 'Puertas', category: 'home' },
+  { id: 'key', emoji: '�x', name: 'Cerrajería', category: 'home' }
 ]
 
 // Función helper para obtener emoji del icono
 const getIconEmoji = (iconId) => {
   const icon = availableIcons.find(i => i.id === iconId)
-  return icon ? icon.emoji : '🛍️'
+  return icon ? icon.emoji : '�x:�️'
 }
 
 // Sistema de imagen dual
 const imageUploadMethod = ref('url') // 'file' o 'url'
 const previewImage = ref(null)
-const currentProductImage = ref(null) // 🖼️ Imagen actual del producto (en modo edición)
-const deletingImage = ref(false) // 🗑️ Estado de eliminación de imagen
+const currentProductImage = ref(null) // �x�️ Imagen actual del producto (en modo edición)
+const deletingImage = ref(false) // �x️ Estado de eliminación de imagen
 const imageLoadError = ref(false)
 
 const showStockHelp = ref(false)
@@ -3129,22 +2637,22 @@ const productForm = ref({
   min_stock: 5,
   max_stock: 100,
   category_id: '',
-  supplier_id: null, // 🏭 Proveedor principal (opcional)
-  warehouse_id: null, // 🏢 Bodega donde se guardará el producto
-  warehouseStock: {}, // 🏢 Stock por cada tienda { warehouse_id: cantidad }
-  warehouseEnabled: {}, // ✅ Control de qué sedes tendrán el producto { warehouse_id: boolean }
+  supplier_id: null, // �x�� Proveedor principal (opcional)
+  warehouse_id: null, // �x�� Bodega donde se guardará el producto
+  warehouseStock: {}, // �x�� Stock por cada tienda { warehouse_id: cantidad }
+  warehouseEnabled: {}, // �S& Control de qué sedes tendrán el producto { warehouse_id: boolean }
   image: '',
-  imageFile: null, // 📸 Archivo de imagen para subir
+  imageFile: null, // �x� Archivo de imagen para subir
   active: true,
-  measurement_unit: 'unit', // 📏 Unidad de medida (unit, kg, g, m, cm, l, ml)
-  allow_decimal: false // 🔢 Permite cantidades decimales (0.5, 1.25, etc)
+  measurement_unit: 'unit', // �x� Unidad de medida (unit, kg, g, m, cm, l, ml)
+  allow_decimal: false // �x� Permite cantidades decimales (0.5, 1.25, etc)
 })
 
-// 🏢 Lista de bodegas disponibles
+// �x�� Lista de bodegas disponibles
 const warehouses = ref([])
 const loadingWarehouses = ref(false)
 
-// 🏢 Tooltip de stock por bodega
+// �x�� Tooltip de stock por bodega
 const stockTooltip = ref({
   visible: false,
   productId: null,
@@ -3153,13 +2661,13 @@ const stockTooltip = ref({
   warehouses: []
 })
 
-// ⚠️ Modal de confirmación para productos sin stock
+// �a�️ Modal de confirmación para productos sin stock
 const showStockWarningModal = ref(false)
 const missingFields = ref([])
 
 // Computed properties
 const filteredProducts = computed(() => {
-  let filtered = displayProducts.value
+  let filtered = products.value
 
   if (searchTerm.value) {
     const term = searchTerm.value.toLowerCase()
@@ -3219,22 +2727,22 @@ const paginatedProducts = computed(() => {
   return filtered.slice(start, end)
 })
 
-const activeProducts = computed(() => displayProducts.value.filter(p => getProductStatus(p) !== false).length)
-const lowStockProducts = computed(() => displayProducts.value.filter(p => (p.current_stock || 0) <= (p.min_stock || 0)).length)
+const activeProducts = computed(() => products.value.filter(p => getProductStatus(p) !== false).length)
+const lowStockProducts = computed(() => products.value.filter(p => (p.current_stock || 0) <= (p.min_stock || 0)).length)
 const totalValue = computed(() => 
-  displayProducts.value.reduce((sum, p) => sum + (parseFloat(p.sale_price || 0) * (p.current_stock || 0)), 0)
+  products.value.reduce((sum, p) => sum + (parseFloat(p.sale_price || 0) * (p.current_stock || 0)), 0)
 )
 const uniqueCategories = computed(() => {
-  const categoryIds = displayProducts.value.map(p => p.category_id).filter(Boolean)
+  const categoryIds = products.value.map(p => p.category_id).filter(Boolean)
   return new Set(categoryIds).size
 })
 
-// ═══════════════════════════════════════════════════════════════
-// 🤖 CONTEXTO PARA IA - Información visible en pantalla
-// ═══════════════════════════════════════════════════════════════
+// �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
+// �x� CONTEXTO PARA IA - Información visible en pantalla
+// �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 const updateScreenContextForAI = () => {
   // Obtener productos con stock bajo para alertas
-  const productosStockBajo = displayProducts.value
+  const productosStockBajo = products.value
     .filter(p => (p.current_stock || 0) <= (p.min_stock || 0))
     .slice(0, 10)
     .map(p => ({
@@ -3244,7 +2752,7 @@ const updateScreenContextForAI = () => {
       categoria: p.category_name || 'Sin categoría'
     }))
 
-  // 🧠 IMPORTANTE: Obtener productos VISIBLES en pantalla (filtrados)
+  // �x�� IMPORTANTE: Obtener productos VISIBLES en pantalla (filtrados)
   // Si hay pocos productos filtrados, incluirlos para que la IA sepa cuáles ve el usuario
   // Helper para obtener nombre del proveedor
   const getSupplierName = (supplierId) => {
@@ -3268,7 +2776,7 @@ const updateScreenContextForAI = () => {
       }))
     : null // Si hay muchos, no los incluimos para no sobrecargar
 
-  // 🧠 Si hay exactamente 1 producto filtrado, automáticamente es el "producto en contexto"
+  // �x�� Si hay exactamente 1 producto filtrado, automáticamente es el "producto en contexto"
   const productoEnContexto = filteredProducts.value.length === 1 
     ? filteredProducts.value[0] 
     : selectedProduct.value
@@ -3276,14 +2784,17 @@ const updateScreenContextForAI = () => {
   // Datos del contexto
   const contextData = {
     resumenProductos: {
-      total: displayProducts.value.length,
+      total: products.value.length,
       activos: activeProducts.value,
-      inactivos: displayProducts.value.length - activeProducts.value,
+      inactivos: products.value.length - activeProducts.value,
       stockBajo: lowStockProducts.value,
       valorInventario: totalValue.value,
       categorias: uniqueCategories.value
     },
     tipoTienda: isFashionStore.value ? 'moda' : 'general',
+    // �x� CRÍTICO: Información de categorías para que la IA sepa si puede crear productos
+    totalCategorias: categories.value.length,
+    sinCategorias: categories.value.length === 0,
     filtrosActivos: {
       busqueda: searchTerm.value || null,
       categoria: categoryFilter.value || null,
@@ -3291,10 +2802,10 @@ const updateScreenContextForAI = () => {
       ordenarPor: sortBy.value
     },
     vistaActual: viewMode.value, // 'table' o 'grid'
-    productosVisibles: productosVisibles, // 🧠 Lista de productos en pantalla (si son pocos)
-    cantidadFiltrada: filteredProducts.value.length, // 🧠 Cuántos productos ve el usuario
+    productosVisibles: productosVisibles, // �x�� Lista de productos en pantalla (si son pocos)
+    cantidadFiltrada: filteredProducts.value.length, // �x�� Cuántos productos ve el usuario
     alertasStockBajo: productosStockBajo,
-    // 🧠 Usar productoEnContexto (automático si hay 1 filtrado, o el seleccionado)
+    // �x�� Usar productoEnContexto (automático si hay 1 filtrado, o el seleccionado)
     productoSeleccionado: productoEnContexto ? {
       id: productoEnContexto.id,
       nombre: productoEnContexto.name,
@@ -3308,15 +2819,15 @@ const updateScreenContextForAI = () => {
       activo: getProductStatus(productoEnContexto)
     } : null,
     
-    // 🏭 Lista de proveedores disponibles (para que la IA pueda sugerir)
+    // �x�� Lista de proveedores disponibles (para que la IA pueda sugerir)
     proveedoresDisponibles: suppliers.value.slice(0, 15).map(s => ({ id: s.id, nombre: s.name })),
     modalAbierto: showProductModal.value ? (isEditing.value ? 'editar' : 'crear') : null,
     sedesDisponibles: availableWarehouses.value.map(w => ({ id: w.id, nombre: w.name })),
     
-    // 📝 Categorías disponibles para crear productos
+    // �x� Categorías disponibles para crear productos
     categoriasDisponibles: categories.value.map(c => ({ id: c.id, nombre: c.name })),
     
-    // 📝 Estado del formulario cuando está abierto
+    // �x� Estado del formulario cuando está abierto
     formularioProducto: showProductModal.value ? {
       nombre: productForm.value.name || '(vacío)',
       precio: productForm.value.price || '(vacío)',
@@ -3350,7 +2861,7 @@ const updateScreenContextForAI = () => {
     }
   }
 
-  // 🧠 Función para normalizar términos de búsqueda (un litro → 1L, medio → 500, etc.)
+  // �x�� Función para normalizar términos de búsqueda (un litro �  1L, medio �  500, etc.)
   const normalizarBusqueda = (texto) => {
     let normalizado = texto.toLowerCase()
     
@@ -3385,13 +2896,13 @@ const updateScreenContextForAI = () => {
     return normalizado
   }
 
-  // 🧠 Función para buscar con coincidencia flexible
+  // �x�� Función para buscar con coincidencia flexible
   const buscarProductoFlexible = (texto) => {
     const textoNormalizado = normalizarBusqueda(texto)
     const palabras = textoNormalizado.split(/\s+/).filter(p => p.length > 1)
     
     // Buscar productos que coincidan con TODAS las palabras importantes
-    const resultados = displayProducts.value.filter(producto => {
+    const resultados = products.value.filter(producto => {
       const nombreProducto = producto.name.toLowerCase()
       const skuProducto = (producto.sku || '').toLowerCase()
       const textoCompleto = `${nombreProducto} ${skuProducto}`
@@ -3402,7 +2913,7 @@ const updateScreenContextForAI = () => {
     
     // Si no hay resultados exactos, buscar coincidencia parcial
     if (resultados.length === 0) {
-      return displayProducts.value.filter(producto => {
+      return products.value.filter(producto => {
         const nombreProducto = producto.name.toLowerCase()
         // Al menos el 60% de las palabras deben coincidir
         const coincidencias = palabras.filter(p => nombreProducto.includes(p))
@@ -3456,7 +2967,7 @@ const updateScreenContextForAI = () => {
   uiContext.registerAction('filtrarPorEstado', async (params) => {
     if (params?.estado === 'inactivos') {
       statusFilter.value = 'inactive'
-      return { success: true, message: 'Mostrando productos inactivos', cantidad: displayProducts.value.filter(p => !getProductStatus(p)).length }
+      return { success: true, message: 'Mostrando productos inactivos', cantidad: products.value.filter(p => !getProductStatus(p)).length }
     } else if (params?.estado === 'activos') {
       statusFilter.value = 'active'
       return { success: true, message: 'Mostrando productos activos', cantidad: activeProducts.value }
@@ -3467,7 +2978,7 @@ const updateScreenContextForAI = () => {
     return { success: false, message: 'Estado no reconocido. Usa: activos, inactivos, stock_bajo' }
   })
 
-  // 🧠 NUEVA ACCIÓN: Buscar proveedor de un producto
+  // �x�� NUEVA ACCI�N: Buscar proveedor de un producto
   uiContext.registerAction('buscarProveedorDeProducto', ({ nombreProducto }) => {
     if (!nombreProducto) {
       return { success: false, message: 'Dime el nombre del producto para buscar su proveedor' }
@@ -3480,7 +2991,7 @@ const updateScreenContextForAI = () => {
       return { 
         success: false, 
         message: `No encontré el producto "${nombreProducto}"`,
-        productosDisponibles: displayProducts.value.slice(0, 10).map(p => p.name)
+        productosDisponibles: products.value.slice(0, 10).map(p => p.name)
       }
     }
     
@@ -3511,18 +3022,54 @@ const updateScreenContextForAI = () => {
   })
 
   uiContext.registerAction('abrirCrearProducto', async () => {
+    // �x� VALIDACI�N: Verificar si hay categorías antes de intentar abrir
+    if (!categories.value || categories.value.length === 0) {
+      showNoCategoriesModal.value = true
+      return { 
+        success: false, 
+        code: 'SIN_CATEGORIAS',
+        message: 'No hay categorías disponibles. Antes de crear productos, necesitas tener al menos una categoría. ¿Cómo quieres que se llame tu primera categoría?',
+        totalCategorias: 0
+      }
+    }
+    
     await openCreateModal()
+    
+    // Verificar si realmente se abrió el modal de crear producto
+    if (!showProductModal.value) {
+      return { 
+        success: false, 
+        message: 'No se pudo abrir el formulario de crear producto.' 
+      }
+    }
+    
     return { 
       success: true, 
       message: isFashionStore.value 
         ? 'Modal de nuevo producto de moda abierto. ¿Cómo se llama el producto?' 
-        : 'Modal de nuevo producto abierto. ¿Cómo se llama el producto?'
+        : 'Modal de nuevo producto abierto. ¿Cómo se llama el producto?',
+      totalCategorias: categories.value.length
+    }
+  })
+
+  // �x� Acción para recargar categorías (usada cuando la IA crea una categoría rápida)
+  uiContext.registerAction('recargarCategorias', async () => {
+    try {
+      await loadCategories()
+      return { 
+        success: true, 
+        message: `Categorías recargadas. Ahora tienes ${categories.value.length} categorías.`,
+        totalCategorias: categories.value.length
+      }
+    } catch (err) {
+      console.error('Error recargando categorías:', err)
+      return { success: false, message: 'Error al recargar categorías' }
     }
   })
 
   uiContext.registerAction('seleccionarProducto', async (params) => {
     if (params?.id) {
-      const producto = displayProducts.value.find(p => p.id === params.id)
+      const producto = products.value.find(p => p.id === params.id)
       if (producto) {
         selectedProduct.value = producto
         showViewModal.value = true
@@ -3549,7 +3096,7 @@ const updateScreenContextForAI = () => {
     return { success: false, message: 'Primero selecciona un producto' }
   })
 
-  // 🔧 NUEVA ACCIÓN: Editar campo específico y guardar automáticamente
+  // �x� NUEVA ACCI�N: Editar campo específico y guardar automáticamente
   uiContext.registerAction('editarCampoProducto', async (params) => {
     const { nombreProducto, campo, nuevoValor } = params || {}
     
@@ -3557,7 +3104,7 @@ const updateScreenContextForAI = () => {
       return { success: false, message: 'Necesito saber qué campo cambiar y el nuevo valor' }
     }
     
-    // 🧠 INTELIGENCIA: Si no se especifica producto, usar el que está en contexto (filtrado único)
+    // �x�� INTELIGENCIA: Si no se especifica producto, usar el que está en contexto (filtrado único)
     let producto = null
     
     if (nombreProducto) {
@@ -3591,7 +3138,7 @@ const updateScreenContextForAI = () => {
       
       const campoAPI = campoMap[campo] || campo
       
-      // 🔧 IMPORTANTE: Obtener datos completos del producto primero
+      // �x� IMPORTANTE: Obtener datos completos del producto primero
       const productoCompleto = await productsService.getById(producto.id)
       
       if (!productoCompleto.success || !productoCompleto.data) {
@@ -3626,7 +3173,7 @@ const updateScreenContextForAI = () => {
         // Refrescar la lista de productos
         await loadProducts()
         
-        // ⚠️ NO limpiar searchTerm - mantener el producto filtrado para ediciones consecutivas
+        // �a�️ NO limpiar searchTerm - mantener el producto filtrado para ediciones consecutivas
         // searchTerm.value = ''  // REMOVIDO: Esto causaba que el contexto se perdiera
         
         // Cerrar cualquier modal abierto
@@ -3644,7 +3191,7 @@ const updateScreenContextForAI = () => {
         
         return { 
           success: true, 
-          message: `✅ Listo! Actualicé el ${campoLabels[campo] || campo} de "${producto.name}" a ${nuevoValor}. Puedes verificarlo en la lista.`
+          message: `�S& Listo! Actualicé el ${campoLabels[campo] || campo} de "${producto.name}" a ${nuevoValor}. Puedes verificarlo en la lista.`
         }
       } else {
         return { success: false, message: `Error al actualizar: ${response.message || 'Error desconocido'}` }
@@ -3658,9 +3205,9 @@ const updateScreenContextForAI = () => {
   // Actualizar el store de contexto
   uiContext.setScreenData(contextData)
 
-  // ═══════════════════════════════════════════════════════════════
-  // 🧠 ACCIONES PARA CREAR PRODUCTOS - CONCIENCIA DE PANTALLA
-  // ═══════════════════════════════════════════════════════════════
+  // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
+  // �x�� ACCIONES PARA CREAR PRODUCTOS - CONCIENCIA DE PANTALLA
+  // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
   
   // Acción para llenar campos del formulario visualmente
   uiContext.registerAction('llenarCampoProducto', ({ campo, valor }) => {
@@ -3729,14 +3276,43 @@ const updateScreenContextForAI = () => {
     
     // Convertir valores numéricos
     if (['price', 'cost', 'stock', 'min_stock', 'max_stock'].includes(campoReal)) {
-      productForm.value[campoReal] = parseFloat(valor) || 0
+      const valorNumerico = parseFloat(valor) || 0
+      productForm.value[campoReal] = valorNumerico
+      
+      // SMART STOCK: Si se asigna stock y hay múltiples bodegas,
+      // auto-habilitar la bodega principal y asignar el stock ahí
+      if (campoReal === 'stock' && valorNumerico > 0 && availableWarehouses.value.length >= 2) {
+        const defaultWarehouse = availableWarehouses.value.find(w => w.is_default) || availableWarehouses.value[0]
+        if (defaultWarehouse) {
+          productForm.value.warehouseEnabled[defaultWarehouse.id] = true
+          productForm.value.warehouseStock[defaultWarehouse.id] = valorNumerico
+        }
+      }
+      
+      // Si hay solo 1 bodega, sincronizar también con warehouseStock
+      if (campoReal === 'stock' && valorNumerico > 0 && availableWarehouses.value.length === 1) {
+        const warehouse = availableWarehouses.value[0]
+        if (warehouse) {
+          productForm.value.warehouseEnabled[warehouse.id] = true
+          productForm.value.warehouseStock[warehouse.id] = valorNumerico
+        }
+      }
     } else {
       productForm.value[campoReal] = valor
     }
     
+    // Mensaje contextual según asignación de stock a sede
+    let mensajeExtra = ''
+    if (campoReal === 'stock' && (parseFloat(valor) || 0) > 0 && availableWarehouses.value.length >= 2) {
+      const sedeAsignada = availableWarehouses.value.find(w => w.is_default) || availableWarehouses.value[0]
+      if (sedeAsignada) {
+        mensajeExtra = ` (asignado a sede "${sedeAsignada.name}")`
+      }
+    }
+    
     return { 
       success: true, 
-      message: `Campo "${campo}" actualizado a "${valor}"`,
+      message: `Campo "${campo}" actualizado a "${valor}"${mensajeExtra}`,
       formularioActual: {
         nombre: productForm.value.name || '(vacío)',
         precio: productForm.value.price || '(vacío)',
@@ -3784,6 +3360,84 @@ const updateScreenContextForAI = () => {
     return { success: true, message: 'Modal cerrado' }
   })
   
+  // �x� Acción para cerrar el modal de advertencia de "sin categorías"
+  uiContext.registerAction('cerrarModalAdvertencia', () => {
+    showNoCategoriesModal.value = false
+    return { success: true, message: 'Modal de advertencia cerrado' }
+  })
+  
+  // �x� Acción para abrir el modal de crear categoría (desde la advertencia)
+  uiContext.registerAction('abrirModalCrearCategoria', () => {
+    // Cerrar modal de advertencia si está abierto
+    showNoCategoriesModal.value = false
+    // Abrir modal de crear categoría
+    categoryForm.value = {
+      name: '',
+      description: '',
+      icon: 'shopping-bag',
+      color: '#3b82f6'
+    }
+    showCategoryModal.value = true
+    return { 
+      success: true, 
+      message: 'Modal de crear categoría abierto. Escribe el nombre de la categoría.',
+      modalAbierto: 'crear-categoria'
+    }
+  })
+  
+  // �x� Acción para llenar el nombre de la categoría en el modal
+  uiContext.registerAction('llenarNombreCategoria', ({ nombre }) => {
+    if (!nombre?.trim()) {
+      return { success: false, message: 'Proporciona un nombre para la categoría' }
+    }
+    categoryForm.value.name = nombre.trim()
+    return { 
+      success: true, 
+      message: `Nombre "${nombre}" asignado. ¿Quieres guardar la categoría?`,
+      nombreAsignado: nombre.trim()
+    }
+  })
+  
+  // �x� Acción para guardar la categoría desde el modal y luego abrir crear producto
+  uiContext.registerAction('guardarCategoriaYAbrirProducto', async () => {
+    try {
+      if (!categoryForm.value.name?.trim()) {
+        return { success: false, message: 'El nombre de la categoría está vacío' }
+      }
+      
+      const response = await categoriesService.create(categoryForm.value)
+      
+      if (response.success || response.data) {
+        // Recargar categorías
+        await loadCategories()
+        
+        // Cerrar modal de categoría
+        showCategoryModal.value = false
+        
+        // Obtener el ID de la nueva categoría
+        const nuevaCat = categories.value.find(c => c.name.toLowerCase() === categoryForm.value.name.toLowerCase().trim())
+        
+        // Ahora abrir el modal de crear producto
+        await openCreateModal()
+        
+        // Pre-seleccionar la categoría recién creada
+        if (nuevaCat) {
+          productForm.value.category_id = nuevaCat.id
+        }
+        
+        return { 
+          success: true, 
+          message: `¡Categoría "${categoryForm.value.name}" creada! Ahora el formulario de producto está abierto. ¿Cómo se llama el producto?`,
+          categoriaCreada: categoryForm.value.name,
+          modalProductoAbierto: true
+        }
+      }
+      return { success: false, message: 'Error al crear la categoría' }
+    } catch (error) {
+      return { success: false, message: `Error: ${error.message}` }
+    }
+  })
+  
   // Acción para crear categoría rápida
   uiContext.registerAction('crearCategoriaRapida', async ({ nombre }) => {
     if (!nombre?.trim()) {
@@ -3820,7 +3474,7 @@ const updateScreenContextForAI = () => {
 }
 
 // Watcher para actualizar contexto cuando cambian los productos o filtros
-watch([displayProducts, searchTerm, categoryFilter, statusFilter, selectedProduct, showProductModal, productForm], () => {
+watch([products, searchTerm, categoryFilter, statusFilter, selectedProduct, showProductModal, productForm], () => {
   updateScreenContextForAI()
 }, { deep: true })
 
@@ -3829,12 +3483,12 @@ const formatCurrency = (value) => {
   return new Intl.NumberFormat('es-CO').format(parseFloat(value || 0))
 }
 
-// 🔢 Formatear número simple (para stock)
+// �x� Formatear número simple (para stock)
 const formatNumber = (value) => {
   return new Intl.NumberFormat('es-CO').format(parseInt(value || 0))
 }
 
-// 💵 Formatear número para inputs (con separadores)
+// �x� Formatear número para inputs (con separadores)
 const formatInputNumber = (value) => {
   const num = parseFloat(value || 0)
   if (isNaN(num)) return '0'
@@ -3844,7 +3498,7 @@ const formatInputNumber = (value) => {
   }).format(num)
 }
 
-// 🎯 Handler para input de costo con formato
+// �x}� Handler para input de costo con formato
 const handleCostInput = (event, variant) => {
   const rawValue = event.target.value.replace(/\./g, '').replace(/,/g, '.')
   const numValue = parseFloat(rawValue) || 0
@@ -3852,7 +3506,7 @@ const handleCostInput = (event, variant) => {
   markVariantChanged(variant.id)
 }
 
-// 🎯 Handler para input de precio con formato
+// �x}� Handler para input de precio con formato
 const handlePriceInput = (event, variant) => {
   const rawValue = event.target.value.replace(/\./g, '').replace(/,/g, '.')
   const numValue = parseFloat(rawValue) || 0
@@ -3860,7 +3514,7 @@ const handlePriceInput = (event, variant) => {
   markVariantChanged(variant.id)
 }
 
-// 🏷️ Formatear opciones de variante para mostrar
+// �x��️ Formatear opciones de variante para mostrar
 const formatVariantOptions = (optionsSummary) => {
   try {
     const options = typeof optionsSummary === 'string' 
@@ -3875,10 +3529,10 @@ const formatVariantOptions = (optionsSummary) => {
   }
 }
 
-// 🖼️ Índice de imagen seleccionada para galería
+// �x�️ Índice de imagen seleccionada para galería
 const selectedImageIndex = ref(0)
 
-// 📸 Helper: Convertir URL de imagen a URL completa del backend
+// �x� Helper: Convertir URL de imagen a URL completa del backend
 const processImageUrl = (url) => {
   if (!url || typeof url !== 'string' || !url.trim()) return null
   
@@ -3911,7 +3565,7 @@ const processImageUrl = (url) => {
   return `${backendUrl}${trimmedUrl}`
 }
 
-// 📸 Computed: Lista de imágenes del producto seleccionado
+// �x� Computed: Lista de imágenes del producto seleccionado
 const selectedProductImages = computed(() => {
   if (!selectedProduct.value) return []
   
@@ -3940,7 +3594,7 @@ const selectedProductImages = computed(() => {
   return images
 })
 
-// 📸 Computed: Imagen principal seleccionada
+// �x� Computed: Imagen principal seleccionada
 const selectedProductMainImage = computed(() => {
   const images = selectedProductImages.value
   const index = selectedImageIndex.value
@@ -3951,29 +3605,29 @@ const selectedProductMainImage = computed(() => {
   return images[index] || images[0]
 })
 
-// 👗 Helpers para productos con variantes (FASHION)
+// �x Helpers para productos con variantes (FASHION)
 const hasVariants = (product) => {
   return product.variants && product.variants.length > 0
 }
 
-// 🎯 Determinar si debe mostrar el modal de Fashion (independiente de si tiene variantes)
+// �x}� Determinar si debe mostrar el modal de Fashion (independiente de si tiene variantes)
 const isFashionProduct = (product) => {
-  // ✅ PRIORIDAD 1: Campo store_type explícito (nueva lógica)
+  // �S& PRIORIDAD 1: Campo store_type explícito (nueva lógica)
   if (product.store_type) {
     return product.store_type === 'fashion'
   }
   
-  // ✅ PRIORIDAD 2: Campo legacy store_category
+  // �S& PRIORIDAD 2: Campo legacy store_category
   if (product.store_category) {
     return product.store_category === 'fashion'
   }
   
-  // ✅ PRIORIDAD 3: Detectar por product_type 'variable' (productos con variantes = fashion)
+  // �S& PRIORIDAD 3: Detectar por product_type 'variable' (productos con variantes = fashion)
   if (product.product_type === 'variable') {
     return true
   }
   
-  // ✅ PRIORIDAD 4: Fallback - si tiene variantes reales, es fashion
+  // �S& PRIORIDAD 4: Fallback - si tiene variantes reales, es fashion
   return hasVariants(product)
 }
 
@@ -4063,7 +3717,7 @@ const loadProducts = async () => {
     
     // Preparar parámetros de consulta
     const params = {
-      _t: Date.now() // ✅ Cache busting para forzar recarga real
+      _t: Date.now() // �S& Cache busting para forzar recarga real
     }
     
     // Determinar el estado a consultar
@@ -4082,26 +3736,11 @@ const loadProducts = async () => {
     
     const response = await productsService.getAll(params)
     
-    console.log('🛍️ [ProductsView] Respuesta completa del endpoint:', response)
-    
     // La API devuelve datos paginados, extraer el array de productos
     if (response.data && response.data.data) {
       products.value = response.data.data || []
     } else {
       products.value = response.data || []
-    }
-    
-    console.log('🛍️ [ProductsView] Productos cargados:', products.value.length)
-    
-    // Verificar el primer producto para ver estructura de imágenes
-    if (products.value.length > 0) {
-      console.log('🛍️ [ProductsView] Primer producto (estructura completa):', products.value[0])
-      console.log('🛍️ [ProductsView] Campos de imagen del primer producto:', {
-        image_url: products.value[0].image_url,
-        image: products.value[0].image,
-        images: products.value[0].images,
-        img: products.value[0].img
-      })
     }
   } catch (error) {
     console.error('Error cargando productos:', error)
@@ -4124,22 +3763,22 @@ const loadCategories = async () => {
   }
 }
 
-// 🏭 Cargar proveedores activos
+// �x�� Cargar proveedores activos (optimizado - endpoint ligero sin analytics)
 const loadSuppliers = async () => {
   try {
-    const response = await apiCall('/suppliers/analytics')
+    // �S& OPTIMIZADO: Usar /suppliers (simple) en lugar de /suppliers/analytics (pesado)
+    const response = await apiCall('/suppliers')
     if (response.success) {
       // Filtrar solo proveedores activos
-      suppliers.value = (response.data.suppliers || []).filter(s => s.active)
-      console.log('✅ Proveedores cargados:', suppliers.value.length)
+      suppliers.value = (response.data || []).filter(s => s.active)
     }
   } catch (error) {
-    console.error('❌ Error cargando proveedores:', error)
+    console.error('�R Error cargando proveedores:', error)
     suppliers.value = []
   }
 }
 
-// 🏢 Computed: Filtrar bodegas según plan del tenant
+// �x�� Computed: Filtrar bodegas según plan del tenant
 const availableWarehouses = computed(() => {
   const plan = appStore.tenantPlan
   const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
@@ -4160,22 +3799,22 @@ const availableWarehouses = computed(() => {
   return defaultWarehouse ? [defaultWarehouse] : warehouses.value.filter(w => w.active).slice(0, 1)
 })
 
-// 🏢 Computed: Determinar si mostrar múltiples columnas de stock
+// �x�� Computed: Determinar si mostrar múltiples columnas de stock
 const showMultipleStockColumns = computed(() => {
   return availableWarehouses.value.length > 1
 })
 
-// 🏢 Helper: Obtener stock de un producto en una bodega específica
+// �x�� Helper: Obtener stock de un producto en una bodega específica
 // Devuelve null si el producto NO existe en esa sede (para mostrar "N/A")
 const getWarehouseStock = (product, warehouseId) => {
   // Si el producto tiene relación con bodegas Y tiene datos, usar esa data
   if (product.warehouses && product.warehouses.length > 0) {
     const warehouse = product.warehouses.find(w => w.id === warehouseId || w.warehouse_id === warehouseId)
     if (warehouse) {
-      // ✅ Producto existe en esta sede
+      // �S& Producto existe en esta sede
       const pivotStock = warehouse.pivot?.stock ?? warehouse.stock ?? 0
       
-      // 🔧 FALLBACK CRÍTICO: Si pivot.stock es 0 pero current_stock tiene valor,
+      // �x� FALLBACK CRÍTICO: Si pivot.stock es 0 pero current_stock tiene valor,
       // significa que la tabla product_warehouse no está sincronizada.
       // En sistemas de bodega única (solo 1 warehouse), usar current_stock.
       if (pivotStock === 0 && product.current_stock > 0) {
@@ -4197,18 +3836,18 @@ const getWarehouseStock = (product, warehouseId) => {
     return product.current_stock || 0
   }
   
-  return null  // ❌ Producto NO existe en esta sede
+  return null  // �R Producto NO existe en esta sede
 }
 
-// 🏢 Helper: Obtener stock total de un producto
+// �x�� Helper: Obtener stock total de un producto
 const getTotalStock = (product) => {
-  // ✅ SIEMPRE usar current_stock como fuente de verdad
+  // �S& SIEMPRE usar current_stock como fuente de verdad
   // Este campo se actualiza automáticamente en el backend cuando se ajusta stock
   // en cualquier bodega (ver Product::updateStock y Product::updateStockInWarehouse)
   return product.current_stock || 0
 }
 
-// 🏢 Cargar bodegas disponibles
+// �x�� Cargar bodegas disponibles
 const loadWarehouses = async () => {
   try {
     loadingWarehouses.value = true
@@ -4221,9 +3860,6 @@ const loadWarehouses = async () => {
       // Fallback por si la API cambia o devuelve array directo
       warehouses.value = Array.isArray(data) ? data : []
     }
-    
-    console.log('✅ Bodegas cargadas:', warehouses.value.length)
-    console.log('📦 Detalle de bodegas:', warehouses.value)
     
     // Seleccionar automáticamente la bodega predeterminada
     const defaultWarehouse = warehouses.value.find(w => w.is_default)
@@ -4242,7 +3878,7 @@ const loadWarehouses = async () => {
   }
 }
 
-// 🏭 Mostrar tooltip de stock por bodega
+// �x�� Mostrar tooltip de stock por bodega
 const showStockTooltip = (event, product) => {
   if (product.warehouses && product.warehouses.length > 0) {
     stockTooltip.value.visible = true
@@ -4255,7 +3891,7 @@ const showStockTooltip = (event, product) => {
   }
 }
 
-// 🏭 Ocultar tooltip de stock por bodega
+// �x�� Ocultar tooltip de stock por bodega
 const hideStockTooltip = () => {
   stockTooltip.value.visible = false
   stockTooltip.value.productId = null
@@ -4268,7 +3904,7 @@ const refreshProducts = async () => {
   await loadProducts()
 }
 
-// 📏 Helper: Obtener abreviación de unidad de medida
+// �x� Helper: Obtener abreviación de unidad de medida
 const getUnitAbbreviation = (unit) => {
   const units = {
     unit: 'und',
@@ -4282,7 +3918,33 @@ const getUnitAbbreviation = (unit) => {
   return units[unit] || 'und'
 }
 
-// 🔢 Auto-actualizar allow_decimal según la unidad seleccionada
+const getUnitLabel = (unit) => {
+  const labels = {
+    unit: 'por unidad',
+    kg: 'por kg',
+    g: 'por gramo',
+    m: 'por metro',
+    cm: 'por cm',
+    l: 'por litro',
+    ml: 'por ml'
+  }
+  return labels[unit] || 'por unidad'
+}
+
+const getUnitPlaceholder = (unit) => {
+  const examples = {
+    unit: 'Ej: $15.000 por unidad',
+    kg: 'Ej: $5.000 por kg',
+    g: 'Ej: $50 por gramo',
+    m: 'Ej: $3.000 por metro',
+    cm: 'Ej: $200 por cm',
+    l: 'Ej: $4.500 por litro',
+    ml: 'Ej: $100 por ml'
+  }
+  return examples[unit] || 'Ej: $15.000 por unidad'
+}
+
+// �x� Auto-actualizar allow_decimal según la unidad seleccionada
 const updateAllowDecimal = () => {
   const decimalUnits = ['kg', 'g', 'm', 'cm', 'l', 'ml']
   productForm.value.allow_decimal = decimalUnits.includes(productForm.value.measurement_unit)
@@ -4292,12 +3954,11 @@ const openCreateModal = async () => {
   // Limpiar producto seleccionado (importante para que el watcher en FashionProductForm no cargue datos)
   selectedProduct.value = null
   
-  // 👗 Restaurar el modo según la configuración del SISTEMA (no del producto anterior editado)
+  // �x Restaurar el modo según la configuración del SISTEMA (no del producto anterior editado)
   const storeType = appStore.systemSettings?.store_type
   isFashionMode.value = storeType === 'fashion' || storeType === 'moda'
-  console.log('🏪 [openCreateModal] Modo restaurado según config del sistema:', isFashionMode.value ? 'FASHION' : 'GENERAL')
   
-  // VALIDACIÓN: Verificar si existen categorías primero
+  // VALIDACI�N: Verificar si existen categorías primero
   if (!categories.value || categories.value.length === 0) {
     showNotification(
       'Sin categorías',
@@ -4310,7 +3971,7 @@ const openCreateModal = async () => {
   
   isEditing.value = false
   
-  // 🏪 El modo fashion ya fue detectado en onMounted, no necesitamos volver a detectarlo
+  // �x�� El modo fashion ya fue detectado en onMounted, no necesitamos volver a detectarlo
   
   // Cargar bodegas antes de abrir el modal
   await loadWarehouses()
@@ -4322,11 +3983,6 @@ const openCreateModal = async () => {
     warehouseStock[warehouse.id] = 0
     warehouseEnabled[warehouse.id] = false // Por defecto no está habilitada ninguna sede
   })
-  console.log('🏭 Inicializando formulario nuevo producto')
-  console.log('📦 Warehouses totales:', warehouses.value.length)
-  console.log('✅ Warehouses disponibles según plan:', availableWarehouses.value.length)
-  console.log('🔢 warehouseStock inicializado:', warehouseStock)
-  console.log('✅ warehouseEnabled inicializado:', warehouseEnabled)
   
   productForm.value = {
     name: '',
@@ -4344,15 +4000,14 @@ const openCreateModal = async () => {
     warehouseEnabled: warehouseEnabled,
     image: '',
     active: true,
-    measurement_unit: 'unit', // 📏 Unidad de medida por defecto
-    allow_decimal: false // 🔢 No permite decimales por defecto
+    measurement_unit: 'unit', // �x� Unidad de medida por defecto
+    allow_decimal: false // �x� No permite decimales por defecto
   }
   
-  // ✅ Si solo hay 1 bodega disponible, sincronizar stock inicial (0)
+  // �S& Si solo hay 1 bodega disponible, sincronizar stock inicial (0)
   if (availableWarehouses.value.length === 1) {
     const warehouseId = availableWarehouses.value[0].id
     productForm.value.warehouseStock[warehouseId] = 0
-    console.log('✅ Sincronización inicial para bodega única:', warehouseId, '= 0')
   }
   
   // Limpiar estado de imágenes
@@ -4368,8 +4023,7 @@ const editProduct = async (product) => {
   showViewModal.value = false
   
   try {
-    // 🔥 SIEMPRE obtener datos completos del producto desde el API
-    console.log('🔍 [editProduct] Obteniendo producto completo desde API:', product.id)
+    // �x� SIEMPRE obtener datos completos del producto desde el API
     const response = await productsService.getById(product.id)
     
     if (!response.success || !response.data) {
@@ -4378,20 +4032,8 @@ const editProduct = async (product) => {
     
     // Usar el producto completo del API
     product = response.data
-    console.log('✅ [editProduct] Producto completo obtenido:', product)
-    console.log('🔍 [editProduct] PROPIEDADES DE IMAGEN DEL PRODUCTO:', {
-      tiene_image_url: 'image_url' in product,
-      tiene_image: 'image' in product,
-      tiene_images: 'images' in product,
-      image_url_valor: product.image_url,
-      image_valor: product.image,
-      images_valor: product.images,
-      images_length: product.images?.length,
-      primera_imagen: product.images?.[0],
-      todas_las_keys: Object.keys(product).filter(k => k.toLowerCase().includes('image'))
-    })
   } catch (error) {
-    console.error('❌ Error obteniendo producto:', error)
+    console.error('�R Error obteniendo producto:', error)
     showNotification(
       'Error',
       'No se pudieron cargar los datos del producto',
@@ -4400,9 +4042,8 @@ const editProduct = async (product) => {
     return
   }
   
-  // 👗 INTELIGENTE: Detectar si el producto es de moda basándose en el PRODUCTO, no en la configuración del sistema
+  // �x INTELIGENTE: Detectar si el producto es de moda basándose en el PRODUCTO, no en la configuración del sistema
   const productIsFashion = isFashionProduct(product)
-  console.log('🎯 [editProduct] Tipo detectado del producto:', productIsFashion ? 'FASHION' : 'GENERAL')
   
   // Temporalmente establecer isFashionMode según el producto (no la config del sistema)
   isFashionMode.value = productIsFashion
@@ -4426,22 +4067,12 @@ const editProduct = async (product) => {
     warehouseEnabled[warehouse.id] = false // Por defecto no está habilitada
   })
   
-  console.log('🔍 [editProduct] Producto recibido:', {
-    id: product.id,
-    name: product.name,
-    product_type: product.product_type,
-    warehouses: product.warehouses,
-    variants: product.variants?.length || 0
-  })
-  
-  // 🎯 Detectar si es producto SIMPLE o VARIABLE
+  // �x}� Detectar si es producto SIMPLE o VARIABLE
   const isSimpleProduct = !product.product_type || product.product_type === 'simple'
   const hasVariants = product.variants && product.variants.length > 0 && product.product_type === 'variable'
   
-  console.log('🔍 [editProduct] Tipo de producto:', isSimpleProduct ? 'SIMPLE (stock por bodega)' : 'VARIABLE (stock en variantes)')
-  
-  // 🔥 CARGAR STOCK DESDE product.current_stock (SOLO para productos SIMPLES)
-  // ✅ Usar current_stock como fuente única de verdad
+  // �x� CARGAR STOCK DESDE product.current_stock (SOLO para productos SIMPLES)
+  // �S& Usar current_stock como fuente única de verdad
   if (isSimpleProduct) {
     const totalStock = parseInt(product.current_stock || 0) || 0
     
@@ -4450,7 +4081,6 @@ const editProduct = async (product) => {
       const warehouseId = warehouses.value[0].id
       warehouseStock[warehouseId] = totalStock
       warehouseEnabled[warehouseId] = true
-      console.log(`✅ Bodega única (${warehouseId}): Stock ${totalStock} desde current_stock`)
     } 
     // Si hay múltiples bodegas, intentar leer desde product.warehouses
     else if (product.warehouses && Array.isArray(product.warehouses)) {
@@ -4471,7 +4101,6 @@ const editProduct = async (product) => {
         warehouseStock[warehouseId] = stock
         if (stock > 0) {
           warehouseEnabled[warehouseId] = true
-          console.log(`✅ Tienda ${warehouseId} con stock ${stock}`)
         }
       })
     }
@@ -4483,16 +4112,12 @@ const editProduct = async (product) => {
     if (parsedStock > 0) {
       warehouseStock[product.warehouse_id] = parsedStock
       warehouseEnabled[product.warehouse_id] = true
-      console.log(`✅ Fallback: Tienda ${product.warehouse_id} con stock ${parsedStock}`)
     }
   }
   
-  console.log('📦 [editProduct] warehouseStock final:', JSON.parse(JSON.stringify(warehouseStock)))
-  console.log('✅ [editProduct] warehouseEnabled final:', JSON.parse(JSON.stringify(warehouseEnabled)))
-  
   isEditing.value = true
   
-  // 🏢 Si hay solo 1 bodega, obtener el stock de esa bodega para el campo "Stock Inicial"
+  // �x�� Si hay solo 1 bodega, obtener el stock de esa bodega para el campo "Stock Inicial"
   let singleWarehouseStock = parseInt(product.current_stock || product.stock || 0)
   if (warehouses.value.length === 1 && warehouses.value[0]) {
     const warehouseId = warehouses.value[0].id
@@ -4514,20 +4139,20 @@ const editProduct = async (product) => {
     min_stock: parseInt(product.min_stock || 5),
     max_stock: parseInt(product.max_stock || 100),
     category_id: product.category_id,
-    supplier_id: product.supplier_id || null, // 🏭 Cargar proveedor
+    supplier_id: product.supplier_id || null, // �x�� Cargar proveedor
     warehouseStock: warehouseStock,
     warehouseEnabled: warehouseEnabled,
     image: '', // Dejar vacío inicialmente
     active: getProductStatus(product) !== false,
-    measurement_unit: product.measurement_unit || 'unit', // 📏 Cargar unidad de medida
-    allow_decimal: product.allow_decimal || false // 🔢 Cargar si permite decimales
+    measurement_unit: product.measurement_unit || 'unit', // �x� Cargar unidad de medida
+    allow_decimal: product.allow_decimal || false // �x� Cargar si permite decimales
   }
   
   // Configurar estado de imágenes para edición
   previewImage.value = null
   imageLoadError.value = false
   
-  // 🖼️ Guardar imagen actual del producto
+  // �x�️ Guardar imagen actual del producto
   // Buscar en: 1) image_url directo, 2) image, 3) array images[0]
   let productImageUrl = product.image_url || product.image || ''
   
@@ -4536,48 +4161,18 @@ const editProduct = async (product) => {
     const firstImage = product.images[0]
     // La imagen puede estar en .image_url o .url dependiendo de la estructura
     productImageUrl = firstImage?.image_url || firstImage?.url || firstImage || ''
-    console.log('🖼️ [editProduct] Imagen encontrada en array images:', productImageUrl)
   }
-  
-  console.log('🖼️ [editProduct] DEBUG Imagen DETALLADO:', {
-    productId: product.id,
-    productName: product.name,
-    'image_url (valor)': product.image_url,
-    'image_url (tipo)': typeof product.image_url,
-    'images (array)': product.images,
-    'images.length': product.images?.length,
-    'primera_imagen_objeto': product.images?.[0],
-    productImageUrl,
-    'productImageUrl (longitud)': productImageUrl?.length,
-    hasImageUrl: !!productImageUrl
-  })
   
   if (productImageUrl && typeof productImageUrl === 'string' && productImageUrl.trim().length > 0) {
     // Verificar si es una URL válida (empieza con http o /storage)
     if (productImageUrl.startsWith('http') || productImageUrl.startsWith('/storage') || productImageUrl.startsWith('storage/')) {
       currentProductImage.value = productImageUrl
-      console.log('✅ [editProduct] Imagen actual cargada:', productImageUrl)
     } else {
-      console.warn('⚠️ [editProduct] URL de imagen no válida:', productImageUrl)
       currentProductImage.value = null
     }
   } else {
-    console.log('ℹ️ [editProduct] Producto sin imagen válida', {
-      productImageUrl,
-      tipo: typeof productImageUrl,
-      esVacio: productImageUrl === '',
-      esNull: productImageUrl === null,
-      esUndefined: productImageUrl === undefined
-    })
     currentProductImage.value = null
   }
-  
-  console.log('🔍 [editProduct] Estado final:', {
-    isEditing: true,
-    currentProductImage: currentProductImage.value,
-    previewImage: previewImage.value,
-    productFormImage: productForm.value.image
-  })
   
   // Por defecto, modo URL
   imageUploadMethod.value = 'url'
@@ -4588,30 +4183,13 @@ const editProduct = async (product) => {
 const viewProduct = async (product) => {
   selectedProduct.value = product
   variantChanges.value = {} // Limpiar cambios previos
-  selectedImageIndex.value = 0 // 🖼️ Reset índice de imagen
-  
-  console.log('👁️ [viewProduct] Abriendo modal para producto:', {
-    id: product.id,
-    name: product.name,
-    store_type: product.store_type,
-    product_type: product.product_type,
-    hasVariants: hasVariants(product),
-    isFashion: isFashionProduct(product)
-  })
+  selectedImageIndex.value = 0 // �x�️ Reset índice de imagen
   
   // Fetch full details including variants
   try {
     const response = await productsService.getById(product.id)
     if (response.success) {
       selectedProduct.value = response.data
-      
-      console.log('📦 DEBUG viewProduct:', {
-        id: selectedProduct.value.id,
-        name: selectedProduct.value.name,
-        store_category: selectedProduct.value.store_category,
-        store_type: selectedProduct.value.store_type,
-        product_type: selectedProduct.value.product_type
-      })
       
       // Inicializar campos editables para cada variante (solo si es producto fashion)
       if (isFashionProduct(selectedProduct.value) && selectedProduct.value.variants) {
@@ -4622,7 +4200,7 @@ const viewProduct = async (product) => {
         })
       }
       
-      // 🎯 Mostrar el modal apropiado
+      // �x}� Mostrar el modal apropiado
       showViewModal.value = true
     }
   } catch (error) {
@@ -4631,7 +4209,7 @@ const viewProduct = async (product) => {
   }
 }
 
-// 📝 Funciones de Edición en Línea (Excel-Style)
+// �x� Funciones de Edición en Línea (Excel-Style)
 const markVariantChanged = (variantId) => {
   if (!variantChanges.value[variantId]) {
     variantChanges.value[variantId] = {}
@@ -4680,7 +4258,7 @@ const saveInventoryChanges = async () => {
     }
     
     showNotification(
-      '✅ Cambios Guardados', 
+      '�S& Cambios Guardados', 
       `Se actualizaron ${changedVariants.length} variante(s) correctamente`, 
       'success'
     )
@@ -4722,7 +4300,7 @@ const saveInventoryChanges = async () => {
   }
 }
 
-// 🔔 Sistema de notificaciones elegantes
+// �x Sistema de notificaciones elegantes
 const showNotification = (title, message = '', type = 'info', duration = 5000) => {
   const notification = {
     id: ++notificationId,
@@ -4746,7 +4324,7 @@ const removeNotification = (id) => {
   }
 }
 
-// 🔄 Función para habilitar/deshabilitar productos
+// �x Función para habilitar/deshabilitar productos
 // Estado para confirmación de cambio de estado
 const showStatusConfirmModal = ref(false)
 const showCategoryInactiveModal = ref(false)
@@ -4756,18 +4334,9 @@ const toggleProductStatus = async (product) => {
   const currentStatus = getProductStatus(product)
   const newStatus = currentStatus !== false ? false : true
   
-  console.log('toggleProductStatus called:', {
-    product: product.name,
-    currentStatus,
-    newStatus,
-    categoryId: product.category_id,
-    categoriesLoaded: categories.value.length
-  })
-  
   // Si se intenta activar un producto, verificar que la categoría esté activa
   if (newStatus === true) {
     const productCategory = categories.value.find(c => c.id === product.category_id)
-    console.log('Category found:', productCategory)
     
     if (!productCategory) {
       showNotification(
@@ -4779,7 +4348,6 @@ const toggleProductStatus = async (product) => {
     }
     
     if (!productCategory.active) {
-      console.log('Category is inactive, showing modal')
       // Mostrar modal para activar categoría primero
       pendingStatusChange.value = {
         product,
@@ -4808,12 +4376,12 @@ const confirmStatusChange = async () => {
     
     const { product, newStatus } = pendingStatusChange.value
     
-    // ✅ SOLO enviar campos necesarios (NO todo el objeto)
+    // �S& SOLO enviar campos necesarios (NO todo el objeto)
     await productsService.update(product.id, { 
       active: newStatus 
     })
     
-    // 🔄 RECARGAR DESDE BASE DE DATOS (Sin lógica local)
+    // �x RECARGAR DESDE BASE DE DATOS (Sin lógica local)
     await loadProducts()
     
     showNotification(
@@ -4831,6 +4399,49 @@ const confirmStatusChange = async () => {
   } finally {
     loading.value = false
     pendingStatusChange.value = null
+  }
+}
+
+// Eliminar producto (soft delete)
+const showDeleteConfirmModal = ref(false)
+const pendingDelete = ref(null)
+const deletingProduct = ref(false)
+const deleteReason = ref('')
+
+const deleteProduct = (product) => {
+  pendingDelete.value = product
+  deleteReason.value = ''
+  showDeleteConfirmModal.value = true
+}
+
+const confirmDeleteProduct = async () => {
+  if (!pendingDelete.value) return
+  
+  try {
+    deletingProduct.value = true
+    const productName = pendingDelete.value.name
+    
+    await productsService.delete(pendingDelete.value.id, deleteReason.value || null)
+    
+    showDeleteConfirmModal.value = false
+    
+    await loadProducts()
+    
+    showNotification(
+      'Producto eliminado',
+      `"${productName}" ha sido movido a la papelera. Puedes restaurarlo desde Configuración.`,
+      'success'
+    )
+  } catch (error) {
+    showNotification(
+      'Error al eliminar',
+      'No se pudo eliminar el producto: ' + (error.message || 'Error desconocido'),
+      'error'
+    )
+  } finally {
+    deletingProduct.value = false
+    pendingDelete.value = null
+    deleteReason.value = ''
   }
 }
 
@@ -4947,7 +4558,7 @@ const handleFileUpload = (event) => {
     return
   }
   
-  // ✅ Guardar el archivo para enviarlo al backend
+  // �S& Guardar el archivo para enviarlo al backend
   productForm.value.imageFile = file
   
   // Crear preview
@@ -4963,19 +4574,18 @@ const handleFileUpload = (event) => {
 const clearImageUpload = () => {
   previewImage.value = null
   productForm.value.image = ''
-  productForm.value.imageFile = null // ✅ Limpiar también el archivo
+  productForm.value.imageFile = null // �S& Limpiar también el archivo
   // Limpiar el input file
   const fileInput = document.querySelector('input[type="file"]')
   if (fileInput) fileInput.value = ''
 }
 
-// 🔄 Cambiar método de imagen (URL/Archivo) - Limpia la imagen actual
+// �x Cambiar método de imagen (URL/Archivo) - Limpia la imagen actual
 const changeImageMethod = (method) => {
   // Limpiar todo cuando cambiamos de método
   clearImageUpload()
   currentProductImage.value = null // Ocultar imagen actual
   imageUploadMethod.value = method
-  console.log('🔄 [changeImageMethod] Cambiado a:', method)
 }
 
 // Eliminar imagen del producto (físicamente del servidor)
@@ -5182,7 +4792,7 @@ const calculateTotalStock = () => {
   }, 0)
 }
 
-// ⚠️ Validar si faltan datos importantes (especialmente stock)
+// �a�️ Validar si faltan datos importantes (especialmente stock)
 const checkMissingImportantFields = () => {
   const missing = []
   const totalStock = calculateTotalStock()
@@ -5217,7 +4827,7 @@ const checkMissingImportantFields = () => {
   return missing
 }
 
-// 👗 Guardar producto tipo Ropa/Variantes
+// �x Guardar producto tipo Ropa/Variantes
 const saveFashionProduct = async () => {
   // Llamar al método handleSubmit del componente hijo
   if (fashionFormRef.value) {
@@ -5230,12 +4840,9 @@ const handleFashionSave = async (productData) => {
     loading.value = true
     showProductModal.value = false // Cerrar modal inmediatamente
     
-    console.log('👗 Enviando producto fashion al backend:', productData)
-    console.log('💰 Verificando costos:', {
-      'productData.variants': productData.variants,
-      'variant[0].cost': productData.variants?.[0]?.cost,
-      'variant[0].cost_price': productData.variants?.[0]?.cost_price
-    })
+    // �x� CRÍTICO: Detectar si es edición usando el ID del productData (viene del form fashion)
+    const productId = productData.id || selectedProduct.value?.id || null
+    const isEditingFashion = isEditing.value && productId
 
     // Detectar si hay imágenes nuevas (archivos)
     const hasNewImages = productData.images && productData.images.some(img => img.file)
@@ -5263,13 +4870,13 @@ const handleFashionSave = async (productData) => {
       const firstVariant = productData.variants && productData.variants[0]
       formData.append('cost_price', firstVariant?.cost || 0)
       
-      // ✅ AGREGAR sale_price y stock si es producto simple
+      // �S& AGREGAR sale_price y stock si es producto simple
       if (isSimpleProduct && firstVariant) {
         formData.append('sale_price', firstVariant.price || 0)
         formData.append('current_stock', firstVariant.stock || 0)
       }
       
-      // ✅ AGREGAR store_category para recordar que fue creado como moda
+      // �S& AGREGAR store_category para recordar que fue creado como moda
       formData.append('store_category', 'fashion')
       
       // Options
@@ -5303,19 +4910,19 @@ const handleFashionSave = async (productData) => {
         })
       }
 
-      // Images - ✅ Enviar como array para que PHP lo interprete correctamente
+      // Images - �S& Enviar como array para que PHP lo interprete correctamente
       if (productData.images && productData.images.length > 0) {
         productData.images.forEach((img) => {
           if (img.file) {
-            formData.append(`images[]`, img.file) // ✅ Usar images[] en lugar de images[index]
+            formData.append(`images[]`, img.file) // �S& Usar images[] en lugar de images[index]
           }
         })
       }
 
       // Detectar si es edición o creación
-      if (isEditing.value && productForm.value.id) {
+      if (isEditingFashion) {
         formData.append('_method', 'PUT')
-        response = await productsService.update(productForm.value.id, formData)
+        response = await productsService.update(productId, formData)
       } else {
         response = await productsService.create(formData)
       }
@@ -5329,20 +4936,20 @@ const handleFashionSave = async (productData) => {
         description: productData.description || '',
         sku: productData.sku || `SKU-${Date.now()}`,
         cost_price: productData.variants?.[0]?.cost || 0,
-        store_category: 'fashion', // ✅ Recordar que fue creado como moda
+        store_category: 'fashion', // �S& Recordar que fue creado como moda
         options: productData.options || [],
         variants: productData.variants || []
       }
       
-      // ✅ AGREGAR sale_price y stock si es producto simple
+      // �S& AGREGAR sale_price y stock si es producto simple
       if (isSimpleProduct && productData.variants?.[0]) {
         payload.sale_price = productData.variants[0].price || 0
         payload.current_stock = productData.variants[0].stock || 0
       }
       
       // Detectar si es edición o creación
-      if (isEditing.value && productForm.value.id) {
-        response = await productsService.update(productForm.value.id, payload)
+      if (isEditingFashion) {
+        response = await productsService.update(productId, payload)
       } else {
         response = await productsService.create(payload)
       }
@@ -5395,7 +5002,7 @@ const saveProduct = async (skipValidation = false) => {
       throw new Error('El precio de venta debe ser mayor a 0')
     }
     
-    // ⚠️ Validar campos importantes y mostrar confirmación si faltan (solo en creación)
+    // �a�️ Validar campos importantes y mostrar confirmación si faltan (solo en creación)
     if (!skipValidation && !isEditing.value) {
       const missing = checkMissingImportantFields()
       
@@ -5411,27 +5018,31 @@ const saveProduct = async (skipValidation = false) => {
     }
     
     // Calcular stock total
-    const totalStock = calculateTotalStock()
+    let totalStock = calculateTotalStock()
     if (totalStock === undefined || totalStock === null || totalStock < 0) {
       throw new Error('El stock total debe ser un número válido (0 o mayor)')
     }
     
-    // Debug: Verificar estado del stock antes de enviar
-    console.log('📦 Stock en productForm.stock:', productForm.value.stock)
-    console.log('📦 Stock en warehouseStock:', productForm.value.warehouseStock)
-    console.log('✅ warehouseEnabled:', productForm.value.warehouseEnabled)
-    console.log('📦 Total stock calculado:', totalStock)
-    console.log('✅ Bodegas disponibles:', availableWarehouses.value.map(w => ({ id: w.id, name: w.name })))
+    // SAFETY NET: Si el stock del formulario es > 0 pero ninguna bodega
+    // está habilitada (ej: asignado por voz), auto-habilitar la principal
+    const stockFormulario = parseInt(productForm.value.stock) || 0
+    if (stockFormulario > 0 && totalStock === 0 && availableWarehouses.value.length >= 1) {
+      const defaultWarehouse = availableWarehouses.value.find(w => w.is_default) || availableWarehouses.value[0]
+      if (defaultWarehouse) {
+        productForm.value.warehouseEnabled[defaultWarehouse.id] = true
+        productForm.value.warehouseStock[defaultWarehouse.id] = stockFormulario
+        totalStock = calculateTotalStock()
+      }
+    }
     
-    // ✅ Detectar si hay un archivo de imagen para subir O convertir base64 a archivo
+    // �S& Detectar si hay un archivo de imagen para subir O convertir base64 a archivo
     let hasImageFile = productForm.value.imageFile instanceof File
     
-    // 🔄 Detectar y convertir base64 a File si es necesario
+    // �x Detectar y convertir base64 a File si es necesario
     const imageUrl = (productForm.value.image || '').trim()
     const isBase64 = imageUrl.startsWith('data:image/')
     
     if (isBase64 && !hasImageFile) {
-      console.log('🔄 [saveProduct] Convirtiendo base64 a File...')
       try {
         // Extraer tipo MIME y datos
         const matches = imageUrl.match(/^data:([^;]+);base64,(.+)$/)
@@ -5452,34 +5063,19 @@ const saveProduct = async (skipValidation = false) => {
           const fileName = `product_${Date.now()}.${mimeType.split('/')[1]}`
           productForm.value.imageFile = new File([blob], fileName, { type: mimeType })
           hasImageFile = true
-          
-          console.log('✅ [saveProduct] Base64 convertido a File:', {
-            fileName,
-            size: blob.size,
-            type: mimeType
-          })
         }
       } catch (error) {
-        console.error('❌ [saveProduct] Error convirtiendo base64:', error)
+        console.error('�R [saveProduct] Error convirtiendo base64:', error)
       }
     }
     
-    // ✅ Detectar si es una URL externa (http/https)
+    // �S& Detectar si es una URL externa (http/https)
     const isExternalUrl = imageUrl.length > 0 && 
                           !isBase64 &&
                           (imageUrl.startsWith('http://') || 
                            imageUrl.startsWith('https://') ||
                            imageUrl.startsWith('/storage') ||
                            imageUrl.startsWith('storage/'))
-    
-    console.log('🖼️ [saveProduct] Detección de imagen:', {
-      hasImageFile,
-      isBase64,
-      imageUrl: imageUrl.substring(0, 100),
-      isExternalUrl,
-      willSendAsFile: hasImageFile,
-      willSendImageUrl: !hasImageFile && isExternalUrl
-    })
     
     let response
     
@@ -5507,10 +5103,10 @@ const saveProduct = async (skipValidation = false) => {
       formData.append('measurement_unit', productForm.value.measurement_unit || 'unit')
       formData.append('allow_decimal', productForm.value.allow_decimal ? 1 : 0)
       
-      // 📷 Agregar la imagen como archivo
+      // �x� Agregar la imagen como archivo
       formData.append('images[]', productForm.value.imageFile)
       
-      // 🏢 Stock por bodegas
+      // �x�� Stock por bodegas
       Object.keys(productForm.value.warehouseStock || {}).forEach(warehouseId => {
         if (productForm.value.warehouseEnabled[warehouseId]) {
           formData.append(`warehouse_stocks[${warehouseId}]`, productForm.value.warehouseStock[warehouseId])
@@ -5555,14 +5151,6 @@ const saveProduct = async (skipValidation = false) => {
         measurement_unit: productForm.value.measurement_unit || 'unit',
         allow_decimal: productForm.value.allow_decimal || false,
       }
-      
-      console.log('📤 [saveProduct] Datos a enviar al backend:', {
-        mode: 'JSON',
-        hasImageUrl: !!apiData.image_url,
-        image_url: apiData.image_url,
-        name: apiData.name,
-        isEditing: isEditing.value
-      })
       
       if (isEditing.value) {
         response = await productsService.update(productForm.value.id, apiData)
@@ -5609,7 +5197,7 @@ watch([searchTerm, categoryFilter, statusFilter, sortBy], () => {
   currentPage.value = 1
 })
 
-// 🏢 Sincronizar stock con bodega única cuando hay solo 1 bodega disponible
+// �x�� Sincronizar stock con bodega única cuando hay solo 1 bodega disponible
 watch(() => productForm.value.stock, (newStock) => {
   // Usar availableWarehouses que ya filtra según el plan
   if (availableWarehouses.value.length === 1 && availableWarehouses.value[0]) {
@@ -5622,27 +5210,22 @@ watch(() => productForm.value.stock, (newStock) => {
     
     // Sincronizar el stock
     productForm.value.warehouseStock[warehouseId] = parseInt(newStock) || 0
-    console.log('✅ Stock sincronizado con bodega única:', warehouseId, '=', newStock, 'Total bodegas disponibles:', availableWarehouses.value.length)
   }
 })
 
 watch(statusFilter, async () => {
-  console.log('Filtro de estado cambió:', statusFilter.value)
   await loadProducts()
 })
 
-// 🎯 Watcher para query params de navegación AI (filtros automáticos)
+// �x}� Watcher para query params de navegación AI (filtros automáticos)
 watch(() => props.queryParams, async (newParams) => {
   if (!newParams || Object.keys(newParams).length === 0) return
-  
-  console.log('🔍 [ProductsView] Query params detectados:', newParams)
   
   // Aplicar filtro según queryParams
   if (newParams.filter) {
     switch(newParams.filter) {
       case 'inactive':
         statusFilter.value = 'inactive'
-        console.log('✅ [ProductsView] Filtro aplicado: Productos Inactivos')
         showNotification(
           'Filtro aplicado',
           'Mostrando solo productos inactivos',
@@ -5651,11 +5234,9 @@ watch(() => props.queryParams, async (newParams) => {
         break
       case 'active':
         statusFilter.value = 'active'
-        console.log('✅ [ProductsView] Filtro aplicado: Productos Activos')
         break
       case 'low-stock':
         statusFilter.value = 'low-stock'
-        console.log('✅ [ProductsView] Filtro aplicado: Productos con Stock Bajo')
         showNotification(
           'Filtro aplicado',
           'Mostrando productos con stock bajo',
@@ -5671,7 +5252,6 @@ watch(() => props.queryParams, async (newParams) => {
     const category = categories.value.find(c => c.name.toLowerCase() === categoryName.toLowerCase())
     if (category) {
       categoryFilter.value = category.id
-      console.log('✅ [ProductsView] Filtro de categoría aplicado:', categoryName)
       showNotification(
         'Categoría seleccionada',
         `Mostrando productos de ${categoryName}`,
@@ -5680,32 +5260,27 @@ watch(() => props.queryParams, async (newParams) => {
     }
   }
 
-  // 🔍 Manejar acciones (create/edit) desde props (AI Navigation)
+  // �x� Manejar acciones (create/edit) desde props (AI Navigation)
   if (newParams.action === 'create') {
-    console.log('✅ [ProductsView] Acción de creación detectada desde Props');
     setTimeout(() => openCreateModal(), 500);
   } else if (newParams.action === 'edit' && newParams.id) {
-    console.log('✅ [ProductsView] Acción de edición detectada desde Props');
     // Asegurar que los productos estén cargados
     if (products.value.length === 0) await loadProducts();
     
     const productToEdit = products.value.find(p => p.id == newParams.id);
     if (productToEdit) {
-      console.log('🚀 [ProductsView] Abriendo modal de edición para:', productToEdit.name);
       editProduct(productToEdit);
     }
   }
 }, { deep: true, immediate: true })
 
-// 🔄 Configurar listener de eventos global ANTES de onMounted (para evitar warning)
+// �x Configurar listener de eventos global ANTES de onMounted (para evitar warning)
 const handleProductsUpdate = (event) => {
-  console.log('🔄 Evento products-updated recibido en ProductsView:', event.detail)
-  console.log('🔄 Recargando productos para sincronizar stock...')
   // Recargar productos automáticamente cuando se reciba el evento
   loadProducts()
 }
 
-// 👁️ Watch: Limpiar cambios al cerrar modal de inventario
+// �x�️ Watch: Limpiar cambios al cerrar modal de inventario
 watch(showViewModal, (newValue) => {
   if (!newValue) {
     // Modal cerrado - limpiar cambios pendientes
@@ -5715,81 +5290,62 @@ watch(showViewModal, (newValue) => {
 
 // Inicialización
 onMounted(async () => {
-  console.log('Módulo de productos inicializado')
-  
-  // 🎯 PRIMERO: Detectar tipo de tienda ANTES de renderizar para evitar parpadeo
+  // �x}� PRIMERO: Detectar tipo de tienda ANTES de renderizar para evitar parpadeo
   const storeType = appStore.systemSettings?.store_type || 'general'
   isFashionMode.value = storeType === 'fashion' || storeType === 'moda'
-  console.log('🏪 Tipo de tienda detectado:', storeType, '| Fashion Mode:', isFashionMode.value)
   
-  // 🔧 Cargar preferencias del usuario primero (PROBLEMA 1: Restaurar vista guardada)
+  // �x� Cargar preferencias del usuario primero (PROBLEMA 1: Restaurar vista guardada)
   loadUserPreferences()
   
-  // 🎨 VISTA POR DEFECTO INTELIGENTE: Grid para Fashion, Table para Retail
+  // �x}� VISTA POR DEFECTO INTELIGENTE: Grid para Fashion, Table para Retail
   // Solo establecer si no hay preferencia guardada
   if (!localStorage.getItem(USER_PREFERENCES_KEY)) {
     viewMode.value = isFashionStore.value ? 'grid' : 'table'
-    console.log('📊 Vista por defecto establecida:', viewMode.value, '(basada en tipo de tienda:', appStore.systemSettings?.store_type, ')')
-  } else {
-    console.log('✅ Vista restaurada desde preferencias:', viewMode.value)
   }
   
   // Registrar listener ANTES del primer await
   window.addEventListener('products-updated', handleProductsUpdate)
   
-  await loadCategories()
-  await loadSuppliers() // 🏭 Cargar proveedores activos
-  await loadWarehouses() // 🏢 Cargar bodegas disponibles
+  // �xa� OPTIMIZACI�N: Cargar todo EN PARALELO en lugar de secuencial
+  // Esto reduce el tiempo de carga de 4-6 segundos a ~1-2 segundos
+  await Promise.all([
+    loadCategories(),
+    loadSuppliers(),
+    loadWarehouses()
+  ])
   
-  // ✅ Inicialización completa - permitir renderizado
+  // �S& Inicialización completa - permitir renderizado
   isInitializing.value = false
-  
-  // 🎓 Mostrar tour si es primera visita
-  if (isFirstVisitProducts.value) {
-    await nextTick()
-    setTimeout(() => {
-      showProductsWelcomeModal.value = true
-    }, 800)
-  }
   
   // Verificar si hay acción de creación desde la URL (Deep Linking) O desde props
   const action = route.query.action || props.queryParams?.action;
   const actionId = route.query.id || props.queryParams?.id;
-
-  console.log('🔍 [ProductsView] route.query:', route.query);
-  console.log('🔍 [ProductsView] props.queryParams:', props.queryParams);
   
   if (action === 'create') {
-    console.log('✅ [ProductsView] Acción de creación detectada');
     // Esperar un momento para asegurar que las categorías estén cargadas
     setTimeout(() => {
-      console.log('🚀 [ProductsView] Llamando a openCreateModal()');
       openCreateModal()
       // Limpiar la query para evitar que se abra al recargar
       if (route.query.action) router.replace({ query: null })
     }, 500)
   } else if (action === 'edit' && actionId) {
-    console.log('✅ [ProductsView] Acción de edición detectada');
     // Esperar a que carguen los productos
     await loadProducts()
     
     const productToEdit = products.value.find(p => p.id == actionId)
     if (productToEdit) {
-      console.log('🚀 [ProductsView] Abriendo modal de edición para:', productToEdit.name)
       editProduct(productToEdit)
       // Limpiar la query
       if (route.query.action) router.replace({ query: null })
     } else {
-      console.warn('⚠️ [ProductsView] Producto no encontrado para edición:', actionId)
+      console.warn('�a�️ [ProductsView] Producto no encontrado para edición:', actionId)
     }
   } else {
-    console.log('ℹ️ [ProductsView] No hay acción de creación en la URL/Props');
     // Verificar si hay datos de producto para editar desde otra vista (solo si no es creación)
     const editProductData = sessionStorage.getItem('editProductData')
     if (editProductData) {
       try {
         const productData = JSON.parse(editProductData)
-        console.log('Producto detectado para edición inmediata:', productData)
         
         // Configurar el producto en productForm directamente sin esperar a cargar todos los productos
         productForm.value = {
@@ -5844,7 +5400,7 @@ onMounted(async () => {
     }
   }
   
-  // 🤖 Inicializar contexto para IA después de cargar datos
+  // �x� Inicializar contexto para IA después de cargar datos
   updateScreenContextForAI()
 })
 

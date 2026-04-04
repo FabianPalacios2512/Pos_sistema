@@ -21,10 +21,31 @@ const isCompensating = ref(false)
 let isInitialized = false
 
 /**
+ * Detectar si estamos en un dispositivo móvil
+ */
+function isMobileDevice() {
+  // Verificar por user agent
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera
+  const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i
+  
+  // Verificar por touch y tamaño de pantalla
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  const isSmallScreen = window.innerWidth <= 1024
+  
+  return mobileRegex.test(userAgent.toLowerCase()) || (hasTouch && isSmallScreen)
+}
+
+/**
  * Detectar si realmente necesitamos compensar
  * Solo para Windows con 125% o más (devicePixelRatio >= 1.2)
+ * NUNCA en dispositivos móviles
  */
 function needsCompensation() {
+  // NUNCA aplicar en móviles - tienen su propio manejo de DPI
+  if (isMobileDevice()) {
+    return false
+  }
+  
   const ratio = window.devicePixelRatio || 1
   // Solo compensar si ratio es 1.2 o mayor (Windows 125%+)
   return ratio >= 1.2

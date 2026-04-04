@@ -339,21 +339,21 @@ const processImageUrl = (url) => {
     return trimmedUrl
   }
   
-  // Si es ruta de storage, construir URL completa al backend
+  // Usar el mismo origen del frontend (funciona en dev y producción)
+  const baseUrl = window.location.origin
+  
+  // Si es ruta de storage, construir URL completa
   if (trimmedUrl.startsWith('/storage')) {
-    const backendUrl = `http://${window.location.hostname}:8000`
-    return `${backendUrl}${trimmedUrl}`
+    return `${baseUrl}${trimmedUrl}`
   }
   
   // Si no empieza con /, agregar /storage/ y construir URL
   if (!trimmedUrl.startsWith('/')) {
-    const backendUrl = `http://${window.location.hostname}:8000`
-    return `${backendUrl}/storage/${trimmedUrl}`
+    return `${baseUrl}/storage/${trimmedUrl}`
   }
   
   // Ruta relativa genérica
-  const backendUrl = `http://${window.location.hostname}:8000`
-  return `${backendUrl}${trimmedUrl}`
+  return `${baseUrl}${trimmedUrl}`
 }
 
 const handleImageError = (e) => {

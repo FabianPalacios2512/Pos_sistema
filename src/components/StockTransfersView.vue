@@ -2,27 +2,20 @@
   <!-- Toast Notifications -->
   <ToastContainer />
   
-  <div :class="embedded ? 'space-y-6' : 'font-sans mx-8'" :style="embedded ? '' : 'background-color: #F4F6F8; height: 100%; display: flex; flex-direction: column;'">
-    <div :class="embedded ? 'space-y-6' : 'p-4 lg:p-6 space-y-6 pb-8 animate-fade-in'" :style="embedded ? '' : 'flex: 1; display: flex; flex-direction: column; min-height: 0;'">
+  <div :class="embedded ? 'space-y-6' : 'min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8'">
+    <div :class="embedded ? 'space-y-6' : 'p-4 lg:p-6 space-y-6 pb-8 animate-fade-in'">
       
       <!-- Header Elegante -->
-      <div v-if="!embedded" class="flex items-center justify-between pb-4 border-b border-gray-300">
-        <div class="flex items-center space-x-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">Traslados de Mercancía</h1>
-            <p class="text-sm text-gray-600">Gestiona movimientos de inventario entre sedes</p>
-          </div>
+      <div v-if="!embedded" class="flex items-center justify-between pb-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Traslados de Mercancía</h1>
+            <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestiona movimientos de inventario entre sedes</p>
         </div>
         
         <div class="flex items-center space-x-3">
           <button 
             @click="fetchTransfers"
-            class="px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl border border-slate-200 shadow-sm transition-all duration-200 flex items-center space-x-2">
+            class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center space-x-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -31,7 +24,7 @@
           
           <button 
             @click="openCreateModal"
-            class="px-5 py-2.5 bg-gradient-to-r from-lime-400 to-green-400 hover:from-lime-500 hover:to-green-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center space-x-2">
+            class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -40,13 +33,13 @@
         </div>
       </div>
 
-      <!-- Filtros -->
-      <div :class="embedded ? 'bg-white dark:bg-zinc-900 rounded-xl shadow-xl dark:shadow-black/50 p-4 border border-gray-300 dark:border-zinc-800' : 'bg-white rounded-lg shadow-sm p-3 border border-gray-200'">
+      <!-- Filtros - Gemini -->
+      <div :class="embedded ? 'bg-white dark:bg-zinc-900 rounded-2xl p-4 border border-gray-200 dark:border-zinc-700' : 'bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 p-4 border border-gray-300 dark:border-zinc-800'">
         <div class="flex flex-wrap items-center gap-3">
           <select 
             v-model="filters.status"
             @change="fetchTransfers"
-            class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-w-36">
+            class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-w-36">
             <option value="">Todos los estados</option>
             <option value="pending">Pendientes</option>
             <option value="in_transit">En tránsito</option>
@@ -57,7 +50,7 @@
           <select 
             v-model="filters.source_warehouse_id"
             @change="fetchTransfers"
-            class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-w-48">
+            class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-w-48">
             <option value="">Todas las sedes origen</option>
             <option v-for="w in warehouses" :key="w.id" :value="w.id">{{ w.name }}</option>
           </select>
@@ -65,7 +58,7 @@
           <button 
             v-if="filters.status || filters.source_warehouse_id"
             @click="clearFilters" 
-            class="p-3 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl border border-transparent hover:border-red-100 dark:hover:border-red-900/30 transition-all duration-200"
+            class="p-3 text-gray-500 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950 rounded-xl border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
             title="Limpiar filtros">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -74,7 +67,7 @@
         </div>
       </div>
 
-      <!-- Lista de Traslados -->
+      <!-- Lista de Traslados - Gemini -->
       <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
         <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-5 py-4 flex items-center justify-between">
           <div>
@@ -84,33 +77,33 @@
         </div>
 
         <div v-if="loading" class="py-12 text-center">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 dark:border-indigo-400"></div>
-          <p class="mt-2 text-sm text-gray-600 dark:text-zinc-400">Cargando traslados...</p>
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
+          <p class="mt-2 text-sm text-gray-500 dark:text-zinc-400">Cargando traslados...</p>
         </div>
 
         <div v-else-if="transfers.length === 0" class="py-12 text-center">
           <div class="flex flex-col items-center space-y-3">
             <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-              <svg class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-6 h-6 text-zinc-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
               </svg>
             </div>
             <div>
-              <p class="text-sm font-semibold text-gray-700 dark:text-zinc-200">No hay traslados</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">No hay traslados</p>
               <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Crea tu primer traslado de mercancía</p>
             </div>
           </div>
         </div>
 
-        <div v-else class="divide-y divide-gray-200 dark:divide-zinc-800 overflow-y-auto" style="flex: 1; min-height: 0;">
+        <div v-else class="divide-y divide-gray-100 dark:divide-zinc-800 overflow-y-auto" style="flex: 1; min-height: 0;">
           <div 
             v-for="transfer in transfers" 
             :key="transfer.id"
-            class="p-4 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-all duration-200">
+            class="p-4 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all duration-200">
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4 flex-1">
                 <div :class="[
-                  'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
+                  'w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0',
                   getStatusColor(transfer.status).bg
                 ]">
                   <svg class="w-6 h-6" :class="getStatusColor(transfer.status).text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,9 +113,9 @@
 
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center space-x-2 mb-1">
-                    <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ transfer.reference_number }}</h3>
+                    <h3 class="text-[15px] font-bold text-gray-900 dark:text-white">{{ transfer.reference_number }}</h3>
                     <span :class="[
-                      'px-2 py-0.5 text-xs font-semibold rounded-full',
+                      'px-2.5 py-1 text-[10px] font-bold rounded-full border uppercase tracking-wide',
                       getStatusColor(transfer.status).badge
                     ]">
                       {{ getStatusText(transfer.status) }}
@@ -143,14 +136,14 @@
                     </span>
                     <span>{{ formatDate(transfer.created_at) }}</span>
                   </div>
-                  <p v-if="transfer.notes" class="text-xs text-gray-600 mt-1">{{ transfer.notes }}</p>
+                  <p v-if="transfer.notes" class="text-xs text-gray-500 dark:text-zinc-400 mt-1">{{ transfer.notes }}</p>
                 </div>
               </div>
 
               <div class="flex items-center space-x-2">
                 <button 
                   @click="viewTransfer(transfer)"
-                  class="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
+                  class="p-2 text-slate-400 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 transition-colors"
                   title="Ver detalle">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -160,7 +153,7 @@
                 <button 
                   v-if="transfer.status === 'pending'"
                   @click="completeTransfer(transfer)"
-                  class="p-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors"
+                  class="p-2 text-slate-400 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30 transition-colors"
                   title="Completar traslado">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -169,7 +162,7 @@
                 <button 
                   v-if="transfer.status === 'pending'"
                   @click="cancelTransfer(transfer)"
-                  class="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors"
+                  class="p-2 text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30 transition-colors"
                   title="Cancelar">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -410,10 +403,10 @@ const handleSaved = () => {
 
 const getStatusColor = (status) => {
   const colors = {
-    pending: { bg: 'bg-yellow-100', text: 'text-yellow-600', badge: 'bg-yellow-100 text-yellow-700' },
-    in_transit: { bg: 'bg-blue-100', text: 'text-blue-600', badge: 'bg-blue-100 text-blue-700' },
-    completed: { bg: 'bg-green-100', text: 'text-green-600', badge: 'bg-green-100 text-green-700' },
-    cancelled: { bg: 'bg-red-100', text: 'text-red-600', badge: 'bg-red-100 text-red-700' }
+    pending: { bg: 'bg-amber-50 dark:bg-amber-950', text: 'text-amber-600 dark:text-amber-400', badge: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800' },
+    in_transit: { bg: 'bg-blue-50 dark:bg-blue-950', text: 'text-blue-600 dark:text-blue-400', badge: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800' },
+    completed: { bg: 'bg-emerald-50 dark:bg-emerald-950', text: 'text-emerald-600 dark:text-emerald-400', badge: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' },
+    cancelled: { bg: 'bg-rose-50 dark:bg-rose-950', text: 'text-rose-600 dark:text-rose-400', badge: 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800' }
   };
   return colors[status] || colors.pending;
 };

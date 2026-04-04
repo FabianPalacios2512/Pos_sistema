@@ -51,7 +51,7 @@ class GoogleAuthController extends Controller
                 }
 
                 // Redirigir al registro con error
-                $frontendUrl = config('app.url', 'https://105pos.pro');
+                $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
                 return redirect($frontendUrl . '/register?error=no_code');
             }
 
@@ -201,9 +201,7 @@ class GoogleAuthController extends Controller
                 ], now()->addMinutes(5));
 
                 // 🔥 Usar URL fija en producción para evitar problemas de proxy
-                $frontendUrl = app()->environment('production')
-                    ? 'https://105pos.pro'
-                    : config('app.url', 'http://localhost:3000');
+                $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
                 $redirectUrl = $frontendUrl . '/register?google_token=' . $tempToken;
 
                 \Log::info('🔀 Redirigiendo a registro con Google token', [

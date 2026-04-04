@@ -8,35 +8,40 @@
         :style="{ top: dynamicHeaderHeight + 'px', height: `calc(100% - ${dynamicHeaderHeight}px)` }"
       >
         <!-- ═══════════════════════════════════════════════════════════════
-             🔴 LIVE CALL OVERLAY - Vista de llamada en vivo estilo Gemini
+             🔴 LIVE CALL OVERLAY - Vista de llamada en vivo estilo Futurista Light Mode
+             Diseño: Google Gemini / Apple Intelligence / Siri
         ═══════════════════════════════════════════════════════════════ -->
         <transition name="fade">
           <div 
             v-if="liveCall.isActive.value"
             class="absolute inset-0 z-50 flex flex-col overflow-hidden"
           >
-            <!-- Fondo con gradiente animado tipo Gemini -->
-            <div class="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-[#0d1525] to-[#1a2744]">
-              <!-- Aurora/Glow effect animado -->
-              <div class="absolute bottom-0 left-0 right-0 h-[60%] overflow-hidden">
+            <!-- Fondo Light/Dark Mode con Ambient Glow futurista -->
+            <div class="absolute inset-0 bg-gradient-to-b from-[#F9FAFB] via-white to-[#F3F4F6] dark:from-[#0a0a0c] dark:via-[#131316] dark:to-[#1a1a1f]">
+              <!-- Ambient Glow - Luz difusa cyan/violeta tipo Gemini -->
+              <div class="absolute inset-0 overflow-hidden">
+                <!-- Glow superior izquierdo (Cyan suave) -->
                 <div 
-                  class="absolute inset-0 opacity-60"
-                  :class="{ 'animate-pulse': liveCall.isSpeaking.value }"
-                  style="background: radial-gradient(ellipse at 50% 100%, rgba(59,130,246,0.4) 0%, rgba(59,130,246,0.1) 40%, transparent 70%);"
+                  class="absolute -top-20 -left-20 w-[400px] h-[400px] rounded-full opacity-30 dark:opacity-40"
+                  :class="{ 'animate-ambient-pulse': liveCall.isSpeaking.value }"
+                  style="background: radial-gradient(circle, rgba(34,211,238,0.4) 0%, rgba(34,211,238,0.1) 40%, transparent 70%);"
                 ></div>
+                <!-- Glow superior derecho (Violeta pálido) -->
                 <div 
-                  class="absolute inset-0 opacity-40"
-                  style="background: radial-gradient(ellipse at 30% 90%, rgba(147,51,234,0.3) 0%, transparent 50%);"
+                  class="absolute -top-10 -right-20 w-[350px] h-[350px] rounded-full opacity-25 dark:opacity-35"
+                  :class="{ 'animate-ambient-pulse-delayed': liveCall.isSpeaking.value }"
+                  style="background: radial-gradient(circle, rgba(167,139,250,0.4) 0%, rgba(167,139,250,0.1) 40%, transparent 70%);"
                 ></div>
+                <!-- Glow inferior central (Rosa muy suave) -->
                 <div 
-                  class="absolute inset-0 opacity-30"
-                  style="background: radial-gradient(ellipse at 70% 95%, rgba(236,72,153,0.2) 0%, transparent 40%);"
+                  class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[300px] h-[300px] rounded-full opacity-20 dark:opacity-30"
+                  style="background: radial-gradient(circle, rgba(251,146,180,0.3) 0%, transparent 60%);"
                 ></div>
               </div>
             </div>
             
             <!-- ═══════════════════════════════════════════════════════════
-                 SELECTOR DE VOZ (Primera vez)
+                 SELECTOR DE VOZ (Primera vez) - Estilo Light Mode
             ═══════════════════════════════════════════════════════════ -->
             <div 
               v-if="liveCall.showVoiceSelector.value"
@@ -44,44 +49,48 @@
             >
               <!-- Header -->
               <div class="text-center mb-4">
-                <h2 class="text-lg font-medium text-white mb-1">Elige tu asistente</h2>
-                <p class="text-white/40 text-xs">Toca el círculo para escuchar la voz</p>
+                <h2 class="text-lg font-semibold text-gray-800 mb-1 tracking-tight">Elige tu asistente</h2>
+                <p class="text-gray-400 text-xs">Toca el círculo para escuchar la voz</p>
               </div>
               
               <!-- Círculo central con ondas -->
               <div class="flex-1 flex flex-col items-center justify-center relative">
-                <!-- Flechas de navegación -->
+                <!-- Flechas de navegación (Glassmorphism) -->
                 <button
                   @click="liveCall.prevVoice()"
-                  class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center transition-all"
-                  :class="{ 'opacity-20 pointer-events-none': liveCall.currentVoiceIndex.value === 0 }"
+                  class="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/70 backdrop-blur-md hover:bg-white/90 flex items-center justify-center transition-all shadow-lg shadow-gray-200/50 border border-gray-100"
+                  :class="{ 'opacity-30 pointer-events-none': liveCall.currentVoiceIndex.value === 0 }"
                 >
-                  <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                   </svg>
                 </button>
                 
-                <!-- Círculo principal con ondas -->
+                <!-- Círculo principal con ondas - Diseño Orbe Futurista -->
                 <div class="relative">
-                  <!-- Ondas de sonido (anillos que se expanden) -->
+                  <!-- Ondas de sonido (anillos que se expanden) - Light Mode -->
                   <div 
                     v-if="liveCall.isPlayingPreview.value"
                     class="absolute inset-0 flex items-center justify-center"
                   >
-                    <div class="absolute w-32 h-32 rounded-full border-2 border-white/20 animate-ping" style="animation-duration: 1.5s;"></div>
-                    <div class="absolute w-40 h-40 rounded-full border border-white/10 animate-ping" style="animation-duration: 2s;"></div>
-                    <div class="absolute w-48 h-48 rounded-full border border-white/5 animate-ping" style="animation-duration: 2.5s;"></div>
+                    <div class="absolute w-32 h-32 rounded-full border-2 border-cyan-300/40 animate-ping" style="animation-duration: 1.5s;"></div>
+                    <div class="absolute w-40 h-40 rounded-full border border-violet-300/30 animate-ping" style="animation-duration: 2s;"></div>
+                    <div class="absolute w-48 h-48 rounded-full border border-pink-200/20 animate-ping" style="animation-duration: 2.5s;"></div>
                   </div>
                   
-                  <!-- Círculo con gradiente -->
+                  <!-- Orbe con gradiente Gemini Colors -->
                   <button
                     @click="liveCall.playVoicePreview()"
                     :disabled="liveCall.isPlayingPreview.value"
-                    class="relative w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl hover:scale-105 disabled:hover:scale-100"
-                    :class="[`bg-gradient-to-br ${liveCall.voices.value[liveCall.currentVoiceIndex.value]?.color || 'from-gray-500 to-gray-700'}`]"
-                    :style="{ boxShadow: `0 0 60px ${liveCall.isPlayingPreview.value ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.5)'}` }"
+                    class="relative w-28 h-28 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-105 disabled:hover:scale-100"
+                    :class="[`bg-gradient-to-br ${liveCall.voices.value[liveCall.currentVoiceIndex.value]?.color || 'from-gray-400 to-gray-600'}`]"
+                    :style="{ 
+                      boxShadow: liveCall.isPlayingPreview.value 
+                        ? '0 0 60px rgba(34,211,238,0.4), 0 0 100px rgba(167,139,250,0.3)' 
+                        : '0 20px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.5) inset'
+                    }"
                   >
-                    <!-- Icono interior -->
+                    <!-- Icono interior - Barras de audio cuando reproduce -->
                     <div 
                       v-if="liveCall.isPlayingPreview.value"
                       class="flex items-end gap-0.5 h-6"
@@ -105,65 +114,66 @@
                   </button>
                 </div>
                 
-                <!-- Nombre y descripción debajo del círculo -->
+                <!-- Nombre y descripción debajo del círculo - Light Mode -->
                 <div class="text-center mt-6">
-                  <h3 class="text-xl font-semibold text-white">
+                  <h3 class="text-xl font-semibold text-gray-800">
                     {{ liveCall.voices.value[liveCall.currentVoiceIndex.value]?.name }}
                   </h3>
-                  <p class="text-white/50 text-sm mt-1">
+                  <p class="text-gray-500 text-sm mt-1">
                     {{ liveCall.voices.value[liveCall.currentVoiceIndex.value]?.description }}
                   </p>
-                  <!-- Género -->
+                  <!-- Género - Pill elegante -->
                   <span 
-                    class="inline-block mt-2 px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider"
+                    class="inline-block mt-2 px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider backdrop-blur-sm"
                     :class="liveCall.voices.value[liveCall.currentVoiceIndex.value]?.gender === 'female' 
-                      ? 'bg-pink-500/20 text-pink-300' 
-                      : 'bg-blue-500/20 text-blue-300'"
+                      ? 'bg-pink-100 text-pink-600 border border-pink-200' 
+                      : 'bg-blue-100 text-blue-600 border border-blue-200'"
                   >
                     {{ liveCall.voices.value[liveCall.currentVoiceIndex.value]?.gender === 'female' ? 'Femenina' : 'Masculina' }}
                   </span>
                 </div>
                 
-                <!-- Flecha siguiente -->
+                <!-- Flecha siguiente (Glassmorphism) -->
                 <button
                   @click="liveCall.nextVoice()"
-                  class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center transition-all"
-                  :class="{ 'opacity-20 pointer-events-none': liveCall.currentVoiceIndex.value === liveCall.voices.value.length - 1 }"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/70 backdrop-blur-md hover:bg-white/90 flex items-center justify-center transition-all shadow-lg shadow-gray-200/50 border border-gray-100"
+                  :class="{ 'opacity-30 pointer-events-none': liveCall.currentVoiceIndex.value === liveCall.voices.value.length - 1 }"
                 >
-                  <svg class="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                   </svg>
                 </button>
               </div>
               
-              <!-- Indicadores (dots) -->
-              <div class="flex justify-center gap-1.5 mt-4">
+              <!-- Indicadores (dots) - Light Mode -->
+              <div class="flex justify-center gap-2 mt-4">
                 <button
                   v-for="(voice, index) in liveCall.voices.value"
                   :key="voice.id"
                   @click="liveCall.goToVoice(index)"
-                  class="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                  class="w-2 h-2 rounded-full transition-all duration-300"
                   :class="[
                     index === liveCall.currentVoiceIndex.value 
-                      ? 'bg-white w-4' 
-                      : 'bg-white/20 hover:bg-white/40'
+                      ? 'bg-gray-800 w-5' 
+                      : 'bg-gray-300 hover:bg-gray-400'
                   ]"
                 ></button>
               </div>
               
-              <!-- Botón continuar -->
+              <!-- Botón continuar - Glassmorphism elegante -->
               <div class="mt-6 space-y-2">
                 <button
                   @click="liveCall.confirmVoiceSelection()"
                   :disabled="liveCall.isPlayingPreview.value"
-                  class="w-full py-3.5 rounded-xl font-semibold transition-all disabled:opacity-50 shadow-lg"
-                  :class="[`bg-gradient-to-r ${liveCall.voices.value[liveCall.currentVoiceIndex.value]?.color || 'from-gray-500 to-gray-700'} text-white`]"
+                  class="w-full py-3.5 rounded-2xl font-semibold transition-all disabled:opacity-50 text-white shadow-xl"
+                  :class="[`bg-gradient-to-r ${liveCall.voices.value[liveCall.currentVoiceIndex.value]?.color || 'from-gray-500 to-gray-700'}`]"
+                  :style="{ boxShadow: '0 10px 30px rgba(0,0,0,0.15)' }"
                 >
                   Continuar con {{ liveCall.voices.value[liveCall.currentVoiceIndex.value]?.name }}
                 </button>
                 <button
                   @click="liveCall.cancelVoiceSelection()"
-                  class="w-full py-2 text-white/40 hover:text-white/60 text-sm transition-all"
+                  class="w-full py-2 text-gray-400 hover:text-gray-600 text-sm transition-all"
                 >
                   Cancelar
                 </button>
@@ -171,97 +181,146 @@
             </div>
             
             <!-- ═══════════════════════════════════════════════════════════
-                 LLAMADA EN CURSO
+                 LLAMADA EN CURSO - Diseño Futurista Light Mode
             ═══════════════════════════════════════════════════════════ -->
             <template v-else>
-              <!-- Header de la llamada -->
+              <!-- Header de la llamada - Minimalista -->
               <div class="relative z-10 flex items-center justify-between px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span class="text-white/80 text-sm font-medium">Live</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div>
+                  <span class="text-gray-600 dark:text-gray-300 text-sm font-medium tracking-wide">Live</span>
                 </div>
-                <span class="text-white/60 text-sm font-mono">{{ liveCall.formattedDuration.value }}</span>
+                <span class="text-gray-400 dark:text-gray-500 text-sm font-mono tabular-nums">{{ liveCall.formattedDuration.value }}</span>
               </div>
               
-              <!-- Contenido central -->
+              <!-- Contenido central - Visualizador Abstracto -->
               <div class="relative z-10 flex-1 flex flex-col items-center justify-center px-6">
-                <!-- Indicador de estado -->
-                <div class="mb-8">
+                
+                <!-- ════════════════════════════════════════════════════════
+                     VISUALIZADOR DE VOZ ABSTRACTO - El Centro de Atención
+                ════════════════════════════════════════════════════════ -->
+                <div class="mb-10">
+                  
+                  <!-- Estado: Conectando -->
                   <div 
                     v-if="liveCall.isConnecting.value"
                     class="flex flex-col items-center"
                   >
-                    <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-4"></div>
-                    <p class="text-white/80 text-lg">Conectando...</p>
+                    <!-- Orbe pulsante de conexión -->
+                    <div class="relative w-24 h-24 flex items-center justify-center">
+                      <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-violet-400 rounded-full animate-ping opacity-20"></div>
+                      <div class="absolute inset-2 bg-gradient-to-r from-cyan-300 to-violet-300 rounded-full animate-pulse opacity-30"></div>
+                      <div class="w-16 h-16 bg-gradient-to-br from-cyan-400 via-violet-400 to-pink-400 rounded-full animate-spin-slow"
+                           style="animation: spin 3s linear infinite;"></div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300 text-lg mt-6 font-light tracking-wide animate-fade-in">Conectando...</p>
                   </div>
                   
+                  <!-- Estado: IA Hablando - Onda de Sonido Fluida tipo Siri/Gemini -->
                   <div 
                     v-else-if="liveCall.isSpeaking.value"
                     class="flex flex-col items-center"
                   >
-                    <!-- Barras de audio animadas -->
-                    <div class="flex items-end gap-1 h-16 mb-4">
-                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 60%; animation-delay: 0ms;"></div>
-                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 80%; animation-delay: 100ms;"></div>
-                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 100%; animation-delay: 200ms;"></div>
-                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 70%; animation-delay: 300ms;"></div>
-                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 90%; animation-delay: 400ms;"></div>
-                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 50%; animation-delay: 500ms;"></div>
-                      <div class="w-1 bg-blue-400 rounded-full animate-bounce" style="height: 75%; animation-delay: 600ms;"></div>
+                    <!-- Visualizador Geométrico Animado -->
+                    <div class="relative flex items-center justify-center">
+                      <div class="voice-loader">
+                        <svg width="100" height="100" viewBox="0 0 100 100">
+                          <defs>
+                            <mask id="clipping">
+                              <polygon points="0,0 100,0 100,100 0,100" fill="black"></polygon>
+                              <polygon points="25,25 75,25 50,75" fill="white"></polygon>
+                              <polygon points="50,25 75,75 25,75" fill="white"></polygon>
+                              <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                              <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                              <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                              <polygon points="35,35 65,35 50,65" fill="white"></polygon>
+                            </mask>
+                          </defs>
+                        </svg>
+                        <div class="voice-loader-box"></div>
+                      </div>
                     </div>
-                    <p class="text-white/80 text-lg">105 IA está hablando...</p>
+                    
+                    <!-- Transcripción flotante -->
+                    <p class="text-[#1F2937] dark:text-white text-xl font-light mt-6 tracking-wide text-center animate-fade-in max-w-[280px]">
+                      105 IA está hablando...
+                    </p>
                   </div>
                   
+                  <!-- Estado: Escuchando - Orbe Pulsante Suave -->
                   <div 
                     v-else
                     class="flex flex-col items-center"
                   >
-                    <!-- Círculo de micrófono pulsante -->
-                    <div class="relative mb-4">
-                      <div class="absolute inset-0 bg-blue-500/20 rounded-full animate-ping"></div>
-                      <div class="relative w-16 h-16 bg-blue-500/30 rounded-full flex items-center justify-center">
+                    <!-- Orbe de escucha - Azul metálico suave -->
+                    <div class="relative">
+                      <!-- Anillos de pulso suave -->
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="absolute w-28 h-28 rounded-full border-2 border-blue-200 animate-ping opacity-30" style="animation-duration: 2s;"></div>
+                        <div class="absolute w-36 h-36 rounded-full border border-cyan-200 animate-ping opacity-20" style="animation-duration: 2.5s;"></div>
+                      </div>
+                      
+                      <!-- Orbe central - Gradiente metálico -->
+                      <div class="relative w-20 h-20 rounded-full flex items-center justify-center"
+                           style="background: linear-gradient(135deg, #60A5FA 0%, #818CF8 50%, #A78BFA 100%);
+                                  box-shadow: 0 10px 40px rgba(96,165,250,0.4), 0 0 0 1px rgba(255,255,255,0.3) inset;">
+                        <!-- Icono de micrófono minimalista -->
                         <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
                         </svg>
                       </div>
                     </div>
-                    <p class="text-white/80 text-lg">Escuchándote...</p>
+                    
+                    <!-- Texto flotante - Tipografía moderna -->
+                    <p class="text-[#1F2937] dark:text-white text-xl font-light mt-8 tracking-wide animate-fade-in">
+                      Escuchándote...
+                    </p>
                   </div>
                 </div>
                 
-                <!-- Voz actual -->
-                <div class="flex items-center gap-2 mb-4 px-3 py-1.5 bg-white/10 rounded-full">
+                <!-- Voz actual - Pill elegante glassmorphism -->
+                <div class="flex items-center gap-2 px-4 py-2 bg-white/60 dark:bg-zinc-800/60 backdrop-blur-md rounded-full border border-gray-200 dark:border-zinc-700 shadow-lg shadow-gray-200/30 dark:shadow-black/30">
                   <span class="text-lg">{{ liveCall.currentVoice.value?.emoji }}</span>
-                  <span class="text-white/60 text-sm">{{ liveCall.currentVoice.value?.name }}</span>
+                  <span class="text-gray-600 dark:text-gray-300 text-sm font-medium">{{ liveCall.currentVoice.value?.name }}</span>
                 </div>
               </div>
               
-              <!-- Barra de controles inferior -->
+              <!-- ════════════════════════════════════════════════════════
+                   CONTROLES FLOTANTES - Glassmorphism
+              ════════════════════════════════════════════════════════ -->
               <div class="relative z-10 px-6 pb-8 pt-4">
-                <div class="flex items-center justify-center gap-4">
-                  <!-- Botón de micrófono -->
+                <!-- Barra flotante de controles -->
+                <div class="flex items-center justify-center gap-4 p-3 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl rounded-3xl border border-gray-200/80 dark:border-zinc-700/80 shadow-xl shadow-gray-300/30 dark:shadow-black/40 max-w-[280px] mx-auto">
+                  
+                  <!-- Botón de micrófono - Glassmorphism con brillo activo -->
                   <button
-                    class="w-14 h-14 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all backdrop-blur-sm border border-white/10"
-                    :class="{ 'bg-blue-500/50': liveCall.isListening.value }"
+                    class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300"
+                    :class="liveCall.isListening.value 
+                      ? 'bg-gradient-to-br from-blue-400 to-violet-500 text-white shadow-lg shadow-blue-400/40' 
+                      : 'bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-gray-300'"
+                    :style="liveCall.isListening.value ? { boxShadow: '0 0 25px rgba(96,165,250,0.5), 0 0 50px rgba(167,139,250,0.3)' } : {}"
                   >
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
                     </svg>
                   </button>
                   
-                  <!-- Botón de colgar -->
+                  <!-- Separador sutil -->
+                  <div class="w-px h-8 bg-gray-200 dark:bg-zinc-700"></div>
+                  
+                  <!-- Botón de cerrar - X elegante minimalista -->
                   <button
                     @click="endLiveCall"
-                    class="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all shadow-lg shadow-red-500/30"
+                    class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 bg-gray-100 dark:bg-zinc-800 hover:bg-rose-50 dark:hover:bg-rose-900/30 text-gray-400 dark:text-gray-500 hover:text-rose-500 dark:hover:text-rose-400 group"
                   >
-                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                   </button>
                 </div>
                 
-                <!-- Texto de ayuda -->
-                <p class="text-center text-white/40 text-xs mt-4">
+                <!-- Texto de ayuda - Tipografía elegante -->
+                <p class="text-center text-gray-400 dark:text-gray-500 text-xs mt-4 tracking-wide font-light">
                   Habla naturalmente • 105 IA te escucha
                 </p>
               </div>
@@ -526,13 +585,44 @@
                   style="line-height: 1.5;"
                 ></textarea>
 
+                <!-- Archivo seleccionado -->
+                <div v-if="selectedFile" class="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl mt-2">
+                  <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                  </svg>
+                  <span class="text-sm text-blue-700 dark:text-blue-300 flex-1 truncate">{{ selectedFile.name }}</span>
+                  <button
+                    type="button"
+                    @click="selectedFile = null; fileInput.value = ''"
+                    class="w-5 h-5 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                    title="Eliminar archivo"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Input file oculto -->
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept=".xlsx,.xls,.csv"
+                  @change="handleFileSelect"
+                  class="hidden"
+                />
+                
                 <!-- Fila de botones debajo del input -->
                 <div class="flex items-center justify-between mt-3">
                   <!-- Izquierda: + y Ajustes -->
                   <div class="flex items-center gap-1">
+                    <!-- Botón Adjuntar Archivo (Excel/CSV) -->
                     <button
                       type="button"
-                      class="w-9 h-9 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-white/60 dark:hover:bg-zinc-700/50 rounded-full transition-all"
+                      @click="fileInput?.click()"
+                      :disabled="selectedFile !== null"
+                      :title="selectedFile ? 'Ya hay un archivo seleccionado' : 'Adjuntar archivo Excel o CSV'"
+                      class="w-9 h-9 flex items-center justify-center text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-white/60 dark:hover:bg-zinc-700/50 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -548,18 +638,8 @@
                     </button>
                   </div>
                   
-                  <!-- Derecha: Selector + Mic + Enviar -->
+                  <!-- Derecha: Mic + Enviar -->
                   <div class="flex items-center gap-1">
-                    <!-- Selector Modelo (Pill) -->
-                    <button
-                      type="button"
-                      @click="selectedProvider = selectedProvider === 'gemini' ? 'groq' : 'gemini'"
-                      class="px-3 py-1.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-xs font-medium rounded-full border border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all flex items-center gap-1.5"
-                    >
-                      {{ selectedProvider === 'gemini' ? 'Gemini' : 'Meta' }}
-                      <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-                    </button>
-                    
                     <!-- 📞 Botón Live Call (solo para Premium y Enterprise) -->
                     <button
                       v-if="hasVoiceAccess"
@@ -728,12 +808,13 @@ export default {
     const tenantPlan = computed(() => appStore.tenantPlan || 'free_trial')
     
     // ⚠️ MODO DESARROLLO - Cambiar a false en producción
-    const DEV_MODE_UNLIMITED = true
+    const DEV_MODE_UNLIMITED = false
     
     // Límites de mensajes de chat por día según plan
     const CHAT_LIMITS = {
-      'free_trial': DEV_MODE_UNLIMITED ? 0 : 5,      // 5 mensajes/día - para que prueben
-      'basico': DEV_MODE_UNLIMITED ? 0 : 15,         // 15 mensajes/día - uso básico
+      'free_trial': DEV_MODE_UNLIMITED ? 0 : 30,     // 30 mensajes/día - para que prueben
+      'starter': DEV_MODE_UNLIMITED ? 0 : 30,        // 30 mensajes/día - plan inicial
+      'basico': DEV_MODE_UNLIMITED ? 0 : 30,         // 30 mensajes/día - uso básico
       'premium': 0,         // 0 = ilimitado
       'enterprise': 0       // 0 = ilimitado
     }
@@ -752,10 +833,12 @@ export default {
     const hasAIAccess = computed(() => true)
     
     // Solo Premium y Enterprise tienen voz (en dev mode, todos tienen)
+    // 🚫 Planes BLOQUEADOS: free_trial y starter
     const hasVoiceAccess = computed(() => {
       if (DEV_MODE_UNLIMITED) return true
       const plan = tenantPlan.value.toLowerCase()
-      return ['premium', 'enterprise'].includes(plan)
+      // Bloquear solo planes básicos (free_trial y starter)
+      return !['free_trial', 'starter', 'basico'].includes(plan)
     })
     
     const isEnterprise = computed(() => {
@@ -1028,16 +1111,33 @@ export default {
       }
     }, { immediate: true })
 
+    // Verificar si es SuperAdmin (no tiene tenant)
+    const isSuperAdmin = () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        return user?.role === 'superadmin' || user?.is_super_admin
+      } catch {
+        return false
+      }
+    }
+
     // Cargar configuración del proveedor de IA
     const loadUsageStats = async () => {
+      // Omitir si es SuperAdmin (no hay tenant)
+      if (isSuperAdmin()) {
+        selectedProvider.value = 'gemini'
+        return
+      }
+      
       try {
         const providerResponse = await api.get('/ai/provider-config')
         if (providerResponse.success && providerResponse.data) {
           const config = providerResponse.data
-          selectedProvider.value = config.default || 'groq'
+          // Forzar siempre Gemini (Groq descontinuado por problemas de fecha)
+          selectedProvider.value = 'gemini'
         }
       } catch (error) {
-        selectedProvider.value = 'groq'
+        selectedProvider.value = 'gemini'
       }
     }
 
@@ -1180,8 +1280,59 @@ export default {
 
       isTyping.value = true
       
-      // 🧠 Obtener contexto de pantalla para la IA
-      const screenContext = aiContextStore.getSystemPrompt()
+      // 🧠 OPTIMIZACIÓN: Detectar si el mensaje necesita contexto de negocio
+      // Mensajes simples como "hola", "gracias", "ok" NO necesitan todos los datos
+      const needsBusinessContext = (() => {
+        const msg = userMessage.toLowerCase().trim()
+        
+        // Palabras clave que NO necesitan contexto de negocio
+        const simpleMessages = [
+          // Saludos
+          'hola', 'hi', 'hey', 'hello', 'buenas', 'buenos dias', 'buenos días',
+          'buenas tardes', 'buenas noches', 'que tal', 'qué tal', 'como estas',
+          'cómo estás', 'como va', 'que onda', 'saludos',
+          // Agradecimientos
+          'gracias', 'thanks', 'muchas gracias', 'genial', 'perfecto', 'excelente',
+          'ok', 'okay', 'vale', 'entendido', 'claro', 'listo', 'bien', 'bueno',
+          // Despedidas
+          'adios', 'adiós', 'bye', 'chao', 'hasta luego', 'nos vemos',
+          // Confirmaciones simples
+          'si', 'sí', 'no', 'ya', 'aja', 'ajá', 'mm', 'mmm', 'ah', 'oh'
+        ]
+        
+        // Si el mensaje es exactamente una palabra simple, no necesita contexto
+        if (simpleMessages.includes(msg)) {
+          return false
+        }
+        
+        // Si el mensaje tiene menos de 3 palabras y empieza con saludo, no necesita contexto
+        const words = msg.split(/\s+/)
+        if (words.length <= 2) {
+          const startsWithGreeting = simpleMessages.some(s => msg.startsWith(s))
+          if (startsWithGreeting) {
+            return false
+          }
+        }
+        
+        // Palabras clave que SÍ requieren contexto de negocio
+        const businessKeywords = [
+          'venta', 'ventas', 'producto', 'productos', 'stock', 'inventario',
+          'cliente', 'clientes', 'factura', 'facturas', 'precio', 'precios',
+          'ganancia', 'ganancias', 'caja', 'dinero', 'cuanto', 'cuánto',
+          'total', 'hoy', 'mes', 'semana', 'ayer', 'reporte', 'reportes',
+          'devolución', 'devoluciones', 'gasto', 'gastos', 'categoria',
+          'categorías', 'bajo', 'agotado', 'vendido', 'vendí', 'vendimos',
+          'mejor', 'peor', 'top', 'ranking', 'estadistica', 'estadísticas',
+          'análisis', 'analisis', 'proveedor', 'proveedores', 'compra', 'compras',
+          'margen', 'rentabilidad', 'importar', 'exportar', 'excel', 'csv'
+        ]
+        
+        // Verificar si contiene palabras de negocio
+        return businessKeywords.some(keyword => msg.includes(keyword))
+      })()
+      
+      // 🧠 Solo obtener contexto si el mensaje lo necesita
+      const screenContext = needsBusinessContext ? aiContextStore.getSystemPrompt() : null
       
       try {
         let response
@@ -1212,9 +1363,6 @@ export default {
         // Registrar uso de chat (solo si tiene límite)
         recordChatUsage()
 
-        // Debug: ver respuesta completa
-        console.log('🤖 [AI105Chat] Respuesta completa del backend:', response)
-
         let aiReply = response.reply
         let aiAction = null
         let suggestedAction = null
@@ -1222,9 +1370,6 @@ export default {
         // Primero verificar si la acción viene directamente en response.action (del backend)
         if (response.action) {
           aiAction = response.action
-          console.log('🎯 [AI105Chat] Acción recibida del backend:', aiAction)
-        } else {
-          console.log('ℹ️ [AI105Chat] No hay acción en response.action')
         }
 
         try {
@@ -1276,50 +1421,40 @@ export default {
 
         // 🎵 Procesar acciones de radio
         if (aiAction && aiAction.type === 'radio' && aiAction.payload) {
-          console.log('🎵 [AI105Chat] Procesando acción de radio:', aiAction.payload)
           const radioAction = aiAction.payload.action
           const volume = aiAction.payload.volume
           
           // Asegurar que el audio esté inicializado
           if (!radioStore.audio) {
-            console.log('🎵 [AI105Chat] Inicializando audio...')
             radioStore.initAudio()
           }
           
           // Cargar estaciones si están vacías
           if (radioStore.topStations.length === 0) {
-            console.log('🎵 [AI105Chat] Cargando estaciones de radio...')
             await radioStore.fetchHomeData()
           }
-          
-          console.log('🎵 [AI105Chat] Ejecutando acción:', radioAction)
           
           switch (radioAction) {
             case 'play':
               radioStartedFromChat.value = true // Marcar que la radio fue iniciada desde el chat
               if (!radioStore.currentStation) {
                 // Si no hay estación, reproducir una aleatoria
-                console.log('🎵 [AI105Chat] No hay estación actual, reproduciendo aleatoria...')
                 radioStore.playRandom()
               } else {
-                console.log('🎵 [AI105Chat] Reproduciendo estación actual:', radioStore.currentStation?.name)
                 radioStore.audio?.play()
               }
               emit('toggle-radio') // Abrir panel de radio
               break
             case 'pause':
-              console.log('🎵 [AI105Chat] Pausando radio...')
               radioStore.audio?.pause()
               break
             case 'toggle':
               radioStore.togglePlay()
               break
             case 'next':
-              console.log('🎵 [AI105Chat] Siguiente canción...')
               radioStore.playNext()
               break
             case 'previous':
-              console.log('🎵 [AI105Chat] Canción anterior...')
               radioStore.playPrevious()
               break
             case 'volume_up':
@@ -1634,5 +1769,165 @@ export default {
 .font-chat {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   🎨 ANIMACIONES FUTURISTAS PARA VOICE AI - Estilo Gemini/Siri/Apple Intelligence
+════════════════════════════════════════════════════════════════════════════ */
+
+/* Ambient Glow Pulse - Para los fondos de luz difusa */
+@keyframes ambient-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes ambient-pulse-delayed {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.08);
+  }
+}
+
+.animate-ambient-pulse {
+  animation: ambient-pulse 3s ease-in-out infinite;
+}
+
+.animate-ambient-pulse-delayed {
+  animation: ambient-pulse-delayed 4s ease-in-out infinite 0.5s;
+}
+
+/* ════════════════════════════════════════════════════════
+   BLOB DINÁMICO MULTI-CAPA - Estilo Premium
+   ════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   VOICE LOADER - Visualizador geométrico animado (optimizado GPU)
+═══════════════════════════════════════════════════════════ */
+.voice-loader {
+  --color-one: #60A5FA;
+  --color-two: #8B5CF6;
+  --color-three: #60A5FA80;
+  --color-four: #8B5CF680;
+  --color-five: #60A5FA40;
+  --time-animation: 3s;
+  --size: 0.8;
+  position: relative;
+  border-radius: 50%;
+  transform: scale(var(--size));
+  will-change: transform;
+  box-shadow:
+    0 0 20px 0 var(--color-three),
+    0 15px 35px 0 var(--color-four);
+  animation: voice-colorize 8s ease-in-out infinite;
+}
+
+.voice-loader::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border-top: solid 1px var(--color-one);
+  border-bottom: solid 1px var(--color-two);
+  background: linear-gradient(180deg, var(--color-five), var(--color-four));
+  box-shadow:
+    inset 0 10px 10px 0 var(--color-three),
+    inset 0 -10px 10px 0 var(--color-four);
+}
+
+.voice-loader .voice-loader-box {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(
+    180deg,
+    var(--color-one) 30%,
+    var(--color-two) 70%
+  );
+  mask: url(#clipping);
+  -webkit-mask: url(#clipping);
+}
+
+.voice-loader svg {
+  position: absolute;
+}
+
+.voice-loader svg #clipping {
+  filter: contrast(10);
+}
+
+.voice-loader svg #clipping polygon {
+  filter: blur(5px);
+  will-change: transform;
+}
+
+.voice-loader svg #clipping polygon:nth-child(1) {
+  transform-origin: 75% 25%;
+  transform: rotate(90deg);
+}
+
+.voice-loader svg #clipping polygon:nth-child(2) {
+  transform-origin: 50% 50%;
+  animation: voice-rotation var(--time-animation) linear infinite reverse;
+}
+
+.voice-loader svg #clipping polygon:nth-child(3) {
+  transform-origin: 50% 60%;
+  animation: voice-rotation var(--time-animation) linear infinite;
+  animation-delay: calc(var(--time-animation) / -3);
+}
+
+.voice-loader svg #clipping polygon:nth-child(4) {
+  transform-origin: 40% 40%;
+  animation: voice-rotation var(--time-animation) linear infinite reverse;
+}
+
+.voice-loader svg #clipping polygon:nth-child(5) {
+  transform-origin: 40% 40%;
+  animation: voice-rotation var(--time-animation) linear infinite reverse;
+  animation-delay: calc(var(--time-animation) / -2);
+}
+
+.voice-loader svg #clipping polygon:nth-child(6) {
+  transform-origin: 60% 40%;
+  animation: voice-rotation var(--time-animation) linear infinite;
+}
+
+.voice-loader svg #clipping polygon:nth-child(7) {
+  transform-origin: 60% 40%;
+  animation: voice-rotation var(--time-animation) linear infinite;
+  animation-delay: calc(var(--time-animation) / -1.5);
+}
+
+@keyframes voice-rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes voice-colorize {
+  0% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(-60deg); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+/* Spin lento para el orbe de conexión */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
 }
 </style>

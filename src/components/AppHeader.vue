@@ -1,43 +1,54 @@
 <template>
-  <!-- Header Empresarial Profesional - Diseño Limpio y Minimalista -->
-  <header class="sticky top-0 z-40 bg-white/80 dark:bg-[#131314]/80 backdrop-blur-xl border-b border-gray-100 dark:border-zinc-800/50 transition-colors duration-300">
-    <div class="h-14 px-4 lg:px-6">
+  <!-- Header Glass Control - Estilo Linear/Vercel -->
+  <header class="sticky top-0 z-40 bg-white dark:bg-[#121214] border-b border-gray-200 dark:border-zinc-800 shadow-[0_1px_3px_rgba(0,0,0,0.05)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)] transition-colors duration-200">
+    <div class="h-[68px] px-4 lg:px-6">
       <div class="flex items-center justify-between h-full">
         
-        <!-- Sección Izquierda: Marca Minimalista -->
+        <!-- Sección Izquierda: Hamburger + Marca -->
         <div class="flex items-center space-x-4">
-          <!-- 📱 Botón Hamburger (Solo móvil) -->
+          <!-- Botón Hamburger (Móvil) -->
           <button
             @click="$emit('toggleSidebar')"
-            class="lg:hidden p-2 -ml-2 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-colors duration-200"
+            class="lg:hidden flex items-center justify-center w-10 h-10 -ml-1 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-all duration-200 active:scale-95"
             title="Menú"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+            <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+
+          <!-- Toggle Sidebar (Desktop) -->
+          <button
+            @click="$emit('toggleSidebarCollapsed')"
+            class="hidden lg:flex items-center justify-center w-10 h-10 -ml-1 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-all duration-200 active:scale-95"
+            :title="sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'"
+          >
+            <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
           
           <div>
-            <h1 class="text-base font-semibold text-gray-900 dark:text-white transition-colors duration-300">105 POS Pro</h1>
-            <p class="text-[11px] text-gray-400 dark:text-zinc-500 font-normal transition-colors duration-300">Sistema de Gestión Empresarial</p>
+            <h1 class="text-base font-semibold text-gray-900 dark:text-white">105 POS Pro</h1>
+            <p class="text-xs text-gray-400 dark:text-zinc-500 font-normal">Sistema de Gestión Empresarial</p>
           </div>
         </div>
         
         <!-- Sección Derecha: Controles y Usuario -->
-        <div class="flex items-center space-x-1">
+        <div class="flex items-center gap-2.5">
           
-          <!-- Notificaciones Compactas -->
+          <!-- Notificaciones - Icono Simple -->
           <div class="relative">
             <button
               @click="toggleNotifications"
-              class="relative p-2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] rounded-full transition-colors duration-200"
+              class="relative flex items-center justify-center w-10 h-10 text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all duration-200"
               title="Notificaciones"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-[20px] h-[20px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
               </svg>
-              <!-- Badge compacto -->
-              <span v-if="notificationCount > 0" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+              <!-- Badge de notificaciones -->
+              <span v-if="notificationCount > 0" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#0f0f12]"></span>
             </button>
             
             <!-- Dropdown Notificaciones -->
@@ -51,90 +62,88 @@
             >
               <div 
                 v-if="notificationsOpen"
-                class="absolute right-0 mt-2 w-80 bg-white dark:bg-[#2d2d38] rounded-lg shadow-xl border border-gray-100 dark:border-zinc-700/60 py-2 z-50 transition-colors duration-300"
+                class="absolute right-0 mt-2 w-80 bg-white dark:bg-[#18181b] rounded-xl shadow-xl border border-[#f3f4f6] dark:border-zinc-800 overflow-hidden z-50"
+                style="box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.15);"
                 @click.stop
               >
-                <div class="px-4 py-3 border-b border-gray-50 dark:border-zinc-700/40">
+                <div class="px-4 py-3 border-b border-[#f3f4f6] dark:border-zinc-800">
                   <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Notificaciones</h3>
-                    <div class="flex items-center gap-2">
+                    <h3 class="text-xs font-semibold text-gray-900 dark:text-white">Notificaciones</h3>
+                    <div class="flex items-center gap-1.5">
                       <!-- Botón Limpiar -->
                       <button
                         v-if="notificationCount > 0"
                         @click="clearNotifications"
-                        class="flex items-center space-x-1 px-2 py-1 text-xs rounded-md transition-all duration-200 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:text-gray-900 dark:hover:text-white"
+                        class="flex items-center space-x-1 px-2 py-1 text-[10px] rounded-md transition-all duration-200 bg-[#f9fafb] dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:text-gray-700 dark:hover:text-white"
                         title="Limpiar todas"
                       >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                         <span>Limpiar</span>
                       </button>
                       <!-- Toggle Silenciar -->
                       <button
                         @click="toggleNotificationsSilent"
-                        class="flex items-center space-x-1 px-2 py-1 text-xs rounded-md transition-all duration-200"
+                        class="flex items-center space-x-1 px-2 py-1 text-[10px] rounded-md transition-all duration-200"
                         :class="notificationsSilent 
-                          ? 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900' 
-                          : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700'"
+                          ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50' 
+                          : 'bg-[#f9fafb] dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700'"
                         :title="notificationsSilent ? 'Reactivar notificaciones' : 'Silenciar notificaciones'"
                       >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path v-if="notificationsSilent" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 5.586a2 2 0 002.828 0L12 2l3.586 3.586a2 2 0 002.828 0l1.414 1.414a2 2 0 000 2.828L16.242 12l3.586 3.586a2 2 0 000 2.828L18.414 20l-3.586-3.586a2 2 0 00-2.828 0L12 20l-3.586-3.586a2 2 0 00-2.828 0L4.172 15l3.586-3.586a2 2 0 000-2.828L4.172 9l1.414-1.414z" />
-                          <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                          <path v-if="notificationsSilent" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.586 5.586a2 2 0 002.828 0L12 2l3.586 3.586a2 2 0 002.828 0l1.414 1.414a2 2 0 000 2.828L16.242 12l3.586 3.586a2 2 0 000 2.828L18.414 20l-3.586-3.586a2 2 0 00-2.828 0L12 20l-3.586-3.586a2 2 0 00-2.828 0L4.172 15l3.586-3.586a2 2 0 000-2.828L4.172 9l1.414-1.414z" />
+                          <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                         <span>{{ notificationsSilent ? 'Silenciadas' : 'Silenciar' }}</span>
                       </button>
                     </div>
                   </div>
                 </div>
-                <div class="max-h-96 overflow-y-auto">
-                  <div v-if="notificationCount === 0" class="px-4 py-6 text-center text-gray-500 dark:text-zinc-400 text-sm">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                <div class="max-h-80 overflow-y-auto">
+                  <div v-if="notificationCount === 0" class="px-4 py-6 text-center text-gray-400 dark:text-zinc-500 text-xs">
+                    <svg class="w-10 h-10 mx-auto mb-2 text-gray-200 dark:text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                     </svg>
-                    <p>No hay notificaciones nuevas</p>
-                    <p class="text-xs mt-1">Los movimientos de inventario aparecerán aquí</p>
+                    <p class="font-medium">No hay notificaciones</p>
+                    <p class="text-[10px] mt-0.5 text-gray-300 dark:text-zinc-600">Los movimientos aparecerán aquí</p>
                   </div>
-                  <div v-else-if="notificationsSilent" class="px-4 py-6 text-center text-gray-500 dark:text-zinc-400 text-sm">
-                    <div class="flex flex-col items-center space-y-2">
-                      <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 5.586a2 2 0 002.828 0L12 2l3.586 3.586a2 2 0 002.828 0l1.414 1.414a2 2 0 000 2.828L16.242 12l3.586 3.586a2 2 0 000 2.828L18.414 20l-3.586-3.586a2 2 0 00-2.828 0L12 20l-3.586-3.586a2 2 0 00-2.828 0L4.172 15l3.586-3.586a2 2 0 000-2.828L4.172 9l1.414-1.414z" />
+                  <div v-else-if="notificationsSilent" class="px-4 py-6 text-center text-gray-400 dark:text-zinc-500 text-xs">
+                    <div class="flex flex-col items-center space-y-1.5">
+                      <svg class="w-7 h-7 text-red-300 dark:text-red-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.586 5.586a2 2 0 002.828 0L12 2l3.586 3.586a2 2 0 002.828 0l1.414 1.414a2 2 0 000 2.828L16.242 12l3.586 3.586a2 2 0 000 2.828L18.414 20l-3.586-3.586a2 2 0 00-2.828 0L12 20l-3.586-3.586a2 2 0 00-2.828 0L4.172 15l3.586-3.586a2 2 0 000-2.828L4.172 9l1.414-1.414z" />
                       </svg>
-                      <p class="text-sm">Notificaciones silenciadas</p>
-                      <p class="text-xs">Los movimientos no se mostrarán</p>
+                      <p class="font-medium">Notificaciones silenciadas</p>
                     </div>
                   </div>
-                  <div v-else class="divide-y divide-gray-100 dark:divide-zinc-800/50">
-                    <!-- Notificaciones empresariales minimalistas -->
+                  <div v-else class="divide-y divide-[#f3f4f6] dark:divide-zinc-800">
+                    <!-- Notificaciones minimalistas -->
                     <div 
                       v-for="notification in notifications" 
                       :key="notification.id"
-                      class="px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors duration-150 cursor-default"
+                      class="px-4 py-2.5 hover:bg-[#f9fafb] dark:hover:bg-zinc-800/50 transition-colors duration-150 cursor-default"
                     >
-                      <div class="flex items-center gap-3">
+                      <div class="flex items-center gap-2.5">
                         <!-- Indicador mínimo -->
                         <div 
                           class="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                          :class="notification.type === 'in' ? 'bg-emerald-500' : 'bg-slate-400 dark:bg-zinc-500'"
+                          :class="notification.type === 'in' ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-600'"
                         ></div>
                         
                         <!-- Contenido compacto -->
                         <div class="flex-1 min-w-0">
-                          <div class="flex items-center justify-between gap-2">
-                            <p class="text-sm text-gray-900 dark:text-white truncate">
-                              <span class="font-medium">{{ notification.title }}</span>
-                              <span class="text-gray-500 dark:text-zinc-400 font-normal"> · {{ notification.description }}</span>
-                            </p>
-                          </div>
-                          <p class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">{{ notification.formatted_date }}</p>
+                          <p class="text-xs text-gray-800 dark:text-zinc-200 truncate">
+                            <span class="font-medium">{{ notification.title }}</span>
+                            <span class="text-gray-400 dark:text-zinc-500"> · {{ notification.description }}</span>
+                          </p>
+                          <p class="text-[10px] text-gray-300 dark:text-zinc-600 mt-0.5">{{ notification.formatted_date }}</p>
                         </div>
                       </div>
                     </div>
                     
                     <!-- Footer minimalista -->
-                    <div class="px-4 py-2.5">
-                      <button class="text-xs font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors">
+                    <div class="px-4 py-2">
+                      <button class="text-[10px] font-medium text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
                         Ver historial completo
                       </button>
                     </div>
@@ -144,39 +153,40 @@
             </Transition>
           </div>
           
-          <!-- Video Tutorial - GHOST BUTTON -->
+          <!-- Video Tutoriales - Tutorial con texto -->
           <button
             id="tour-video-button"
             @click="showVideoTutorial"
-            class="hidden md:flex p-2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] rounded-full transition-colors duration-200"
-            title="Video tutorial"
+            class="hidden md:flex items-center gap-1.5 h-10 px-3 text-gray-600 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 rounded-lg transition-all duration-200"
+            title="Ver tutorial"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z"/>
             </svg>
+            <span class="text-sm font-semibold">Tutorial</span>
           </button>
           
-          <!-- Mini Player Radio - Inteligente -->
+          <!-- Radio - Con texto -->
           <div class="hidden md:block">
-            <!-- Estado INACTIVO: Botón simple -->
+            <!-- Estado INACTIVO: Icono + texto -->
             <button
               v-if="!isRadioActive"
               id="tour-voice-button"
               @click="$emit('toggle-radio')"
-              class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-all duration-200 hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] text-gray-500 dark:text-zinc-400"
+              class="flex items-center gap-1.5 h-10 px-3 rounded-lg transition-all duration-200 text-gray-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
               title="Abrir Radio"
             >
-              <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
               </svg>
-              <span class="text-sm font-medium">Radio</span>
+              <span class="text-sm font-semibold">Radio</span>
             </button>
 
             <!-- Estado ACTIVO: Mini Player con controles -->
             <div
               v-else
-              class="flex items-center gap-1.5 px-2 py-1.5 rounded-xl transition-all duration-200 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30"
+              class="flex items-center gap-1.5 h-10 px-3 rounded-xl transition-all duration-200 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/60 shadow-sm"
             >
               <!-- Visualizador de ondas -->
               <div class="flex items-end gap-0.5 h-4 w-4 flex-shrink-0">
@@ -240,56 +250,71 @@
             </div>
           </div>
 
-          <!-- Botón 105 IA - Destacado con estilo premium -->
+          <!-- Botón 105 IA - Estilo Premium Outline con Borde Gradiente -->
           <button
             id="tour-ia-button"
             @click="toggleAIChat"
-            class="hidden md:flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl shadow-md shadow-violet-500/25 hover:shadow-lg hover:shadow-violet-500/30 transition-all duration-300 hover:scale-[1.02]"
+            class="hidden md:flex items-center justify-center space-x-1.5 h-10 px-3.5 rounded-lg transition-all duration-200 hover:scale-[1.02] group relative overflow-hidden text-gray-600 dark:text-zinc-400 hover:bg-violet-50 dark:hover:bg-violet-900/15"
             title="Asistente IA 105"
           >
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0L14.59 8.41L23 11L14.59 13.59L12 22L9.41 13.59L1 11L9.41 8.41L12 0Z"/>
-            </svg>
-            <span class="text-sm font-semibold">105 IA</span>
+            <!-- Glow sutil en hover -->
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-violet-500/0 to-pink-500/0 group-hover:from-blue-500/5 group-hover:via-violet-500/5 group-hover:to-pink-500/5 transition-all duration-300 rounded-lg dark:group-hover:from-blue-500/10 dark:group-hover:via-violet-500/10 dark:group-hover:to-pink-500/10"></div>
+            
+            <!-- Icono Sparkles con gradiente Gemini -->
+            <div class="relative flex-shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="url(#gemini-gradient-header)">
+                <defs>
+                  <linearGradient id="gemini-gradient-header" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#60A5FA"/>
+                    <stop offset="50%" style="stop-color:#A78BFA"/>
+                    <stop offset="100%" style="stop-color:#F472B6"/>
+                  </linearGradient>
+                </defs>
+                <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+              </svg>
+            </div>
+            
+            <!-- Texto con gradiente -->
+            <span class="relative text-sm font-semibold bg-gradient-to-r from-blue-600 via-violet-600 to-pink-500 bg-clip-text text-transparent">105 IA</span>
           </button>
-          
-          <!-- Separador -->
-          <div class="hidden md:block h-5 w-px bg-gray-200 dark:bg-gray-600"></div>
           
           <!-- Contexto de Sede - TEXTO PLANO (no botón) -->
           <div v-if="shouldShowWarehouseInfo" 
                class="hidden md:flex items-center gap-1.5 px-2 py-1"
                title="Tienda actual">
             <svg class="w-3.5 h-3.5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
-            <span class="text-sm font-medium text-gray-600 dark:text-zinc-400">{{ currentWarehouse.name }}</span>
+            <span class="text-xs font-medium text-gray-500 dark:text-zinc-400">{{ currentWarehouse.name }}</span>
           </div>
           
-          <!-- Perfil de Usuario - Avatar Profesional estilo Google -->
-          <div class="relative" id="user-dropdown-container">
+          <!-- Perfil de Usuario - Círculo Perfecto -->
+          <div class="relative ml-1" id="user-dropdown-container">
             <button
               id="user-profile-button"
               @click="toggleUserDropdown"
-              class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all duration-200"
+              class="relative flex items-center justify-center transition-all duration-200 hover:scale-105"
               :title="`${currentUser.name} - ${currentUser.role?.name || 'User'}`"
             >
-              <!-- Avatar Circular - Diseño Google -->
-              <div class="relative w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-sm ring-2 ring-transparent hover:ring-emerald-200 dark:hover:ring-emerald-800 transition-all">
-                <span class="text-white font-bold text-sm">{{ currentUser.initials }}</span>
-                
-                <!-- 🎯 Indicador de Plan - Sutil punto de color -->
+              <!-- Avatar Premium con Anillo Gradiente (Estilo Gemini) -->
+              <div 
+                :class="[
+                  'relative rounded-full flex items-center justify-center transition-all duration-300',
+                  isPremiumOrEnterprise ? 'bg-gradient-to-tr from-blue-500 via-purple-500 to-cyan-400 p-[2px] shadow-lg shadow-purple-500/25' : 'ring-2 ring-white dark:ring-[#121214] shadow-sm'
+                ]"
+              >
+                <!-- Contenedor Interno del Avatar -->
                 <div 
-                  v-if="isPremiumOrEnterprise"
-                  class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white dark:border-[#1a1a1f] shadow-sm"
-                  :class="isEnterprisePlan ? 'bg-violet-500' : 'bg-emerald-500'"
-                  :title="planBadgeText"
-                ></div>
+                  class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center"
+                  :class="isPremiumOrEnterprise ? 'border-2 border-white dark:border-[#121214]' : ''"
+                >
+                  <span class="text-white font-semibold text-sm">{{ currentUser.initials }}</span>
+                </div>
               </div>
             </button>
             
-            <!-- Dropdown Mejorado - Estilo Google/Gemini -->
+            <!-- Dropdown Mejorado - Estilo Soft UI -->
             <Transition
               enter-active-class="transition ease-out duration-200"
               enter-from-class="opacity-0 scale-95 translate-y-1"
@@ -301,44 +326,44 @@
               <div 
                 v-if="userDropdownOpen"
                 id="user-dropdown-menu"
-                class="absolute right-0 mt-2 w-80 bg-white dark:bg-[#2d2d38] rounded-2xl shadow-2xl border border-gray-200/80 dark:border-zinc-700/60 overflow-hidden z-50"
-                style="box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);"
+                class="absolute right-0 mt-2 w-72 bg-white dark:bg-[#18181b] rounded-xl shadow-xl border border-[#f3f4f6] dark:border-zinc-800 overflow-hidden z-50"
+                style="box-shadow: 0 8px 30px -8px rgba(0, 0, 0, 0.15);"
                 @click.stop
               >
-                <!-- Header del Usuario - Estilo Google Account -->
-                <div class="p-5 bg-white dark:bg-[#2d2d38]">
-                  <div class="flex items-start gap-4">
-                    <!-- Avatar Grande -->
+                <!-- Header del Usuario - Estilo Limpio -->
+                <div class="p-4 bg-[#fafafa] dark:bg-zinc-900/50">
+                  <div class="flex items-start gap-3">
+                    <!-- Avatar Grande Premium -->
                     <div class="relative flex-shrink-0">
-                      <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg">
-                        <span class="text-white font-bold text-xl">{{ currentUser.initials }}</span>
-                      </div>
-                      <!-- Indicador de plan sutil -->
                       <div 
-                        v-if="isPremiumOrEnterprise"
-                        class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-3 border-white dark:border-[#2d2d38] flex items-center justify-center"
-                        :class="isEnterprisePlan ? 'bg-violet-500' : 'bg-emerald-500'"
+                        :class="[
+                          'relative rounded-full flex items-center justify-center transition-all duration-300',
+                          isPremiumOrEnterprise ? 'bg-gradient-to-tr from-blue-500 via-purple-500 to-cyan-400 p-[2.5px] shadow-lg shadow-purple-500/25' : 'shadow-md'
+                        ]"
                       >
-                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                        </svg>
+                        <div 
+                          class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center"
+                          :class="isPremiumOrEnterprise ? 'border-[2.5px] border-[#fafafa] dark:border-zinc-900/50' : 'border-2 border-transparent'"
+                        >
+                          <span class="text-white font-semibold text-lg">{{ currentUser.initials }}</span>
+                        </div>
                       </div>
                     </div>
                     
                     <!-- Info del Usuario -->
-                    <div class="flex-1 min-w-0 pt-1">
-                      <h3 class="text-base font-semibold text-gray-900 dark:text-white truncate">{{ currentUser.name }}</h3>
-                      <p class="text-sm text-gray-500 dark:text-zinc-400 truncate">{{ currentUser.email }}</p>
+                    <div class="flex-1 min-w-0">
+                      <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ currentUser.name }}</h3>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">{{ currentUser.email }}</p>
                       
                       <!-- Badge de Plan Elegante -->
                       <div 
                         v-if="isPremiumOrEnterprise"
-                        class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                        class="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
                         :class="isEnterprisePlan 
-                          ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300' 
-                          : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300'"
+                          ? 'bg-violet-100 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300' 
+                          : 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300'"
                       >
-                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         {{ isEnterprisePlan ? 'Enterprise' : 'Pro' }}
@@ -348,41 +373,41 @@
                 </div>
                 
                 <!-- Separador sutil -->
-                <div class="h-px bg-gray-100 dark:bg-zinc-700/60"></div>
+                <div class="h-px bg-[#f3f4f6] dark:bg-zinc-800"></div>
                 
                 <!-- Opciones del Menu -->
-                <div class="py-2">
+                <div class="py-1">
                   <!-- Mi Perfil -->
                   <button
                     @click="handleProfileClick"
-                    class="w-full flex items-center px-5 py-3 text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group"
+                    class="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-200 hover:bg-[#f9fafb] dark:hover:bg-zinc-800/50 transition-colors group"
                   >
-                    <div class="w-9 h-9 mr-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-950 transition-colors">
-                      <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-8 h-8 mr-3 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-950 transition-colors">
+                      <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                       </svg>
                     </div>
-                    <span class="font-medium">Mi Perfil</span>
+                    <span class="font-medium text-xs">Mi Perfil</span>
                   </button>
                   
                   <!-- Configuración -->
                   <button
                     v-if="shouldShowSettings"
                     @click="handleSettingsClick"
-                    class="w-full flex items-center px-5 py-3 text-sm text-gray-700 dark:text-zinc-200 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group"
+                    class="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-200 hover:bg-[#f9fafb] dark:hover:bg-zinc-800/50 transition-colors group"
                   >
-                    <div class="w-9 h-9 mr-4 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors">
-                      <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-8 h-8 mr-3 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors">
+                      <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                       </svg>
                     </div>
-                    <span class="font-medium">Configuración</span>
+                    <span class="font-medium text-xs">Configuración</span>
                   </button>
                 </div>
                 
                 <!-- Separador -->
-                <div class="h-px bg-gray-100 dark:bg-zinc-700/60"></div>
+                <div class="h-px bg-[#f3f4f6] dark:bg-zinc-800"></div>
                 
                 <!-- Selector de Tema - Diseño Limpio -->
                 <div class="p-4">
@@ -638,10 +663,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  autoHideEnabled: {
-    type: Boolean,
-    default: false
-  },
   sidebarCollapsed: {
     type: Boolean,
     default: false
@@ -657,7 +678,6 @@ const emit = defineEmits([
   'notifications-silenced',
   'show-video-tutorial',
   'toggleSidebar',
-  'toggleAutoHide',
   'toggleSidebarCollapsed',
   'toggle-radio',
   'notifications-opened',
@@ -1139,5 +1159,32 @@ onMounted(() => {
 .animate-music-bar-3 { 
   animation: music-bar 0.9s ease-in-out infinite; 
   animation-delay: 0.6s; 
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   🎨 BOTÓN 105 IA - Estilo Premium con Borde Gradiente
+   Material You / Glassmorphism
+════════════════════════════════════════════════════════════════════════════ */
+.ai-gradient-border {
+  position: relative;
+  background: white;
+  border: 1.5px solid transparent;
+  background-image: linear-gradient(white, white), 
+                    linear-gradient(135deg, #60A5FA, #A78BFA, #F472B6);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* Dark mode */
+:deep(.dark) .ai-gradient-border,
+.dark .ai-gradient-border {
+  background-image: linear-gradient(#18181b, #18181b), 
+                    linear-gradient(135deg, #60A5FA, #A78BFA, #F472B6);
+}
+
+/* Fallback usando :global para dark mode */
+:global(.dark) .ai-gradient-border {
+  background-image: linear-gradient(#18181b, #18181b), 
+                    linear-gradient(135deg, #60A5FA, #A78BFA, #F472B6);
 }
 </style>

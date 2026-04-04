@@ -572,14 +572,14 @@ const getPlanDisplayName = (plan) => {
 // Prices configuration
 const planPrices = {
   basic: {
-    monthly: { display: 25000, total: 25000 },
-    yearly: { display: 20000, total: 240000 },
-    '24months': { display: 20000, total: 440000 }
+    monthly: { display: 35000, total: 35000 },
+    yearly: { display: 30000, total: 360000 },
+    '24months': { display: 30000, total: 660000 }
   },
   premium: {
-    monthly: { display: 60000, total: 60000 },
-    yearly: { display: 50000, total: 600000 },
-    '24months': { display: 50000, total: 1100000 }
+    monthly: { display: 75000, total: 75000 },
+    yearly: { display: 65000, total: 780000 },
+    '24months': { display: 65000, total: 1430000 }
   },
   enterprise: {
     monthly: { display: 150000, total: 150000 },

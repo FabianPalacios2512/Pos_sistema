@@ -39,9 +39,23 @@ const actions = {
         state.user = user
         state.isAuthenticated = true
         
-        // ✅ FIX: NO verificar token con /me en cada recarga
-        // Solo confiar en token de localStorage
-        // La verificación real se hará cuando el usuario interactúe con el backend
+        // Si el usuario tiene datos incompletos (ej: nombre vacío), refrescar desde el backend
+        if (token && (!user.name || !user.role || user.name === 'Cargando...')) {
+          try {
+            const apiClient = (await import('../services/apiClient.js')).default
+            apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`
+            const response = await apiClient.get('/me')
+            if (response.data?.success) {
+              const freshUser = response.data.data?.user || response.data.data
+              if (freshUser && freshUser.name) {
+                state.user = freshUser
+                localStorage.setItem('user', JSON.stringify(freshUser))
+              }
+            }
+          } catch (refreshError) {
+            // Si falla el refresh, continuar con los datos que tenemos
+          }
+        }
       }
     } catch (error) {
       console.error('Error al inicializar autenticación:', error)

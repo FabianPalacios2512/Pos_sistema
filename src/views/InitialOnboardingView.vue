@@ -1,305 +1,300 @@
 <template>
-  <div class="h-screen overflow-y-auto font-sans bg-[#EEF2F6] pb-12">
+  <div class="flex-1 w-full h-full overflow-y-auto font-sans bg-[#EEF2F6] pb-24">
 
-    <div class="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
+    <div class="relative w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 flex flex-col flex-1">
       
-      <!-- Header con tu estilo -->
-      <div class="bg-white/50  rounded-[24px] border border-white shadow-sm p-4 sm:p-6 mb-6 sm:mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div class="flex items-center space-x-3 sm:space-x-4">
-            <div class="w-11 h-11 sm:w-14 sm:h-14 bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-              <svg class="w-5 h-5 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-            </div>
-            <div class="min-w-0">
-              <h1 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight truncate">
-                Configuración de {{ config.storeName || 'Tu Tienda' }}
-              </h1>
-              <p class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide mt-0.5 sm:mt-1">
-                Personaliza tu sistema en {{ totalSteps }} pasos sencillos
-              </p>
-            </div>
-          </div>
+      <!-- Encabezado y Progreso Minimalista -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 mt-2 shrink-0">
+        <div>
+          <h1 class="text-2xl md:text-[28px] font-black text-slate-900 tracking-tight">
+            Configuración de <span class="text-[#009F7A]">{{ config.storeName || 'tu Tienda' }}</span>
+          </h1>
+          <p class="text-sm font-semibold text-slate-500 mt-1">
+            Personaliza tu sistema en {{ isPremiumPlan ? '3' : '2' }} pasos
+          </p>
+        </div>
 
-          <!-- Stepper móvil compacto (visible en móvil) -->
-          <div class="flex md:hidden items-center justify-center gap-2">
-            <template v-for="step in totalSteps" :key="step">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all duration-300"
-                   :class="currentStep >= step ? 'bg-slate-900 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-400'">
-                <span v-if="currentStep > step || (!isPremiumPlan && step === 2 && currentStep === 2)">✓</span>
-                <span v-else>{{ step }}</span>
-              </div>
-              <div v-if="step < totalSteps" class="w-6 h-0.5 rounded-full transition-all duration-300" 
-                   :class="currentStep > step ? 'bg-slate-900' : 'bg-slate-200'"></div>
-            </template>
-          </div>
-
-          <!-- Stepper horizontal (oculto en móvil) -->
-          <div class="hidden md:flex items-center space-x-4">
-            <div class="flex items-center">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300"
-                   :class="currentStep >= 1 ? 'bg-slate-900 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-400'">
-                <span v-if="currentStep > 1">✓</span>
-                <span v-else>1</span>
-              </div>
-              <span class="ml-2 text-xs font-bold uppercase tracking-wide" :class="currentStep >= 1 ? 'text-slate-900' : 'text-slate-400'">Diseño</span>
+        <!-- Stepper Sutil -->
+        <div class="flex items-center gap-2 md:gap-3">
+          <!-- Paso 1 -->
+          <div class="flex items-center gap-1.5 md:gap-2">
+            <div class="w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold transition-all"
+                 :class="currentStep >= 1 ? 'border-[#009F7A] bg-[#009F7A]/10 text-[#009F7A]' : 'border-slate-300 text-slate-400'">
+              <span v-if="currentStep > 1">✓</span><span v-else>1</span>
             </div>
-            <div class="w-12 h-0.5 rounded-full transition-all duration-300" :class="currentStep >= 2 ? 'bg-slate-900' : 'bg-slate-200'"></div>
-            
-            <div class="flex items-center">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300"
-                   :class="currentStep >= 2 ? 'bg-slate-900 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-400'">
-                <span v-if="currentStep > 2 || (!isPremiumPlan && currentStep === 2)">✓</span>
-                <span v-else>2</span>
-              </div>
-              <span class="ml-2 text-xs font-bold uppercase tracking-wide" :class="currentStep >= 2 ? 'text-slate-900' : 'text-slate-400'">Datos</span>
-            </div>
-            
-            <!-- Paso 3 solo para Premium/Enterprise -->
-            <template v-if="isPremiumPlan">
-              <div class="w-12 h-0.5 rounded-full transition-all duration-300" :class="currentStep >= 3 ? 'bg-slate-900' : 'bg-slate-200'"></div>
-
-              <div class="flex items-center">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300"
-                     :class="currentStep >= 3 ? 'bg-slate-900 text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-400'">
-                  3
-                </div>
-                <span class="ml-2 text-xs font-bold uppercase tracking-wide" :class="currentStep >= 3 ? 'text-slate-900' : 'text-slate-400'">WhatsApp</span>
-              </div>
-            </template>
+            <span class="text-[10px] font-bold uppercase tracking-widest hidden sm:inline" :class="currentStep >= 1 ? 'text-slate-900' : 'text-slate-400'">Diseño</span>
           </div>
+          
+          <div class="w-4 sm:w-8 h-[2px] rounded-full transition-all" :class="currentStep >= 2 ? 'bg-[#009F7A]' : 'bg-slate-200'"></div>
+          
+          <!-- Paso 2 -->
+          <div class="flex items-center gap-1.5 md:gap-2">
+            <div class="w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold transition-all"
+                 :class="currentStep >= 2 ? 'border-[#009F7A] bg-[#009F7A]/10 text-[#009F7A]' : 'border-slate-300 text-slate-400'">
+              <span v-if="currentStep > 2 || (!isPremiumPlan && currentStep === 2)">✓</span><span v-else>2</span>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-widest hidden sm:inline" :class="currentStep >= 2 ? 'text-slate-900' : 'text-slate-400'">Datos</span>
+          </div>
+          
+          <!-- Paso 3 (Premium) -->
+          <template v-if="isPremiumPlan">
+            <div class="w-4 sm:w-8 h-[2px] rounded-full transition-all" :class="currentStep >= 3 ? 'bg-[#009F7A]' : 'bg-slate-200'"></div>
+            <div class="flex items-center gap-1.5 md:gap-2">
+              <div class="w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold transition-all"
+                   :class="currentStep >= 3 ? 'border-[#009F7A] bg-[#009F7A]/10 text-[#009F7A]' : 'border-slate-300 text-slate-400'">
+                3
+              </div>
+              <span class="text-[10px] font-bold uppercase tracking-widest hidden sm:inline" :class="currentStep >= 3 ? 'text-slate-900' : 'text-slate-400'">WhatsApp</span>
+            </div>
+          </template>
         </div>
       </div>
 
       <!-- Transiciones suaves entre pasos -->
       <Transition name="fade-slide" mode="out-in">
         
-        <div v-if="currentStep === 1" key="step1" class="space-y-6">
-          <div class="bg-white/50  rounded-[24px] border border-white shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
-            <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight mb-1 sm:mb-2">Elige tu Plantilla de Facturación</h2>
-            <p class="text-xs sm:text-sm font-semibold text-slate-600">
-              Selecciona el diseño que mejor represente tu marca. Podrás cambiarlo después en configuración.
-            </p>
+        <!-- ==============================================
+             PASO 1: ELIGE TU PLANTILLA
+             ============================================== -->
+        <div v-if="currentStep === 1" key="step1" class="space-y-6 flex-1">
+          
+          <div class="mb-4">
+            <h2 class="text-lg md:text-xl font-black text-slate-900 tracking-tight">Elige tu Plantilla de Facturación</h2>
+            <p class="text-xs md:text-sm font-semibold text-slate-500 mt-1">Selecciona el diseño que mejor represente tu marca. Podrás cambiarlo después.</p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-7xl mx-auto">
+          <!-- Grid de Radio Cards Minimalistas -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             
-            <div @click="selectedTemplate = 'classic'" 
-                 class="group relative bg-white rounded-2xl sm:rounded-[24px] overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl"
-                 :class="selectedTemplate === 'classic' ? 'ring-4 ring-slate-900 ring-offset-2 sm:ring-offset-4 ring-offset-[#EEF2F6] shadow-xl' : 'border border-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)]'">
+            <!-- Plantilla Clásica -->
+            <label class="group relative flex flex-col bg-white border rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-slate-50 outline-none"
+                   :class="selectedTemplate === 'classic' ? 'border-[#009F7A] bg-[#009F7A]/5 ring-2 ring-[#009F7A]/20' : 'border-slate-200 hover:border-[#009F7A]/40'">
+              <input type="radio" v-model="selectedTemplate" value="classic" class="sr-only">
               
-              <div v-if="selectedTemplate === 'classic'" class="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 animate-scale-in">
-                <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-900 flex items-center justify-center shadow-lg">
-                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                </div>
+              <!-- Checkmark Elegante -->
+              <div v-if="selectedTemplate === 'classic'" class="absolute top-3 right-3 text-[#009F7A] z-10 bg-white/90 rounded-full p-0.5 backdrop-blur shadow-sm">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                </svg>
               </div>
-              
-              <div class="invoice-preview-wrapper bg-slate-50 border-b border-slate-100">
-                <div class="invoice-preview-scaler">
+
+              <!-- Preview Escala Reducida -->
+              <div class="w-full flex justify-center pt-6 pb-2 bg-[#F8FAFC] border-b border-slate-100 overflow-hidden relative" style="height: 380px;">
+                <div class="invoice-preview-scaler transition-transform group-hover:scale-[0.88]" style="transform: scale(0.85); transform-origin: top center; margin-top: 0;">
                   <ThermalClassicPreview :data="previewDataStep1" :items="dummyItems" />
                 </div>
               </div>
-              
-              <div class="p-3 sm:p-5 text-center bg-white relative z-10">
-                <h3 class="font-black text-slate-900 mb-1 tracking-tight">Clásico Profesional</h3>
-                <p class="text-xs text-slate-500 font-bold">Ideal para régimen común y empresas</p>
-              </div>
-            </div>
 
-            <div @click="selectedTemplate = 'modern'" 
-                 class="group relative bg-white rounded-[24px] overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl"
-                 :class="selectedTemplate === 'modern' ? 'ring-4 ring-slate-900 ring-offset-4 ring-offset-[#EEF2F6] shadow-xl' : 'border border-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)]'">
-              
-              <div v-if="selectedTemplate === 'modern'" class="absolute top-4 right-4 z-20 animate-scale-in">
-                <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                </div>
+              <div class="p-4 flex-1 flex flex-col justify-center">
+                <h3 class="text-sm font-extrabold text-slate-900 tracking-tight">Clásico Profesional</h3>
+                <p class="text-xs font-semibold text-slate-500 mt-1">Régimen común y empresas</p>
               </div>
+            </label>
+
+            <!-- Plantilla Moderna -->
+            <label class="group relative flex flex-col bg-white border rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-slate-50 outline-none"
+                   :class="selectedTemplate === 'modern' ? 'border-[#009F7A] bg-[#009F7A]/5 ring-2 ring-[#009F7A]/20' : 'border-slate-200 hover:border-[#009F7A]/40'">
+              <input type="radio" v-model="selectedTemplate" value="modern" class="sr-only">
               
-              <div class="invoice-preview-wrapper bg-slate-50 border-b border-slate-100">
-                <div class="invoice-preview-scaler">
+              <div v-if="selectedTemplate === 'modern'" class="absolute top-3 right-3 text-[#009F7A] z-10 bg-white/90 rounded-full p-0.5 backdrop-blur shadow-sm">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                </svg>
+              </div>
+
+              <div class="w-full flex justify-center pt-6 pb-2 bg-transparent border-b border-slate-100 overflow-hidden relative" style="height: 380px;">
+                <div class="invoice-preview-scaler transition-transform group-hover:scale-[0.88]" style="transform: scale(0.85); transform-origin: top center; margin-top: 0;">
                   <ThermalModernPreview :data="previewDataStep1" :items="dummyItems" />
                 </div>
               </div>
-              
-              <div class="p-5 text-center bg-white relative z-10">
-                <h3 class="font-black text-slate-900 mb-1 tracking-tight">Moderno SaaS</h3>
-                <p class="text-xs text-slate-500 font-bold">Estilo digital con encabezado de color</p>
-              </div>
-            </div>
 
-            <div @click="selectedTemplate = 'minimal'" 
-                 class="group relative bg-white rounded-[24px] overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl"
-                 :class="selectedTemplate === 'minimal' ? 'ring-4 ring-slate-900 ring-offset-4 ring-offset-[#EEF2F6] shadow-xl' : 'border border-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)]'">
-              
-              <div v-if="selectedTemplate === 'minimal'" class="absolute top-4 right-4 z-20 animate-scale-in">
-                <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-lg">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                </div>
+              <div class="p-4 flex-1 flex flex-col justify-center">
+                <h3 class="text-sm font-extrabold text-slate-900 tracking-tight">Moderno SaaS</h3>
+                <p class="text-xs font-semibold text-slate-500 mt-1">Estilo digital corporativo</p>
               </div>
+            </label>
+
+            <!-- Plantilla Ticket Minimalista -->
+            <label class="group relative flex flex-col bg-white border rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-slate-50 outline-none"
+                   :class="selectedTemplate === 'minimal' ? 'border-[#009F7A] bg-[#009F7A]/5 ring-2 ring-[#009F7A]/20' : 'border-slate-200 hover:border-[#009F7A]/40'">
+              <input type="radio" v-model="selectedTemplate" value="minimal" class="sr-only">
               
-              <div class="invoice-preview-wrapper bg-slate-50 border-b border-slate-100">
-                <div class="invoice-preview-scaler">
+              <div v-if="selectedTemplate === 'minimal'" class="absolute top-3 right-3 text-[#009F7A] z-10 bg-white/90 rounded-full p-0.5 backdrop-blur shadow-sm">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                </svg>
+              </div>
+
+              <div class="w-full flex justify-center pt-6 pb-2 bg-[#F8FAFC] border-b border-slate-100 overflow-hidden relative" style="height: 380px;">
+                <div class="invoice-preview-scaler transition-transform group-hover:scale-[0.88]" style="transform: scale(0.85); transform-origin: top center; margin-top: 0;">
                   <ThermalMinimalPreview :data="previewDataStep1" :items="dummyItems" />
                 </div>
               </div>
-              
-              <div class="p-5 text-center bg-white relative z-10">
-                <h3 class="font-black text-slate-900 mb-1 tracking-tight">Ticket Minimalista</h3>
-                <p class="text-xs text-slate-500 font-bold">Ahorra papel y tinta. Alto contraste.</p>
+
+              <div class="p-4 flex-1 flex flex-col justify-center">
+                <h3 class="text-sm font-extrabold text-slate-900 tracking-tight">Ticket Minimalista</h3>
+                <p class="text-xs font-semibold text-slate-500 mt-1">Ahorro de papel. Alto contraste.</p>
               </div>
-            </div>
+            </label>
           </div>
           
-          <div class="mt-8 text-center">
-            <button @click="nextStep" class="px-10 py-3 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center space-x-2 mx-auto">
-              <span>Continuar</span>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="mt-8 flex justify-end shrink-0">
+            <button @click="nextStep" class="w-full sm:w-auto px-8 py-3 bg-slate-900 hover:bg-black text-white rounded-lg font-bold text-sm tracking-wide transition-all shadow-lg hover:shadow-xl flex items-center justify-center space-x-2">
+              <span>Continuar Configuración</span>
+              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
               </svg>
             </button>
           </div>
         </div>
 
-        <!-- STEP 2: CONFIGURATION -->
-        <div v-else-if="currentStep === 2" key="step2" class="space-y-6">
-          <div class="bg-white/50  rounded-[24px] border border-white shadow-sm p-6 mb-6">
-            <h2 class="text-xl font-black text-slate-900 tracking-tight mb-2">Información de tu Negocio</h2>
-            <p class="text-sm font-semibold text-slate-600">
-              Estos datos aparecerán en todas tus facturas. Asegúrate de que sean correctos.
-            </p>
+        <!-- ==============================================
+             PASO 2: DATOS DEL NEGOCIO (60/40 Asimétrico y Sticky)
+             ============================================== -->
+        <div v-else-if="currentStep === 2" key="step2" class="space-y-6 flex-1">
+          
+          <div class="mb-4">
+            <h2 class="text-lg md:text-xl font-black text-slate-900 tracking-tight">Información del Negocio</h2>
+            <p class="text-xs md:text-sm font-semibold text-slate-500 mt-1">Los datos que aparecerán impresos en tus facturas.</p>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            <!-- Formulario - 2 columnas -->
-            <div class="lg:col-span-2">
-              <div class="bg-white rounded-[24px] border border-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] p-6 space-y-5">
-                
-                <!-- Tipo de Negocio - ELIMINADO (Ya se pide en el Welcome) -->
+          <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start relative pb-8">
+            
+            <!-- Columna Izquierda: Formulario (60%) -->
+            <div class="w-full lg:w-[65%] xl:w-[70%] flex flex-col space-y-6">
+              
+              <div class="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 shadow-sm">
+                <!-- Zona Drag & Drop Minimalista de Logo -->
+                <div class="mb-6 flex items-center gap-4 p-4 border border-dashed border-slate-300 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                  <div v-if="config.logo" class="w-14 h-14 bg-white border border-slate-200 shadow-sm rounded-lg overflow-hidden flex items-center justify-center shrink-0">
+                    <img :src="config.logo" alt="Logo" class="w-full h-full object-contain p-1">
+                  </div>
+                  <div v-else class="w-14 h-14 bg-white border border-slate-200 shadow-sm rounded-lg text-slate-400 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                  </div>
+                  <div>
+                    <label class="cursor-pointer text-base font-bold text-slate-900 hover:text-[#009F7A] transition-colors inline-block">
+                      Subir Logo de la Empresa
+                      <input type="file" @change="handleLogoUpload" accept="image/*" class="hidden">
+                    </label>
+                    <p class="text-[13px] font-semibold text-slate-500 mt-1">PNG o JPG (Recomendado fondo transparente)</p>
+                  </div>
+                </div>
 
-
-                <!-- Logo Upload - PRIMERO (como en la factura) -->
-                <div>
-                  <label class="block text-sm font-bold text-slate-900 mb-3">
-                    Logo del Negocio <span class="text-xs text-slate-500 font-normal">(Opcional)</span>
-                  </label>
-                  <div class="flex items-center space-x-4">
-                    <div v-if="config.logo" class="w-20 h-20 rounded-xl border-2 border-slate-200 overflow-hidden flex items-center justify-center bg-slate-50 shadow-sm">
-                      <img :src="config.logo" alt="Logo" class="w-full h-full object-contain">
+                <!-- Grid de Inputs Floating Labels -->
+                <div class="space-y-4">
+                  
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Tienda -->
+                    <div class="relative group">
+                      <input v-model="config.storeName" type="text" id="storeName" placeholder=" " class="peer w-full px-4 pt-6 pb-2.5 border-b-2 border-x-0 border-t-0 border-slate-200 bg-slate-50 hover:bg-slate-100 focus:bg-white focus:outline-none focus:border-[#009F7A] text-base font-semibold text-slate-900 rounded-t-lg transition-all" required>
+                      <label for="storeName" class="absolute text-sm text-slate-500 font-semibold duration-300 transform -translate-y-2.5 scale-75 top-4 left-4 z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-2.5 peer-focus:text-[#009F7A] peer-focus:font-bold">Nombre del Negocio <span class="text-red-500">*</span></label>
                     </div>
-                    <div v-else class="w-20 h-20 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50">
-                      <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    <!-- NIT -->
+                    <div class="relative group">
+                      <input v-model="config.nit" type="text" id="nit" placeholder=" " class="peer w-full px-4 pt-6 pb-2.5 border-b-2 border-x-0 border-t-0 border-slate-200 bg-slate-50 hover:bg-slate-100 focus:bg-white focus:outline-none focus:border-[#009F7A] text-base font-semibold text-slate-900 rounded-t-lg transition-all">
+                      <label for="nit" class="absolute text-sm text-slate-500 font-semibold duration-300 transform -translate-y-2.5 scale-75 top-4 left-4 z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-2.5 peer-focus:text-[#009F7A] peer-focus:font-bold">NIT / Documento</label>
+                    </div>
+                  </div>
+
+                  <!-- Dirección Completa -->
+                  <div class="relative group">
+                    <input v-model="config.address" type="text" id="address" placeholder=" " class="peer w-full px-4 pt-6 pb-2.5 border-b-2 border-x-0 border-t-0 border-slate-200 bg-slate-50 hover:bg-slate-100 focus:bg-white focus:outline-none focus:border-[#009F7A] text-base font-semibold text-slate-900 rounded-t-lg transition-all">
+                    <label for="address" class="absolute text-sm text-slate-500 font-semibold duration-300 transform -translate-y-2.5 scale-75 top-4 left-4 z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-2.5 peer-focus:text-[#009F7A] peer-focus:font-bold">Dirección Completa</label>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Teléfono -->
+                    <div class="relative group">
+                      <input v-model="config.phone" type="tel" id="phone" placeholder=" " class="peer w-full px-4 pt-6 pb-2.5 border-b-2 border-x-0 border-t-0 border-slate-200 bg-slate-50 hover:bg-slate-100 focus:bg-white focus:outline-none focus:border-[#009F7A] text-base font-semibold text-slate-900 rounded-t-lg transition-all" required>
+                      <label for="phone" class="absolute text-sm text-slate-500 font-semibold duration-300 transform -translate-y-2.5 scale-75 top-4 left-4 z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-2.5 peer-focus:text-[#009F7A] peer-focus:font-bold">Teléfono / WhatsApp <span class="text-red-500">*</span></label>
+                    </div>
+                    <!-- Email -->
+                    <div class="relative group">
+                      <input v-model="config.email" type="email" id="email" placeholder=" " class="peer w-full px-4 pt-6 pb-2.5 border-b-2 border-x-0 border-t-0 border-slate-200 bg-slate-50 hover:bg-slate-100 focus:bg-white focus:outline-none focus:border-[#009F7A] text-base font-semibold text-slate-900 rounded-t-lg transition-all">
+                      <label for="email" class="absolute text-sm text-slate-500 font-semibold duration-300 transform -translate-y-2.5 scale-75 top-4 left-4 z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-2.5 peer-focus:text-[#009F7A] peer-focus:font-bold">Correo (Opcional)</label>
+                    </div>
+                  </div>
+
+                  <!-- Footer Text -->
+                  <div class="relative group pt-2">
+                    <textarea v-model="config.thankYouMessage" id="msg" rows="2" placeholder=" " class="peer w-full px-4 pt-7 pb-3 border-b-2 border-x-0 border-t-0 border-slate-200 bg-slate-50 hover:bg-slate-100 focus:bg-white focus:outline-none focus:border-[#009F7A] text-base font-semibold text-slate-900 rounded-t-lg transition-all resize-none"></textarea>
+                    <label for="msg" class="absolute text-xs text-slate-500 font-semibold duration-300 transform -translate-y-3.5 scale-75 top-5 left-4 z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3.5 peer-focus:text-[#009F7A] peer-focus:font-bold">Mensaje de Despedida (Ticket)</label>
+                  </div>
+                </div>
+              </div>
+
+              
+              <!-- Sección opcional: Importar Productos desde Excel (NO para tiendas de MODA) -->
+              <div v-if="!isFashionStore" class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 shadow-sm p-5 mt-2">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                  <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
                     </div>
-                    <div class="flex-1">
-                      <label class="cursor-pointer inline-flex items-center space-x-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-xl border border-slate-200 transition-colors shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    <div>
+                      <h3 class="text-base font-black text-slate-900 tracking-tight">¿Tienes tu inventario en Excel?</h3>
+                      <p class="text-[13px] font-semibold text-slate-600 mt-1">
+                        Importa tus productos automáticamente. Nuestra IA detectará las columnas.
+                      </p>
+                      <div v-if="importedProductsCount > 0" class="mt-2 inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-bold rounded-full">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span>Subir Logo</span>
-                        <input type="file" @change="handleLogoUpload" accept="image/*" class="hidden">
-                      </label>
-                      <p class="text-xs font-semibold text-slate-500 mt-1.5">PNG, JPG, SVG • Máx. 2MB</p>
+                        {{ importedProductsCount }} productos importados
+                      </div>
                     </div>
                   </div>
+                  <button
+                    @click="showExcelImportModal = true"
+                    class="shrink-0 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center space-x-2 w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <span>Importar Excel</span>
+                  </button>
                 </div>
+              </div>
 
-                <!-- Nombre y NIT - Grid 2 columnas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label class="block text-sm font-bold text-slate-900 mb-2">
-                      Nombre del Negocio <span class="text-red-500">*</span>
-                    </label>
-                    <input 
-                      v-model="config.storeName" 
-                      type="text" 
-                      placeholder="Ej: Mi Tienda S.A.S"
-                      class="w-full px-4 py-3 text-base border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all text-slate-900 font-semibold"
-                      required
-                    >
-                  </div>
-                  <div>
-                    <label class="block text-sm font-bold text-slate-900 mb-2">
-                      NIT / Documento
-                    </label>
-                    <input 
-                      v-model="config.nit" 
-                      type="text" 
-                      placeholder="Ej: 900.123.456-7"
-                      class="w-full px-4 py-3 text-base border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all text-slate-900 font-semibold"
-                    >
-                  </div>
-                </div>
-
-                <!-- Dirección - Completa -->
-                <div>
-                  <label class="block text-sm font-bold text-slate-900 mb-2">
-                    Dirección
-                  </label>
-                  <input 
-                    v-model="config.address" 
-                    type="text" 
-                    placeholder="Ej: Calle 123 #45-67, Bogotá"
-                    class="w-full px-4 py-3 text-base border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all text-slate-900 font-semibold"
-                  >
-                </div>
-
-                <!-- Teléfono y Email - Grid 2 columnas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label class="block text-sm font-bold text-slate-900 mb-2">
-                      Teléfono <span class="text-red-500">*</span>
-                    </label>
-                    <input 
-                      v-model="config.phone" 
-                      type="tel" 
-                      placeholder="+57 300 123 4567"
-                      class="w-full px-4 py-3 text-base border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all text-slate-900 font-semibold"
-                      required
-                    >
-                  </div>
-                  <div>
-                    <label class="block text-sm font-bold text-slate-900 mb-2">
-                      Email
-                    </label>
-                    <input 
-                      v-model="config.email" 
-                      type="email" 
-                      placeholder="contacto@mitienda.com"
-                      class="w-full px-4 py-3 text-base border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all text-slate-900 font-semibold"
-                    >
-                  </div>
-                </div>
-
-                <!-- Mensaje de Agradecimiento -->
-                <div>
-                  <label class="block text-sm font-bold text-slate-900 mb-2">
-                    Mensaje de Agradecimiento
-                  </label>
-                  <textarea 
-                    v-model="config.thankYouMessage" 
-                    rows="3"
-                    placeholder="Gracias por su compra. Esperamos verlo pronto."
-                    class="w-full px-4 py-3 text-base border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all text-slate-900 font-semibold resize-none"
-                  ></textarea>
-                  <p class="text-xs font-semibold text-slate-500 mt-1.5">Este mensaje aparecerá al final de cada factura</p>
-                </div>
-
+              <!-- Botones de Navegación Paso 2 -->
+              <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl border border-slate-200 gap-4 mt-2 shadow-sm">
+                <button @click="currentStep = 1" class="w-full sm:w-auto px-6 py-3 text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-bold text-base rounded-lg transition-all flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                  <span>Atrás</span>
+                </button>
+                
+                <button v-if="!isPremiumPlan" @click="finishOnboarding" :disabled="!config.storeName || !config.phone"
+                  class="w-full sm:w-auto px-8 py-3.5 bg-slate-900 hover:bg-black disabled:bg-slate-300 disabled:text-slate-500 text-white rounded-lg font-bold text-base tracking-wide transition-all shadow-lg flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span>Finalizar y Entrar</span>
+                </button>
+                
+                <button v-else @click="nextStep" :disabled="!config.storeName || !config.phone"
+                  class="w-full sm:w-auto px-8 py-3.5 bg-slate-900 hover:bg-black disabled:bg-slate-300 disabled:text-slate-500 text-white rounded-lg font-bold text-base tracking-wide transition-all shadow-lg flex items-center justify-center gap-2">
+                  <span>Continuar a WhatsApp</span>
+                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                </button>
               </div>
             </div>
 
-            <!-- Preview en tiempo real - 1 columna -->
-            <div class="lg:sticky lg:top-8 h-fit">
-              <div class="bg-white rounded-[24px] border border-white shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] overflow-hidden">
-                <div class="bg-slate-50 border-b border-slate-100 px-4 py-3">
-                  <h3 class="text-sm font-black text-slate-900 tracking-tight">Vista Previa</h3>
-                  <p class="text-xs font-bold text-slate-500">Así se verá tu factura</p>
-                </div>
-                <div class="overflow-y-auto p-4 bg-slate-50" style="max-height: 600px;">
-                  <div class="bg-white shadow-2xl rounded-lg">
+            <!-- Columna Derecha: Sticky Preview (45%) -->
+            <div class="w-full lg:w-[35%] xl:w-[30%] lg:sticky lg:top-8 mt-2 lg:mt-0 max-w-[400px] mx-auto lg:mx-0">
+              <div class="flex items-center gap-2 mb-2 ml-1">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <h3 class="text-xs font-bold uppercase text-slate-500 tracking-widest">Vista Previa en Tiempo Real</h3>
+              </div>
+              
+              <div class="w-full bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-100 transition-all duration-300">
+                <div class="invoice-preview-wrapper bg-[#F8FAFC] overflow-hidden relative border-t-4"
+                     :class="{
+                       'border-slate-800': selectedTemplate === 'classic',
+                       'border-blue-500': selectedTemplate === 'modern',
+                       'border-black': selectedTemplate === 'minimal'
+                     }"
+                     style="height: 480px;">
+                  <div class="invoice-preview-scaler w-full flex justify-center origin-top pt-6" style="transform: scale(0.95); transform-origin: top center;">
                     <ThermalModernPreview v-if="selectedTemplate === 'modern'" :data="previewConfigData" :items="dummyItems" />
                     <ThermalClassicPreview v-else-if="selectedTemplate === 'classic'" :data="previewConfigData" :items="dummyItems" />
                     <ThermalMinimalPreview v-else :data="previewConfigData" :items="dummyItems" />
@@ -308,84 +303,9 @@
               </div>
             </div>
           </div>
-
-          <!-- Sección opcional: Importar Productos desde Excel (NO para tiendas de MODA) -->
-          <!-- Las tiendas de moda usan variantes (talla, color), no importación simple de Excel -->
-          <div v-if="!isFashionStore" class="max-w-7xl mx-auto mt-6">
-            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-[24px] border border-indigo-100 shadow-sm p-6">
-              <div class="flex items-start justify-between">
-                <div class="flex items-start space-x-4">
-                  <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="text-lg font-black text-slate-900 tracking-tight">¿Tienes tu inventario en Excel?</h3>
-                    <p class="text-sm font-semibold text-slate-600 mt-1">
-                      Importa tus productos automáticamente. Nuestra IA detectará las columnas y mapeará los datos.
-                    </p>
-                    <div v-if="importedProductsCount > 0" class="mt-2 inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-bold rounded-full">
-                      <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                      </svg>
-                      {{ importedProductsCount }} productos importados
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  @click="showExcelImportModal = true"
-                  class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all duration-200 flex items-center space-x-2">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                  </svg>
-                  <span>Importar Excel</span>
-                </button>
-              </div>
-              <p class="text-xs text-slate-500 mt-4 pl-16">
-                💡 Puedes saltar este paso y agregar productos después en el módulo de Productos.
-              </p>
-            </div>
-          </div>
-
-          <!-- Botones de navegación -->
-          <div class="flex justify-between items-center max-w-7xl mx-auto mt-8">
-            <button 
-              @click="currentStep = 1" 
-              class="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 font-bold text-base border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center space-x-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
-              </svg>
-              <span>Atrás</span>
-            </button>
-            
-            <!-- Si es plan básico/free, mostrar "Finalizar" en paso 2 -->
-            <button 
-              v-if="!isPremiumPlan"
-              @click="finishOnboarding" 
-              :disabled="!config.storeName || !config.phone"
-              class="px-10 py-3 bg-slate-900 hover:bg-black disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center space-x-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span>Finalizar y Empezar</span>
-            </button>
-            
-            <!-- Si es plan premium, continuar al paso 3 -->
-            <button 
-              v-else
-              @click="nextStep" 
-              :disabled="!config.storeName || !config.phone"
-              class="px-10 py-3 bg-slate-900 hover:bg-black disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center space-x-2">
-              <span>Continuar</span>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </button>
-          </div>
         </div>
 
-        <!-- STEP 3: WHATSAPP - Solo para planes Premium/Enterprise -->
+        <!-- <!-- STEP 3: WHATSAPP - Solo para planes Premium/Enterprise -->
         <div v-else-if="currentStep === 3 && isPremiumPlan" key="step3" class="space-y-6">
           <div class="bg-white/50  rounded-[24px] border border-white shadow-sm p-6 mb-6">
             <h2 class="text-xl font-black text-slate-900 tracking-tight mb-2">Conecta WhatsApp Business</h2>
@@ -540,7 +460,7 @@ import ExcelImportModal from '@/components/ExcelImportModal.vue'
 
 const router = useRouter()
 const currentStep = ref(1)
-const selectedTemplate = ref('modern')
+const selectedTemplate = ref('classic')
 const isLoading = ref(true)
 
 // 🔐 Verificar si el plan permite WhatsApp (solo premium y enterprise)

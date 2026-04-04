@@ -76,6 +76,12 @@ class TenantRegisterController extends Controller
                     }
                 });
             } catch (\Exception $e) {
+                // Reset tenancy state to prevent bootstrapper state corruption
+                // when tenant DB doesn't exist (e.g. local dev environment)
+                try {
+                    tenancy()->end();
+                } catch (\Throwable $ignored) {}
+
                 \Log::warning('⚠️ Error verificando NIT/CC en tenant', [
                     'tenant_id' => $existingTenant->id,
                     'error' => $e->getMessage()
@@ -178,6 +184,18 @@ class TenantRegisterController extends Controller
             $tenant->domains()->create([
                 'domain' => $domainToCreate
             ]);
+
+            // 🎯 PASO 2.5: Crear dominio alternativo si el subdomain tiene guiones
+            // El tenant_id reemplaza guiones (-) por guiones bajos (_) para compatibilidad con MySQL
+            // Esto causa que si el usuario llega al dominio con guiones bajos, no se identifique el tenant
+            // Solución: registrar ambas variantes del dominio
+            $underscoreDomain = $tenantId . '.' . $baseDomain; // ej: la_central.localhost
+            if ($underscoreDomain !== $domainToCreate) {
+                $tenant->domains()->create([
+                    'domain' => $underscoreDomain
+                ]);
+                \Log::info('✅ Dominio alternativo creado', ['domain' => $underscoreDomain]);
+            }
 
             // 🎯 PASO 3: Marcar el token como usado si existe
             if ($request->token) {

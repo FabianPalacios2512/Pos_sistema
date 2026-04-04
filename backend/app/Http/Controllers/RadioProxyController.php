@@ -75,7 +75,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-medellin-olimpica',
                 'name' => 'Olímpica Stereo 104.9 FM Medellín',
-                'url_resolved' => 'https://26683.live.streamtheworld.com:443/OLP_MEDELLINAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_MEDELLINAAC.aac',
                 'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
                 'tags' => 'tropical,vallenato,salsa',
                 'country' => 'Colombia',
@@ -95,7 +95,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-medellin-mix',
                 'name' => 'Mix 89.9 FM Medellín',
-                'url_resolved' => 'https://24493.live.streamtheworld.com:443/MIX_MEDELLINAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_MEDELLINAAC.aac',
                 'favicon' => 'https://upload.wikimedia.org/wikipedia/commons/4/42/Mix_Colombia_logo.png',
                 'tags' => 'pop,hits,urban',
                 'country' => 'Colombia',
@@ -105,7 +105,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-medellin-tropicana',
                 'name' => 'Tropicana 98.9 FM Medellín',
-                'url_resolved' => 'https://26563.live.streamtheworld.com:443/TR_MEDELLINAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/TR_MEDELLINAAC.aac',
                 'favicon' => 'https://www.tropicanafm.com/wp-content/uploads/2021/02/cropped-favicon_tropicana-180x180.png',
                 'tags' => 'tropical,salsa',
                 'country' => 'Colombia',
@@ -115,7 +115,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-medellin-besame',
                 'name' => 'Bésame 94.9 FM Medellín',
-                'url_resolved' => 'https://26683.live.streamtheworld.com:443/BESAME_MEDELLINAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/BESAME_MEDELLINAAC.aac',
                 'favicon' => 'https://www.besame.fm/wp-content/uploads/2020/11/cropped-favicon-besame-32x32.png',
                 'tags' => 'romantica,baladas',
                 'country' => 'Colombia',
@@ -125,7 +125,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-medellin-radioacktiva',
                 'name' => 'Radioacktiva 102.3 FM Medellín',
-                'url_resolved' => 'https://26663.live.streamtheworld.com:443/RADIOACKTIVA_MEDAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOACKTIVA_MEDAAC.aac',
                 'favicon' => 'https://www.radioacktiva.com/wp-content/uploads/2024/12/cropped-favicon-new1-180x180.png',
                 'tags' => 'rock,metal,alternativo',
                 'country' => 'Colombia',
@@ -135,7 +135,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-medellin-estrella',
                 'name' => 'Estrella Estéreo 104.3 FM',
-                'url_resolved' => 'http://68.233.236.92:8006/;',
+                'url_resolved' => 'https://cp12.serverse.com/proxy/estrellae/stream',
                 'favicon' => 'https://estrellacolombia.com/wp-content/uploads/2017/01/cropped-estrella_estereo-01-180x180.png',
                 'tags' => 'tropical,popular',
                 'country' => 'Colombia',
@@ -149,7 +149,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-blu',
                 'name' => 'Blu Radio 89.9 FM Bogotá',
-                'url_resolved' => 'http://24413.live.streamtheworld.com:3690/BLURADIO_SC',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/BLURADIOAAC.aac',
                 'favicon' => 'https://cdn-profiles.tunein.com/s224698/images/logog.png',
                 'tags' => 'noticias,talk',
                 'country' => 'Colombia',
@@ -159,7 +159,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-caracol',
                 'name' => 'Caracol Radio 100.9 FM Bogotá',
-                'url_resolved' => 'https://26683.live.streamtheworld.com:443/CARACOL_RADIOAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/CARACOL_RADIOAAC.aac',
                 'favicon' => 'https://caracol.com.co/pf/resources/caracol-colombia/touch-icon-ipad.png?d=174',
                 'tags' => 'noticias,deportes',
                 'country' => 'Colombia',
@@ -169,7 +169,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-wradio',
                 'name' => 'W Radio 99.9 FM Bogotá',
-                'url_resolved' => 'https://26643.live.streamtheworld.com:443/WRADIOAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/WRADIOAAC.aac',
                 'favicon' => 'https://www.wradio.com.co/pf/resources/wradio-colombia/touch-icon-ipad.png?d=248',
                 'tags' => 'noticias,talk',
                 'country' => 'Colombia',
@@ -179,7 +179,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-olimpica',
                 'name' => 'Olímpica Stereo 105.9 FM Bogotá',
-                'url_resolved' => 'https://27403.live.streamtheworld.com:443/OLP_BOGOTAAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_BOGOTAAAC.aac',
                 'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
                 'tags' => 'tropical,vallenato',
                 'country' => 'Colombia',
@@ -189,7 +189,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-los40',
                 'name' => 'LOS40 Colombia',
-                'url_resolved' => 'https://24413.live.streamtheworld.com:443/LOS40_COLOMBIAAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_COLOMBIAAAC.aac',
                 'favicon' => 'https://cdn-profiles.tunein.com/p1306541/images/logod.png',
                 'tags' => 'pop,hits',
                 'country' => 'Colombia',
@@ -199,7 +199,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-tropicana',
                 'name' => 'Tropicana 102.9 FM Bogotá',
-                'url_resolved' => 'http://14073.live.streamtheworld.com:3690/TROPICANA_SC',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/TR_BOGOTAAAC.aac',
                 'favicon' => 'https://www.tropicanafm.com/wp-content/uploads/2021/02/cropped-favicon_tropicana-180x180.png',
                 'tags' => 'tropical,salsa',
                 'country' => 'Colombia',
@@ -209,7 +209,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-radioacktiva',
                 'name' => 'Radioacktiva 97.9 FM Bogotá',
-                'url_resolved' => 'https://27693.live.streamtheworld.com:443/RADIO_ACTIVAAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_ACTIVAAAC.aac',
                 'favicon' => 'https://www.radioacktiva.com/wp-content/uploads/2024/12/cropped-favicon-new1-180x180.png',
                 'tags' => 'rock,metal',
                 'country' => 'Colombia',
@@ -219,7 +219,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-candela',
                 'name' => 'Candela Estéreo 101.9 FM Bogotá',
-                'url_resolved' => 'http://24403.live.streamtheworld.com/CANDELAESTEREO_SC',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/CANDELAESTEREOAAC.aac',
                 'favicon' => 'https://uploads.candelaestereo.com/1/2019/06/cropped-logo-candela-llama-100x100.png',
                 'tags' => 'tropical,popular',
                 'country' => 'Colombia',
@@ -229,7 +229,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-vibra',
                 'name' => 'Vibra Bogotá 104.9 FM',
-                'url_resolved' => 'http://27363.live.streamtheworld.com/VIBRAAAC_SC',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/VIBRAAAC.aac',
                 'favicon' => 'https://cdn-profiles.tunein.com/s33998/images/logog.png',
                 'tags' => 'pop,hits,urban',
                 'country' => 'Colombia',
@@ -239,28 +239,19 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-radionica',
                 'name' => 'Radiónica 99.1 FM Bogotá',
-                'url_resolved' => 'http://shoutcast.rtvc.gov.co:8010/;',
+                'url_resolved' => 'https://rtvcplay-radio.streaming.media.azure.net/5028e849-81c5-4b9a-ac28-b0a0a5e9e95f/radionica.ism/manifest(format=mpd-time-csf)',
                 'favicon' => 'https://cdn-profiles.tunein.com/s9541/images/logog.png',
                 'tags' => 'alternativo,indie,rock',
                 'country' => 'Colombia',
                 'state' => 'Bogota',
                 'votes' => 950
             ],
-            [
-                'stationuuid' => 'co-bogota-lakalle',
-                'name' => 'La Kalle Bogotá',
-                'url_resolved' => 'http://27423.live.streamtheworld.com/LA_KALLE_SC',
-                'favicon' => 'https://cdn-profiles.tunein.com/s34136/images/logog.png',
-                'tags' => 'reggaeton,urbano',
-                'country' => 'Colombia',
-                'state' => 'Bogota',
-                'votes' => 920
-            ],
+
             [
                 'stationuuid' => 'co-bogota-lax',
                 'name' => 'La X Bogotá',
                 'url_resolved' => 'https://www.laxmasmusica.com/static/web_dataNormal.mp3',
-                'favicon' => 'http://www.laxmasmusica.com/static/images/apple-icon-180x180.aab671daf60d.png',
+                'favicon' => 'https://www.laxmasmusica.com/static/images/apple-icon-180x180.aab671daf60d.png',
                 'tags' => 'rock,alternativo',
                 'country' => 'Colombia',
                 'state' => 'Bogota',
@@ -269,7 +260,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-bogota-maria',
                 'name' => 'Radio María Colombia',
-                'url_resolved' => 'http://dreamsiteradiocp.com:8076/',
+                'url_resolved' => 'https://server12.sothink.com.ar/radiomaria',
                 'favicon' => 'https://cdn-profiles.tunein.com/s68925/images/logog.png',
                 'tags' => 'cristiana,religiosa',
                 'country' => 'Colombia',
@@ -283,7 +274,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-cali-olimpica',
                 'name' => 'Olímpica Stereo 104.5 FM Cali',
-                'url_resolved' => 'https://27593.live.streamtheworld.com:443/OLP_CALI.mp3',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_CALIAAC.aac',
                 'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
                 'tags' => 'salsa,tropical',
                 'country' => 'Colombia',
@@ -293,7 +284,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-cali-tropicana',
                 'name' => 'Tropicana 93.1 FM Cali',
-                'url_resolved' => 'http://26503.live.streamtheworld.com:80/TR_CALI.mp3',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/TR_CALIAAC.aac',
                 'favicon' => 'https://www.tropicanafm.com/wp-content/uploads/2021/02/cropped-favicon_tropicana-180x180.png',
                 'tags' => 'salsa,tropical',
                 'country' => 'Colombia',
@@ -303,7 +294,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-cali-mix',
                 'name' => 'MIX 102.5 FM Cali',
-                'url_resolved' => 'https://14133.live.streamtheworld.com/MIX_CALIAAC_SC',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_CALIAAC.aac',
                 'favicon' => 'https://upload.wikimedia.org/wikipedia/commons/4/42/Mix_Colombia_logo.png',
                 'tags' => 'pop,hits,urban',
                 'country' => 'Colombia',
@@ -337,7 +328,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-barranquilla-olimpica',
                 'name' => 'Olímpica Stereo Barranquilla',
-                'url_resolved' => 'https://13693.live.streamtheworld.com:443/OLP_BARRANQUILLAAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_BARRANQUILLAAAC.aac',
                 'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
                 'tags' => 'vallenato,tropical',
                 'country' => 'Colombia',
@@ -381,7 +372,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-cartagena-tiempo',
                 'name' => 'Radio Tiempo Cartagena',
-                'url_resolved' => 'https://20603.live.streamtheworld.com:443/RT_CARTAGENAAAC.aac',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/RT_CARTAGENAAAC.aac',
                 'favicon' => 'https://radiotiempo.co/icon?b8748d2f62517688',
                 'tags' => 'tropical,salsa',
                 'country' => 'Colombia',
@@ -415,8 +406,8 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-super-clasica',
                 'name' => 'Super Clásica',
-                'url_resolved' => 'http://77.73.69.238:8000/stream',
-                'favicon' => 'http://cdn-radiotime-logos.tunein.com/s161501q.png',
+                'url_resolved' => 'https://stream.zeno.fm/yn65fsaurfhvv',
+                'favicon' => 'https://cdn-radiotime-logos.tunein.com/s161501q.png',
                 'tags' => 'clasicos,baladas',
                 'country' => 'Colombia',
                 'state' => 'Bogota',
@@ -425,7 +416,7 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-llanera',
                 'name' => 'Música Llanera',
-                'url_resolved' => 'http://192.99.203.81:8704/',
+                'url_resolved' => 'https://stream.zeno.fm/0r0xa792kwzuv',
                 'favicon' => 'https://www.musicallanera.co/wp-content/uploads/2015/10/cropped-emoticon-vaquero-llanero-1-180x180.png',
                 'tags' => 'llanera,joropo',
                 'country' => 'Colombia',
@@ -435,12 +426,227 @@ class RadioProxyController extends Controller
             [
                 'stationuuid' => 'co-paisa',
                 'name' => 'Paisa Estéreo',
-                'url_resolved' => 'http://radiolatina.info:7094/',
+                'url_resolved' => 'https://radiolatina.info:7095/;',
                 'favicon' => 'https://cdn-profiles.tunein.com/s129619/images/logog.png',
                 'tags' => 'tropical,popular',
                 'country' => 'Colombia',
                 'state' => 'Antioquia',
                 'votes' => 780
+            ],
+
+            // =====================
+            // BUCARAMANGA - SANTANDER
+            // =====================
+            [
+                'stationuuid' => 'co-bucaramanga-olimpica',
+                'name' => 'Olímpica Stereo 97.7 FM Bucaramanga',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_BUCARAMANGAAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,vallenato',
+                'country' => 'Colombia',
+                'state' => 'Santander',
+                'votes' => 900
+            ],
+
+
+            // =====================
+            // PEREIRA - RISARALDA
+            // =====================
+            [
+                'stationuuid' => 'co-pereira-olimpica',
+                'name' => 'Olímpica Stereo 96.1 FM Pereira',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_PEREIRAAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,popular',
+                'country' => 'Colombia',
+                'state' => 'Risaralda',
+                'votes' => 860
+            ],
+
+
+            // =====================
+            // MANIZALES - CALDAS
+            // =====================
+            [
+                'stationuuid' => 'co-manizales-olimpica',
+                'name' => 'Olímpica Stereo 89.7 FM Manizales',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_MANIZALESAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,popular',
+                'country' => 'Colombia',
+                'state' => 'Caldas',
+                'votes' => 820
+            ],
+
+
+            // =====================
+            // CÚCUTA - NORTE DE SANTANDER
+            // =====================
+            [
+                'stationuuid' => 'co-cucuta-olimpica',
+                'name' => 'Olímpica Stereo 97.7 FM Cúcuta',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_CUCUTAAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,vallenato',
+                'country' => 'Colombia',
+                'state' => 'Norte de Santander',
+                'votes' => 810
+            ],
+
+
+            // =====================
+            // SANTA MARTA - MAGDALENA
+            // =====================
+            [
+                'stationuuid' => 'co-santamarta-olimpica',
+                'name' => 'Olímpica Stereo 97.1 FM Santa Marta',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_SANTA_MARTAAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'vallenato,tropical',
+                'country' => 'Colombia',
+                'state' => 'Magdalena',
+                'votes' => 830
+            ],
+
+
+            // =====================
+            // IBAGUÉ - TOLIMA
+            // =====================
+            [
+                'stationuuid' => 'co-ibague-olimpica',
+                'name' => 'Olímpica Stereo 94.3 FM Ibagué',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_IBAGUEAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,popular',
+                'country' => 'Colombia',
+                'state' => 'Tolima',
+                'votes' => 800
+            ],
+            [
+                'stationuuid' => 'co-ibague-tropicana',
+                'name' => 'Tropicana 97.7 FM Ibagué',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/TR_IBAGUEAAC.aac',
+                'favicon' => 'https://www.tropicanafm.com/wp-content/uploads/2021/02/cropped-favicon_tropicana-180x180.png',
+                'tags' => 'tropical,salsa',
+                'country' => 'Colombia',
+                'state' => 'Tolima',
+                'votes' => 780
+            ],
+
+            // =====================
+            // VILLAVICENCIO - META
+            // =====================
+            [
+                'stationuuid' => 'co-villavicencio-olimpica',
+                'name' => 'Olímpica Stereo 105.3 FM Villavicencio',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_VILLAVICENCIOAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,llanera',
+                'country' => 'Colombia',
+                'state' => 'Meta',
+                'votes' => 780
+            ],
+            [
+                'stationuuid' => 'co-villavicencio-tropicana',
+                'name' => 'Tropicana 99.3 FM Villavicencio',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/TR_VILLAVICENCIOAAC.aac',
+                'favicon' => 'https://www.tropicanafm.com/wp-content/uploads/2021/02/cropped-favicon_tropicana-180x180.png',
+                'tags' => 'tropical,popular',
+                'country' => 'Colombia',
+                'state' => 'Meta',
+                'votes' => 760
+            ],
+
+            // =====================
+            // NEIVA - HUILA
+            // =====================
+            [
+                'stationuuid' => 'co-neiva-olimpica',
+                'name' => 'Olímpica Stereo 100.3 FM Neiva',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_NEIVAAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,popular',
+                'country' => 'Colombia',
+                'state' => 'Huila',
+                'votes' => 750
+            ],
+            [
+                'stationuuid' => 'co-neiva-tropicana',
+                'name' => 'Tropicana 99.7 FM Neiva',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/TR_NEIVAAAC.aac',
+                'favicon' => 'https://www.tropicanafm.com/wp-content/uploads/2021/02/cropped-favicon_tropicana-180x180.png',
+                'tags' => 'tropical,salsa',
+                'country' => 'Colombia',
+                'state' => 'Huila',
+                'votes' => 730
+            ],
+
+            // =====================
+            // MONTERÍA - CÓRDOBA
+            // =====================
+            [
+                'stationuuid' => 'co-monteria-olimpica',
+                'name' => 'Olímpica Stereo 92.7 FM Montería',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_MONTERIAAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'vallenato,tropical',
+                'country' => 'Colombia',
+                'state' => 'Cordoba',
+                'votes' => 770
+            ],
+            [
+                'stationuuid' => 'co-monteria-tropicana',
+                'name' => 'Tropicana 89.5 FM Montería',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/TR_MONTERIAAAC.aac',
+                'favicon' => 'https://www.tropicanafm.com/wp-content/uploads/2021/02/cropped-favicon_tropicana-180x180.png',
+                'tags' => 'tropical,salsa',
+                'country' => 'Colombia',
+                'state' => 'Cordoba',
+                'votes' => 750
+            ],
+
+            // =====================
+            // PASTO - NARIÑO
+            // =====================
+
+            [
+                'stationuuid' => 'co-pasto-tropicana',
+                'name' => 'Tropicana 100.1 FM Pasto',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/TR_PASTOAAC.aac',
+                'favicon' => 'https://www.tropicanafm.com/wp-content/uploads/2021/02/cropped-favicon_tropicana-180x180.png',
+                'tags' => 'tropical,salsa',
+                'country' => 'Colombia',
+                'state' => 'Narino',
+                'votes' => 700
+            ],
+
+            // =====================
+            // CARTAGENA - BOLÍVAR (Complemento)
+            // =====================
+            [
+                'stationuuid' => 'co-cartagena-olimpica',
+                'name' => 'Olímpica Stereo 90.5 FM Cartagena',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_CARTAGENAAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,salsa,champeta',
+                'country' => 'Colombia',
+                'state' => 'Bolivar',
+                'votes' => 920
+            ],
+
+
+            // =====================
+            // ARMENIA - QUINDÍO
+            // =====================
+            [
+                'stationuuid' => 'co-armenia-olimpica',
+                'name' => 'Olímpica Stereo 96.1 FM Armenia',
+                'url_resolved' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_ARMENIAAAC.aac',
+                'favicon' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
+                'tags' => 'tropical,popular',
+                'country' => 'Colombia',
+                'state' => 'Quindio',
+                'votes' => 740
             ]
         ];
     }

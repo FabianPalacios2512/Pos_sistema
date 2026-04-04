@@ -3,20 +3,20 @@
     <Transition name="fade">
       <div 
         v-if="isOpen" 
-        class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4"
+        class="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center sm:p-4"
         @click="closeModal"
       >
         <!-- Contenedor Principal - Estilo Linear/Vercel -->
         <div 
-          class="radio-modal-container w-full max-w-[1100px] h-[85vh] max-h-[720px] rounded-2xl shadow-xl overflow-hidden flex flex-col relative font-sans"
+          class="radio-modal-container w-full sm:max-w-[1100px] h-[92dvh] sm:h-[85vh] sm:max-h-[720px] rounded-t-2xl sm:rounded-2xl shadow-xl overflow-hidden flex flex-col relative font-sans"
           :class="isDarkMode ? 'bg-[#09090b] border border-zinc-800' : 'bg-white border border-slate-200'"
           @click.stop
         >
           
-          <!-- Botón Cerrar - Minimalista -->
+          <!-- Botón Cerrar - Minimalista (Desktop only) -->
           <button 
             @click="closeModal"
-            class="absolute top-5 right-5 z-50 rounded-lg p-2 transition-all duration-200"
+            class="hidden sm:block absolute top-5 right-5 z-50 rounded-lg p-2 transition-all duration-200"
             :class="isDarkMode 
               ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' 
               : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'"
@@ -26,12 +26,38 @@
             </svg>
           </button>
 
+          <!-- 📱 MOBILE HEADER (sm:hidden) -->
+          <div
+            class="sm:hidden flex items-center justify-between px-4 py-3 flex-shrink-0 border-b"
+            :class="isDarkMode ? 'bg-[#09090b] border-zinc-800' : 'bg-white border-slate-100'"
+          >
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center">
+                <svg class="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+              </div>
+              <span class="font-semibold text-sm" :class="isDarkMode ? 'text-white' : 'text-slate-900'">Radio 105</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            </div>
+            <span class="text-xs" :class="isDarkMode ? 'text-zinc-500' : 'text-slate-400'">{{ greeting }}</span>
+            <button
+              @click="closeModal"
+              class="p-1.5 rounded-lg transition-all duration-200"
+              :class="isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'"
+            >
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
           <!-- LAYOUT PRINCIPAL - Sidebar + Content -->
-          <div class="flex-1 flex overflow-hidden">
+          <div class="flex-1 flex overflow-hidden min-h-0">
             
-            <!-- SIDEBAR - Estilo Linear -->
+            <!-- SIDEBAR - Estilo Linear (Desktop only) -->
             <aside 
-              class="w-56 flex flex-col flex-shrink-0 border-r"
+              class="hidden sm:flex w-56 flex-col flex-shrink-0 border-r"
               :class="isDarkMode ? 'bg-[#09090b] border-zinc-800/80' : 'bg-slate-50/50 border-slate-200'"
             >
               <div class="p-5">
@@ -122,6 +148,31 @@
                       :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
                       <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Costa
                     </button>
+                    <button @click="filterCity('Bucaramanga', 'Santander')" 
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
+                      :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Bucaramanga
+                    </button>
+                    <button @click="filterCity('Cartagena', 'Bolivar')" 
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
+                      :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
+                      <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span> Cartagena
+                    </button>
+                    <button @click="filterCity('Pereira', 'Risaralda')" 
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
+                      :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
+                      <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span> Pereira
+                    </button>
+                    <button @click="filterCity('Cúcuta', 'Norte de Santander')" 
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
+                      :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
+                      <span class="w-1.5 h-1.5 rounded-full bg-lime-500"></span> Cúcuta
+                    </button>
+                    <button @click="filterCity('Santa Marta', 'Magdalena')" 
+                      class="w-full text-left px-3 py-2 text-sm rounded-lg transition-all duration-100 flex items-center gap-2.5"
+                      :class="isDarkMode ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'">
+                      <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span> Santa Marta
+                    </button>
                   </div>
                 </div>
               </div>
@@ -129,13 +180,100 @@
 
             <!-- ÁREA PRINCIPAL -->
             <main 
-              class="flex-1 relative overflow-y-auto custom-scrollbar pb-28"
+              class="flex-1 relative overflow-y-auto custom-scrollbar pb-[64px] sm:pb-28"
               :class="isDarkMode ? 'bg-[#09090b]' : 'bg-white'"
             >
               
-              <!-- Header con Search - Estilo Linear -->
+              <!-- 📱 MOBILE: Search + Filter Chips (sm:hidden) -->
+              <div
+                class="sm:hidden sticky top-0 z-30 px-4 pt-3 pb-2 border-b space-y-2"
+                :class="isDarkMode ? 'bg-[#09090b] border-zinc-800/80' : 'bg-white border-slate-100'"
+              >
+                <!-- Search -->
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2" :class="isDarkMode ? 'text-zinc-500' : 'text-slate-400'">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    v-model="searchQuery"
+                    @input="handleSearch"
+                    placeholder="Buscar emisoras..."
+                    class="w-full pl-9 pr-4 py-2 rounded-lg text-sm transition-all focus:outline-none focus:ring-2"
+                    :class="isDarkMode
+                      ? 'bg-zinc-800/50 text-white placeholder-zinc-500 focus:ring-zinc-700 border border-zinc-700/50'
+                      : 'bg-slate-100 text-slate-900 placeholder-slate-400 focus:ring-slate-200 border border-transparent'"
+                  />
+                </div>
+                <!-- Filter chips - horizontal scroll -->
+                <div class="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
+                  <button
+                    @click="goHome"
+                    class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="radioStore.currentView === 'home'
+                      ? (isDarkMode ? 'bg-zinc-700 text-white' : 'bg-slate-800 text-white')
+                      : (isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600')"
+                  >Inicio</button>
+                  <button
+                    @click="goToFavorites"
+                    class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="radioStore.currentView === 'favorites'
+                      ? (isDarkMode ? 'bg-zinc-700 text-white' : 'bg-slate-800 text-white')
+                      : (isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600')"
+                  >Favoritos <span v-if="radioStore.favorites.length > 0" class="opacity-70">({{ radioStore.favorites.length }})</span></button>
+                  <button
+                    @click="filterCity('Medell\u00edn', 'Antioquia')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>Medell\u00edn</button>
+                  <button
+                    @click="filterCity('Bogot\u00e1', 'Bogota')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></span>Bogot\u00e1</button>
+                  <button
+                    @click="filterCity('Cali', 'Valle del Cauca')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-orange-500 flex-shrink-0"></span>Cali</button>
+                  <button
+                    @click="filterCity('Costa', 'Atlantico')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0"></span>Costa</button>
+                  <button
+                    @click="filterCity('Bucaramanga', 'Santander')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-rose-500 flex-shrink-0"></span>Bucaramanga</button>
+                  <button
+                    @click="filterCity('Cartagena', 'Bolivar')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-cyan-500 flex-shrink-0"></span>Cartagena</button>
+                  <button
+                    @click="filterCity('Pereira', 'Risaralda')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-violet-500 flex-shrink-0"></span>Pereira</button>
+                  <button
+                    @click="filterCity('Cúcuta', 'Norte de Santander')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-lime-500 flex-shrink-0"></span>Cúcuta</button>
+                  <button
+                    @click="filterCity('Santa Marta', 'Magdalena')"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all"
+                    :class="isDarkMode ? 'bg-zinc-800/70 text-zinc-400' : 'bg-slate-100 text-slate-600'"
+                  ><span class="w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0"></span>Santa Marta</button>
+                </div>
+              </div>
+
+              <!-- Header con Search - Estilo Linear (Desktop only) -->
               <header 
-                class="sticky top-0 z-30 px-6 py-4 border-b"
+                class="hidden sm:block sticky top-0 z-30 px-6 py-4 border-b"
                 :class="isDarkMode ? 'bg-[#09090b] border-zinc-800/80' : 'bg-white border-slate-100'"
               >
                 <div class="flex items-center gap-4">
@@ -160,7 +298,7 @@
                 </div>
               </header>
 
-              <div class="p-6 space-y-8">
+              <div class="p-4 sm:p-6 space-y-6 sm:space-y-8">
                 
                 <!-- LOADING STATE con Skeleton -->
                 <div v-if="radioStore.isLoading" class="space-y-8">
@@ -292,9 +430,9 @@
             </main>
           </div>
 
-          <!-- PLAYER BAR - Sticky Bottom - Estilo Linear/Vercel -->
+          <!-- PLAYER BAR - Sticky Bottom - Estilo Linear/Vercel (Desktop only) -->
           <div 
-            class="absolute bottom-0 left-0 right-0 h-20 flex items-center justify-between px-5 z-50 border-t"
+            class="hidden sm:flex absolute bottom-0 left-0 right-0 h-20 items-center justify-between px-5 z-50 border-t"
             :class="isDarkMode 
               ? 'bg-[#09090b] border-zinc-800' 
               : 'bg-white border-slate-200'"
@@ -477,6 +615,92 @@
               <span class="text-[10px] w-7 text-right font-mono" :class="isDarkMode ? 'text-zinc-500' : 'text-slate-400'">{{ radioStore.volume }}%</span>
             </div>
 
+          </div>
+
+          <!-- PLAYER BAR - Mobile compact (sm:hidden) -->
+          <div
+            class="sm:hidden flex items-center gap-3 px-3 py-2.5 z-50 border-t flex-shrink-0"
+            :class="isDarkMode ? 'bg-[#09090b] border-zinc-800' : 'bg-white border-slate-200'"
+          >
+            <!-- Station logo -->
+            <div
+              class="w-10 h-10 rounded-lg overflow-hidden relative flex-shrink-0"
+              :class="isDarkMode ? 'bg-zinc-800' : 'bg-slate-100'"
+            >
+              <template v-if="radioStore.currentStation">
+                <img
+                  :src="getStationLogo(radioStore.currentStation)"
+                  :alt="radioStore.currentStation.name"
+                  class="w-full h-full object-cover"
+                  @error="handleImageError"
+                />
+                <div v-if="radioStore.isPlaying" class="absolute inset-0 bg-black/40 flex items-center justify-center gap-0.5">
+                  <div class="w-0.5 bg-emerald-400 rounded-full animate-music-bar-1"></div>
+                  <div class="w-0.5 bg-emerald-400 rounded-full animate-music-bar-2"></div>
+                  <div class="w-0.5 bg-emerald-400 rounded-full animate-music-bar-3"></div>
+                </div>
+              </template>
+              <template v-else>
+                <svg class="h-5 w-5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" :class="isDarkMode ? 'text-zinc-600' : 'text-slate-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+              </template>
+            </div>
+            <!-- Station info -->
+            <div class="flex-1 min-w-0">
+              <div class="font-semibold text-sm truncate" :class="isDarkMode ? 'text-white' : 'text-slate-900'">
+                {{ radioStore.currentStation?.name || 'Selecciona una emisora' }}
+              </div>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span v-if="radioStore.isPlaying" class="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-emerald-500">
+                  <span class="w-1 h-1 bg-emerald-500 rounded-full animate-pulse"></span>En vivo
+                </span>
+                <div v-if="radioStore.isPlaying" class="flex-1 h-0.5 rounded-full overflow-hidden" :class="isDarkMode ? 'bg-zinc-800' : 'bg-slate-200'">
+                  <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 animate-progress-wave" style="width:200%"></div>
+                </div>
+                <span v-else class="text-xs" :class="isDarkMode ? 'text-zinc-600' : 'text-slate-400'">Detenido</span>
+              </div>
+            </div>
+            <!-- Controls -->
+            <div class="flex items-center gap-0.5">
+              <button
+                @click="radioStore.playPrevious()"
+                class="p-2 rounded-lg transition-colors"
+                :class="isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+              </button>
+              <button
+                @click="radioStore.togglePlay()"
+                class="w-9 h-9 rounded-full flex items-center justify-center transition-all"
+                :class="radioStore.isPlaying
+                  ? 'bg-emerald-500 hover:bg-emerald-400 text-white'
+                  : (isDarkMode ? 'bg-white text-black' : 'bg-slate-900 text-white')"
+              >
+                <svg v-if="!radioStore.isPlaying" class="h-4 w-4 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg v-else class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+              </button>
+              <button
+                @click="radioStore.playNext()"
+                class="p-2 rounded-lg transition-colors"
+                :class="isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm10-12v12h2V6h-2z"/></svg>
+              </button>
+            </div>
+            <!-- Mute toggle -->
+            <button
+              @click="radioStore.toggleMute()"
+              class="p-2 rounded-lg transition-colors flex-shrink-0"
+              :class="isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'"
+            >
+              <svg v-if="!radioStore.isMuted && radioStore.volume > 0" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              </svg>
+              <svg v-else class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+              </svg>
+            </button>
           </div>
 
         </div>
@@ -914,6 +1138,10 @@ const StationTile = defineComponent({
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
   background: #52525b; 
 }
+
+/* Hide scrollbar for filter chips */
+.hide-scrollbar { scrollbar-width: none; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
 
 /* Optimizar animaciones con GPU acceleration */
 .group {

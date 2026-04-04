@@ -3777,11 +3777,24 @@ export default {
       
       // Datos del contexto
       const contextData = {
-        seccionActiva: seccionesNombres[activeSection.value] || activeSection.value,
+        // Identificador del módulo y sección actual
+        modulo: 'intelligent_inventory',
+        seccionActiva: activeSection.value, // Nombre interno: overview, products, movements, etc.
+        seccionNombre: seccionesNombres[activeSection.value] || activeSection.value, // Nombre legible
         periodo: selectedPeriod.value === 'day' ? 'Hoy' :
                  selectedPeriod.value === 'week' ? 'Esta Semana' :
                  selectedPeriod.value === 'month' ? 'Este Mes' :
                  selectedPeriod.value === 'year' ? 'Este Año' : 'Personalizado',
+        
+        // Métricas principales para que la IA siempre las tenga
+        metrics: {
+          activeProducts: metrics.activeProducts,
+          totalProducts: metrics.totalProducts,
+          totalInventoryValue: metrics.totalInventoryValue,
+          totalSaleValue: metrics.totalSaleValue || 0,
+          lowStockProducts: metrics.lowStockProducts,
+          outOfStockProducts: metrics.outOfStockProducts
+        },
         
         // KPIs principales (Vista General)
         kpis: {
@@ -3809,8 +3822,9 @@ export default {
           balance: formatCurrency((movimientosSummary.total_entry_value || 0) - (movimientosSummary.total_exit_value || 0))
         },
         
-        // Listas de datos según la sección
+        // Listas de datos según la sección (expuestas para que uiContextStore las lea)
         topProductos: topProductos,
+        topProductosVendidos: topProductos, // Alias para que uiContextStore lo encuentre
         productosStockBajo: productosStockBajo,
         movimientosRecientes: movimientosRecientes,
         productosEnTabla: activeSection.value === 'products' ? productosTabla : [],

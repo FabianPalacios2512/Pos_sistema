@@ -1,6 +1,12 @@
 <template>
+  <!-- Loading: show nothing until config is loaded to prevent template flash -->
+  <div v-if="!configLoaded" class="min-h-screen bg-white flex items-center justify-center">
+    <div class="w-6 h-6 border-2 border-gray-200 border-t-gray-800 rounded-full animate-spin"></div>
+  </div>
+
   <!-- Dynamic Template Selector -->
   <CatalogTemplateSelector 
+    v-else
     :template="catalogConfig.template"
     :storeConfig="storeConfigForTemplate"
     :categories="visibleCategories"
@@ -13,6 +19,7 @@ import CatalogTemplateSelector from '../components/catalog/CatalogTemplateSelect
 import apiClient from '../services/apiClient.js'
 
 // Estado
+const configLoaded = ref(false)
 const catalogConfig = ref({
   template: 'speed-market', // Plantilla por defecto segura para todas las tiendas
   primary_color: '#10B981',
@@ -123,6 +130,7 @@ const loadVisibleCategories = async () => {
 // Lifecycle
 onMounted(async () => {
   await loadCatalogConfig()
+  configLoaded.value = true
   await Promise.all([loadProducts(), loadVisibleCategories()])
 })
 </script>

@@ -1,18 +1,19 @@
 <template>
-  <div class="min-h-screen font-sans bg-[#f8f9fa] dark:bg-[#131314] transition-colors duration-300 px-8">
+  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
-      <!-- Header - Gemini Style -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div>
-          <h1 class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] tracking-tight">Control de Inventario</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Control de Inventario</h1>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestiona stock, movimientos y alertas de productos</p>
         </div>
         
         <div class="flex items-center space-x-3">
           <!-- Botón Actualizar - Gemini style -->
           <button @click="refreshInventoryData" 
                   :disabled="loading"
-                  class="px-5 py-2.5 bg-white dark:bg-[#3a3a3f] hover:bg-[#f0f4f9] dark:hover:bg-[#4a4a4f] text-[#1e1f20] dark:text-[#e3e3e3] text-sm font-medium rounded-full transition-all duration-200 flex items-center space-x-2"
+                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center space-x-2"
                   :class="{ 'opacity-50 cursor-not-allowed': loading }">
             <svg class="w-4 h-4" :class="{'animate-spin': loading}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -22,7 +23,7 @@
           
           <!-- Botón Principal - Negro/Slate como el resto del sistema -->
           <button @click="openMovementModal"
-                  class="px-5 py-2.5 bg-[#1e1f20] hover:bg-black dark:bg-[#e3e3e3] dark:hover:bg-white text-white dark:text-[#1e1f20] text-sm font-medium rounded-full transition-all duration-200 flex items-center space-x-2">
+                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
@@ -34,88 +35,88 @@
       <!-- KPIs - Gemini Style -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <!-- Total Productos -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 transition-all duration-200 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c]">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-4 py-4 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-[#f3e8fd] dark:bg-[#7c3aed]/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-[#7c3aed] dark:text-[#a78bfa]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <div class="w-11 h-11 bg-purple-50 dark:bg-zinc-800/50 rounded-xl border border-purple-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Total Productos</p>
-              <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ totalProducts }}</p>
+              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Total Productos</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ totalProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Stock Bajo -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 transition-all duration-200 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c]">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-4 py-4 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-[#fef7e0] dark:bg-[#f9ab00]/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-[#f9ab00] dark:text-[#fdd663]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <div class="w-11 h-11 bg-amber-50 dark:bg-zinc-800/50 rounded-xl border border-amber-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-amber-500 dark:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Stock Bajo</p>
-              <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ lowStockProducts }}</p>
+              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Stock Bajo</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ lowStockProducts }}</p>
             </div>
           </div>
         </div>
 
         <!-- Valor Inventario -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 transition-all duration-200 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c]">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-4 py-4 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <div class="w-11 h-11 bg-emerald-50 dark:bg-zinc-800/50 rounded-xl border border-emerald-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Valor Total</p>
-              <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">${{ totalInventoryValue.toLocaleString() }}</p>
+              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Valor Total</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ totalInventoryValue.toLocaleString() }}</p>
             </div>
           </div>
         </div>
 
         <!-- Movimientos Hoy -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-4 transition-all duration-200 hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c]">
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-4 py-4 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <div class="w-11 h-11 bg-blue-50 dark:bg-zinc-800/50 rounded-xl border border-blue-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">Movimientos Hoy</p>
-              <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ todayMovements }}</p>
+              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Movimientos Hoy</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ todayMovements }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Selector de Sede/Bodega - Gemini Style -->
-      <div v-if="showWarehouseFilter" class="flex items-center justify-between py-3 px-4 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl">
+      <div v-if="showWarehouseFilter" class="flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-zinc-900 rounded-2xl">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-[#e8eaed] dark:bg-[#3a3a3f] rounded-full flex items-center justify-center">
-            <svg class="w-4 h-4 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <div class="w-9 h-9 bg-gray-200 dark:bg-zinc-700 rounded-full flex items-center justify-center">
+            <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"></path>
             </svg>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-sm font-medium text-[#5f6368] dark:text-[#9aa0a6]">Bodega:</span>
+            <span class="text-sm font-medium text-gray-600 dark:text-zinc-400">Bodega:</span>
             <select 
               v-model="selectedWarehouse"
               @change="refreshInventoryData"
-              class="px-3 py-1.5 bg-transparent border-0 text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] focus:ring-0 cursor-pointer hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] rounded-full transition-colors"
+              class="px-3 py-1.5 bg-transparent border-0 text-sm font-medium text-gray-900 dark:text-white focus:ring-0 cursor-pointer hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full transition-colors"
             >
-              <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id" class="bg-white dark:bg-[#282a2c]">
+              <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id" class="bg-white dark:bg-zinc-800">
                 {{ warehouse.name }}{{ warehouse.is_default ? ' (Principal)' : '' }}
               </option>
             </select>
           </div>
         </div>
-        <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6] hidden sm:flex items-center gap-1">
+        <span class="text-xs text-gray-600 dark:text-zinc-400 hidden sm:flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"></path>
           </svg>
@@ -124,18 +125,19 @@
       </div>
       
       <!-- Contenedor Principal - Gemini Style -->
-      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl overflow-hidden">
-        <!-- Tabs - Gemini Style -->
-        <div class="border-b border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c]">
+      <!-- Contenedor Principal -->
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden">
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
           <nav class="flex px-6" aria-label="Tabs">
             <button @click="activeTab = 'stock'" 
                     :class="[
                       'group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors mr-8',
                       activeTab === 'stock' 
-                        ? 'border-[#1a73e8] dark:border-[#8ab4f8] text-[#1a73e8] dark:text-[#8ab4f8]' 
-                        : 'border-transparent text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] hover:border-[#e8eaed] dark:hover:border-[#3a3a3f]'
+                        ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' 
+                        : 'border-transparent text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-200 dark:hover:border-zinc-700'
                     ]">
-              <svg class="w-4 h-4" :class="activeTab === 'stock' ? 'text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-[#5f6368] dark:text-[#9aa0a6] group-hover:text-[#1e1f20] dark:group-hover:text-[#e3e3e3]'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <svg class="w-4 h-4" :class="activeTab === 'stock' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-400 group-hover:text-gray-900 dark:group-hover:text-white'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path>
               </svg>
               Stock Actual
@@ -144,15 +146,15 @@
                     :class="[
                       'group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm relative transition-colors mr-8',
                       activeTab === 'movements' 
-                        ? 'border-[#1a73e8] dark:border-[#8ab4f8] text-[#1a73e8] dark:text-[#8ab4f8]' 
-                        : 'border-transparent text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] hover:border-[#e8eaed] dark:hover:border-[#3a3a3f]'
+                        ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' 
+                        : 'border-transparent text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-200 dark:hover:border-zinc-700'
                     ]">
-              <svg class="w-4 h-4" :class="activeTab === 'movements' ? 'text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-[#5f6368] dark:text-[#9aa0a6] group-hover:text-[#1e1f20] dark:group-hover:text-[#e3e3e3]'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <svg class="w-4 h-4" :class="activeTab === 'movements' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-400 group-hover:text-gray-900 dark:group-hover:text-white'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
               </svg>
               Movimientos
               <span v-if="unreadMovementsCount > 0" 
-                    class="ml-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-medium text-white bg-[#d93025] rounded-full">
+                    class="ml-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-medium text-white bg-rose-600 rounded-full">
                 {{ unreadMovementsCount }}
               </span>
             </button>
@@ -160,15 +162,15 @@
                     :class="[
                       'group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm relative transition-colors',
                       activeTab === 'alerts' 
-                        ? 'border-[#1a73e8] dark:border-[#8ab4f8] text-[#1a73e8] dark:text-[#8ab4f8]' 
-                        : 'border-transparent text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1e1f20] dark:hover:text-[#e3e3e3] hover:border-[#e8eaed] dark:hover:border-[#3a3a3f]'
+                        ? 'border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400' 
+                        : 'border-transparent text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-200 dark:hover:border-zinc-700'
                     ]">
-              <svg class="w-4 h-4" :class="activeTab === 'alerts' ? 'text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-[#5f6368] dark:text-[#9aa0a6] group-hover:text-[#1e1f20] dark:group-hover:text-[#e3e3e3]'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <svg class="w-4 h-4" :class="activeTab === 'alerts' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-zinc-400 group-hover:text-gray-900 dark:group-hover:text-white'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
               </svg>
               Alertas
               <span v-if="unreadAlertsCount > 0" 
-                    class="ml-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-medium text-white bg-[#d93025] rounded-full">
+                    class="ml-1 inline-flex items-center justify-center w-5 h-5 text-[10px] font-medium text-white bg-rose-600 rounded-full">
                 {{ unreadAlertsCount }}
               </span>
             </button>
@@ -179,29 +181,29 @@
         <div v-if="activeTab === 'stock'">
           <!-- Indicador de carga - Gemini style -->
           <div v-if="loading" class="flex items-center justify-center py-12">
-            <svg class="animate-spin w-8 h-8 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span class="ml-3 text-sm text-[#5f6368] dark:text-[#9aa0a6]">Cargando productos...</span>
+            <span class="ml-3 text-sm text-gray-600 dark:text-zinc-400">Cargando productos...</span>
           </div>
           
           <div v-else>
             <!-- Filtros - Gemini Style -->
-            <div class="p-4 bg-[#f8f9fa] dark:bg-[#282a2c]">
+            <div class="p-4 bg-gray-50 dark:bg-zinc-800">
               <div class="flex flex-wrap items-center gap-3">
                 <div class="flex-1 min-w-48 relative">
-                  <svg class="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <svg class="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                   </svg>
                   <input v-model="searchTerm" 
                          type="text" 
                          placeholder="Buscar productos..." 
-                         class="w-full pl-11 pr-4 py-3 text-sm rounded-full bg-white dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] dark:placeholder-[#9aa0a6] focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all duration-200">
+                         class="w-full pl-11 pr-4 py-3 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200">
                 </div>
                 
                 <select v-model="categoryFilter" 
-                        class="px-4 py-3 text-sm rounded-full bg-white dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all duration-200 min-w-40 cursor-pointer">
+                        class="px-4 py-3 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 min-w-40 cursor-pointer">
                   <option value="">Todas las categorías</option>
                   <option v-for="category in categories" :key="category.id" :value="category.name">
                     {{ category.name }}
@@ -209,7 +211,7 @@
                 </select>
                 
                 <select v-model="stockFilter" 
-                        class="px-4 py-3 text-sm rounded-full bg-white dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3] font-medium focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all duration-200 min-w-36 cursor-pointer">
+                        class="px-4 py-3 text-sm rounded-xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 min-w-36 cursor-pointer">
                   <option value="">Todo el stock</option>
                   <option value="low">Stock bajo</option>
                   <option value="normal">Stock normal</option>
@@ -217,7 +219,7 @@
                 </select>
                 
                 <button @click="searchTerm = ''; categoryFilter = ''; stockFilter = ''" 
-                        class="p-2.5 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#d93025] dark:hover:text-[#f28b82] hover:bg-[#fce8e6] dark:hover:bg-[#d93025]/20 rounded-full transition-all duration-200"
+                        class="p-2.5 text-gray-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-600/20 rounded-xl transition-all duration-200"
                         title="Limpiar filtros">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" 
@@ -230,67 +232,67 @@
           <!-- Tabla de Stock - Gemini Style -->
           <div class="overflow-x-auto">
             <table class="min-w-full">
-              <thead class="bg-[#f8f9fa] dark:bg-[#282a2c]">
+              <thead class="bg-gray-50 dark:bg-zinc-800">
                 <tr>
-                  <th class="px-6 py-3.5 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Producto</th>
-                  <th class="px-6 py-3.5 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Categoría</th>
-                  <th class="px-6 py-3.5 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Stock</th>
-                  <th class="px-6 py-3.5 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Ventas</th>
-                  <th class="px-6 py-3.5 text-right text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Ingresos</th>
-                  <th class="px-6 py-3.5 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Estado</th>
-                  <th class="px-6 py-3.5 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wider">Acciones</th>
+                  <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Producto</th>
+                  <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Categoría</th>
+                  <th class="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Stock</th>
+                  <th class="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ventas</th>
+                  <th class="px-6 py-3.5 text-right text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ingresos</th>
+                  <th class="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-[#e8eaed] dark:divide-[#3a3a3f] bg-white dark:bg-[#1e1f20]">
-                <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-colors duration-150 group">
+              <tbody class="divide-y divide-gray-200 dark:divide-zinc-700 bg-white dark:bg-zinc-900">
+                <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors duration-150 group">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <!-- Imagen del producto -->
                       <div class="w-12 h-12 rounded-xl mr-4 overflow-hidden flex-shrink-0"
-                           :class="getProductImage(product) ? 'bg-white dark:bg-[#282a2c]' : 'bg-[#f8f9fa] dark:bg-[#282a2c] flex items-center justify-center'">
+                           :class="getProductImage(product) ? 'bg-white dark:bg-zinc-800' : 'bg-gray-50 dark:bg-zinc-800 flex items-center justify-center'">
                         <img v-if="getProductImage(product)"
                              :src="getProductImage(product)" 
                              :alt="product.name"
                              class="w-full h-full object-cover">
-                        <svg v-else class="w-6 h-6 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <svg v-else class="w-6 h-6 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
                         </svg>
                       </div>
                       <div>
-                        <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.name }}</p>
-                        <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ product.barcode || 'Sin código' }}</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</p>
+                        <p class="text-xs text-gray-600 dark:text-zinc-400">{{ product.barcode || 'Sin código' }}</p>
                       </div>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#f8f9fa] dark:bg-[#3a3a3f] text-[#1e1f20] dark:text-[#e3e3e3]">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-50 dark:bg-zinc-700 text-gray-900 dark:text-white">
                       {{ product.category }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
                     <div class="flex flex-col items-center">
-                      <span class="text-sm font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.current_stock || 0 }}</span>
-                      <span class="text-[10px] text-[#5f6368] dark:text-[#9aa0a6]">Min: {{ product.min_stock || 10 }}</span>
+                      <span class="text-sm font-bold text-gray-900 dark:text-white">{{ product.current_stock || 0 }}</span>
+                      <span class="text-[10px] text-gray-600 dark:text-zinc-400">Min: {{ product.min_stock || 10 }}</span>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
                     <div class="flex flex-col items-center">
-                      <span class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.total_sold || 0 }}</span>
-                      <span class="text-[10px] text-[#5f6368] dark:text-[#9aa0a6]">unidades</span>
+                      <span class="text-sm font-medium text-gray-900 dark:text-white">{{ product.total_sold || 0 }}</span>
+                      <span class="text-[10px] text-gray-600 dark:text-zinc-400">unidades</span>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right">
                     <div class="flex flex-col items-end">
-                      <span class="text-sm font-semibold text-[#1e8e3e] dark:text-[#81c995]">${{ parseFloat(product.total_revenue || 0).toLocaleString() }}</span>
-                      <span class="text-[10px] text-[#5f6368] dark:text-[#9aa0a6]">Precio: ${{ parseFloat(product.sale_price || 0).toLocaleString() }}</span>
+                      <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">${{ parseFloat(product.total_revenue || 0).toLocaleString() }}</span>
+                      <span class="text-[10px] text-gray-600 dark:text-zinc-400">Precio: ${{ parseFloat(product.sale_price || 0).toLocaleString() }}</span>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
                     <span :class="[
                       'inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wide',
                       product.current_stock <= product.min_stock 
-                        ? 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]' 
-                        : 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]'
+                        ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' 
+                        : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
                     ]">
                       {{ product.current_stock <= product.min_stock ? 'Bajo Stock' : 'En Stock' }}
                     </span>
@@ -298,7 +300,7 @@
                   <td class="px-6 py-4 whitespace-nowrap text-center">
                     <div class="flex items-center justify-center gap-1">
                       <button @click="adjustStock(product)" 
-                              class="p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#1a73e8] dark:hover:text-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/20 rounded-full transition-all duration-200"
+                              class="p-2 text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
                               title="Ajustar Stock">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -306,7 +308,7 @@
                         </svg>
                       </button>
                       <button @click="viewMovements(product)" 
-                              class="p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:text-[#7c3aed] dark:hover:text-[#a78bfa] hover:bg-[#f3e8ff] dark:hover:bg-[#7c3aed]/20 rounded-full transition-all duration-200"
+                              class="p-2 text-gray-600 dark:text-zinc-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-xl transition-all duration-200"
                               title="Ver Historial">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -349,27 +351,27 @@
           <!-- Lista de Alertas -->
           <div class="space-y-3">
             <div v-if="stockAlerts.length === 0" class="text-center py-16">
-              <div class="w-16 h-16 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-[#1e8e3e] dark:text-[#81c995]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
-              <p class="text-lg font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mb-1">¡Todo en orden!</p>
-              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Todos los productos tienen stock suficiente</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white mb-1">¡Todo en orden!</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400">Todos los productos tienen stock suficiente</p>
             </div>
 
             <div v-for="alert in stockAlerts" :key="alert.id" 
-                 class="bg-white dark:bg-[#282a2c] rounded-2xl p-4 hover:bg-[#f8f9fa] dark:hover:bg-[#3a3a3f] transition-all duration-200">
+                 class="bg-white dark:bg-zinc-800 rounded-2xl p-4 hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all duration-200">
               <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-4 flex-1 min-w-0">
                   <!-- Imagen o Ícono del producto -->
                   <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0"
-                       :class="getProductImage(alert) ? 'bg-white dark:bg-[#282a2c]' : 'bg-[#f8f9fa] dark:bg-[#3a3a3f] flex items-center justify-center'">
+                       :class="getProductImage(alert) ? 'bg-white dark:bg-zinc-800' : 'bg-gray-50 dark:bg-zinc-700 flex items-center justify-center'">
                     <img v-if="getProductImage(alert)"
                          :src="getProductImage(alert)" 
                          :alt="alert.name"
                          class="w-full h-full object-cover">
-                    <svg v-else class="w-6 h-6 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <svg v-else class="w-6 h-6 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.75 7.5h16.5m-15.75 0l1.5-1.875A2.625 2.625 0 018.25 4.5h7.5a2.625 2.625 0 012.25 1.125l1.5 1.875"/>
                     </svg>
                   </div>
@@ -377,26 +379,26 @@
                   <!-- Información del producto -->
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-1">
-                      <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] truncate">{{ alert.name }}</h4>
+                      <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ alert.name }}</h4>
                       <span v-if="alert.stock === 0" 
-                            class="px-2 py-0.5 rounded-full text-[10px] font-medium uppercase bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]">
+                            class="px-2 py-0.5 rounded-full text-[10px] font-medium uppercase bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400">
                         Agotado
                       </span>
                       <span v-else 
-                            class="px-2 py-0.5 rounded-full text-[10px] font-medium uppercase bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#f9ab00] dark:text-[#fdd663]">
+                            class="px-2 py-0.5 rounded-full text-[10px] font-medium uppercase bg-amber-50 dark:bg-amber-500/20 text-amber-500 dark:text-amber-300">
                         Bajo Stock
                       </span>
                     </div>
-                    <div class="flex items-center gap-4 text-xs text-[#5f6368] dark:text-[#9aa0a6]">
-                      <span>Stock: <strong class="text-[#1e1f20] dark:text-[#e3e3e3]">{{ alert.stock }}</strong> / {{ alert.min_stock }}</span>
-                      <span>Categoría: <strong class="text-[#1e1f20] dark:text-[#e3e3e3]">{{ alert.category }}</strong></span>
+                    <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-zinc-400">
+                      <span>Stock: <strong class="text-gray-900 dark:text-white">{{ alert.stock }}</strong> / {{ alert.min_stock }}</span>
+                      <span>Categoría: <strong class="text-gray-900 dark:text-white">{{ alert.category }}</strong></span>
                     </div>
                   </div>
                 </div>
                 
                 <!-- Botón de acción - Gemini Style -->
                 <button @click="adjustStock(alert)" 
-                        class="px-4 py-2 bg-[#1a73e8] hover:bg-[#1557b0] dark:bg-[#8ab4f8] dark:hover:bg-[#aecbfa] text-white dark:text-[#131314] text-xs font-medium rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0">
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-400 dark:hover:bg-blue-300 text-white dark:text-gray-900 text-xs font-medium rounded-xl transition-all duration-200 flex items-center gap-1.5 flex-shrink-0">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                   </svg>
@@ -414,22 +416,22 @@
     <div v-if="showMovementModal" 
          class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
          @click.self="closeMovementModal">
-      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
         <!-- Header del Modal -->
-        <div class="flex items-center justify-between pb-4 border-b border-[#e8eaed] dark:border-[#3a3a3f] mb-6">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-zinc-700 mb-6">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center">
-              <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Nuevo Movimiento</h3>
-              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Registra entradas y salidas de inventario</p>
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white">Nuevo Movimiento</h3>
+              <p class="text-xs text-gray-600 dark:text-zinc-400">Registra entradas y salidas de inventario</p>
             </div>
           </div>
           <button @click="closeMovementModal" 
-                  class="p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] rounded-full transition-colors">
+                  class="p-2 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-full transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -439,9 +441,9 @@
         <div class="space-y-6">
           <!-- Filtro por Categoría -->
           <div>
-            <label class="block text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Filtrar por Categoría (Opcional)</label>
+            <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Filtrar por Categoría (Opcional)</label>
             <select v-model="modalCategoryFilter" 
-                    class="w-full px-4 py-3 rounded-full bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all">
+                    class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
               <option value="">Todas las categorías</option>
               <option v-for="category in modalCategoriesForSelect" :key="category" :value="category">
                 {{ category }}
@@ -451,9 +453,9 @@
 
           <!-- Búsqueda de Producto -->
           <div class="relative">
-            <label class="block text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">
+            <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">
               Buscar Producto
-              <span class="text-xs font-normal text-[#5f6368] dark:text-[#9aa0a6]">(por nombre, código de barras, SKU o ID)</span>
+              <span class="text-xs font-normal text-gray-600 dark:text-zinc-400">(por nombre, código de barras, SKU o ID)</span>
             </label>
             <input 
               ref="modalProductInput"
@@ -461,34 +463,34 @@
               @input="onSearchInput"
               @focus="modalShowDropdown = modalSearchTerm.length >= 1"
               type="text" 
-              class="w-full px-4 py-3 rounded-full bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] dark:placeholder-[#9aa0a6] text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all"
+              class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
               placeholder="Escribe para buscar producto..."
               autocomplete="off">
             
             <!-- Producto Seleccionado -->
             <div v-if="selectedProduct && !modalShowDropdown" 
-                 class="mt-3 p-4 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 rounded-2xl">
+                 class="mt-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl">
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                   <div v-if="selectedProduct.image_url" class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
                     <img :src="selectedProduct.image_url" 
                          :alt="selectedProduct.name"
                          class="w-full h-full object-cover"
-                         @error="(e) => e.target.parentElement.innerHTML = `<div class='w-full h-full bg-[#1e8e3e]/20 flex items-center justify-center'><span class='text-sm font-medium text-[#1e8e3e] dark:text-[#81c995]'>${selectedProduct.name.charAt(0).toUpperCase()}</span></div>`">
+                         @error="(e) => e.target.parentElement.innerHTML = `<div class='w-full h-full bg-emerald-100 flex items-center justify-center'><span class='text-sm font-medium text-emerald-600 dark:text-emerald-400'>${selectedProduct.name.charAt(0).toUpperCase()}</span></div>`">
                   </div>
-                  <div v-else class="w-12 h-12 bg-[#e6f4ea] dark:bg-[#1e8e3e]/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <span class="text-lg font-medium text-[#1e8e3e] dark:text-[#81c995]">{{ selectedProduct.name.charAt(0).toUpperCase() }}</span>
+                  <div v-else class="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span class="text-lg font-medium text-emerald-600 dark:text-emerald-400">{{ selectedProduct.name.charAt(0).toUpperCase() }}</span>
                   </div>
                   <div>
-                    <p class="font-medium text-[#1e8e3e] dark:text-[#81c995]">{{ selectedProduct.name }}</p>
-                    <p class="text-sm text-[#1e8e3e]/80 dark:text-[#81c995]/80">
+                    <p class="font-medium text-emerald-600 dark:text-emerald-400">{{ selectedProduct.name }}</p>
+                    <p class="text-sm text-emerald-600/80 dark:text-emerald-400/80">
                       Stock actual: {{ selectedProduct.current_stock || 0 }} unidades
                     </p>
-                    <p class="text-xs text-[#1e8e3e]/60 dark:text-[#81c995]/60">{{ selectedProduct.barcode || 'Sin código' }}</p>
+                    <p class="text-xs text-emerald-600/60 dark:text-emerald-400/60">{{ selectedProduct.barcode || 'Sin código' }}</p>
                   </div>
                 </div>
                 <button @click="clearProductSelection" 
-                        class="p-2 text-[#1e8e3e] dark:text-[#81c995] hover:bg-[#1e8e3e]/10 rounded-full transition-colors">
+                        class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 rounded-full transition-colors">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
@@ -498,11 +500,11 @@
 
             <!-- Dropdown de Resultados -->
             <div v-if="modalShowDropdown && modalFilteredProducts.length > 0" 
-                 class="absolute z-10 w-full mt-2 bg-white dark:bg-[#282a2c] rounded-2xl shadow-lg max-h-60 overflow-y-auto">
+                 class="absolute z-10 w-full mt-2 bg-white dark:bg-zinc-800 rounded-2xl shadow-lg max-h-60 overflow-y-auto">
               <div v-for="product in modalFilteredProducts" 
                    :key="product.id"
                    @click="selectProduct(product)"
-                   class="p-4 hover:bg-[#f8f9fa] dark:hover:bg-[#3a3a3f] cursor-pointer border-b border-[#e8eaed] dark:border-[#3a3a3f] last:border-b-0 first:rounded-t-2xl last:rounded-b-2xl transition-colors">
+                   class="p-4 hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer border-b border-gray-200 dark:border-zinc-700 last:border-b-0 first:rounded-t-2xl last:rounded-b-2xl transition-colors">
                 <div class="flex items-center justify-between gap-3">
                   <div class="flex items-center gap-3 flex-1">
                     <div v-if="product.image_url" class="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
@@ -517,9 +519,9 @@
                       </span>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ product.name }}</p>
-                      <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">{{ product.category }}</p>
-                      <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">
+                      <p class="font-medium text-gray-900 dark:text-white">{{ product.name }}</p>
+                      <p class="text-sm text-gray-600 dark:text-zinc-400">{{ product.category }}</p>
+                      <p class="text-xs text-gray-600 dark:text-zinc-400">
                         {{ product.barcode || 'Sin código' }} | Stock: {{ product.current_stock || 0 }}
                       </p>
                     </div>
@@ -536,7 +538,7 @@
 
             <!-- Mensaje cuando no hay resultados -->
             <div v-if="modalShowDropdown && modalSearchTerm.length >= 1 && modalFilteredProducts.length === 0" 
-                 class="absolute z-10 w-full mt-2 bg-white dark:bg-[#282a2c] rounded-2xl shadow-lg p-4 text-center text-[#5f6368] dark:text-[#9aa0a6]">
+                 class="absolute z-10 w-full mt-2 bg-white dark:bg-zinc-800 rounded-2xl shadow-lg p-4 text-center text-gray-600 dark:text-zinc-400">
               No se encontraron productos con: "{{ modalSearchTerm }}"
             </div>
           </div>
@@ -544,45 +546,45 @@
           <!-- Tipo y Cantidad -->
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Tipo de Movimiento</label>
+              <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Tipo de Movimiento</label>
               <select v-model="newMovementForm.type" 
-                      class="w-full px-4 py-3 rounded-full bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all">
+                      class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
                 <option value="entrada">📦 Entrada</option>
                 <option value="salida">📤 Salida</option>
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Cantidad</label>
+              <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Cantidad</label>
               <input v-model="newMovementForm.quantity" 
                      type="number" 
                      min="1"
-                     class="w-full px-4 py-3 rounded-full bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all"
+                     class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
                      placeholder="0">
             </div>
           </div>
           
           <!-- Motivo -->
           <div>
-            <label class="block text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Motivo del Movimiento</label>
+            <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Motivo del Movimiento</label>
             <input v-model="newMovementForm.reason" 
                    type="text" 
-                   class="w-full px-4 py-3 rounded-full bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] dark:placeholder-[#9aa0a6] text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] transition-all"
+                   class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
                    placeholder="Ej: Compra, Venta, Ajuste de inventario, Devolución...">
           </div>
 
           <!-- Alerta Stock Bajo -->
           <div v-if="selectedProduct && newMovementForm.type === 'salida' && 
                      parseInt(newMovementForm.quantity || 0) > (selectedProduct.current_stock || 0)" 
-               class="p-4 bg-[#fce8e6] dark:bg-[#d93025]/20 rounded-2xl">
+               class="p-4 bg-rose-50 dark:bg-rose-900/20 rounded-2xl">
             <div class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-[#d93025]/20 rounded-full flex items-center justify-center">
-                <svg class="w-4 h-4 text-[#d93025] dark:text-[#f28b82]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <div class="w-8 h-8 bg-rose-600/20 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                 </svg>
               </div>
               <div>
-                <p class="text-sm font-medium text-[#d93025] dark:text-[#f28b82]">Stock insuficiente</p>
-                <p class="text-xs text-[#d93025]/80 dark:text-[#f28b82]/80">
+                <p class="text-sm font-medium text-rose-600 dark:text-rose-400">Stock insuficiente</p>
+                <p class="text-xs text-rose-600/80 dark:text-rose-400/80">
                   Solo hay {{ selectedProduct.current_stock || 0 }} unidades disponibles.
                 </p>
               </div>
@@ -591,14 +593,14 @@
         </div>
         
         <!-- Botones de Acción - Gemini Style -->
-        <div class="flex justify-end gap-3 pt-6 mt-6 border-t border-[#e8eaed] dark:border-[#3a3a3f]">
+        <div class="flex justify-end gap-3 pt-6 mt-6 border-t border-gray-200 dark:border-zinc-700">
           <button @click="closeMovementModal" 
-                  class="px-5 py-2.5 text-[#1a73e8] dark:text-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/20 text-sm font-medium rounded-full transition-all duration-200">
+                  class="px-5 py-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm font-medium rounded-xl transition-all duration-200">
             Cancelar
           </button>
           <button @click="createMovement" 
                   :disabled="!selectedProduct || !newMovementForm.quantity || !newMovementForm.reason"
-                  class="px-5 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] disabled:bg-[#e8eaed] disabled:text-[#9aa0a6] dark:bg-[#8ab4f8] dark:hover:bg-[#aecbfa] dark:disabled:bg-[#3a3a3f] dark:disabled:text-[#5f6368] text-white dark:text-[#131314] rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
+                  class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 dark:disabled:text-gray-600 text-white dark:text-gray-900 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
             Registrar Movimiento
           </button>
         </div>
@@ -609,26 +611,26 @@
     <div v-if="showAdjustModal" 
          class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in"
          @click.self="showAdjustModal = false">
-      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl w-full max-w-5xl flex flex-col max-h-[90vh] animate-scale-in">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-5xl flex flex-col max-h-[90vh] animate-scale-in">
         
         <!-- Header - Gemini Style -->
-        <div class="bg-white dark:bg-[#1e1f20] border-b border-[#e8eaed] dark:border-[#3a3a3f] px-8 py-5 flex-shrink-0 rounded-t-2xl">
+        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 px-8 py-5 flex-shrink-0 rounded-t-2xl">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
               </div>
               <div>
-                <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Ajustar Stock</h3>
-                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Modifica la cantidad en inventario</p>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Ajustar Stock</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Modifica la cantidad en inventario</p>
               </div>
             </div>
             <button @click="showAdjustModal = false" 
-                    class="p-2 hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] rounded-full transition-all">
-              <svg class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    class="p-2 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-full transition-all">
+              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
@@ -636,27 +638,27 @@
         </div>
         
         <!-- Contenido del Modal -->
-        <div class="flex-1 overflow-y-auto bg-[#f8f9fa] dark:bg-[#131314] p-6" v-if="selectedProductForAdjust">
+        <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-zinc-950 p-6" v-if="selectedProductForAdjust">
           
           <!-- Información del Producto -->
-          <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 mb-5">
+          <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 mb-5">
             <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <span class="text-base font-medium text-[#1a73e8] dark:text-[#8ab4f8]">{{ selectedProductForAdjust.name.charAt(0) }}</span>
+              <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="text-base font-medium text-blue-600 dark:text-blue-400">{{ selectedProductForAdjust.name.charAt(0) }}</span>
               </div>
               <div class="flex-1">
-                <h4 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProductForAdjust.name }}</h4>
+                <h4 class="text-base font-medium text-gray-900 dark:text-white">{{ selectedProductForAdjust.name }}</h4>
                 <div class="flex items-center gap-3 mt-1">
-                  <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ selectedProductForAdjust.category }}</span>
-                  <span v-if="productVariants.length > 0" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#f3e8ff] dark:bg-[#7c3aed]/20 text-[#7c3aed] dark:text-[#a78bfa]">
+                  <span class="text-xs text-gray-600 dark:text-zinc-400">{{ selectedProductForAdjust.category }}</span>
+                  <span v-if="productVariants.length > 0" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
                     👗 MODA/VARIANTES
                   </span>
                   <div v-else class="flex items-center gap-3">
-                    <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Stock:</span>
-                    <span class="text-sm font-semibold text-[#1a73e8] dark:text-[#8ab4f8]">{{ selectedProductForAdjust.current_stock || 0 }} uds</span>
-                    <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">|</span>
-                    <span class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Mínimo:</span>
-                    <span class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProductForAdjust.min_stock || 10 }} uds</span>
+                    <span class="text-xs text-gray-600 dark:text-zinc-400">Stock:</span>
+                    <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">{{ selectedProductForAdjust.current_stock || 0 }} uds</span>
+                    <span class="text-xs text-gray-600 dark:text-zinc-400">|</span>
+                    <span class="text-xs text-gray-600 dark:text-zinc-400">Mínimo:</span>
+                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedProductForAdjust.min_stock || 10 }} uds</span>
                   </div>
                 </div>
               </div>
@@ -668,8 +670,8 @@
             
             <!-- Columna Izquierda: Variantes (si existen) -->
             <div v-if="productVariants.length > 0" class="col-span-5 space-y-5">
-              <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5">
-                <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-3">Selecciona la Variante</h4>
+              <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5">
+                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Selecciona la Variante</h4>
                 <div class="space-y-2 max-h-[320px] overflow-y-auto">
                   <button
                     v-for="variant in productVariants"
@@ -679,30 +681,30 @@
                     :class="[
                       'w-full p-3 rounded-xl transition-all text-left',
                       selectedVariant?.id === variant.id
-                        ? 'bg-[#f3e8ff] dark:bg-[#7c3aed]/20 ring-2 ring-[#7c3aed] dark:ring-[#a78bfa]'
-                        : 'bg-[#f8f9fa] dark:bg-[#282a2c] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f]'
+                        ? 'bg-purple-50 dark:bg-purple-900/20 ring-2 ring-purple-600 dark:ring-purple-400'
+                        : 'bg-gray-50 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700'
                     ]"
                   >
                     <div class="flex items-start gap-2">
-                      <svg v-if="selectedVariant?.id === variant.id" class="w-5 h-5 text-[#7c3aed] dark:text-[#a78bfa] flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <svg v-if="selectedVariant?.id === variant.id" class="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                       </svg>
                       <div class="flex-1 min-w-0">
-                        <p class="font-medium text-[#1e1f20] dark:text-[#e3e3e3] text-sm mb-1">
+                        <p class="font-medium text-gray-900 dark:text-white text-sm mb-1">
                           {{ (typeof variant.options_summary === 'string' ? JSON.parse(variant.options_summary) : variant.options_summary).map(opt => `${opt.name}: ${opt.value}`).join(' | ') }}
                         </p>
-                        <div class="flex items-center gap-2 text-xs text-[#5f6368] dark:text-[#9aa0a6]">
+                        <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-zinc-400">
                           <span>{{ variant.sku }}</span>
-                          <span class="text-[#e8eaed] dark:text-[#3a3a3f]">|</span>
-                          <span class="font-medium text-[#1a73e8] dark:text-[#8ab4f8]">{{ variant.stock || 0 }} uds</span>
-                          <span class="text-[#e8eaed] dark:text-[#3a3a3f]">|</span>
+                          <span class="text-gray-200 dark:text-zinc-700">|</span>
+                          <span class="font-medium text-blue-600 dark:text-blue-400">{{ variant.stock || 0 }} uds</span>
+                          <span class="text-gray-200 dark:text-zinc-700">|</span>
                           <span>${{ Number(variant.price || 0).toLocaleString('es-CO') }}</span>
                         </div>
                       </div>
                     </div>
                   </button>
                 </div>
-                <p v-if="adjustForm.errors.variant" class="text-[#d93025] dark:text-[#f28b82] text-xs mt-2 flex items-center">
+                <p v-if="adjustForm.errors.variant" class="text-rose-600 dark:text-rose-400 text-xs mt-2 flex items-center">
                   <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
                   </svg>
@@ -713,17 +715,17 @@
 
             <!-- Columna Derecha: Formulario de Ajuste -->
             <div :class="productVariants.length > 0 ? 'col-span-7' : 'col-span-12'">
-              <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-5 space-y-4">
+              <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 space-y-4">
                 
                 <!-- Tipo de Ajuste -->
                 <div>
-                  <label class="block text-xs font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Tipo de Ajuste</label>
+                  <label class="block text-xs font-medium text-gray-900 dark:text-white mb-2">Tipo de Ajuste</label>
                   <div class="grid grid-cols-2 gap-3">
                     <button type="button" @click="setQuickAdjustment('restock')"
                             :class="['p-3 rounded-xl transition-all', 
                                      adjustForm.adjustmentType === 'restock' 
-                                       ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995] ring-2 ring-[#1e8e3e] dark:ring-[#81c995]' 
-                                       : 'bg-[#f8f9fa] dark:bg-[#282a2c] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] text-[#5f6368] dark:text-[#9aa0a6]']">
+                                       ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 ring-2 ring-[#1e8e3e] dark:ring-[#81c995]' 
+                                       : 'bg-gray-50 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-400']">
                       <div class="flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -734,8 +736,8 @@
                     <button type="button" @click="setQuickAdjustment('correction')"
                             :class="['p-3 rounded-xl transition-all', 
                                      adjustForm.adjustmentType === 'correction' 
-                                       ? 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#f9ab00] dark:text-[#fdd663] ring-2 ring-[#f9ab00] dark:ring-[#fdd663]' 
-                                       : 'bg-[#f8f9fa] dark:bg-[#282a2c] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] text-[#5f6368] dark:text-[#9aa0a6]']">
+                                       ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-500 dark:text-amber-300 ring-2 ring-amber-500 dark:ring-amber-300' 
+                                       : 'bg-gray-50 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-400']">
                       <div class="flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -748,21 +750,21 @@
 
                 <!-- Nuevo Stock -->
                 <div>
-                  <label class="block text-xs font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Nuevo Stock</label>
+                  <label class="block text-xs font-medium text-gray-900 dark:text-white mb-2">Nuevo Stock</label>
                   <div class="relative">
                     <input v-model="adjustForm.new_stock" 
                            type="number" 
                            min="0"
                            step="1"
-                           :class="['w-full px-4 py-3 pr-12 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] text-sm',
+                           :class="['w-full px-4 py-3 pr-12 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm',
                                     adjustForm.errors.new_stock 
-                                      ? 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]' 
-                                      : 'bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3]']"
+                                      ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' 
+                                      : 'bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white']"
                            placeholder="Ingresa la cantidad nueva"
                            @blur="validateNewStock">
-                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-[#5f6368] dark:text-[#9aa0a6] font-medium">uds</span>
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-600 dark:text-zinc-400 font-medium">uds</span>
                   </div>
-                  <p v-if="adjustForm.errors.new_stock" class="text-[#d93025] dark:text-[#f28b82] text-xs mt-1.5 flex items-center">
+                  <p v-if="adjustForm.errors.new_stock" class="text-rose-600 dark:text-rose-400 text-xs mt-1.5 flex items-center">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
                     </svg>
@@ -772,12 +774,12 @@
                 
                 <!-- Motivo -->
                 <div>
-                  <label class="block text-xs font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Motivo del Ajuste</label>
+                  <label class="block text-xs font-medium text-gray-900 dark:text-white mb-2">Motivo del Ajuste</label>
                   <select v-model="adjustForm.reason" 
-                          :class="['w-full px-4 py-3 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] text-sm cursor-pointer',
+                          :class="['w-full px-4 py-3 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm cursor-pointer',
                                    adjustForm.errors.reason 
-                                     ? 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]' 
-                                     : 'bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3]']"
+                                     ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' 
+                                     : 'bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white']"
                           @change="validateReason">
                     <option value="">Selecciona un motivo...</option>
                     <option value="Reposición de inventario">Reposición de inventario</option>
@@ -792,9 +794,9 @@
                   <input v-if="adjustForm.reason === 'Otro'" 
                          v-model="adjustForm.customReason"
                          type="text" 
-                         class="w-full px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm mt-2"
+                         class="w-full px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white text-sm mt-2"
                          placeholder="Especifica el motivo...">
-                  <p v-if="adjustForm.errors.reason" class="text-[#d93025] dark:text-[#f28b82] text-xs mt-1.5 flex items-center">
+                  <p v-if="adjustForm.errors.reason" class="text-rose-600 dark:text-rose-400 text-xs mt-1.5 flex items-center">
                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
                     </svg>
@@ -829,7 +831,7 @@
                     </div>
                     <div class="text-right">
                       <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
-                            :class="stockDifference >= 0 ? 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995]' : 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82]'">
+                            :class="stockDifference >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'">
                         {{ stockDifference >= 0 ? '📦 Entrada' : '📤 Salida' }}
                       </span>
                     </div>
@@ -840,14 +842,14 @@
           </div>
           
           <!-- Footer: Botones de Acción - Gemini Style -->
-          <div class="flex justify-end gap-3 pt-6 mt-6 border-t border-[#e8eaed] dark:border-[#3a3a3f]">
+          <div class="flex justify-end gap-3 pt-6 mt-6 border-t border-gray-200 dark:border-zinc-700">
             <button @click="showAdjustModal = false" 
-                    class="px-5 py-2.5 text-[#1a73e8] dark:text-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/20 text-sm font-medium rounded-full transition-all duration-200">
+                    class="px-5 py-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm font-medium rounded-xl transition-all duration-200">
               Cancelar
             </button>
             <button @click="processStockAdjustment" 
                     :disabled="!isFormValid"
-                    class="px-6 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] disabled:bg-[#e8eaed] disabled:text-[#9aa0a6] dark:bg-[#8ab4f8] dark:hover:bg-[#aecbfa] dark:disabled:bg-[#3a3a3f] dark:disabled:text-[#5f6368] text-white dark:text-[#131314] rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
+                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 dark:disabled:text-gray-600 text-white dark:text-gray-900 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
               {{ adjustmentLoading ? 'Procesando...' : 'Confirmar Ajuste' }}
             </button>
           </div>
@@ -859,24 +861,24 @@
     <div v-if="showHistoryModal" 
          class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
          @click.self="showHistoryModal = false">
-      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-hidden transform transition-all">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-hidden transform transition-all">
         <!-- Header del Modal -->
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-full flex items-center justify-center">
-              <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div>
-              <h3 class="text-xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3]">Historial de Movimientos</h3>
-              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]" v-if="selectedProductForHistory">
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Historial de Movimientos</h3>
+              <p class="text-sm text-gray-600 dark:text-zinc-400" v-if="selectedProductForHistory">
                 {{ selectedProductForHistory.name }} - {{ selectedProductForHistory.category }}
               </p>
             </div>
           </div>
           <button @click="showHistoryModal = false" 
-                  class="p-2 text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] rounded-full transition-colors">
+                  class="p-2 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-full transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -884,22 +886,22 @@
         </div>
 
         <!-- Información del Producto -->
-        <div v-if="selectedProductForHistory" class="bg-[#f0f4f9] dark:bg-[#282a2c] rounded-2xl p-4 mb-6">
+        <div v-if="selectedProductForHistory" class="bg-gray-100 dark:bg-zinc-800 rounded-2xl p-4 mb-6">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="text-center">
-              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Stock Actual</p>
-              <p class="text-2xl font-semibold text-[#1a73e8] dark:text-[#8ab4f8]">{{ selectedProductForHistory.current_stock || 0 }}</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400">Stock Actual</p>
+              <p class="text-2xl font-semibold text-blue-600 dark:text-blue-400">{{ selectedProductForHistory.current_stock || 0 }}</p>
             </div>
             <div class="text-center">
-              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Stock Mínimo</p>
-              <p class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProductForHistory.min_stock || 0 }}</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400">Stock Mínimo</p>
+              <p class="text-lg font-medium text-gray-900 dark:text-white">{{ selectedProductForHistory.min_stock || 0 }}</p>
             </div>
             <div class="text-center">
-              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Precio Venta</p>
-              <p class="text-lg font-medium text-[#1e8e3e] dark:text-[#81c995]">${{ parseFloat(selectedProductForHistory.sale_price || 0).toLocaleString() }}</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400">Precio Venta</p>
+              <p class="text-lg font-medium text-emerald-600 dark:text-emerald-400">${{ parseFloat(selectedProductForHistory.sale_price || 0).toLocaleString() }}</p>
             </div>
             <div class="text-center">
-              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Estado</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400">Estado</p>
               <span :class="[
                 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
                 getStockStatusClass(selectedProductForHistory.current_stock, selectedProductForHistory.min_stock)
@@ -913,9 +915,9 @@
         <!-- Filtros del Historial - Gemini Style -->
         <div class="flex flex-col sm:flex-row gap-4 mb-6">
           <div class="flex-1">
-            <label class="block text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Período</label>
+            <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Período</label>
             <select v-model="historyDateFilter" 
-                    class="w-full px-4 py-3 rounded-full bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] cursor-pointer"
+                    class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
                     @change="filterMovements">
               <option value="all">Todos los períodos</option>
               <option value="today">Hoy</option>
@@ -924,9 +926,9 @@
             </select>
           </div>
           <div class="flex-1">
-            <label class="block text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3] mb-2">Tipo de Movimiento</label>
+            <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Tipo de Movimiento</label>
             <select v-model="historyTypeFilter" 
-                    class="w-full px-4 py-3 rounded-full bg-[#f8f9fa] dark:bg-[#282a2c] text-[#1e1f20] dark:text-[#e3e3e3] text-sm focus:outline-none focus:ring-2 focus:ring-[#8ab4f8] cursor-pointer"
+                    class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer"
                     @change="filterMovements">
               <option value="all">Todos los tipos</option>
               <option value="entrada">Entradas</option>
@@ -937,7 +939,7 @@
           <div class="flex items-end">
             <button @click="loadProductHistory" 
                     :disabled="historyLoading"
-                    class="px-5 py-3 bg-[#1a73e8] hover:bg-[#1557b0] disabled:bg-[#e8eaed] disabled:text-[#9aa0a6] dark:bg-[#8ab4f8] dark:hover:bg-[#aecbfa] dark:disabled:bg-[#3a3a3f] text-white dark:text-[#131314] rounded-full font-medium flex items-center gap-2 transition-colors text-sm">
+                    class="px-5 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 text-white dark:text-gray-900 rounded-full font-medium flex items-center gap-2 transition-colors text-sm">
               <svg class="w-4 h-4" :class="{'animate-spin': historyLoading}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
@@ -947,31 +949,31 @@
         </div>
 
         <!-- Lista de Movimientos - Gemini Style -->
-        <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl overflow-hidden max-h-96 overflow-y-auto">
+        <div class="bg-gray-50 dark:bg-zinc-800 rounded-2xl overflow-hidden max-h-96 overflow-y-auto">
           <div v-if="historyLoading" class="flex items-center justify-center py-12">
             <div class="text-center">
-              <svg class="animate-spin w-8 h-8 text-[#1a73e8] dark:text-[#8ab4f8] mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+              <svg class="animate-spin w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <p class="text-[#5f6368] dark:text-[#9aa0a6]">Cargando historial...</p>
+              <p class="text-gray-600 dark:text-zinc-400">Cargando historial...</p>
             </div>
           </div>
           
           <div v-else-if="filteredMovements.length === 0" class="flex items-center justify-center py-12">
             <div class="text-center">
-              <svg class="w-12 h-12 text-[#5f6368] dark:text-[#9aa0a6] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <svg class="w-12 h-12 text-gray-600 dark:text-zinc-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
-              <p class="text-[#1e1f20] dark:text-[#e3e3e3]">No hay movimientos para mostrar</p>
-              <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">Prueba cambiando los filtros</p>
+              <p class="text-gray-900 dark:text-white">No hay movimientos para mostrar</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400">Prueba cambiando los filtros</p>
             </div>
           </div>
 
           <div v-else>
-            <div class="divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
+            <div class="divide-y divide-gray-200 dark:divide-zinc-700">
               <div v-for="movement in filteredMovements" :key="movement.id" 
-                   class="px-6 py-4 hover:bg-white dark:hover:bg-[#1e1f20] transition-colors">
+                   class="px-6 py-4 hover:bg-white dark:hover:bg-zinc-900 transition-colors">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center space-x-4">
                     <div class="w-10 h-10 rounded-full flex items-center justify-center"
@@ -983,7 +985,7 @@
                     </div>
                     <div>
                       <div class="flex items-center space-x-2">
-                        <span class="font-medium text-[#1e1f20] dark:text-[#e3e3e3]">
+                        <span class="font-medium text-gray-900 dark:text-white">
                           {{ getQuantityDisplay(movement) }}
                         </span>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
@@ -991,15 +993,15 @@
                           {{ getMovementTypeLabel(movement.type) }}
                         </span>
                       </div>
-                      <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">{{ movement.reference || movement.notes || 'Sin motivo especificado' }}</p>
-                      <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ formatDateTime(movement.movement_date || movement.created_at) }}</p>
+                      <p class="text-sm text-gray-600 dark:text-zinc-400">{{ movement.reference || movement.notes || 'Sin motivo especificado' }}</p>
+                      <p class="text-xs text-gray-600 dark:text-zinc-400">{{ formatDateTime(movement.movement_date || movement.created_at) }}</p>
                     </div>
                   </div>
                   <div class="text-right">
-                    <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
                       Stock resultante: {{ movement.new_stock || 'N/A' }}
                     </p>
-                    <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]" v-if="movement.user">
+                    <p class="text-xs text-gray-600 dark:text-zinc-400" v-if="movement.user">
                       Por: {{ movement.user.name || movement.user }}
                     </p>
                   </div>
@@ -1010,12 +1012,12 @@
         </div>
 
         <!-- Footer del Modal - Gemini Style -->
-        <div class="flex items-center justify-between mt-6 pt-4 border-t border-[#e8eaed] dark:border-[#3a3a3f]">
-          <div class="text-sm text-[#5f6368] dark:text-[#9aa0a6]">
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-zinc-700">
+          <div class="text-sm text-gray-600 dark:text-zinc-400">
             Total: {{ filteredMovements.length }} movimientos
           </div>
           <button @click="showHistoryModal = false" 
-                  class="px-5 py-2.5 text-[#1a73e8] dark:text-[#8ab4f8] hover:bg-[#e8f0fe] dark:hover:bg-[#1a73e8]/20 rounded-full font-medium transition-colors text-sm">
+                  class="px-5 py-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full font-medium transition-colors text-sm">
             Cerrar
           </button>
         </div>
@@ -2217,14 +2219,16 @@ onMounted(async () => {
   try {
     loading.value = true
     
-    // 🏢 NUEVO: Cargar warehouses si el plan lo permite
-    await loadWarehousesIfAvailable()
+    // 🚀 OPTIMIZACIÓN: Cargar datos en paralelo en lugar de secuencial
+    // Esto reduce el tiempo de carga de ~4s a ~1-2s
+    await Promise.all([
+      loadWarehousesIfAvailable(),
+      loadProducts(),
+      loadCategories(),
+      loadMovementsData()
+    ])
     
-    await loadProducts()
-    await loadCategories()
-    await loadMovementsData()
-    
-    // Inicializar notificaciones
+    // Inicializar notificaciones (puede ser secuencial - no crítico para UI)
     await notificationStore.initializeLastVisited()
     await notificationStore.loadNotifications()
     notificationStore.startPolling(15000)
@@ -2243,10 +2247,12 @@ onMounted(async () => {
 // 🔄 AUTO-REFRESH al reactivar el componente
 onActivated(async () => {
   console.log('🔄 [InventoryView] Component activated - Refreshing data...')
-  // Recarga silenciosa de datos críticos
+  // 🚀 Recarga en paralelo de datos críticos
   try {
-    await loadProducts()
-    await loadMovementsData()
+    await Promise.all([
+      loadProducts(),
+      loadMovementsData()
+    ])
   } catch (error) {
     console.error('Error en auto-refresh de inventario:', error)
   }

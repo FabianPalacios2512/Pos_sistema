@@ -1,27 +1,27 @@
 <template>
   <Teleport to="body">
     <div 
-      class="fixed top-0 left-0 right-0 bottom-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4"
+      class="fixed top-0 left-0 right-0 bottom-0 bg-black/50 dark:bg-black/60 flex items-center justify-center p-4"
       style="z-index: 99999; position: fixed; inset: 0;">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-300 dark:border-zinc-800">
+      <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-[#dadce0] dark:border-[#3a3a3f]">
         
         <!-- Header -->
-        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] border-b border-[#e8eaed] dark:border-[#3a3a3f] px-6 py-4 flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-2xl flex items-center justify-center">
+              <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-bold text-gray-900 dark:text-white">Detalle del Traslado</h3>
-              <p class="text-xs text-gray-500 dark:text-zinc-400">{{ transfer.reference_number }}</p>
+              <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Detalle del Traslado</h3>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ transfer.reference_number }}</p>
             </div>
           </div>
           <button 
             @click="$emit('close')"
-            class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
-            <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="p-2 hover:bg-[#f1f3f4] dark:hover:bg-[#282a2c] rounded-full transition-colors">
+            <svg class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
@@ -34,10 +34,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           
           <!-- Estado -->
-          <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4">
-            <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 mb-2">Estado</p>
+          <div class="bg-white dark:bg-[#282a2c] rounded-xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
+            <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] mb-2">Estado</p>
             <span :class="[
-              'px-3 py-1 rounded-full text-xs font-semibold',
+              'px-3 py-1 rounded-full text-xs font-medium',
               getStatusClass(transfer.status)
             ]">
               {{ getStatusText(transfer.status) }}
@@ -45,14 +45,14 @@
           </div>
 
           <!-- Fechas -->
-          <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-4">
-            <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 mb-2">Fechas</p>
+          <div class="bg-white dark:bg-[#282a2c] rounded-xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
+            <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] mb-2">Fechas</p>
             <div class="space-y-1">
-              <p class="text-xs text-gray-700 dark:text-zinc-300">
-                <span class="font-semibold">Creado:</span> {{ formatDate(transfer.created_at) }}
+              <p class="text-xs text-[#3c4043] dark:text-[#bdc1c6]">
+                <span class="font-medium">Creado:</span> {{ formatDate(transfer.created_at) }}
               </p>
-              <p v-if="transfer.completed_at" class="text-xs text-gray-700 dark:text-zinc-300">
-                <span class="font-semibold">Completado:</span> {{ formatDate(transfer.completed_at) }}
+              <p v-if="transfer.completed_at" class="text-xs text-[#3c4043] dark:text-[#bdc1c6]">
+                <span class="font-medium">Completado:</span> {{ formatDate(transfer.completed_at) }}
               </p>
             </div>
           </div>
@@ -60,65 +60,65 @@
         </div>
 
         <!-- Flujo de Traslado -->
-        <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-lg p-4 mb-6 border border-blue-100 dark:border-blue-900/30">
+        <div class="bg-[#e8f0fe] dark:bg-[#1a73e8]/10 rounded-xl p-4 mb-6 border border-[#c6dafc] dark:border-[#1a73e8]/30">
           <div class="flex items-center justify-between">
             <div class="flex-1">
-              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Origen</p>
-              <p class="text-sm font-bold text-gray-900 dark:text-white">{{ transfer.source_warehouse?.name }}</p>
+              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] mb-1">Origen</p>
+              <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ transfer.source_warehouse?.name }}</p>
             </div>
             
             <div class="flex items-center space-x-2 px-4">
-              <div class="h-0.5 w-8 bg-blue-400 dark:bg-blue-600"></div>
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="h-0.5 w-8 bg-[#1a73e8] dark:bg-[#8ab4f8]"></div>
+              <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
               </svg>
-              <div class="h-0.5 w-8 bg-purple-400 dark:bg-purple-600"></div>
+              <div class="h-0.5 w-8 bg-[#9334e6] dark:bg-[#c58af9]"></div>
             </div>
             
             <div class="flex-1 text-right">
-              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Destino</p>
-              <p class="text-sm font-bold text-gray-900 dark:text-white">{{ transfer.destination_warehouse?.name }}</p>
+              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] mb-1">Destino</p>
+              <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ transfer.destination_warehouse?.name }}</p>
             </div>
           </div>
         </div>
 
         <!-- Notas -->
-        <div v-if="transfer.notes" class="bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-900/50 rounded-lg p-4 mb-6">
-          <p class="text-xs font-semibold text-yellow-800 dark:text-yellow-200 mb-1">Notas</p>
-          <p class="text-sm text-yellow-900 dark:text-yellow-100">{{ transfer.notes }}</p>
+        <div v-if="transfer.notes" class="bg-[#fef7e0] dark:bg-[#f9ab00]/10 border border-[#fdd663] dark:border-[#f9ab00]/30 rounded-xl p-4 mb-6">
+          <p class="text-xs font-medium text-[#e37400] dark:text-[#fdd663] mb-1">Notas</p>
+          <p class="text-sm text-[#5f6368] dark:text-[#bdc1c6]">{{ transfer.notes }}</p>
         </div>
 
         <!-- Tabla de Productos -->
-        <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
-          <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 py-3">
-            <h4 class="text-sm font-bold text-gray-900 dark:text-white">Productos</h4>
+        <div class="bg-white dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f] rounded-xl overflow-hidden">
+          <div class="bg-[#f8f9fa] dark:bg-[#282a2c] border-b border-[#e8eaed] dark:border-[#3a3a3f] px-4 py-3">
+            <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Productos</h4>
           </div>
           
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-            <thead class="bg-gray-50 dark:bg-zinc-900">
+          <table class="min-w-full divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
+            <thead class="bg-[#f8f9fa] dark:bg-[#282a2c]">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">
+                <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
                   Producto
                 </th>
-                <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">
+                <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
                   Cantidad
                 </th>
-                <th v-if="transfer.status === 'completed'" class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">
+                <th v-if="transfer.status === 'completed'" class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
                   Recibido
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
-              <tr v-for="item in transfer.items" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+            <tbody class="bg-white dark:bg-[#282a2c] divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
+              <tr v-for="item in transfer.items" :key="item.id" class="hover:bg-[#f1f3f4] dark:hover:bg-[#35363a] transition-colors">
                 <td class="px-4 py-3">
-                  <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.product?.name }}</p>
-                  <p v-if="item.product?.code" class="text-xs text-gray-500 dark:text-zinc-400">Código: {{ item.product.code }}</p>
+                  <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.product?.name }}</p>
+                  <p v-if="item.product?.code" class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Código: {{ item.product.code }}</p>
                 </td>
                 <td class="px-4 py-3 text-center">
-                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.quantity }}</span>
+                  <span class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.quantity }}</span>
                 </td>
                 <td v-if="transfer.status === 'completed'" class="px-4 py-3 text-center">
-                  <span class="px-2 py-1 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-xs font-semibold rounded-full border border-emerald-100 dark:border-emerald-800">
+                  <span class="px-2 py-1 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995] text-xs font-medium rounded-full border border-[#ceead6] dark:border-[#1e8e3e]/30">
                     {{ item.received_quantity || item.quantity }}
                   </span>
                 </td>
@@ -127,10 +127,10 @@
           </table>
 
           <!-- Total -->
-          <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-4 py-3 flex justify-end">
+          <div class="bg-[#f8f9fa] dark:bg-[#282a2c] border-t border-[#e8eaed] dark:border-[#3a3a3f] px-4 py-3 flex justify-end">
             <div class="text-right">
-              <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1">Total de Productos</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white">{{ totalProducts }} unidades</p>
+              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-1">Total de Productos</p>
+              <p class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ totalProducts }} unidades</p>
             </div>
           </div>
         </div>
@@ -138,12 +138,12 @@
       </div>
 
       <!-- Footer -->
-      <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-between">
+      <div class="bg-[#f8f9fa] dark:bg-[#282a2c] border-t border-[#e8eaed] dark:border-[#3a3a3f] px-6 py-4 flex justify-between">
         <div class="flex space-x-2">
           <button 
             v-if="transfer.status === 'pending'"
             @click="handleComplete"
-            class="px-4 py-2 bg-emerald-600 dark:bg-emerald-700 hover:bg-emerald-700 dark:hover:bg-emerald-600 text-white text-sm font-semibold rounded-lg transition-colors flex items-center space-x-2">
+            class="px-4 py-2 bg-[#1e8e3e] hover:bg-[#188038] text-white text-sm font-medium rounded-full transition-colors flex items-center space-x-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
@@ -153,7 +153,7 @@
           <button 
             v-if="transfer.status === 'pending'"
             @click="handleCancel"
-            class="px-4 py-2 bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-600 text-white text-sm font-semibold rounded-lg transition-colors flex items-center space-x-2">
+            class="px-4 py-2 bg-[#d93025] hover:bg-[#c5221f] text-white text-sm font-medium rounded-full transition-colors flex items-center space-x-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -164,7 +164,7 @@
         <button 
           @click="$emit('close')"
           type="button"
-          class="px-4 py-2.5 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+          class="px-4 py-2.5 bg-white dark:bg-[#35363a] border border-[#dadce0] dark:border-[#3a3a3f] text-[#3c4043] dark:text-[#e3e3e3] text-sm font-medium rounded-full hover:bg-[#f1f3f4] dark:hover:bg-[#44464a] transition-colors">
           Cerrar
         </button>
       </div>
@@ -228,12 +228,12 @@ const totalProducts = computed(() => {
 
 const getStatusClass = (status) => {
   const classes = {
-    'pending': 'bg-yellow-100 text-yellow-700',
-    'in_transit': 'bg-blue-100 text-blue-700',
-    'completed': 'bg-green-100 text-green-700',
-    'cancelled': 'bg-red-100 text-red-700'
+    'pending': 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#e37400] dark:text-[#fdd663] border border-[#fdd663] dark:border-[#f9ab00]/30',
+    'in_transit': 'bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] border border-[#c6dafc] dark:border-[#1a73e8]/30',
+    'completed': 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995] border border-[#ceead6] dark:border-[#1e8e3e]/30',
+    'cancelled': 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82] border border-[#f5c6cb] dark:border-[#d93025]/30'
   };
-  return classes[status] || 'bg-gray-100 text-gray-700';
+  return classes[status] || 'bg-[#f1f3f4] dark:bg-[#35363a] text-[#5f6368] dark:text-[#9aa0a6] border border-[#e8eaed] dark:border-[#3a3a3f]';
 };
 
 const getStatusText = (status) => {

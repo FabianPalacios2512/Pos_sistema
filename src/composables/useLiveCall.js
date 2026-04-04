@@ -17,6 +17,7 @@ import { getAuthToken, getTenantId } from '@/services/api'
 import { useRadioStore } from '@/store/radioStore'
 import { useUIContextStore } from '@/store/uiContextStore'
 import { useModuleNavigation } from '@/composables/useModuleNavigation'
+import { appStore } from '@/store/appStore.js'
 import api from '@/services/api'
 
 // Configuración de audio
@@ -133,6 +134,7 @@ export function useLiveCall(options = {}) {
   let audioProcessor = null
   let audioQueue = []
   let isProcessingAudio = false
+  let activeSources = []  // Track scheduled AudioBufferSourceNodes for interruption
   let durationInterval = null
   let setupCompleteReceived = false
   let inactivityTimeout = null
@@ -525,6 +527,31 @@ export function useLiveCall(options = {}) {
           hour12: true
         })
         
+        // 🏪 Obtener datos globales del negocio y tipo de tienda
+        const uiContext = useUIContextStore()
+        const globalData = uiContext.globalBusinessData
+        
+        // Detectar tipo de tienda desde configuración (usando appStore directamente)
+        let tipoTienda = appStore.systemSettings?.store_type || 'general'
+        let nombreNegocio = appStore.systemSettings?.business_name || appStore.businessName || 'Mi Tienda'
+        
+        // Contar productos y categorías para detectar tienda nueva
+        const totalProductos = globalData?.inventario?.productosTotal || appStore.products?.length || 0
+        const productosActivos = globalData?.inventario?.productosActivos || appStore.products?.filter(p => p.active !== false)?.length || 0
+        const totalCategorias = appStore.categories?.length || 0
+        const esTiendaNueva = totalProductos === 0
+        const sinCategorias = totalCategorias === 0
+        
+        // Mapear tipo de tienda a nombre legible
+        const tiposTiendaMap = {
+          'general': 'tienda general (minimarket, variedades)',
+          'fashion': 'tienda de moda y ropa',
+          'restaurant': 'restaurante o comidas',
+          'food': 'restaurante o comidas rápidas',
+          'electronics': 'tienda de tecnología y electrónica'
+        }
+        const tipoTiendaDescripcion = tiposTiendaMap[tipoTienda] || 'tienda general'
+        
         // Enviar configuración inicial con instrucciones para que inicie la conversación
         const setupMessage = {
           setup: {
@@ -542,10 +569,77 @@ export function useLiveCall(options = {}) {
             systemInstruction: {
               parts: [{
                 text: `Eres el asistente de voz de ciento cinco pos. Tu nombre es "ciento cinco i a". El usuario se llama ${userName}.
+El negocio se llama "${nombreNegocio}" y es una ${tipoTiendaDescripcion}.
 
-FECHA Y HORA ACTUAL EN COLOMBIA: ${fechaFormateada}, ${horaFormateada} (Bogotá, UTC-5)
+📅 FECHA Y HORA (solo si te preguntan): ${fechaFormateada}, ${horaFormateada} (Bogotá, UTC-5)
+⚠️ NO menciones la fecha ni hora al saludar. Solo dila si el usuario te la pregunta explícitamente.
 
-💰 MONEDA - MUY IMPORTANTE:
+📊 ESTADO ACTUAL DEL NEGOCIO:
+- Total productos registrados: ${totalProductos}
+- Productos activos: ${productosActivos}
+- Total categorías: ${totalCategorias}
+- Tipo de tienda: ${tipoTiendaDescripcion}
+${esTiendaNueva || sinCategorias ? `
+🆕 TIENDA NUEVA DETECTADA - MODO ONBOARDING:
+${esTiendaNueva ? '⚠️ Esta tienda NO tiene productos registrados aún.' : ''}
+${sinCategorias ? '⚠️ Esta tienda NO tiene categorías creadas aún.' : ''}
+Tu objetivo es AYUDAR al usuario a configurar su negocio de forma amigable.
+
+SALUDO ESPECIAL PARA TIENDA NUEVA:
+Al saludar, sé cálido y ofrece ayuda proactivamente:
+- "¡Hola ${userName}! Soy ciento cinco i a. Veo que estás comenzando con tu ${tipoTiendaDescripcion}. ¿Te ayudo a registrar tus primeros productos?"
+- Si acepta, pregúntale qué tipo de productos vende para guiarlo mejor
+- Ofrécele crear su primera categoría y luego sus primeros productos
+- Sé paciente y guíalo paso a paso
+
+FLUJO RECOMENDADO PARA TIENDA NUEVA:
+1. Saluda y ofrece ayuda para empezar
+2. Pregunta: "¿Qué tipo de productos vendes?" para entender mejor su negocio
+3. ${sinCategorias ? 'Ayúdalo a crear su primera categoría según lo que venda' : 'Ya tiene categorías, puedes crear productos'}
+4. Luego guíalo para crear su primer producto
+5. Hazlo sentir acompañado, que no está solo configurando esto
+` : `
+SALUDO NORMAL (tienda con productos):
+Responde de forma breve y amigable, como un asistente de trabajo.
+- "¡Hola ${userName}! ¿En qué te puedo ayudar?"
+- NO menciones la fecha/hora
+- NO hagas resúmenes de ventas sin que te pregunten
+- Puedes mencionar si ves algo relevante como alertas de stock bajo
+`}
+
+🚨🚨 REGLA UX CRÍTICA - EXPERIENCIA VISUAL DEL USUARIO 🚨🚨🚨
+SIEMPRE recuerda: Estás asistiendo a un usuario que VE una pantalla. 
+TODO lo que hagas debe ser VISIBLE para él. NO hagas cosas "en el fondo".
+
+ANTES de ejecutar CUALQUIER acción, SIEMPRE verifica:
+1. ¿En qué módulo/vista está el usuario? → USA obtenerContexto() primero
+2. ¿Estoy en el lugar correcto para esta acción? → Si NO, NAVEGA primero con navegarModulo()
+3. ¿El usuario verá lo que voy a hacer? → Abre modales/formularios ANTES de llenar datos
+
+FLUJO OBLIGATORIO PARA CUALQUIER ACCIÓN:
+1. VERIFICAR → obtenerContexto() para saber dónde estás
+2. NAVEGAR → navegarModulo() si no estás en el módulo correcto  
+3. ESPERAR → Siempre espera después de navegar para que el usuario vea el cambio
+4. ABRIR → Abre el modal/formulario correspondiente PRIMERO
+5. EJECUTAR → Llena datos o ejecuta la acción VISUALMENTE
+6. CONFIRMAR → Pregunta al usuario antes de guardar
+
+EJEMPLO INCORRECTO ❌:
+Usuario: "Créame un crédito nuevo"
+→ Buscas clientes internamente sin abrir nada
+→ El usuario no ve nada, no sabe qué pasa
+
+EJEMPLO CORRECTO ✅:
+Usuario: "Créame un crédito nuevo"  
+1. obtenerContexto() → Ver en qué módulo estás
+2. Si no estás en CrediTienda → navegarModulo(modulo: 'creditienda')
+3. Esperar a que cargue
+4. crearNuevoCredito() → Abre el modal para que el usuario VEA
+5. AHORA pregunta: "Ya abrí el formulario. ¿Cuál es la cédula del cliente?"
+
+REGLA DE ORO: El usuario debe VER cada paso que das. Nada "en segundo plano".
+
+�💰 MONEDA - MUY IMPORTANTE:
 - TODOS los precios y montos están en PESOS COLOMBIANOS (COP)
 - NUNCA menciones dólares. Solo di "pesos" o el número directamente
 - Ejemplo correcto: "50 mil pesos" o "50.000"
@@ -596,8 +690,14 @@ REGLA ANTI-SILENCIO:
 - Ofrece alternativas: "No encontré X, pero puedo buscar Y"
 - NUNCA te quedes en silencio
 
-REGLA IMPORTANTE - DATOS EN TIEMPO REAL:
+⚠️ REGLA CRÍTICA - DATOS EN TIEMPO REAL (NO EN CACHÉ):
 - Para cualquier dato numérico (productos, ventas, facturas), SIEMPRE usa las herramientas
+- NUNCA respondas con datos del contexto almacenado - pueden estar desactualizados
+- Si el usuario pregunta "¿hay facturas hoy?" → USA resumenVentasHoy() SIEMPRE
+- Si pregunta "¿cuál fue la última factura?" → USA mostrarFactura({tipo:'ultima', periodo:'hoy'})
+- Si pregunta "¿cuál es la más barata?" → USA mostrarFactura({tipo:'mas_barata', periodo:'hoy'})
+- Si pregunta "¿cuál es la más cara?" → USA mostrarFactura({tipo:'mas_cara', periodo:'hoy'})
+- Los datos del contexto son solo una referencia, las herramientas dan datos REALES
 - Nunca inventes números, consulta siempre
 
 ⚠️ REGLA CRÍTICA - VERIFICAR ANTES DE CONFIRMAR:
@@ -749,7 +849,26 @@ Datos que puedes ver en Inventario:
 - Pestañas: Stock Actual (tabla de productos), Movimientos (historial), Alertas (stock bajo)
 - Cada producto: nombre, categoría, stock, ventas, ingresos, estado
 
-📊 INVENTARIO INTELIGENTE - FUNCIONES ESPECIALES:
+📊 INVENTARIO INTELIGENTE - EL MÓDULO MÁS PODEROSO:
+⭐ Inventario Inteligente es el módulo de análisis avanzado. NAVEGA AQUÍ cuando el usuario pregunte sobre:
+- Rotación de productos (Clase A, B, C)
+- Rentabilidad y márgenes de ganancia
+- Predicciones de ventas futuras
+- Productos que se van a agotar
+- Análisis de clientes (top clientes, frecuencia, gastos)
+- Análisis de proveedores (mejores proveedores, deudas)
+- Tendencias de ventas
+- Capital invertido vs valor potencial
+
+CUÁNDO NAVEGAR A INVENTARIO INTELIGENTE:
+1. "¿Cuál es mi rotación de productos?" → navegarModulo('inventario_inteligente') + cambiarSeccionInventarioInteligente('productos')
+2. "¿Qué producto es más rentable?" → navegarModulo('inventario_inteligente') + ir a Productos y ver margen %
+3. "¿Qué se va a vender más?" → navegarModulo('inventario_inteligente') + cambiarSeccionInventarioInteligente('predicciones')
+4. "¿Qué producto se va a agotar?" → navegarModulo('inventario_inteligente') + cambiarSeccionInventarioInteligente('predicciones')
+5. "Dame análisis de clientes" → navegarModulo('inventario_inteligente') + cambiarSeccionInventarioInteligente('clientes')
+6. "¿Quién es mi mejor proveedor?" → navegarModulo('inventario_inteligente') + cambiarSeccionInventarioInteligente('proveedores')
+
+FUNCIONES DISPONIBLES EN INVENTARIO INTELIGENTE:
 Cuando el usuario esté en Inventario Inteligente, puedes:
 - cambiarSeccionInventarioInteligente: Cambia entre Vista General, Productos, Movimientos, Clientes, Proveedores, Alertas, Predicciones
 - buscarProductoInventarioInteligente: Busca productos en la tabla
@@ -759,9 +878,9 @@ Cuando el usuario esté en Inventario Inteligente, puedes:
 - buscarClienteInventarioInteligente: Muestra la sección de clientes
 - buscarProveedorInventarioInteligente: Muestra la sección de proveedores
 
-Datos que puedes ver en Inventario Inteligente:
+SECCIONES DE INVENTARIO INTELIGENTE Y SUS DATOS:
 - Vista General: Productos activos, valor invertido, valor potencial, ganancia estimada, ventas, transacciones, alertas stock, gastos, ganancia neta, top productos, stock bajo, movimientos recientes
-- Productos: Tabla con nombre, SKU, categoría, stock, precio, costo, rotación (Clase A/B/C), rentabilidad (margen %)
+- Productos: Tabla con nombre, SKU, categoría, stock, precio, costo, ROTACIÓN (Clase A/B/C), RENTABILIDAD (margen %)
 - Movimientos: Total movimientos, entradas, salidas, valor entradas, valor salidas, balance, historial detallado con fechas y fuentes
 - Clientes: KPIs (total clientes, ingresos, ganancia, promedio, descuento, top cliente) + Tabla con compras, gastos, productos únicos, frecuencia
 - Proveedores: KPIs (total proveedores, activos, órdenes pendientes, deuda, top proveedor) + Tabla con productos, órdenes, total comprado
@@ -769,7 +888,7 @@ Datos que puedes ver en Inventario Inteligente:
 - Predicciones: ⭐ MUY IMPORTANTE - Tendencias de ventas (actual vs anterior), productos que se van a agotar (con días estimados), pronóstico ML de ventas por producto (confianza alta/media/baja)
 
 🔮 PREDICCIONES - PREGUNTAS QUE PUEDES RESPONDER:
-Cuando el usuario pregunte sobre el futuro, usa los datos de Predicciones:
+Cuando el usuario pregunte sobre el futuro, NAVEGA A PREDICCIONES:
 - "¿Qué producto vamos a vender más?" → Mira pronosticoVentas, el primero es el más vendido
 - "¿Qué producto se va a vender poco?" → Mira pronosticoVentas, el último es el menos vendido
 - "¿Algún producto se va a agotar pronto?" → Mira productosAgotamiento con urgencia CRÍTICO
@@ -800,10 +919,11 @@ HERRAMIENTAS:
 - obtenerContexto: USA ESTO para preguntas sobre la pantalla actual, datos visibles, estado de caja
 - buscarProductoEnVivo: ⭐ USA ESTO para "busca", "encuentra", "dónde está el producto"
 - editarProductoPorVoz: USA ESTO para "cambia el stock", "actualiza el precio", "modifica"
-- crearProductoConversacional: USA ESTO para "crear producto", "agregar producto nuevo"
+- crearProductoConversacional: USA ESTO para "crear producto", "agregar producto nuevo" (⚠️ Si no hay categorías, te avisará y debes crear una primero)
+- crearCategoriaRapida: ⭐ USA ESTO para crear categoría sin navegar. Funciona desde cualquier módulo. Ideal antes de crear producto si no hay categorías.
 - buscarCategoriaEnVivo: USA ESTO para buscar categorías por nombre
 - verProductosCategoria: USA ESTO para "muéstrame los productos de X categoría"
-- crearCategoria: USA ESTO para "crear categoría nueva"
+- crearCategoria: USA ESTO para "crear categoría nueva" (navega al módulo de categorías)
 - cambiarTabInventario: USA ESTO para "muéstrame las alertas", "ir a movimientos"
 - buscarInventario: USA ESTO para buscar productos en inventario
 - verAlertasInventario: USA ESTO para "productos con stock bajo"
@@ -815,18 +935,52 @@ HERRAMIENTAS:
 - controlarRadio: play/pause/next música
 - ejecutarAccion: enviar email, WhatsApp, descargar PDF
 
-� CREAR PRODUCTOS - FLUJO PASO A PASO:
+🏁 CREAR PRODUCTOS - FLUJO PASO A PASO:
+⚠️ IMPORTANTE: Antes de crear productos, EL SISTEMA NECESITA AL MENOS 1 CATEGORÍA.
+Si no hay categorías, crearProductoConversacional te avisará con "SIN_CATEGORIAS".
+
+⚠️ CAMPOS OBLIGATORIOS (5 campos - NO PUEDES OMITIR NINGUNO):
+1. nombre - Nombre del producto
+2. categoria - Categoría donde va el producto
+3. costo - Precio de compra/costo
+4. precio - Precio de venta al público
+5. stock - ⚠️ STOCK INICIAL (MUY IMPORTANTE - si es 0, el producto NO aparecerá en el POS)
+
 Cuando el usuario diga "crear producto", "nuevo producto", "agregar producto":
 1. Usa crearProductoConversacional(accion: 'iniciar') - Esto navega a productos y abre el modal
-2. El sistema YA sabe el tipo de tienda (moda/general), NO preguntes eso
-3. Pregunta SOLO los datos necesarios: nombre, categoría, precio costo, precio venta
-4. Por cada dato que el usuario diga, usa crearProductoConversacional(accion: 'asignar', campo: 'X', valor: 'Y')
-5. Los campos se llenan VISUALMENTE en el formulario
-6. Cuando tenga los 4 campos obligatorios, pregunta si quiere agregar más datos o guardar
-7. Para guardar: crearProductoConversacional(accion: 'confirmar')
-8. Si una categoría no existe, pregunta si quiere crearla y usa crearCategoriaRapida
+2. ⚠️ Si el sistema responde "SIN_CATEGORIAS", debes:
+   a) Primero usa flujoSinCategorias(accion: 'abrirModalCategoria') - Esto cierra el aviso y abre el modal de crear categoría
+   b) Pregunta: "¿Cómo quieres que se llame tu primera categoría?" 
+   c) Cuando el usuario diga el nombre, usa flujoSinCategorias(accion: 'crearCategoriaYAbrirProducto', nombre: 'X')
+   d) El sistema creará la categoría Y abrirá automáticamente el modal de crear producto
+3. El sistema YA sabe el tipo de tienda (moda/general), NO preguntes eso
+4. Pregunta los 5 campos OBLIGATORIOS en orden: nombre → categoría → costo → precio → stock
+5. Por cada dato que el usuario diga, usa crearProductoConversacional(accion: 'asignar', campo: 'X', valor: 'Y')
+6. ⚠️ SIEMPRE verifica que el campo se llenó correctamente mirando la respuesta
+7. Los campos se llenan VISUALMENTE en el formulario - CONFIRMA que aparecen
+8. ⚠️ NUNCA digas "ya tenemos todos los datos" si falta el STOCK
+9. Cuando tenga los 5 campos, pregunta si quiere guardar
+10. Para guardar: crearProductoConversacional(accion: 'confirmar')
+11. Si una categoría no existe, pregunta si quiere crearla y usa crearCategoriaRapida
 
-EJEMPLO DE FLUJO:
+⚠️ REGLA CRÍTICA DEL STOCK:
+- SIEMPRE pregunta: "¿Con cuántas unidades iniciamos?" o "¿Cuántas unidades tienes en inventario?"
+- Si el usuario no lo menciona, PREGÚNTALO antes de guardar
+- Si el stock es 0, ADVIERTE: "Con stock 0 el producto no aparecerá en el punto de venta"
+- Mínimo recomendado: 1 unidad
+
+🔴 FLUJO VISUAL CUANDO NO HAY CATEGORÍAS (IMPORTANTE - USA ESTO):
+Usuario: "Quiero crear un producto"
+→ crearProductoConversacional(accion: 'iniciar')
+Sistema: {success: false, code: 'SIN_CATEGORIAS', message: 'No hay categorías...'}
+→ flujoSinCategorias(accion: 'abrirModalCategoria')  ← ESTO abre el modal de crear categoría visualmente
+IA: "Se abrió el formulario de categoría. ¿Cómo quieres que se llame?"
+Usuario: "Bebidas"
+→ flujoSinCategorias(accion: 'crearCategoriaYAbrirProducto', nombre: 'Bebidas')  ← ESTO crea la categoría Y abre el modal de producto
+IA: "¡Listo! Categoría 'Bebidas' creada y formulario de producto abierto. ¿Cómo se llama el producto?"
+... (continúa flujo normal con crearProductoConversacional)
+
+EJEMPLO DE FLUJO NORMAL (CON STOCK OBLIGATORIO):
 Usuario: "Quiero crear un producto"
 → crearProductoConversacional(accion: 'iniciar')
 IA: "Modal abierto. ¿Cómo se llama el producto?"
@@ -841,7 +995,10 @@ Usuario: "50 mil"
 IA: "Costo $50,000. ¿Y precio de venta?"
 Usuario: "90 mil"
 → crearProductoConversacional(accion: 'asignar', campo: 'precio', valor: '90000')
-IA: "¡Listo! ¿Lo guardo?"
+IA: "Precio $90,000. ¿Con cuántas unidades iniciamos el stock?"
+Usuario: "Tengo 20"
+→ crearProductoConversacional(accion: 'asignar', campo: 'stock', valor: '20')
+IA: "Perfecto, stock inicial de 20 unidades. ¡Ya tenemos todo! ¿Lo guardo?"
 Usuario: "Sí"
 → crearProductoConversacional(accion: 'confirmar')
 
@@ -861,25 +1018,50 @@ El módulo de Clientes tiene una vista Master-Detail como Facturas.
 5. Si el usuario quiere cancelar, usa cerrarModalCliente
 
 💳 CREDITIENDA - GESTIÓN DE CRÉDITOS:
-Módulo para gestionar créditos a clientes (cartera/cuentas por cobrar).
-- Si preguntan "¿cuánto me deben?", "total por cobrar", "cartera" → Usa el contexto de CrediTienda
-- Si preguntan "habilitar crédito", "nuevo crédito", "dar crédito a X" → Usa crearNuevoCredito
-- IMPORTANTE: Al crear crédito, pide PRIMERO la cédula. El sistema busca automáticamente si el cliente existe y auto-llena los datos.
-- Acciones: crearNuevoCredito, buscarClientePorDocumento, llenarCampoCredito, guardarCredito, registrarAbono, seleccionarClienteCredito
+⚠️ IMPORTANTE: Este módulo puede NO estar habilitado. Si intentas acceder y no está habilitado, 
+el sistema te avisará. Informa al usuario que puede activarlo desde Configuración > Módulos.
 
-🔴 FLUJO PARA HABILITAR CRÉDITO (IMPORTANTE):
-1. Ejecuta crearNuevoCredito para abrir el modal
-2. Pregunta SOLO la cédula/CC del cliente
-3. Usa buscarClientePorDocumento({documento: 'número'}) - esto busca si existe y auto-llena TODO
-4. Si el cliente existe: solo pregunta el cupo de crédito
-5. Si NO existe: pide nombre, teléfono, email y cupo
-6. Usa llenarCampoCredito para el cupo (campo: 'cupo', valor: '500000')
-7. Ejecuta guardarCredito
+Módulo para gestionar créditos a clientes (cartera/cuentas por cobrar).
+- Si preguntan "¿cuánto me deben?", "total por cobrar", "cartera" → Usa el contexto de CrediTienda (si está habilitado)
+- Si preguntan "habilitar crédito", "nuevo crédito", "dar crédito a X" → Usa crearNuevoCredito
+- Acciones: crearNuevoCredito, buscarClientePorDocumento, llenarCampoCredito, guardarCredito, registrarAbono, seleccionarClienteCredito, cerrarModalCredito
+- Para cerrar cualquier modal en CrediTienda → usa cerrarModalCredito (cierra TODOS los modales abiertos)
+
+🔴 FLUJO PARA HABILITAR CRÉDITO (IMPORTANTE - VISUAL PARA EL USUARIO):
+⚠️ Verificar primero si CrediTienda está habilitado - el sistema te lo dirá.
+
+PASO 1 - VERIFICAR Y NAVEGAR:
+- USA obtenerContexto() para ver en qué módulo estás
+- Si NO estás en CrediTienda → navegarModulo(modulo: 'creditienda')
+- Espera 1 segundo para que el usuario VEA la navegación
+
+PASO 2 - ABRIR EL MODAL PRIMERO:
+- SIEMPRE ejecuta crearNuevoCredito() para abrir el modal ANTES de preguntar datos
+- El usuario debe VER el formulario abierto
+- DI: "Ya abrí el formulario de nuevo crédito. ¿Cuál es la cédula del cliente?"
+
+PASO 3 - PEDIR DATOS UNO A UNO:
+- Pregunta la cédula/CC del cliente
+- Usa buscarClientePorDocumento({documento: 'número'}) - esto busca si existe y auto-llena TODO
+- Si el cliente existe: solo pregunta el cupo de crédito
+- Si NO existe: pide nombre, teléfono, email y cupo
+- Por cada dato usa llenarCampoCredito
+
+PASO 4 - GUARDAR:
+- Cuando tenga todos los datos, pregunta "¿Lo guardo?"
+- Si confirma → guardarCredito()
+
+❌ NUNCA busques clientes internamente sin que el usuario vea el modal abierto
 
 🔴 FLUJO PARA REGISTRAR ABONO:
 1. Selecciona el cliente con seleccionarClienteCredito({nombre: 'X'})
 2. Usa registrarAbono({monto: 50000, metodo: 'cash'}) - metodos: cash, transfer, card
 3. Confirma con confirmarAbono
+
+🔴 CERRAR MODALES EN CREDITIENDA:
+Si el usuario dice "cerrar", "cancelar", "salir del modal", "ciérralo":
+→ USA cerrarModalCredito() - esto cierra CUALQUIER modal que esté abierto
+→ Funciona para: crear crédito, registrar abono, editar cliente, recordatorios, WhatsApp, fotos
 
 🏭 PROVEEDORES Y COMPRAS - GESTIÓN DE ÓRDENES DE COMPRA:
 Módulo para gestionar proveedores y crear órdenes de compra (pedidos a proveedores).
@@ -1048,6 +1230,23 @@ Este módulo es EL CORAZÓN del sistema para supervisores. Te permite monitorear
 - Acciones: verDetalleSesion, verAuditoriaSesion, buscarSesionesPorUsuario, filtrarSesionesPorEstado, generarReporteSesion, refrescarCajas
 - Datos visibles: KPIs (sesiones activas, total en cajas, ventas hoy), lista de sesiones, alertas
 
+🔴 AUDITORÍA DE CAJA (⭐⭐⭐ MUY IMPORTANTE):
+La auditoría muestra TODOS los movimientos de una sesión de caja:
+- Ventas realizadas (con cliente y método de pago)
+- Devoluciones procesadas (con motivo)
+- Gastos registrados desde esa caja (con categoría y proveedor)
+- Timeline cronológico de todos los eventos
+- Estadísticas: venta promedio, venta mayor, duración de sesión
+
+Para abrir la auditoría usa: verAuditoriaSesion({busqueda: 'nombre del empleado'})
+Ejemplo: "Quiero ver la auditoría de María" → verAuditoriaSesion({busqueda: 'María'})
+         "Muéstrame los movimientos de la caja de Juan" → verAuditoriaSesion({busqueda: 'Juan'})
+         "Abre la auditoría" (si hay uno seleccionado) → verAuditoriaSesion({})
+
+🔴 DIFERENCIA ENTRE DETALLE Y AUDITORÍA:
+- verDetalleSesion: Muestra RESUMEN (ventas totales, efectivo, estado)
+- verAuditoriaSesion: Muestra TODO (cada venta, cada devolución, cada gasto, timeline completo)
+
 🔴 EJEMPLO DE RESPUESTAS INTELIGENTES:
 Usuario: "¿Cómo va María hoy?"
 → "María lleva 4 horas trabajando, ha vendido $680.000 en efectivo. Va muy bien, es tu mejor vendedora del día."
@@ -1060,6 +1259,9 @@ Usuario: "Dame un resumen de las cajas"
 
 Usuario: "¿Cómo va mi caja vs mis empleados?"
 → "Tu caja: $320K en ventas. Tus empleados: María ($210K), Pedro ($180K). Vas primero hoy."
+
+Usuario: "Quiero ver los gastos de María" / "Abre la auditoría de María"
+→ Usa verAuditoriaSesion({busqueda: 'María'}) y di "Abriendo auditoría de María, ahí verás todos sus movimientos"
 
 ⚠️ REGLA CLAVE: Sé un supervisor inteligente. No des datos fríos, interpreta:
 - Empleado con muchas ventas → felicítalo
@@ -1162,13 +1364,33 @@ Permite consultar reportes de ventas y cajeros desde CUALQUIER pantalla.
 🧾 VENTAS Y FACTURAS - AUDITORÍA INTERNA (⭐⭐⭐ LO MÁS IMPORTANTE DEL POS):
 Eres el AUDITOR INTERNO del negocio. Puedes consultar ventas de CUALQUIER FECHA, CUALQUIER EMPLEADO.
 
+⚠️ REGLA CRÍTICA FACTURAS - NO USAR DATOS EN CACHÉ:
+Cuando el usuario pregunte sobre facturas (hoy, última, primera, cuántas hay):
+- SIEMPRE usa las herramientas que consultan la API en tiempo real
+- NUNCA uses datos del contexto guardado porque pueden estar desactualizados
+- Usa resumenVentasHoy() para saber cuántas facturas hay hoy
+- Usa listarFacturasRecientes({periodo: 'hoy'}) para VER una lista de facturas
+- Usa mostrarFactura({tipo: 'ultima', periodo: 'hoy'}) para ABRIR la última factura
+- Usa mostrarFactura({tipo: 'mas_cara', periodo: 'hoy'}) para ABRIR la más cara
+- Usa mostrarFactura({tipo: 'mas_barata', periodo: 'hoy'}) para ABRIR la más barata
+- Usa mostrarFactura({tipo: 'primera', periodo: 'hoy'}) para ABRIR la primera del día
+
 🔴 HERRAMIENTAS GLOBALES DE VENTAS (funcionan desde cualquier módulo):
 - consultarVentasFecha({fecha, fechaFin?, incluirDetalle?}) - Ventas de una fecha específica
 - ventasPorEmpleado({empleado, fecha?, periodo?}) - Ventas de un empleado específico
 - buscarFactura({busqueda, tipo?, estado?}) - Buscar factura por número/cliente
 - detalleFactura({identificador}) - Detalle completo de una factura
-- resumenVentasHoy() - Resumen rápido del día actual
+- resumenVentasHoy() - ⭐ Resumen rápido del día actual (SIEMPRE CONSULTA LA API)
 - navegarAFacturas({facturaId?, busqueda?}) - Ir al módulo de facturas
+- mostrarFactura({tipo, periodo, numero?}) - ABRIR factura: mas_cara, mas_barata, ultima, primera, por_numero
+- listarFacturasRecientes({limite?, periodo?}) - LISTAR facturas recientes (no abre, solo muestra)
+- seleccionarFacturaEnVista({numero?, posicion?}) - Seleccionar factura en la vista (solo en módulo facturas)
+- consultarDevoluciones({accion, periodo?}) - DEVOLUCIONES: listar, contar o navegar al módulo
+
+🔴 DEVOLUCIONES:
+- "¿Cuántas devoluciones hay?" → consultarDevoluciones({accion: 'contar', periodo: 'hoy'})
+- "Muéstrame las devoluciones" → consultarDevoluciones({accion: 'listar'})
+- "Llévame a devoluciones" → consultarDevoluciones({accion: 'navegar'})
 
 🔴 CUANDO EL USUARIO PREGUNTE (desde cualquier vista):
 
@@ -1204,6 +1426,29 @@ Eres el AUDITOR INTERNO del negocio. Puedes consultar ventas de CUALQUIER FECHA,
   
 - "Dame el detalle de la factura 1234" / "¿Qué tiene esa factura?"
   → USA detalleFactura({identificador: '1234'})
+
+📋 CONSULTAS DE FACTURAS POR PERÍODO (⭐ NUEVO):
+- "¿Cuál fue la primera factura del mes?" / "Primera venta del mes"
+  → USA consultarFacturasPeriodo({tipo: 'primera', periodo: 'mes'})
+  
+- "¿Cuál fue la última factura de hoy?" / "Última venta del día"
+  → USA consultarFacturasPeriodo({tipo: 'ultima', periodo: 'hoy'})
+  
+- "Primera factura de la semana"
+  → USA consultarFacturasPeriodo({tipo: 'primera', periodo: 'semana'})
+  
+- "¿Cuáles son las últimas facturas?" / "Facturas recientes"
+  → USA listarFacturasRecientes({limite: 5})
+  
+- "Muéstrame las facturas de hoy"
+  → USA listarFacturasRecientes({periodo: 'hoy'})
+
+🎯 SELECCIÓN EN VISTA DE FACTURAS (solo cuando esté en módulo facturas):
+- "Selecciona la factura FV-1234" / "Abre la factura 1234"
+  → USA seleccionarFacturaEnVista({numero: '1234'})
+  
+- "Selecciona la primera factura" / "Abre la tercera"
+  → USA seleccionarFacturaEnVista({posicion: 1}) o ({posicion: 3})
 
 📊 RESUMEN RÁPIDO:
 - "¿Cómo vamos hoy?" / "¿Qué tal las ventas?" / "¿Cómo va el día?"
@@ -1258,14 +1503,14 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                 },
                 {
                   name: 'mostrarFactura',
-                  description: 'Navega a facturas y abre una factura específica. Usa para: muéstrame la factura más cara de hoy/ayer/semana/mes, abre la última factura, busca factura por número.',
+                  description: 'Navega a facturas y abre una factura específica. Opciones: mas_cara (la de mayor total), mas_barata (la de menor total), ultima (la más reciente por fecha/hora), primera (la primera del día), por_numero (buscar por número de factura). Período: hoy, ayer, semana, mes.',
                   parameters: {
                     type: 'OBJECT',
                     properties: {
                       tipo: { 
                         type: 'STRING', 
-                        description: 'Qué factura buscar',
-                        enum: ['mas_cara', 'ultima', 'por_numero']
+                        description: 'Qué factura buscar: mas_cara=mayor total, mas_barata=menor total, ultima=más reciente, primera=primera del período, por_numero=buscar por número',
+                        enum: ['mas_cara', 'mas_barata', 'ultima', 'primera', 'por_numero']
                       },
                       periodo: {
                         type: 'STRING',
@@ -1295,6 +1540,26 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                       }
                     },
                     required: ['consulta']
+                  }
+                },
+                {
+                  name: 'consultarDevoluciones',
+                  description: 'Consulta y navega a devoluciones. Puede listar devoluciones recientes, contar cuántas hay, o abrir el módulo de devoluciones. Úsala cuando pregunten: cuántas devoluciones hay, muéstrame las devoluciones, llévame a devoluciones.',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      accion: { 
+                        type: 'STRING', 
+                        description: 'Qué hacer: listar (muestra lista), contar (solo cantidad), navegar (abre el módulo)',
+                        enum: ['listar', 'contar', 'navegar']
+                      },
+                      periodo: {
+                        type: 'STRING',
+                        description: 'Período: hoy, semana, mes, todos',
+                        enum: ['hoy', 'semana', 'mes', 'todos']
+                      }
+                    },
+                    required: ['accion']
                   }
                 },
                 {
@@ -1502,7 +1767,27 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                     required: ['nombre']
                   }
                 },
-                // 📦 INVENTARIO
+                // � FLUJO SIN CATEGORÍAS - Para manejar visualmente el proceso
+                {
+                  name: 'flujoSinCategorias',
+                  description: 'Maneja el flujo VISUAL cuando no hay categorías. IMPORTANTE: Usa esto cuando crearProductoConversacional devuelva SIN_CATEGORIAS. Acciones: abrirModalCategoria (abre el formulario de crear categoría), crearCategoriaYAbrirProducto (crea la categoría y abre el formulario de producto).',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      accion: { 
+                        type: 'STRING', 
+                        description: 'Acción a ejecutar: abrirModalCategoria, crearCategoriaYAbrirProducto',
+                        enum: ['abrirModalCategoria', 'crearCategoriaYAbrirProducto']
+                      },
+                      nombre: { 
+                        type: 'STRING', 
+                        description: 'Nombre de la categoría (solo para crearCategoriaYAbrirProducto)'
+                      }
+                    },
+                    required: ['accion']
+                  }
+                },
+                // �📦 INVENTARIO
                 {
                   name: 'cambiarTabInventario',
                   description: 'Cambia entre las pestañas del inventario: Stock Actual, Movimientos, Alertas. Solo funciona en el módulo de inventario.',
@@ -2302,6 +2587,18 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                   }
                 },
                 {
+                  name: 'abrirAuditoria',
+                  description: 'Abre el modal de AUDITORÍA de una sesión de caja. Muestra TODOS los movimientos: ventas, devoluciones, gastos, timeline cronológico. Usa cuando digan: "abre la auditoría de María", "quiero ver los movimientos de Juan", "muéstrame todo lo que hizo Pedro", "ver gastos de la caja de X", "auditoría de caja".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      idSesion: { type: 'STRING', description: 'ID de la sesión (opcional)' },
+                      busqueda: { type: 'STRING', description: 'Nombre del empleado para buscar su sesión' }
+                    },
+                    required: []
+                  }
+                },
+                {
                   name: 'filtrarSesionesCaja',
                   description: 'Filtra las sesiones de caja por estado. Solo funciona en el módulo Control de Cajas.',
                   parameters: {
@@ -2598,6 +2895,63 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                     },
                     required: []
                   }
+                },
+                {
+                  name: 'consultarFacturasPeriodo',
+                  description: 'Consulta información de facturas por período (primera/última del día, semana o mes). Para: "¿cuál fue la primera factura del mes?", "¿cuál fue la última venta de hoy?", "primera factura de la semana".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      tipo: {
+                        type: 'STRING',
+                        description: 'Tipo de consulta: primera o última factura',
+                        enum: ['primera', 'ultima']
+                      },
+                      periodo: {
+                        type: 'STRING',
+                        description: 'Período a consultar',
+                        enum: ['hoy', 'semana', 'mes']
+                      }
+                    },
+                    required: ['tipo', 'periodo']
+                  }
+                },
+                {
+                  name: 'listarFacturasRecientes',
+                  description: 'Lista las facturas más recientes con detalles. Para: "¿cuáles son las últimas facturas?", "mostrar facturas recientes", "¿qué facturas hay hoy?".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      limite: {
+                        type: 'NUMBER',
+                        description: 'Cantidad de facturas a listar (máximo 10, default 5)'
+                      },
+                      periodo: {
+                        type: 'STRING',
+                        description: 'Filtrar por período: hoy, semana, mes o todos',
+                        enum: ['hoy', 'semana', 'mes', 'todos']
+                      }
+                    },
+                    required: []
+                  }
+                },
+                {
+                  name: 'seleccionarFacturaEnVista',
+                  description: 'Selecciona una factura específica en la vista de facturas. Solo funciona cuando el usuario está en el módulo de facturas. Para: "selecciona la factura 5", "abre la tercera factura", "muéstrame la factura FV-1234".',
+                  parameters: {
+                    type: 'OBJECT',
+                    properties: {
+                      numero: {
+                        type: 'STRING',
+                        description: 'Número de factura (ej: FV-1234, 1234)'
+                      },
+                      posicion: {
+                        type: 'NUMBER',
+                        description: 'Posición en la lista visible (1 = primera, 2 = segunda, etc.)'
+                      }
+                    },
+                    required: []
+                  }
                 }
               ]
             }]
@@ -2691,12 +3045,28 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
             resetInactivityTimeout()
           }
           
-          // Interrumpido
+          // Interrumpido - El usuario habló mientras la IA hablaba
           if (data.serverContent?.interrupted) {
             isSpeaking.value = false
-            // Limpiar cola de audio para detener reproducción
+            // Limpiar cola de audio pendiente
             audioQueue = []
-            nextPlayTime = 0  // Resetear tiempo de reproducción
+            isProcessingAudio = false
+            
+            // CRÍTICO: Detener TODOS los AudioBufferSource ya programados
+            // Sin esto, los chunks ya scheduled siguen sonando en paralelo
+            for (const src of activeSources) {
+              try { src.stop() } catch(e) { /* ya terminó */ }
+            }
+            activeSources = []
+            
+            // Resetear el outputAudioContext para cortar audio inmediatamente
+            if (outputAudioContext) {
+              try {
+                outputAudioContext.close()
+              } catch(e) { /* ignore */ }
+              outputAudioContext = null
+            }
+            nextPlayTime = 0
           }
           
           // === MANEJO DE TOOL CALLS (Function Calling) ===
@@ -2916,6 +3286,13 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
         source.buffer = audioBuffer
         source.connect(outputAudioContext.destination)
         
+        // Trackear para poder cancelar en interrupciones
+        activeSources.push(source)
+        source.onended = () => {
+          const idx = activeSources.indexOf(source)
+          if (idx > -1) activeSources.splice(idx, 1)
+        }
+        
         // Calcular tiempo de inicio para evitar gaps
         const currentTime = outputAudioContext.currentTime
         const startTime = Math.max(currentTime, nextPlayTime)
@@ -2995,10 +3372,14 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
       outputAudioContext = null
     }
     
-    // Limpiar cola de audio
+    // Detener y limpiar audio activo
+    for (const src of activeSources) {
+      try { src.stop() } catch(e) { /* ya terminó */ }
+    }
+    activeSources = []
     audioQueue = []
     isProcessingAudio = false
-    nextPlayTime = 0  // Resetear tiempo de reproducción continua
+    nextPlayTime = 0
   }
   
   // ═══════════════════════════════════════════════════════════════
@@ -3067,42 +3448,97 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
               const periodo = fc.args?.periodo || 'hoy'
               const numero = fc.args?.numero || ''
               
+              console.log(`📋 [mostrarFactura] Buscando: tipo=${tipo}, periodo=${periodo}`)
+              
               // Obtener rango de fechas usando zona horaria de Colombia
               const rango = getDateRange(periodo)
+              console.log(`📅 [mostrarFactura] Rango: ${rango.inicio} a ${rango.fin} (${rango.label})`)
               
-              // Obtener facturas
-              const respFacturas = await api.get('/invoices', {
-                params: { status: 'completed', limit: 200 }
+              // Usar invoicesService que tiene la autenticación correcta
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const invoicesResponse = await invoicesService.getInvoices()
+              
+              if (!invoicesResponse.success || !invoicesResponse.data) {
+                console.error('❌ [mostrarFactura] Error obteniendo facturas:', invoicesResponse)
+                result = { success: false, message: 'No pude obtener las facturas. Intenta de nuevo.' }
+                break
+              }
+              
+              // Filtrar solo facturas (no cotizaciones) y completadas/pagadas
+              const facturas = invoicesResponse.data.filter(inv => {
+                const isInvoice = inv.type !== 'quote' && inv.type !== 'Cotización'
+                const isPaid = inv.status === 'paid' || inv.status === 'Pagada' || inv.status === 'pagada' || inv.status === 'completed'
+                return isInvoice && isPaid
               })
               
-              const facturas = respFacturas.data?.data || respFacturas.data || []
+              console.log(`📊 [mostrarFactura] Total facturas pagadas: ${facturas.length}`)
               
-              // Filtrar facturas por rango de fechas
+              // Debug: mostrar primeras 3 facturas con sus fechas
+              if (facturas.length > 0) {
+                console.log('📋 [mostrarFactura] Primeras facturas:', facturas.slice(0, 3).map(f => ({
+                  num: f.invoice_number,
+                  created_at: f.created_at,
+                  date: f.date,
+                  total: f.total
+                })))
+              }
+              
+              // Filtrar facturas por rango de fechas (comparando solo la parte de fecha)
               const facturasFiltradas = facturas.filter(f => {
-                const fechaFactura = f.created_at?.split('T')[0] || f.date?.split('T')[0]
-                return fechaFactura >= rango.inicio && fechaFactura <= rango.fin
+                // Extraer solo la fecha YYYY-MM-DD de created_at o date
+                const fechaFactura = (f.created_at || f.date || '').split('T')[0].split(' ')[0]
+                const enRango = fechaFactura >= rango.inicio && fechaFactura <= rango.fin
+                return enRango
               })
+              
+              console.log(`✅ [mostrarFactura] Facturas en rango ${rango.label}: ${facturasFiltradas.length}`)
+              if (facturasFiltradas.length > 0) {
+                console.log('📋 [mostrarFactura] Facturas filtradas:', facturasFiltradas.map(f => ({
+                  num: f.invoice_number,
+                  fecha: (f.created_at || f.date || '').split('T')[0],
+                  total: f.total
+                })))
+              }
               
               let facturaSeleccionada = null
               let descripcion = ''
               
               if (tipo === 'mas_cara') {
+                // La factura con el total más alto
                 if (facturasFiltradas.length > 0) {
                   facturaSeleccionada = facturasFiltradas.reduce((max, f) => 
                     (parseFloat(f.total) > parseFloat(max.total)) ? f : max
                   , facturasFiltradas[0])
                   descripcion = `la factura más cara de ${rango.label}: ${facturaSeleccionada.invoice_number} por $${parseFloat(facturaSeleccionada.total).toLocaleString()}`
                 }
-              } else if (tipo === 'ultima') {
+              } else if (tipo === 'mas_barata') {
+                // La factura con el total más bajo
                 if (facturasFiltradas.length > 0) {
-                  // Ordenar por fecha desc
+                  facturaSeleccionada = facturasFiltradas.reduce((min, f) => 
+                    (parseFloat(f.total) < parseFloat(min.total)) ? f : min
+                  , facturasFiltradas[0])
+                  descripcion = `la factura más barata de ${rango.label}: ${facturaSeleccionada.invoice_number} por $${parseFloat(facturaSeleccionada.total).toLocaleString()}`
+                }
+              } else if (tipo === 'ultima') {
+                // La más reciente por timestamp completo
+                if (facturasFiltradas.length > 0) {
                   const ordenadas = [...facturasFiltradas].sort((a, b) => 
                     new Date(b.created_at || b.date) - new Date(a.created_at || a.date)
                   )
                   facturaSeleccionada = ordenadas[0]
                   descripcion = `la última factura de ${rango.label}: ${facturaSeleccionada.invoice_number} por $${parseFloat(facturaSeleccionada.total).toLocaleString()}`
                 }
+              } else if (tipo === 'primera') {
+                // La primera del período (más antigua)
+                if (facturasFiltradas.length > 0) {
+                  const ordenadas = [...facturasFiltradas].sort((a, b) => 
+                    new Date(a.created_at || a.date) - new Date(b.created_at || b.date)
+                  )
+                  facturaSeleccionada = ordenadas[0]
+                  descripcion = `la primera factura de ${rango.label}: ${facturaSeleccionada.invoice_number} por $${parseFloat(facturaSeleccionada.total).toLocaleString()}`
+                }
               } else if (tipo === 'por_numero' && numero) {
+                // Buscar por número (en todas las facturas, no solo las del período)
                 facturaSeleccionada = facturas.find(f => 
                   f.invoice_number?.toLowerCase().includes(numero.toLowerCase())
                 )
@@ -3110,6 +3546,12 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                   descripcion = `la factura ${facturaSeleccionada.invoice_number}`
                 }
               }
+              
+              console.log(`🎯 [mostrarFactura] Seleccionada:`, facturaSeleccionada ? {
+                num: facturaSeleccionada.invoice_number,
+                total: facturaSeleccionada.total,
+                fecha: facturaSeleccionada.created_at || facturaSeleccionada.date
+              } : 'ninguna')
               
               if (facturaSeleccionada) {
                 // Navegar al módulo de facturas Y seleccionar la factura
@@ -3119,14 +3561,17 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                   message: `Listo, te muestro ${descripcion}. Ya la abrí en pantalla.`
                 }
               } else {
+                // Dar más contexto sobre por qué no encontró
+                const mensajeNoEncontrado = tipo === 'por_numero' 
+                  ? `No encontré la factura ${numero}` 
+                  : `No hay facturas para ${rango.label}. Total de facturas en sistema: ${facturas.length}. ¿Quieres que busque en otro período?`
                 result = { 
                   success: false, 
-                  message: tipo === 'por_numero' 
-                    ? `No encontré la factura ${numero}` 
-                    : `No hay facturas ${rango.label}`
+                  message: mensajeNoEncontrado
                 }
               }
             } catch (err) {
+              console.error('❌ [mostrarFactura] Error:', err)
               result = { success: false, message: 'Error buscando la factura' }
             }
             break
@@ -3139,16 +3584,25 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
               // Obtener rango de fechas usando zona horaria de Colombia
               const rango = getDateRange(periodo)
               
-              // Llamar a la API de facturas
-              const response = await api.get('/invoices', {
-                params: { status: 'completed', limit: 200 }
-              })
+              // Usar invoicesService que tiene la autenticación correcta
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const invoicesResponse = await invoicesService.getInvoices()
               
-              const facturas = response.data?.data || response.data || []
+              if (!invoicesResponse.success || !invoicesResponse.data) {
+                result = { success: false, message: 'No pude obtener las facturas' }
+                break
+              }
+              
+              // Filtrar solo facturas pagadas (no cotizaciones)
+              const facturas = invoicesResponse.data.filter(inv => {
+                const isInvoice = inv.type !== 'quote' && inv.type !== 'Cotización'
+                const isPaid = inv.status === 'paid' || inv.status === 'Pagada' || inv.status === 'pagada' || inv.status === 'completed'
+                return isInvoice && isPaid
+              })
               
               // Filtrar facturas por rango de fechas
               const facturasFiltradas = facturas.filter(f => {
-                const fechaFactura = f.created_at?.split('T')[0] || f.date?.split('T')[0]
+                const fechaFactura = (f.created_at || f.date || '').split('T')[0].split(' ')[0]
                 return fechaFactura >= rango.inicio && fechaFactura <= rango.fin
               })
               
@@ -3173,155 +3627,257 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
               result = { success: false, message: 'Error consultando facturas' }
             }
             break
-            
-          case 'navegarModulo':
-            const modulo = fc.args?.modulo || 'dashboard'
-            const filtroNav = fc.args?.filtro || null
-            const moduloMap = {
-              'productos': 'products',
-              'inventario': 'products',
-              'clientes': 'customers',
-              'facturas': 'invoices',
-              'devoluciones': 'returns-management',
-              'reportes': 'reports',
-              'configuracion': 'settings',
-              'proveedores': 'purchase-orders',
-              'suppliers': 'purchase-orders',
-              'compras': 'purchase-orders',
-              'ordenes_compra': 'purchase-orders',
-              'ordenes': 'purchase-orders',
-              'purchase-orders': 'purchase-orders',
-              'categorias': 'categories',
-              'stock': 'stock',
-              'dashboard': 'dashboard',
-              'pos': 'pos',
-              'inventario_inteligente': 'intelligent_inventory',
-              'intelligent_inventory': 'intelligent_inventory',
-              'sedes': 'warehouses',
-              'warehouses': 'warehouses',
-              'bodegas': 'warehouses',
-              'tiendas': 'warehouses',
-              'traslados': 'warehouses',
-              'creditienda': 'accounts-receivable',
-              'creditos': 'accounts-receivable',
-              'cuentas_por_cobrar': 'accounts-receivable',
-              'accounts-receivable': 'accounts-receivable',
-              'cartera': 'accounts-receivable',
-              'usuarios': 'users-management',
-              'users': 'users-management',
-              'roles': 'users-management',
-              'empleados': 'users-management',
-              'users-management': 'users-management',
-              // Control de Cajas
-              'cash-admin': 'cash-admin',
-              'cajas': 'cash-admin',
-              'control_cajas': 'cash-admin',
-              'control_de_cajas': 'cash-admin',
-              'sesiones': 'cash-admin',
-              'sesiones_caja': 'cash-admin',
-              'supervisar': 'cash-admin',
-              'supervision': 'cash-admin',
-              // Gastos Operativos
-              'expenses': 'expenses',
-              'gastos': 'expenses',
-              'gastos_operativos': 'expenses',
-              'egresos': 'expenses',
-              'gastos operativos': 'expenses'
-            }
-            const moduloFinal = moduloMap[modulo] || modulo
-            
-            // Mapear filtros a valores que los módulos entienden
-            const filtroMap = {
-              'inactivos': 'inactive',
-              'inactivo': 'inactive',
-              'stock_bajo': 'low-stock',
-              'sin_stock': 'low-stock',
-              'activos': 'active',
-              // Filtros de período para Dashboard
-              '7_dias': '7 días',
-              '7d': '7 días',
-              '7 dias': '7 días',
-              'semana': '7 días',
-              'semanal': '7 días',
-              '30_dias': '30 días',
-              '30d': '30 días',
-              '30 dias': '30 días',
-              'mes': '30 días',
-              'mensual': '30 días',
-              '24h': '24 horas',
-              'hoy': '24 horas',
-              '24_horas': '24 horas',
-              // Filtros para Sedes
-              'traslados': 'transfers',
-              'sedes': 'warehouses'
-            }
-            const filtroFinal = filtroNav ? (filtroMap[filtroNav] || filtroNav) : null
-            
-            // Verificar si ya estamos en ese módulo
-            const uiContext = useUIContextStore()
-            const moduloActual = uiContext.currentModule
-            
-            console.log(`🧭 [navegarModulo] Módulo actual: "${moduloActual}" → Destino: "${moduloFinal}"`)
-            
-            // 🔄 LÓGICA INTELIGENTE: Si pide clientes/proveedores y estamos en Inventario Inteligente
-            // → Cambiar pestaña en lugar de navegar a otro módulo
-            if (moduloActual === 'intelligent_inventory' && (modulo === 'clientes' || modulo === 'proveedores')) {
-              const seccion = modulo === 'clientes' ? 'customers' : 'suppliers'
-              const seccionNombre = modulo === 'clientes' ? 'Clientes' : 'Proveedores'
+          
+          case 'consultarDevoluciones':
+            try {
+              const accion = fc.args?.accion || 'listar'
+              const periodo = fc.args?.periodo || 'todos'
               
-              // Ejecutar cambio de sección
-              const cambioResult = await uiContext.executeAction('cambiarSeccionInventarioInteligente', { seccion })
-              result = cambioResult || { 
-                success: true, 
-                message: `Cambiando a la pestaña de ${seccionNombre} en Inventario Inteligente` 
+              console.log(`🔄 [consultarDevoluciones] Acción: ${accion}, Período: ${periodo}`)
+              
+              // Si solo quieren navegar, ir directo al módulo
+              if (accion === 'navegar') {
+                navigateToModule('returns-management')
+                result = { success: true, message: 'Te llevé al módulo de devoluciones.' }
+                break
               }
-              console.log(`🔄 [navegarModulo] Estamos en Inventario Inteligente, cambiando a pestaña ${seccionNombre}`)
-              break
-            }
-            
-            // 🔄 LÓGICA INTELIGENTE PARA SEDES: Si pide traslados y estamos en sedes, cambiar pestaña
-            if (moduloActual === 'warehouses' && modulo === 'traslados') {
-              const cambioResult = await uiContext.executeAction('cambiarPestanaSedes', { tab: 'transfers' })
-              result = cambioResult || { 
-                success: true, 
-                message: `Cambiando a la pestaña de Traslados` 
+              
+              // Importar servicio de devoluciones
+              const { default: returnsService } = await import('@/services/returnsService.js')
+              const devolucionesResponse = await returnsService.getReturns()
+              
+              // El servicio puede retornar data directamente o dentro de un objeto
+              const devoluciones = Array.isArray(devolucionesResponse) 
+                ? devolucionesResponse 
+                : (devolucionesResponse.data || devolucionesResponse.returns || [])
+              
+              console.log(`📊 [consultarDevoluciones] Total devoluciones: ${devoluciones.length}`)
+              
+              // Filtrar por período si es necesario
+              let devolucionesFiltradas = devoluciones
+              if (periodo !== 'todos') {
+                const rango = getDateRange(periodo)
+                devolucionesFiltradas = devoluciones.filter(d => {
+                  const fechaDev = (d.created_at || d.date || '').split('T')[0].split(' ')[0]
+                  return fechaDev >= rango.inicio && fechaDev <= rango.fin
+                })
               }
-              console.log(`🔄 [navegarModulo] Estamos en Sedes, cambiando a pestaña Traslados`)
-              break
-            }
-            
-            const yaEstaEnModulo = moduloActual === moduloFinal
-            
-            // Si ya está en el módulo y no hay filtro nuevo, avisar
-            if (yaEstaEnModulo && !filtroFinal) {
-              const nombresModulo = {
-                'dashboard': 'el Panel de Control',
-                'products': 'Productos',
-                'invoices': 'Facturas',
-                'returns-management': 'Devoluciones',
-                'customers': 'Clientes',
-                'pos': 'el Punto de Venta',
-                'reports': 'Reportes',
-                'settings': 'Configuración',
-                'warehouses': 'Gestión de Sedes'
+              
+              const cantidad = devolucionesFiltradas.length
+              const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+              
+              if (accion === 'contar') {
+                const periodoTexto = periodo === 'todos' ? 'en total' : periodo === 'hoy' ? 'hoy' : periodo === 'semana' ? 'esta semana' : 'este mes'
+                result = { 
+                  success: true, 
+                  message: cantidad > 0 
+                    ? `Hay ${cantidad} devolución${cantidad > 1 ? 'es' : ''} ${periodoTexto}.`
+                    : `No hay devoluciones ${periodoTexto}.`
+                }
+              } else {
+                // Listar devoluciones
+                if (cantidad === 0) {
+                  const periodoTexto = periodo === 'todos' ? '' : periodo === 'hoy' ? ' de hoy' : periodo === 'semana' ? ' de esta semana' : ' de este mes'
+                  result = { success: true, message: `No hay devoluciones${periodoTexto}.` }
+                } else {
+                  // Ordenar por fecha descendente
+                  const ordenadas = [...devolucionesFiltradas].sort((a, b) => 
+                    new Date(b.created_at || b.date) - new Date(a.created_at || a.date)
+                  )
+                  
+                  // Tomar las últimas 5
+                  const recientes = ordenadas.slice(0, 5)
+                  const periodoTexto = periodo === 'todos' ? '' : periodo === 'hoy' ? ' de hoy' : periodo === 'semana' ? ' de esta semana' : ' del mes'
+                  
+                  let mensaje = `🔄 ${cantidad} devolución${cantidad > 1 ? 'es' : ''}${periodoTexto}:\n\n`
+                  
+                  recientes.forEach((dev, idx) => {
+                    const fecha = new Date(dev.created_at || dev.date).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
+                    const monto = formatMoney(dev.total || dev.amount || 0)
+                    const motivo = dev.reason || dev.notes || 'Sin motivo'
+                    const factura = dev.invoice_number || dev.original_invoice || ''
+                    mensaje += `${idx + 1}. ${factura ? `Fact. ${factura} - ` : ''}${monto} (${fecha})\n   📝 ${motivo.substring(0, 50)}${motivo.length > 50 ? '...' : ''}\n`
+                  })
+                  
+                  if (cantidad > 5) {
+                    mensaje += `\n📊 ${cantidad - 5} devoluciones más disponibles`
+                  }
+                  
+                  // Calcular total devuelto
+                  const totalDevuelto = devolucionesFiltradas.reduce((sum, d) => sum + parseFloat(d.total || d.amount || 0), 0)
+                  mensaje += `\n\n💰 Total devuelto: ${formatMoney(totalDevuelto)}`
+                  
+                  result = { success: true, message: mensaje }
+                }
+                
+                // También navegar al módulo
+                navigateToModule('returns-management')
               }
-              result = { success: true, message: `Ya estás en ${nombresModulo[moduloFinal] || moduloFinal}` }
-              console.log(`⚠️ [navegarModulo] Ya está en el módulo, no navegando`)
-              break
-            }
-            
-            // Navegar con filtro si existe
-            console.log(`✅ [navegarModulo] Navegando a ${moduloFinal}${filtroFinal ? ' con filtro: ' + filtroFinal : ''}`)
-            if (filtroFinal) {
-              navigateToModule(moduloFinal, { filter: filtroFinal })
-              result = { success: true, message: yaEstaEnModulo 
-                ? `Listo, cambié el gráfico a ${filtroNav}` 
-                : `Listo, estás en ${modulo} con ${filtroNav}` }
-            } else {
-              navigateToModule(moduloFinal)
-              result = { success: true, message: `Listo, estás en ${modulo}` }
+            } catch (err) {
+              console.error('❌ [consultarDevoluciones] Error:', err)
+              // Si hay error, al menos navegar al módulo
+              navigateToModule('returns-management')
+              result = { success: true, message: 'Te llevé a devoluciones. No pude cargar el listado automáticamente.' }
             }
             break
+            
+          case 'navegarModulo': {
+            try {
+              const modulo = fc.args?.modulo || 'dashboard'
+              const filtroNav = fc.args?.filtro || null
+              const moduloMap = {
+                'productos': 'products',
+                'inventario': 'products',
+                'clientes': 'customers',
+                'facturas': 'invoices',
+                'devoluciones': 'returns-management',
+                'reportes': 'reports',
+                'configuracion': 'settings',
+                'proveedores': 'purchase-orders',
+                'suppliers': 'purchase-orders',
+                'compras': 'purchase-orders',
+                'ordenes_compra': 'purchase-orders',
+                'ordenes': 'purchase-orders',
+                'purchase-orders': 'purchase-orders',
+                'categorias': 'categories',
+                'stock': 'stock',
+                'dashboard': 'dashboard',
+                'pos': 'pos',
+                'inventario_inteligente': 'intelligent_inventory',
+                'intelligent_inventory': 'intelligent_inventory',
+                'sedes': 'warehouses',
+                'warehouses': 'warehouses',
+                'bodegas': 'warehouses',
+                'tiendas': 'warehouses',
+                'traslados': 'warehouses',
+                'creditienda': 'accounts-receivable',
+                'creditos': 'accounts-receivable',
+                'cuentas_por_cobrar': 'accounts-receivable',
+                'accounts-receivable': 'accounts-receivable',
+                'cartera': 'accounts-receivable',
+                'usuarios': 'users-management',
+                'users': 'users-management',
+                'roles': 'users-management',
+                'empleados': 'users-management',
+                'users-management': 'users-management',
+                // Control de Cajas
+                'cash-admin': 'cash-admin',
+                'cajas': 'cash-admin',
+                'control_cajas': 'cash-admin',
+                'control_de_cajas': 'cash-admin',
+                'sesiones': 'cash-admin',
+                'sesiones_caja': 'cash-admin',
+                'supervisar': 'cash-admin',
+                'supervision': 'cash-admin',
+                // Gastos Operativos
+                'expenses': 'expenses',
+                'gastos': 'expenses',
+                'gastos_operativos': 'expenses',
+                'egresos': 'expenses',
+                'gastos operativos': 'expenses'
+              }
+              const moduloFinal = moduloMap[modulo] || modulo
+              
+              console.log(`🧭 [navegarModulo] Procesando: "${modulo}" → "${moduloFinal}"`)
+              
+              // 🔒 Verificar si CrediTienda está habilitado antes de navegar
+              if (moduloFinal === 'accounts-receivable') {
+                try {
+                  const { appStore } = await import('@/store/appStore.js')
+                  if (!appStore.systemSettings?.creditienda_enabled) {
+                    result = { 
+                      success: false, 
+                      message: 'El módulo CrediTienda no está habilitado actualmente. Para activarlo, ve a Configuración > Módulos > CrediTienda.' 
+                    }
+                    break
+                  }
+                } catch (e) {
+                  console.warn('⚠️ [navegarModulo] No se pudo verificar CrediTienda:', e)
+                }
+              }
+              
+              // Mapear filtros a valores que los módulos entienden
+              const filtroMap = {
+                'inactivos': 'inactive',
+                'inactivo': 'inactive',
+                'stock_bajo': 'low-stock',
+                'sin_stock': 'low-stock',
+                'activos': 'active',
+                '7_dias': '7 días',
+                '7d': '7 días',
+                '7 dias': '7 días',
+                'semana': '7 días',
+                'semanal': '7 días',
+                '30_dias': '30 días',
+                '30d': '30 días',
+                '30 dias': '30 días',
+                'mes': '30 días',
+                'mensual': '30 días',
+                '24h': '24 horas',
+                'hoy': '24 horas',
+                '24_horas': '24 horas',
+                'traslados': 'transfers',
+                'sedes': 'warehouses'
+              }
+              const filtroFinal = filtroNav ? (filtroMap[filtroNav] || filtroNav) : null
+              
+              // Verificar si ya estamos en ese módulo
+              const uiContext = useUIContextStore()
+              const moduloActual = uiContext.currentModule
+              
+              console.log(`🧭 [navegarModulo] Módulo actual: "${moduloActual}" → Destino: "${moduloFinal}"`)
+              
+              // Lógica especial para pestañas dentro de módulos
+              if (moduloActual === 'intelligent_inventory' && (modulo === 'clientes' || modulo === 'proveedores')) {
+                const seccion = modulo === 'clientes' ? 'customers' : 'suppliers'
+                const cambioResult = await uiContext.executeAction('cambiarSeccionInventarioInteligente', { seccion })
+                result = cambioResult || { success: true, message: `Cambiando a ${modulo}` }
+                break
+              }
+              
+              if (moduloActual === 'warehouses' && modulo === 'traslados') {
+                const cambioResult = await uiContext.executeAction('cambiarPestanaSedes', { tab: 'transfers' })
+                result = cambioResult || { success: true, message: `Cambiando a Traslados` }
+                break
+              }
+              
+              const yaEstaEnModulo = moduloActual === moduloFinal
+              
+              // Si ya está en el módulo y no hay filtro nuevo
+              if (yaEstaEnModulo && !filtroFinal) {
+                const nombresModulo = {
+                  'dashboard': 'el Panel de Control',
+                  'products': 'Productos',
+                  'invoices': 'Facturas',
+                  'returns-management': 'Devoluciones',
+                  'customers': 'Clientes',
+                  'pos': 'el Punto de Venta',
+                  'reports': 'Reportes',
+                  'settings': 'Configuración',
+                  'warehouses': 'Gestión de Sedes'
+                }
+                result = { success: true, message: `Ya estás en ${nombresModulo[moduloFinal] || moduloFinal}` }
+                break
+              }
+              
+              // Navegar
+              console.log(`✅ [navegarModulo] Navegando a ${moduloFinal}`)
+              if (filtroFinal) {
+                navigateToModule(moduloFinal, { filter: filtroFinal })
+                result = { success: true, message: `Listo, estás en ${modulo}${filtroNav ? ' con ' + filtroNav : ''}` }
+              } else {
+                navigateToModule(moduloFinal)
+                result = { success: true, message: `Listo, estás en ${modulo}` }
+              }
+            } catch (err) {
+              console.error('❌ [navegarModulo] Error:', err)
+              // Intentar navegar de todos modos
+              const moduloSimple = fc.args?.modulo || 'dashboard'
+              navigateToModule(moduloSimple)
+              result = { success: true, message: `Te llevé a ${moduloSimple}` }
+            }
+            break
+          }
           
           case 'consultarProductos':
             try {
@@ -3784,9 +4340,29 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                 }
                 
                 if (!modalAbierto && !openResult?.success) {
-                  result = { 
-                    success: false, 
-                    message: 'No pude abrir el formulario de crear producto. Intenta hacer clic en el botón "Nuevo Producto" manualmente.' 
+                  // 🔴 Verificar si el problema es que no hay categorías
+                  const contextoCheck = uiContext.getContextForAI()
+                  const totalCategorias = contextoCheck?.screenData?.totalCategorias || 
+                                          contextoCheck?.screenData?.categoriasDisponibles?.length || 0
+                  const sinCategorias = contextoCheck?.screenData?.sinCategorias || 
+                                        openResult?.code === 'SIN_CATEGORIAS' ||
+                                        totalCategorias === 0
+                  
+                  if (sinCategorias) {
+                    // 🔴 Hay un modal de advertencia abierto - la IA debe usar flujoSinCategorias
+                    result = { 
+                      success: false, 
+                      code: 'SIN_CATEGORIAS',
+                      message: 'Se abrió un aviso de que no hay categorías. Antes de crear un producto, necesitas crear al menos una categoría.',
+                      accionRequerida: 'flujoSinCategorias',
+                      instruccion: 'Usa flujoSinCategorias(accion: "abrirModalCategoria") para abrir el formulario de categoría. Luego pregunta el nombre y usa flujoSinCategorias(accion: "crearCategoriaYAbrirProducto", nombre: "X")',
+                      modalAdvertenciaAbierto: true
+                    }
+                  } else {
+                    result = { 
+                      success: false, 
+                      message: 'No pude abrir el formulario de crear producto. Intenta hacer clic en el botón "Nuevo Producto" manualmente.' 
+                    }
                   }
                   break
                 }
@@ -3796,8 +4372,23 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                 const tipoTienda = contexto.screenData?.tipoTienda || 'general'
                 const categorias = contexto.screenData?.categoriasDisponibles || []
                 
-                let mensaje = '¡Listo! El formulario está abierto. '
-                mensaje += 'Necesito: nombre, categoría, precio de costo y precio de venta. '
+                // 🔴 Doble verificación: aunque el modal se haya "abierto", verificar categorías
+                if (categorias.length === 0) {
+                  // 🔴 Cerrar cualquier modal y redirigir al flujo de sin categorías
+                  await uiContext.executeAction('cerrarModalAdvertencia')
+                  result = { 
+                    success: false, 
+                    code: 'SIN_CATEGORIAS',
+                    message: 'Se detectó que no hay categorías. Antes de crear un producto, necesitas crear al menos una categoría.',
+                    accionRequerida: 'flujoSinCategorias',
+                    instruccion: 'Usa flujoSinCategorias(accion: "abrirModalCategoria") para abrir el formulario de categoría. Luego pregunta el nombre y usa flujoSinCategorias(accion: "crearCategoriaYAbrirProducto", nombre: "X")',
+                    modalAdvertenciaAbierto: false
+                  }
+                  break
+                }
+                
+                let mensaje = '¡Listo! El formulario está abierto y visible. '
+                mensaje += 'Necesito 5 datos obligatorios: nombre, categoría, precio de costo, precio de venta y STOCK INICIAL. '
                 
                 if (categorias.length > 0) {
                   mensaje += `Tienes ${categorias.length} categorías. `
@@ -3820,21 +4411,48 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                 // Llenar el campo visualmente
                 const llenarResult = await uiContext.executeAction('llenarCampoProducto', { campo, valor })
                 
+                // Pequeña espera para que se actualice la UI
+                await new Promise(resolve => setTimeout(resolve, 150))
+                
                 if (llenarResult?.success) {
-                  // Verificar qué campos faltan
-                  const formulario = uiContext.getContextForAI()?.screenData?.formularioProducto
-                  const faltantes = formulario?.camposFaltantes || []
+                  // La función llenarCampoProducto YA verificó y retornó success
+                  // Obtener el estado actual del formulario para ver qué falta
+                  const formularioActual = uiContext.getContextForAI()?.screenData?.formularioProducto || {}
+                  let faltantes = formularioActual?.camposFaltantes || []
                   
-                  let mensaje = llenarResult.message
+                  // 🚨 STOCK ES OBLIGATORIO - Verificar si está en los faltantes o tiene valor 0
+                  const stockActual = parseInt(formularioActual?.stock || formularioActual?.valores?.stock || 0)
+                  const tieneStock = stockActual > 0 || (campo === 'stock' && parseInt(valor) > 0)
+                  
+                  // Si se asignó stock con valor > 0, quitarlo de faltantes
+                  if (campo === 'stock' && parseInt(valor) > 0) {
+                    faltantes = faltantes.filter(f => !f.toLowerCase().includes('stock'))
+                  } else if (!tieneStock && !faltantes.some(f => f.toLowerCase().includes('stock'))) {
+                    // Si no tiene stock y no está en faltantes, agregarlo
+                    faltantes = [...faltantes, 'stock inicial']
+                  }
+                  
+                  // Construir mensaje de éxito
+                  let mensaje = llenarResult.message || `Campo ${campo} asignado correctamente.`
+                  
                   if (faltantes.length > 0) {
                     mensaje += ` Aún faltan: ${faltantes.join(', ')}.`
+                    if (faltantes.some(f => f.toLowerCase().includes('stock'))) {
+                      mensaje += ' ⚠️ El stock es importante para que el producto aparezca en el POS.'
+                    }
                   } else {
                     mensaje += ' ¡Ya tenemos todos los datos obligatorios! ¿Quieres que guarde el producto?'
                   }
                   
-                  result = { success: true, message: mensaje, camposFaltantes: faltantes }
+                  result = { 
+                    success: true, 
+                    message: mensaje, 
+                    camposFaltantes: faltantes,
+                    formularioActual: llenarResult.formularioActual || formularioActual
+                  }
                 } else {
-                  result = llenarResult
+                  // Si llenarCampoProducto falló, retornar ese error
+                  result = llenarResult || { success: false, message: `No pude asignar el campo ${campo}` }
                 }
               } else if (accion === 'confirmar') {
                 // 🔒 Verificar que hay un formulario para guardar
@@ -3847,9 +4465,24 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                   break
                 }
                 
+                // 🚨 VERIFICAR STOCK ANTES DE GUARDAR
+                const formularioPreGuardar = contextoActual.screenData.formularioProducto
+                const stockPreGuardar = parseInt(formularioPreGuardar?.stock || formularioPreGuardar?.current_stock || formularioPreGuardar?.valores?.stock || 0)
+                
+                if (stockPreGuardar <= 0) {
+                  result = { 
+                    success: false, 
+                    code: 'FALTA_STOCK',
+                    message: '⚠️ El producto tiene stock 0. Si lo guardas así, NO aparecerá en el Punto de Venta. ¿Con cuántas unidades iniciamos el inventario?',
+                    accionRequerida: 'asignar stock',
+                    instruccion: 'Primero asigna un stock con crearProductoConversacional(accion: "asignar", campo: "stock", valor: "X")'
+                  }
+                  break
+                }
+                
                 // Guardar el producto
                 const guardarResult = await uiContext.executeAction('guardarProducto')
-                result = guardarResult || { success: true, message: 'Producto guardado' }
+                result = guardarResult || { success: true, message: 'Producto guardado correctamente con ' + stockPreGuardar + ' unidades en stock' }
               } else if (accion === 'cancelar') {
                 await uiContext.executeAction('cerrarModalProducto')
                 result = { success: true, message: 'Creación cancelada. ¿En qué más te ayudo?' }
@@ -3954,18 +4587,106 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                 break
               }
               
-              const uiContext = useUIContextStore()
-              
-              // Crear categoría rápida (funciona desde productos)
-              const crearResult = await uiContext.executeAction('crearCategoriaRapida', { nombre })
-              result = crearResult || { success: true, message: `Categoría "${nombre}" creada` }
+              // 🔴 Crear categoría directamente via API (funciona desde cualquier módulo)
+              try {
+                const { default: apiClient } = await import('../services/api.js')
+                const response = await apiClient.post('/categories', { 
+                  name: nombre.trim(),
+                  description: `Categoría creada por asistente de voz`,
+                  active: true
+                })
+                
+                if (response.data) {
+                  // Si estamos en productos, notificar para que recargue categorías
+                  const uiContext = useUIContextStore()
+                  if (uiContext.currentModule === 'products') {
+                    // Intentar recargar las categorías en el módulo de productos
+                    await uiContext.executeAction('recargarCategorias')
+                  }
+                  
+                  result = { 
+                    success: true, 
+                    message: `¡Listo! Categoría "${nombre}" creada correctamente. Ahora puedes crear productos en esta categoría.`,
+                    categoria: {
+                      id: response.data.id || response.data.category?.id,
+                      nombre: nombre.trim()
+                    }
+                  }
+                } else {
+                  result = { success: false, message: 'No pude crear la categoría. Intenta de nuevo.' }
+                }
+              } catch (apiError) {
+                console.error('Error API crearCategoriaRapida:', apiError)
+                const errorMsg = apiError.response?.data?.message || 'Error al crear la categoría'
+                result = { success: false, message: errorMsg }
+              }
             } catch (err) {
               console.error('Error en crearCategoriaRapida:', err)
               result = { success: false, message: 'Error al crear la categoría' }
             }
             break
           
-          // 📦 INVENTARIO
+          // � FLUJO SIN CATEGORÍAS - Maneja visualmente el proceso
+          case 'flujoSinCategorias':
+            try {
+              const accion = fc.args?.accion
+              const nombre = fc.args?.nombre
+              const uiContext = useUIContextStore()
+              
+              // Asegurar que estamos en el módulo de productos
+              if (uiContext.currentModule !== 'products') {
+                navigateToModule('products')
+                await new Promise(resolve => setTimeout(resolve, 600))
+              }
+              
+              if (accion === 'abrirModalCategoria') {
+                // Cerrar modal de advertencia y abrir modal de crear categoría
+                const openResult = await uiContext.executeAction('abrirModalCrearCategoria')
+                if (openResult?.success) {
+                  result = { 
+                    success: true, 
+                    message: 'El formulario de crear categoría está abierto y visible. ¿Cómo quieres que se llame tu primera categoría?',
+                    modalAbierto: 'crear-categoria'
+                  }
+                } else {
+                  result = { success: false, message: 'No pude abrir el formulario de crear categoría' }
+                }
+              } else if (accion === 'crearCategoriaYAbrirProducto') {
+                if (!nombre?.trim()) {
+                  result = { success: false, message: 'Necesito el nombre de la categoría' }
+                  break
+                }
+                
+                // Guardar la categoría y abrir automáticamente el modal de producto
+                // Primero llenar el nombre
+                await uiContext.executeAction('llenarNombreCategoria', { nombre: nombre.trim() })
+                
+                // Luego guardar y abrir producto
+                const saveResult = await uiContext.executeAction('guardarCategoriaYAbrirProducto')
+                
+                if (saveResult?.success) {
+                  result = { 
+                    success: true, 
+                    message: saveResult.message || `¡Categoría "${nombre}" creada! El formulario de producto está abierto. ¿Cómo se llama el producto?`,
+                    categoriaCreada: nombre.trim(),
+                    modalAbierto: 'crear-producto'
+                  }
+                } else {
+                  result = saveResult || { success: false, message: 'Error al crear la categoría' }
+                }
+              } else {
+                result = { 
+                  success: false, 
+                  message: 'Acción no reconocida. Usa: abrirModalCategoria o crearCategoriaYAbrirProducto'
+                }
+              }
+            } catch (err) {
+              console.error('Error en flujoSinCategorias:', err)
+              result = { success: false, message: 'Error en el flujo de categorías' }
+            }
+            break
+          
+          // �📦 INVENTARIO
           case 'cambiarTabInventario':
             try {
               const tab = fc.args?.tab?.toLowerCase()
@@ -4459,9 +5180,20 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
             break
           
           // === CREDITIENDA - GESTIÓN DE CRÉDITOS ===
+          // ⚠️ IMPORTANTE: Verificar si CrediTienda está habilitado antes de ejecutar cualquier acción
           case 'crearNuevoCredito':
             try {
               const uiContext = useUIContextStore()
+              const { appStore } = await import('@/store/appStore.js')
+              
+              // 🔒 Verificar si CrediTienda está habilitado
+              if (!appStore.systemSettings?.creditienda_enabled) {
+                result = { 
+                  success: false, 
+                  message: 'El módulo CrediTienda no está habilitado. Puedes activarlo desde Configuración > Módulos. CrediTienda te permite gestionar créditos y cuentas por cobrar de tus clientes.' 
+                }
+                break
+              }
               
               // Navegar a CrediTienda si no estamos ahí
               if (uiContext.currentModule !== 'accounts-receivable') {
@@ -4480,10 +5212,20 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
           case 'buscarClientePorDocumento':
             try {
               const uiContext = useUIContextStore()
+              const { appStore } = await import('@/store/appStore.js')
               const documento = fc.args?.documento
               
               if (!documento) {
                 result = { success: false, message: 'Debes proporcionar el número de documento' }
+                break
+              }
+              
+              // 🔒 Verificar si CrediTienda está habilitado
+              if (!appStore.systemSettings?.creditienda_enabled) {
+                result = { 
+                  success: false, 
+                  message: 'El módulo CrediTienda no está habilitado. Puedes activarlo desde Configuración > Módulos para gestionar créditos de clientes.' 
+                }
                 break
               }
               
@@ -4534,10 +5276,20 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
           case 'seleccionarClienteCredito':
             try {
               const uiContext = useUIContextStore()
+              const { appStore } = await import('@/store/appStore.js')
               const nombreCredito = fc.args?.nombre
               
               if (!nombreCredito) {
                 result = { success: false, message: 'Debes proporcionar el nombre del cliente' }
+                break
+              }
+              
+              // 🔒 Verificar si CrediTienda está habilitado
+              if (!appStore.systemSettings?.creditienda_enabled) {
+                result = { 
+                  success: false, 
+                  message: 'El módulo CrediTienda no está habilitado. Puedes activarlo desde Configuración > Módulos para gestionar créditos de clientes.' 
+                }
                 break
               }
               
@@ -4558,11 +5310,21 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
           case 'registrarAbono':
             try {
               const uiContext = useUIContextStore()
+              const { appStore } = await import('@/store/appStore.js')
               const monto = fc.args?.monto
               const metodo = fc.args?.metodo || 'cash'
               
               if (!monto || monto <= 0) {
                 result = { success: false, message: 'Debes proporcionar un monto válido' }
+                break
+              }
+              
+              // 🔒 Verificar si CrediTienda está habilitado
+              if (!appStore.systemSettings?.creditienda_enabled) {
+                result = { 
+                  success: false, 
+                  message: 'El módulo CrediTienda no está habilitado. Actívalo desde Configuración > Módulos.' 
+                }
                 break
               }
               
@@ -5561,6 +6323,36 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
             }
             break
           
+          case 'abrirAuditoria':
+          case 'verAuditoria':
+          case 'verAuditoriaSesion':
+            try {
+              const uiContext = useUIContextStore()
+              const idSesion = fc.args?.idSesion
+              const busqueda = fc.args?.busqueda || fc.args?.nombre
+              
+              // Verificar que estamos en control de cajas
+              if (uiContext.currentModule !== 'cash-admin') {
+                navigateToModule('cash-admin')
+                await new Promise(resolve => setTimeout(resolve, 800))
+              }
+              
+              const auditResult = await uiContext.executeAction('verAuditoriaSesion', { idSesion, busqueda })
+              
+              if (auditResult?.success) {
+                result = { 
+                  success: true, 
+                  message: `Abriendo auditoría${busqueda ? ` de ${busqueda}` : ''}. Aquí podrás ver todas las ventas, devoluciones y gastos de esta sesión.`
+                }
+              } else {
+                result = auditResult || { success: false, message: 'No encontré esa sesión. ¿Puedes decirme el nombre del empleado?' }
+              }
+            } catch (err) {
+              console.error('Error en abrirAuditoria:', err)
+              result = { success: false, message: 'Error al abrir auditoría' }
+            }
+            break
+          
           case 'filtrarSesionesCaja':
             try {
               const uiContext = useUIContextStore()
@@ -6201,17 +6993,28 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
               
               if (invoicesResponse.success && invoicesResponse.data) {
                 const allInvoices = invoicesResponse.data
-                const busquedaLower = busqueda.toLowerCase()
+                const busquedaLower = busqueda.toLowerCase().replace('fv-', '').replace('#', '')
+                const busquedaSinCeros = busquedaLower.replace(/^0+/, '') // Quitar ceros a la izquierda
                 
-                // Buscar coincidencias
+                // Buscar coincidencias de forma inteligente
                 const coincidencias = allInvoices.filter(inv => {
-                  const numero = (inv.invoice_number || inv.number || `FV-${inv.id}`).toLowerCase()
+                  const numero = (inv.invoice_number || inv.number || `FV-${inv.id}`).toLowerCase().replace('fv-', '')
+                  const numeroSinCeros = numero.replace(/^0+/, '')
                   const cliente = (inv.customer_name || '').toLowerCase()
                   const vendedor = (inv.seller_name || '').toLowerCase()
                   
-                  const matchBusqueda = numero.includes(busquedaLower) || 
-                                        cliente.includes(busquedaLower) || 
-                                        busquedaLower.includes(numero.replace('fv-', ''))
+                  // Match por número (con lógica inteligente de ceros)
+                  const matchNumero = numero === busquedaLower || 
+                                      numeroSinCeros === busquedaSinCeros ||
+                                      numero.includes(busquedaLower) ||
+                                      numeroSinCeros.endsWith(busquedaSinCeros) ||
+                                      busquedaSinCeros.endsWith(numeroSinCeros) ||
+                                      inv.id.toString() === busquedaSinCeros
+                  
+                  // Match por cliente o vendedor
+                  const matchTexto = cliente.includes(busquedaLower) || vendedor.includes(busquedaLower)
+                  
+                  const matchBusqueda = matchNumero || matchTexto
                   
                   // Filtros adicionales
                   let matchTipo = true
@@ -6330,10 +7133,13 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
               const invoicesResponse = await invoicesService.getInvoices()
               
               if (invoicesResponse.success && invoicesResponse.data) {
-                const hoy = new Date().toISOString().split('T')[0]
+                // Usar fecha local (Colombia) no UTC
+                const ahora = new Date()
+                const hoy = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`
                 
                 const facturasHoy = invoicesResponse.data.filter(inv => {
-                  const invDate = (inv.date || inv.created_at || '').split('T')[0]
+                  // La fecha viene como YYYY-MM-DD del backend (ya en hora local)
+                  const invDate = (inv.date || inv.created_at || '').split('T')[0].split(' ')[0]
                   const isPaid = inv.status === 'paid' || inv.status === 'Pagada' || inv.status === 'pagada'
                   const isInvoice = inv.type !== 'quote' && inv.type !== 'Cotización'
                   return invDate === hoy && isPaid && isInvoice
@@ -6343,20 +7149,32 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                 const numFacturas = facturasHoy.length
                 const ticketPromedio = numFacturas > 0 ? totalVentas / numFacturas : 0
                 
-                // Última venta
-                const ultimaVenta = facturasHoy.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]
+                // Última venta (copiar array para no mutar el original)
+                const facturasOrdenadas = [...facturasHoy].sort((a, b) => {
+                  const dateA = new Date(a.created_at || a.date)
+                  const dateB = new Date(b.created_at || b.date)
+                  return dateB - dateA  // Más reciente primero
+                })
+                const ultimaVenta = facturasOrdenadas[0]
+                const primeraVenta = facturasOrdenadas[facturasOrdenadas.length - 1]
                 
                 let mensaje = `📊 HOY llevas:\n• ${formatMoney(totalVentas)} en ventas\n• ${numFacturas} facturas\n• Ticket promedio: ${formatMoney(ticketPromedio)}`
                 
                 if (ultimaVenta) {
-                  mensaje += `\n\n🕐 Última venta: ${formatMoney(ultimaVenta.total)} a ${ultimaVenta.customer_name}`
+                  const numUltima = ultimaVenta.invoice_number || ultimaVenta.number || `FV-${ultimaVenta.id}`
+                  mensaje += `\n\n🕐 Última factura: ${numUltima} - ${formatMoney(ultimaVenta.total)} a ${ultimaVenta.customer_name || 'Cliente'}`
+                  
+                  if (numFacturas > 1 && primeraVenta) {
+                    const numPrimera = primeraVenta.invoice_number || primeraVenta.number || `FV-${primeraVenta.id}`
+                    mensaje += `\n🏁 Primera factura: ${numPrimera}`
+                  }
                 }
                 
                 if (numFacturas === 0) {
                   mensaje = `📊 Aún no hay ventas registradas hoy. ¡A vender!`
                 }
                 
-                result = { success: true, message: mensaje }
+                result = { success: true, message: mensaje, data: { total: totalVentas, cantidad: numFacturas, ultimaId: ultimaVenta?.id } }
               } else {
                 result = { success: false, message: 'No pude obtener las ventas de hoy' }
               }
@@ -6371,24 +7189,311 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
               const facturaId = fc.args?.facturaId
               const busqueda = fc.args?.busqueda
               
-              navigateToModule('invoices')
+              // Construir parámetros de navegación
+              const params = {}
+              if (facturaId) params.selectId = facturaId
+              if (busqueda) params.search = busqueda
               
-              if (facturaId || busqueda) {
-                await new Promise(resolve => setTimeout(resolve, 500))
-                const params = {}
-                if (facturaId) params.selectId = facturaId
-                if (busqueda) params.search = busqueda
-                
-                // Actualizar route query
-                if (typeof window !== 'undefined' && window.__ROUTER__) {
-                  window.__ROUTER__.push({ path: '/invoices', query: params })
-                }
-              }
+              // Navegar usando navigateToModule que soporta query params
+              navigateToModule('invoices', params)
               
               result = { success: true, message: 'Te llevé a facturas' }
             } catch (err) {
               console.error('Error en navegarAFacturas:', err)
               result = { success: false, message: 'Error al navegar a facturas' }
+            }
+            break
+          
+          case 'consultarFacturasPeriodo':
+            try {
+              const tipo = fc.args?.tipo || 'primera' // 'primera' o 'ultima'
+              const periodo = fc.args?.periodo || 'mes' // 'hoy', 'semana', 'mes'
+              
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+              
+              const invoicesResponse = await invoicesService.getInvoices()
+              
+              if (invoicesResponse.success && invoicesResponse.data) {
+                // Usar fecha local (Colombia) no UTC
+                const ahora = new Date()
+                const hoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`
+                
+                // Función para obtener fecha string de una factura
+                const getInvDateStr = (inv) => (inv.date || inv.created_at || '').split('T')[0].split(' ')[0]
+                
+                // Calcular fecha de inicio según período
+                let fechaInicioStr = hoyStr
+                if (periodo === 'semana') {
+                  const dayOfWeek = ahora.getDay()
+                  const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // Lunes como inicio
+                  const fechaInicio = new Date(ahora)
+                  fechaInicio.setDate(ahora.getDate() - diff)
+                  fechaInicioStr = `${fechaInicio.getFullYear()}-${String(fechaInicio.getMonth() + 1).padStart(2, '0')}-${String(fechaInicio.getDate()).padStart(2, '0')}`
+                } else if (periodo === 'mes') {
+                  fechaInicioStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-01`
+                }
+                
+                // Filtrar facturas del período (solo facturas pagadas, no cotizaciones)
+                const facturasPeriodo = invoicesResponse.data.filter(inv => {
+                  const invDateStr = getInvDateStr(inv)
+                  const isPaid = inv.status === 'paid' || inv.status === 'Pagada' || inv.status === 'pagada'
+                  const isInvoice = inv.type !== 'quote' && inv.type !== 'Cotización'
+                  // Comparar strings YYYY-MM-DD directamente
+                  return invDateStr >= fechaInicioStr && invDateStr <= hoyStr && isPaid && isInvoice
+                })
+                
+                if (facturasPeriodo.length === 0) {
+                  const periodoTexto = periodo === 'hoy' ? 'hoy' : periodo === 'semana' ? 'esta semana' : 'este mes'
+                  result = { success: true, message: `No hay facturas registradas ${periodoTexto}.` }
+                  break
+                }
+                
+                // Ordenar por fecha Y hora (usando created_at que tiene timestamp completo)
+                // Esto es crítico para desempatar facturas del mismo día
+                facturasPeriodo.sort((a, b) => {
+                  const dateA = new Date(a.created_at || a.date)
+                  const dateB = new Date(b.created_at || b.date)
+                  return dateA - dateB
+                })
+                
+                // Seleccionar primera o última según tipo
+                const factura = tipo === 'primera' ? facturasPeriodo[0] : facturasPeriodo[facturasPeriodo.length - 1]
+                
+                const fecha = new Date(factura.date || factura.created_at)
+                const fechaTexto = fecha.toLocaleDateString('es-CO', { 
+                  weekday: 'long', 
+                  day: 'numeric', 
+                  month: 'long',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })
+                
+                const periodoTexto = periodo === 'hoy' ? 'de hoy' : periodo === 'semana' ? 'de esta semana' : 'del mes'
+                const tipoTexto = tipo === 'primera' ? 'Primera' : 'Última'
+                const numeroFactura = factura.invoice_number || factura.number || `FV-${factura.id}`
+                
+                let mensaje = `📄 ${tipoTexto} factura ${periodoTexto}:\n\n`
+                mensaje += `🔢 Número: ${numeroFactura} (ID interno: ${factura.id})\n`
+                mensaje += `👤 Cliente: ${factura.customer_name || 'Cliente general'}\n`
+                mensaje += `💰 Total: ${formatMoney(factura.total)}\n`
+                mensaje += `📅 Fecha: ${fechaTexto}\n`
+                mensaje += `👔 Vendedor: ${factura.seller_name || 'N/A'}\n`
+                mensaje += `💳 Método: ${factura.payment_method || 'Efectivo'}`
+                
+                if (facturasPeriodo.length > 1) {
+                  mensaje += `\n\n📊 Total de facturas ${periodoTexto}: ${facturasPeriodo.length}`
+                }
+                
+                result = { success: true, message: mensaje, data: { facturaId: factura.id, numero: numeroFactura } }
+              } else {
+                result = { success: false, message: 'No pude obtener las facturas' }
+              }
+            } catch (err) {
+              console.error('Error en consultarFacturasPeriodo:', err)
+              result = { success: false, message: 'Error al consultar facturas del período' }
+            }
+            break
+          
+          case 'listarFacturasRecientes':
+            try {
+              const limite = Math.min(fc.args?.limite || 5, 10) // Máximo 10
+              const periodo = fc.args?.periodo || 'todos'
+              
+              const { invoicesService } = await import('@/services/invoicesService.js')
+              const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+              
+              const invoicesResponse = await invoicesService.getInvoices()
+              
+              if (invoicesResponse.success && invoicesResponse.data) {
+                let facturas = invoicesResponse.data.filter(inv => {
+                  const isInvoice = inv.type !== 'quote' && inv.type !== 'Cotización'
+                  return isInvoice
+                })
+                
+                // Filtrar por período si se especifica - usar getColombiaDate para consistencia
+                if (periodo !== 'todos') {
+                  const hoyStr = getColombiaDate(0) // YYYY-MM-DD en zona Colombia
+                  
+                  // Función para obtener fecha string de una factura
+                  const getInvDateStr = (inv) => (inv.created_at || inv.date || '').split('T')[0].split(' ')[0]
+                  
+                  let fechaInicioStr = hoyStr
+                  if (periodo === 'semana') {
+                    fechaInicioStr = getColombiaDate(-7)
+                  } else if (periodo === 'mes') {
+                    fechaInicioStr = getColombiaDate(-30)
+                  }
+                  // Si periodo === 'hoy', fechaInicioStr ya es hoyStr
+                  
+                  console.log(`📅 [listarFacturasRecientes] Filtrando: ${fechaInicioStr} a ${hoyStr} (periodo: ${periodo})`)
+                  
+                  facturas = facturas.filter(inv => {
+                    const invDateStr = getInvDateStr(inv)
+                    // Comparar strings YYYY-MM-DD directamente
+                    const enRango = invDateStr >= fechaInicioStr && invDateStr <= hoyStr
+                    return enRango
+                  })
+                  
+                  console.log(`✅ [listarFacturasRecientes] Facturas encontradas en rango: ${facturas.length}`)
+                }
+                
+                // Ordenar por fecha Y hora descendente (usar created_at para incluir timestamp)
+                facturas.sort((a, b) => {
+                  const dateA = new Date(a.created_at || a.date)
+                  const dateB = new Date(b.created_at || b.date)
+                  return dateB - dateA  // Descendente: más reciente primero
+                })
+                
+                // Limitar resultados
+                const facturasLimitadas = facturas.slice(0, limite)
+                
+                if (facturasLimitadas.length === 0) {
+                  const periodoTexto = periodo === 'todos' ? '' : periodo === 'hoy' ? ' de hoy' : periodo === 'semana' ? ' de esta semana' : ' de este mes'
+                  result = { success: true, message: `No hay facturas${periodoTexto}.` }
+                  break
+                }
+                
+                const periodoTexto = periodo === 'todos' ? '' : periodo === 'hoy' ? ' de hoy' : periodo === 'semana' ? ' de esta semana' : ' del mes'
+                let mensaje = `📋 Últimas ${facturasLimitadas.length} facturas${periodoTexto}:\n\n`
+                
+                facturasLimitadas.forEach((fac, idx) => {
+                  const numero = fac.invoice_number || fac.number || `FV-${fac.id}`
+                  const fecha = new Date(fac.date || fac.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
+                  const estado = fac.status === 'paid' || fac.status === 'Pagada' ? '✅' : fac.status === 'pending' || fac.status === 'Pendiente' ? '⏳' : '❌'
+                  mensaje += `${idx + 1}. ${estado} ${numero} - ${fac.customer_name || 'Cliente'} - ${formatMoney(fac.total)} (${fecha})\n`
+                })
+                
+                // Resumen
+                const totalMonto = facturasLimitadas.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
+                mensaje += `\n💰 Total mostrado: ${formatMoney(totalMonto)}`
+                
+                if (facturas.length > limite) {
+                  mensaje += `\n📊 ${facturas.length - limite} facturas más disponibles`
+                }
+                
+                result = { success: true, message: mensaje }
+              } else {
+                result = { success: false, message: 'No pude obtener las facturas' }
+              }
+            } catch (err) {
+              console.error('Error en listarFacturasRecientes:', err)
+              result = { success: false, message: 'Error al listar facturas' }
+            }
+            break
+          
+          case 'seleccionarFacturaEnVista':
+            try {
+              const uiContext = useUIContextStore()
+              const numero = fc.args?.numero
+              const posicion = fc.args?.posicion
+              
+              // Verificar que estemos en el módulo de facturas
+              const moduloActual = uiContext.currentModule
+              
+              if (moduloActual !== 'invoices') {
+                // Si no estamos en facturas, navegar primero
+                navigateToModule('invoices')
+                // Esperar más tiempo para que el módulo se cargue completamente y registre sus acciones
+                await new Promise(resolve => setTimeout(resolve, 1200))
+              }
+              
+              // Intentar ejecutar la acción registrada en el componente (múltiples intentos)
+              let actionResult = null
+              let intentos = 0
+              const maxIntentos = 3
+              
+              while (intentos < maxIntentos && !actionResult?.success) {
+                actionResult = await uiContext?.executeAction?.('seleccionarFactura', { numero, posicion })
+                
+                if (!actionResult?.success) {
+                  intentos++
+                  if (intentos < maxIntentos) {
+                    // Esperar un poco más para que las acciones se registren
+                    await new Promise(resolve => setTimeout(resolve, 500))
+                  }
+                }
+              }
+              
+              if (actionResult?.success) {
+                // Actualizar el contexto después de seleccionar
+                await new Promise(resolve => setTimeout(resolve, 100))
+                result = { success: true, message: actionResult.message || 'Factura seleccionada y abierta' }
+              } else {
+                // Fallback: buscar en la API directamente y seleccionar
+                try {
+                  const { invoicesService } = await import('@/services/invoicesService.js')
+                  const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
+                  
+                  const invoicesResponse = await invoicesService.getInvoices()
+                  
+                  if (invoicesResponse.success && invoicesResponse.data) {
+                    let facturaEncontrada = null
+                    const allInvoices = invoicesResponse.data
+                    
+                    if (posicion && posicion > 0) {
+                      // Ordenar por fecha y tomar la posición
+                      const ordenadas = [...allInvoices]
+                        .filter(i => i.status !== 'cancelled')
+                        .sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at))
+                      
+                      const pos = parseInt(posicion) - 1
+                      if (pos >= 0 && pos < ordenadas.length) {
+                        facturaEncontrada = ordenadas[pos]
+                      }
+                    } else if (numero) {
+                      // Limpiar el número: quitar FV-, #, ceros a la izquierda
+                      const numeroLimpio = numero.toString().toLowerCase()
+                        .replace('fv-', '')
+                        .replace('#', '')
+                        .replace(/^0+/, '') // Quitar ceros a la izquierda
+                      
+                      // Buscar factura de forma inteligente
+                      facturaEncontrada = allInvoices.find(f => {
+                        const numFactura = (f.invoice_number || f.number || `FV-${f.id}`).toLowerCase().replace('fv-', '')
+                        const numSinCeros = numFactura.replace(/^0+/, '') // Quitar ceros a la izquierda
+                        
+                        // Coincidencia exacta (con o sin ceros)
+                        if (numFactura === numeroLimpio || numSinCeros === numeroLimpio) return true
+                        
+                        // Coincidencia por ID
+                        if (f.id.toString() === numeroLimpio) return true
+                        
+                        // Coincidencia parcial: los últimos dígitos coinciden
+                        if (numSinCeros.endsWith(numeroLimpio) || numeroLimpio.endsWith(numSinCeros)) return true
+                        
+                        // El número de factura contiene el número buscado
+                        if (numFactura.includes(numeroLimpio)) return true
+                        
+                        return false
+                      })
+                    }
+                    
+                    if (facturaEncontrada) {
+                      // Navegar a facturas con el ID para seleccionar usando navigateToModule
+                      navigateToModule('invoices', { selectId: facturaEncontrada.id })
+                      
+                      const numeroFac = facturaEncontrada.invoice_number || facturaEncontrada.number || `FV-${facturaEncontrada.id}`
+                      const fecha = new Date(facturaEncontrada.date).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
+                      
+                      result = { 
+                        success: true, 
+                        message: `📄 Te abrí la factura ${numeroFac}:\n• Cliente: ${facturaEncontrada.customer_name || 'Cliente General'}\n• Total: ${formatMoney(facturaEncontrada.total)}\n• Fecha: ${fecha}\n• Estado: ${facturaEncontrada.status}\n\n¿Qué quieres hacer con ella? Puedo enviarla por WhatsApp, Email o descargar el PDF.`
+                      }
+                    } else {
+                      result = { success: false, message: `No encontré esa factura. Verifica el número o dime "la primera factura" o "la última factura".` }
+                    }
+                  } else {
+                    result = { success: false, message: 'No pude cargar las facturas' }
+                  }
+                } catch (apiErr) {
+                  console.error('Error buscando factura:', apiErr)
+                  result = { success: false, message: 'Error al buscar la factura' }
+                }
+              }
+            } catch (err) {
+              console.error('Error en seleccionarFacturaEnVista:', err)
+              result = { success: false, message: 'Error al seleccionar factura' }
             }
             break
         }

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test ePayco - Plan $100k</title>
-    <script src="https://checkout.epayco.co/checkout.js"></script>
+    <title>Test ePayco Smart Checkout 2.0 - Plan $100k</title>
+    <script src="https://checkout.epayco.co/checkout-v2.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,6 +34,10 @@
         button:hover {
             background: #553C9A;
         }
+        button:disabled {
+            background: #A0AEC0;
+            cursor: not-allowed;
+        }
         .info {
             background: #EBF8FF;
             padding: 15px;
@@ -52,14 +56,23 @@
             color: #2D3748;
             text-align: center;
         }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+        .status.loading { background: #FEF3C7; border-left: 4px solid #F59E0B; display: block; }
+        .status.success { background: #D1FAE5; border-left: 4px solid #10B981; display: block; }
+        .status.error { background: #FEE2E2; border-left: 4px solid #EF4444; display: block; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>🧪 Test ePayco - Plan $100k</h1>
+        <h1>🧪 Test ePayco Smart Checkout 2.0</h1>
         
         <div class="info">
-            <strong>⚠️ Nota:</strong> Esta es una prueba directa con el único monto que funciona en tu cuenta de ePayco.
+            <strong>⚠️ Nota:</strong> Esta es una prueba del nuevo Smart Checkout 2.0 de ePayco.
         </div>
 
         <div class="price">$100.000</div>
@@ -73,7 +86,9 @@
             <li>✅ Soporte 24/7</li>
         </ul>
 
-        <button onclick="pagarAhora()">💳 Pagar con ePayco</button>
+        <button id="payBtn" onclick="pagarAhora()">💳 Pagar con ePayco</button>
+        
+        <div id="status" class="status"></div>
 
         <div style="margin-top: 20px; padding: 15px; background: #FFF5F5; border-radius: 8px; border-left: 4px solid #E53E3E;">
             <strong>Tarjeta de prueba:</strong><br>
@@ -84,43 +99,84 @@
     </div>
 
     <script>
-        function pagarAhora() {
-            const tenantId = 'fabiana'; // Cambia esto por tu tenant_id real
-            const reference = `test_100k_${Date.now()}`;
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://105pos.pro';
+        
+        function setStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+        }
+
+        async function pagarAhora() {
+            const btn = document.getElementById('payBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Procesando...';
             
-            // Configurar ePayco
-            const handler = ePayco.checkout.configure({
-                key: 'de4263d3e7094669c4d837ad7dadb69e', // ✅ PUBLIC_KEY Producción
-                test: false // Modo producción
-            });
+            const tenantId = 'test_checkout_v2';
+            const reference = `test_v2_${Date.now()}`;
+            
+            try {
+                setStatus('Creando sesión de checkout...', 'loading');
+                
+                // 1. Crear sesión en el backend
+                const response = await fetch(`${API_BASE}/api/epayco/create-session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: 100000,
+                        reference: reference,
+                        customer_email: 'test@105pos.pro',
+                        payment_frequency: 'monthly',
+                        plan: 'enterprise',
+                        tenant_id: tenantId,
+                        company_name: 'Test Checkout 2.0',
+                        description: 'Prueba Smart Checkout 2.0',
+                        response_url: window.location.origin + '/payment/success?reference=' + reference
+                    })
+                });
 
-            // Abrir checkout
-            handler.open({
-                name: 'Plan Empresarial - 105 POS',
-                description: 'Suscripción Mensual - Plan Enterprise',
-                invoice: reference,
-                currency: 'cop',
-                amount: '100000', // $100.000 - EL ÚNICO QUE FUNCIONA
-                tax_base: '0',
-                tax: '0',
-                country: 'co',
-                lang: 'es',
-                external: 'true',
-                response: window.location.origin + '/payment/success',
-                confirmation: 'https://105pos.pro/api/epayco/webhook',
-                name_billing: 'Test Cliente',
-                address_billing: 'Calle 123 # 45-67',
-                type_doc_billing: 'cc',
-                mobilephone_billing: '3000000000',
-                number_doc_billing: '1000000000',
-                email_billing: 'cliente@105pos.pro',
-                extra1: tenantId,
-                extra2: 'enterprise',
-                extra3: 'test'
-            });
+                const data = await response.json();
+                
+                if (!data.success || !data.sessionId) {
+                    throw new Error(data.error || 'No se pudo crear la sesión');
+                }
 
-            console.log('🚀 Abriendo ePayco con $100.000');
-            console.log('📋 Referencia:', reference);
+                setStatus('Sesión creada. Abriendo checkout...', 'success');
+                console.log('✅ SessionId:', data.sessionId);
+
+                // 2. Configurar y abrir Smart Checkout 2.0
+                const checkout = ePayco.checkout.configure({
+                    sessionId: data.sessionId,
+                    type: 'standard', // 'onpage' o 'standard'
+                    test: false // Producción
+                });
+
+                // 3. Event handlers
+                checkout.onCreated(() => {
+                    console.log('✅ Checkout creado');
+                    setStatus('Checkout abierto correctamente', 'success');
+                });
+
+                checkout.onErrors((errors) => {
+                    console.error('❌ Errores:', errors);
+                    setStatus('Error: ' + JSON.stringify(errors), 'error');
+                });
+
+                checkout.onClosed(() => {
+                    console.log('🔒 Checkout cerrado');
+                    btn.disabled = false;
+                    btn.textContent = '💳 Pagar con ePayco';
+                });
+
+                // 4. Abrir
+                checkout.open();
+
+            } catch (error) {
+                console.error('Error:', error);
+                setStatus('Error: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.textContent = '💳 Pagar con ePayco';
+            }
         }
     </script>
 </body>

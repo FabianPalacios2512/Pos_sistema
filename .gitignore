@@ -79,3 +79,5 @@ backend/public/img-radio/
 
 # Dev dist
 dev-dist/
+backend_vps_env.txt
+backend/backend_vps_env.txt

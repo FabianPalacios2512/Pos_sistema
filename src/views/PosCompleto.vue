@@ -1,6 +1,6 @@
 <template>
   <!-- Sistema POS Empresarial Completo -->
-  <div :class="{ 'dark': isDarkMode }" class="bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-zinc-900 dark:via-zinc-950 dark:to-black transition-colors duration-300" style="height: 100%; display: flex; flex-direction: column;">
+  <div :class="{ 'dark': isDarkMode }" class="bg-[#F9FAFB] dark:bg-gradient-to-b dark:from-zinc-900 dark:via-zinc-950 dark:to-black transition-colors duration-300 overflow-x-hidden" style="height: 100%; display: flex; flex-direction: column;">
     
     <!-- 🔥 Modal de Suscripción Expirada (NO se puede cerrar) -->
     <SubscriptionExpiredModal />
@@ -10,6 +10,7 @@
       :currentModule="currentModule"
       :sidebarOpen="sidebarOpen"
       :sidebarCollapsed="sidebarCollapsed"
+      :isFastFoodMode="isFastFoodMode"
       @change-module="setCurrentModule"
       @toggle-sidebar="toggleSidebar"
       @update:sidebarCollapsed="sidebarCollapsed = $event"
@@ -18,8 +19,8 @@
     <!-- Contenedor Principal con Chat IA Lateral -->
     <div class="flex flex-1 min-h-0 transition-all duration-300"
          :class="{
-           'lg:ml-60 lg:pl-4': !sidebarCollapsed,
-           'lg:ml-20': sidebarCollapsed
+           'lg:ml-[252px]': !sidebarCollapsed,
+           'lg:ml-[68px]': sidebarCollapsed
          }">
       
       <!-- Área Principal de Contenido -->
@@ -32,11 +33,9 @@
           :current-user="currentUser"
           :current-module="currentModule"
           :current-warehouse="currentWarehouse"
-          :auto-hide-enabled="autoHideEnabled"
           :sidebar-collapsed="sidebarCollapsed"
           :should-show-settings="shouldShowModule('settings')"
-          @toggleSidebar="sidebarOpen = !sidebarOpen"
-          @toggleAutoHide="autoHideEnabled = !autoHideEnabled"
+          @toggleSidebar="toggleSidebar"
           @toggleSidebarCollapsed="sidebarCollapsed = !sidebarCollapsed"
           @navigate-to-settings="handleNavigateSettings"
           @navigate-to-profile="handleNavigateProfile"
@@ -185,24 +184,38 @@
       <button
         v-if="!aiChatStore.isOpen.value && currentModule !== 'pos'"
         @click="aiChatStore.open"
-        class="fixed bottom-2 right-6 z-50 group flex items-center gap-2 pl-2.5 pr-3.5 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600"
+        class="fixed bottom-6 right-6 z-50 group w-14 h-14 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
         title="Asistente IA 105"
       >
-        <!-- Icono IA -->
-        <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+        <!-- Glow pulsante de fondo - IA está viva -->
+        <div class="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 via-violet-400 to-pink-400 opacity-30 blur-lg animate-ai-glow group-hover:opacity-50"></div>
+        
+        <!-- Círculo Glassmorphism principal -->
+        <div class="absolute inset-0 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-white/50 dark:border-zinc-700/50 shadow-xl shadow-violet-500/10 dark:shadow-violet-500/5"
+             style="background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); box-shadow: 0 8px 32px rgba(167,139,250,0.2), inset 0 0 0 1px rgba(255,255,255,0.5);">
+        </div>
+        
+        <!-- Borde gradiente brillante -->
+        <div class="absolute inset-0 rounded-full p-[1.5px] bg-gradient-to-br from-blue-400 via-violet-400 to-pink-400 opacity-60 group-hover:opacity-100 transition-opacity">
+          <div class="w-full h-full rounded-full bg-white dark:bg-zinc-900"></div>
+        </div>
+        
+        <!-- Icono Sparkles con gradiente Gemini -->
+        <div class="relative z-10">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="url(#gemini-gradient-fab)">
+            <defs>
+              <linearGradient id="gemini-gradient-fab" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#60A5FA"/>
+                <stop offset="50%" style="stop-color:#A78BFA"/>
+                <stop offset="100%" style="stop-color:#F472B6"/>
+              </linearGradient>
+            </defs>
+            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
           </svg>
         </div>
         
-        <!-- Texto -->
-        <span class="text-white font-semibold text-xs">Asistente IA</span>
-        
-        <!-- Indicador online -->
-        <div class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5">
-          <span class="absolute inline-flex h-full w-full rounded-full bg-white opacity-75 animate-ping"></span>
-          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white border-2 border-emerald-500"></span>
-        </div>
+        <!-- Pulso de vida sutil -->
+        <div class="absolute inset-0 rounded-full border-2 border-violet-400/30 animate-ping" style="animation-duration: 2s;"></div>
       </button>
     </Transition>
 
@@ -213,6 +226,7 @@
 import { ref, reactive, computed, onMounted, onUnmounted, nextTick, defineAsyncComponent, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import authService from '../services/authService.js'
+import authStore from '../store/auth.js'
 import { invoicesService } from '../services/invoicesService.js'
 import { customersService } from '../services/customersService.js'
 import { inventoryService } from '../services/inventoryService.js'
@@ -292,8 +306,9 @@ const PlaceholderView = defineAsyncComponent(() => import('../components/Placeho
 
 // Configuración UI
 const isDarkMode = ref(false)
-const sidebarOpen = ref(true)
-const sidebarCollapsed = ref(true) // Nueva variable para estado colapsado del sidebar (inicia cerrado)
+const sidebarOpen = ref(false) // Inicia cerrado - handleResize lo abrirá en desktop
+const sidebarCollapsed = ref(localStorage.getItem('pos-sidebar-collapsed') !== 'false') // Persist collapsed state
+const isMobileDevice = ref(false) // Detectar dispositivos táctiles
 const currentModule = ref('pos') // Módulo inicial: POS
 const moduleQueryParams = ref({}) // Query params para módulos (ej: {filter: 'inactive'})
 
@@ -310,17 +325,6 @@ const currentUser = ref({
 
 // Warehouse actual (para mostrar en header cuando está en POS)
 const currentWarehouse = ref(null)
-
-// ===== MENÚ INTELIGENTE =====
-const autoHideEnabled = ref(true) // Habilitar auto-hide
-const isMouseNearEdge = ref(false) // Mouse cerca del borde izquierdo
-const isMouseOnSidebar = ref(false) // Mouse sobre el sidebar
-const autoHideTimeout = ref(null) // Timeout para auto-hide
-const edgeDetectionZone = 5 // Zona muy pequeña para "golpe" al borde
-const sidebarSafeZone = 20 // Solo 20px extra después del sidebar
-const autoHideDelay = 1500 // 1.5 segundos máximo
-const lastMouseX = ref(0) // Para detectar movimiento rápido
-const mouseSpeed = ref(0) // Velocidad del mouse
 
 // Modal de confirmación para salir del POS con productos en carrito
 const showCartWarningModal = ref(false)
@@ -375,16 +379,39 @@ const initializeUser = () => {
   if (user) {
     currentUser.value = {
       id: user.id,
-      name: user.name,
+      name: user.name || 'Usuario',
       email: user.email,
       role: user.role,
-      initials: user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
+      initials: (user.name || 'U')
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2)
     }
     
     // Establecer módulo inicial basándose en los permisos del usuario
     currentModule.value = getFirstAccessibleModule()
   }
 }
+
+// Reactivamente actualizar la UI cuando authStore recibe datos frescos del backend
+watch(() => authStore.state.user, (newUser) => {
+  if (newUser && newUser.name && newUser.name !== currentUser.value.name) {
+    currentUser.value = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      initials: (newUser.name || 'U')
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2)
+    }
+  }
+}, { deep: true })
 
 // Obtener permisos según el rol
 const getUserPermissions = (role) => {
@@ -545,49 +572,25 @@ const getPaymentMethodCode = (paymentMethod) => {
   return mappedMethod
 }
 
-// Función para asegurar que existe el Cliente General en BD
+// Función para obtener el Consumidor Final del sistema (creado por el seeder)
 const ensureDefaultCustomer = async () => {
   try {
-    
-    // Buscar si ya existe un cliente "Cliente General"
     const customersResponse = await customersService.getAll()
     if (customersResponse.success) {
-      const existingGeneral = customersResponse.data.find(customer => 
-        customer.name === 'Cliente General' || 
-        customer.name === 'General' ||
-        customer.email === 'general@sistema.local'
+      const consumidorFinal = customersResponse.data.find(customer => 
+        customer.document_number === '222222222222'
       )
-      
-      if (existingGeneral) {
-        defaultCustomerId.value = existingGeneral.id
+      if (consumidorFinal) {
+        defaultCustomerId.value = consumidorFinal.id
         return defaultCustomerId.value
       }
     }
-    
-    // Si no existe, crearlo
-    // Debug logs removed for production
-    const newCustomer = {
-      name: 'Cliente General',
-      email: 'general@sistema.local',
-      phone: '000-000-0000',
-      address: 'Dirección General',
-      identification: '00000000000',
-      active: true
-    }
-    
-    const createResponse = await customersService.create(newCustomer)
-    if (createResponse.success) {
-      defaultCustomerId.value = createResponse.data.id
-      return defaultCustomerId.value
-    } else {
-      throw new Error('No se pudo crear el Cliente General')
-    }
-    
+    defaultCustomerId.value = null
+    return null
   } catch (error) {
-    console.error('❌ Error manejando Cliente General:', error)
-    // Como fallback, usar ID 7 (Cliente General)
-    defaultCustomerId.value = 7
-    return defaultCustomerId.value
+    console.error('Error obteniendo Consumidor Final:', error)
+    defaultCustomerId.value = null
+    return null
   }
 }
 
@@ -1209,6 +1212,23 @@ const salesData = ref({
 
 // ===== COMPUTED PROPERTIES =====
 
+// 🍔 Fast Food Mode Detection (para sidebar y UI)
+const isFastFoodMode = computed(() => {
+  const settings = appStore.systemSettings || {}
+  const storeType = settings.store_type
+  
+  // Prioridad 1: Configuración explícita
+  if (storeType) {
+    return storeType === 'restaurant' || storeType === 'fast_food' || storeType === 'food'
+  }
+  
+  // Prioridad 2: Auto-detección por nombre del negocio
+  const foodKeywords = ['restaurante', 'restaurant', 'comida', 'food', 'fast food', 'cafeteria', 'pizzeria', 
+    'burger', 'hamburguesa', 'pollo', 'asadero', 'fritanga', 'fritos', 'empanadas', 'arepas']
+  const businessName = (settings.business_name || appStore.businessName || '').toLowerCase()
+  return foodKeywords.some(kw => businessName.includes(kw))
+})
+
 // Productos con stock bajo
 const lowStockProducts = computed(() => {
   return productsList.value.filter(product => product.stock <= product.min_stock)
@@ -1251,7 +1271,17 @@ const toggleDarkMode = () => {
 
 // Función para toggle del sidebar
 const toggleSidebar = () => {
-  sidebarCollapsed.value = !sidebarCollapsed.value
+  if (isMobileDevice.value || window.innerWidth < 1024) {
+    // En móvil: abrir/cerrar el drawer completo (expandido)
+    sidebarOpen.value = !sidebarOpen.value
+    if (sidebarOpen.value) {
+      sidebarCollapsed.value = false // Siempre expandido en móvil
+    }
+  } else {
+    // En desktop: colapsar/expandir
+    sidebarCollapsed.value = !sidebarCollapsed.value
+    localStorage.setItem('pos-sidebar-collapsed', sidebarCollapsed.value.toString())
+  }
 }
 
 // Cambiar módulo actual
@@ -1316,7 +1346,6 @@ const setCurrentModule = (module, options = {}) => {
   // � Si volvemos al POS, forzar recreación del componente para refrescar datos
   if (module === 'pos') {
     posRefreshKey.value = Date.now()
-    console.log('🔄 [PosCompleto] Forzando refresh del POS con key:', posRefreshKey.value)
   }
   
   // �📱 Cerrar sidebar en móvil al cambiar de módulo
@@ -1327,13 +1356,10 @@ const setCurrentModule = (module, options = {}) => {
   
   // Manejar acciones especiales después del cambio de módulo
   if (options.action && module === 'pos') {
-    console.log('🔄 Acción especial detectada:', options.action, 'para módulo:', module)
     if (options.action === 'open-close-cash-modal') {
-      console.log('🔄 Guardando acción pendiente: openCloseCashModal')
       // Guardar la acción para ejecutar cuando el componente se monte
       pendingPosAction.value = 'openCloseCashModal'
     } else if (options.action === 'open-open-cash-modal') {
-      console.log('🔄 Guardando acción pendiente: openOpenCashModal')
       // Guardar la acción para ejecutar cuando el componente se monte
       pendingPosAction.value = 'openOpenCashModal'
     }
@@ -1341,7 +1367,6 @@ const setCurrentModule = (module, options = {}) => {
   
   // Manejar apertura del modal de devoluciones
   if (options.openReturnsModal && module === 'pos') {
-    console.log('🔄 Guardando acción pendiente: openReturnsModal')
     pendingPosAction.value = 'openReturnsModal'
   }
   
@@ -1353,65 +1378,47 @@ const setCurrentModule = (module, options = {}) => {
 
 // Función para ejecutar acciones en el componente PosView
 const triggerPosAction = async (action) => {
-  console.log('🎯 triggerPosAction llamado con acción:', action)
-  console.log('🎯 posViewRef.value:', posViewRef.value)
-  console.log('🎯 currentModule.value:', currentModule.value)
-  
   if (posViewRef.value && currentModule.value === 'pos') {
     try {
       switch (action) {
         case 'openCloseCashModal':
-          console.log('🎯 Intentando abrir modal de cerrar caja')
           // Acceder a la función del PosView para abrir el modal de cerrar caja
           if (posViewRef.value.openCloseCashModal) {
-            console.log('🎯 Llamando a openCloseCashModal() directamente')
             await posViewRef.value.openCloseCashModal()
           } else if (posViewRef.value.showCloseCashModal) {
-            console.log('🎯 Llamando a showCloseCashModal() como alternativa')
             await posViewRef.value.showCloseCashModal()
           } else {
-            console.log('🎯 Intentando acceso directo a showCashCloseModal')
             // Fallback: acceder directamente a la variable reactiva
             if (posViewRef.value.showCashCloseModal !== undefined) {
               posViewRef.value.showCashCloseModal = true
-              console.log('🎯 showCashCloseModal asignado a true')
             } else {
-              console.warn('🎯 ❌ No se encontró ninguna forma de abrir el modal')
+              console.warn('No se encontró ninguna forma de abrir el modal de cerrar caja')
             }
           }
           break
         case 'openOpenCashModal':
-          console.log('🎯 Intentando abrir modal de abrir caja')
           // Acceder a la función del PosView para abrir el modal de abrir caja
           if (posViewRef.value.openOpenCashModal) {
-            console.log('🎯 Llamando a openOpenCashModal() directamente')
             posViewRef.value.openOpenCashModal()
           } else if (posViewRef.value.showOpenCashModal) {
-            console.log('🎯 Llamando a showOpenCashModal() como alternativa')
             posViewRef.value.showOpenCashModal()
           } else {
-            console.log('🎯 Intentando acceso directo a showCashOpenModal')
             // Fallback: acceder directamente a la variable reactiva
             if (posViewRef.value.showCashOpenModal !== undefined) {
               posViewRef.value.showCashOpenModal = true
-              console.log('🎯 showCashOpenModal asignado a true')
             } else {
-              console.warn('🎯 ❌ No se encontró ninguna forma de abrir el modal de abrir caja')
+              console.warn('No se encontró ninguna forma de abrir el modal de abrir caja')
             }
           }
           break
         case 'openReturnsModal':
-          console.log('🎯 Intentando abrir modal de devoluciones')
           // Acceder a la función del PosView para abrir el modal de devoluciones
           if (posViewRef.value.openReturnsModal) {
-            console.log('🎯 Llamando a openReturnsModal() directamente')
             posViewRef.value.openReturnsModal()
           } else if (posViewRef.value.showReturnsModal !== undefined) {
-            console.log('🎯 Intentando acceso directo a showReturnsModal')
             posViewRef.value.showReturnsModal = true
-            console.log('🎯 showReturnsModal asignado a true')
           } else {
-            console.warn('🎯 ❌ No se encontró ninguna forma de abrir el modal de devoluciones')
+            console.warn('No se encontró ninguna forma de abrir el modal de devoluciones')
           }
           break
         default:
@@ -1646,7 +1653,6 @@ watch(() => route.query, (newQuery) => {
 // Watcher para ejecutar acciones pendientes cuando el componente PosView se monte
 watch(posViewRef, async (newRef) => {
   if (newRef && pendingPosAction.value) {
-    console.log('🔄 PosView montado, ejecutando acción pendiente:', pendingPosAction.value)
     // Ejecutar acción pendiente con un pequeño delay para asegurar que esté completamente inicializado
     setTimeout(async () => {
       // Si pendingPosAction es una función, ejecutarla directamente
@@ -1664,7 +1670,6 @@ watch(posViewRef, async (newRef) => {
 // 🔄 Watcher para AUTO-REFRESH cuando entras al módulo POS
 watch(() => currentModule.value, async (newModule, oldModule) => {
   // 🧠 ACTUALIZAR UI CONTEXT STORE PARA IA (sincronizar módulo actual)
-  console.log('📍 [PosCompleto] Módulo actual cambiado:', oldModule, '→', newModule)
   uiContext.setCurrentModule(newModule)
   
   if (newModule === 'pos' && oldModule !== 'pos') {
@@ -1681,101 +1686,7 @@ watch(() => currentModule.value, async (newModule, oldModule) => {
       console.error('⚠️ Error en auto-refresh al entrar al POS:', error)
     }
   }
-}, { immediate: true }) // 🔥 Ejecutar inmediatamente al cargar para sincronizar estado inicial
-
-// ===== MOUSE HANDLING (AUTO-HIDE MENU) =====
-
-const handleMouseMove = (event) => {
-  if (!autoHideEnabled.value) return
-  
-  // Calcular velocidad del mouse para detectar "golpe"
-  const currentMouseX = event.clientX
-  mouseSpeed.value = Math.abs(currentMouseX - lastMouseX.value)
-  lastMouseX.value = currentMouseX
-  
-  // Detección de borde y zona segura más precisas
-  const nearEdge = currentMouseX <= edgeDetectionZone
-  const sidebarWidth = sidebarCollapsed.value ? 80 : 288 // w-20 vs w-72
-  const inSidebarSafeZone = currentMouseX <= sidebarWidth + sidebarSafeZone // Solo +20px
-  
-  isMouseNearEdge.value = nearEdge
-  
-  // ACTIVACIÓN: Solo expandir con "golpe" rápido al borde (velocidad > 10px)
-  if (nearEdge && sidebarCollapsed.value && mouseSpeed.value > 10) {
-    sidebarCollapsed.value = false
-  }
-  
-  // ZONA SEGURA: Sidebar + pequeño margen
-  if (isMouseOnSidebar.value || inSidebarSafeZone) {
-    if (autoHideTimeout.value) {
-      clearTimeout(autoHideTimeout.value)
-      autoHideTimeout.value = null
-    }
-    return
-  }
-  
-  // ZONA DE CIERRE: Fuera de la zona segura
-  if (!sidebarCollapsed.value && !isMouseOnSidebar.value) {
-    if (autoHideTimeout.value) {
-      clearTimeout(autoHideTimeout.value)
-    }
-    
-    autoHideTimeout.value = setTimeout(() => {
-      if (!isMouseOnSidebar.value && !isMouseNearEdge.value && autoHideEnabled.value) {
-        console.log('Colapsando menú - fuera de zona segura')
-        sidebarCollapsed.value = true
-      }
-    }, autoHideDelay)
-  }
-}
-
-const handleSidebarMouseEnter = () => {
-  console.log('Mouse ENTRA al sidebar') // Debug temporal
-  isMouseOnSidebar.value = true
-  // Cancelar INMEDIATAMENTE cualquier timeout de cierre
-  if (autoHideTimeout.value) {
-    clearTimeout(autoHideTimeout.value)
-    autoHideTimeout.value = null
-  }
-}
-
-const handleSidebarMouseLeave = () => {
-  console.log('Mouse SALE del sidebar') // Debug temporal
-  isMouseOnSidebar.value = false
-  
-  // Solo iniciar el cierre si el auto-hide está habilitado y el menú está expandido
-  if (autoHideEnabled.value && !sidebarCollapsed.value) {
-    console.log('Iniciando timeout de cierre desde mouseLeave...') // Debug temporal
-    // Tiempo más corto - máximo 2 segundos
-    autoHideTimeout.value = setTimeout(() => {
-      console.log('Ejecutando cierre desde mouseLeave - Mouse en sidebar:', isMouseOnSidebar.value, 'Cerca del borde:', isMouseNearEdge.value) // Debug
-      // Verificación final antes de cerrar
-      if (!isMouseOnSidebar.value && !isMouseNearEdge.value && autoHideEnabled.value) {
-        sidebarCollapsed.value = true
-        console.log('Menú cerrado desde mouseLeave') // Debug
-      }
-    }, 2000) // Exactamente 2 segundos
-  }
-}
-
-// Función para manejar clicks fuera del sidebar (más preciso)
-const handleClickOutsideSidebar = (event) => {
-  if (!autoHideEnabled.value || sidebarCollapsed.value) return
-  
-  // Click más preciso - según la imagen, después de donde empieza el contenido verde
-  const clickX = event.clientX
-  const sidebarWidth = 288 // w-72 expandido
-  const safeClickZone = sidebarWidth + sidebarSafeZone // Solo +20px como en mousemove
-  
-  if (clickX > safeClickZone) {
-    sidebarCollapsed.value = true
-    // Cancelar cualquier timeout pendiente
-    if (autoHideTimeout.value) {
-      clearTimeout(autoHideTimeout.value)
-      autoHideTimeout.value = null
-    }
-  }
-}
+}, { immediate: true })
 
 // ===== LIFECYCLE HOOKS =====
 
@@ -1797,20 +1708,17 @@ onMounted(() => {
   // 🔄 RESTAURAR el último módulo si se hizo refresh
   const lastModule = restoreLastModule()
   if (lastModule && lastModule !== 'pos') {
-    console.log('🔄 Restaurando último módulo después de refresh:', lastModule)
     currentModule.value = lastModule
   }
   
   // Registrar listener para navegación global (desde chat AI u otros componentes)
   onModuleChange((moduleName, queryParams = {}) => {
-    console.log('🎯 [PosCompleto] Recibido cambio de módulo global:', moduleName, 'Query:', queryParams)
     // Pasar fromAI: true para que NO muestre alert() cuando falla por permisos
     setCurrentModule(moduleName, { fromAI: true })
     
     // Si hay query params (filtros), almacenarlos para que los módulos los usen
     if (Object.keys(queryParams).length > 0) {
       moduleQueryParams.value = queryParams
-      console.log('🔍 [PosCompleto] Query params configurados:', moduleQueryParams.value)
     } else {
       moduleQueryParams.value = {}
     }
@@ -1830,35 +1738,26 @@ onMounted(() => {
   // Inicializar Cliente General para ventas sin cliente específico
   ensureDefaultCustomer()
   
+  // Detectar dispositivos táctiles
+  isMobileDevice.value = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  
   // Ajustar sidebar según tamaño de pantalla
   const handleResize = () => {
-    if (window.innerWidth >= 1024) {
+    const isDesktop = window.innerWidth >= 1024
+    if (isDesktop) {
       sidebarOpen.value = true
+    } else {
+      // En móvil: cerrar sidebar por defecto
+      sidebarOpen.value = false
     }
   }
   
   window.addEventListener('resize', handleResize)
   handleResize()
-  
-  // Inicializar variables del menú inteligente
-  lastMouseX.value = 0
-  
-  // ===== MENÚ INTELIGENTE - AUTO-HIDE =====
-  
-  // Event listeners para menú inteligente
-  document.addEventListener('mousemove', handleMouseMove)
-  document.addEventListener('click', handleClickOutsideSidebar)
-  
-  // Agregar event listeners al sidebar (ya configurados en el template)
 })
 
 onUnmounted(() => {
-  // Limpiar event listeners del menú inteligente
-  document.removeEventListener('mousemove', handleMouseMove)
-  document.removeEventListener('click', handleClickOutsideSidebar)
-  if (autoHideTimeout.value) {
-    clearTimeout(autoHideTimeout.value)
-  }
+  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -1985,5 +1884,24 @@ main > div {
   .ai-chat-content-spacing {
     padding-right: 400px;
   }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   🎨 ANIMACIÓN GLOW PULSANTE PARA BOTÓN IA FLOTANTE
+   Efecto de "vida" - La IA está esperando
+════════════════════════════════════════════════════════════════════════════ */
+@keyframes ai-glow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.15);
+  }
+}
+
+.animate-ai-glow {
+  animation: ai-glow 3s ease-in-out infinite;
 }
 </style>

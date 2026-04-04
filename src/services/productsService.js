@@ -52,9 +52,22 @@ export const productsService = {
   },
 
   // Eliminar producto
-  async delete(id) {
+  async delete(id, reason = null) {
     return await apiCall(`/products/${id}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      body: JSON.stringify({ reason })
+    })
+  },
+
+  // Obtener productos eliminados (papelera)
+  async getTrash() {
+    return await apiCall('/products/trash')
+  },
+
+  // Restaurar producto eliminado
+  async restore(id) {
+    return await apiCall(`/products/${id}/restore`, {
+      method: 'POST'
     })
   },
 

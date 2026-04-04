@@ -1,5 +1,6 @@
 <template>
-  <div v-if="showInstallPrompt" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-[9999]">
+  <!-- TEMPORALMENTE DESACTIVADO - Prompt de instalación PWA -->
+  <div v-if="false && showInstallPrompt" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-[9999]">
     <div class="bg-gradient-to-r from-slate-900 to-slate-800 dark:from-slate-950 dark:to-black rounded-2xl shadow-2xl border-2 border-slate-700 dark:border-slate-800 p-5 ">
       <div class="flex items-start gap-4">
         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-lg">

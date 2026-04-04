@@ -1,128 +1,145 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center z-50 p-4" @click.self="$emit('close')">
+    <Transition
+      enter-active-class="transition ease-out duration-200"
+      enter-from-class="opacity-0 scale-[0.97]"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition ease-in duration-150"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-[0.97]"
+    >
+    <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-[640px] w-full overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-2xl dark:shadow-black/50">
       
       <!-- Header -->
-      <div class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-gray-900">
-              {{ isEditing ? 'Editar Sede' : 'Nueva Sede' }}
-            </h3>
-            <p class="text-xs text-gray-500">Complete la información de la sede</p>
-          </div>
+      <div class="px-7 py-5 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+            {{ isEditing ? 'Editar Sede' : 'Nueva Sede' }}
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-0.5">Información de la sucursal</p>
         </div>
         <button 
           @click="$emit('close')"
-          class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors duration-150">
+          <svg class="w-5 h-5 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       </div>
 
       <!-- Body -->
-      <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-        <form @submit.prevent="handleSubmit" class="space-y-4">
+      <div class="px-7 py-6">
+        <form @submit.prevent="handleSubmit" class="space-y-5">
           
-          <!-- Nombre de la Sede -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              Nombre de la Sede <span class="text-red-500">*</span>
-            </label>
-            <input 
-              v-model="form.name"
-              type="text" 
-              required
-              placeholder="Ej: Sede Centro, Sucursal Norte"
-              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            />
+          <!-- Fila 1: Nombre + Teléfono -->
+          <div class="grid grid-cols-3 gap-4">
+            <div class="col-span-2">
+              <label class="block text-[13px] font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                Nombre de la Sede <span class="text-rose-500">*</span>
+              </label>
+              <input 
+                v-model="form.name"
+                type="text" 
+                required
+                placeholder="Ej: Sede Centro, Sucursal Norte"
+                class="w-full px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 text-[15px] transition-all duration-200"
+              />
+            </div>
+            <div>
+              <label class="block text-[13px] font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
+                Teléfono
+              </label>
+              <input 
+                v-model="form.phone"
+                type="tel" 
+                placeholder="3001234567"
+                class="w-full px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 text-[15px] transition-all duration-200"
+              />
+            </div>
           </div>
 
-          <!-- Dirección -->
+          <!-- Fila 2: Dirección full width -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <label class="block text-[13px] font-semibold text-gray-700 dark:text-zinc-300 mb-1.5">
               Dirección
             </label>
             <input 
               v-model="form.address"
               type="text" 
-              placeholder="Calle 123 #45-67"
-              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              placeholder="Calle 123 #45-67, Barrio, Ciudad"
+              class="w-full px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 text-[15px] transition-all duration-200"
             />
           </div>
 
-          <!-- Teléfono -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              Teléfono
-            </label>
-            <input 
-              v-model="form.phone"
-              type="tel" 
-              placeholder="3001234567"
-              class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            />
-          </div>
-
-          <!-- Checkboxes -->
-          <div class="space-y-3 pt-2">
-            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <input 
-                v-model="form.is_default"
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <div class="flex-1">
-                <span class="text-sm font-semibold text-gray-900">Marcar como sede principal</span>
-                <p class="text-xs text-gray-500 mt-0.5">La sede principal se usa por defecto al abrir caja</p>
+          <!-- Toggles en fila horizontal -->
+          <div class="flex items-center gap-8 pt-2">
+            <!-- Sede principal -->
+            <label class="flex items-center gap-3 cursor-pointer group">
+              <button 
+                type="button"
+                @click="form.is_default = !form.is_default"
+                :class="[
+                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 flex-shrink-0',
+                  form.is_default ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-zinc-700'
+                ]">
+                <span :class="[
+                  'inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200',
+                  form.is_default ? 'translate-x-[22px]' : 'translate-x-[3px]'
+                ]" />
+              </button>
+              <div>
+                <span class="text-sm font-medium text-gray-900 dark:text-zinc-200 group-hover:text-gray-700 dark:group-hover:text-white transition-colors">Sede principal</span>
+                <p class="text-xs text-gray-400 dark:text-zinc-500">Se usa por defecto al abrir caja</p>
               </div>
             </label>
 
-            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-              <input 
-                v-model="form.active"
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <div class="flex-1">
-                <span class="text-sm font-semibold text-gray-900">Sede activa</span>
-                <p class="text-xs text-gray-500 mt-0.5">Las sedes inactivas no pueden operar</p>
+            <!-- Separador -->
+            <div class="h-9 w-px bg-gray-200 dark:bg-zinc-800"></div>
+
+            <!-- Sede activa -->
+            <label class="flex items-center gap-3 cursor-pointer group">
+              <button 
+                type="button"
+                @click="form.active = !form.active"
+                :class="[
+                  'relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 flex-shrink-0',
+                  form.active ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-gray-300 dark:bg-zinc-700'
+                ]">
+                <span :class="[
+                  'inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200',
+                  form.active ? 'translate-x-[22px]' : 'translate-x-[3px]'
+                ]" />
+              </button>
+              <div>
+                <span class="text-sm font-medium text-gray-900 dark:text-zinc-200 group-hover:text-gray-700 dark:group-hover:text-white transition-colors">Activa</span>
+                <p class="text-xs text-gray-400 dark:text-zinc-500">Las inactivas no pueden operar</p>
               </div>
             </label>
           </div>
 
-          <!-- Alerta Informativa -->
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex space-x-3">
-            <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Nota sutil -->
+          <div v-if="!isEditing" class="flex items-start gap-2 pt-1">
+            <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <div class="text-sm text-blue-800">
-              <p class="font-semibold mb-1">Importante</p>
-              <p class="text-xs">Al crear una nueva sede, todos los productos se agregarán automáticamente con stock 0. Deberás hacer un traslado inicial desde otra sede o ajustar el inventario manualmente.</p>
-            </div>
+            <p class="text-xs text-gray-400 dark:text-zinc-500 leading-relaxed">Al crear una sede, los productos se agregarán con stock 0. Podrás ajustar inventario o hacer un traslado después.</p>
           </div>
 
         </form>
       </div>
 
       <!-- Footer -->
-      <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end space-x-3">
+      <div class="px-7 py-5 border-t border-gray-100 dark:border-zinc-800/60 flex items-center justify-end gap-3">
         <button 
           @click="$emit('close')"
           type="button"
-          class="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+          class="px-6 py-2.5 text-sm font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-all duration-150">
           Cancelar
         </button>
         <button 
           @click="handleSubmit"
           :disabled="saving || !form.name"
-          class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
+          class="px-7 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-sm transition-all duration-150 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 disabled:shadow-none active:scale-[0.98] flex items-center gap-2">
           <svg v-if="saving" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -132,6 +149,7 @@
       </div>
 
     </div>
+    </Transition>
   </div>
 </template>
 

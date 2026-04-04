@@ -65,22 +65,22 @@
       <!-- Planes de Precios -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         
-        <!-- Plan Emprendedor -->
+        <!-- Plan Basic -->
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 p-8 hover:scale-105 transition-transform duration-300">
           <div class="text-center">
             <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2">
-              Emprendedor
+              Basic
             </h3>
             <div class="flex items-end justify-center gap-1 mb-4">
               <span class="text-5xl font-black text-slate-900 dark:text-white">
-                $25,000
+                $35,000
               </span>
               <span class="text-sm text-gray-600 dark:text-zinc-400 mb-2">
                 /mes
               </span>
             </div>
             <p class="text-sm text-gray-600 dark:text-zinc-400 mb-6">
-              Perfecto para iniciar tu negocio
+              Ideal para emprendedores
             </p>
           </div>
 
@@ -114,14 +114,14 @@
 
           <!-- CTA Button -->
           <button 
-            @click="selectPlan('emprendedor')"
+            @click="selectPlan('basic')"
             class="w-full px-6 py-3.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300"
           >
             Seleccionar Plan
           </button>
         </div>
 
-        <!-- Plan Negocio Pro -->
+        <!-- Plan Premium -->
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border-2 border-blue-500 dark:border-blue-400 p-8 hover:scale-105 transition-transform duration-300 relative">
           <!-- Badge Recomendado -->
           <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
@@ -132,11 +132,11 @@
 
           <div class="text-center">
             <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2">
-              Negocio Pro
+              Premium
             </h3>
             <div class="flex items-end justify-center gap-1 mb-4">
               <span class="text-5xl font-black text-slate-900 dark:text-white">
-                $50,000
+                $75,000
               </span>
               <span class="text-sm text-gray-600 dark:text-zinc-400 mb-2">
                 /mes
@@ -177,7 +177,7 @@
 
           <!-- CTA Button -->
           <button 
-            @click="selectPlan('negocio_pro')"
+            @click="selectPlan('premium')"
             class="w-full px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-400/40 dark:shadow-blue-900/50 transition-all duration-300"
           >
             Seleccionar Plan

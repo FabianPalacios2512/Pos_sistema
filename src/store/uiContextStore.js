@@ -105,6 +105,23 @@ export const useUIContextStore = defineStore('uiContext', () => {
     rankings: {
       topProductosHoy: [],
       topProductosMes: []
+    },
+    
+    // 🔄 Devoluciones
+    devoluciones: {
+      devolucionesHoy: 0,
+      devolucionesMes: 0,
+      montoHoy: 0,
+      montoMes: 0
+    },
+    
+    // 🧾 Última Factura (para consultas rápidas de la IA)
+    ultimaFactura: {
+      numero: null,
+      cliente: null,
+      total: 0,
+      fecha: null,
+      productos: 0
     }
   })
   
@@ -130,6 +147,8 @@ export const useUIContextStore = defineStore('uiContext', () => {
       'reportes-generales': 'Reportes Generales',
       'reports-caja': 'Reportes de Caja',
       'reportes-caja': 'Reportes de Caja',
+      'reports-inventario': 'Reportes de Inventario',
+      'reportes-inventario': 'Reportes de Inventario',
       'settings': 'Configuración',
       'warehouses': 'Bodegas',
       'intelligent_inventory': 'Inventario Inteligente',
@@ -302,6 +321,133 @@ export const useUIContextStore = defineStore('uiContext', () => {
         summary += `\n• Tiene Teléfono: ${dev.tieneTelefono ? 'SÍ (' + dev.telefono + ')' : 'NO'}`
       }
       
+      // ═══════════════════════════════════════════════════════════
+      // 💰 DATOS DE CONTROL DE CAJAS (módulo cash-admin)
+      // ═══════════════════════════════════════════════════════════
+      if (screenData.value.tipoReporte === 'cash-admin') {
+        summary += `\n\n💰 CONTROL DE CAJAS:`
+        
+        if (screenData.value.kpis) {
+          const kpis = screenData.value.kpis
+          summary += `\n\n📊 KPIs DE CAJAS:`
+          summary += `\n• Sesiones activas: ${kpis.sesionesActivas || 0}`
+          summary += `\n• Total en cajas: ${kpis.totalEnCajas || '$0'}`
+          summary += `\n• Ventas hoy: ${kpis.ventasHoy || '$0'}`
+          if (kpis.empleadosConCajaAbierta?.length > 0) {
+            summary += `\n• Empleados con caja abierta: ${kpis.empleadosConCajaAbierta.join(', ')}`
+          }
+        }
+        
+        if (screenData.value.sesiones?.lista?.length > 0) {
+          summary += `\n\n👥 SESIONES DE CAJA (${screenData.value.sesiones.totalRegistros}):`
+          screenData.value.sesiones.lista.slice(0, 5).forEach((s, i) => {
+            summary += `\n${i+1}. ${s.usuario}: ${s.ventas} - ${s.estado} (${s.duracion})`
+          })
+          if (screenData.value.sesiones.lista.length > 5) {
+            summary += `\n... y ${screenData.value.sesiones.totalRegistros - 5} más`
+          }
+        }
+        
+        if (screenData.value.alertasEmpleados?.length > 0) {
+          summary += `\n\n⚠️ ALERTAS DE EMPLEADOS (${screenData.value.alertasEmpleados.length}):`
+          screenData.value.alertasEmpleados.forEach(a => {
+            summary += `\n• [${a.tipo}] ${a.titulo}: ${a.descripcion}`
+          })
+        }
+        
+        // Info de modales abiertos
+        if (screenData.value.modales) {
+          if (screenData.value.modales.auditoriaAbierta) {
+            summary += `\n\n📋 MODAL DE AUDITORÍA ABIERTO - Puedes consultar movimientos detallados`
+          }
+          if (screenData.value.modales.detalleAbierto) {
+            summary += `\n\n📋 MODAL DE DETALLES ABIERTO`
+          }
+        }
+        
+        // Datos de auditoría si están disponibles
+        if (screenData.value.auditoriaActual) {
+          const audit = screenData.value.auditoriaActual
+          summary += `\n\n🔍 AUDITORÍA DE SESIÓN (${audit.usuario}):`
+          if (audit.estadisticas) {
+            summary += `\n• Ventas: ${audit.estadisticas.totalTransacciones} (${audit.estadisticas.totalVentas})`
+            summary += `\n• Venta promedio: ${audit.estadisticas.ventaPromedio}`
+            summary += `\n• Venta mayor: ${audit.estadisticas.ventaMayor}`
+            summary += `\n• Devoluciones: ${audit.estadisticas.devoluciones || 0} (${audit.estadisticas.montoDevuelto || '$0'})`
+            summary += `\n• Gastos: ${audit.estadisticas.gastos || 0} (${audit.estadisticas.montoGastos || '$0'})`
+            summary += `\n• Duración: ${audit.estadisticas.duracion || 'N/A'}`
+          }
+          if (audit.timeline?.length > 0) {
+            summary += `\n• Timeline con ${audit.timeline.length} eventos registrados`
+          }
+        }
+        
+        summary += `\n\n💡 ACCIONES DISPONIBLES:`
+        summary += `\n• verAuditoriaSesion: Ver todos los movimientos (ventas, devoluciones, gastos) de una sesión`
+        summary += `\n• verDetalleSesion: Ver resumen de una sesión`
+        summary += `\n• consultarRendimientoEmpleado: Ver estadísticas de un empleado`
+      }
+      
+      // ═══════════════════════════════════════════════════════════
+      // 🧾 DATOS DE FACTURAS (módulo invoices)
+      // ═══════════════════════════════════════════════════════════
+      if (screenData.value.tipoReporte === 'invoices') {
+        summary += `\n\n🧾 MÓDULO DE FACTURAS:`
+        
+        if (screenData.value.resumenFacturas) {
+          const resumen = screenData.value.resumenFacturas
+          summary += `\n\n📊 RESUMEN DE FACTURAS:`
+          summary += `\n• Total de facturas: ${resumen.total}`
+          summary += `\n• Facturas del mes: ${resumen.facturasDelMes}`
+          summary += `\n• Total facturado: ${resumen.totalFacturado}`
+          summary += `\n• Pagadas: ${resumen.porEstado?.pagadas || 0}`
+          summary += `\n• Pendientes: ${resumen.porEstado?.pendientes || 0}`
+          summary += `\n• Anuladas: ${resumen.porEstado?.anuladas || 0}`
+          summary += `\n• Devueltas: ${resumen.porEstado?.devueltas || 0}`
+          summary += `\n• Cotizaciones activas: ${resumen.cotizaciones || 0}`
+        }
+        
+        // Facturas de hoy
+        if (screenData.value.facturasHoy) {
+          const hoy = screenData.value.facturasHoy
+          summary += `\n\n📅 FACTURAS DE HOY:`
+          summary += `\n• Cantidad: ${hoy.cantidad}`
+          summary += `\n• Total: ${hoy.total}`
+          if (hoy.lista?.length > 0) {
+            hoy.lista.forEach((f, i) => {
+              summary += `\n  ${i+1}. ${f.numero}: ${f.cliente} - ${f.total}`
+            })
+          }
+        }
+        
+        // Últimas facturas
+        if (screenData.value.ultimasFacturas?.length > 0) {
+          summary += `\n\n📋 ÚLTIMAS ${screenData.value.ultimasFacturas.length} FACTURAS:`
+          screenData.value.ultimasFacturas.forEach((f, i) => {
+            summary += `\n${i+1}. ${f.numero}: ${f.cliente} - ${f.total} (${f.fecha}) [${f.estado}]`
+          })
+        }
+        
+        // Primera y última del período
+        if (screenData.value.primeraFacturaPeriodo) {
+          const p = screenData.value.primeraFacturaPeriodo
+          summary += `\n\n📌 PRIMERA FACTURA DEL PERÍODO:`
+          summary += `\n• ${p.numero}: ${p.cliente} - ${p.total} (${p.fecha})`
+        }
+        if (screenData.value.ultimaFacturaPeriodo) {
+          const u = screenData.value.ultimaFacturaPeriodo
+          summary += `\n\n📌 ÚLTIMA FACTURA (MÁS RECIENTE):`
+          summary += `\n• ${u.numero}: ${u.cliente} - ${u.total} (${u.fecha})`
+        }
+        
+        summary += `\n\n💡 ACCIONES DISPONIBLES:`
+        summary += `\n• seleccionarFactura: Seleccionar una factura por número o posición`
+        summary += `\n• consultarFacturasHoy: Ver todas las facturas de hoy`
+        summary += `\n• consultarFacturaEspecial: Ver primera/última factura del día/semana/mes`
+        summary += `\n• buscarFacturasPorCliente: Buscar facturas de un cliente específico`
+        summary += `\n• sendEmail, sendWhatsApp, downloadPDF, printInvoice: Acciones sobre factura seleccionada`
+      }
+      
       // 📦 DATOS DE PRODUCTOS (módulo products)
       if (screenData.value.resumenProductos) {
         const prods = screenData.value.resumenProductos
@@ -362,6 +508,223 @@ export const useUIContextStore = defineStore('uiContext', () => {
       // 📦 MODAL DE PRODUCTO ABIERTO
       if (screenData.value.modalAbierto) {
         summary += `\n\n📝 MODAL ABIERTO: ${screenData.value.modalAbierto === 'crear' ? 'Nuevo Producto' : 'Editar Producto'}`
+      }
+      
+      // ═══════════════════════════════════════════════════════════
+      // 🧠 INVENTARIO INTELIGENTE (módulo intelligent_inventory)
+      // ═══════════════════════════════════════════════════════════
+      if (currentModule.value === 'intelligent_inventory') {
+        summary += `\n\n🧠 INVENTARIO INTELIGENTE - ANÁLISIS AVANZADO:`
+        
+        // Sección activa
+        const seccionActiva = screenData.value.seccionActiva || 'overview'
+        const nombresSeccion = {
+          'overview': 'Vista General',
+          'products': 'Productos',
+          'movements': 'Movimientos',
+          'customers': 'Clientes',
+          'suppliers': 'Proveedores',
+          'alerts': 'Alertas',
+          'predictions': 'Predicciones'
+        }
+        summary += `\n• Sección actual: ${nombresSeccion[seccionActiva] || seccionActiva}`
+        summary += `\n• Secciones disponibles: Vista General, Productos, Movimientos, Clientes, Proveedores, Alertas, Predicciones`
+        
+        // KPIs si están disponibles
+        if (screenData.value.metrics) {
+          const m = screenData.value.metrics
+          summary += `\n\n📊 KPIs INVENTARIO INTELIGENTE:`
+          summary += `\n• Productos activos: ${m.activeProducts || 0} de ${m.totalProducts || 0}`
+          summary += `\n• Valor invertido (costo): $${(m.totalInventoryValue || 0).toLocaleString('es-CO')}`
+          summary += `\n• Valor potencial (venta): $${(m.totalSaleValue || 0).toLocaleString('es-CO')}`
+          summary += `\n• Ganancia estimada: $${((m.totalSaleValue || 0) - (m.totalInventoryValue || 0)).toLocaleString('es-CO')}`
+          summary += `\n• Productos stock bajo: ${m.lowStockProducts || 0}`
+          summary += `\n• Productos sin stock: ${m.outOfStockProducts || 0}`
+        }
+        
+        // Datos de rotación si están disponibles
+        if (screenData.value.rotacion || screenData.value.topProductosVendidos) {
+          summary += `\n\n📈 DATOS DE ROTACIÓN Y VENTAS:`
+          if (screenData.value.topProductosVendidos?.length > 0) {
+            summary += `\n\n🏆 TOP PRODUCTOS MÁS VENDIDOS:`
+            screenData.value.topProductosVendidos.slice(0, 5).forEach((p, i) => {
+              summary += `\n${i+1}. ${p.nombre}: ${p.vendidos || p.cantidad || 0} unidades ($${(p.ingresos || p.total || 0).toLocaleString('es-CO')})`
+            })
+          }
+        }
+        
+        // Productos con stock bajo
+        if (screenData.value.productosStockBajo?.length > 0) {
+          summary += `\n\n⚠️ PRODUCTOS CON STOCK BAJO (${screenData.value.productosStockBajo.length}):`
+          screenData.value.productosStockBajo.slice(0, 5).forEach(p => {
+            summary += `\n• ${p.nombre}: ${p.stockActual || p.stock || 0}/${p.stockMinimo || p.min_stock || 0} unidades`
+          })
+        }
+        
+        // Predicciones si están disponibles
+        if (screenData.value.predicciones) {
+          summary += `\n\n🔮 PREDICCIONES DE INVENTARIO:`
+          if (screenData.value.predicciones.proximosAgotarse?.length > 0) {
+            summary += `\n• Próximos a agotarse: ${screenData.value.predicciones.proximosAgotarse.map(p => p.nombre).join(', ')}`
+          }
+          if (screenData.value.predicciones.tendenciaVentas) {
+            summary += `\n• Tendencia ventas: ${screenData.value.predicciones.tendenciaVentas}`
+          }
+        }
+        
+        // Instrucciones específicas
+        if (screenData.value.instrucciones) {
+          summary += `\n\n📋 INFORMACIÓN DE NAVEGACIÓN:`
+          summary += `\n${screenData.value.instrucciones.secciones || ''}`
+        }
+        
+        summary += `\n\n💡 ACCIONES DISPONIBLES EN INVENTARIO INTELIGENTE:`
+        summary += `\n• cambiarSeccionInventarioInteligente: Cambiar entre Vista General, Productos, Movimientos, etc.`
+        summary += `\n• buscarProductoInventarioInteligente: Buscar productos`
+        summary += `\n• cambiarPeriodoInventarioInteligente: Cambiar período (hoy, semana, mes, año)`
+        summary += `\n• verAlertasInventarioInteligente: Ver productos con stock bajo`
+        summary += `\n• verPrediccionesInventarioInteligente: Ver predicciones ML`
+      }
+      
+      // ═══════════════════════════════════════════════════════════
+      // 📊 DATOS DE REPORTES
+      // ═══════════════════════════════════════════════════════════
+      
+
+      // �📈 REPORTES DE CAJA
+      if (screenData.value.tipoReporte === 'reports-caja') {
+        summary += `\n\n📊 REPORTE DE CAJAS ACTIVO:`
+        summary += `\n• Descripción: ${screenData.value.descripcion || 'Análisis de cajeros'}`
+        summary += `\n• Período: ${screenData.value.periodoActual || 'No definido'}`
+        
+        if (screenData.value.kpis) {
+          const kpis = screenData.value.kpis
+          summary += `\n\n💰 KPIs DE CAJA:`
+          summary += `\n• Sesiones activas: ${kpis.sesionesActivas || 0}`
+          summary += `\n• Total ventas: ${kpis.totalVentas || '$0'}`
+          summary += `\n• Transacciones: ${kpis.totalTransacciones || 0}`
+          summary += `\n• Mejor cajero: ${kpis.mejorCajero || 'N/A'} (${kpis.mejorCajeroVentas || '$0'})`
+          summary += `\n• Promedio por hora: ${kpis.promedioHora || '$0'}`
+        }
+        
+        if (screenData.value.cajeros && screenData.value.cajeros.length > 0) {
+          summary += `\n\n👥 COMPARATIVA DE CAJEROS (${screenData.value.cajeros.length}):`
+          screenData.value.cajeros.forEach((c, i) => {
+            summary += `\n${i+1}. ${c.nombre}: ${c.ventas} (${c.transacciones} trans.) - Ticket: ${c.ticketPromedio}`
+          })
+        }
+        
+        if (screenData.value.topSesiones && screenData.value.topSesiones.length > 0) {
+          summary += `\n\n🏆 TOP SESIONES:`
+          screenData.value.topSesiones.forEach((s, i) => {
+            summary += `\n${i+1}. ${s.cajero}: ${s.ventas} (${s.fecha})`
+          })
+        }
+        
+        if (screenData.value.alertas && screenData.value.alertas.length > 0) {
+          summary += `\n\n⚠️ ALERTAS DE CAJA (${screenData.value.alertas.length}):`
+          screenData.value.alertas.forEach(a => {
+            summary += `\n• [${a.tipo}] ${a.titulo}: ${a.mensaje}`
+          })
+        }
+      }
+      
+      // 📦 REPORTES DE INVENTARIO
+      if (screenData.value.tipoReporte === 'reports-inventario') {
+        summary += `\n\n📦 REPORTE DE INVENTARIO ACTIVO:`
+        summary += `\n• Descripción: ${screenData.value.descripcion || 'Análisis de inventario'}`
+        
+        if (screenData.value.kpis) {
+          const kpis = screenData.value.kpis
+          summary += `\n\n📊 KPIs DE INVENTARIO:`
+          summary += `\n• Total productos: ${kpis.totalProductos || 0} (${kpis.productosActivos || 0} activos)`
+          summary += `\n• Valor inventario (costo): ${kpis.valorInventario || '$0'}`
+          summary += `\n• Valor venta potencial: ${kpis.valorVentaPotencial || '$0'}`
+          summary += `\n• Margen potencial: ${kpis.margenPotencial || '$0'} (${kpis.porcentajeMargen || '0%'})`
+          summary += `\n• Productos stock bajo: ${kpis.productosBajoStock || 0}`
+          summary += `\n• Productos sin stock: ${kpis.productosSinStock || 0}`
+        }
+        
+        if (screenData.value.analisisABC) {
+          const abc = screenData.value.analisisABC
+          summary += `\n\n📈 ANÁLISIS ABC:`
+          summary += `\n• Clase A (alta rotación): ${abc.claseA || 0} productos`
+          summary += `\n• Clase B (media rotación): ${abc.claseB || 0} productos`
+          summary += `\n• Clase C (baja rotación): ${abc.claseC || 0} productos`
+        }
+        
+        if (screenData.value.categorias && screenData.value.categorias.length > 0) {
+          summary += `\n\n📂 DISTRIBUCIÓN POR CATEGORÍA:`
+          screenData.value.categorias.forEach(c => {
+            summary += `\n• ${c.nombre}: ${c.valor}`
+          })
+        }
+        
+        if (screenData.value.topVendidos && screenData.value.topVendidos.length > 0) {
+          summary += `\n\n🏆 TOP PRODUCTOS MÁS VENDIDOS:`
+          screenData.value.topVendidos.forEach((p, i) => {
+            summary += `\n${i+1}. ${p.nombre}: ${p.vendidos} unidades (${p.ingresos})`
+          })
+        }
+        
+        if (screenData.value.stockBajo && screenData.value.stockBajo.length > 0) {
+          summary += `\n\n⚠️ PRODUCTOS CON STOCK BAJO (${screenData.value.stockBajo.length}):`
+          screenData.value.stockBajo.forEach(p => {
+            summary += `\n• ${p.nombre}: ${p.stockActual}/${p.stockMinimo} unidades`
+          })
+        }
+        
+        if (screenData.value.sinMovimiento && screenData.value.sinMovimiento.length > 0) {
+          summary += `\n\n📦 PRODUCTOS SIN MOVIMIENTO (Capital Inmovilizado):`
+          screenData.value.sinMovimiento.forEach(p => {
+            summary += `\n• ${p.nombre}: ${p.stock} unidades (${p.valorInmovilizado})`
+          })
+        }
+      }
+      
+      // � REPORTES GENERALES
+      if (screenData.value.tipoReporte === 'reports-general') {
+        summary += `\n\n📊 REPORTE GENERAL ACTIVO:`
+        summary += `\n• Descripción: ${screenData.value.descripcion || 'Dashboard ejecutivo'}`
+        summary += `\n• Período: ${screenData.value.periodoActual || 'No definido'}`
+        
+        if (screenData.value.kpis) {
+          const kpis = screenData.value.kpis
+          summary += `\n\n💰 KPIs DE VENTAS:`
+          summary += `\n• Ventas totales: ${kpis.ventasTotales || '$0'}`
+          summary += `\n• Transacciones: ${kpis.transacciones || 0}`
+          summary += `\n• Ticket promedio: ${kpis.ticketPromedio || '$0'}`
+          summary += `\n• Margen bruto: ${kpis.margenBruto || '0%'}`
+        }
+        
+        if (screenData.value.topProductos && screenData.value.topProductos.length > 0) {
+          summary += `\n\n🏆 TOP PRODUCTOS MÁS VENDIDOS:`
+          screenData.value.topProductos.forEach((p, i) => {
+            summary += `\n${i+1}. ${p.nombre}: ${p.vendidos} vendidos (${p.ingresos})`
+          })
+        }
+        
+        if (screenData.value.ventasPorCategoria && screenData.value.ventasPorCategoria.length > 0) {
+          summary += `\n\n📂 VENTAS POR CATEGORÍA:`
+          screenData.value.ventasPorCategoria.forEach(c => {
+            summary += `\n• ${c.nombre}: ${c.ventas}`
+          })
+        }
+        
+        if (screenData.value.productosStockBajo && screenData.value.productosStockBajo.length > 0) {
+          summary += `\n\n⚠️ ALERTAS DE STOCK BAJO (${screenData.value.productosStockBajo.length}):`
+          screenData.value.productosStockBajo.forEach(p => {
+            summary += `\n• ${p.nombre}: ${p.stock} unidades`
+          })
+        }
+      }
+      
+      // �📋 MENÚ DE REPORTES
+      if (screenData.value.tipoReporte === 'reports-menu') {
+        summary += `\n\n📊 MENÚ DE REPORTES:`
+        summary += `\n• Reporte activo: ${screenData.value.reporteActivoNombre || 'Ninguno'}`
+        summary += `\n• Reportes disponibles: ${(screenData.value.reportesDisponibles || []).join(', ')}`
+        summary += `\n• Puedo cambiar entre: Reportes Generales, Reportes de Caja, Reportes de Inventario`
       }
     }
     

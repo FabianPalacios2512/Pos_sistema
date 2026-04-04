@@ -1,71 +1,45 @@
 #!/bin/bash
 
-# 🚀 Script de Deploy Manual para 105 POS Pro
-# Usar cuando GitHub Actions falla o no se actualiza
+# 🚀 Deploy Manual 105 POS Pro — Rápido (solo envía cambios)
+set -e
 
-set -e  # Exit on error
+SSH_KEY="$HOME/.ssh/id_rsa"
+VPS="root@72.61.73.245"
+RSYNC_SSH="ssh -i $SSH_KEY -o StrictHostKeyChecking=no -o BatchMode=yes"
 
-echo "🎨 Building frontend locally..."
-npm run build
+echo "🎨 Compilando frontend..."
+npm run build 2>&1 | tail -5
 
 echo ""
-echo "📦 Copying frontend to backend/public..."
+echo "📦 Copiando dist → backend/public..."
 cp -r dist/* backend/public/
 
 echo ""
-echo "📤 Uploading frontend to VPS (backend/public)..."
-rsync -avz --progress --delete backend/public/ root@72.61.73.245:/var/www/105pos/backend/public/
+echo "📤 Subiendo frontend (solo cambios)..."
+rsync -az --checksum -e "$RSYNC_SSH" \
+  backend/public/ $VPS:/var/www/105pos/backend/public/
+rsync -az --checksum -e "$RSYNC_SSH" \
+  dist/ $VPS:/var/www/105pos/dist/
 
 echo ""
-echo "📤 Uploading frontend to VPS (dist folder for subdomains)..."
-rsync -avz --progress --delete dist/ root@72.61.73.245:/var/www/105pos/dist/
+echo "🔄 Subiendo backend (solo cambios)..."
+rsync -az --checksum \
+  --exclude 'node_modules' --exclude 'vendor' --exclude 'dist' \
+  --exclude '.git' --exclude 'storage' --exclude '.env' \
+  -e "$RSYNC_SSH" \
+  backend/ $VPS:/var/www/105pos/backend/
 
 echo ""
-echo "🔄 Uploading backend files (sin node_modules ni vendor)..."
-rsync -avz --progress \
-  --exclude 'node_modules' \
-  --exclude 'vendor' \
-  --exclude 'dist' \
-  --exclude '.git' \
-  --exclude 'storage' \
-  --exclude '.env' \
-  backend/ root@72.61.73.245:/var/www/105pos/backend/
-  
-echo ""
-echo "🔄 Uploading src/ (Vue components)..."
-rsync -avz --progress src/ root@72.61.73.245:/var/www/105pos/src/
+echo "⚙️  Limpiando cache en VPS..."
+ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no $VPS \
+  "cd /var/www/105pos/backend && \
+   php artisan config:clear && php artisan cache:clear && \
+   php artisan route:clear && php artisan view:clear && \
+   php artisan config:cache && php artisan route:cache && \
+   sudo systemctl restart php8.3-fpm && echo 'CACHE OK'"
 
 echo ""
-echo "🔄 Uploading public/ files..."
-rsync -avz --progress public/ root@72.61.73.245:/var/www/105pos/public/
-
-echo ""
-echo "🔄 Uploading root config files..."
-rsync -avz --progress \
-  index.html \
-  package.json \
-  vite.config.js \
-  tailwind.config.js \
-  postcss.config.js \
-  root@72.61.73.245:/var/www/105pos/
-
-echo ""
-echo "⚙️  Running Laravel commands on VPS..."
-ssh root@72.61.73.245 "cd /var/www/105pos/backend && \
-  php artisan config:clear && \
-  php artisan cache:clear && \
-  php artisan route:clear && \
-  php artisan view:clear && \
-  php artisan config:cache && \
-  php artisan route:cache && \
-  sudo systemctl restart php8.3-fpm"
-
-echo ""
-echo "🔗 Fixing tenant storage symlinks..."
-ssh root@72.61.73.245 "cd /var/www/105pos/backend && php fix_tenant_symlinks.php"
-
-echo ""
-echo "✅ Deploy manual completado!"
-echo "🌐 Verifica en: https://maria.105pos.pro/pos"
+echo "✅ Deploy completado!"
+echo "🌐 https://maria.105pos.pro/pos  (Ctrl+Shift+R para limpiar cache)"
 echo ""
 echo "💡 Recuerda hacer Ctrl+Shift+R para limpiar el cache del navegador"

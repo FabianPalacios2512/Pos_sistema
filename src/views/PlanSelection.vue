@@ -206,15 +206,15 @@
             <div class="mb-5">
               <div class="flex items-baseline gap-1 mb-1">
                 <span class="text-4xl font-bold text-slate-900">
-                  {{ paymentFrequency === '24months' ? '$20.000' : (paymentFrequency === 'yearly' ? '$20.000' : '$25.000') }}
+                  {{ paymentFrequency === '24months' ? '$30.000' : (paymentFrequency === 'yearly' ? '$30.000' : '$35.000') }}
                 </span>
                 <span class="text-sm text-slate-500">/mes</span>
               </div>
               <p v-if="paymentFrequency === '24months'" class="text-xs text-emerald-600 font-medium">
-                Facturado $480.000/24 meses
+                Facturado $720.000/24 meses
               </p>
               <p v-else-if="paymentFrequency === 'yearly'" class="text-xs text-emerald-600 font-medium">
-                Facturado $240.000/año
+                Facturado $360.000/año
               </p>
               <p v-else class="text-xs text-slate-500 font-medium">
                 Facturado mensualmente
@@ -307,8 +307,8 @@
               <div class="flex items-baseline gap-1 mb-1">
                 <span class="text-4xl font-bold text-slate-900">
                   {{ includeDianInvoicing 
-                    ? (paymentFrequency === '24months' ? '$80.000' : (paymentFrequency === 'yearly' ? '$80.000' : '$90.000'))
-                    : (paymentFrequency === '24months' ? '$50.000' : (paymentFrequency === 'yearly' ? '$50.000' : '$60.000')) 
+                    ? (paymentFrequency === '24months' ? '$95.000' : (paymentFrequency === 'yearly' ? '$95.000' : '$105.000'))
+                    : (paymentFrequency === '24months' ? '$65.000' : (paymentFrequency === 'yearly' ? '$65.000' : '$75.000')) 
                   }}
                 </span>
                 <span class="text-sm text-slate-500">/mes</span>
@@ -372,8 +372,8 @@
                 </svg>
                 <span>Tienda Web</span>
               </div>
-              <div class="flex items-start gap-3 text-slate-700">
-                <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <div class="flex items-center gap-2.5 text-slate-600">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                 </svg>
                 <span>Envíos WhatsApp</span>
@@ -382,7 +382,19 @@
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                 </svg>
-                <span>Agente IA</span>
+                <span>Envíos por Email</span>
+              </div>
+              <div class="flex items-center gap-2.5 text-slate-600">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span>Chat IA</span>
+              </div>
+              <div class="flex items-center gap-2.5 text-slate-600">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span>Agente IA de Voz</span>
               </div>
               <div class="flex items-center gap-2.5 text-slate-600">
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -456,7 +468,7 @@
 
             <!-- Lista de Características -->
             <div class="space-y-3 text-sm mt-auto">
-              <p class="font-semibold text-slate-700 text-xs uppercase tracking-wide">Todo lo de Premium, más:</p>
+              <p class="font-semibold text-slate-700 text-xs uppercase tracking-wide">Todo Ilimitado:</p>
               
               <div class="flex items-center gap-2.5 text-slate-600">
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -468,7 +480,19 @@
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                 </svg>
-                <span>Multi-Sede</span>
+                <span>Multi-Sede Ilimitado</span>
+              </div>
+              <div class="flex items-center gap-2.5 text-slate-600">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span>Facturación Electrónica Ilimitada</span>
+              </div>
+              <div class="flex items-center gap-2.5 text-slate-600">
+                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+                <span>IA de Voz Ilimitada</span>
               </div>
               <div class="flex items-center gap-2.5 text-slate-600">
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -480,13 +504,7 @@
                 <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                 </svg>
-                <span>IA Predictiva</span>
-              </div>
-              <div class="flex items-center gap-2.5 text-slate-600">
-                <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-                <span>Gerente Dedicado</span>
+                <span>Soporte Prioridad Alta</span>
               </div>
             </div>
           </div>
@@ -595,9 +613,19 @@ onMounted(() => {
     tenantId.value = data.tenant_id || null
     redirectUrl.value = data.redirect_url || ''
     
-    // ✅ Si no tiene subdomain pero tiene tenant_id, usar tenant_id como subdomain
+    // ✅ Si no tiene subdomain pero tiene tenant_id, derivar subdomain
+    // NOTA: tenant_id usa underscores (la_central) pero el dominio usa hyphens (la-central)
     if (!data.subdomain && data.tenant_id) {
-      data.subdomain = data.tenant_id
+      if (data.redirect_url) {
+        try {
+          const parsedUrl = new URL(data.redirect_url)
+          data.subdomain = parsedUrl.hostname.split('.')[0]
+        } catch (e) {
+          data.subdomain = data.tenant_id.replace(/_/g, '-')
+        }
+      } else {
+        data.subdomain = data.tenant_id.replace(/_/g, '-')
+      }
       localStorage.setItem('registration_data', JSON.stringify(data))
     }
     return
@@ -673,54 +701,57 @@ const handlePlanSelection = async (plan) => {
       return `https://105pos.pro/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
     }
 
-    // Inicializar transacción en backend (guardar pending payment)
-    await axios.post('/api/epayco/init-transaction', {
+    // 🚀 Checkout 2.0: Crear sesión en el backend
+    const sessionResponse = await axios.post('/api/epayco/create-session', {
       amount: finalPrice,
       reference: reference,
       customer_email: localStorage.getItem('user_email') || 'cliente@105pos.pro',
       payment_frequency: paymentFrequency.value,
       plan: plan,
-      tenant_id: tenantId.value
+      tenant_id: tenantId.value,
+      company_name: companyName.value || 'Cliente 105POS',
+      description: `Suscripción ${paymentFrequency.value} al plan ${plan}`,
+      response_url: getRedirectUrl()
     })
 
-    // Configurar ePayco - PRODUCCIÓN
-    const handler = window.ePayco.checkout.configure({
-      key: 'de4263d3e7094669c4d837ad7dadb69e', // ✅ PUBLIC_KEY Producción
+    if (!sessionResponse.data.success || !sessionResponse.data.sessionId) {
+      throw new Error(sessionResponse.data.error || 'No se pudo crear la sesión de pago')
+    }
+
+    const { sessionId, verification_token } = sessionResponse.data
+
+    // 🚀 Configurar ePayco Smart Checkout 2.0
+    const checkout = window.ePayco.checkout.configure({
+      sessionId: sessionId,
+      type: 'standard', // 'onpage' = modal embebido, 'standard' = redirige a página completa de ePayco
       test: false // ✅ MODO PRODUCCIÓN
     })
 
-    const data = {
-      name: `Plan ${plan} - ${companyName.value}`,
-      description: `Suscripción ${paymentFrequency.value} al plan ${plan}`,
-      invoice: reference,
-      currency: 'cop',
-      amount: finalPrice,
-      tax_base: '0',
-      tax: '0',
-      country: 'co',
-      lang: 'es',
-      external: 'true', // true = Standard Checkout (Redirección a la página de ePayco)
-      extra1: tenantId.value,
-      extra2: plan,
-      extra3: paymentFrequency.value,
-      confirmation: 'https://105pos.pro/api/epayco/webhook',
-      response: getRedirectUrl(),
-      name_billing: companyName.value || 'Cliente 105POS',
-      address_billing: 'Calle 123 # 45-67',
-      type_doc_billing: 'cc',
-      mobilephone_billing: '3000000000',
-      number_doc_billing: '1234567890',
-      email_billing: localStorage.getItem('user_email') || 'cliente@105pos.pro',
-    }
+    // Event handlers para Checkout 2.0
+    checkout.onCreated(() => {
+      console.log('✅ ePayco Checkout creado exitosamente')
+    })
 
-    handler.open(data)
+    checkout.onErrors((errors) => {
+      console.error('❌ Error en ePayco Checkout:', errors)
+    })
+
+    checkout.onClosed(() => {
+      console.log('🔒 ePayco Checkout cerrado')
+      // Verificar estado del pago cuando se cierra el checkout
+      isProcessing.value = false
+    })
+
+    // Abrir el checkout
+    checkout.open()
     
     // Guardar referencia en localStorage
     localStorage.setItem('pending_payment', JSON.stringify({
       reference: reference,
       plan: plan,
       tenant_id: tenantId.value,
-      amount: finalPrice
+      amount: finalPrice,
+      verification_token: verification_token
     }))
 
   } catch (error) {
@@ -738,14 +769,14 @@ const handlePlanSelection = async (plan) => {
 const calculatePlanPrice = (plan) => {
   const prices = {
     basic: {
-      monthly: 25000,
-      yearly: 240000, // 20k/mes * 12
-      '24months': 480000 // 20k/mes * 24
+      monthly: 35000,
+      yearly: 360000, // 30k/mes * 12
+      '24months': 720000 // 30k/mes * 24
     },
     premium: {
-      monthly: 60000,
-      yearly: 600000, // 50k/mes * 12
-      '24months': 1200000 // 50k/mes * 24
+      monthly: 75000,
+      yearly: 780000, // 65k/mes * 12
+      '24months': 1560000 // 65k/mes * 24
     },
     enterprise: {
       monthly: 150000,
@@ -806,10 +837,18 @@ const redirectToLogin = () => {
   let subdomain = urlParams.get('subdomain')
 
   if (!subdomain) {
+    // Si hay tenant_id pero no subdomain, convertir underscores a hyphens
+    const tenantIdFallback = urlParams.get('tenant_id')
+    if (tenantIdFallback) {
+      subdomain = tenantIdFallback.replace(/_/g, '-')
+    }
+  }
+
+  if (!subdomain) {
     const registrationData = localStorage.getItem('registration_data')
     if (registrationData) {
       const data = JSON.parse(registrationData)
-      subdomain = data.subdomain
+      subdomain = data.subdomain || (data.tenant_id ? data.tenant_id.replace(/_/g, '-') : '')
     }
   }
 
@@ -842,13 +881,22 @@ const performAutoLogin = async () => {
       
       // Obtener subdomain
       const urlParams = new URLSearchParams(window.location.search)
-      let subdomain = urlParams.get('subdomain') || urlParams.get('tenant_id')
+      let subdomain = urlParams.get('subdomain')
+      
+      // Si no hay subdomain explícito, intentar derivarlo del tenant_id
+      // NOTA: tenant_id usa underscores (la_central) pero el dominio usa hyphens (la-central)
+      if (!subdomain) {
+        const tenantIdParam = urlParams.get('tenant_id')
+        if (tenantIdParam) {
+          subdomain = tenantIdParam.replace(/_/g, '-')
+        }
+      }
       
       if (!subdomain) {
         const regData = localStorage.getItem('registration_data')
         if (regData) {
           const parsed = JSON.parse(regData)
-          subdomain = parsed.subdomain || parsed.tenant_id
+          subdomain = parsed.subdomain || (parsed.tenant_id ? parsed.tenant_id.replace(/_/g, '-') : '')
         }
       }
       
@@ -884,7 +932,9 @@ const performAutoLogin = async () => {
     }
 
     const data = JSON.parse(registrationData)
-    const { email, temp_password, is_google, subdomain, authenticated } = data
+    // Asegurar que subdomain tenga el formato correcto (hyphens, no underscores)
+    const subdomain = data.subdomain || (data.tenant_id ? data.tenant_id.replace(/_/g, '-') : '')
+    const { email, temp_password, is_google, authenticated } = data
 
     // ✅ Si el usuario ya está autenticado desde el registro, redirigir directamente
     if (authenticated) {

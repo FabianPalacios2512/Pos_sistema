@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 /*
@@ -120,6 +121,10 @@ function getCashDashboardData() {
     try {
         $period = request()->get('period', 'today');
         $nowColombia = Carbon::now()->setTimezone('America/Bogota');
+        
+        // Variables para gastos y devoluciones
+        $totalExpenses = 0;
+        $totalRefunds = 0;
 
         // CORREGIDO: Para 'today', usar el campo 'date' que ya está en formato Y-m-d
         if ($period === 'today') {
@@ -136,17 +141,29 @@ function getCashDashboardData() {
                 ->whereDate('date', $todayString)
                 ->where('status', 'paid')
                 ->count();
+            
+            // Gastos de caja del día (usando campo 'date' no 'created_at')
+            if (Schema::hasTable('expenses')) {
+                $totalExpenses = DB::table('expenses')
+                    ->whereDate('date', $todayString)
+                    ->sum('amount') ?: 0;
+            }
+            
+            // Devoluciones del día (usando campo 'total' no 'refund_amount')
+            if (Schema::hasTable('returns')) {
+                $totalRefunds = DB::table('returns')
+                    ->whereDate('return_date', $todayString)
+                    ->where('status', 'completed')
+                    ->sum('total') ?: 0;
+            }
 
             // DEBUG: Log para verificar qué está pasando
             \Log::info('Cash Reports Dashboard - Today', [
                 'today_string' => $todayString,
                 'total_sales' => $totalSales,
                 'total_transactions' => $totalTransactions,
-                'sample_invoices' => DB::table('invoices')
-                    ->whereDate('date', $todayString)
-                    ->select('id', 'invoice_number', 'total', 'status', 'date', 'created_at')
-                    ->limit(5)
-                    ->get()
+                'total_expenses' => $totalExpenses,
+                'total_refunds' => $totalRefunds
             ]);
         } else {
             // Para otros períodos, usar el rango de fechas
@@ -161,6 +178,21 @@ function getCashDashboardData() {
                 ->whereBetween('date', [$dateRange['start'], $dateRange['end']])
                 ->where('status', 'paid')
                 ->count();
+            
+            // Gastos de caja del período (usando campo 'date')
+            if (Schema::hasTable('expenses')) {
+                $totalExpenses = DB::table('expenses')
+                    ->whereBetween('date', [$dateRange['start'], $dateRange['end']])
+                    ->sum('amount') ?: 0;
+            }
+            
+            // Devoluciones del período (usando 'return_date' y 'total')
+            if (Schema::hasTable('returns')) {
+                $totalRefunds = DB::table('returns')
+                    ->whereBetween('return_date', [$dateRange['start'], $dateRange['end']])
+                    ->where('status', 'completed')
+                    ->sum('total') ?: 0;
+            }
         }
 
         // Promedio por transacción
@@ -173,8 +205,8 @@ function getCashDashboardData() {
             ->select([
                 'cash_sessions.id',
                 'users.name as cashier',
-                'cash_sessions.opening_time',
-                'cash_sessions.total_sales',
+                'cash_sessions.opened_at as opening_time',
+                'cash_sessions.opening_amount',
                 'cash_sessions.status'
             ])
             ->get();
@@ -184,6 +216,8 @@ function getCashDashboardData() {
             'total_sales' => $totalSales,
             'total_transactions' => $totalTransactions,
             'average_sale' => $averageSale,
+            'total_expenses' => $totalExpenses,
+            'total_refunds' => $totalRefunds,
             'active_sessions' => $activeSessions,
             'period' => $period,
             'debug_date' => $nowColombia->format('Y-m-d H:i:s')
@@ -191,6 +225,10 @@ function getCashDashboardData() {
 
 
     } catch (Exception $e) {
+        \Log::error('Cash Reports Dashboard Error', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
         return response()->json([
             'success' => false,
             'error' => $e->getMessage()
@@ -355,11 +393,19 @@ function getTopSessions() {
         $limit = request()->get('limit', 5);
         $dateRange = getCashReportDateRange($period);
 
-        // CORREGIDO: Buscar sesiones que tuvieron ventas en el período, no sesiones creadas en el período
+        // Verificar si hay sesiones de caja
+        if (!Schema::hasTable('cash_sessions')) {
+            return response()->json([
+                'success' => true,
+                'data' => []
+            ]);
+        }
+
+        // SIMPLIFICADO: Buscar sesiones con ventas en el período
         $topSessions = DB::table('cash_sessions')
             ->join('users', 'cash_sessions.user_id', '=', 'users.id')
             ->join('invoices', 'invoices.cash_session_id', '=', 'cash_sessions.id')
-            ->whereBetween(DB::raw('CONVERT_TZ(invoices.created_at, "+00:00", "-05:00")'), [$dateRange['start'], $dateRange['end']])
+            ->whereBetween('invoices.date', [$dateRange['start'], $dateRange['end']])
             ->where('cash_sessions.status', '!=', 'cancelled')
             ->where('invoices.status', '!=', 'cancelled')
             ->select([
@@ -367,10 +413,10 @@ function getTopSessions() {
                 'users.name as cashier',
                 DB::raw('SUM(invoices.total) as sales'),
                 DB::raw('COUNT(invoices.id) as transactions'),
-                DB::raw('DATE(CONVERT_TZ(cash_sessions.created_at, "+00:00", "-05:00")) as date'),
-                DB::raw('ROUND(TIMESTAMPDIFF(HOUR, cash_sessions.opening_time, COALESCE(cash_sessions.closing_time, NOW())), 1) as duration')
+                DB::raw('DATE(cash_sessions.created_at) as date'),
+                DB::raw('COALESCE(ROUND(TIMESTAMPDIFF(HOUR, cash_sessions.opened_at, COALESCE(cash_sessions.closed_at, NOW())), 1), 8) as duration')
             ])
-            ->groupBy('cash_sessions.id', 'users.name', 'cash_sessions.created_at', 'cash_sessions.opening_time', 'cash_sessions.closing_time')
+            ->groupBy('cash_sessions.id', 'users.name', 'cash_sessions.created_at', 'cash_sessions.opened_at', 'cash_sessions.closed_at')
             ->orderBy('sales', 'desc')
             ->limit($limit)
             ->get()
@@ -382,6 +428,10 @@ function getTopSessions() {
         ]);
 
     } catch (Exception $e) {
+        \Log::error('Cash Reports - Top Sessions Error', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
         return response()->json([
             'success' => false,
             'error' => $e->getMessage()

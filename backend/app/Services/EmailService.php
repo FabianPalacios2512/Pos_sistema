@@ -93,7 +93,7 @@ class EmailService
 
             Mail::send('emails.password-reset-code', $templateData, function ($message) use ($data) {
                 $message->to($data['email'], $data['name'] ?? 'Usuario')
-                    ->subject('🔐 Código de Recuperación - 105 POS');
+                    ->subject('105 POS: Codigo de verificacion de seguridad');
 
                 $message->from(
                     config('mail.from.address'),

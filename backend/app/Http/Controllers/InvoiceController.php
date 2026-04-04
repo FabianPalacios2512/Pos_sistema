@@ -441,6 +441,84 @@ class InvoiceController extends Controller
             $user = auth()->user();
             $invoice->seller_name = $user ? $user->name : 'Vendedor';
 
+            // 🧾 FACTUS: Validar factura automáticamente ante la DIAN
+            // Las credenciales son GLOBALES (desde .env) - 105POS distribuye las facturas
+            if ($data['type'] === 'invoice') {
+                try {
+                    $factus = \App\Services\FactusService::create();
+                    
+                    if ($factus->isEnabled()) {
+                        // Preparar datos para Factus
+                        $invoiceForFactus = [
+                            'reference_code' => $invoice->number,
+                            'number' => $invoice->number,
+                            'payment_method' => $invoice->payment_method ?? 'efectivo',
+                            'notes' => $invoice->notes,
+                            'send_email' => false, // No enviar email automáticamente
+                            'due_date' => $invoice->due_date?->format('Y-m-d'),
+                            'subtotal' => (float) $invoice->subtotal,
+                            'discount_amount' => (float) ($invoice->discount_amount ?? 0),
+                            'customer' => [
+                                'name' => $invoice->customer->name ?? 'Consumidor Final',
+                                'document' => $invoice->customer->document ?? '222222222222',
+                                'document_type' => $invoice->customer->document_type ?? 'cc',
+                                'email' => $invoice->customer->email ?? '',
+                                'phone' => $invoice->customer->phone ?? '',
+                                'address' => $invoice->customer->address ?? 'Sin dirección'
+                            ],
+                            'items' => $invoice->invoiceItems->map(function($item) {
+                                // 🧾 Obtener SKU del producto desde la tabla products
+                                $product = \App\Models\Product::find($item->product_id);
+                                $productSku = $product->sku ?? $product->barcode ?? 'PROD-' . $item->product_id;
+                                
+                                return [
+                                    'product_id' => $item->product_id,
+                                    'product_sku' => $productSku,
+                                    'product_name' => $item->product_name ?? $product->name ?? 'Producto',
+                                    'quantity' => $item->quantity,
+                                    'unit_price' => (float) $item->unit_price,
+                                    'discount_amount' => (float) ($item->discount_amount ?? 0),
+                                    'tax_amount' => (float) ($item->tax_amount ?? 0),
+                                    'notes' => $item->notes ?? ''
+                                ];
+                            })->toArray()
+                        ];
+                        
+                        $factusResponse = $factus->createInvoice($invoiceForFactus);
+                        $billData = $factusResponse['data']['bill'] ?? [];
+                        
+                        // Actualizar factura con CUFE y datos de la DIAN
+                        $invoice->update([
+                            'cufe' => $billData['cufe'] ?? null,
+                            'factus_number' => $billData['number'] ?? null,
+                            'qr_code' => $billData['qr'] ?? null,
+                            'qr_image' => $billData['qr_image'] ?? null,
+                            'factus_status' => 'validated',
+                            'factus_validated_at' => now(),
+                            'factus_response' => $factusResponse
+                        ]);
+                        
+                        // Recargar la factura con los datos de Factus
+                        $invoice->refresh();
+                        
+                        \Log::info('✅ Factura validada automáticamente ante DIAN', [
+                            'invoice_id' => $invoice->id,
+                            'number' => $invoice->number,
+                            'cufe' => $billData['cufe'] ?? 'N/A',
+                            'tenant' => tenant('id')
+                        ]);
+                    }
+                } catch (\Exception $factusError) {
+                    // Si falla Factus, no bloqueamos la venta - solo loggeamos el error
+                    \Log::warning('⚠️ No se pudo validar factura con Factus (la venta continúa)', [
+                        'invoice_id' => $invoice->id,
+                        'number' => $invoice->number,
+                        'error' => $factusError->getMessage(),
+                        'tenant' => tenant('id')
+                    ]);
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Factura creada exitosamente',
@@ -1482,11 +1560,218 @@ class InvoiceController extends Controller
                 $invoice->seller_name = Auth::user()->name;
             }
 
+            // 🧾 FACTURACIÓN ELECTRÓNICA DIAN
+            // Soporta dos proveedores: Alanube (rápido, ~2s) y Factus (lento, ~12s)
+            // Skip si el usuario desactivó la facturación electrónica desde el frontend
+            $skipElectronicInvoice = $request->input('skip_electronic_invoice', false);
+            
+            if ($data['type'] === 'invoice' && !$skipElectronicInvoice) {
+                try {
+                    // Obtener configuración del tenant para saber qué proveedor usar
+                    $systemSettings = DB::table('system_settings')->first();
+                    $provider = $systemSettings->electronic_invoice_provider ?? 'none';
+                    
+                    \Log::info('🧾 Facturación Electrónica: Verificando proveedor', [
+                        'provider' => $provider,
+                        'invoice_number' => $invoice->number,
+                        'tenant' => tenant('id')
+                    ]);
+                    
+                    if ($provider === 'alanube') {
+                        // ═══════════════════════════════════════════════════════════════
+                        // 🚀 ALANUBE - PROVEEDOR RÁPIDO (~2 segundos)
+                        // ═══════════════════════════════════════════════════════════════
+                        $alanube = \App\Services\AlanubeService::create();
+                        
+                        if ($alanube->isConfigured() && !empty($systemSettings->alanube_company_id)) {
+                            \Log::info('🚀 Alanube: Iniciando validación DIAN', [
+                                'company_id' => $systemSettings->alanube_company_id
+                            ]);
+                            
+                            // Preparar datos para Alanube
+                            $invoiceForAlanube = [
+                                'number' => $invoice->number,
+                                'payment_method' => $invoice->payment_method ?? 'efectivo',
+                                'notes' => $invoice->notes,
+                                'due_date' => $invoice->due_date?->format('Y-m-d'),
+                                'subtotal' => (float) $invoice->subtotal,
+                                'total' => (float) $invoice->total,
+                                'discount_amount' => (float) ($invoice->discount_amount ?? 0),
+                                'customer' => [
+                                    'name' => $invoice->customer->name ?? 'Consumidor Final',
+                                    'document' => $invoice->customer->document ?? '222222222222',
+                                    'document_type' => $invoice->customer->document_type ?? 'CC',
+                                    'email' => $invoice->customer->email ?? '',
+                                    'phone' => $invoice->customer->phone ?? '',
+                                    'address' => $invoice->customer->address ?? 'Sin dirección'
+                                ],
+                                'items' => $invoice->invoiceItems->map(function($item) {
+                                    $product = \App\Models\Product::find($item->product_id);
+                                    return [
+                                        'product_id' => $item->product_id,
+                                        'product_sku' => $product->sku ?? $product->barcode ?? 'PROD-' . $item->product_id,
+                                        'product_name' => $item->product_name ?? $product->name ?? 'Producto',
+                                        'quantity' => $item->quantity,
+                                        'unit_price' => (float) $item->unit_price,
+                                        'discount_amount' => (float) ($item->discount_amount ?? 0),
+                                        'tax_amount' => (float) ($item->tax_amount ?? 0)
+                                    ];
+                                })->toArray()
+                            ];
+                            
+                            $alanubeResponse = $alanube->createInvoice($invoiceForAlanube);
+                            
+                            if ($alanubeResponse['success'] && isset($alanubeResponse['data']['bill'])) {
+                                $billData = $alanubeResponse['data']['bill'];
+                                
+                                // Actualizar factura con CUFE de Alanube
+                                $invoice->update([
+                                    'cufe' => $billData['cufe'] ?? null,
+                                    'factus_number' => $billData['number'] ?? null,
+                                    'qr_code' => $billData['qr'] ?? $billData['qr_image'] ?? null,
+                                    'factus_status' => 'validated',
+                                    'factus_validated_at' => now(),
+                                    'factus_response' => json_encode($alanubeResponse)
+                                ]);
+                                
+                                $invoice->refresh();
+                                $invoice->load(['customer', 'invoiceItems']);
+                                
+                                \Log::info('✅ Factura validada por Alanube (DIAN)', [
+                                    'invoice_id' => $invoice->id,
+                                    'cufe' => $billData['cufe'] ?? 'N/A',
+                                    'time_ms' => $alanubeResponse['time_ms'] ?? 'N/A',
+                                    'tenant' => tenant('id')
+                                ]);
+                            } else {
+                                throw new \Exception($alanubeResponse['message'] ?? 'Error desconocido de Alanube');
+                            }
+                        } else {
+                            \Log::warning('⚠️ Alanube configurado pero sin company_id - Usando CUFE local');
+                            $localCufe = $this->generateLocalCufe($invoice);
+                            $invoice->update([
+                                'cufe' => $localCufe,
+                                'factus_status' => 'local',
+                                'factus_validated_at' => now()
+                            ]);
+                            $invoice->refresh();
+                        }
+                    } elseif ($provider === 'factus') {
+                        // ═══════════════════════════════════════════════════════════════
+                        // 🐢 FACTUS - PROVEEDOR LEGACY (~12-15 segundos)
+                        // ═══════════════════════════════════════════════════════════════
+                        $factus = \App\Services\FactusService::create();
+                        
+                        \Log::info('🧾 Factus: Verificando si está habilitado', [
+                            'isEnabled' => $factus->isEnabled(),
+                            'isConfigured' => $factus->isConfigured()
+                        ]);
+                        
+                        if ($factus->isEnabled()) {
+                            \Log::info('🧾 Factus: Preparando datos para validación DIAN', [
+                                'invoice_number' => $invoice->number,
+                                'customer_name' => $invoice->customer->name ?? 'N/A'
+                            ]);
+                            
+                            // Preparar datos para Factus
+                            $invoiceForFactus = [
+                                'reference_code' => $invoice->number,
+                                'number' => $invoice->number,
+                                'payment_method' => $invoice->payment_method ?? 'efectivo',
+                                'notes' => $invoice->notes,
+                                'send_email' => false,
+                                'due_date' => $invoice->due_date?->format('Y-m-d'),
+                                'subtotal' => (float) $invoice->subtotal,
+                                'discount_amount' => (float) ($invoice->discount_amount ?? 0),
+                                'customer' => [
+                                    'name' => $invoice->customer->name ?? 'Consumidor Final',
+                                    'document' => $invoice->customer->document ?? '222222222222',
+                                    'document_type' => $invoice->customer->document_type ?? 'cc',
+                                    'email' => $invoice->customer->email ?? '',
+                                    'phone' => $invoice->customer->phone ?? '',
+                                    'address' => $invoice->customer->address ?? 'Sin dirección'
+                                ],
+                                'items' => $invoice->invoiceItems->map(function($item) {
+                                    $product = \App\Models\Product::find($item->product_id);
+                                    $productSku = $product->sku ?? $product->barcode ?? 'PROD-' . $item->product_id;
+                                    
+                                    return [
+                                        'product_id' => $item->product_id,
+                                        'product_sku' => $productSku,
+                                        'product_name' => $item->product_name ?? $product->name ?? 'Producto',
+                                        'quantity' => $item->quantity,
+                                        'unit_price' => (float) $item->unit_price,
+                                        'discount_amount' => (float) ($item->discount_amount ?? 0),
+                                        'tax_amount' => (float) ($item->tax_amount ?? 0),
+                                        'notes' => $item->notes ?? ''
+                                    ];
+                                })->toArray()
+                            ];
+                            
+                            $factusResponse = $factus->createInvoice($invoiceForFactus);
+                            $billData = $factusResponse['data']['bill'] ?? [];
+                            
+                            // Actualizar factura con CUFE y datos de la DIAN
+                            $invoice->update([
+                                'cufe' => $billData['cufe'] ?? null,
+                                'factus_number' => $billData['number'] ?? null,
+                                'qr_code' => $billData['qr'] ?? null,
+                                'qr_image' => $billData['qr_image'] ?? null,
+                                'factus_status' => 'validated',
+                                'factus_validated_at' => now(),
+                                'factus_response' => json_encode($factusResponse)
+                            ]);
+                            
+                            $invoice->refresh();
+                            $invoice->load(['customer', 'invoiceItems']);
+                            
+                            \Log::info('✅ Factura POS validada por Factus (DIAN)', [
+                                'invoice_id' => $invoice->id,
+                                'number' => $invoice->number,
+                                'cufe' => $billData['cufe'] ?? 'N/A',
+                                'factus_number' => $billData['number'] ?? 'N/A',
+                                'tenant' => tenant('id')
+                            ]);
+                        } else {
+                            \Log::info('ℹ️ Factus no está habilitado - Factura sin validación DIAN');
+                        }
+                    } else {
+                        // Proveedor = 'none' - No hacer nada
+                        \Log::info('ℹ️ Facturación electrónica desactivada (provider: none)');
+                    }
+                } catch (\Exception $electronicError) {
+                    // Si falla cualquier proveedor, no bloqueamos la venta - solo loggeamos
+                    \Log::warning('⚠️ No se pudo validar factura electrónicamente (la venta continúa)', [
+                        'invoice_id' => $invoice->id,
+                        'number' => $invoice->number,
+                        'error' => $electronicError->getMessage(),
+                        'tenant' => tenant('id')
+                    ]);
+                }
+            } elseif ($skipElectronicInvoice && $data['type'] === 'invoice') {
+                // 🧾 Usuario desactivó facturación electrónica - generar CUFE local
+                $localCufe = $this->generateLocalCufe($invoice);
+                $invoice->update([
+                    'cufe' => $localCufe,
+                    'factus_status' => 'local',
+                    'factus_validated_at' => now()
+                ]);
+                $invoice->refresh();
+                
+                \Log::info('ℹ️ Facturación electrónica desactivada por usuario - CUFE local', [
+                    'invoice_id' => $invoice->id,
+                    'number' => $invoice->number,
+                    'local_cufe' => $localCufe,
+                    'tenant' => tenant('id')
+                ]);
+            }
+
             \Log::info('✅ Factura POS creada exitosamente', [
                 'invoice_id' => $invoice->id,
                 'invoice_number' => $invoice->number,
                 'total' => $invoice->total,
-                'seller_name' => $invoice->seller_name
+                'seller_name' => $invoice->seller_name,
+                'cufe' => $invoice->cufe ?? 'Sin CUFE'
             ]);
 
             return response()->json([
@@ -1874,6 +2159,36 @@ class InvoiceController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Generate a local CUFE (Código Único de Factura Electrónica) for offline/local invoices
+     * Este CUFE es solo para uso interno cuando la facturación electrónica está desactivada
+     * NO es válido para la DIAN
+     */
+    private function generateLocalCufe($invoice): string
+    {
+        // Estructura del CUFE local: LOCAL-{tenant}-{invoice_id}-{date}-{hash}
+        $tenant = tenant('id') ?? 'default';
+        $invoiceId = $invoice->id;
+        $date = now()->format('YmdHis');
+        $total = number_format($invoice->total, 2, '', '');
+        
+        // Crear hash único basado en datos de la factura
+        $dataToHash = implode('|', [
+            $tenant,
+            $invoiceId,
+            $invoice->number,
+            $total,
+            $date,
+            config('app.key') // Usar app key como salt
+        ]);
+        
+        $hash = hash('sha256', $dataToHash);
+        
+        // Formato: LOCAL-{primeros 8 chars hash}-{invoice_id}-{date}
+        // Total ~40 chars, similar en longitud a un CUFE real
+        return 'LOCAL-' . substr($hash, 0, 32) . '-' . $invoiceId;
     }
 
     /**

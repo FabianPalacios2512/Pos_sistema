@@ -25,59 +25,67 @@
           </div>
 
           <!-- Tarjetas de selección premium -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl mx-auto mt-8">
             
-            <!-- Opción: Retail General -->
+            <!-- Tarjeta 1: Retail General -->
             <button 
               @click="selectStoreType('general')"
               :disabled="savingStoreType"
-              class="group relative bg-white rounded-2xl p-8 border-2 border-slate-200 hover:border-slate-400 hover:shadow-xl transition-all duration-300 text-left transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="relative block w-full text-left p-6 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-[#009F7A]/40 hover:bg-slate-50 transition-all group focus:outline-none focus:ring-2 focus:ring-[#009F7A]/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <div class="flex flex-col items-center space-y-4">
-                <!-- Icono con gradiente -->
-                <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:shadow-xl group-hover:shadow-blue-500/30 transition-all">
-                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                  </svg>
-                </div>
-                
-                <!-- Texto -->
-                <div class="text-center">
-                  <h3 class="text-xl font-bold text-slate-900 mb-2">Retail General</h3>
-                  <p class="text-sm text-slate-500 font-medium">
-                    Mini Market, Ferretería, Papelería, Farmacia, Supermercado
-                  </p>
-                </div>
-
-                <!-- Badge "Más usado" -->
-                <span class="absolute top-4 right-4 px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg">
-                  Más usado
-                </span>
+              <!-- Icono Corporativo (Storefront) -->
+              <div class="mb-4 text-slate-600 group-hover:text-slate-800 transition-colors">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+                </svg>
               </div>
+
+              <div class="flex items-center gap-2 mb-2">
+                <h3 class="text-lg font-bold text-slate-900 leading-tight">Retail General</h3>
+                <!-- Badge Minimalista -->
+                <span class="bg-emerald-50 text-[#009F7A] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">Más usado</span>
+              </div>
+              <p class="text-sm text-slate-600 leading-relaxed">Mini Market, Ferretería, Papelería, Farmacia</p>
             </button>
 
-            <!-- Opción: Moda & Boutique -->
+            <!-- Tarjeta 2: Moda & Boutique -->
             <button 
               @click="selectStoreType('fashion')"
               :disabled="savingStoreType"
-              class="group relative bg-white rounded-2xl p-8 border-2 border-slate-200 hover:border-slate-400 hover:shadow-xl transition-all duration-300 text-left transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="relative block w-full text-left p-6 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-[#009F7A]/40 hover:bg-slate-50 transition-all group focus:outline-none focus:ring-2 focus:ring-[#009F7A]/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <div class="flex flex-col items-center space-y-4">
-                <!-- Icono con gradiente -->
-                <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:shadow-xl group-hover:shadow-purple-500/30 transition-all">
-                  <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-                  </svg>
-                </div>
-                
-                <!-- Texto -->
-                <div class="text-center">
-                  <h3 class="text-xl font-bold text-slate-900 mb-2">Moda & Boutique</h3>
-                  <p class="text-sm text-slate-500 font-medium">
-                    Ropa, Calzado, Accesorios, Joyería, Perfumería
-                  </p>
-                </div>
+              <!-- Icono Corporativo (Shopping Bag) -->
+              <div class="mb-4 text-slate-600 group-hover:text-slate-800 transition-colors">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
               </div>
+
+              <div class="flex items-center gap-2 mb-2">
+                <h3 class="text-lg font-bold text-slate-900 leading-tight">Moda & Boutique</h3>
+              </div>
+              <p class="text-sm text-slate-500 leading-relaxed">Ropa, Calzado, Accesorios, Joyería</p>
+            </button>
+
+            <!-- Tarjeta 3: Restaurante -->
+            <button 
+              @click="selectStoreType('food')"
+              :disabled="savingStoreType"
+              class="relative block w-full text-left p-6 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-[#009F7A]/40 hover:bg-slate-50 transition-all group focus:outline-none focus:ring-2 focus:ring-[#009F7A]/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <!-- Icono Corporativo (Plato Campana Cloche) -->
+              <div class="mb-4 text-slate-600 group-hover:text-slate-800 transition-colors">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 0a7.5 7.5 0 0 0-7.5 7.5c0 .414.336.75.75.75h13.5a.75.75 0 0 0 .75-.75A7.5 7.5 0 0 0 12 5ZM3 15h18" />
+                </svg>
+              </div>
+
+              <div class="flex items-center gap-2 mb-2">
+                <h3 class="text-lg font-bold text-slate-900 leading-tight">Restaurante</h3>
+                <!-- Badge Minimalista Neutro -->
+                <span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide">Nuevo</span>
+              </div>
+              <p class="text-sm text-slate-500 leading-relaxed">Comidas rápidas, Cafetería, Heladería</p>
             </button>
           </div>
 
@@ -239,10 +247,32 @@ const userName = ref('')
 const loadingPhase = ref(1) // Empezar en 1 para mostrar animación primero
 const savingStoreType = ref(false)
 
-onMounted(() => {
+onMounted(async () => {
   // Obtener nombre del usuario del localStorage o store
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   userName.value = user.name || user.username || ''
+  
+  // Si no hay nombre, intentar obtenerlo del backend
+  if (!userName.value) {
+    try {
+      const token = localStorage.getItem('authToken')
+      if (token) {
+        const response = await axios.get('/api/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (response.data?.success) {
+          const freshUser = response.data.data?.user || response.data.data
+          if (freshUser?.name) {
+            userName.value = freshUser.name
+            // Actualizar localStorage con datos frescos
+            localStorage.setItem('user', JSON.stringify(freshUser))
+          }
+        }
+      }
+    } catch (e) {
+      // Continuar sin nombre - la animación mostrará "¡Hola!" sin nombre
+    }
+  }
   
   // Iniciar la secuencia de animación automáticamente
   startWelcomeSequence()

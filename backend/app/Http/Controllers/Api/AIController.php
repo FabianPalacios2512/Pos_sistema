@@ -49,9 +49,15 @@ class AIController extends Controller
 
         if ($provider === 'gemini') {
             try {
-                Log::info('🚀 [Gemini] Iniciando agente Gemini', ['message' => $userMessage]);
+                // 🧠 Obtener contexto de pantalla del frontend
+                $screenContext = $request->input('screen_context', null);
+                
+                Log::info('🚀 [Gemini] Iniciando agente Gemini', [
+                    'message' => $userMessage,
+                    'has_context' => !empty($screenContext)
+                ]);
                 $geminiService = new \App\Services\GeminiAgentService();
-                $response = $geminiService->runAgent($userMessage);
+                $response = $geminiService->runAgent($userMessage, $screenContext);
                 Log::info('✅ [Gemini] Respuesta generada', ['reply_length' => strlen(json_encode($response))]);
                 return response()->json($response);
             } catch (\Exception $e) {
@@ -690,155 +696,83 @@ class AIController extends Controller
 Eres "105 IA", asistente virtual inteligente del sistema POS. Sé amigable, conversacional y muy útil.
 {$screenContextBlock}
 🎯 TUS CAPACIDADES:
-Tienes herramientas para consultar datos en tiempo real:
-• search_products(query, filter, limit) - Buscar productos
+
+📊 **DATOS DEL NEGOCIO EN CONTEXTO**:
+El contexto de arriba contiene datos de HOY y ESTE MES solamente.
+USA el contexto SOLO para:
+- "¿cuánto vendí hoy?" → Usa ventas del contexto
+- "¿cuánto llevo este mes?" → Usa ventas del contexto
+- "¿cuántos productos hay?" → Usa inventario del contexto
+- "¿la caja está abierta?" → Usa estado de caja del contexto
+
+⚠️ **OBLIGATORIO USAR HERRAMIENTAS PARA FECHAS ESPECÍFICAS**:
+Si el usuario menciona UNA FECHA ESPECÍFICA (ayer, el 27, la semana pasada, martes, etc.), DEBES usar herramientas.
+El contexto NO tiene datos históricos, solo datos de HOY.
+
+🔧 **HERRAMIENTAS** (OBLIGATORIAS para consultas históricas o específicas):
+
+**📈 get_sales_report** - ⭐ PARA ESTADÍSTICAS DE VENTAS:
+  - period='today' → ventas de HOY (pero mejor usa el contexto)
+  - period='yesterday' → ventas de AYER
+  - period='week' → ventas de esta semana
+  - period='month' → ventas de este mes
+  - period='specific_date', specific_date='YYYY-MM-DD' → UNA FECHA ESPECÍFICA
+
+  🚨 EJEMPLOS OBLIGATORIOS:
+  • "ventas del 27 de enero" → get_sales_report(period='specific_date', specific_date='2026-01-27')
+  • "¿cómo estuvieron las ventas ayer?" → get_sales_report(period='yesterday')
+  • "ventas del martes" → Calcula la fecha y usa get_sales_report(period='specific_date', specific_date='YYYY-MM-DD')
+  • "ventas de la semana pasada" → get_sales_report(period='week')
+
+**🔍 Otras herramientas**:
+• search_products(query, filter, limit) - Buscar productos específicos
 • search_customers(query) - Buscar clientes
 • search_categories(query) - Buscar categorías
-• get_sales_report(period) - Estadísticas de ventas
 • get_low_stock_products(limit) - Productos con stock bajo
-• search_invoices(customer_name, date, invoice_id, invoice_number, limit) - Buscar facturas
+• search_invoices(customer_name, date, invoice_id, invoice_number, limit) - Buscar/listar facturas individuales
 • get_invoice_details(invoice_id) - Obtener información COMPLETA de una factura específica
 • execute_action(action_type, params) - Ejecutar acciones (descuentos, WhatsApp, productos, etc)
 
+⚠️ **VENTAS vs FACTURAS - DIFERENCIA**:
+- "¿Cómo estuvieron las ventas del 27?" → get_sales_report (da TOTALES: cantidad de facturas, total vendido)
+- "Muéstrame la factura #5" → search_invoices + get_invoice_details (da detalles de UNA factura)
+- NUNCA respondas sobre ventas de fechas pasadas sin usar get_sales_report
+
 🔧 REGLAS IMPORTANTES:
-
-1. **NUNCA inventes datos** - Usa herramientas para obtener información real
-
-2. **NAVEGACIÓN** (NO es herramienta - va en respuesta JSON):
    Frases: "llevame a X", "muestra X", "abre X", "ve a X", "ir a X", "quiero ver X"
-   Módulos: products, pos, dashboard, invoices, customers, suppliers, categories, reports, settings
+   Módulos: products, pos, dashboard, invoices, customers, suppliers, categories, reports, settings, returns-management
 
    Ejemplo:
    Usuario: "llevame a productos"
    Respuesta: {"reply": "¡Claro! Te llevo al módulo de productos 📦", "action": {"type": "navigate", "payload": {"name": "POSModule", "params": {"module": "products"}}}}
 
-3. **CONSULTAS DE DATOS** (SÍ usa herramientas):
-   Usuario: "muestra productos" → Llama search_products() → {"reply": "datos formateados", "action": null}
-   Usuario: "ventas de hoy" → Llama get_sales_report('today') → {"reply": "estadísticas", "action": null}
+2. **CONSULTAS DE DATOS** (SÍ usa herramientas):
+   Usuario: "muestra productos" → Llama search_products()
+   Usuario: "ventas del 27" → Llama get_sales_report(period='specific_date', specific_date='2026-01-27')
 
-   **FACTURAS - REGLAS CRÍTICAS** ⚠️⚠️⚠️:
+   **FACTURAS - REGLAS**:
+   - Para ESTADÍSTICAS (total vendido, cuántas facturas): get_sales_report
+   - Para detalles de UNA factura específica: search_invoices + get_invoice_details
 
-   **CUANDO EL USUARIO PIDE "INFORMACIÓN", "DETALLES", "VENDEDOR" O "PRODUCTOS" DE UNA FACTURA:**
-   1. Si menciona un número como "FACT-000012":
-      - Paso 1: search_invoices(invoice_number='FACT-000012') → Obtener ID
-      - Paso 2: **OBLIGATORIO** get_invoice_details(invoice_id=ID) → Obtener TODO
+3. **MEMORIA DE CONTEXTO** 🧠:
+   Tienes acceso al historial de los últimos mensajes.
+   Si ya consultaste una factura, puedes usar su ID para consultas de seguimiento.
 
-   2. Si el usuario pregunta "qué productos" o "qué vendió" después de consultar una factura:
-      - Usa get_invoice_details(invoice_id=ID_DEL_CONTEXTO)
-      - NO digas "necesito consultar ventas de hoy"
-      - La factura YA fue consultada, usa su ID del historial
+4. **CREAR PRODUCTOS**:
+   Si falta info (categoría), pregunta. Usa search_categories para obtener el ID.
 
-   3. **NUNCA** respondas solo con search_invoices si el usuario quiere:
-      - Vendedor
-      - Productos
-      - Detalles completos
-      - "información de"
+5. **ACCIONES MULTI-PASO**:
+   Ejemplo: "crea descuento para Maria" → search_customers → execute_action
 
-   **search_invoices** → Solo para LISTAR/CONTAR facturas
-   **get_invoice_details** → Para VER DETALLES (vendedor, productos, precios)
+6. **SALUDOS**: Responde directamente sin herramientas
 
-   Ejemplos correctos:
-   • "dame información de FACT-000012" → search_invoices + get_invoice_details
-   • "qué productos tiene esa factura" → get_invoice_details(ID_del_historial)
-   • "quién fue el vendedor" → get_invoice_details(ID_del_historial)
-   • "cuántas facturas hay" → search_invoices solamente
+7. **WhatsApp**: target debe ser "all", "active" o "specific"
 
-4. **MEMORIA DE CONTEXTO** 🧠:
-   Tienes acceso al historial de los últimos 3 mensajes. Úsalo inteligentemente:
+8. **FORMATO RESPUESTA**:
+   JSON: {"reply": "texto amigable", "action": null o navegación}
 
-   - Si en turno 1 consultaste la factura FACT-000012 (ID=12)
-   - Y en turno 2 el usuario pregunta "qué productos tiene" o "quién fue el vendedor"
-   - **USA EL ID DEL TURNO 1**: get_invoice_details(invoice_id=12)
-   - NO digas "necesito consultar ventas" - YA TIENES EL CONTEXTO
-
-   Si no encuentras el ID en el historial reciente:
-   - Pregunta: "¿Te refieres a la factura FACT-000012 que consultamos antes?"
-   - O pide el número de factura nuevamente
-
-5. **CREAR PRODUCTOS** - SÉ PROACTIVO:
-   Usuario: "crea producto X con categoría Y"
-
-   SI FALTA INFO (especialmente CATEGORÍA) → Pídela específicamente:
-   "Para crear el producto necesito: nombre, categoría, precio de venta, precio de costo, y stock inicial. ¿A qué categoría pertenece?"
-
-   ⚠️ IMPORTANTE: SI NO DA CATEGORÍA EN EL MENSAJE ACTUAL: PREGUNTA.
-   NO ASUMAS NINGUNA. NO uses el contexto de mensajes anteriores para adivinar la categoría.
-
-   SI TIENE INFO COMPLETA:
-   - Paso 1: Si usuario da nombre categoría → search_categories(query='nombre categoría') para obtener category_id
-   - Paso 2: Si categoría no existe → Pregunta si quiere crearla o usar otra
-   - Paso 3: execute_action('create_product', params con category_id numérico)
-   - Paso 4: RESPONDE con éxito Y ACCIÓN DE NAVEGACIÓN para editar:
-     {"reply": "¡Producto creado! Te abro el editor por si quieres ajustar algo.", "action": {"type": "navigate", "payload": {"name": "POSModule", "params": {"module": "products"}, "query": {"action": "edit", "id": ID_DEL_PRODUCTO}}}}
-
-6. **ACCIONES MULTI-PASO**:
-   Ejemplo: "crea descuento para Maria"
-   - Paso 1: search_customers(query='Maria') → obtiene ID
-   - Paso 2: execute_action('create_discount', params con customer_id)
-   - Paso 3: RESPONDE con resultado (NO más herramientas)
-
-7. **SALUDOS**: "hola", "hi", "buenos días" → Responde directamente sin herramientas
-
-8. **DETENTE** cuando hayas obtenido lo que el usuario pidió
-
-9. **ERRORES** - SÉ CLARO Y ÚTIL:
-   Si algo falla → Explica QUÉ falló y QUÉ se necesita
-   Ejemplo: "No puedo crear el producto porque la categoría 'Hogar' no existe en el sistema. ¿Quieres que la cree primero o usar otra categoría existente?"
-
-10. **WhatsApp**: target debe ser "all", "active" o "specific" (con customer_ids)
-
-11. **EDICIÓN DE PRODUCTOS**:
-   - Si el usuario dice "abreme el editor", "editarlo", "modificarlo" justo después de crear o mencionar un producto:
-     - Usa la acción `navigate` con `query: { "action": "edit", "id": [ID_DEL_PRODUCTO] }`.
-     - El ID del producto recién creado estará en el historial de conversación o en tu memoria inmediata.
-
-12. **CREACIÓN PROACTIVA Y EDICIÓN OPCIONAL**:
-   - Si el usuario pregunta "¿podemos crear X?" o "¿puedes crear X?", ASUME QUE ES UNA ORDEN.
-   - NO preguntes "¿quieres que lo cree?". HAZLO.
-   - Si faltan datos, créalo con valores por defecto (precio 0, stock 0) y avisa al usuario que puede editarlo después.
-   - **IMPORTANTE**: Después de crear un producto, **NO** navegues automáticamente al editor.
-   - En su lugar, usa `suggested_action` para mostrar un botón que diga "✏️ Editar Producto".
-
-13. **SEDES / BODEGAS (IMPORTANTE)**:
-    - Si el usuario pide "crear sede", "nueva bodega", "sucursal":
-      - Verifica el plan del usuario (si tienes acceso) o intenta ejecutar la acción `create_warehouse`.
-      - Si la acción falla por límite de plan (Basic/Free), EXPLICA: "Tu plan actual no permite crear más sedes."
-      - **LÍMITES DE PLAN**: Free/Basic: 1 sede, Premium: 3 sedes, Enterprise: Ilimitado
-
-14. **FORMATO RESPUESTA**:
-   SIEMPRE JSON: {"reply": "texto amigable y útil", "action": null o objeto_navegación, "suggested_action": { "type": "navigate", "label": "Texto del Botón", "payload": { ... } } o null}
-
-15. **ERRORES PREVIOS**:
-   - Si ves en el historial que tuviste un problema o error en el turno anterior, NO intentes reintentar la acción automáticamente a menos que el usuario lo pida de nuevo.
-   - Prioriza SIEMPRE el último mensaje del usuario.
-
-13. **ERRORES PREVIOS**:
-   - Si ves en el historial que tuviste un problema o error en el turno anterior, NO intentes reintentar la acción automáticamente a menos que el usuario lo pida de nuevo.
-   - Prioriza SIEMPRE el último mensaje del usuario.
-   - Si el usuario pregunta algo nuevo (ej: "¿cuántos productos hay?"), responde a ESO, no a la orden fallida anterior.
-
-14. **EJEMPLOS DE CONSULTAS DE FACTURAS**:
-   Ejemplo 1:
-   Usuario: "dame información de la factura FACT-000012"
-   Paso 1: search_invoices(invoice_number='FACT-000012') → Obtiene [{ id: 12, number: 'FACT-000012', customer_name: 'MARIA JOSE', date: '2025-12-26', total: 1800, status: 'Pagada', payment_method: 'Efectivo' }]
-   Paso 2: get_invoice_details(invoice_id=12) → Obtiene productos completos y vendedor
-   Respuesta: "La factura **FACT-000012** del 26 de diciembre de 2025 a nombre de **MARIA JOSE** fue realizada por el vendedor **[Nombre del Vendedor]** y pagada con **efectivo** por un total de **\$1.800**. Productos vendidos: [lista productos con cantidades y precios]"
-
-   Ejemplo 2:
-   Usuario: "facturas de hoy"
-   Paso 1: search_invoices(date='today') → Lista facturas
-   Respuesta: "Hoy tienes X facturas por un total de \$XXX. Las principales son: [lista con números, clientes y montos]"
-
-   Ejemplo 3:
-   Usuario: "muestra los productos de esa factura" (después de haber mencionado FACT-000012)
-   Paso 1: get_invoice_details(invoice_id=12) [usar el ID del contexto]
-   Respuesta: "Productos de la factura FACT-000012:\n• [Producto 1]: X unidades x \$Y = \$Z\n• [Producto 2]: X unidades x \$Y = \$Z\n**Total: \$1.800**\n**Vendedor: [Nombre]**"
-
-   ⚠️ IMPORTANTE: SIEMPRE incluye el vendedor (seller_name) en las respuestas sobre facturas cuando esté disponible.
-
-¡Sé inteligente, proactivo y ayuda al usuario a completar sus tareas!
-
-Hoy: {$currentDate}, {$currentTime}
+⏰ **FECHA Y HORA ACTUAL (COLOMBIA)**: {$currentDate} a las {$currentTime}
+⚠️ Para calcular fechas: Hoy es {$currentDate}. Si dicen "el martes" o "hace 2 días", calcula la fecha YYYY-MM-DD correspondiente.
 EOT;
     }
 
@@ -896,14 +830,18 @@ EOT;
                 'type' => 'function',
                 'function' => [
                     'name' => 'get_sales_report',
-                    'description' => 'Obtener estadísticas de ventas para un período específico de tiempo',
+                    'description' => 'Obtener estadísticas de ventas para un período específico de tiempo. Para fechas específicas como "27 de enero", usa specific_date.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
                             'period' => [
                                 'type' => 'string',
-                                'enum' => ['today', 'yesterday', 'week', 'month', 'last_7_days'],
-                                'description' => 'Período de tiempo para el reporte'
+                                'enum' => ['today', 'yesterday', 'week', 'month', 'last_7_days', 'specific_date'],
+                                'description' => 'Período de tiempo para el reporte. Usa "specific_date" si el usuario menciona una fecha concreta.'
+                            ],
+                            'specific_date' => [
+                                'type' => 'string',
+                                'description' => 'Fecha específica en formato YYYY-MM-DD. Solo usar cuando period="specific_date". Ejemplo: 2026-01-27 para el 27 de enero de 2026.'
                             ]
                         ],
                         'required' => ['period']
@@ -1313,12 +1251,14 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 return $this->toolSearchCategories($args);
 
                 case 'get_sales_report':
+                    \Log::info('🔧 [AI] get_sales_report llamado con args:', $args);
                     return $this->toolGetSalesReport($args);
 
                 case 'get_low_stock_products':
                     return $this->toolGetLowStockProducts($args);
 
                 case 'search_invoices':
+                    \Log::info('🔧 [AI] search_invoices llamado con args:', $args);
                     return $this->toolSearchInvoices($args);
 
                 case 'get_invoice_details':
@@ -1444,45 +1384,65 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
     private function toolGetSalesReport($args)
     {
         $period = $args['period'] ?? 'today';
+        
+        // Usar zona horaria de Colombia explícitamente
+        $now = Carbon::now('America/Bogota');
+        $today = Carbon::today('America/Bogota');
+        $yesterday = Carbon::yesterday('America/Bogota');
 
-        $dateQuery = match($period) {
-            'today' => [['date', '=', Carbon::today()]],
-            'yesterday' => [['date', '=', Carbon::yesterday()]],
-            'week' => [['date', '>=', Carbon::now()->startOfWeek()]],
-            'month' => [['date', '>=', Carbon::now()->startOfMonth()]],
-            'last_7_days' => [['date', '>=', Carbon::now()->subDays(7)]],
-            default => [['date', '=', Carbon::today()]]
+        // Manejar fecha específica
+        $specificDate = $args['specific_date'] ?? null;
+        $isSpecificDate = $period === 'specific_date' && $specificDate;
+
+        // Calcular fecha de inicio según el período
+        $dateFilter = match($period) {
+            'today' => $today->format('Y-m-d'),
+            'yesterday' => $yesterday->format('Y-m-d'),
+            'week' => $now->copy()->startOfWeek()->format('Y-m-d'),
+            'month' => $now->copy()->startOfMonth()->format('Y-m-d'),
+            'last_7_days' => $now->copy()->subDays(7)->format('Y-m-d'),
+            'specific_date' => $specificDate ?? $today->format('Y-m-d'),
+            default => $today->format('Y-m-d')
         };
+        
+        $todayStr = $today->format('Y-m-d');
 
-        $total = Invoice::where('type', 'invoice')
-            ->where($dateQuery)
-            ->where('status', '!=', 'cancelled')
-            ->sum('total');
+        // Query para facturas PAGADAS (igual que la IA de voz)
+        $query = Invoice::where('type', 'invoice')
+            ->where('status', 'paid'); // Solo pagadas, como hace la voz
+            
+        if (in_array($period, ['today', 'yesterday']) || $isSpecificDate) {
+            $query->whereDate('date', $dateFilter);
+        } else {
+            $query->whereDate('date', '>=', $dateFilter)
+                  ->whereDate('date', '<=', $todayStr);
+        }
 
-        $count = Invoice::where('type', 'invoice')
-            ->where($dateQuery)
-            ->where('status', '!=', 'cancelled')
-            ->count();
+        $invoices = $query->get();
+        $total = $invoices->sum('total');
+        $count = $invoices->count();
+
+        // Obtener últimas facturas para contexto
+        $lastInvoices = $invoices->sortByDesc('created_at')->take(5)->map(function($inv) {
+            return [
+                'id' => $inv->id,
+                'number' => $inv->invoice_number ?? "FV-{$inv->id}",
+                'customer' => $inv->customer_name ?? 'Cliente general',
+                'total' => $inv->total,
+                'date' => $inv->date,
+            ];
+        })->values()->toArray();
 
         // Get top selling products for this period
-        $dateFilter = match($period) {
-            'today' => Carbon::today(),
-            'yesterday' => Carbon::yesterday(),
-            'week' => Carbon::now()->startOfWeek(),
-            'month' => Carbon::now()->startOfMonth(),
-            'last_7_days' => Carbon::now()->subDays(7),
-            default => Carbon::today()
-        };
-
-        $topProducts = InvoiceItem::whereHas('invoice', function($query) use ($dateFilter, $period) {
-                if (in_array($period, ['today', 'yesterday'])) {
-                    $query->where('type', 'invoice')
-                          ->whereDate('date', $dateFilter)
-                          ->where('status', '!=', 'cancelled');
+        $topProducts = InvoiceItem::whereHas('invoice', function($q) use ($dateFilter, $period, $todayStr, $isSpecificDate) {
+                $q->where('type', 'invoice')
+                  ->where('status', 'paid');
+                  
+                if (in_array($period, ['today', 'yesterday']) || $isSpecificDate) {
+                    $q->whereDate('date', $dateFilter);
                 } else {
-                    $query->where('type', 'invoice')
-                          ->where('date', '>=', $dateFilter)
-                          ->where('status', '!=', 'cancelled');
+                    $q->whereDate('date', '>=', $dateFilter)
+                      ->whereDate('date', '<=', $todayStr);
                 }
             })
             ->selectRaw('product_name, sum(quantity) as total_qty, sum(unit_price * quantity) as total_revenue')
@@ -1494,10 +1454,18 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
 
         return [
             'period' => $period,
+            'current_date' => $now->format('Y-m-d'),
+            'current_time' => $now->format('H:i'),
+            'query_date' => $dateFilter,
+            'timezone' => 'America/Bogota',
             'total_sales' => $total,
             'invoice_count' => $count,
             'average_ticket' => $count > 0 ? round($total / $count, 2) : 0,
-            'top_products' => $topProducts
+            'last_invoices' => $lastInvoices,
+            'top_products' => $topProducts,
+            'message' => $count > 0 
+                ? "El {$dateFilter} hubo {$count} facturas pagadas por un total de $" . number_format($total, 0, ',', '.') 
+                : "No hay facturas pagadas para el período consultado ({$dateFilter})"
         ];
     }
 
@@ -2020,7 +1988,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             $rows = $parseResult['data'] ?? [];
 
             // ✅ ELIMINAR ARCHIVO INMEDIATAMENTE DESPUÉS DE PARSEAR
-            // No esperar a que Gemini responda
             if (file_exists($fullPath)) {
                 unlink($fullPath);
                 Log::info("🗑️ [Gemini Excel] Archivo temporal eliminado inmediatamente");
@@ -2038,38 +2005,28 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 'total_rows' => count($rows)
             ]);
 
-            // 3. Preparar datos para Gemini (SIN la ruta del archivo)
+            // 🚀 NUEVO ENFOQUE: Importar directamente sin pasar por Gemini Agent
+            // Esto evita el error MALFORMED_FUNCTION_CALL con archivos grandes
             $geminiService = app(\App\Services\GeminiAgentService::class);
-
-            $prompt = $userMessage ?: "Importa estos productos a la base de datos.";
-            $prompt .= "\n\n🚀 **INSTRUCCIÓN IMPORTANTE:** Usa la función `importarProductosMasivo` para crear todos estos productos en la base de datos de una sola vez.\n\n";
-            $prompt .= "**Datos del archivo:**\n";
-            $prompt .= "- Columnas: " . implode(', ', $headers) . "\n";
-            $prompt .= "- Total de productos: " . count($rows) . "\n\n";
-            $prompt .= "**Primeras 5 filas (vista previa):**\n```json\n";
-
-            foreach (array_slice($rows, 0, 5) as $index => $row) {
-                $prompt .= json_encode(array_combine($headers, $row), JSON_UNESCAPED_UNICODE) . "\n";
-            }
-            $prompt .= "```\n\n";
-            $prompt .= "📋 **Datos completos listos para importar:**\n```json\n";
-            $prompt .= json_encode(['headers' => $headers, 'rows' => $rows], JSON_UNESCAPED_UNICODE);
-            $prompt .= "\n```\n\n";
-            $prompt .= "✅ **Ahora llama a la función `importarProductosMasivo` con este JSON para importar los " . count($rows) . " productos.**";
-
-            Log::info("📤 [Gemini Excel] Enviando a Gemini", [
-                'total_products' => count($rows),
-                'headers' => $headers
+            
+            // Llamar directamente al handler de importación
+            $importResult = $geminiService->executeImportFromController([
+                'products_data' => [
+                    'headers' => $headers,
+                    'rows' => $rows
+                ]
             ]);
 
-            // 4. Ejecutar con Gemini Agent
-            $response = $geminiService->runAgent($prompt);
+            Log::info("✅ [Gemini Excel] Importación completada", [
+                'success' => $importResult['status'] === 'success',
+                'created' => $importResult['productos_creados'] ?? 0
+            ]);
 
-            Log::info("✅ [Gemini Excel] Respuesta recibida de Gemini");
-
-            // 6. Retornar respuesta de Gemini
+            // Retornar resultado de la importación (usar 'mensaje' que es el campo correcto)
+            $replyText = $importResult['mensaje'] ?? $importResult['message'] ?? 'Importación procesada';
+            
             return response()->json([
-                'reply' => $response,
+                'reply' => $replyText,
                 'status' => 'success'
             ]);
 

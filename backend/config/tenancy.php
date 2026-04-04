@@ -30,9 +30,11 @@ return [
      * To configure their behavior, see the config keys below.
      */
     'bootstrappers' => [
+        // FilesystemTenancyBootstrapper MUST be before DatabaseTenancyBootstrapper
+        // so that originalPaths['disks'] is always populated before any revert() call
+        Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
         // Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
-        Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
         // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
     ],

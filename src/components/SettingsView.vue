@@ -140,6 +140,39 @@
               <span>Categorías de Gastos</span>
             </button>
           </li>
+          
+          <li>
+            <button @click="activeSection = 'trash'"
+                    :class="[
+                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                      activeSection === 'trash'
+                        ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-l-4 border-emerald-600 dark:border-emerald-500'
+                        : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-zinc-200'
+                    ]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              <span>Papelera</span>
+            </button>
+          </li>
+          
+          <!-- 🧾 Facturación Electrónica DIAN (TEMPORALMENTE DESHABILITADO) -->
+          <!-- TODO: Reactivar cuando esté listo el módulo de facturación electrónica
+          <li>
+            <button @click="activeSection = 'electronic-invoice'"
+                    :class="[
+                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                      activeSection === 'electronic-invoice'
+                        ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-l-4 border-emerald-600 dark:border-emerald-500'
+                        : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-zinc-200'
+                    ]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+              <span>Factura Electrónica</span>
+            </button>
+          </li>
+          -->
         </ul>
       </nav>
     </aside>
@@ -336,13 +369,14 @@
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Tipo de Tienda</label>
+                <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Tipo de Negocio</label>
                 <select v-model="systemSettings.store_type" 
                         class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                  <option value="general">General (Mini Market, Ferretería, Papelería, etc.)</option>
-                  <option value="fashion">Moda (Ropa, Zapatos, Accesorios)</option>
+                  <option value="general">🏪 General (Mini Market, Ferretería, Papelería)</option>
+                  <option value="fashion">👗 Moda (Ropa, Zapatos, Accesorios)</option>
+                  <option value="food">🍔 Restaurante / Comidas Rápidas</option>
                 </select>
-                <p class="text-[10px] text-gray-500 dark:text-zinc-400 mt-1">Define el diseño del POS y comportamiento predeterminado al crear productos.</p>
+                <p class="text-[10px] text-gray-500 dark:text-zinc-400 mt-1">Cambia el diseño del punto de venta según tu tipo de negocio.</p>
               </div>
               
               <div>
@@ -997,6 +1031,130 @@
         </div>
 
       </div>
+
+      <!-- 🗑️ Sección: Papelera de Productos -->
+      <div v-if="activeSection === 'trash'" class="space-y-6">
+        
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden">
+          <!-- Header -->
+          <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-5 py-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-gray-900 dark:text-white">Productos Eliminados</h2>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ trashedProducts.length }} producto{{ trashedProducts.length !== 1 ? 's' : '' }} en la papelera</p>
+            </div>
+            <button @click="loadTrashedProducts" :disabled="loadingTrash"
+                    class="px-4 py-2 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 rounded-lg text-sm font-medium flex items-center gap-2 transition-all duration-200">
+              <svg :class="loadingTrash ? 'animate-spin' : ''" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              <span>{{ loadingTrash ? 'Cargando...' : 'Actualizar' }}</span>
+            </button>
+          </div>
+
+          <!-- Filtro de búsqueda -->
+          <div class="p-5 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input v-model="trashSearch" type="text" placeholder="Buscar producto eliminado..."
+                     class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
+            </div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
+              <thead class="bg-gray-50 dark:bg-zinc-900">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Producto</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">SKU</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Categoría</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Eliminado</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Eliminado por</th>
+                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Motivo</th>
+                  <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800">
+                <!-- Loading -->
+                <tr v-if="loadingTrash">
+                  <td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-zinc-400">
+                    <div class="flex items-center justify-center gap-2">
+                      <div class="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span>Cargando papelera...</span>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Empty -->
+                <tr v-else-if="filteredTrashedProducts.length === 0">
+                  <td colspan="7" class="px-4 py-12 text-center">
+                    <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    <p class="text-gray-500 dark:text-zinc-400 font-medium">{{ trashSearch ? 'Sin resultados' : 'La papelera está vacía' }}</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1">{{ trashSearch ? 'Intenta con otro término' : 'Los productos eliminados aparecerán aquí' }}</p>
+                  </td>
+                </tr>
+                <!-- Rows -->
+                <tr v-else v-for="product in filteredTrashedProducts" :key="product.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-200">
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-lg flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
+                        <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover opacity-60">
+                        <div v-else class="w-full h-full flex items-center justify-center">
+                          <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-sm font-medium text-gray-900 dark:text-zinc-200 truncate">{{ product.name }}</p>
+                        <p class="text-xs text-gray-400 dark:text-zinc-500">${{ Number(product.sale_price || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 }) }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="text-sm text-gray-600 dark:text-zinc-300 font-mono">{{ product.sku || '-' }}</span>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="text-sm text-gray-600 dark:text-zinc-300">{{ product.category || 'Sin categoría' }}</span>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div>
+                      <p class="text-sm text-gray-900 dark:text-zinc-200">{{ formatTrashDate(product.deleted_at) }}</p>
+                      <p class="text-xs text-gray-400 dark:text-zinc-500">{{ formatTrashTime(product.deleted_at) }}</p>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="text-sm text-gray-600 dark:text-zinc-300">{{ product.deleted_by_name || 'Sistema' }}</span>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span v-if="product.deleted_reason" class="text-sm text-gray-600 dark:text-zinc-300 line-clamp-2" :title="product.deleted_reason">{{ product.deleted_reason }}</span>
+                    <span v-else class="text-xs text-gray-400 dark:text-zinc-500 italic">Sin motivo</span>
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    <button @click="restoreProduct(product)"
+                            :disabled="restoringProductId === product.id"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 rounded-lg text-xs font-semibold transition-all duration-200 disabled:opacity-50">
+                      <svg v-if="restoringProductId !== product.id" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
+                      <div v-else class="w-3.5 h-3.5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                      {{ restoringProductId === product.id ? 'Restaurando...' : 'Restaurar' }}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🧾 Sección: Facturación Electrónica DIAN -->
+      <div v-if="activeSection === 'electronic-invoice'">
+        <ElectronicInvoiceConfig />
+      </div>
       
       </div>
       <!-- Fin Área de Contenido con Scroll -->
@@ -1288,6 +1446,7 @@ import axiosInstance from '../services/apiClient'
 import { appStore } from '../store/appStore.js'
 import UpgradePlanModal from './UpgradePlanModal.vue'
 import PaymentHistoryPanel from './PaymentHistoryPanel.vue'
+import ElectronicInvoiceConfig from './settings/ElectronicInvoiceConfig.vue'
 
 // Props para evitar warnings de Vue
 const props = defineProps({
@@ -1317,6 +1476,12 @@ const categoryForm = ref({
   color: '#3B82F6',
   is_active: true
 })
+
+// Estados para papelera de productos
+const trashedProducts = ref([])
+const loadingTrash = ref(false)
+const restoringProductId = ref(null)
+const trashSearch = ref('')
 
 // Sistema de notificaciones simple sin Vuex
 const errorMessage = ref('')
@@ -1686,7 +1851,9 @@ const getSectionTitle = () => {
     pos: 'Configuración del POS',
     discounts: 'Descuentos y Promociones',
     payments: 'Métodos de Pago',
-    expenses: 'Categorías de Gastos'
+    expenses: 'Categorías de Gastos',
+    'electronic-invoice': 'Facturación Electrónica DIAN',
+    trash: 'Papelera de Productos'
   }
   return titles[activeSection.value] || 'Configuración'
 }
@@ -1700,7 +1867,9 @@ const getSectionDescription = () => {
     pos: 'Opciones avanzadas del punto de venta',
     discounts: 'Gestión de descuentos y códigos promocionales',
     payments: 'Configuración de formas de pago aceptadas',
-    expenses: 'Categorización de gastos operativos'
+    expenses: 'Categorización de gastos operativos',
+    'electronic-invoice': 'Configura tu empresa para emitir facturas electrónicas validadas por la DIAN',
+    trash: 'Productos eliminados que pueden ser restaurados'
   }
   return descriptions[activeSection.value] || ''
 }
@@ -1854,7 +2023,6 @@ const loadExpenseCategories = async () => {
     if (expenseCategoryFilters.value.is_active !== '') params.is_active = expenseCategoryFilters.value.is_active
     
     const response = await axiosInstance.get('/expense-categories', { params })
-    console.log('Response de categorías:', response.data)
     
     // Asegurar estructura correcta
     if (response.data) {
@@ -1868,11 +2036,8 @@ const loadExpenseCategories = async () => {
       expenseCategories.value = { data: [], total: 0 }
     }
     
-    console.log('expenseCategories después de asignar:', expenseCategories.value)
-    
     // Cargar estadísticas
     const statsResponse = await axiosInstance.get('/expense-categories/statistics')
-    console.log('Stats response:', statsResponse.data)
     if (statsResponse.data && statsResponse.data.success) {
       expenseCategoriesStats.value = statsResponse.data.data || {}
     } else {
@@ -1948,10 +2113,65 @@ const closeCategoryModal = () => {
   categoryForm.value = { name: '', description: '', color: '#3B82F6', is_active: true }
 }
 
+// Funciones para papelera de productos
+const filteredTrashedProducts = computed(() => {
+  if (!trashSearch.value) return trashedProducts.value
+  const q = trashSearch.value.toLowerCase()
+  return trashedProducts.value.filter(p =>
+    (p.name && p.name.toLowerCase().includes(q)) ||
+    (p.sku && p.sku.toLowerCase().includes(q)) ||
+    (p.category && p.category.toLowerCase().includes(q)) ||
+    (p.deleted_by_name && p.deleted_by_name.toLowerCase().includes(q)) ||
+    (p.deleted_reason && p.deleted_reason.toLowerCase().includes(q))
+  )
+})
+
+const loadTrashedProducts = async () => {
+  loadingTrash.value = true
+  try {
+    const response = await axiosInstance.get('/products/trash')
+    if (response.data.success) {
+      trashedProducts.value = response.data.data || []
+    }
+  } catch (error) {
+    console.error('Error al cargar papelera:', error)
+  } finally {
+    loadingTrash.value = false
+  }
+}
+
+const restoreProduct = async (product) => {
+  restoringProductId.value = product.id
+  try {
+    const response = await axiosInstance.post(`/products/${product.id}/restore`)
+    if (response.data.success) {
+      showNotification(`"${product.name}" restaurado exitosamente`, 'success')
+      await loadTrashedProducts()
+    }
+  } catch (error) {
+    showNotification('Error al restaurar producto: ' + (error.response?.data?.message || error.message), 'error')
+  } finally {
+    restoringProductId.value = null
+  }
+}
+
+const formatTrashDate = (dateString) => {
+  if (!dateString) return '-'
+  return new Date(dateString).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+const formatTrashTime = (dateString) => {
+  if (!dateString) return ''
+  return new Date(dateString).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+}
+
 // Watch para cargar categorías cuando se selecciona la sección de gastos
 watch(activeSection, (newVal) => {
   if (newVal === 'expenses') {
     loadExpenseCategories()
+  }
+  if (newVal === 'trash') {
+    loadTrashedProducts()
   }
 })
 

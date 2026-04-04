@@ -64,44 +64,54 @@
           <!-- Reportes de Inventario -->
           <button 
             @click="setActiveReport('inventario')"
-            class="group relative px-5 py-4 rounded-2xl border transition-all duration-300 text-left opacity-60 cursor-not-allowed bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-800"
-            disabled
+            :class="[
+              'group relative px-5 py-4 rounded-2xl border transition-all duration-300 text-left',
+              activeReport === 'inventario' 
+                ? 'bg-white dark:bg-zinc-900 border-amber-300 dark:border-amber-700 shadow-lg dark:shadow-black/50' 
+                : 'bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-800 hover:border-amber-300 dark:hover:border-amber-700 hover:shadow-lg dark:hover:shadow-black/50'
+            ]"
           >
             <div class="flex items-center space-x-3">
-              <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-colors bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
               </div>
               <div class="flex-1">
-                <h3 class="text-sm font-bold text-gray-700 dark:text-zinc-400">Reportes de Inventario</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Control de stock</p>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white transition-colors">Reportes de Inventario</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5 transition-colors">Control de stock</p>
               </div>
+              <div v-if="activeReport === 'inventario'" class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
             </div>
             <span class="absolute top-2 right-3 text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 px-2 py-0.5 rounded-md border border-amber-100 dark:border-amber-800 uppercase tracking-wide">
-              Próximo
+              Activo
             </span>
           </button>
 
           <!-- Reportes Financieros -->
           <button 
             @click="setActiveReport('financiero')"
-            class="group relative px-5 py-4 rounded-2xl border transition-all duration-300 text-left opacity-60 cursor-not-allowed bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-800"
-            disabled
+            :class="[
+              'group relative px-5 py-4 rounded-2xl border transition-all duration-300 text-left',
+              activeReport === 'financiero' 
+                ? 'bg-white dark:bg-zinc-900 border-rose-300 dark:border-rose-700 shadow-lg dark:shadow-black/50' 
+                : 'bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-800 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-lg dark:hover:shadow-black/50'
+            ]"
           >
             <div class="flex items-center space-x-3">
-              <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center transition-colors bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
                 <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
               </div>
               <div class="flex-1">
-                <h3 class="text-sm font-bold text-gray-700 dark:text-zinc-400">Reportes Financieros</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Análisis económico</p>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white transition-colors">Reportes Financieros</h3>
+                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5 transition-colors">Análisis económico</p>
               </div>
+              <div v-if="activeReport === 'financiero'" class="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
             </div>
             <span class="absolute top-2 right-3 text-[10px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950 px-2 py-0.5 rounded-md border border-rose-100 dark:border-rose-800 uppercase tracking-wide">
-              Próximo
+              Nuevo
             </span>
           </button>
 
@@ -122,38 +132,12 @@
 
         <!-- Reportes de Inventario -->
         <div v-if="activeReport === 'inventario'">
-          <div class="bg-white rounded-2xl p-6 border border-gray-300">
-            <div class="text-center py-12">
-              <div class="w-20 h-20 bg-purple-100 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-900 mb-4">Reportes de Inventario</h3>
-              <p class="text-gray-600 mb-6 max-w-md mx-auto">Los reportes detallados de inventario estarán disponibles en la próxima actualización.</p>
-              <button class="px-5 py-2 bg-gradient-to-r from-lime-400 to-green-400 hover:from-lime-500 hover:to-green-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105">
-                Notificarme cuando esté listo
-              </button>
-            </div>
-          </div>
+          <ReportesInventarioView />
         </div>
 
         <!-- Reportes Financieros -->
         <div v-if="activeReport === 'financiero'">
-          <div class="bg-white rounded-2xl p-6 border border-gray-300">
-            <div class="text-center py-12">
-              <div class="w-20 h-20 bg-orange-100 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                <svg class="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <h3 class="text-xl font-bold text-gray-900 mb-4">Reportes Financieros</h3>
-              <p class="text-gray-600 mb-6 max-w-md mx-auto">Los reportes financieros avanzados estarán disponibles en la próxima actualización.</p>
-              <button class="px-5 py-2 bg-gradient-to-r from-lime-400 to-green-400 hover:from-lime-500 hover:to-green-500 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105">
-                Notificarme cuando esté listo
-              </button>
-            </div>
-          </div>
+          <ReportesFinancierosView />
         </div>
 
       </div>
@@ -170,6 +154,8 @@ import { useUIContextStore } from '@/store/uiContextStore'
 // Componentes lazy loading
 const ReportsView = defineAsyncComponent(() => import('./ReportsView.vue'))
 const ReportesCajaView = defineAsyncComponent(() => import('./ReportesCajaView.vue'))
+const ReportesInventarioView = defineAsyncComponent(() => import('../views/ReportesInventarioView.vue'))
+const ReportesFinancierosView = defineAsyncComponent(() => import('../views/ReportesFinancierosView.vue'))
 
 // Estado reactivo
 const activeReport = ref('general')
@@ -188,13 +174,16 @@ const setActiveReport = (report) => {
 
 // Actualizar contexto para la IA
 const actualizarContextoIA = () => {
-  uiContextStore.setScreenData('reports-menu', {
+  uiContextStore.setScreenData({
+    tipoReporte: 'reports-menu',
     modulo: 'Reportes',
-    descripcion: 'Menú principal de reportes con acceso a Reportes Generales y Reportes de Caja',
+    descripcion: 'Menú principal de reportes con acceso a Reportes Generales, Reportes de Caja y Reportes de Inventario',
     reporteActivo: activeReport.value,
-    reportesDisponibles: ['general', 'caja'],
+    reportesDisponibles: ['general', 'caja', 'inventario', 'financiero'],
     reporteActivoNombre: activeReport.value === 'general' ? 'Reportes Generales' : 
-                         activeReport.value === 'caja' ? 'Reportes de Caja' : 'Otro'
+                         activeReport.value === 'caja' ? 'Reportes de Caja' : 
+                         activeReport.value === 'inventario' ? 'Reportes de Inventario' : 
+                         activeReport.value === 'financiero' ? 'Reportes Financieros' : 'Otro'
   })
 }
 
@@ -212,6 +201,18 @@ const registrarAccionesIA = () => {
     return { success: true, message: 'Cambiado a Reportes Generales' }
   })
   
+  // Cambiar a reporte de inventario
+  uiContextStore.registerAction('cambiarAReporteInventario', async () => {
+    activeReport.value = 'inventario'
+    return { success: true, message: 'Cambiado a Reportes de Inventario' }
+  })
+  
+  // Cambiar a reporte financiero
+  uiContextStore.registerAction('cambiarAReporteFinanciero', async () => {
+    activeReport.value = 'financiero'
+    return { success: true, message: 'Cambiado a Reportes Financieros' }
+  })
+  
   // Cambiar tipo de reporte
   uiContextStore.registerAction('cambiarTipoReporte', async ({ tipo }) => {
     if (tipo === 'caja' || tipo === 'cajeros') {
@@ -220,12 +221,21 @@ const registrarAccionesIA = () => {
     } else if (tipo === 'general' || tipo === 'ventas') {
       activeReport.value = 'general'
       return { success: true, message: 'Cambiado a Reportes Generales' }
+    } else if (tipo === 'inventario' || tipo === 'stock') {
+      activeReport.value = 'inventario'
+      return { success: true, message: 'Cambiado a Reportes de Inventario' }
+    } else if (tipo === 'financiero' || tipo === 'finanzas' || tipo === 'ganancias') {
+      activeReport.value = 'financiero'
+      return { success: true, message: 'Cambiado a Reportes Financieros' }
     }
-    return { success: false, message: 'Tipo de reporte no válido. Usa "general" o "caja".' }
+    return { success: false, message: 'Tipo de reporte no válido. Usa "general", "caja", "inventario" o "financiero".' }
   })
 }
 
 onMounted(() => {
+  // Establecer módulo actual para la IA
+  uiContextStore.setCurrentModule('reports')
+  
   registrarAccionesIA()
   actualizarContextoIA()
 })

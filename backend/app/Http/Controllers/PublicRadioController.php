@@ -310,7 +310,7 @@ class PublicRadioController extends Controller
             [
                 'id' => 'co-medellin-mix',
                 'name' => 'Mix 89.9 FM Medellín',
-                'stream_url' => 'https://24493.live.streamtheworld.com:443/MIX_MEDELLINAAC.aac',
+                'stream_url' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_MEDELLINAAC.aac',
                 'logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/42/Mix_Colombia_logo.png',
                 'tags' => 'pop,hits,urban',
                 'country' => 'Colombia',
@@ -431,7 +431,7 @@ class PublicRadioController extends Controller
             [
                 'id' => 'co-bogota-los40',
                 'name' => 'LOS40 Colombia',
-                'stream_url' => 'https://24413.live.streamtheworld.com:443/LOS40_COLOMBIAAAC.aac',
+                'stream_url' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_COLOMBIAAAC.aac',
                 'logo' => 'https://cdn-profiles.tunein.com/p1306541/images/logod.png',
                 'tags' => 'pop,hits',
                 'country' => 'Colombia',
@@ -457,7 +457,7 @@ class PublicRadioController extends Controller
             [
                 'id' => 'co-bogota-radioacktiva',
                 'name' => 'Radioacktiva 97.9 FM Bogotá',
-                'stream_url' => 'https://27693.live.streamtheworld.com:443/RADIO_ACTIVAAAC.aac',
+                'stream_url' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_ACTIVAAAC.aac',
                 'logo' => 'https://www.radioacktiva.com/wp-content/uploads/2024/12/cropped-favicon-new1-180x180.png',
                 'tags' => 'rock,metal',
                 'country' => 'Colombia',
@@ -506,19 +506,7 @@ class PublicRadioController extends Controller
                 'bitrate' => 128,
                 'votes' => 950
             ],
-            [
-                'id' => 'co-bogota-lakalle',
-                'name' => 'La Kalle Bogotá',
-                'stream_url' => 'http://27423.live.streamtheworld.com/LA_KALLE_SC',
-                'logo' => 'https://cdn-profiles.tunein.com/s34136/images/logog.png',
-                'tags' => 'reggaeton,urbano',
-                'country' => 'Colombia',
-                'state' => 'Bogota',
-                'city' => 'Bogotá',
-                'frequency' => '96.9 FM',
-                'bitrate' => 128,
-                'votes' => 920
-            ],
+
             [
                 'id' => 'co-bogota-lax',
                 'name' => 'La X Bogotá',
@@ -565,7 +553,7 @@ class PublicRadioController extends Controller
             [
                 'id' => 'co-cali-olimpica',
                 'name' => 'Olímpica Stereo 104.5 FM Cali',
-                'stream_url' => 'https://27593.live.streamtheworld.com:443/OLP_CALI.mp3',
+                'stream_url' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/OLP_CALIAAC.aac',
                 'logo' => 'https://olimpicastereo.com.co/wp-content/uploads/2019/12/Logo_olimpica_stereologo.png',
                 'tags' => 'salsa,tropical',
                 'country' => 'Colombia',
@@ -591,7 +579,7 @@ class PublicRadioController extends Controller
             [
                 'id' => 'co-cali-mix',
                 'name' => 'MIX 102.5 FM Cali',
-                'stream_url' => 'https://14133.live.streamtheworld.com/MIX_CALIAAC_SC',
+                'stream_url' => 'https://playerservices.streamtheworld.com/api/livestream-redirect/MIX_CALIAAC.aac',
                 'logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/42/Mix_Colombia_logo.png',
                 'tags' => 'pop,hits,urban',
                 'country' => 'Colombia',

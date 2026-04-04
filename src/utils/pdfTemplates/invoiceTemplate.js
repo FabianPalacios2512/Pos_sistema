@@ -35,7 +35,12 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       payments = [],
       change = 0,
       notes = '',
-      payment_method = '' // Para saber si es crédito
+      payment_method = '', // Para saber si es crédito
+      // 🎫 FACTURACIÓN ELECTRÓNICA DIAN
+      cufe = '',
+      factus_number = '',
+      qr_code = '', // URL del QR de la DIAN
+      qr_image = '' // Imagen QR en base64 de Factus
     } = invoiceData
 
     // Número de factura (compatibilidad con diferentes nombres)
@@ -65,29 +70,42 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       invoice_footer_message: systemSettings.invoice_footer_message
     })
 
-    // Generar QR Code
-    const qrDataURL = await QRCode.toDataURL(invoiceCode, {
-      width: 80,
+    // 🎫 Generar QR Code - Prioridad: DIAN (qr_code) > Número de factura
+    // Si hay qr_code de la DIAN (Alanube/Factus), usarlo para el QR real
+    const qrContent = qr_code || invoiceCode
+    const isDianQR = !!qr_code // Indica si es QR validado por DIAN
+    
+    console.log('🔍 QR Info:', {
+      hasQrCode: !!qr_code,
+      qrContentPreview: qrContent.substring(0, 50) + '...',
+      isDianQR
+    })
+    
+    const qrDataURL = await QRCode.toDataURL(qrContent, {
+      width: 120, // Mayor resolución para QR de DIAN (más datos)
       margin: 1,
-      color: { dark: '#000000', light: '#FFFFFF' }
+      color: { dark: '#000000', light: '#FFFFFF' },
+      errorCorrectionLevel: isDianQR ? 'M' : 'L' // Mayor corrección para QR DIAN
     })
 
     // Calcular altura dinámica exacta según contenido
-    const headerHeight = 60 // Header empresa + factura (aumentado de 50 a 60 para el logo)
+    const headerHeight = 60 // Header empresa + factura
     const customerHeight = 10 // Info cliente
     const tableHeaderHeight = 10 // Header tabla
     const itemHeight = 5 // Espacio por producto
     const itemCount = items.length
-    const surchargeLineHeight = surcharge_amount > 0 ? 4 : 0 // 🎯 Espacio para recargo si aplica
+    const surchargeLineHeight = surcharge_amount > 0 ? 4 : 0 // Espacio para recargo si aplica
     const totalsHeight = 35 + surchargeLineHeight // Totales + forma de pago
-    const messageHeight = 15 // Mensaje agradecimiento
-    const qrHeight = 35 // QR + código
-    const legalHeight = 18 // Info legal (4 líneas)
-    const footerHeight = 10 // Powered by + línea divisoria + margen inferior
+    const messageHeight = 10 // Mensaje agradecimiento (reducido)
+    const qrHeight = 28 // QR + código (reducido)
+    // CUFE compacto - solo espacio necesario
+    const cufeHeight = cufe ? 18 : 0 // Espacio para CUFE (más compacto)
+    const legalHeight = 12 // Info legal compacta
+    const footerHeight = 6 // Powered by compacto
 
     const dynamicHeight = headerHeight + customerHeight + tableHeaderHeight +
       (itemCount * itemHeight) + totalsHeight + messageHeight +
-      qrHeight + legalHeight + footerHeight + 20 // 20mm padding extra para asegurar espacio
+      qrHeight + cufeHeight + legalHeight + footerHeight + 5 // Solo 5mm margen seguridad
 
     // Crear PDF con formato ticket (80mm ancho, altura dinámica)
     const pdf = new jsPDF({
@@ -660,101 +678,129 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     }
     pdf.line(leftMargin, yPos, rightMargin, yPos)
     pdf.setLineDashPattern([], 0)
-    yPos += 5
+    yPos += 3
 
     // ==================== MENSAJE PERSONALIZADO ====================
     pdf.setFont('helvetica', 'bold')
-    pdf.setFontSize(10)
-    
-    // Color del mensaje según template
-    if (style.name === 'modern') {
-      pdf.setTextColor(0, 86, 179) // Color de acento
-    } else {
-      pdf.setTextColor(0, 0, 0)
-    }
+    pdf.setFontSize(8) // Más pequeño
+    pdf.setTextColor(0, 0, 0) // Siempre negro - profesional
 
     // Usar el mensaje personalizado del onboarding
     const messageLines = pdf.splitTextToSize(thankYouMessage, 65)
     messageLines.forEach(line => {
       pdf.text(line, centerX, yPos, { align: 'center' })
-      yPos += 4
+      yPos += 3
     })
-    pdf.setTextColor(0, 0, 0)
-    yPos += 4
+    yPos += 2
 
-    // ==================== QR CODE CON ESTILO SELECCIONADO ====================
-    const qrSize = 28
+    // ==================== QR CODE - ÚNICO (DIAN si validado, local si no) ====================
+    const qrSize = 22 // Más compacto
     const qrX = (pageWidth - qrSize) / 2
 
-    // Marco alrededor del QR según estilo seleccionado
-    pdf.setLineWidth(0.4)
+    // 🎫 Determinar si es CUFE real de DIAN o CUFE local
+    // Alanube: envía qr_code (contenido texto) - ya está codificado en qrDataURL
+    // Factus: envía qr_image (base64 de imagen)
+    const hasRealDianQrContent = qr_code && qr_code.includes('NumFac:') // Formato DIAN estándar
+    const hasRealDianQrImage = qr_image && qr_image.startsWith('data:image')
+    const isRealDianCufe = cufe && !cufe.startsWith('LOCAL-') && (hasRealDianQrContent || hasRealDianQrImage)
+    const isLocalCufe = cufe && cufe.startsWith('LOCAL-')
 
-    if (style.name === 'modern') {
-      pdf.setDrawColor(0, 86, 179) // Color de acento azul
-    } else if (style.name === 'minimal') {
-      pdf.setDrawColor(204, 204, 204) // Gris claro para Minimal
-      pdf.setLineWidth(0.2) // Línea más fina
-    } else {
-      pdf.setDrawColor(0, 0, 0) // Negro para Classic
-    }
-
-    // Aplicar estilo de QR seleccionado en onboarding
-    if (qrStyle === 'circle') {
-      pdf.circle(qrX + qrSize / 2, yPos + qrSize / 2, qrSize / 2 + 1, 'S')
-    } else if (qrStyle === 'square') {
-      pdf.rect(qrX - 1, yPos - 1, qrSize + 2, qrSize + 2, 'S')
-    } else {
-      // QR redondeado (default)
-      if (style.name === 'modern') {
-        pdf.roundedRect(qrX - 1, yPos - 1, qrSize + 2, qrSize + 2, 3, 3, 'S')
-      } else {
-        pdf.roundedRect(qrX - 1, yPos - 1, qrSize + 2, qrSize + 2, 2, 2, 'S')
+    if (isRealDianCufe) {
+      // ========== FACTURA ELECTRÓNICA VALIDADA DIAN ==========
+      try {
+        // Si tenemos imagen base64 de Factus, usarla; si no, usar qrDataURL generado del contenido
+        if (hasRealDianQrImage) {
+          pdf.addImage(qr_image, 'PNG', qrX, yPos, qrSize, qrSize)
+        } else {
+          // Usar el QR generado del contenido de Alanube (qr_code)
+          pdf.addImage(qrDataURL, 'PNG', qrX, yPos, qrSize, qrSize)
+        }
+        yPos += qrSize + 2
+        
+        // Número de factura interno
+        pdf.setFontSize(6)
+        pdf.setFont('helvetica', 'normal')
+        pdf.setTextColor(0, 0, 0)
+        pdf.text(invoiceCode, centerX, yPos, { align: 'center' })
+        yPos += 3
+        
+        // Línea separadora sutil
+        pdf.setDrawColor(200, 200, 200)
+        pdf.setLineWidth(0.1)
+        pdf.line(leftMargin + 5, yPos, rightMargin - 5, yPos)
+        yPos += 2
+        
+        // Texto DIAN - negro, sin colores
+        pdf.setFontSize(5)
+        pdf.setFont('helvetica', 'bold')
+        pdf.text('FACTURA ELECTRÓNICA DE VENTA', centerX, yPos, { align: 'center' })
+        yPos += 2
+        
+        // Número DIAN
+        pdf.setFont('helvetica', 'normal')
+        if (factus_number) {
+          pdf.text(`No. ${factus_number}`, centerX, yPos, { align: 'center' })
+          yPos += 2
+        }
+        
+        // CUFE compacto (todo junto sin "CUFE:" separado)
+        pdf.setFontSize(4)
+        const cufeLines = []
+        for (let i = 0; i < cufe.length; i += 48) {
+          cufeLines.push(cufe.substring(i, i + 48))
+        }
+        cufeLines.forEach(line => {
+          pdf.text(line, centerX, yPos, { align: 'center' })
+          yPos += 1.5
+        })
+        yPos += 1
+        
+      } catch (e) {
+        console.warn('Error al agregar QR de DIAN:', e)
+        pdf.addImage(qrDataURL, 'PNG', qrX, yPos, qrSize, qrSize)
+        yPos += qrSize + 2
       }
+      
+    } else {
+      // ========== DOCUMENTO SIN VALIDACIÓN DIAN ==========
+      pdf.addImage(qrDataURL, 'PNG', qrX, yPos, qrSize, qrSize)
+      yPos += qrSize + 2
+
+      pdf.setFontSize(6)
+      pdf.setFont('helvetica', 'normal')
+      pdf.setTextColor(0, 0, 0)
+      pdf.text(invoiceCode, centerX, yPos, { align: 'center' })
+      yPos += 3
+      
+      // Nota compacta
+      pdf.setFontSize(4)
+      pdf.setTextColor(120, 120, 120)
+      pdf.text('Documento equivalente - Art. 616-2 E.T.', centerX, yPos, { align: 'center' })
+      yPos += 2
+      pdf.setTextColor(0, 0, 0)
     }
-
-    pdf.addImage(qrDataURL, 'PNG', qrX, yPos, qrSize, qrSize)
-    yPos += qrSize + 4
-
-    pdf.setFontSize(7)
-    pdf.setFont('helvetica', 'bold')
-    if (style.name === 'modern') {
-      pdf.setTextColor(85, 85, 85) // Gris medio
-    }
-    pdf.text(invoiceCode, centerX, yPos, { align: 'center' })
-    pdf.setTextColor(0, 0, 0)
-    yPos += 6
-
-    // ==================== INFORMACIÓN LEGAL PROFESIONAL ====================
+    
+    // ==================== INFORMACIÓN LEGAL COMPACTA ====================
     pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(6) // Más pequeño para ahorrar papel
-    pdf.setTextColor(0, 0, 0) // Negro puro para impresión térmica
-
+    pdf.setFontSize(5)
+    pdf.setTextColor(100, 100, 100)
     pdf.text('Régimen Común - No responsable de IVA', centerX, yPos, { align: 'center' })
-    yPos += 3
+    yPos += 2
     pdf.text('Factura de venta Art. 617 del E.T.', centerX, yPos, { align: 'center' })
     yPos += 3
-    pdf.text('Resolución DIAN 18764069871234', centerX, yPos, { align: 'center' })
-    yPos += 3
-    pdf.text('Vigencia: 01/01/2024 al 31/12/2024', centerX, yPos, { align: 'center' })
-    yPos += 4
 
-    // ==================== FOOTER POWERED BY CENTRADO ====================
-    // Línea separadora final
+    // ==================== FOOTER POWERED BY ====================
     pdf.setLineWidth(0.1)
-    pdf.setDrawColor(180, 180, 180)
-    pdf.line(leftMargin, yPos, rightMargin, yPos)
-    yPos += 3
+    pdf.setDrawColor(200, 200, 200)
+    pdf.line(leftMargin + 10, yPos, rightMargin - 10, yPos)
+    yPos += 2
 
-    pdf.setFont('helvetica', 'normal')
-    pdf.setFontSize(6)
-    pdf.setTextColor(140, 140, 140) // Gris sutil
+    pdf.setFontSize(5)
+    pdf.setTextColor(160, 160, 160)
+    pdf.text('Powered by 105 POS', centerX, yPos, { align: 'center' })
+    yPos += 2
 
-    // Texto completamente centrado
-    const poweredText = 'Powered by 105 POS'
-    pdf.text(poweredText, centerX, yPos, { align: 'center' })
-    yPos += 3 // Margen inferior después del powered by
-
-    pdf.setTextColor(0, 0, 0) // Reset color
+    pdf.setTextColor(0, 0, 0)
 
     return pdf
 

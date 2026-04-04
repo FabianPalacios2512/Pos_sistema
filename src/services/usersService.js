@@ -192,6 +192,43 @@ class UsersService {
       }
     }
   }
+
+  // ═══════════════════════════════════════════
+  // Dashboard de Rendimiento & Auditoría
+  // ═══════════════════════════════════════════
+
+  async getDashboardKpis() {
+    const response = await apiClient.get('/users-dashboard/kpis')
+    return response.data
+  }
+
+  async getUsersWithPerformance() {
+    const response = await apiClient.get('/users-dashboard/with-performance')
+    return response.data
+  }
+
+  async getUserProfile(id) {
+    const response = await apiClient.get(`/users-dashboard/${id}/profile`)
+    return response.data
+  }
+
+  async getUserTimeline(id, date = null) {
+    const params = date ? { date } : {}
+    const response = await apiClient.get(`/users-dashboard/${id}/timeline`, { params })
+    return response.data
+  }
+
+  async assignUserWarehouse(id, warehouseId) {
+    const response = await apiClient.patch(`/users-dashboard/${id}/assign-warehouse`, {
+      warehouse_id: warehouseId
+    })
+    return response.data
+  }
+
+  async getPlanInfo() {
+    const response = await apiClient.get('/users-dashboard/plan-info')
+    return response.data
+  }
 }
 
 export default new UsersService()

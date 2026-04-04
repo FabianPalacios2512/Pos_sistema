@@ -3,86 +3,106 @@
   <div v-if="show" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-50 p-4">
     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden border border-gray-200 dark:border-zinc-800">
       <!-- Header del Modal -->
-      <div class="bg-gray-50 dark:bg-zinc-900 shadow-sm border-b border-gray-200 dark:border-zinc-800 p-6">
-        <div class="flex items-center justify-between">
+      <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-8 pt-6 pb-5">
+        <div class="flex items-center justify-between mb-6">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Devoluciones</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Procesar devoluciones de productos vendidos
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Procesar Devolución</h1>
+            <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">
+              Sigue los pasos para completar la devolución
             </p>
           </div>
 
           <!-- Botón de cerrar -->
-          <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-white p-2 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-white p-2.5 transition-all rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 border border-transparent hover:border-gray-200 dark:hover:border-zinc-700">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
         
-        <!-- Estados de proceso -->
-        <div class="flex items-center space-x-4 mt-4">
-          <div class="flex items-center space-x-2">
-            <div class="flex items-center space-x-1">
-              <div class="w-3 h-3 rounded-full transition-colors" :class="currentStep >= 1 ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-zinc-700'"></div>
-              <span class="text-sm font-medium" :class="currentStep >= 1 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-zinc-500'">Buscar Factura</span>
+        <!-- Stepper profesional -->
+        <div class="flex items-center justify-center">
+          <!-- Paso 1 -->
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300"
+                 :class="currentStep >= 1 ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400'">
+              <svg v-if="currentStep > 1" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <span v-else>1</span>
             </div>
-            <div class="w-8 h-0.5" :class="currentStep >= 2 ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-zinc-700'"></div>
-            <div class="flex items-center space-x-1">
-              <div class="w-3 h-3 rounded-full transition-colors" :class="currentStep >= 2 ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-zinc-700'"></div>
-              <span class="text-sm font-medium" :class="currentStep >= 2 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-zinc-500'">Seleccionar Items</span>
+            <span class="text-sm font-semibold transition-colors" :class="currentStep >= 1 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500'">Buscar Factura</span>
+          </div>
+          
+          <!-- Línea conectora -->
+          <div class="w-16 h-[2px] mx-3 rounded-full transition-colors duration-300" :class="currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-200 dark:bg-zinc-700'"></div>
+          
+          <!-- Paso 2 -->
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300"
+                 :class="currentStep >= 2 ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400'">
+              <svg v-if="currentStep > 2" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <span v-else>2</span>
             </div>
-            <div class="w-8 h-0.5" :class="currentStep >= 3 ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-zinc-700'"></div>
-            <div class="flex items-center space-x-1">
-              <div class="w-3 h-3 rounded-full transition-colors" :class="currentStep >= 3 ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-zinc-700'"></div>
-              <span class="text-sm font-medium" :class="currentStep >= 3 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-zinc-500'">Confirmar</span>
+            <span class="text-sm font-semibold transition-colors" :class="currentStep >= 2 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500'">Seleccionar Items</span>
+          </div>
+          
+          <!-- Línea conectora -->
+          <div class="w-16 h-[2px] mx-3 rounded-full transition-colors duration-300" :class="currentStep >= 3 ? 'bg-blue-600' : 'bg-gray-200 dark:bg-zinc-700'"></div>
+          
+          <!-- Paso 3 -->
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300"
+                 :class="currentStep >= 3 ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400'">
+              3
             </div>
+            <span class="text-sm font-semibold transition-colors" :class="currentStep >= 3 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500'">Confirmar</span>
           </div>
         </div>
       </div>
 
       <!-- Contenido principal con scroll -->
-      <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+      <div class="p-8 overflow-y-auto max-h-[calc(90vh-160px)]">
       <!-- Paso 1: Buscar Factura -->
-      <div v-if="currentStep === 1" class="max-w-2xl mx-auto">
-        <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-gray-200 dark:border-zinc-700 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div v-if="currentStep === 1" class="max-w-xl mx-auto pt-8">
+        <div class="text-center mb-8">
+          <div class="w-16 h-16 bg-blue-50 dark:bg-blue-950/50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-100 dark:border-blue-900/40">
+            <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
             Buscar Factura Original
           </h2>
+          <p class="text-sm text-gray-500 dark:text-zinc-400">Ingresa el número de factura o escanea el QR</p>
+        </div>
           
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">
-                Número de Factura
-              </label>
-              <div class="flex space-x-3">
-                <input
-                  v-model="searchInvoiceNumber"
-                  type="text"
-                  placeholder="Ej: FAC-000123 o escanee QR"
-                  class="flex-1 px-4 py-3 border border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all"
-                  @keyup.enter="searchInvoice"
-                  :disabled="isLoading"
-                >
-                <button
-                  @click="startQRScanner"
-                  :disabled="isLoading"
-                  class="px-4 py-3 bg-slate-600 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:text-gray-500 text-white rounded-xl font-medium transition-all duration-200 shadow-sm"
-                  title="Escanear código QR de la factura"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M12 12h.01M12 12v4.01"></path>
-                  </svg>
-                </button>
-                <button
-                  @click="searchInvoice"
-                  :disabled="isLoading || !searchInvoiceNumber.trim()"
-                  class="px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:text-gray-500 text-white rounded-xl font-bold transition-all duration-200 shadow-lg"
-                >
-                  <span v-if="!isLoading">Buscar</span>
-                  <span v-else>Buscando...</span>
-                </button>
-              </div>
+        <div class="space-y-4">
+          <div>
+            <div class="relative">
+              <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                v-model="searchInvoiceNumber"
+                type="text"
+                placeholder="FAC-000123"
+                class="w-full pl-12 pr-14 py-4 text-base font-medium border-2 border-gray-200 dark:border-zinc-700 rounded-2xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent focus:bg-white dark:focus:bg-zinc-800 shadow-sm transition-all duration-200"
+                @keyup.enter="searchInvoice"
+                :disabled="isLoading"
+              >
+              <button
+                @click="startQRScanner"
+                :disabled="isLoading"
+                class="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-xl transition-all"
+                title="Escanear código QR"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75z"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <p class="text-xs text-gray-400 dark:text-zinc-500 text-center mt-2">Presiona <kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-zinc-800 rounded text-gray-500 dark:text-zinc-400 font-mono text-[10px] border border-gray-200 dark:border-zinc-700">Enter</kbd> para buscar</p>
               
               <!-- Modal de escáner QR -->
               <div v-if="showQRScanner" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-50">
@@ -126,101 +146,121 @@
             </div>
           </div>
         </div>
-      </div>
 
       <!-- Paso 2: Mostrar Factura y Seleccionar Items -->
       <div v-if="currentStep === 2 && invoiceData" class="space-y-6">
         <!-- Información de la factura -->
-        <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-sm border border-gray-200 dark:border-zinc-700 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              Factura {{ invoiceData.invoice.number }}
-            </h2>
+        <div class="bg-white dark:bg-zinc-800/50 rounded-2xl border border-gray-200 dark:border-zinc-700/60 p-6">
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-xl flex items-center justify-center border border-blue-100 dark:border-blue-900/40">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+                  Factura {{ invoiceData.invoice.number }}
+                </h2>
+                <p class="text-xs text-gray-500 dark:text-zinc-400">Selecciona los productos a devolver</p>
+              </div>
+            </div>
             <button
               @click="goToStep(1)"
-              class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+              class="px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-900/40"
             >
               Cambiar Factura
             </button>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-gray-50 dark:bg-zinc-900 p-3 rounded-xl border border-gray-200 dark:border-zinc-700">
-              <label class="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">Cliente</label>
-              <p class="font-semibold text-gray-900 dark:text-white">{{ invoiceData.invoice.customer.name }}</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            <div class="bg-gray-50 dark:bg-zinc-800 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700">
+              <label class="block text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mb-1 uppercase tracking-wider">Cliente</label>
+              <p class="font-bold text-gray-900 dark:text-white text-sm">{{ invoiceData.invoice.customer.name }}</p>
             </div>
-            <div class="bg-gray-50 dark:bg-zinc-900 p-3 rounded-xl border border-gray-200 dark:border-zinc-700">
-              <label class="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">Fecha</label>
-              <p class="font-semibold text-gray-900 dark:text-white">{{ formatDate(invoiceData.invoice.date) }}</p>
+            <div class="bg-gray-50 dark:bg-zinc-800 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700">
+              <label class="block text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mb-1 uppercase tracking-wider">Fecha</label>
+              <p class="font-bold text-gray-900 dark:text-white text-sm">{{ formatDate(invoiceData.invoice.date) }}</p>
             </div>
-            <div class="bg-gray-50 dark:bg-zinc-900 p-3 rounded-xl border border-gray-200 dark:border-zinc-700">
-              <label class="block text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1">Total</label>
-              <p class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(invoiceData.invoice.total) }}</p>
+            <div class="bg-gray-50 dark:bg-zinc-800 px-4 py-3 rounded-xl border border-gray-200 dark:border-zinc-700">
+              <label class="block text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mb-1 uppercase tracking-wider">Total Factura</label>
+              <p class="font-bold text-gray-900 dark:text-white text-sm">${{ formatCurrency(invoiceData.invoice.total) }}</p>
             </div>
           </div>
 
           <!-- Productos de la factura -->
-          <h3 class="text-md font-semibold text-gray-900 dark:text-white mb-3">
+          <h3 class="text-[11px] font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">
             Productos a Devolver
           </h3>
           
           <div class="overflow-hidden border border-gray-200 dark:border-zinc-700 rounded-xl">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
-              <thead class="bg-gray-50 dark:bg-zinc-800">
+              <thead class="bg-gray-50 dark:bg-zinc-800/80">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                  <th class="px-5 py-3.5 text-left text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                     Producto
                   </th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
-                    Cant. Original
+                  <th class="px-5 py-3.5 text-center text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                    Original
                   </th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                  <th class="px-5 py-3.5 text-center text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                     Disponible
                   </th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                  <th class="px-5 py-3.5 text-center text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                     Devolver
                   </th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
-                    Precio Unit.
+                  <th class="px-5 py-3.5 text-right text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                    Precio
                   </th>
-                  <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                  <th class="px-5 py-3.5 text-right text-[10px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                     Subtotal
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
-                <tr v-for="item in invoiceData.invoice.invoice_items" :key="item.id">
-                  <td class="px-4 py-3">
+              <tbody class="bg-white dark:bg-zinc-800/30 divide-y divide-gray-100 dark:divide-zinc-700/50">
+                <tr v-for="item in invoiceData.invoice.invoice_items" :key="item.id" 
+                    class="transition-colors duration-150"
+                    :class="(item.returnQuantity || 0) > 0 ? 'bg-blue-50/50 dark:bg-blue-950/20' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'">
+                  <td class="px-5 py-4">
                     <div>
-                      <p class="font-medium text-gray-900 dark:text-white">{{ item.product.name }}</p>
-                      <p class="text-sm text-gray-500 dark:text-gray-400">{{ item.product.sku }}</p>
+                      <p class="font-semibold text-sm text-gray-900 dark:text-white">{{ item.product?.name || item.product_name || 'Producto eliminado' }}</p>
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ item.product?.sku || item.product_sku || '—' }}</p>
                     </div>
                   </td>
-                  <td class="px-4 py-3 text-gray-900 dark:text-white">
-                    {{ item.quantity }}
+                  <td class="px-5 py-4 text-center">
+                    <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">{{ item.quantity }}</span>
                   </td>
-                  <td class="px-4 py-3">
-                    <span class="text-gray-900 dark:text-white">{{ item.available_for_return }}</span>
-                    <span v-if="item.returned_quantity > 0" class="text-xs text-orange-600 ml-2">
-                      ({{ item.returned_quantity }} devueltas)
+                  <td class="px-5 py-4 text-center">
+                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ item.available_for_return }}</span>
+                    <span v-if="item.returned_quantity > 0" class="block text-[10px] text-amber-600 dark:text-amber-400 font-medium mt-0.5">
+                      {{ item.returned_quantity }} ya devueltas
                     </span>
                   </td>
-                  <td class="px-4 py-3">
-                    <input
-                      v-model.number="item.returnQuantity"
-                      type="number"
-                      :min="0"
-                      :max="item.available_for_return"
-                      class="w-20 px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 transition-all"
-                      :disabled="item.available_for_return <= 0"
-                      @input="updateReturnTotals"
-                    >
+                  <td class="px-5 py-4">
+                    <div class="flex items-center justify-center gap-1">
+                      <button
+                        @click="item.returnQuantity = Math.max(0, (item.returnQuantity || 0) - 1); updateReturnTotals()"
+                        :disabled="!item.returnQuantity || item.available_for_return <= 0"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all font-bold text-sm"
+                      >−</button>
+                      <span class="w-10 text-center text-sm font-bold" 
+                            :class="(item.returnQuantity || 0) > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-zinc-500'">
+                        {{ item.returnQuantity || 0 }}
+                      </span>
+                      <button
+                        @click="item.returnQuantity = Math.min(item.available_for_return, (item.returnQuantity || 0) + 1); updateReturnTotals()"
+                        :disabled="(item.returnQuantity || 0) >= item.available_for_return || item.available_for_return <= 0"
+                        class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-700 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-30 disabled:cursor-not-allowed transition-all font-bold text-sm"
+                      >+</button>
+                    </div>
                   </td>
-                  <td class="px-4 py-3 text-gray-900 dark:text-white">
+                  <td class="px-5 py-4 text-right text-sm font-medium text-gray-600 dark:text-zinc-300">
                     ${{ formatCurrency(item.unit_price) }}
                   </td>
-                  <td class="px-4 py-3 text-gray-900 dark:text-white">
-                    ${{ formatCurrency((item.returnQuantity || 0) * item.unit_price) }}
+                  <td class="px-5 py-4 text-right">
+                    <span class="text-sm font-bold" :class="(item.returnQuantity || 0) > 0 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-500'">
+                      ${{ formatCurrency((item.returnQuantity || 0) * item.unit_price) }}
+                    </span>
                   </td>
                 </tr>
               </tbody>
@@ -228,18 +268,20 @@
           </div>
 
           <!-- Totales de devolución -->
-          <div class="mt-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-5 border border-blue-100 dark:border-blue-900/50">
-            <div class="flex justify-between items-center text-sm mb-2">
-              <span class="text-gray-600 dark:text-zinc-400 font-medium">Subtotal:</span>
-              <span class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(returnTotals.subtotal) }}</span>
-            </div>
-            <div class="flex justify-between items-center text-sm mb-3">
-              <span class="text-gray-600 dark:text-zinc-400 font-medium">IVA:</span>
-              <span class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(returnTotals.taxAmount) }}</span>
-            </div>
-            <div class="flex justify-between items-center text-xl font-bold pt-3 border-t-2 border-blue-200 dark:border-blue-900">
-              <span class="text-gray-900 dark:text-white">Total a Devolver:</span>
-              <span class="text-blue-600 dark:text-blue-400">${{ formatCurrency(returnTotals.total) }}</span>
+          <div class="mt-6 flex justify-end">
+            <div class="w-80 bg-white dark:bg-zinc-800 rounded-xl p-5 border border-gray-200 dark:border-zinc-700 shadow-sm">
+              <div class="flex justify-between items-center text-sm mb-2.5">
+                <span class="text-gray-500 dark:text-zinc-400 font-medium">Subtotal:</span>
+                <span class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(returnTotals.subtotal) }}</span>
+              </div>
+              <div class="flex justify-between items-center text-sm mb-3">
+                <span class="text-gray-500 dark:text-zinc-400 font-medium">IVA:</span>
+                <span class="font-semibold text-gray-900 dark:text-white">${{ formatCurrency(returnTotals.taxAmount) }}</span>
+              </div>
+              <div class="flex justify-between items-center pt-3 border-t-2 border-gray-200 dark:border-zinc-700">
+                <span class="text-sm font-bold text-gray-900 dark:text-white">Total a Devolver:</span>
+                <span class="text-2xl font-extrabold text-blue-600 dark:text-blue-400">${{ formatCurrency(returnTotals.total) }}</span>
+              </div>
             </div>
           </div>
 
@@ -247,14 +289,14 @@
           <div class="flex justify-between mt-6">
             <button
               @click="goToStep(1)"
-              class="px-6 py-3 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-xl font-semibold transition-all hover:shadow-md"
+              class="px-5 py-2.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 rounded-xl font-semibold text-sm transition-all"
             >
               ← Volver
             </button>
             <button
               @click="goToStep(3)"
               :disabled="!hasSelectedItems"
-              class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-lg transition-all hover:scale-105 disabled:hover:scale-100"
+              class="px-8 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 disabled:cursor-not-allowed text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300"
             >
               Continuar →
             </button>
@@ -262,65 +304,73 @@
         </div>
       </div>
 
-      <!-- Paso 3: Confirmar Devolución - Diseño Compacto Horizontal -->
+      <!-- Paso 3: Confirmar Devolución -->
       <div v-if="currentStep === 3" class="max-w-5xl mx-auto">
-        <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-xl border border-gray-200 dark:border-zinc-700 p-6">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">
-            Confirmar Devolución
-          </h2>
+        <div class="bg-white dark:bg-zinc-800/50 rounded-2xl border border-gray-200 dark:border-zinc-700/60 p-6">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center border border-emerald-100 dark:border-emerald-900/40">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">Confirmar Devolución</h2>
+              <p class="text-xs text-gray-500 dark:text-zinc-400">Revisa los datos y confirma</p>
+            </div>
+          </div>
 
-          <!-- Grid de 2 columnas: Izquierda (Productos) | Derecha (Formulario) -->
+          <!-- Grid de 2 columnas -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             <!-- Columna Izquierda: Productos a Devolver -->
             <div>
-              <h3 class="text-sm font-bold text-gray-700 dark:text-zinc-300 mb-3 uppercase tracking-wide">Productos a Devolver</h3>
-              <div class="space-y-2 max-h-[280px] overflow-y-auto pr-2">
+              <h3 class="text-[11px] font-bold text-gray-700 dark:text-zinc-300 mb-3 uppercase tracking-wider">Productos a Devolver</h3>
+              <div class="space-y-2 max-h-[260px] overflow-y-auto pr-1">
                 <div v-for="item in selectedReturnItems" :key="item.product_id" 
-                     class="flex justify-between items-center py-2.5 px-3 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-700">
+                     class="flex justify-between items-center py-3 px-4 bg-gray-50 dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-colors">
                   <div class="flex-1 min-w-0">
-                    <span class="text-sm font-semibold text-gray-900 dark:text-white block truncate">{{ item.product.name }}</span>
-                    <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">x{{ item.quantity }}</span>
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white block truncate">{{ item.product?.name || item.product_name || 'Producto eliminado' }}</span>
+                    <span class="text-xs text-blue-600 dark:text-blue-400 font-bold">x{{ item.quantity }}</span>
                   </div>
-                  <span class="text-sm font-bold text-gray-900 dark:text-white ml-3">
+                  <span class="text-sm font-bold text-gray-900 dark:text-white ml-3 tabular-nums">
                     ${{ formatCurrency(item.quantity * item.unit_price) }}
                   </span>
                 </div>
               </div>
               
               <!-- Total destacado -->
-              <div class="mt-4 bg-blue-50 dark:bg-blue-950/40 rounded-xl p-4 border border-blue-200 dark:border-blue-900">
+              <div class="mt-4 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-5 border border-emerald-200 dark:border-emerald-900/50">
                 <div class="flex items-center justify-between">
-                  <p class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">Total a Reembolsar</p>
-                  <p class="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                  <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Total a Reembolsar</p>
+                  <p class="text-[2rem] font-extrabold text-emerald-600 dark:text-emerald-400 tabular-nums leading-none">
                     ${{ formatCurrency(returnTotals.total) }}
                   </p>
                 </div>
               </div>
             </div>
 
-            <!-- Columna Derecha: Formulario de Devolución -->
-            <div class="space-y-4">
+            <!-- Columna Derecha: Formulario -->
+            <div class="space-y-5">
               <div>
-                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wide">
+                <label class="block text-[11px] font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wider">
                   Motivo de la Devolución *
                 </label>
                 <textarea
                   v-model="returnReason"
                   rows="3"
-                  placeholder="Describe el motivo de la devolución..."
-                  class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all"
+                  placeholder="Describe el motivo..."
+                  class="w-full px-4 py-3 text-sm border border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent focus:bg-white dark:focus:bg-zinc-800 transition-all"
                   required
                 ></textarea>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wide">
+                <label class="block text-[11px] font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wider">
                   Método de Reembolso *
                 </label>
                 <select
                   v-model="refundMethod"
-                  class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all font-medium"
+                  class="w-full px-4 py-3 text-sm border border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all font-medium cursor-pointer"
                   required
                 >
                   <option value="">Seleccionar método</option>
@@ -332,32 +382,35 @@
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wide">
+                <label class="block text-[11px] font-bold text-gray-700 dark:text-zinc-300 mb-2 uppercase tracking-wider">
                   Notas Adicionales
                 </label>
                 <textarea
                   v-model="additionalNotes"
                   rows="2"
                   placeholder="Notas adicionales (opcional)..."
-                  class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 focus:border-transparent transition-all"
+                  class="w-full px-4 py-3 text-sm border border-gray-200 dark:border-zinc-700 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent focus:bg-white dark:focus:bg-zinc-800 transition-all"
                 ></textarea>
               </div>
             </div>
           </div>
 
           <!-- Botones de acción -->
-          <div class="flex justify-between mt-6">
+          <div class="flex justify-between mt-8 pt-6 border-t border-gray-200 dark:border-zinc-700">
             <button
               @click="goToStep(2)"
-              class="px-6 py-3 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded-xl font-semibold transition-all hover:shadow-md"
+              class="px-5 py-2.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 rounded-xl font-semibold text-sm transition-all"
             >
               ← Volver
             </button>
             <button
               @click="processReturn"
               :disabled="!canProcessReturn || isLoading"
-              class="px-8 py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-lg transition-all hover:scale-105 disabled:hover:scale-100"
+              class="px-10 py-3 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 disabled:bg-gray-200 dark:disabled:bg-zinc-800 disabled:text-gray-400 dark:disabled:text-zinc-600 disabled:cursor-not-allowed text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-600/30 transition-all duration-300 flex items-center gap-2"
             >
+              <svg v-if="!isLoading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+              </svg>
               <span v-if="!isLoading">Procesar Devolución</span>
               <span v-else>Procesando...</span>
             </button>
@@ -368,36 +421,36 @@
 
     <!-- Modal de éxito con acciones -->
     <div v-if="showSuccessModal" class="fixed inset-0 bg-black/70 dark:bg-black/80 flex items-center justify-center z-50 animate-fade-in">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-lg w-full mx-4 p-8 border border-gray-200 dark:border-zinc-700 transform scale-100 animate-scale-in">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 border border-gray-200 dark:border-zinc-800 transform scale-100 animate-scale-in">
         <div class="text-center">
-          <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 dark:from-green-500 dark:to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+          <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-emerald-100 dark:border-emerald-900/40">
+            <svg class="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¡Devolución Procesada!</h3>
-          <p class="text-gray-600 dark:text-zinc-400 mb-6 leading-relaxed">
-            La devolución <strong class="text-gray-900 dark:text-white">{{ processedReturn?.number || 'sin número' }}</strong> ha sido procesada exitosamente.
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Devolución Procesada</h3>
+          <p class="text-sm text-gray-500 dark:text-zinc-400 mb-6">
+            <strong class="text-gray-900 dark:text-white">{{ processedReturn?.number || 'sin número' }}</strong> procesada exitosamente.
           </p>
           
           <!-- Botones de acción -->
-          <div class="grid grid-cols-2 gap-3 mb-4">
+          <div class="grid grid-cols-2 gap-2.5 mb-4">
             <button
               @click="printReturn"
-              class="px-4 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
+              class="px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-semibold rounded-xl border border-gray-200 dark:border-zinc-700 transition-all flex items-center justify-center gap-2"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
               </svg>
               Imprimir
             </button>
             
             <button
               @click="downloadReturn"
-              class="px-4 py-3 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
+              class="px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-semibold rounded-xl border border-gray-200 dark:border-zinc-700 transition-all flex items-center justify-center gap-2"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
               </svg>
               Descargar
             </button>
@@ -405,7 +458,7 @@
           
           <button
             @click="closeModalAndReset"
-            class="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl font-bold shadow-lg transition-all hover:scale-105"
+            class="w-full px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg shadow-emerald-600/30 transition-all duration-200"
           >
             Cerrar
           </button>

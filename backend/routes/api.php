@@ -79,6 +79,7 @@ Route::get('/radio/search', [RadioProxyController::class, 'search']);
 
 // ==================== CENTRAL LOGIN (Smart Login) ====================
 Route::post('/central/login', [CentralLoginController::class, 'centralLogin']);
+Route::get('/central/login-session', [CentralLoginController::class, 'getCentralLoginSession']);
 Route::get('/central/check-email', [CentralLoginController::class, 'checkEmailExists']);
 Route::get('/central/check-document', [CentralLoginController::class, 'checkDocumentExists']);
 
@@ -105,7 +106,8 @@ Route::middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(functio
 // Duplicar rutas para compatibilidad con frontend (usa ambos prefijos)
 Route::prefix('admin/api')->middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(function () {
     Route::delete('/tenants/{id}', [SuperAdminController::class, 'deleteTenant']);
-    Route::put('/tenants/{id}', [SuperAdminController::class, 'updateTenantSubscription']); // Para actualizar plan
+    Route::put('/tenants/{id}', [SuperAdminController::class, 'updateTenant']); // Para actualizar plan/status
+    Route::put('/tenants/{id}/subscription', [SuperAdminController::class, 'updateTenantSubscription']); // Para actualizar fechas
     Route::get('/tenants/{id}/users', [SuperAdminController::class, 'getTenantUsers']);
     Route::get('/tenants/{id}/products', [SuperAdminController::class, 'getTenantProducts']);
     Route::post('/tenants/{id}/users/{userId}/reset-password', [SuperAdminController::class, 'resetUserPassword']);
@@ -228,6 +230,10 @@ Route::get('/ping', function () {
 });
 
 // ==================== EPAYCO - PAYMENT ROUTES ====================
+// 🚀 Checkout 2.0 (Smart Checkout) - Nueva implementación
+Route::post('/epayco/create-session', [EPaycoPaymentController::class, 'createCheckoutSession']);
+
+// Legacy v1 (mantener para compatibilidad)
 Route::post('/epayco/init-transaction', [EPaycoPaymentController::class, 'initTransaction']);
 Route::post('/epayco/webhook', [EPaycoPaymentController::class, 'webhook']);
 Route::get('/epayco/check-payment-status', [EPaycoPaymentController::class, 'checkPaymentStatus']); // Acepta query params: ?reference=xxx o ?ref_payco=xxx

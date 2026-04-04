@@ -183,6 +183,14 @@ Route::get('/cash-reports/payment-methods', function() { require_once __DIR__ . 
 Route::get('/cash-reports/top-sessions', function() { require_once __DIR__ . '/cash-reports-real-fixed.php'; return getTopSessions(); });
 Route::get('/cash-reports/alerts', function() { require_once __DIR__ . '/cash-reports-real-fixed.php'; return getCashAlerts(); });
 
+// RUTAS TEMPORALES PARA REPORTES DE INVENTARIO (sin autenticación, solo para desarrollo)
+Route::get('/inventory-reports/overview', [InventoryController::class, 'overview']);
+Route::get('/inventory-reports/products', [InventoryController::class, 'products']);
+Route::get('/inventory-reports/movements', [InventoryController::class, 'movements']);
+Route::get('/inventory-reports/alerts', [InventoryController::class, 'alerts']);
+Route::get('/inventory-reports/predictions', [InventoryController::class, 'predictions']);
+Route::get('/inventory-reports/categories', [CategoryController::class, 'index']);
+
 // RUTAS TEMPORALES DE PRUEBA (sin autenticación)
 Route::get('/inventory/test/overview', [InventoryTestController::class, 'overview']);
 Route::get('/inventory/test/dashboard', [InventoryTestController::class, 'dashboard']);
@@ -207,6 +215,7 @@ Route::get('/warehouses/{id}/products', [WarehouseController::class, 'getWarehou
 Route::get('/optimized/dashboard', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'getDashboardData']);
 Route::get('/optimized/recent-transactions', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'getRecentTransactions']);
 Route::get('/optimized/metrics', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'getMainMetrics']);
+Route::get('/optimized/financial', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'getFinancialData']);
 Route::post('/optimized/clear-cache', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'clearCache']);
 
 // Dashboard ventas hoy en hora Colombia (sin auth para pruebas)
@@ -329,10 +338,25 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::get('/system-settings/next-invoice-number', [SystemSettingsController::class, 'getNextInvoiceNumber']);
     Route::post('/system-settings/reset', [SystemSettingsController::class, 'reset']);
     Route::post('/settings/initial-onboarding', [SystemSettingsController::class, 'saveOnboarding']);
+    
+    // ==================== TIPO DE LAYOUT DEL NEGOCIO ====================
+    Route::post('/settings/business-layout', [SystemSettingsController::class, 'saveBusinessLayout']);
+    Route::get('/settings/business-layout', [SystemSettingsController::class, 'getBusinessLayout']);
 
     // Alias para compatibilidad con frontend (rutas con /tenant/)
     Route::get('/tenant/system-settings', [SystemSettingsController::class, 'index']);
     Route::put('/tenant/system-settings', [SystemSettingsController::class, 'update']);
+
+    // ==================== FACTURACIÓN ELECTRÓNICA - ALANUBE ====================
+    Route::prefix('alanube')->group(function () {
+        Route::get('/status', [\App\Http\Controllers\AlanubeController::class, 'getStatus']);
+        Route::post('/fiscal-data', [\App\Http\Controllers\AlanubeController::class, 'saveFiscalData']);
+        Route::post('/register-company', [\App\Http\Controllers\AlanubeController::class, 'registerCompany']);
+        Route::post('/run-test-set', [\App\Http\Controllers\AlanubeController::class, 'runTestSet']);
+        Route::post('/set-provider', [\App\Http\Controllers\AlanubeController::class, 'setProvider']);
+        Route::post('/resolution', [\App\Http\Controllers\AlanubeController::class, 'saveResolution']);
+        Route::get('/cities', [\App\Http\Controllers\AlanubeController::class, 'getCities']);
+    });
 
     // Descuentos y Promociones - Rutas específicas ANTES del apiResource
     Route::post('/discounts/validate-code', [DiscountsController::class, 'validateCode']);
@@ -350,6 +374,8 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     // Productos
     Route::get('/products-pos', [ProductController::class, 'forPos']); // Endpoint optimizado para POS
     Route::get('/products/low-stock', [ProductController::class, 'lowStock']);
+    Route::get('/products/trash', [ProductController::class, 'trash']); // Papelera de productos eliminados
+    Route::post('/products/{id}/restore', [ProductController::class, 'restore']); // Restaurar producto
     Route::post('/products/{product}/update-stock', [ProductController::class, 'updateStock']);
     Route::put('/products/variants/bulk-update', [ProductController::class, 'bulkUpdateVariants']); // Actualización masiva de variantes
     Route::delete('/products/images/{imageId}', [ProductController::class, 'deleteImage']); // ✅ Eliminar UNA imagen específica
@@ -370,6 +396,23 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::post('/users/{id}/change-password', [UserController::class, 'changePassword']);
     Route::patch('/users/{id}/toggle-active', [UserController::class, 'toggleActive']);
+
+    // Dashboard de Usuarios (KPIs, Rendimiento, Auditoría)
+    Route::get('/users-dashboard/kpis', [\App\Http\Controllers\Api\UserDashboardController::class, 'dashboardKpis']);
+    Route::get('/users-dashboard/with-performance', [\App\Http\Controllers\Api\UserDashboardController::class, 'usersWithPerformance']);
+    Route::get('/users-dashboard/{id}/profile', [\App\Http\Controllers\Api\UserDashboardController::class, 'userProfile']);
+    Route::get('/users-dashboard/{id}/timeline', [\App\Http\Controllers\Api\UserDashboardController::class, 'userTimeline']);
+    Route::patch('/users-dashboard/{id}/assign-warehouse', [\App\Http\Controllers\Api\UserDashboardController::class, 'assignWarehouse']);
+    Route::get('/users-dashboard/plan-info', [\App\Http\Controllers\Api\UserDashboardController::class, 'planInfo']);
+
+    // Biométrico - Punteo de Jornada
+    Route::post('/biometric/enroll', [\App\Http\Controllers\Api\BiometricController::class, 'enroll']);
+    Route::get('/biometric/{userId}/descriptor', [\App\Http\Controllers\Api\BiometricController::class, 'getDescriptor']);
+    Route::get('/biometric/{userId}/check', [\App\Http\Controllers\Api\BiometricController::class, 'checkEnrollment']);
+    Route::post('/biometric/attendance', [\App\Http\Controllers\Api\BiometricController::class, 'recordAttendance']);
+    Route::get('/biometric/attendance/history', [\App\Http\Controllers\Api\BiometricController::class, 'attendanceHistory']);
+    Route::get('/biometric/attendance/today', [\App\Http\Controllers\Api\BiometricController::class, 'todaySummary']);
+    Route::delete('/biometric/{userId}/profile', [\App\Http\Controllers\Api\BiometricController::class, 'deleteProfile']);
 
     // Permisos
     Route::apiResource('permissions', PermissionController::class);
@@ -550,6 +593,28 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::post('/ai/log-voice-usage', [\App\Http\Controllers\Api\AIController::class, 'logVoiceUsage']);
 
 });
+
+// ==================== FACTURACIÓN ELECTRÓNICA FACTUS (DIAN) ====================
+// NOTA: Las credenciales son GLOBALES (desde .env)
+// 105POS compra paquete de facturas y las distribuye automáticamente
+// Los tenants NO configuran nada - la validación es automática al crear factura
+
+Route::get('/factus/status', [\App\Http\Controllers\FactusController::class, 'status']);
+
+// Rutas protegidas de Factus (solo para operaciones específicas)
+Route::middleware(['auth:sanctum'])->prefix('factus')->group(function () {
+    // Descarga de documentos DIAN
+    Route::get('/invoices/{invoiceId}/pdf', [\App\Http\Controllers\FactusController::class, 'downloadPDF']);
+    Route::get('/invoices/{invoiceId}/xml', [\App\Http\Controllers\FactusController::class, 'downloadXML']);
+    
+    // Consultas de estado
+    Route::get('/invoices/{invoiceId}/status', [\App\Http\Controllers\FactusController::class, 'getInvoiceStatus']);
+    Route::get('/invoices/validated', [\App\Http\Controllers\FactusController::class, 'listValidatedInvoices']);
+    
+    // Validación manual (si no se validó automáticamente)
+    Route::post('/invoices/{invoiceId}/validate', [\App\Http\Controllers\FactusController::class, 'validateInvoice']);
+});
+// ==================== FIN FACTURACIÓN ELECTRÓNICA ====================
 
 // ==================== WEB CATALOG CONFIGURATION ====================
 // 🔍 TEMPORAL - Endpoint de debug ANTES de auth para verificar routing

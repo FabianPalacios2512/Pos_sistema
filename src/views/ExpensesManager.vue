@@ -1,18 +1,18 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
+  <div class="min-h-screen font-sans bg-[#f8f9fa] dark:bg-[#131314] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Header sin icono -->
       <div class="flex items-center justify-between pb-4">
         <div>
           <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Gastos Operativos</h1>
-          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">Gestiona los gastos del negocio</p>
+          <p class="text-sm text-gray-500 dark:text-gray-500 mt-1 font-normal">Gestiona los gastos del negocio</p>
         </div>
         
         <div class="flex items-center gap-3">
           <!-- Botón Actualizar -->
           <button @click="loadExpenses" 
-                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200">
+                  class="px-5 py-2.5 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#2a2b2e] text-gray-700 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
             <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -21,7 +21,7 @@
           
           <!-- Botón Registrar Gasto -->
           <button @click="openCreateModal" 
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-indigo-500/20 transition-all duration-300">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full transition-all duration-300">
             <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -30,107 +30,107 @@
         </div>
       </div>
       
-      <!-- KPIs con glassmorphism -->
+      <!-- KPIs con estilo Gemini -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Total Gastos Mes -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-              <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50">
+              <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
-                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Mes Actual</p>
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Mes Actual</p>
                 <span v-if="statistics.percentage_change !== undefined" 
                       :class="[
-                        'text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wide',
-                        statistics.percentage_change > 0 ? 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800' : 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800'
+                        'text-[10px] font-medium px-2 py-0.5 rounded-full border uppercase tracking-wide',
+                        statistics.percentage_change > 0 ? 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800' : 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800'
                       ]">
                   {{ statistics.percentage_change > 0 ? '+' : '' }}{{ statistics.percentage_change }}%
                 </span>
               </div>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ formatNumber(statistics.current_month || 0) }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ expenses.total || 0 }} gastos</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">${{ formatNumber(statistics.current_month || 0) }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ expenses.total || 0 }} gastos</p>
             </div>
           </div>
         </div>
 
         <!-- Efectivo -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-              <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">En Efectivo</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">En Efectivo</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">
                 ${{ formatNumber(getPaymentMethodTotal('efectivo')) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ getPaymentMethodCount('efectivo') }} gastos</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ getPaymentMethodCount('efectivo') }} gastos</p>
             </div>
           </div>
         </div>
 
         <!-- Transferencia -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Transferencia</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Transferencia</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">
                 ${{ formatNumber(getPaymentMethodTotal('transferencia')) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ getPaymentMethodCount('transferencia') }} gastos</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ getPaymentMethodCount('transferencia') }} gastos</p>
             </div>
           </div>
         </div>
 
         <!-- Tarjeta -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
-              <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800/50">
+              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Tarjeta</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tarjeta</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">
                 ${{ formatNumber(getPaymentMethodTotal('tarjeta')) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ getPaymentMethodCount('tarjeta') }} gastos</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ getPaymentMethodCount('tarjeta') }} gastos</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Filtros -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-sm dark:shadow-black/50 p-3 border border-gray-200 dark:border-zinc-800">
+      <div class="bg-white dark:bg-[#131314] rounded-xl shadow-lg p-3 border border-gray-200 dark:border-gray-800">
         <div class="flex flex-wrap items-center gap-3">
           <!-- Búsqueda -->
           <div class="flex-1 min-w-48 relative">
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
             <input v-model="filters.search" 
                    @input="loadExpenses"
                    type="text" 
                    placeholder="Buscar por descripción, proveedor o recibo..."
-                   class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
+                   class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           </div>
           
           <!-- Filtro por Categoría -->
           <select v-model="filters.category_id" 
                   @change="loadExpenses"
-                  class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-w-36">
+                  class="px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-36">
             <option value="">Todas las Categorías</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }}
@@ -140,7 +140,7 @@
           <!-- Filtro por Método de Pago -->
           <select v-model="filters.payment_method" 
                   @change="loadExpenses"
-                  class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 min-w-36">
+                  class="px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-36">
             <option value="">Todos los Métodos</option>
             <option value="efectivo">Efectivo</option>
             <option value="transferencia">Transferencia</option>
@@ -151,17 +151,17 @@
           <input v-model="filters.start_date" 
                  @change="loadExpenses"
                  type="date" 
-                 class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                 class="px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-700 dark:text-gray-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
           
           <!-- Fecha Fin -->
           <input v-model="filters.end_date" 
                  @change="loadExpenses"
                  type="date" 
-                 class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                 class="px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-700 dark:text-gray-200 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
           
           <!-- Botón Limpiar Filtros -->
           <button @click="clearFilters" 
-                  class="p-3 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl border border-transparent hover:border-red-100 dark:hover:border-red-900/30 transition-all duration-200"
+                  class="p-2.5 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-transparent hover:border-red-100 dark:hover:border-red-900/30 transition-all duration-200"
                   title="Limpiar filtros">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -171,11 +171,11 @@
       </div>
 
       <!-- Tabla de Gastos -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
-        <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between">
+      <div class="bg-white dark:bg-[#131314] rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
           <div>
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Lista de Gastos</h2>
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white">Lista de Gastos</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {{ expenses.total || 0 }} gastos registrados
             </p>
           </div>
@@ -183,53 +183,53 @@
         
         <div v-if="loading" class="px-4 py-12 text-center">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
-          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-3">Cargando gastos...</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-3">Cargando gastos...</p>
         </div>
 
         <div v-else-if="expenses.data && expenses.data.length === 0" class="px-4 py-12 text-center">
           <div class="flex flex-col items-center space-y-3">
-            <div class="w-12 h-12 bg-gray-100 dark:bg-zinc-800 rounded-full flex items-center justify-center">
-              <svg class="w-6 h-6 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-12 h-12 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
               </svg>
             </div>
             <div>
-              <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300">No hay gastos registrados</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Comienza registrando tu primer gasto</p>
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-300">No hay gastos registrados</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Comienza registrando tu primer gasto</p>
             </div>
             <button @click="openCreateModal" 
-                    class="px-3 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-medium rounded-lg">
+                    class="px-4 py-2 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full">
               Registrar Gasto
             </button>
           </div>
         </div>
 
         <table v-else class="min-w-full">
-          <thead class="border-b border-gray-200 dark:border-zinc-800">
+          <thead class="border-b border-gray-200 dark:border-gray-800">
             <tr>
-              <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Fecha</th>
-              <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Categoría</th>
-              <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Descripción</th>
-              <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Monto</th>
-              <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Método</th>
-              <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Usuario</th>
-              <th class="px-3 py-3 text-center text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Acciones</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Fecha</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Categoría</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Descripción</th>
+              <th class="px-3 py-3 text-right text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Monto</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Método</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Usuario</th>
+              <th class="px-3 py-3 text-center text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">Acciones</th>
             </tr>
           </thead>
           <tbody class="bg-transparent">
-            <tr v-for="expense in expenses.data" :key="expense.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-200 border-b border-gray-100 dark:border-zinc-800/40">
-              <td class="px-3 py-3 text-sm text-gray-900 dark:text-zinc-200">
+            <tr v-for="expense in expenses.data" :key="expense.id" class="hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] transition-colors duration-200 border-b border-gray-100 dark:border-gray-800/50">
+              <td class="px-3 py-3 text-sm text-gray-900 dark:text-gray-200">
                 {{ formatDate(expense.date) }}
               </td>
               <td class="px-3 py-3">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide"
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium border uppercase tracking-wide"
                       :style="{ backgroundColor: expense.category?.color + '20', color: expense.category?.color, borderColor: expense.category?.color + '40' }">
                   {{ expense.category?.name }}
                 </span>
               </td>
-              <td class="px-3 py-3 text-sm text-gray-700 dark:text-zinc-300">
+              <td class="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">
                 <div class="max-w-xs truncate">{{ expense.description }}</div>
-                <div v-if="expense.supplier" class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
+                <div v-if="expense.supplier" class="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
                   {{ expense.supplier }}
                 </div>
               </td>
@@ -239,20 +239,20 @@
               <td class="px-3 py-3">
                 <span :class="[
                   'px-2 py-0.5 rounded-md text-xs border font-medium',
-                  expense.payment_method === 'efectivo' ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' :
-                  expense.payment_method === 'transferencia' ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800' :
-                  'bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800'
+                  expense.payment_method === 'efectivo' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' :
+                  expense.payment_method === 'transferencia' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800' :
+                  'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800'
                 ]">
                   {{ expense.payment_method }}
                 </span>
               </td>
-              <td class="px-3 py-3 text-sm text-gray-600 dark:text-zinc-400">
+              <td class="px-3 py-3 text-sm text-gray-600 dark:text-gray-400">
                 {{ expense.user?.name }}
               </td>
               <td class="px-3 py-3 text-center">
                 <div class="flex items-center justify-center gap-1">
                   <button @click="viewExpense(expense)" 
-                          class="p-2 text-slate-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 transition-all duration-200"
+                          class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 transition-all duration-200"
                           title="Ver detalles">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -260,14 +260,14 @@
                     </svg>
                   </button>
                   <button @click="editExpense(expense)" 
-                          class="p-2 text-slate-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg border border-transparent hover:border-amber-100 dark:hover:border-amber-900/30 transition-all duration-200"
+                          class="p-2 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg border border-transparent hover:border-amber-100 dark:hover:border-amber-900/30 transition-all duration-200"
                           title="Editar">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                   </button>
                   <button @click="confirmDelete(expense)" 
-                          class="p-2 text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
+                          class="p-2 text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
                           title="Eliminar">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -281,22 +281,22 @@
 
         <!-- Paginación - Solo mostrar si hay más de 10 registros -->
         <div v-if="expenses.data && expenses.data.length > 0 && expenses.total > 10" 
-             class="bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between">
+             class="bg-white dark:bg-[#131314] border-t border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <div class="flex items-center space-x-2">
-              <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Mostrar:</span>
+              <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Mostrar:</span>
               <select v-model="filters.per_page" 
                       @change="loadExpenses"
-                      class="border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                      class="border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
               </select>
-              <span class="text-xs text-gray-700 dark:text-zinc-300">por página</span>
+              <span class="text-xs text-gray-700 dark:text-gray-300">por página</span>
             </div>
             
-            <div class="text-xs text-gray-700 dark:text-zinc-300">
+            <div class="text-xs text-gray-700 dark:text-gray-300">
               Mostrando {{ expenses.from }} a {{ expenses.to }} de {{ expenses.total }} registros
             </div>
           </div>
@@ -304,7 +304,7 @@
           <div class="flex items-center space-x-1">
             <button @click="goToPage(1)" 
                     :disabled="expenses.current_page === 1"
-                    class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2a2a35] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    class="p-1.5 text-gray-500 dark:text-gray-400 bg-white dark:bg-[#131314] border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
               </svg>
@@ -312,7 +312,7 @@
             
             <button @click="goToPage(expenses.current_page - 1)" 
                     :disabled="expenses.current_page === 1"
-                    class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2a2a35] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    class="p-1.5 text-gray-500 dark:text-gray-400 bg-white dark:bg-[#131314] border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
@@ -322,12 +322,12 @@
               <span class="px-2.5 py-1 text-xs font-medium bg-blue-600 dark:bg-blue-500 text-white border border-blue-600 dark:border-blue-500 rounded-lg">
                 {{ expenses.current_page }}
               </span>
-              <span class="text-xs text-gray-500 dark:text-zinc-400">de {{ expenses.last_page }}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">de {{ expenses.last_page }}</span>
             </div>
             
             <button @click="goToPage(expenses.current_page + 1)" 
                     :disabled="expenses.current_page === expenses.last_page"
-                    class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2a2a35] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    class="p-1.5 text-gray-500 dark:text-gray-400 bg-white dark:bg-[#131314] border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
               </svg>
@@ -335,7 +335,7 @@
             
             <button @click="goToPage(expenses.last_page)" 
                     :disabled="expenses.current_page === expenses.last_page"
-                    class="p-1.5 text-gray-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2a2a35] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    class="p-1.5 text-gray-500 dark:text-gray-400 bg-white dark:bg-[#131314] border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
               </svg>
@@ -347,55 +347,55 @@
 
     <!-- Modal de Confirmación de Eliminación -->
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black/60 dark:bg-black/75  flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/40 max-w-md w-full border border-gray-300 dark:border-zinc-800 overflow-hidden">
-        <div class="bg-rose-50 dark:bg-rose-950/30 border-b border-rose-100 dark:border-rose-900/50 px-6 py-4">
+      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl shadow-2xl dark:shadow-black/40 max-w-md w-full border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="bg-rose-50 dark:bg-rose-900/20 border-b border-rose-100 dark:border-rose-900/30 px-6 py-4">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-rose-100 dark:bg-rose-950 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-rose-100 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800/50 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-6 h-6 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-gray-900 dark:text-white">¿Eliminar Gasto?</h3>
-              <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Esta acción no se puede deshacer</p>
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">¿Eliminar Gasto?</h3>
+              <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Esta acción no se puede deshacer</p>
             </div>
           </div>
         </div>
 
         <div v-if="expenseToDelete" class="p-6 space-y-4">
-          <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
+          <div class="bg-[#f8f9fa] dark:bg-[#131314] rounded-xl p-4 border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between mb-3">
-              <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">Monto del gasto:</span>
-              <span class="text-2xl font-bold text-gray-900 dark:text-white">${{ formatNumber(expenseToDelete.amount) }}</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Monto del gasto:</span>
+              <span class="text-2xl font-semibold text-gray-900 dark:text-white">${{ formatNumber(expenseToDelete.amount) }}</span>
             </div>
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <span class="text-gray-600 dark:text-zinc-400">Categoría:</span>
+                <span class="text-gray-600 dark:text-gray-400">Categoría:</span>
                 <span class="font-medium text-gray-900 dark:text-white">{{ expenseToDelete.category?.name }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600 dark:text-zinc-400">Descripción:</span>
+                <span class="text-gray-600 dark:text-gray-400">Descripción:</span>
                 <span class="font-medium text-gray-900 dark:text-white truncate ml-2 max-w-[200px]">{{ expenseToDelete.description }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600 dark:text-zinc-400">Fecha:</span>
+                <span class="text-gray-600 dark:text-gray-400">Fecha:</span>
                 <span class="font-medium text-gray-900 dark:text-white">{{ formatDate(expenseToDelete.date) }}</span>
               </div>
             </div>
           </div>
 
-          <p class="text-sm text-gray-600 dark:text-zinc-400 text-center">
+          <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
             ¿Estás seguro que deseas eliminar este gasto?
           </p>
         </div>
 
-        <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex gap-3 rounded-b-2xl">
+        <div class="bg-[#f8f9fa] dark:bg-[#131314] border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex gap-3 rounded-b-2xl">
           <button @click="showDeleteModal = false" 
-                  class="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
+                  class="flex-1 px-4 py-2.5 bg-white dark:bg-[#1e1f20] hover:bg-gray-50 dark:hover:bg-[#252525] text-gray-700 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
             Cancelar
           </button>
           <button @click="deleteExpense" 
-                  class="flex-1 px-4 py-2.5 bg-rose-600 dark:bg-rose-500 hover:bg-rose-700 dark:hover:bg-rose-600 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300">
+                  class="flex-1 px-4 py-2.5 bg-rose-600 dark:bg-rose-500 hover:bg-rose-700 dark:hover:bg-rose-600 text-white text-sm font-medium rounded-full shadow-lg transition-all duration-300">
             Eliminar Gasto
           </button>
         </div>
@@ -404,23 +404,23 @@
 
     <!-- Modal Crear/Editar Gasto -->
     <div v-if="showModal" class="fixed inset-0 bg-black/60 dark:bg-black/75  flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/40 border border-gray-300 dark:border-zinc-800 max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-gray-800 max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <!-- Header Modal -->
-        <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <div class="bg-[#f8f9fa] dark:bg-[#131314] border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-red-50 dark:bg-red-950 rounded-lg flex items-center justify-center">
+            <div class="w-11 h-11 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50 rounded-xl flex items-center justify-center">
               <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-bold text-gray-900 dark:text-white">
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white">
                 {{ isEditing ? 'Editar Gasto' : 'Registrar Nuevo Gasto' }}
               </h3>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Complete la información del gasto operativo</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Complete la información del gasto operativo</p>
             </div>
           </div>
-          <button @click="closeModal" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
+          <button @click="closeModal" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -434,21 +434,21 @@
             <!-- Columna Izquierda: Información Principal (2/3) -->
             <div class="lg:col-span-2 space-y-5">
               <!-- Sección: Información Básica -->
-              <div class="bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800 rounded-xl p-5">
-                <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-gray-200 dark:border-zinc-800">
-                  <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="bg-white dark:bg-[#1e1f20] border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+                <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+                  <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
-                  <h4 class="text-sm font-bold text-gray-900 dark:text-white">Información del Gasto</h4>
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Información del Gasto</h4>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                   <!-- Categoría -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Categoría *</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría *</label>
                     <select v-model="form.category_id" 
                             required
-                            class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-[#2a2a35] text-gray-900 dark:text-zinc-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                            class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                       <option value="">Seleccionar categoría</option>
                       <option v-for="category in categories" :key="category.id" :value="category.id">
                         {{ category.name }}
@@ -458,47 +458,47 @@
 
                   <!-- Monto -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Monto *</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Monto *</label>
                     <div class="relative">
-                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-zinc-400 text-sm font-medium">$</span>
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm font-medium">$</span>
                       <input v-model="form.amount" 
                              type="text"
                              inputmode="decimal"
                              @input="formatAmountInput"
                              required
                              placeholder="0.00"
-                             class="w-full pl-8 pr-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-[#2a2a35] text-gray-900 dark:text-white rounded-lg text-sm font-semibold font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                             class="w-full pl-8 pr-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-white rounded-lg text-sm font-semibold font-mono focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                     </div>
                   </div>
                 </div>
 
                 <!-- Descripción -->
                 <div class="mt-4">
-                  <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Descripción del Gasto *</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Descripción del Gasto *</label>
                   <textarea v-model="form.description" 
                             rows="3"
                             required
                             placeholder="Describe el propósito y detalles del gasto..."
-                            class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"></textarea>
+                            class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"></textarea>
                 </div>
               </div>
 
               <!-- Sección: Información de Pago -->
-              <div class="bg-white dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800 rounded-xl p-5">
-                <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-gray-200 dark:border-zinc-800">
-                  <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="bg-white dark:bg-[#1e1f20] border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+                <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+                  <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                   </svg>
-                  <h4 class="text-sm font-bold text-gray-900 dark:text-white">Método de Pago</h4>
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Método de Pago</h4>
                 </div>
 
                 <div class="space-y-4">
                   <!-- Método de Pago -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Forma de Pago *</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Forma de Pago *</label>
                     <select v-model="form.payment_method" 
                             required
-                            class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                            class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                       <option value="efectivo">Efectivo</option>
                       <option value="transferencia">Transferencia Bancaria</option>
                       <option value="tarjeta">Tarjeta de Crédito/Débito</option>
@@ -507,7 +507,7 @@
 
                   <!-- Fuente del Gasto (solo para efectivo) -->
                   <div v-if="form.payment_method === 'efectivo'">
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Fuente *</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Fuente *</label>
                     <div class="space-y-2">
                       <label class="flex items-center space-x-2 cursor-pointer">
                         <input type="radio" 
@@ -516,7 +516,7 @@
                                value="caja"
                                required
                                class="w-4 h-4 text-blue-600">
-                        <span class="text-sm text-gray-700 dark:text-zinc-300">Descontar de caja actual</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Descontar de caja actual</span>
                       </label>
                       <label class="flex items-center space-x-2 cursor-pointer">
                         <input type="radio" 
@@ -525,7 +525,7 @@
                                value="general"
                                required
                                class="w-4 h-4 text-blue-600">
-                        <span class="text-sm text-gray-700 dark:text-zinc-300">Gasto general</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Gasto general</span>
                       </label>
                     </div>
                   </div>
@@ -536,48 +536,48 @@
             <!-- Columna Derecha: Información Complementaria (1/3) -->
             <div class="space-y-5">
               <!-- Sección: Detalles Adicionales -->
-              <div class="bg-gradient-to-br from-gray-50 to-slate-50 dark:from-[#252530]/40 dark:to-[#2a2a35]/40 border border-gray-200 dark:border-zinc-800 rounded-xl p-5">
-                <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-gray-200 dark:border-zinc-800">
-                  <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="bg-[#f8f9fa] dark:bg-[#131314] border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+                <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+                  <svg class="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                   </svg>
-                  <h4 class="text-sm font-bold text-gray-900 dark:text-white">Información Complementaria</h4>
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Información Complementaria</h4>
                 </div>
 
                 <div class="space-y-4">
                   <!-- Fecha -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Fecha</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Fecha</label>
                     <input v-model="form.date" 
                            type="date"
-                           class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                           class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-900 dark:text-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                   </div>
 
                   <!-- Proveedor -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Proveedor</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Proveedor</label>
                     <input v-model="form.supplier" 
                            type="text"
                            placeholder="Nombre del proveedor"
-                           class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-[#2a2a35] text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                           class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                   </div>
 
                   <!-- Número de Recibo -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Nº Recibo</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Nº Recibo</label>
                     <input v-model="form.receipt_number" 
                            type="text"
                            placeholder="FAC-001234"
-                           class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-[#2a2a35] text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                           class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                   </div>
 
                   <!-- Notas Adicionales -->
                   <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Notas</label>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Notas</label>
                     <textarea v-model="form.notes" 
                               rows="3"
                               placeholder="Información adicional..."
-                              class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-[#2a2a35] text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"></textarea>
+                              class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-all"></textarea>
                   </div>
                 </div>
               </div>
@@ -585,19 +585,19 @@
           </div>
 
           <!-- Footer Modal dentro del form -->
-          <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-between items-center flex-shrink-0">
-            <p class="text-xs text-gray-500 dark:text-zinc-400">
-              <span class="font-semibold">*</span> Campos obligatorios
+          <div class="bg-[#f8f9fa] dark:bg-[#131314] border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex justify-between items-center flex-shrink-0">
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              <span class="font-medium">*</span> Campos obligatorios
             </p>
             <div class="flex gap-3">
               <button @click="closeModal" 
                       type="button"
-                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
+                      class="px-5 py-2.5 bg-white dark:bg-[#1e1f20] hover:bg-gray-50 dark:hover:bg-[#252525] text-gray-700 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
                 Cancelar
               </button>
               <button type="submit"
                       :disabled="saving"
-                      class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                      class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                 <svg v-if="!saving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
@@ -615,10 +615,10 @@
 
     <!-- Modal Ver Detalles -->
     <div v-if="showViewModal" class="fixed inset-0 bg-black/60 dark:bg-black/75  flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/40 border border-gray-300 dark:border-zinc-800 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-          <h3 class="text-base font-bold text-gray-900 dark:text-white">Detalles del Gasto</h3>
-          <button @click="showViewModal = false" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
+      <div class="bg-white dark:bg-[#1e1f20] rounded-2xl shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-gray-800 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-[#f8f9fa] dark:bg-[#131314] border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white">Detalles del Gasto</h3>
+          <button @click="showViewModal = false" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -628,58 +628,58 @@
         <div v-if="selectedExpense" class="p-6 space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Categoría</p>
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide"
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Categoría</p>
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium border uppercase tracking-wide"
                     :style="{ backgroundColor: selectedExpense.category?.color + '20', color: selectedExpense.category?.color, borderColor: selectedExpense.category?.color + '40' }">
                 {{ selectedExpense.category?.name }}
               </span>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Monto</p>
-              <p class="text-lg font-bold text-gray-900 dark:text-white">${{ formatNumber(selectedExpense.amount) }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Monto</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">${{ formatNumber(selectedExpense.amount) }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Método de Pago</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-zinc-200">{{ selectedExpense.payment_method }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Método de Pago</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ selectedExpense.payment_method }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Fecha</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-zinc-200">{{ formatDate(selectedExpense.date) }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Fecha</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ formatDate(selectedExpense.date) }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Registrado por</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-zinc-200">{{ selectedExpense.user?.name }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Registrado por</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ selectedExpense.user?.name }}</p>
             </div>
             <div v-if="selectedExpense.supplier">
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Proveedor</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-zinc-200">{{ selectedExpense.supplier }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Proveedor</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ selectedExpense.supplier }}</p>
             </div>
             <div v-if="selectedExpense.receipt_number">
-              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Número de Recibo</p>
-              <p class="text-sm font-medium text-gray-900 dark:text-zinc-200">{{ selectedExpense.receipt_number }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Número de Recibo</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ selectedExpense.receipt_number }}</p>
             </div>
           </div>
 
           <div>
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Descripción</p>
-            <p class="text-sm text-gray-900 dark:text-zinc-200">{{ selectedExpense.description }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Descripción</p>
+            <p class="text-sm text-gray-900 dark:text-gray-200">{{ selectedExpense.description }}</p>
           </div>
 
           <div v-if="selectedExpense.notes">
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Notas</p>
-            <p class="text-sm text-gray-900 dark:text-zinc-200">{{ selectedExpense.notes }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Notas</p>
+            <p class="text-sm text-gray-900 dark:text-gray-200">{{ selectedExpense.notes }}</p>
           </div>
 
-          <div v-if="selectedExpense.cash_session_id" class="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-lg p-3">
+          <div v-if="selectedExpense.cash_session_id" class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-3">
             <p class="text-xs text-blue-700 dark:text-blue-400">
               <strong>Vinculado a Sesión de Caja:</strong> #{{ selectedExpense.cash_session_id }}
             </p>
           </div>
         </div>
 
-        <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-6 py-3 flex justify-end rounded-b-2xl">
+        <div class="bg-[#f8f9fa] dark:bg-[#131314] border-t border-gray-200 dark:border-gray-800 px-6 py-3 flex justify-end rounded-b-2xl">
           <button @click="showViewModal = false" 
-                  class="px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
+                  class="px-4 py-2.5 bg-white dark:bg-[#1e1f20] hover:bg-gray-50 dark:hover:bg-[#252525] text-gray-700 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
             Cerrar
           </button>
         </div>

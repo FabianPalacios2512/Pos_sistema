@@ -1,93 +1,66 @@
 <template>
-  <!-- 🔐 Pantalla de Recuperación de Contraseña - DISEÑO PREMIUM -->
-  <div class="min-h-screen flex">
-    
-    <!-- 📸 LADO IZQUIERDO: Panel de Marca Premium (45%) -->
-    <div class="hidden lg:flex lg:w-[45%] relative overflow-hidden">
-      <!-- Fondo con gradiente slate premium -->
-      <div class="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-black"></div>
-      
-      <!-- Imagen con overlay -->
-      <img 
-        src="/login.png" 
-        alt="105 POS - Recuperar Contraseña" 
-        class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-        :class="imageLoaded ? 'opacity-40' : 'opacity-0'"
-        @load="imageLoaded = true"
-        loading="eager"
-      />
-      
-      <!-- Overlay gradiente -->
-      <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-slate-900/40"></div>
-      
-      <!-- Contenido del panel izquierdo -->
-      <div class="relative z-10 flex flex-col justify-between h-full p-10">
-        
-        <!-- Logo y Branding -->
+  <div class="flex min-h-screen bg-white font-['Plus_Jakarta_Sans',sans-serif] text-slate-900 overflow-hidden" style="height: 100%; min-height: 100%;">
+
+    <!-- LADO IZQUIERDO: Panel de Marca Corporativo (40%) -->
+    <div class="hidden lg:flex lg:w-[40%] relative overflow-hidden bg-slate-900 flex-col p-12 text-white">
+      <!-- Imagen de fondo corporativa -->
+      <div class="absolute inset-0">
+        <img src="/login.png" alt="105 POS" class="w-full h-full object-cover object-center" />
+      </div>
+      <!-- Capa de superposición oscura -->
+      <div class="absolute inset-0 bg-slate-900/85"></div>
+
+      <!-- Top: Logo + Botón Radio -->
+      <div class="relative z-10 flex items-center justify-between mb-8">
         <div>
-          <div class="flex items-center gap-3 mb-16">
-            <div class="w-12 h-12 rounded-xl bg-white/10  flex items-center justify-center border border-white/20">
-              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-              </svg>
-            </div>
-            <span class="text-xl font-bold text-white">105 POS</span>
-          </div>
-
-          <!-- Título principal -->
-          <h1 class="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6">
-            Recupera tu
-            <span class="block text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-              acceso seguro
-            </span>
-          </h1>
-          
-          <p class="text-lg text-slate-300 leading-relaxed max-w-md">
-            Te ayudaremos a restablecer tu contraseña de forma rápida y segura.
-          </p>
+          <h1 class="text-2xl font-bold tracking-tight text-white font-['Space_Grotesk',sans-serif]">105 POS Pro</h1>
+          <p class="text-[11px] text-[#009F7A] font-bold uppercase tracking-widest mt-1">Plataforma Empresarial</p>
         </div>
 
-        <!-- Características de seguridad -->
-        <div class="space-y-4 mb-8">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-              <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-              </svg>
-            </div>
-            <span class="text-slate-300">Proceso 100% seguro y encriptado</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-              <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
-            </div>
-            <span class="text-slate-300">Código de 6 dígitos por email</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <span class="text-slate-300">El código expira en 15 minutos</span>
-          </div>
-        </div>
+        <!-- Botón Radio -->
+        <button
+          @click="radioOpen = true"
+          title="Abrir Radio 105"
+          class="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 hover:border-white/30 text-white hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20 transition-all duration-200 group"
+        >
+          <svg class="w-[17px] h-[17px] flex-shrink-0 text-white/80 group-hover:text-[#009F7A] transition-colors duration-200" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 3v10.55A4 4 0 1 0 11 17V7h4V3H9Z"/>
+          </svg>
+          <span class="flex items-center gap-2">
+            <span class="text-[13px] font-medium text-white font-['Plus_Jakarta_Sans',sans-serif]">Radio</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#009F7A] animate-pulse flex-shrink-0"></span>
+          </span>
+        </button>
+      </div>
 
-        <!-- Footer -->
-        <div class="text-sm text-slate-500">
-          <p>© 2025 105 POS Pro. Todos los derechos reservados.</p>
+      <!-- Centro: Mensaje Corporativo -->
+      <div class="relative z-10 flex-1 flex flex-col justify-center max-w-md pr-6">
+        <h2 class="text-[34px] font-bold text-white mb-6 tracking-tight leading-[1.15] font-['Space_Grotesk',sans-serif]">
+          Recupera tu acceso<br/><span class="text-[#009F7A]">de forma segura.</span>
+        </h2>
+        <p class="text-slate-300 text-[15px] font-medium leading-relaxed">
+          Te enviaremos un código de verificación a tu correo para restablecer tu contraseña en minutos.
+        </p>
+      </div>
+
+      <!-- Bottom: Testimonio -->
+      <div class="relative z-10 pt-8 mt-auto border-t border-white/10">
+        <p class="text-slate-100 text-[15px] mb-6 leading-relaxed font-medium">"Una herramienta sólida que nos permite controlar las ventas de todas nuestras sucursales con total precisión y sin interrupciones."</p>
+        <div class="flex items-center gap-4">
+          <div class="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center text-sm font-bold text-white uppercase border border-slate-700 shadow-sm">
+            MJ
+          </div>
+          <div>
+            <p class="text-sm font-bold text-white">María José G.B.</p>
+            <p class="text-xs text-[#009F7A] font-bold mt-0.5">Directora de Operaciones</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 📝 LADO DERECHO: Formulario Premium (55%) -->
-    <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 bg-white relative">
-      <!-- Patrón de fondo sutil -->
-      <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50"></div>
-      
-      <div class="w-full max-w-md relative z-10">
+    <!-- LADO DERECHO: Formulario -->
+    <div class="flex-1 lg:w-[60%] flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-20 xl:px-32 bg-white">
+      <div class="w-full max-w-md mx-auto">
         
         <!-- PASO 1: Solicitar Email -->
         <div v-if="step === 'request'" class="animate-fade-in">
@@ -347,12 +320,17 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal Radio -->
+  <RadioPlayerModal :is-open="radioOpen" @close="radioOpen = false" />
+
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import RadioPlayerModal from './RadioPlayerModal.vue'
 
 const router = useRouter()
 
@@ -364,7 +342,8 @@ const password = ref('')
 const passwordConfirmation = ref('')
 const loading = ref(false)
 const message = ref({ text: '', type: '' })
-const imageLoaded = ref(false) // 🖼️ Estado de carga de imagen
+const imageLoaded = ref(false)
+const radioOpen = ref(false)
 
 // 📧 Paso 1: Solicitar código
 const requestReset = async () => {

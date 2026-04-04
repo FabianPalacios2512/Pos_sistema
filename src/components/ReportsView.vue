@@ -1,24 +1,25 @@
 <template>
-  <div class="font-sans transition-colors duration-300">
-    <div class="space-y-6 pb-8 animate-fade-in">
+  <div class="h-full flex flex-col font-sans transition-colors duration-300">
+    <div class="flex-1 overflow-y-auto p-8 space-y-8">
       
-      <!-- Header profesional sin brillo excesivo -->
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4">
+      <!-- Header - Minimalista -->
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Reportes Generales</h1>
-          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">Análisis integral de rendimiento • {{ getPeriodLabel() }}</p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Reportes Generales</h1>
+          <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Análisis integral de rendimiento • {{ getPeriodLabel() }}</p>
         </div>
           
         <div class="flex items-center gap-3">
-          <!-- Period Selector con icono -->
+          <!-- Period Selector - Pill Style -->
           <div class="relative">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
             <select 
               v-model="selectedPeriod" 
               @change="loadReportsData"
-              class="pl-10 pr-4 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 appearance-none cursor-pointer"
+              class="pl-10 pr-5 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/30 appearance-none cursor-pointer shadow-sm hover:shadow-md transition-shadow border-0"
+              style="box-shadow: 0 2px 8px rgba(0,0,0,0.04);"
             >
               <option value="today">Hoy</option>
               <option value="week">Esta semana</option>
@@ -27,12 +28,12 @@
             </select>
           </div>
           
-          <!-- Export Button -->
+          <!-- Export Button - Subtle -->
           <button 
             @click="exportReport" 
-            class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
+            class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
             <span>Exportar</span>
@@ -40,211 +41,191 @@
         </div>
       </div>
     
-    <!-- Indicador de carga -->
-    <div v-if="loading" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+    <!-- Indicador de carga - Clean -->
+    <div v-if="loading" class="bg-white dark:bg-zinc-900 rounded-2xl p-12 text-center" style="box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
       <div class="inline-flex items-center space-x-3">
-        <svg class="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span class="text-gray-600">Cargando datos de reportes...</span>
+        <span class="text-gray-500 dark:text-gray-400 font-medium">Cargando datos...</span>
       </div>
     </div>
 
-    <!-- Mensaje de error -->
-    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
-      <div class="flex items-center space-x-3">
-        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
+    <!-- Mensaje de error - Clean -->
+    <div v-else-if="error" class="bg-white dark:bg-zinc-900 rounded-2xl p-8" style="box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
+          <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
         <div>
-          <h3 class="text-red-800 font-medium">Error al cargar reportes</h3>
-          <p class="text-red-600 text-sm">{{ error }}</p>
+          <h3 class="text-gray-900 dark:text-white font-semibold">Error al cargar reportes</h3>
+          <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{{ error }}</p>
         </div>
       </div>
-      <button @click="loadReportsData" class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+      <button @click="loadReportsData" class="mt-6 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl transition-all font-medium text-sm hover:shadow-md">
         Reintentar
       </button>
     </div>
 
     <!-- Contenido principal -->
-    <div v-else class="space-y-6">
+    <div v-else class="space-y-8">
       
-      <!-- 📊 KPIs PRINCIPALES CON GLASSMORPHISM -->
+      <!-- ═══════════════════════════════════════════════════════════════
+           KPIs PRINCIPALES - Estilo Stripe/Linear (Clean, Bold Numbers)
+      ═══════════════════════════════════════════════════════════════ -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        <!-- Total Sales -->
-        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/50 dark:to-emerald-900/30 transition-transform group-hover:scale-105">
-              <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+        <!-- Total Sales - Clean KPI -->
+        <!-- KPI: Ventas Totales -->
+        <div class="kpi-card group px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="icon-container flex-shrink-0">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-1">
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Ventas Totales</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400">
-                  +15%
-                </span>
-              </div>
-              <p class="text-2xl font-black text-gray-900 dark:text-white">${{ (totalSales || 0).toLocaleString() }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">vs período anterior</p>
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Ventas Totales</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ (totalSales || 0).toLocaleString() }}</p>
+              <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">+15% vs período anterior</p>
             </div>
           </div>
         </div>
 
-        <!-- Total Transactions -->
-        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 transition-transform group-hover:scale-105">
-              <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- KPI: Transacciones -->
+        <div class="kpi-card group px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="icon-container flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h2m3 0h2a2 2 0 002-2V7a2 2 0 00-2-2h-2m-3 0V3m0 0l3 3m-3-3l-3 3"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-1">
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Transacciones</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-400">
-                  +8%
-                </span>
-              </div>
-              <p class="text-2xl font-black text-gray-900 dark:text-white">{{ (totalTransactions || 0).toLocaleString() }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">vs período anterior</p>
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Transacciones</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ (totalTransactions || 0).toLocaleString() }}</p>
+              <p class="text-xs text-blue-600 dark:text-blue-400 mt-0.5">+8% vs período anterior</p>
             </div>
           </div>
         </div>
 
-        <!-- Average Ticket -->
-        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/50 dark:to-amber-900/30 transition-transform group-hover:scale-105">
-              <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- KPI: Ticket Promedio -->
+        <div class="kpi-card group px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="icon-container flex-shrink-0">
+              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-1">
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Ticket Promedio</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400">
-                  +5%
-                </span>
-              </div>
-              <p class="text-2xl font-black text-gray-900 dark:text-white">${{ (averageTicket || 0).toLocaleString() }}</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">vs período anterior</p>
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Ticket Promedio</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">${{ (averageTicket || 0).toLocaleString() }}</p>
+              <p class="text-xs text-amber-600 dark:text-amber-400 mt-0.5">+5% vs período anterior</p>
             </div>
           </div>
         </div>
 
-        <!-- Gross Margin -->
-        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl px-5 py-4 shadow-lg shadow-gray-200/50 dark:shadow-black/30 hover:shadow-xl transition-all duration-300 group">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30 transition-transform group-hover:scale-105">
-              <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- KPI: Margen Bruto -->
+        <div class="kpi-card group px-4 py-3">
+          <div class="flex items-center gap-3">
+            <div class="icon-container flex-shrink-0">
+              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between mb-1">
-                <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Margen Bruto</p>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-400">
-                  +2.1%
-                </span>
-              </div>
-              <p class="text-2xl font-black text-gray-900 dark:text-white">{{ grossMargin }}%</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">vs período anterior</p>
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Margen Bruto</p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ grossMargin }}%</p>
+              <p class="text-xs text-purple-600 dark:text-purple-400 mt-0.5">+2.1% vs período anterior</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 📈 GRÁFICOS PROFESIONALES -->
+      <!-- ═══════════════════════════════════════════════════════════════
+           GRÁFICOS - Estilo Sistema de Diseño
+      ═══════════════════════════════════════════════════════════════ -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <!-- Sales Trend Chart -->
-        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
+        <div class="chart-card">
+          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800">
             <div>
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white">Tendencia de Ventas</h2>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Rendimiento para {{ getPeriodLabel() }}</p>
+              <h2 class="text-base font-semibold text-gray-900 dark:text-white">Tendencia de Ventas</h2>
+              <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Rendimiento para {{ getPeriodLabel() }}</p>
             </div>
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-              </svg>
-            </div>
+            <svg class="w-5 h-5 text-emerald-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
           </div>
-          <div class="p-6">
-            <div class="relative" style="height: 320px;">
+          <div class="px-7 pb-6">
+            <div class="relative" style="height: 280px;">
               <Line :data="lineChartData" :options="lineChartOptions" />
             </div>
-            <div class="mt-6 grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-zinc-800/50">
-              <div class="text-center p-3.5 bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-950/50 dark:to-emerald-900/20 rounded-xl">
-                <p class="text-xs text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mb-1">Crecimiento</p>
-                <p class="text-xl font-black text-emerald-700 dark:text-emerald-400">+{{ dailySales && dailySales.length > 0 ? Math.round((dailySales.reduce((a, b) => a + b, 0) / dailySales.length) * 0.0015) : 15 }}%</p>
+            <div class="mt-6 grid grid-cols-2 gap-4">
+              <div class="text-center p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-500/5">
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-1">Crecimiento</p>
+                <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">+{{ dailySales && dailySales.length > 0 ? Math.round((dailySales.reduce((a, b) => a + b, 0) / dailySales.length) * 0.0015) : 15 }}%</p>
               </div>
-              <div class="text-center p-3.5 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/50 dark:to-blue-900/20 rounded-xl">
-                <p class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-1">Pico Máximo</p>
-                <p class="text-xl font-black text-blue-700 dark:text-blue-400">${{ dailySales && dailySales.length > 0 ? Math.max(...dailySales).toLocaleString() : '2,800' }}</p>
+              <div class="text-center p-4 rounded-xl bg-blue-50/50 dark:bg-blue-500/5">
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-1">Pico Máximo</p>
+                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">${{ dailySales && dailySales.length > 0 ? Math.max(...dailySales).toLocaleString() : '2,800' }}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Top Products Chart -->
-        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden transition-all duration-300">
-          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
+        <!-- Top Products Chart - Clean Card -->
+        <div class="chart-card">
+          <div class="px-7 py-6 flex items-center justify-between">
             <div>
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white">Top Productos</h2>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Productos más vendidos por ingresos</p>
+              <h2 class="text-base font-semibold text-gray-900 dark:text-white">Top Productos</h2>
+              <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Productos más vendidos por ingresos</p>
             </div>
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/50 dark:to-emerald-900/30">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div>
+            <svg class="w-5 h-5 text-emerald-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
           </div>
-          <div class="p-6">
+          <div class="px-7 pb-6">
             <div style="height: 320px;">
               <Bar :data="barChartData" :options="barChartOptions" />
             </div>
           </div>
         </div>
 
-        <!-- Category Sales Chart -->
-        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
+        <!-- Category Sales Chart - Clean Card -->
+        <div class="chart-card">
+          <div class="px-7 py-6 flex items-center justify-between">
             <div>
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white">Ventas por Categoría</h2>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Distribución de ventas por categorías</p>
+              <h2 class="text-base font-semibold text-gray-900 dark:text-white">Ventas por Categoría</h2>
+              <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Distribución de ventas por categorías</p>
             </div>
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
-              </svg>
-            </div>
+            <svg class="w-5 h-5 text-violet-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+            </svg>
           </div>
-          <div class="p-6">
+          <div class="px-7 pb-6">
             <div style="height: 320px;">
               <Bar :data="categoryBarChartData" :options="categoryBarChartOptions" />
             </div>
           </div>
         </div>
 
-        <!-- Critical Stock Chart -->
-        <div class="bg-white/80 dark:bg-zinc-900/80  rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 overflow-hidden">
-          <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50">
+        <!-- Critical Stock Chart - Clean Card -->
+        <div class="chart-card">
+          <div class="px-7 py-6 flex items-center justify-between">
             <div>
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white">Stock Crítico</h2>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Productos con inventario bajo</p>
+              <h2 class="text-base font-semibold text-gray-900 dark:text-white">Stock Crítico</h2>
+              <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Productos con inventario bajo</p>
             </div>
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-rose-50 to-rose-100 dark:from-rose-950/50 dark:to-rose-900/30">
-              <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
-            </div>
+            <svg class="w-5 h-5 text-rose-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
           </div>
-          <div class="p-6">
+          <div class="px-7 pb-6">
             <div style="height: 320px;" class="flex justify-center items-center">
               <PolarArea 
                 v-if="lowStockProducts && lowStockProducts.length > 0"
@@ -252,12 +233,14 @@
                 :options="polarChartOptions" 
                 class="w-full h-full"
               />
-              <div v-else class="text-center text-gray-500 dark:text-zinc-400">
-                <svg class="w-16 h-16 mx-auto mb-3 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <p class="font-medium">Sin productos críticos</p>
-                <p class="text-sm">Todo el inventario está en niveles óptimos</p>
+              <div v-else class="text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center">
+                  <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <p class="font-semibold text-gray-900 dark:text-white">Sin productos críticos</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Todo el inventario está en niveles óptimos</p>
               </div>
             </div>
           </div>
@@ -266,7 +249,7 @@
 
     </div>
     
-  </div>
+    </div>
   </div>
 </template>
 
@@ -581,7 +564,8 @@ const actualizarContextoIA = () => {
     stock: p.quantity || p.stock || 0
   }))
   
-  uiContextStore.setScreenData('reports-general', {
+  uiContextStore.setScreenData({
+    tipoReporte: 'reports-general',
     modulo: 'Reportes Generales',
     descripcion: 'Dashboard ejecutivo con análisis de ventas, productos más vendidos, categorías y alertas de stock',
     kpis,
@@ -671,6 +655,9 @@ const registrarAccionesIA = () => {
 
 // Cargar datos al montar el componente
 onMounted(() => {
+  // Establecer módulo actual para la IA
+  uiContextStore.setCurrentModule('reports-general')
+  
   if (selectedPeriod.value === 'today') {
     loadHourlyReportsData()
   } else {
@@ -798,18 +785,21 @@ const getProChartOptions = (isHorizontal = false, showLegend = false) => ({
     legend: { display: false },
     title: { display: false },
     tooltip: { 
-      backgroundColor: '#18181b',
+      backgroundColor: 'rgba(15, 15, 16, 0.95)',
       titleColor: '#fff',
-      bodyColor: '#fff',
-      cornerRadius: 8,
+      bodyColor: 'rgba(255,255,255,0.8)',
+      cornerRadius: 12,
       displayColors: false,
-      padding: 12,
+      padding: 14,
       titleFont: {
-        size: 14,
-        weight: 'bold'
+        size: 13,
+        weight: '600',
+        family: "'Inter', -apple-system, sans-serif"
       },
       bodyFont: {
-        size: 13
+        size: 14,
+        weight: '500',
+        family: "'Inter', -apple-system, sans-serif"
       },
       callbacks: {
         label: (context) => {
@@ -840,28 +830,22 @@ const getProChartOptions = (isHorizontal = false, showLegend = false) => ({
   scales: {
     x: { 
       grid: { 
-        display: isHorizontal,
-        color: (context) => {
-          const isDark = document.documentElement.classList.contains('dark')
-          return isDark ? 'rgba(161, 161, 170, 0.1)' : 'rgba(148, 163, 184, 0.1)' // zinc-400 vs slate-400
-        },
-        drawBorder: false,
-        lineWidth: 1
+        display: false // ❌ ELIMINAR grid para look premium
       },
       border: {
         display: false
       },
       ticks: { 
-        color: (context) => {
+        color: () => {
           const isDark = document.documentElement.classList.contains('dark')
-          return isDark ? '#d4d4d8' : '#64748b' // zinc-300 vs slate-500 (mejor contraste)
+          return isDark ? 'rgba(161, 161, 170, 0.6)' : 'rgba(100, 116, 139, 0.7)'
         },
         font: {
           family: "'Inter', -apple-system, sans-serif",
           size: 11,
           weight: '500'
         },
-        padding: 8,
+        padding: 10,
         callback: function(value, index) {
           if (isHorizontal) {
             // Para barras horizontales: formatear valores monetarios
@@ -875,21 +859,15 @@ const getProChartOptions = (isHorizontal = false, showLegend = false) => ({
     },
     y: { 
       grid: { 
-        display: !isHorizontal,
-        color: (context) => {
-          const isDark = document.documentElement.classList.contains('dark')
-          return isDark ? 'rgba(161, 161, 170, 0.1)' : 'rgba(148, 163, 184, 0.1)'
-        },
-        drawBorder: false,
-        lineWidth: 1
+        display: false // ❌ ELIMINAR grid para look premium
       },
       border: {
         display: false
       },
       ticks: { 
-        color: (context) => {
+        color: () => {
           const isDark = document.documentElement.classList.contains('dark')
-          return isDark ? '#d4d4d8' : '#64748b' // zinc-300 para mejor contraste
+          return isDark ? 'rgba(161, 161, 170, 0.6)' : 'rgba(100, 116, 139, 0.7)'
         },
         font: {
           family: "'Inter', -apple-system, sans-serif",
@@ -1038,18 +1016,21 @@ const lineChartOptions = computed(() => ({
       display: false
     },
     tooltip: {
-      backgroundColor: '#18181b',
+      backgroundColor: 'rgba(15, 15, 16, 0.95)',
       titleColor: '#fff',
-      bodyColor: '#fff',
-      cornerRadius: 8,
+      bodyColor: 'rgba(255,255,255,0.8)',
+      cornerRadius: 12,
       displayColors: false,
-      padding: 12,
+      padding: 14,
       titleFont: {
-        size: 14,
-        weight: 'bold'
+        size: 13,
+        weight: '600',
+        family: "'Inter', -apple-system, sans-serif"
       },
       bodyFont: {
-        size: 13
+        size: 14,
+        weight: '500',
+        family: "'Inter', -apple-system, sans-serif"
       },
       callbacks: {
         title: (context) => {
@@ -1072,41 +1053,35 @@ const lineChartOptions = computed(() => ({
   scales: {
     x: {
       grid: {
-        display: true,
-        color: 'rgba(148, 163, 184, 0.1)',
-        drawBorder: false,
-        lineWidth: 1
+        display: false // ❌ ELIMINAR grid vertical
       },
       border: {
         display: false
       },
       ticks: {
-        color: (context) => {
+        color: () => {
           const isDark = document.documentElement.classList.contains('dark')
-          return isDark ? '#d4d4d8' : '#64748b' // zinc-300 en oscuro
+          return isDark ? 'rgba(161, 161, 170, 0.6)' : 'rgba(100, 116, 139, 0.7)'
         },
         font: {
           family: "'Inter', -apple-system, sans-serif",
           size: 11,
           weight: '500'
         },
-        padding: 8
+        padding: 10
       }
     },
     y: {
       grid: {
-        display: true,
-        color: 'rgba(148, 163, 184, 0.1)',
-        drawBorder: false,
-        lineWidth: 1
+        display: false // ❌ ELIMINAR grid horizontal
       },
       border: {
         display: false
       },
       ticks: {
-        color: (context) => {
+        color: () => {
           const isDark = document.documentElement.classList.contains('dark')
-          return isDark ? '#d4d4d8' : '#64748b' // zinc-300 en oscuro
+          return isDark ? 'rgba(161, 161, 170, 0.6)' : 'rgba(100, 116, 139, 0.7)'
         },
         font: {
           family: "'Inter', -apple-system, sans-serif",
@@ -1131,11 +1106,12 @@ const barChartData = computed(() => ({
         const ctx = context.chart.ctx;
         const gradient = ctx.createLinearGradient(0, 0, 450, 0);
         gradient.addColorStop(0, 'rgba(16, 185, 129, 0.9)');
-        gradient.addColorStop(1, 'rgba(16, 185, 129, 0.6)');
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0.5)');
         return gradient;
       },
-      borderRadius: 8,
-      barPercentage: 0.7,
+      borderRadius: { topRight: 6, bottomRight: 6 },
+      barPercentage: 0.5, // Barras más delgadas
+      categoryPercentage: 0.7,
       borderWidth: 0,
       hoverBackgroundColor: 'rgba(5, 150, 105, 1)'
     }
@@ -1152,16 +1128,16 @@ const categoryBarChartData = computed(() => ({
       data: salesByCategory.value.map(c => c.sales),
       backgroundColor: (context) => {
         const ctx = context.chart.ctx;
-        const gradient = ctx.createLinearGradient(0, 0, 0, 350);
-        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.9)');
-        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.5)');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.9)');
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.4)');
         return gradient;
       },
-      borderRadius: 10,
-      barPercentage: 0.75,
-      categoryPercentage: 0.85,
+      borderRadius: { topLeft: 8, topRight: 8 },
+      barPercentage: 0.55, // Barras más delgadas y elegantes
+      categoryPercentage: 0.7,
       borderWidth: 0,
-      hoverBackgroundColor: 'rgba(37, 99, 235, 1)'
+      hoverBackgroundColor: 'rgba(79, 70, 229, 1)'
     }
   ]
 }));
@@ -1193,14 +1169,56 @@ const radarChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-        legend: { display: true, position: 'top' }, // La leyenda es útil aquí
-        tooltip: getProChartOptions().plugins.tooltip,
+        legend: { 
+          display: true, 
+          position: 'top',
+          labels: {
+            color: () => document.documentElement.classList.contains('dark') ? '#a1a1aa' : '#64748b',
+            padding: 16,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            font: {
+              family: "'Inter', -apple-system, sans-serif",
+              size: 12,
+              weight: '500'
+            }
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(15, 15, 16, 0.95)',
+          titleColor: '#fff',
+          bodyColor: 'rgba(255,255,255,0.8)',
+          cornerRadius: 12,
+          displayColors: false,
+          padding: 14,
+          titleFont: {
+            size: 13,
+            weight: '600',
+            family: "'Inter', -apple-system, sans-serif"
+          },
+          bodyFont: {
+            size: 14,
+            weight: '500',
+            family: "'Inter', -apple-system, sans-serif"
+          }
+        },
     },
     scales: {
         r: {
-            angleLines: { color: '#e5e7eb' },
-            grid: { color: '#e5e7eb' },
-            pointLabels: { font: { size: 14, weight: 'bold' }, color: '#374151' },
+            angleLines: { 
+              color: () => document.documentElement.classList.contains('dark') ? 'rgba(63, 63, 70, 0.5)' : 'rgba(226, 232, 240, 0.8)'
+            },
+            grid: { 
+              color: () => document.documentElement.classList.contains('dark') ? 'rgba(63, 63, 70, 0.3)' : 'rgba(226, 232, 240, 0.6)'
+            },
+            pointLabels: { 
+              font: { 
+                size: 12, 
+                weight: '500',
+                family: "'Inter', -apple-system, sans-serif"
+              }, 
+              color: () => document.documentElement.classList.contains('dark') ? '#a1a1aa' : '#64748b'
+            },
             ticks: { display: false, beginAtZero: true, max: 100 }
         }
     }
@@ -1252,17 +1270,34 @@ const polarChartOptions = {
             display: true, 
             position: 'right',
             labels: {
-                padding: 15,
+                color: () => document.documentElement.classList.contains('dark') ? '#a1a1aa' : '#64748b',
+                padding: 16,
                 usePointStyle: true,
                 pointStyle: 'circle',
                 font: {
-                    size: 12,
+                    family: "'Inter', -apple-system, sans-serif",
+                    size: 11,
                     weight: '500'
                 }
             }
         },
         tooltip: {
-            ...getProChartOptions().plugins.tooltip,
+            backgroundColor: 'rgba(15, 15, 16, 0.95)',
+            titleColor: '#fff',
+            bodyColor: 'rgba(255,255,255,0.8)',
+            cornerRadius: 12,
+            displayColors: false,
+            padding: 14,
+            titleFont: {
+              size: 13,
+              weight: '600',
+              family: "'Inter', -apple-system, sans-serif"
+            },
+            bodyFont: {
+              size: 14,
+              weight: '500',
+              family: "'Inter', -apple-system, sans-serif"
+            },
             callbacks: {
                 label: function(context) {
                     const label = context.label || '';
@@ -1274,8 +1309,16 @@ const polarChartOptions = {
     },
     scales: {
         r: {
-            grid: { color: '#e5e7eb', circular: true },
-            ticks: { display: true, beginAtZero: true, stepSize: 5 },
+            grid: { 
+              color: () => document.documentElement.classList.contains('dark') ? 'rgba(63, 63, 70, 0.3)' : 'rgba(226, 232, 240, 0.6)', 
+              circular: true 
+            },
+            ticks: { 
+              display: false, 
+              beginAtZero: true, 
+              stepSize: 5,
+              backdropColor: 'transparent'
+            },
             pointLabels: { display: false }
         }
     }
@@ -1287,15 +1330,19 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* ═══════════════════════════════════════════════════════════════════════════
+   DASHBOARD PREMIUM - Estilo Stripe/Linear
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 /* Animación suave de aparición */
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -1303,8 +1350,193 @@ onMounted(async () => {
   }
 }
 
-/* Estilos generales */
-* {
-  transition: all 0.2s ease-in-out;
+/* ═══════════════════════════════════════════════════════════════════════════
+   KPI CARDS - Tarjetas de métricas premium (Estilo Sistema de Diseño)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.kpi-card {
+  background: white;
+  border: 1px solid rgb(209, 213, 219); /* gray-300 */
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.kpi-card:hover {
+  border-color: rgb(156, 163, 175); /* gray-400 */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.dark) .kpi-card,
+.dark .kpi-card {
+  background: rgba(24, 24, 27, 0.8); /* zinc-900/80 */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(63, 63, 70, 0.6); /* zinc-800/60 */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+:deep(.dark) .kpi-card:hover,
+.dark .kpi-card:hover {
+  border-color: rgba(63, 63, 70, 0.8); /* zinc-700/80 */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHART CARDS - Contenedores de gráficos (Estilo Sistema de Diseño)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.chart-card {
+  background: white;
+  border: 1px solid rgb(209, 213, 219); /* gray-300 */
+  border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.chart-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.dark) .chart-card,
+.dark .chart-card {
+  background: rgb(24, 24, 27); /* zinc-900 */
+  border: 1px solid rgb(39, 39, 42); /* zinc-800 */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+:deep(.dark) .chart-card:hover,
+.dark .chart-card:hover {
+  border-color: rgb(63, 63, 70); /* zinc-700 */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ICONOS EN KPIs (Estilo Sistema de Diseño)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.kpi-card .icon-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(243, 244, 246); /* gray-100 */
+  border: 1px solid rgb(229, 231, 235); /* gray-200 */
+  transition: all 0.2s ease;
+}
+
+:deep(.dark) .kpi-card .icon-container,
+.dark .kpi-card .icon-container {
+  background: rgba(39, 39, 42, 0.5); /* zinc-800/50 */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.kpi-card:hover .icon-container {
+  transform: scale(1.02);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SELECTOR DE PERIODO - Pills modernas
+   ═══════════════════════════════════════════════════════════════════════════ */
+.period-selector {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  background: #f4f4f5;
+  border-radius: 12px;
+}
+
+:deep(.dark) .period-selector,
+.dark .period-selector {
+  background: rgba(39, 39, 42, 0.8);
+}
+
+.period-pill {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  color: #71717a;
+  border: none;
+  background: transparent;
+}
+
+.period-pill:hover {
+  color: #18181b;
+}
+
+.period-pill.active {
+  background: white;
+  color: #18181b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.dark) .period-pill,
+.dark .period-pill {
+  color: #a1a1aa;
+}
+
+:deep(.dark) .period-pill:hover,
+.dark .period-pill:hover {
+  color: #fafafa;
+}
+
+:deep(.dark) .period-pill.active,
+.dark .period-pill.active {
+  background: rgba(63, 63, 70, 0.8);
+  color: #fafafa;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BADGES DE CAMBIO PORCENTUAL
+   ═══════════════════════════════════════════════════════════════════════════ */
+.change-badge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.change-badge.positive {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.change-badge.negative {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+:deep(.dark) .change-badge.positive,
+.dark .change-badge.positive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+:deep(.dark) .change-badge.negative,
+.dark .change-badge.negative {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE AJUSTES
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .kpi-card {
+    border-radius: 16px;
+  }
+  
+  .chart-card {
+    border-radius: 20px;
+  }
+  
+  .period-selector {
+    flex-wrap: wrap;
+  }
 }
 </style>

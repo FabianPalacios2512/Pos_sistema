@@ -19,7 +19,7 @@ class GeminiAgentService
     protected $apiKey;
     protected $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
     protected $sessionId;
-    protected $maxHistoryMessages = 20; // Cuántos mensajes recordar (suficiente contexto)
+    protected $maxHistoryMessages = 10; // Reducido de 20 a 10 para optimizar tokens
 
     public function __construct()
     {
@@ -51,12 +51,16 @@ class GeminiAgentService
         // Obtener plan actual del tenant
         $tenantPlan = 'free_trial';
         $businessName = 'tu negocio';
+        $storeType = 'general';
         try {
             if (function_exists('tenant')) {
                 $tenant = tenant();
                 $tenantPlan = $tenant ? ($tenant->plan ?? 'free_trial') : 'free_trial';
                 $businessName = $tenant ? ($tenant->business_name ?? 'tu negocio') : 'tu negocio';
             }
+            // Obtener tipo de tienda de la configuración
+            $settings = \App\Models\SystemSetting::getSettings();
+            $storeType = $settings->store_type ?? 'general';
         } catch (\Exception $e) {
             Log::warning('No se pudo obtener el plan del tenant: ' . $e->getMessage());
         }
@@ -69,16 +73,46 @@ class GeminiAgentService
             default => 'BÁSICO'
         };
 
+        // Información contextual según tipo de tienda
+        $storeTypeInfo = match($storeType) {
+            'fashion' => 'TIENDA DE MODA 👗 - Productos con variantes (tallas, colores). POS Fashion con selector de variantes.',
+            'food' => 'TIENDA DE ALIMENTOS 🍔 - Productos perecederos con fechas de vencimiento.',
+            'electronics' => 'TIENDA DE ELECTRÓNICOS 📱 - Productos con números de serie y garantías.',
+            default => 'TIENDA GENERAL 📦 - Productos simples sin variantes. Inventario estándar.'
+        };
+
+        // Sección específica de conocimiento según tipo de tienda
+        $storeTypeKnowledge = $this->getStoreTypeKnowledge($storeType);
+
         return <<<EOT
 Eres "105 IA", el asistente virtual INTELIGENTE del sistema POS 105 para "{$businessName}". 
 No eres un simple chatbot que responde - eres un ASISTENTE DE NEGOCIO que PIENSA, ANALIZA y ACTÚA.
 
 🏢 CONTEXTO:
 - Negocio: {$businessName}
+- Tipo de tienda: {$storeTypeInfo}
 - Plan: {$tenantPlan} ({$planInfo})
 - País: Colombia 🇨🇴
 - Fecha: {$currentDate}
 - Hora: {$currentTime}
+
+{$storeTypeKnowledge}
+
+═══════════════════════════════════════════════════════════════
+         📊 DATOS DEL NEGOCIO EN TIEMPO REAL (PRIORIDAD MÁXIMA)
+═══════════════════════════════════════════════════════════════
+
+⚠️ IMPORTANTE: Si el usuario envía datos con [DATOS DEL NEGOCIO EN TIEMPO REAL], 
+USA ESOS DATOS para responder preguntas como:
+- "¿cuántas devoluciones hemos hecho?" → Lee las devoluciones del contexto
+- "¿cuánto vendí hoy/este mes?" → Lee las ventas del contexto
+- "¿cuántos productos hay?" → Lee el inventario del contexto
+- "¿cómo van las ganancias?" → Lee las ganancias del contexto
+- "¿cuánto he gastado?" → Lee los gastos del contexto
+- "¿la caja está abierta?" → Lee el estado de caja del contexto
+
+❌ NO digas "no tengo herramienta" o "no puedo consultar" si los datos YA ESTÁN en el contexto.
+✅ Responde directamente con los números que ves en el contexto.
 
 ═══════════════════════════════════════════════════════════════
             🧠 TU MENTALIDAD: PIENSA → ANALIZA → ACTÚA
@@ -139,6 +173,19 @@ Tú: *Usa actualizarConfiguracion* → "¡Listo! Ya activé Creditienda. ¿Te ay
 - "Ventas de hoy" → Muestra ventas (no preguntes "¿qué quieres ver?")
 - "Sí", "ok", "hazlo", "dale" → EJECUTA la última acción propuesta.
 
+⚠️⚠️⚠️ REGLA CRÍTICA: FECHAS ESPECÍFICAS = USA HERRAMIENTAS ⚠️⚠️⚠️
+- Si el usuario pregunta por UNA FECHA ESPECÍFICA (ayer, el 27, martes, hace 2 días, semana pasada):
+  → DEBES llamar a consultarVentas con fecha="YYYY-MM-DD" o periodo="ayer"
+  → NUNCA respondas con datos del contexto para fechas pasadas
+  → El contexto de pantalla solo tiene datos de HOY, no de fechas anteriores
+  
+- Ejemplos:
+  • "¿ventas del 27 de enero?" → consultarVentas(fecha="2026-01-27") ← OBLIGATORIO
+  • "¿cómo estuvo ayer?" → consultarVentas(periodo="ayer") ← OBLIGATORIO  
+  • "ventas del martes" → Calcula fecha y usa consultarVentas(fecha="YYYY-MM-DD")
+  
+- Si NO usas la herramienta para fechas pasadas, darás datos INCORRECTOS.
+
 📌 REGLA 1.5: NO PREGUNTES POR PERÍODO
 - "Producto más vendido" → Consulta TODO el histórico (no preguntes "¿de qué período?")
 - "Cuántos proveedores tengo" → Consulta TODOS (no digas "no puedo")
@@ -162,6 +209,28 @@ Tú: *Usa actualizarConfiguracion* → "¡Listo! Ya activé Creditienda. ¿Te ay
 - Eliminar TODOS los productos: PROHIBIDO. Di "No puedo eliminar todo, dime cuáles específicamente".
 - ACTUALIZAR masivo: Muestra preview antes de aplicar.
 
+📌 REGLA 4.5: CREACIÓN DE PRODUCTOS - RECOPILA TODOS LOS DATOS
+Cuando el usuario quiera CREAR un producto, SIEMPRE debes recopilar estos datos OBLIGATORIOS antes de crear:
+1. **Nombre** del producto (obligatorio)
+2. **Precio de venta** (obligatorio)  
+3. **Costo** del producto (obligatorio para calcular margen)
+4. **Stock inicial** (obligatorio - ¿cuántas unidades tiene?)
+5. **Categoría** (obligatorio)
+
+⚠️ NUNCA crees un producto sin preguntar por el STOCK. Ejemplo de flujo correcto:
+- Usuario: "Quiero crear un producto"
+- Tú: "¡Perfecto! Vamos a crearlo. ¿Cómo se llama el producto?"
+- Usuario: "Coca-Cola"
+- Tú: "Genial, Coca-Cola. ¿Cuál es el precio de venta?"
+- Usuario: "3000"
+- Tú: "¿Y cuánto te costó? (precio de compra)"
+- Usuario: "2000"
+- Tú: "¿Cuántas unidades tienes en stock?" ← ⚠️ SIEMPRE PREGUNTA ESTO
+- Usuario: "50"
+- Tú: "¿En qué categoría lo pongo? (Bebidas, Snacks, etc.)"
+- Usuario: "Bebidas"
+- Tú: *Crea el producto con todos los datos*
+
 📌 REGLA 5: CONTEXTO COLOMBIANO 🇨🇴
 - Precios: $15.000 (punto para miles, sin decimales)
 - Fechas: dd/mm/yyyy
@@ -172,6 +241,14 @@ Tú: *Usa actualizarConfiguracion* → "¡Listo! Ya activé Creditienda. ¿Te ay
 - Si hay datos, muéstralos organizados.
 - Usa emojis moderados (✅ ❌ 📦 💰 📊).
 - Nunca digas "backend", "API", "query" - habla como humano.
+
+📌 REGLA 7: SALUDOS Y CORTESÍA - SÉ AMABLE Y CÁLIDO
+- Si el usuario te saluda ("hola", "hey", "buenas", etc.) → Responde con calidez y brevedad.
+- Ejemplo: "¡Hola! 👋 ¿En qué te puedo ayudar hoy?"
+- NUNCA respondas de forma seca como "¿Qué necesitas?" o "Dime".
+- Sé profesional pero cercano, como un asistente amigable.
+- Si no tienes datos del negocio en el mensaje, no inventes métricas ni digas "veo que vendiste X".
+- Simplemente saluda y ofrece ayuda.
 
 ═══════════════════════════════════════════════════════════════
                     🔧 TUS HERRAMIENTAS
@@ -189,8 +266,9 @@ Tú: *Usa actualizarConfiguracion* → "¡Listo! Ya activé Creditienda. ¿Te ay
 
 💰 VENTAS Y FACTURACIÓN:
 • consultarVentas - Ver ventas por período
-• consultarFacturas - Buscar facturas
-• obtenerDetalleFactura - Ver detalle de una factura
+• consultarFacturas - Buscar facturas por cliente, número o período
+• obtenerUltimaFactura - Obtiene la ÚLTIMA factura generada con TODOS sus detalles
+• obtenerDetalleFactura - Ver detalle de una factura específica por ID
 • obtenerReporteVentas - Resumen de ventas con métricas
 • obtenerFacturaMasRentable - La factura con mayor margen de ganancia
 
@@ -231,6 +309,93 @@ Después de crear un producto, puedes sugerir: "¿Quieres que te lleve al módul
 🎯 TU MISIÓN: Que el dueño del negocio sienta que tiene un asistente BRILLANTE que ENTIENDE, PIENSA y RESUELVE. No un bot tonto que solo sigue reglas.
 
 ¡Ahora ve y sorprende al usuario con tu inteligencia!
+EOT;
+    }
+
+    /**
+     * Retorna conocimiento específico según el tipo de tienda
+     * Para que la IA entienda las diferencias entre Fashion y General
+     */
+    private function getStoreTypeKnowledge(string $storeType): string
+    {
+        if ($storeType === 'fashion') {
+            return <<<EOT
+═══════════════════════════════════════════════════════════════
+         👗 TIENDA DE MODA - CONOCIMIENTO ESPECIALIZADO
+═══════════════════════════════════════════════════════════════
+
+⚠️ ESTA ES UNA TIENDA DE MODA (FASHION). Esto significa:
+
+📦 PRODUCTOS CON VARIANTES:
+- Los productos tienen VARIANTES (tallas: XS, S, M, L, XL, XXL y colores: Azul, Negro, Blanco, etc.)
+- El STOCK está distribuido entre las variantes, no en el producto principal
+- Cuando el usuario pregunte "¿cuánto stock tengo de X?", suma todas las variantes
+- Ejemplo: Camiseta Básica → Talla M Azul (5 unidades), Talla L Negro (3 unidades) = 8 unidades totales
+
+📊 ESTRUCTURA DE DATOS FASHION:
+- products → Producto padre (nombre, descripción, imagen principal)
+- product_variants → Variantes con talla, color, SKU único, precio y stock individual
+- product_options → Define las opciones disponibles (Talla, Color)
+- product_option_values → Los valores posibles (S, M, L / Rojo, Azul)
+
+💡 CONSULTAS INTELIGENTES PARA MODA:
+- "¿Cuántas tallas XL tengo?" → Buscar en product_variants por talla
+- "¿Qué colores hay del vestido X?" → Listar variantes únicas por color
+- "Productos sin stock en talla M" → Variantes con stock=0 y talla=M
+- "¿Qué tallas se venden más?" → Analizar ventas por variante
+
+🛒 POS FASHION (Punto de Venta):
+- El POS de moda muestra un selector de TALLA y COLOR antes de agregar al carrito
+- No se puede vender un producto sin seleccionar la variante
+- El precio puede variar entre variantes (ej: XXL más caro)
+- El descuento puede aplicarse a nivel de variante
+
+🎯 TÉRMINOS DE MODA QUE DEBES CONOCER:
+- "Prenda" = Producto de ropa
+- "Referencia" = El SKU o código del producto
+- "Línea" = Categoría (ej: Línea casual, Línea formal)
+- "Temporada" = Colección por época del año
+- "Outlet" = Productos de temporadas pasadas con descuento
+
+⚠️ ERRORES A EVITAR:
+- NO mostrar stock del producto padre como total (ese está calculado)
+- NO crear productos simples en tiendas fashion (deben tener variantes)
+- SIEMPRE preguntar talla/color cuando el usuario quiere información específica
+EOT;
+        }
+
+        // Para tienda general u otros tipos
+        return <<<EOT
+═══════════════════════════════════════════════════════════════
+         📦 TIENDA GENERAL - CONOCIMIENTO ESPECIALIZADO  
+═══════════════════════════════════════════════════════════════
+
+📦 PRODUCTOS SIMPLES:
+- Los productos NO tienen variantes (sin tallas ni colores)
+- Cada producto tiene UN solo SKU, precio y stock
+- El stock se maneja directamente en el producto
+- Ideal para: ferreterías, papelerías, minimarkets, licoreras, etc.
+
+📊 ESTRUCTURA DE DATOS GENERAL:
+- products → Producto con nombre, SKU, precio, stock, costo
+- product_warehouse → Stock por bodega (si tiene multisede)
+- Sin tablas de variantes
+
+💡 CONSULTAS TÍPICAS:
+- "¿Cuánto tengo de X?" → Stock directo del producto
+- "Productos agotados" → productos con stock <= 0
+- "Productos por vencer" → Si maneja fechas de vencimiento
+
+🛒 POS GENERAL (Punto de Venta):
+- El POS general permite agregar productos directamente
+- Sin selector de variantes
+- Cantidad se ajusta en el carrito
+
+🎯 TÉRMINOS COMUNES:
+- "Ítem" = Producto
+- "Referencia" = SKU o código
+- "Línea" = Categoría de productos
+- "Margen" = Diferencia entre precio venta y costo
 EOT;
     }
 
@@ -309,8 +474,10 @@ EOT;
 
     /**
      * Ejecuta el agente Gemini con el prompt del usuario.
+     * @param string $prompt - Mensaje del usuario
+     * @param string|null $screenContext - Contexto de pantalla del frontend (datos del negocio)
      */
-    public function runAgent($prompt)
+    public function runAgent($prompt, $screenContext = null)
     {
         $startTime = microtime(true);
         
@@ -331,13 +498,24 @@ EOT;
                 'status' => 'success'
             ];
         }
+        
+        // 🧠 OPTIMIZACIÓN: Guardar SOLO el mensaje del usuario en historial (SIN contexto)
+        // Esto evita que el historial crezca exponencialmente con datos del negocio repetidos
+        $originalUserMessage = $prompt;
+        
+        // 🧠 Si hay contexto de pantalla, agregarlo al prompt DESPUÉS de guardar el original
+        if (!empty($screenContext)) {
+            $prompt = "[DATOS DEL NEGOCIO EN TIEMPO REAL - USA ESTA INFORMACIÓN PARA RESPONDER]\n" . $screenContext . "\n\n[PREGUNTA DEL USUARIO]\n" . $prompt;
+            Log::info('🧠 [Gemini] Contexto de pantalla agregado al prompt', ['context_length' => strlen($screenContext)]);
+        }
 
         try {
             // Limpiar historial antiguo (>24h) - NO el historial actual
             $this->cleanOldHistory();
 
-            // Guardar mensaje del usuario en historial
-            $this->saveMessage('user', $prompt);
+            // Guardar SOLO el mensaje original del usuario (SIN contexto de negocio)
+            // Esto evita que el historial crezca de 7k a 12k tokens por mensaje
+            $this->saveMessage('user', $originalUserMessage);
 
             // 1. Definir herramientas (Tools)
             $tools = $this->getToolsDefinition();
@@ -412,6 +590,10 @@ EOT;
             // Si no hubo llamada a función, devolver la respuesta de texto normal
             $replyText = $firstPart['text'] ?? 'No entendí tu solicitud. ¿Puedes ser más específico?';
 
+            // 🛡️ FILTRO: Detectar si Gemini respondió con código técnico en lugar de ejecutar función
+            // Esto pasa a veces cuando el modelo "alucina" y genera código Python/JS
+            $replyText = $this->sanitizeAIResponse($replyText, $prompt);
+
             // Guardar respuesta en historial
             $this->saveMessage('assistant', $replyText);
 
@@ -442,6 +624,20 @@ EOT;
                 'status' => 'error'
             ];
         }
+    }
+
+    /**
+     * Ejecuta importación de productos directamente desde el controlador
+     * Evita pasar por el prompt de Gemini para archivos grandes
+     */
+    public function executeImportFromController($args)
+    {
+        Log::info('[GeminiAgent] Ejecutando importación directa desde controlador', [
+            'has_headers' => isset($args['products_data']['headers']),
+            'rows_count' => count($args['products_data']['rows'] ?? [])
+        ]);
+
+        return $this->importarProductosMasivoHandler($args);
     }
 
     /**
@@ -566,6 +762,9 @@ EOT;
             $replyText = implode("\n", $resultMessages);
         }
 
+        // 🛡️ Sanitizar respuesta final también (por si acaso)
+        $replyText = $this->sanitizeAIResponse($replyText, $messages[0]['parts'][0]['text'] ?? '');
+
         // Guardar respuesta en historial
         $this->saveMessage('assistant', $replyText);
 
@@ -606,15 +805,17 @@ EOT;
                     // === PRODUCTOS ===
                     [
                         'name' => 'crearProducto',
-                        'description' => 'Crea un nuevo producto en el inventario con nombre, precio y stock.',
+                        'description' => 'Crea un nuevo producto. IMPORTANTE: Antes de usar esta función, DEBES haber preguntado al usuario por: nombre, precio de venta, costo, stock inicial y categoría. NO crees productos sin stock.',
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'nombre' => ['type' => 'STRING', 'description' => 'Nombre del producto'],
-                                'precio' => ['type' => 'NUMBER', 'description' => 'Precio del producto'],
-                                'stock' => ['type' => 'NUMBER', 'description' => 'Cantidad inicial en stock']
+                                'nombre' => ['type' => 'STRING', 'description' => 'Nombre del producto (obligatorio)'],
+                                'precio' => ['type' => 'NUMBER', 'description' => 'Precio de venta del producto (obligatorio)'],
+                                'costo' => ['type' => 'NUMBER', 'description' => 'Precio de costo/compra del producto'],
+                                'stock' => ['type' => 'NUMBER', 'description' => 'Cantidad inicial en stock (obligatorio - siempre pregunta cuántas unidades tiene)'],
+                                'categoria' => ['type' => 'STRING', 'description' => 'Nombre de la categoría del producto']
                             ],
-                            'required' => ['nombre']
+                            'required' => ['nombre', 'precio', 'stock']
                         ]
                     ],
                     [
@@ -746,7 +947,7 @@ EOT;
                     // === FACTURAS ===
                     [
                         'name' => 'consultarFacturas',
-                        'description' => 'Busca facturas por cliente, número de factura o período de tiempo.',
+                        'description' => 'Busca facturas por cliente, número de factura o período de tiempo. Para obtener la última factura, usa orden="reciente" y limite=1.',
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
@@ -754,10 +955,23 @@ EOT;
                                 'numero_factura' => ['type' => 'STRING', 'description' => 'Número de factura (ej: FACT-0001)'],
                                 'periodo' => [
                                     'type' => 'STRING',
-                                    'enum' => ['hoy', 'ayer', 'semana', 'mes']
+                                    'enum' => ['hoy', 'ayer', 'semana', 'mes', 'todo']
                                 ],
-                                'limite' => ['type' => 'NUMBER', 'description' => 'Máximo de resultados']
+                                'orden' => [
+                                    'type' => 'STRING',
+                                    'enum' => ['reciente', 'antiguo', 'mayor_monto', 'menor_monto'],
+                                    'description' => 'Orden de resultados: reciente (más nueva primero), antiguo, mayor_monto, menor_monto'
+                                ],
+                                'limite' => ['type' => 'NUMBER', 'description' => 'Máximo de resultados (default 10, para última factura usa 1)']
                             ]
+                        ]
+                    ],
+                    [
+                        'name' => 'obtenerUltimaFactura',
+                        'description' => 'Obtiene la última factura generada en el sistema con todos sus detalles: número, cliente, productos, total, fecha.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => new \stdClass()
                         ]
                     ],
                     [
@@ -1150,6 +1364,8 @@ EOT;
                 return $this->consultarFacturasDB($args);
             case 'obtenerDetalleFactura':
                 return $this->obtenerDetalleFacturaDB($args);
+            case 'obtenerUltimaFactura':
+                return $this->obtenerUltimaFacturaDB();
 
             // Categorías
             case 'consultarCategorias':
@@ -1210,7 +1426,9 @@ EOT;
             // 1. Validar datos mínimos
             $nombre = trim($data['nombre'] ?? '');
             $precio = floatval($data['precio'] ?? 0);
+            $costo = floatval($data['costo'] ?? 0);
             $stock = intval($data['stock'] ?? 0);
+            $categoriaNombre = trim($data['categoria'] ?? '');
 
             // Validación de nombre
             if (empty($nombre) || $nombre === 'Producto sin nombre') {
@@ -1221,19 +1439,24 @@ EOT;
             }
 
             // Validación de precio
-            if ($precio < 0) {
+            if ($precio <= 0) {
                 return [
                     'status' => 'error',
-                    'message' => "El precio no puede ser negativo."
+                    'message' => "Necesito el precio de venta del producto. ¿A cuánto lo vas a vender?"
                 ];
             }
 
-            // Validación de stock
-            if ($stock < 0) {
+            // Validación de stock - SIEMPRE debe tener stock
+            if ($stock <= 0) {
                 return [
                     'status' => 'error',
-                    'message' => "El stock no puede ser negativo."
+                    'message' => "¿Cuántas unidades tienes en stock de {$nombre}? Necesito saber la cantidad inicial."
                 ];
+            }
+
+            // Si no hay costo, estimar como 60% del precio
+            if ($costo <= 0) {
+                $costo = $precio * 0.6;
             }
 
             // Verificar si ya existe un producto con ese nombre
@@ -1253,13 +1476,31 @@ EOT;
                 ];
             }
 
-            // 2. Obtener Categoría por defecto (o crearla si no existe)
-            $categoria = Category::where('active', true)->first();
-            if (!$categoria) {
-                $categoria = Category::create([
-                    'name' => 'General',
-                    'active' => true
-                ]);
+            // 2. Buscar o crear categoría
+            $categoria = null;
+            if (!empty($categoriaNombre)) {
+                // Buscar categoría por nombre (case insensitive)
+                $categoria = Category::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($categoriaNombre) . '%'])
+                    ->where('active', true)
+                    ->first();
+                
+                // Si no existe, crearla
+                if (!$categoria) {
+                    $categoria = Category::create([
+                        'name' => ucfirst($categoriaNombre),
+                        'active' => true
+                    ]);
+                    Log::info("📂 [IA] Categoría creada: {$categoria->name}");
+                }
+            } else {
+                // Usar categoría por defecto
+                $categoria = Category::where('active', true)->first();
+                if (!$categoria) {
+                    $categoria = Category::create([
+                        'name' => 'General',
+                        'active' => true
+                    ]);
+                }
             }
 
             // 3. Obtener Proveedor por defecto (o crear uno si no existe)
@@ -1279,7 +1520,7 @@ EOT;
                 'name' => $nombre,
                 'product_type' => 'simple',
                 'sale_price' => $precio,
-                'cost_price' => 0,
+                'cost_price' => $costo,
                 'current_stock' => $stock,
                 'min_stock' => 5, // Valor por defecto razonable
                 'manage_stock' => true,
@@ -1295,20 +1536,24 @@ EOT;
                 'product_id' => $producto->id,
                 'product_name' => $producto->name,
                 'sale_price' => $producto->sale_price,
+                'cost_price' => $producto->cost_price,
                 'stock' => $producto->current_stock,
+                'category' => $categoria->name,
                 'user_id' => auth()->id(),
                 'timestamp' => now()->toISOString()
             ]);
 
             $precioFormateado = '$' . number_format($producto->sale_price, 0, ',', '.');
+            $costoFormateado = '$' . number_format($producto->cost_price, 0, ',', '.');
+            $margen = $precio > 0 ? round((($precio - $costo) / $precio) * 100) : 0;
 
             return [
                 'status' => 'ok',
                 'product_id' => $producto->id,
                 'message' => "✅ Producto creado exitosamente:\n\n" .
                             "📦 **{$producto->name}**\n" .
-                            "• ID: {$producto->id}\n" .
-                            "• Precio: {$precioFormateado}\n" .
+                            "• Precio de venta: {$precioFormateado}\n" .
+                            "• Costo: {$costoFormateado} (margen: {$margen}%)\n" .
                             "• Stock inicial: {$producto->current_stock} unidades\n" .
                             "• Categoría: {$categoria->name}\n" .
                             "• SKU: {$producto->sku}"
@@ -1674,9 +1919,12 @@ EOT;
             $fecha = $args['fecha'] ?? null;
             $limite = intval($args['limite'] ?? 10);
 
+            Log::info('🔧 [Gemini] consultarVentas llamado', ['periodo' => $periodo, 'fecha' => $fecha, 'limite' => $limite]);
+
+            // Query para facturas PAGADAS (igual que la IA de voz)
             $query = Invoice::with('customer:id,name')
                 ->where('type', 'invoice')
-                ->where('status', '!=', 'cancelled');
+                ->where('status', 'paid'); // Solo facturas pagadas
 
             // Texto descriptivo del período
             $periodoTexto = 'todos los tiempos';
@@ -2155,6 +2403,62 @@ EOT;
         }
     }
 
+    /**
+     * Obtiene la última factura generada en el sistema
+     */
+    private function obtenerUltimaFacturaDB()
+    {
+        try {
+            $factura = Invoice::with(['customer', 'items'])
+                ->where('type', 'invoice')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if (!$factura) {
+                return [
+                    'status' => 'not_found',
+                    'message' => 'No hay facturas registradas en el sistema.'
+                ];
+            }
+
+            $productos = $factura->items->map(function($item) {
+                return [
+                    'producto' => $item->product_name,
+                    'cantidad' => $item->quantity,
+                    'precio_unitario' => $item->unit_price,
+                    'subtotal' => $item->quantity * $item->unit_price
+                ];
+            });
+
+            return [
+                'factura' => [
+                    'id' => $factura->id,
+                    'numero' => $factura->number,
+                    'cliente' => $factura->customer?->name ?? 'Cliente General',
+                    'vendedor' => $factura->seller_name ?? 'No registrado',
+                    'fecha' => Carbon::parse($factura->date)->format('d/m/Y'),
+                    'hora' => Carbon::parse($factura->created_at)->format('H:i'),
+                    'subtotal' => $factura->subtotal,
+                    'impuesto' => $factura->tax_amount ?? 0,
+                    'total' => $factura->total,
+                    'estado' => $factura->status,
+                    'metodo_pago' => $factura->payment_method ?? 'Efectivo'
+                ],
+                'productos' => $productos->toArray(),
+                'cantidad_productos' => $productos->count(),
+                'mensaje' => "La última factura es {$factura->number} del " . Carbon::parse($factura->date)->format('d/m/Y') . 
+                             " a las " . Carbon::parse($factura->created_at)->format('H:i') .
+                             " para " . ($factura->customer?->name ?? 'Cliente General') . 
+                             " por $" . number_format($factura->total, 0, ',', '.') .
+                             " con {$productos->count()} producto(s)."
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("❌ Error obtenerUltimaFactura: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Error al obtener la última factura.'];
+        }
+    }
+
     // ========================================
     // FUNCIONES DE BASE DE DATOS - CATEGORÍAS
     // ========================================
@@ -2462,14 +2766,14 @@ EOT;
 
             foreach ($rows as $rowIndex => $row) {
                 try {
-                    // Extraer datos de la fila
-                    $nombre = $this->getValueFromRow($row, $headerMap, ['nombre', 'producto', 'name']);
-                    $precioVenta = $this->getValueFromRow($row, $headerMap, ['precio venta', 'precio', 'price', 'venta']);
-                    $precioCosto = $this->getValueFromRow($row, $headerMap, ['precio costo', 'costo', 'cost']);
-                    $stock = $this->getValueFromRow($row, $headerMap, ['stock', 'cantidad', 'existencia']);
-                    $sku = $this->getValueFromRow($row, $headerMap, ['sku', 'código', 'code']);
-                    $barcode = $this->getValueFromRow($row, $headerMap, ['código barras', 'barcode', 'ean', 'upc']);
-                    $categoriaNombre = $this->getValueFromRow($row, $headerMap, ['categoría', 'categoria', 'category']);
+                    // Extraer datos de la fila (con más variantes de nombres de columnas)
+                    $nombre = $this->getValueFromRow($row, $headerMap, ['nombre', 'producto', 'name', 'nombre del producto', 'nombre producto', 'descripcion', 'descripción', 'articulo', 'artículo', 'item']);
+                    $precioVenta = $this->getValueFromRow($row, $headerMap, ['precio venta', 'precio', 'price', 'venta', 'precioventa', 'precio_venta', 'pvp', 'precio unitario']);
+                    $precioCosto = $this->getValueFromRow($row, $headerMap, ['precio costo', 'costo', 'cost', 'precio compra', 'preciocompra', 'precio_costo', 'costo unitario', 'compra']);
+                    $stock = $this->getValueFromRow($row, $headerMap, ['stock', 'cantidad', 'existencia', 'inventario', 'unidades', 'qty', 'existencias']);
+                    $sku = $this->getValueFromRow($row, $headerMap, ['sku', 'código', 'code', 'codigo', 'referencia', 'ref']);
+                    $barcode = $this->getValueFromRow($row, $headerMap, ['código barras', 'barcode', 'ean', 'upc', 'codigo de barras', 'códigobarras']);
+                    $categoriaNombre = $this->getValueFromRow($row, $headerMap, ['categoría', 'categoria', 'category', 'tipo', 'grupo', 'familia']);
 
                     // Validar datos mínimos
                     if (empty($nombre)) {
@@ -2502,6 +2806,16 @@ EOT;
                         $categoryId = $defaultCategory->id;
                     }
 
+                    // Generar SKU automático si no viene
+                    $productSku = $sku;
+                    if (empty($productSku)) {
+                        // Generar SKU basado en nombre + timestamp + random
+                        $productSku = 'SKU-' . strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $nombre), 0, 5)) . '-' . substr(time(), -5) . rand(10, 99);
+                    }
+                    
+                    // Generar barcode vacío si no viene (puede ser null en DB normalmente)
+                    $productBarcode = $barcode ?: null;
+
                     // Crear producto (sin stock en products, se maneja en product_warehouse)
                     $product = Product::create([
                         'name' => $nombre,
@@ -2509,8 +2823,8 @@ EOT;
                         'sale_price' => floatval($precioVenta ?? 0),
                         'cost_price' => floatval($precioCosto ?? 0),
                         'current_stock' => intval($stock ?? 0), // Total del stock
-                        'sku' => $sku ?? null,
-                        'barcode' => $barcode ?? null,
+                        'sku' => $productSku,
+                        'barcode' => $productBarcode,
                         'category_id' => $categoryId,
                         'active' => true,
                     ]);
@@ -3553,5 +3867,66 @@ EOT;
             ],
             'message' => $mensajes[$accion] ?? '🎵 Controlando radio...'
         ];
+    }
+
+    /**
+     * 🛡️ Sanitiza respuestas de la IA para evitar mostrar código técnico al usuario
+     * A veces Gemini "alucina" y genera código Python/JS en lugar de ejecutar funciones
+     */
+    private function sanitizeAIResponse(string $response, string $originalPrompt): string
+    {
+        // Patrones de código técnico que NO deben mostrarse al usuario
+        $technicalPatterns = [
+            '/print\s*\(\s*\w+\.\w+\(/i',           // print(default_api.xxx(
+            '/default_api\./i',                      // default_api.
+            '/api\.\w+\(/i',                         // api.xxx(
+            '/import\s+\w+/i',                       // import xxx
+            '/from\s+\w+\s+import/i',                // from xxx import
+            '/def\s+\w+\s*\(/i',                     // def xxx(
+            '/function\s+\w+\s*\(/i',                // function xxx(
+            '/console\.log\(/i',                     // console.log(
+            '/await\s+\w+\.\w+\(/i',                 // await xxx.xxx(
+            '/```python/i',                          // código Python
+            '/```javascript/i',                      // código JavaScript
+            '/controlarRadio\s*\(/i',                // controlarRadio(
+            '/navegarModulo\s*\(/i',                 // navegarModulo(
+        ];
+
+        foreach ($technicalPatterns as $pattern) {
+            if (preg_match($pattern, $response)) {
+                Log::warning('🛡️ [Gemini] Respuesta con código técnico detectada y filtrada', [
+                    'original_prompt' => substr($originalPrompt, 0, 100),
+                    'bad_response' => substr($response, 0, 200)
+                ]);
+
+                // Detectar qué quería hacer el usuario y dar respuesta amigable
+                $promptLower = strtolower($originalPrompt);
+                
+                // Radio/Música
+                if (preg_match('/radio|música|musica|pon|prende|reproduce|play/i', $promptLower)) {
+                    return '🎵 ¡Listo! Poniendo música para ti.';
+                }
+                
+                // Pausar
+                if (preg_match('/para|pausa|stop|detén|deten/i', $promptLower)) {
+                    return '⏸️ Música pausada.';
+                }
+                
+                // Siguiente
+                if (preg_match('/siguiente|next|otra|cambia/i', $promptLower)) {
+                    return '⏭️ Siguiente canción...';
+                }
+                
+                // Navegación
+                if (preg_match('/llévame|llevame|ir a|ve a|abre|muéstrame|muestrame/i', $promptLower)) {
+                    return '🚀 Te llevo ahí...';
+                }
+
+                // Respuesta genérica
+                return '¡Entendido! Estoy procesando tu solicitud.';
+            }
+        }
+
+        return $response;
     }
 }

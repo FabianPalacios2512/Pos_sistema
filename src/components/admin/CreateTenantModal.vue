@@ -1,50 +1,52 @@
 <template>
-  <div class="fixed inset-0 bg-black/70  flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-2xl w-full border border-gray-300 dark:border-zinc-800 shadow-2xl dark:shadow-black/50 max-h-[90vh] overflow-hidden">
-      <!-- Header -->
-      <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white">Crear Nueva Tienda</h3>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Crea una cuenta manualmente para un nuevo cliente</p>
+  <!-- MODAL OPTIMIZADO PARA MÓVIL - Full screen en móvil, centrado en desktop -->
+  <div class="fixed inset-0 bg-black/70 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+    <div class="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-lg border border-gray-300 dark:border-zinc-800 shadow-2xl dark:shadow-black/50 max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
+      <!-- Header - Más compacto en móvil -->
+      <div class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-10">
+        <div class="flex-1 min-w-0">
+          <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Nueva Tienda</h3>
+          <p class="text-xs sm:text-sm text-gray-600 dark:text-zinc-400 mt-0.5 hidden sm:block">Crear cuenta para nuevo cliente</p>
         </div>
-        <button @click="$emit('close')" class="p-2 text-gray-400 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button @click="$emit('close')" class="p-2.5 -mr-2 text-gray-400 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-xl transition-all">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       </div>
 
-      <!-- Form Content -->
-      <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
-        <form @submit.prevent="handleCreate" class="space-y-5">
+      <!-- Form Content - Scrollable en móvil -->
+      <div class="p-4 sm:p-6 overflow-y-auto max-h-[calc(95vh-140px)] sm:max-h-[calc(90vh-180px)]">
+        <form @submit.prevent="handleCreate" class="space-y-4 sm:space-y-5">
           
-          <!-- Row 1: Nombre del dueño y Cédula/NIT -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">
-                Nombre del Propietario <span class="text-red-500">*</span>
+          <!-- Row 1: Nombre del dueño y Cédula/NIT - Stack en móvil -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-300">
+                Propietario <span class="text-red-500">*</span>
               </label>
               <input 
                 v-model="form.owner_name" 
                 type="text" 
-                placeholder="Ej. Juan Pérez"
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400 dark:placeholder-zinc-500" 
+                placeholder="Juan Pérez"
+                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400 dark:placeholder-zinc-500 text-base" 
                 required
               >
             </div>
 
-            <div class="space-y-2">
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">
-                Cédula / NIT <span class="text-red-500">*</span>
+            <div class="space-y-1.5">
+              <label class="block text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-300">
+                Cédula/NIT <span class="text-red-500">*</span>
               </label>
               <div class="relative">
                 <input 
                   v-model="form.cedula" 
                   type="text" 
-                  placeholder="Ej. 123456789"
+                  inputmode="numeric"
+                  placeholder="123456789"
                   @input="form.cedula = form.cedula.replace(/[^0-9]/g, ''); checkCedula()"
                   maxlength="15"
-                  class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 transition-all placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 transition-all placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-base"
                   :class="[
                     cedulaStatus === 'taken' ? 'border-red-500 dark:border-red-500' : 
                     cedulaStatus === 'available' ? 'border-emerald-500 dark:border-emerald-500' : 
@@ -74,33 +76,35 @@
           </div>
 
           <!-- Row 2: Nombre del Negocio -->
-          <div class="space-y-2">
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">
+          <div class="space-y-1.5">
+            <label class="block text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-300">
               Nombre del Negocio <span class="text-red-500">*</span>
             </label>
             <input 
               v-model="form.business_name" 
               type="text" 
-              placeholder="Ej. Cafetería Central"
+              placeholder="Cafetería Central"
               @input="generateSubdomain"
-              class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400 dark:placeholder-zinc-500" 
+              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400 dark:placeholder-zinc-500 text-base" 
               required
             >
           </div>
 
-          <!-- Row 3: Email y Contraseña -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">
-                Email del Admin <span class="text-red-500">*</span>
+          <!-- Row 3: Email y Contraseña - Stack en móvil -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-300">
+                Email <span class="text-red-500">*</span>
               </label>
               <div class="relative">
                 <input 
                   v-model="form.admin_email" 
                   type="email" 
+                  inputmode="email"
+                  autocomplete="email"
                   placeholder="admin@empresa.com"
                   @blur="checkEmail"
-                  class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 transition-all placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 transition-all placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-base"
                   :class="[
                     emailStatus === 'taken' ? 'border-red-500 dark:border-red-500' : 
                     emailStatus === 'available' ? 'border-emerald-500 dark:border-emerald-500' : 
@@ -128,8 +132,8 @@
               <p v-if="emailStatus === 'taken'" class="text-xs text-red-500 font-medium">Este email ya está registrado</p>
             </div>
 
-            <div class="space-y-2">
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">
+            <div class="space-y-1.5">
+              <label class="block text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-300">
                 Contraseña <span class="text-red-500">*</span>
               </label>
               <div class="relative">
@@ -138,13 +142,13 @@
                   :type="showPassword ? 'text' : 'password'" 
                   placeholder="Mínimo 6 caracteres"
                   minlength="6"
-                  class="w-full px-4 py-3 pr-12 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400 dark:placeholder-zinc-500" 
+                  class="w-full px-3 sm:px-4 py-2.5 sm:py-3 pr-12 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400 dark:placeholder-zinc-500 text-base" 
                   required
                 >
                 <button 
                   type="button" 
                   @click="showPassword = !showPassword"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
                 >
                   <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -158,28 +162,31 @@
             </div>
           </div>
 
-          <!-- Row 4: Subdominio -->
-          <div class="space-y-2">
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">
+          <!-- Row 4: Subdominio - Diseño vertical en móvil -->
+          <div class="space-y-1.5">
+            <label class="block text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-300">
               Subdominio <span class="text-red-500">*</span>
             </label>
-            <div class="relative">
-              <input 
-                v-model="form.subdomain" 
-                type="text" 
-                placeholder="mi-negocio"
-                @input="checkAvailability"
-                class="w-full px-4 py-3 pr-32 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 transition-all placeholder-gray-400 dark:placeholder-zinc-500 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                :class="[
-                  availabilityStatus === 'taken' ? 'border-red-500 dark:border-red-500' : 
-                  availabilityStatus === 'available' ? 'border-emerald-500 dark:border-emerald-500' : 
-                  'border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400'
-                ]"
-                required
-              >
-              <div class="absolute right-0 top-0 h-full flex items-center pr-4 pointer-events-none">
-                <span class="text-gray-500 dark:text-zinc-400 font-medium bg-gray-100 dark:bg-zinc-700 px-3 py-1.5 rounded-lg text-sm">.105pos.pro</span>
+            <div class="flex flex-col sm:flex-row gap-2 sm:gap-0">
+              <div class="relative flex-1">
+                <input 
+                  v-model="form.subdomain" 
+                  type="text" 
+                  placeholder="mi-negocio"
+                  @input="checkAvailability"
+                  class="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl sm:rounded-r-none border-2 transition-all placeholder-gray-400 dark:placeholder-zinc-500 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-base"
+                  :class="[
+                    availabilityStatus === 'taken' ? 'border-red-500 dark:border-red-500' : 
+                    availabilityStatus === 'available' ? 'border-emerald-500 dark:border-emerald-500' : 
+                    'border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400'
+                  ]"
+                  required
+                >
               </div>
+              <div class="hidden sm:flex items-center px-4 py-2.5 bg-gray-100 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400 font-medium rounded-r-xl border-2 border-l-0 border-gray-200 dark:border-zinc-700 text-sm">
+                .105pos.pro
+              </div>
+              <p class="sm:hidden text-xs text-gray-500 dark:text-zinc-400 font-mono pl-1">{{ form.subdomain || 'xxx' }}.105pos.pro</p>
             </div>
             
             <!-- Estado de Disponibilidad -->
@@ -212,33 +219,33 @@
             </div>
           </div>
 
-          <!-- Row 5: Plan y Duración -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">Plan</label>
+          <!-- Row 5: Plan y Duración - Grid 2 cols en móvil también -->
+          <div class="grid grid-cols-2 gap-3 sm:gap-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-300">Plan</label>
               <select 
                 v-model="form.plan" 
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                class="w-full px-2 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm sm:text-base"
               >
-                <option value="free">🎁 Free Trial</option>
-                <option value="basic">💼 Basic ($29/mes)</option>
-                <option value="premium">⭐ Premium ($79/mes)</option>
-                <option value="enterprise">🏢 Enterprise ($199/mes)</option>
+                <option value="free">🎁 Trial</option>
+                <option value="basic">💼 Basic</option>
+                <option value="premium">⭐ Premium</option>
+                <option value="enterprise">🏢 Enterprise</option>
               </select>
             </div>
 
-            <div class="space-y-2">
-              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300">Duración</label>
+            <div class="space-y-1.5">
+              <label class="block text-xs sm:text-sm font-bold text-gray-700 dark:text-zinc-300">Duración</label>
               <select 
                 v-model="form.duration_months" 
-                class="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                class="w-full px-2 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm sm:text-base"
               >
-                <option :value="0" v-if="form.plan === 'free'">7 días (Trial)</option>
+                <option :value="0" v-if="form.plan === 'free'">7 días</option>
                 <option :value="1">1 mes</option>
-                <option :value="3">3 meses (-5%)</option>
-                <option :value="6">6 meses (-10%)</option>
-                <option :value="12">12 meses (-15%)</option>
-                <option :value="24">24 meses (-20%)</option>
+                <option :value="3">3 meses</option>
+                <option :value="6">6 meses</option>
+                <option :value="12">12 meses</option>
+                <option :value="24">24 meses</option>
               </select>
             </div>
           </div>
@@ -301,11 +308,11 @@
         </form>
       </div>
 
-      <!-- Footer Buttons -->
-      <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3">
+      <!-- Footer Buttons - Sticky en móvil -->
+      <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-end gap-2 sm:gap-3 sticky bottom-0">
         <button 
           @click="$emit('close')" 
-          class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200"
+          class="flex-1 sm:flex-none px-4 sm:px-5 py-3 sm:py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200"
         >
           {{ successData ? 'Cerrar' : 'Cancelar' }}
         </button>
@@ -313,7 +320,7 @@
           v-if="!successData"
           @click="handleCreate" 
           :disabled="!canCreate || isCreating"
-          class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          class="flex-1 sm:flex-none px-4 sm:px-6 py-3 sm:py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <svg v-if="isCreating" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

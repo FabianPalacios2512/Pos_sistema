@@ -1,13 +1,13 @@
 <template>
-  <!-- 🎨 Diseño SaaS Profesional - Sistema de Usuarios y Roles -->
-  <div class="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
+  <!-- 🎨 Diseño Gemini - Sistema de Usuarios y Roles -->
+  <div class="min-h-screen font-sans bg-[#f8f9fa] dark:bg-[#131314] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Header sin borde, sin icono -->
       <div class="flex items-center justify-between pb-4">
         <div>
           <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Usuarios y Roles</h1>
-          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">
+          <p class="text-sm text-gray-500 dark:text-gray-500 mt-1 font-normal">
             {{ activeTab === 'users' ? 'Administra empleados y su acceso al sistema' : 'Configura roles y permisos granulares' }}
           </p>
         </div>
@@ -37,7 +37,7 @@
           <!-- Botón Secundario -->
           <button @click="refreshData"
                   :disabled="loading"
-                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200"
+                  class="px-5 py-2.5 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#2a2a2d] text-gray-700 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200"
                   :class="{ 'opacity-50 cursor-not-allowed': loading }">
             <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -47,7 +47,7 @@
           <!-- Botón Principal -->
           <button @click="activeTab === 'users' ? openCreateUserModal() : openCreateRoleModal()"
                   :disabled="activeTab === 'users' && !canCreateMoreUsers"
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-medium rounded-full transition-all duration-300 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -57,98 +57,98 @@
       </div>
 
       <!-- Tabs Navigation -->
-      <div class="bg-gray-50 dark:bg-zinc-800 rounded-xl p-1 inline-flex border border-gray-200 dark:border-zinc-700 h-[46px]">
+      <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-full p-1 inline-flex border border-gray-200 dark:border-gray-700 h-[46px]">
         <button @click="activeTab = 'users'"
                 :class="[
-                  'px-5 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 flex items-center gap-2',
+                  'px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2',
                   activeTab === 'users'
-                    ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 ]">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
           </svg>
           <span>Usuarios</span>
-          <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400">
+          <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
             {{ users.length }}
           </span>
         </button>
         
         <button @click="activeTab = 'roles'"
                 :class="[
-                  'px-5 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 flex items-center gap-2',
+                  'px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2',
                   activeTab === 'roles'
-                    ? 'bg-white dark:bg-zinc-900 text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 ]">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
           <span>Roles</span>
-          <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400">
+          <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
             {{ roles.length }}
           </span>
         </button>
       </div>
 
-      <!-- KPIs con Glassmorphism -->
+      <!-- KPIs con estilo Gemini -->
       <div v-if="activeTab === 'users'" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Total Usuarios -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Usuarios</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ users.length }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Usuarios</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ users.length }}</p>
             </div>
           </div>
         </div>
 
         <!-- Usuarios Activos -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Activos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ activeUsersCount }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Activos</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ activeUsersCount }}</p>
             </div>
           </div>
         </div>
 
         <!-- Usuarios Inactivos -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Inactivos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ inactiveUsersCount }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Inactivos</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ inactiveUsersCount }}</p>
             </div>
           </div>
         </div>
 
         <!-- Roles Configurados -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Roles</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ roles.length }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Roles</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ roles.length }}</p>
             </div>
           </div>
         </div>
@@ -157,61 +157,61 @@
       <!-- KPIs para Roles -->
       <div v-else class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <!-- Total Roles -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Roles</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ roles.length }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Roles</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ roles.length }}</p>
             </div>
           </div>
         </div>
 
         <!-- Permisos Disponibles -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Permisos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ totalPermissions }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Permisos</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ totalPermissions }}</p>
             </div>
           </div>
         </div>
 
         <!-- Módulos del Sistema -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-950 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Módulos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ permissionsModules.length }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Módulos</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ permissionsModules.length }}</p>
             </div>
           </div>
         </div>
 
         <!-- Roles Activos -->
-        <div class="bg-white dark:bg-zinc-900/80  rounded-xl px-4 py-3 border border-gray-300 dark:border dark:border-white/5 hover:border-gray-400 dark:hover:border-white/10 transition-all duration-200 shadow-md hover:shadow-lg dark:shadow-lg dark:shadow-black/50">
+        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Roles en Uso</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ activeRolesCount }}</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Roles en Uso</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ activeRolesCount }}</p>
             </div>
           </div>
         </div>

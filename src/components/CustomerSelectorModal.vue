@@ -323,7 +323,7 @@ const quickCustomer = ref({
 // Computed
 const filteredCustomers = computed(() => {
   // 🛡️ Filtrar el Consumidor Final (cliente del sistema) - No debe mostrarse en selectores
-  const systemCustomers = (customers.value || []).filter(c => c.document_number !== '222222222222')
+  const systemCustomers = (customers.value || []).filter(c => c.document_number !== '222222222222' && c.document_number !== '00000000000' && c.email !== 'general@sistema.local')
   
   if (!searchTerm.value) return systemCustomers
   

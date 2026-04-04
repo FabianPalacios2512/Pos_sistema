@@ -40,7 +40,7 @@ return [
         'private_key' => env('EPAYCO_PRIVATE_KEY'),
         'p_cust_id_cliente' => env('EPAYCO_P_CUST_ID_CLIENTE'),
         'p_key' => env('EPAYCO_P_KEY'),
-        'test_mode' => env('EPAYCO_TEST_MODE', true),
+        'test_mode' => filter_var(env('EPAYCO_TEST_MODE', 'false'), FILTER_VALIDATE_BOOLEAN),
     ],
 
     'google' => [

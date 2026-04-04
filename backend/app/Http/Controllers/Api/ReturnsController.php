@@ -93,7 +93,9 @@ class ReturnsController extends Controller
                 ], 422);
             }
 
-            $invoice = Invoice::with(['customer', 'invoiceItems.product'])
+            $invoice = Invoice::with(['customer', 'invoiceItems.product' => function ($query) {
+                    $query->withTrashed();
+                }])
                 ->where('number', $request->invoice_number)
                 ->where('status', 'paid')
                 ->first();

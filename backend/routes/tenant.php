@@ -146,3 +146,13 @@ Route::middleware([
         }
     });
 });
+
+// SPA catch-all: Serve index.html for frontend routes (Vue Router history mode)
+Route::middleware([
+    'web',
+    InitializeTenancyByDomain::class,
+])->group(function () {
+    Route::get('/{any}', function () {
+        return file_get_contents(public_path('index.html'));
+    })->where('any', '^(?!api|storage).*$');
+});

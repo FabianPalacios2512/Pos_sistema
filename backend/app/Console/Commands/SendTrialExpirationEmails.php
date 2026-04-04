@@ -127,8 +127,8 @@ class SendTrialExpirationEmails extends Command
                     <p>Tu periodo de prueba de <strong>105 POS</strong> ha finalizado.</p>
                     <p>Para recuperar el acceso completo a tu sistema y todos tus datos, selecciona un plan:</p>
                     <ul>
-                        <li>💼 <strong>Plan Emprendedor</strong>: $25,000/mes</li>
-                        <li>🚀 <strong>Plan Negocio Pro</strong>: $50,000/mes (Recomendado)</li>
+                        <li>💼 <strong>Plan Basic</strong>: \$35.000/mes</li>
+                        <li>🚀 <strong>Plan Premium</strong>: \$75.000/mes (Recomendado)</li>
                     </ul>
                     <p><a href='{$upgradeUrl}' style='display: inline-block; padding: 12px 24px; background: #1e40af; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;'>Ver planes y actualizar</a></p>
                 ";

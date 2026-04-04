@@ -12,6 +12,8 @@ class SystemSetting extends Model
     protected $fillable = [
         'company_name',
         'store_type', // 🏪 Tipo de tienda (general, fashion, food, etc.)
+        'business_layout_type', // 🎨 Layout del POS: general, fashion, fast_food
+        'business_layout_selected', // ✅ Si ya seleccionó tipo de negocio
         'company_document',
         'company_phone',
         'company_email',
@@ -69,6 +71,7 @@ class SystemSetting extends Model
         'loyalty_points_per_currency' => 'decimal:6',
         'loyalty_point_value' => 'decimal:2',
         'onboarding_completed' => 'boolean', // ✅ Cast correcto para validación
+        'business_layout_selected' => 'boolean', // ✅ Si ya seleccionó tipo de negocio
     ];
 
     /**

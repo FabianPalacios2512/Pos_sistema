@@ -95,8 +95,22 @@ onMounted(async () => {
   await authStore.actions.initialize()
   
   // ✅ INICIALIZAR APPSTORE DESPUÉS DE LA AUTENTICACIÓN (incluye sesión de caja)
-  if (authStore.state.isAuthenticated) {
-    await appStore.initialize()
+  // 🛡️ PERO NO en el dominio central (105pos.pro) en rutas que no son de tenant
+  const hostname = window.location.hostname
+  const isCentralDomain = hostname === '105pos.pro' || hostname === 'www.105pos.pro'
+  const centralOnlyRoutes = ['/select-plan', '/register', '/payment/success', '/payment/failure', '/payment/pending', '/payment/verify']
+  const currentPath = window.location.pathname
+  const isCentralOnlyRoute = centralOnlyRoutes.some(r => currentPath.startsWith(r))
+  
+  // Solo inicializar appStore si estamos autenticados Y NO estamos en ruta central-only del dominio central
+  if (authStore.state.isAuthenticated && !(isCentralDomain && isCentralOnlyRoute)) {
+    try {
+      await appStore.initialize()
+    } catch (err) {
+      console.error('Error inicializando appStore:', err.message)
+      // Marcar como initialized con datos parciales para que la app no quede bloqueada
+      appStore.initialized = true
+    }
   }
   
   // 🔧 TODO: Re-habilitar health-check cuando se arregle correctamente con tenancy

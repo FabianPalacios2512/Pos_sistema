@@ -3,62 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Código de Recuperación</title>
+    <title>105 POS: Codigo de verificacion de seguridad</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f8fafc; line-height: 1.6;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
-        <tr>
-            <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: white; max-width: 600px;">
+<body style="margin: 0; padding: 0; background-color: #F1F5F9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
 
-                    <!-- Header Compacto -->
+    <!-- Wrapper -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F1F5F9; padding: 48px 16px;">
+        <tr>
+            <td align="center" valign="top">
+
+                <!-- Card principal -->
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 580px; background-color: #FFFFFF; border-radius: 8px; overflow: hidden; border: 1px solid #E2E8F0;">
+
+                    <!-- ===== CABECERA ===== -->
                     <tr>
-                        <td style="padding: 32px 40px 24px 40px; text-align: center; border-bottom: 1px solid #e2e8f0;">
-                            <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 12px; letter-spacing: 1px;">105 POS</div>
-                            <h1 style="margin: 0; font-size: 22px; font-weight: 700; color: #0f172a;">Código de Recuperación</h1>
+                        <td style="padding: 32px 48px 28px 48px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td valign="middle">
+                                        <span style="font-size: 18px; font-weight: 800; color: #0F172A; letter-spacing: -0.3px;">105 POS</span>
+                                        <span style="display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 1px; vertical-align: middle;">Pro</span>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
 
-                    <!-- Contenido -->
+                    <!-- Linea separadora -->
                     <tr>
-                        <td style="padding: 32px 40px;">
-                            <p style="margin: 0 0 16px 0; font-size: 15px; color: #475569;">Hola <strong>{{ $name }}</strong>,</p>
+                        <td style="padding: 0 48px;">
+                            <div style="height: 1px; background-color: #E2E8F0;"></div>
+                        </td>
+                    </tr>
 
-                            <p style="margin: 0 0 24px 0; font-size: 14px; color: #64748b; line-height: 1.6;">
-                                Recibimos una solicitud para restablecer tu contraseña. Usa el siguiente código:
+                    <!-- ===== CUERPO ===== -->
+                    <tr>
+                        <td style="padding: 40px 48px 32px 48px;">
+
+                            <!-- Saludo -->
+                            <p style="margin: 0 0 8px 0; font-size: 15px; font-weight: 400; color: #334155; line-height: 1.6;">Hola <strong style="color: #0F172A; font-weight: 600;">{{ $name }}</strong>,</p>
+
+                            <!-- Descripcion -->
+                            <p style="margin: 0 0 32px 0; font-size: 15px; font-weight: 400; color: #475569; line-height: 1.7;">
+                                Hemos recibido una solicitud para acceder a tu cuenta en 105 POS. Por favor, introduce el siguiente codigo de verificacion para continuar:
                             </p>
 
-                            <!-- Código -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px 0;">
+                            <!-- Contenedor del codigo -->
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px;">
                                 <tr>
-                                    <td style="background-color: #0f172a; padding: 24px; text-align: center;">
-                                        <div style="color: rgba(255,255,255,0.6); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Tu Código</div>
-                                        <div style="color: white; font-size: 36px; font-weight: 700; letter-spacing: 8px; font-family: 'Courier New', monospace;">{{ $code }}</div>
+                                    <td align="center" style="background-color: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 28px 24px;">
+                                        <p style="margin: 0 0 10px 0; font-size: 11px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 2px;">Codigo de verificacion</p>
+                                        <p style="margin: 0; font-size: 38px; font-weight: 700; color: #0F172A; letter-spacing: 12px; font-family: 'Courier New', 'Lucida Console', monospace;">{{ $code }}</p>
                                     </td>
                                 </tr>
                             </table>
 
-                            <p style="margin: 0 0 16px 0; font-size: 13px; color: #94a3b8;">
-                                <strong style="color: #475569;">Expira en 15 minutos.</strong> Si no solicitaste este cambio, ignora este correo.
+                            <!-- Contexto de seguridad -->
+                            <p style="margin: 0; font-size: 13px; font-weight: 400; color: #64748B; line-height: 1.75;">
+                                Este codigo expirara en <strong style="color: #475569;">15 minutos</strong>. Si no has intentado iniciar sesion ni solicitar este codigo, te recomendamos cambiar tu contrasena inmediatamente y contactar a soporte.
                             </p>
+
                         </td>
                     </tr>
 
-                    <!-- Footer Compacto -->
+                    <!-- Linea separadora -->
                     <tr>
-                        <td style="padding: 24px 40px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-                            <p style="margin: 0 0 4px 0; font-size: 13px; color: #64748b;">
-                                <strong style="color: #0f172a;">105 POS</strong> - Sistema de Gestión Empresarial
-                            </p>
-                            <p style="margin: 0; font-size: 12px; color: #94a3b8;">
-                                © {{ date('Y') }} 105 POS. Todos los derechos reservados.
+                        <td style="padding: 0 48px;">
+                            <div style="height: 1px; background-color: #E2E8F0;"></div>
+                        </td>
+                    </tr>
+
+                    <!-- ===== FOOTER ===== -->
+                    <tr>
+                        <td style="padding: 24px 48px; text-align: center;">
+                            <p style="margin: 0; font-size: 12px; font-weight: 400; color: #94A3B8; line-height: 1.6;">
+                                &copy; {{ date('Y') }} 105 POS Pro. Todos los derechos reservados.
                             </p>
                         </td>
                     </tr>
 
                 </table>
+                <!-- /Card principal -->
+
             </td>
         </tr>
     </table>
+
 </body>
 </html>

@@ -111,7 +111,7 @@ class SystemSettingsController extends Controller
 
             $validated = $request->validate([
                 'company_name' => 'nullable|string|max:255',
-                'store_type' => 'nullable|string|in:general,fashion,food,electronics', // 🏪 Validación de tipo de tienda
+                'store_type' => 'nullable|string|in:general,fashion,restaurant,food,electronics', // 🏪 Validación de tipo de tienda
                 'company_document' => 'nullable|string|max:255',
                 'company_phone' => 'nullable|string|max:255',
                 'company_email' => 'nullable|email|max:255',
@@ -325,6 +325,89 @@ class SystemSettingsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al guardar configuración inicial: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Guardar tipo de layout del negocio (General, Moda, Restaurante)
+     */
+    public function saveBusinessLayout(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'business_layout_type' => 'required|string|in:general,fashion,restaurant',
+                'business_layout_selected' => 'boolean'
+            ]);
+            
+            $settings = SystemSetting::first();
+            
+            if (!$settings) {
+                $settings = SystemSetting::create([
+                    'store_type' => $validated['business_layout_type'],
+                    'business_layout_selected' => $validated['business_layout_selected'] ?? true
+                ]);
+            } else {
+                // Actualizar store_type directamente en la BD
+                $table = $settings->getTable();
+                \DB::table($table)
+                    ->where('id', $settings->id)
+                    ->update([
+                        'store_type' => $validated['business_layout_type'],
+                        'updated_at' => now()
+                    ]);
+                    
+                $settings = $settings->fresh();
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Tipo de negocio actualizado exitosamente',
+                'data' => [
+                    'store_type' => $settings->store_type,
+                    'layout_type' => $validated['business_layout_type']
+                ]
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error al guardar layout del negocio:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar tipo de negocio: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Obtener tipo de layout actual del negocio
+     */
+    public function getBusinessLayout()
+    {
+        try {
+            $settings = SystemSetting::first();
+            
+            $layoutType = 'general'; // Default
+            
+            if ($settings && $settings->store_type) {
+                $layoutType = $settings->store_type;
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'layout_type' => $layoutType,
+                    'store_type' => $settings->store_type ?? 'general'
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener tipo de negocio: ' . $e->getMessage()
             ], 500);
         }
     }

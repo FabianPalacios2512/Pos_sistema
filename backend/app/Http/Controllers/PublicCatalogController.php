@@ -33,6 +33,15 @@ class PublicCatalogController extends Controller
         // Obtener configuración cacheada
         $config = $this->getCachedConfig();
 
+        // ✅ VALIDACIÓN CRÍTICA: Si store_active está en false, no mostrar nada
+        if (!$config || !$config->store_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Catálogo no disponible',
+                'products' => []
+            ]);
+        }
+
         $query = Product::with(['category', 'images', 'options.values', 'variants.optionValues'])
             ->availableForOnline();
 
@@ -177,6 +186,15 @@ class PublicCatalogController extends Controller
     {
         // Obtener configuración cacheada
         $config = $this->getCachedConfig();
+
+        // ✅ VALIDACIÓN CRÍTICA: Si store_active está en false, no mostrar categorías
+        if (!$config || !$config->store_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Catálogo no disponible',
+                'categories' => []
+            ]);
+        }
 
         $query = DB::table('categories')
             ->where('categories.active', true)

@@ -40,9 +40,9 @@ class SuperAdminController extends Controller
                 if (!$tenant->subscription_ends_at || $tenant->subscription_ends_at > now()) {
                     $planPrices = [
                         'free' => 0,
-                        'basic' => 29,
-                        'premium' => 59,
-                        'enterprise' => 99
+                        'basic' => 35000,
+                        'premium' => 75000,
+                        'enterprise' => 150000
                     ];
                     $mrr += $planPrices[$tenant->plan] ?? 0;
                 }
@@ -518,6 +518,77 @@ class SuperAdminController extends Controller
                 'available' => true, // Asumir disponible en caso de error
                 'error' => 'Error al verificar disponibilidad'
             ]);
+        }
+    }
+
+    /**
+     * Actualizar datos generales de un tenant (plan, status, business_name)
+     */
+    public function updateTenant(Request $request, $id)
+    {
+        $tenant = Tenant::find($id);
+
+        if (!$tenant) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tenant no encontrado'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'business_name' => 'nullable|string|max:255',
+            'plan' => 'nullable|string|in:free_trial,basic,premium,enterprise',
+            'status' => 'nullable|string|in:active,paused,suspended',
+        ]);
+
+        try {
+            // Actualizar business_name si se proporciona
+            if (isset($validated['business_name'])) {
+                $data = $tenant->data;
+                $data['business_name'] = $validated['business_name'];
+                $tenant->data = $data;
+            }
+
+            // Actualizar plan
+            if (isset($validated['plan'])) {
+                $tenant->plan = $validated['plan'];
+            }
+
+            // Actualizar estado
+            if (isset($validated['status'])) {
+                $data = $tenant->data;
+                $data['status'] = $validated['status'];
+                $tenant->data = $data;
+            }
+
+            $tenant->save();
+
+            \Log::info('✅ Tenant actualizado', [
+                'tenant_id' => $id,
+                'plan' => $validated['plan'] ?? null,
+                'status' => $validated['status'] ?? null
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tienda actualizada exitosamente',
+                'data' => [
+                    'id' => $tenant->id,
+                    'business_name' => $tenant->data['business_name'] ?? 'Sin Nombre',
+                    'plan' => $tenant->plan,
+                    'status' => $tenant->data['status'] ?? 'active',
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('❌ Error actualizando tenant:', [
+                'tenant_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar la tienda: ' . $e->getMessage()
+            ], 500);
         }
     }
 

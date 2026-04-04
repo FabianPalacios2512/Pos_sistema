@@ -25,7 +25,15 @@ class Invoice extends Model
         'return_reference',
         'notes',
         'seller_name',
-        'items'
+        'items',
+        // 🧾 FACTUS - Facturación Electrónica DIAN
+        'cufe',
+        'factus_number',
+        'qr_code',
+        'qr_image',
+        'factus_status',
+        'factus_validated_at',
+        'factus_response'
     ];
 
     protected $casts = [
@@ -36,7 +44,9 @@ class Invoice extends Model
         'discount_amount' => 'decimal:2',
         'total' => 'decimal:2',
         'surcharge_amount' => 'decimal:2',
-        'items' => 'array' // Auto-convierte entre array y JSON
+        'items' => 'array', // Auto-convierte entre array y JSON
+        'factus_validated_at' => 'datetime',
+        'factus_response' => 'array'
     ];
 
     public function customer(): BelongsTo

@@ -110,12 +110,29 @@ class CentralLoginController extends Controller
                 ], 422);
             }
 
-            // 🎯 PASO 3: Construir URL de redirección
+            // 🎯 PASO 3: Generar token temporal para auto-login cross-domain
+            $tempToken = \Str::random(60);
+            
+            // Guardar sesión temporal en cache (5 minutos)
+            \Cache::put('central_login_' . $tempToken, [
+                'user_id' => $authResult['user']->id,
+                'tenant_id' => $tenantDomain['tenant_id'],
+                'email' => $request->email,
+                'name' => $authResult['user']->name,
+            ], now()->addMinutes(5));
+            
+            \Log::info('🔐 Central Login Token generado', [
+                'token' => substr($tempToken, 0, 10) . '...',
+                'tenant_id' => $tenantDomain['tenant_id'],
+                'email' => $request->email
+            ]);
+
+            // 🎯 PASO 4: Construir URL de redirección con token
             $protocol = app()->environment('local') ? (request()->secure() ? 'https://' : 'http://') : 'https://';
             $port = app()->environment('local') ? ':3000' : '';
-            $redirectUrl = $protocol . $tenantDomain['domain'] . $port;
+            $redirectUrl = $protocol . $tenantDomain['domain'] . $port . '/login?central_login_token=' . $tempToken;
 
-            // 📊 PASO 4: Retornar datos para el frontend
+            // 📊 PASO 5: Retornar datos para el frontend
             return response()->json([
                 'success' => true,
                 'message' => 'Credenciales válidas. Redirigiendo a tu cuenta...',
@@ -126,11 +143,6 @@ class CentralLoginController extends Controller
                     'user' => [
                         'email' => $request->email,
                         'name' => $authResult['user']->name,
-                    ],
-                    // Token temporal para el frontend (se generará uno real en el tenant)
-                    'credentials' => [
-                        'email' => $request->email,
-                        'password' => $request->password,
                     ]
                 ]
             ]);
@@ -359,6 +371,149 @@ class CentralLoginController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al verificar NIT/CC. Por favor intenta de nuevo.'
+            ], 500);
+        }
+    }
+
+    /**
+     * 🔐 Obtener sesión de login centralizado usando token temporal
+     * 
+     * GET /api/central/login-session?token=XXX
+     * 
+     * Este endpoint consume el token temporal generado en centralLogin()
+     * y genera un token Sanctum real para el usuario en su tenant.
+     */
+    public function getCentralLoginSession(Request $request)
+    {
+        $token = $request->input('token');
+
+        if (!$token) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token no proporcionado'
+            ], 400);
+        }
+
+        $sessionData = \Cache::get('central_login_' . $token);
+
+        if (!$sessionData) {
+            \Log::warning('⚠️ Central login token inválido o expirado', [
+                'token' => substr($token, 0, 10) . '...'
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Token inválido o expirado. Por favor, inicia sesión nuevamente.'
+            ], 404);
+        }
+
+        // Eliminar token después de usarlo (one-time use)
+        \Cache::forget('central_login_' . $token);
+
+        try {
+            // Buscar el tenant
+            $tenant = Tenant::find($sessionData['tenant_id']);
+
+            if (!$tenant) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tenant no encontrado'
+                ], 404);
+            }
+
+            // Ejecutar en contexto del tenant para generar token Sanctum
+            $authToken = null;
+            $userData = null;
+
+            $tenant->run(function () use ($sessionData, &$authToken, &$userData) {
+                // Buscar usuario en el tenant con rol y permisos
+                $user = User::with('role')->find($sessionData['user_id']);
+
+                if (!$user) {
+                    throw new \Exception('Usuario no encontrado en el tenant');
+                }
+
+                // Generar token Sanctum real
+                $authToken = $user->createToken('central-login-token')->plainTextToken;
+
+                // Preparar datos del rol con permisos
+                $roleData = null;
+                if ($user->role) {
+                    $roleData = [
+                        'id' => $user->role->id,
+                        'name' => $user->role->name,
+                        'description' => $user->role->description,
+                        'permissions' => $user->role->permissions ?? [],
+                        'active' => $user->role->active
+                    ];
+                }
+
+                // Preparar datos del usuario
+                $userData = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'cc' => $user->cc,
+                    'phone' => $user->phone,
+                    'active' => $user->active,
+                    'role_id' => $user->role_id,
+                    'role' => $roleData,
+                    'tenant_id' => $sessionData['tenant_id']
+                ];
+            });
+
+            // Verificar si el tenant tiene un plan válido
+            $validPlans = ['basic', 'premium', 'enterprise', 'free_trial'];
+            $needsPlanSelection = false;
+            $tenantInfo = null;
+            
+            $planType = $tenant->plan ?? 'pending';
+            $subscriptionStatus = 'pending';
+            
+            if ($tenant->subscription_ends_at && now()->isBefore($tenant->subscription_ends_at)) {
+                $subscriptionStatus = 'active';
+            } elseif ($tenant->subscription_ends_at && now()->isAfter($tenant->subscription_ends_at)) {
+                $subscriptionStatus = 'expired';
+            }
+            
+            // Si no tiene plan válido, enviar señal al frontend
+            if (!in_array($planType, $validPlans) || $subscriptionStatus === 'pending') {
+                $needsPlanSelection = true;
+                $tenantInfo = [
+                    'id' => $tenant->id,
+                    'business_name' => $tenant->business_name,
+                    'plan' => $planType,
+                    'subscription_status' => $subscriptionStatus
+                ];
+            }
+
+            \Log::info('✅ Central Login Session exitosa', [
+                'user_id' => $sessionData['user_id'],
+                'tenant_id' => $sessionData['tenant_id'],
+                'email' => $sessionData['email'],
+                'needs_plan_selection' => $needsPlanSelection
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión iniciada correctamente',
+                'data' => [
+                    'token' => $authToken,
+                    'user' => $userData,
+                ],
+                'needs_plan_selection' => $needsPlanSelection,
+                'tenant' => $tenantInfo
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('❌ Error en getCentralLoginSession', [
+                'error' => $e->getMessage(),
+                'tenant_id' => $sessionData['tenant_id'] ?? null
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al iniciar sesión. Intenta nuevamente.'
             ], 500);
         }
     }

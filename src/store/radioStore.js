@@ -241,7 +241,18 @@ export const useRadioStore = defineStore('radio', {
                     'Medellín': 'Antioquia',
                     'Cali': 'Valle del Cauca',
                     'Barranquilla': 'Atlantico',
-                    'Cartagena': 'Bolivar'
+                    'Cartagena': 'Bolivar',
+                    'Bucaramanga': 'Santander',
+                    'Pereira': 'Risaralda',
+                    'Manizales': 'Caldas',
+                    'Cúcuta': 'Norte de Santander',
+                    'Santa Marta': 'Magdalena',
+                    'Ibagué': 'Tolima',
+                    'Villavicencio': 'Meta',
+                    'Neiva': 'Huila',
+                    'Montería': 'Cordoba',
+                    'Pasto': 'Narino',
+                    'Armenia': 'Quindio'
                 }
                 stateFilter = cityMap[city] || ''
             }

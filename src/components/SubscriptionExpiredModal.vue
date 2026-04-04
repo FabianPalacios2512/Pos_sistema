@@ -69,7 +69,7 @@
             </div>
             
             <div class="mb-5">
-              <span class="text-3xl font-bold text-gray-900 dark:text-white">$25.000</span>
+              <span class="text-3xl font-bold text-gray-900 dark:text-white">$35.000</span>
               <span class="text-gray-500 dark:text-zinc-400">/mes</span>
             </div>
             
@@ -136,7 +136,7 @@
             </div>
             
             <div class="mb-5">
-              <span class="text-3xl font-bold text-gray-900 dark:text-white">$60.000</span>
+              <span class="text-3xl font-bold text-gray-900 dark:text-white">$75.000</span>
               <span class="text-gray-500 dark:text-zinc-400">/mes</span>
             </div>
             
@@ -325,9 +325,9 @@ const tenantId = ref(null)
 // Obtener precio del plan seleccionado
 const getPlanPrice = () => {
   const prices = {
-    basic: '$25.000',
-    premium: '$60.000',
-    corporativo: '$100.000'
+    basic: '$35.000',
+    premium: '$75.000',
+    corporativo: '$150.000'
   }
   return prices[selectedPlan.value] || ''
 }

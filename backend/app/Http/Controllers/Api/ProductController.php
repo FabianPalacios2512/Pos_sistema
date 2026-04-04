@@ -135,8 +135,11 @@ class ProductController extends Controller
         $products = $query->orderBy('name')
                          ->paginate($perPage);
 
+        // ✅ OPTIMIZACIÓN: Solo cargar ventas si se solicita explícitamente
+        $includeSales = $request->get('with_sales', false);
+
         // Formatear las variantes y ajustar stock por warehouse
-        $products->getCollection()->transform(function($product) use ($warehouseId) {
+        $products->getCollection()->transform(function($product) use ($warehouseId, $includeSales) {
             // Formatear options_summary de variantes
             if ($product->variants) {
                 $product->variants->each(function($variant) {
@@ -171,19 +174,25 @@ class ProductController extends Controller
                 }
             }
 
-            // 💰 CALCULAR ventas e ingresos para mostrar en inventario
-            $salesData = DB::table('invoice_items')
-                ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
-                ->where('invoice_items.product_id', $product->id)
-                ->where('invoices.status', 'paid')
-                ->selectRaw('
-                    COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
-                    COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
-                ')
-                ->first();
+            // 💰 CALCULAR ventas e ingresos SOLO si se solicitan (evita N+1 queries)
+            if ($includeSales) {
+                $salesData = DB::table('invoice_items')
+                    ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                    ->where('invoice_items.product_id', $product->id)
+                    ->where('invoices.status', 'paid')
+                    ->selectRaw('
+                        COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
+                        COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
+                    ')
+                    ->first();
 
-            $product->total_sold = (int)($salesData->total_sold ?? 0);
-            $product->total_revenue = (float)($salesData->total_revenue ?? 0);
+                $product->total_sold = (int)($salesData->total_sold ?? 0);
+                $product->total_revenue = (float)($salesData->total_revenue ?? 0);
+            } else {
+                // Valores por defecto para no romper el frontend
+                $product->total_sold = 0;
+                $product->total_revenue = 0;
+            }
 
             return $product;
         });
@@ -202,7 +211,10 @@ class ProductController extends Controller
         $searchScope = $request->query('scope', 'local'); // 'local' o 'global'
 
         $query = Product::select([
-                'id', 'name', 'sku', 'barcode', 'sale_price as price',
+                'id', 'name', 'sku', 'barcode', 
+                'cost_price',              // 💰 Precio de costo para calcular valor invertido
+                'sale_price', 
+                'sale_price as price',     // Alias para compatibilidad
                 'current_stock', // ✅ Mantener current_stock sin alias
                 'category_id', 'image_url as image',
                 'active', 'manage_stock', 'product_type',
@@ -413,6 +425,11 @@ class ProductController extends Controller
 
                 $productData['sale_price'] = $minPrice;
                 $productData['current_stock'] = 0; // Suma de variantes se actualiza después
+            }
+
+            // ✅ Si se envió image_url (URL externa), incluirla en los datos del producto
+            if ($request->has('image_url') && $request->input('image_url')) {
+                $productData['image_url'] = $request->input('image_url');
             }
 
             $product = Product::create($productData);
@@ -744,6 +761,11 @@ class ProductController extends Controller
                 'product_type' => $newType,
                 'cost_price' => $costPrice,
             ];
+
+            // ✅ Guardar image_url si viene en el request (URL externa)
+            if ($request->has('image_url')) {
+                $updateData['image_url'] = $request->input('image_url');
+            }
 
             // ✅ Actualizar current_stock si viene en el request (edición directa por IA o manual)
             if ($request->has('current_stock')) {
@@ -1085,13 +1107,110 @@ class ProductController extends Controller
         });
     }
 
-    public function destroy(Product $product)
+    public function destroy(Request $request, Product $product)
     {
-        $product->update(['active' => false]);
-        return response()->json([
-            'success' => true,
-            'message' => 'Producto desactivado exitosamente'
-        ]);
+        try {
+            $productName = $product->name;
+
+            // Guardar auditoría de eliminación
+            $product->deleted_by = auth()->id();
+            $product->deleted_reason = $request->input('reason', null);
+            $product->save();
+
+            // Desactivar variantes asociadas
+            $product->variants()->update(['active' => false]);
+
+            // Soft-delete: establece deleted_at, mantiene el registro en BD
+            // Todas las FK (invoice_items, sale_items, inventory_movements) permanecen intactas
+            $product->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Producto \"{$productName}\" eliminado exitosamente"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el producto: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Listar productos eliminados (papelera)
+     */
+    public function trash()
+    {
+        try {
+            $products = Product::onlyTrashed()
+                ->with(['category'])
+                ->orderBy('deleted_at', 'desc')
+                ->get()
+                ->map(function ($product) {
+                    $deletedByUser = null;
+                    if ($product->deleted_by) {
+                        $deletedByUser = \App\Models\User::find($product->deleted_by);
+                    }
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'sku' => $product->sku,
+                        'barcode' => $product->barcode,
+                        'category' => $product->category ? $product->category->name : null,
+                        'sale_price' => $product->sale_price,
+                        'cost_price' => $product->cost_price,
+                        'current_stock' => $product->current_stock,
+                        'image_url' => $product->image_url,
+                        'deleted_at' => $product->deleted_at,
+                        'deleted_by' => $product->deleted_by,
+                        'deleted_by_name' => $deletedByUser ? $deletedByUser->name : 'Sistema',
+                        'deleted_reason' => $product->deleted_reason,
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $products,
+                'total' => $products->count()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener productos eliminados: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Restaurar un producto eliminado
+     */
+    public function restore($id)
+    {
+        try {
+            $product = Product::onlyTrashed()->findOrFail($id);
+            $productName = $product->name;
+
+            // Restaurar producto
+            $product->restore();
+
+            // Limpiar campos de auditoría de eliminación
+            $product->deleted_by = null;
+            $product->deleted_reason = null;
+            $product->save();
+
+            // Reactivar variantes
+            $product->variants()->update(['active' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Producto \"{$productName}\" restaurado exitosamente"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al restaurar el producto: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function lowStock()

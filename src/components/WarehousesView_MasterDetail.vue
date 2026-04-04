@@ -2,18 +2,15 @@
   <!-- Toast Notifications -->
   <ToastContainer />
   
-  <!-- Gradiente en TODO el fondo -->
-  <div class="font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8" style="height: 100%; display: flex; flex-direction: column;">
-    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+  <!-- Layout Full Height -->
+  <div class="h-full font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 overflow-hidden flex flex-col">
+    <div class="flex-none px-6 lg:px-8 pt-5 pb-4 space-y-5 animate-fade-in">
       
-      <!-- Header sin borde, sin contenedor separado -->
-      <div class="flex items-center justify-between pb-4">
-        <!-- Título y Subtítulo -->
+      <!-- Header -->
+      <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Gestión de Sedes</h1>
-          <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 font-normal">
-            {{ activeTab === 'warehouses' ? 'Administra las tiendas y bodegas del negocio' : 'Gestiona movimientos de inventario entre sedes' }}
-          </p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Sedes</h1>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Administra, controla y monitorea todas las sedes de tu empresa</p>
         </div>
     
         <!-- Botones de Acción -->
@@ -22,18 +19,18 @@
           <template v-if="activeTab === 'warehouses'">
             <button
               @click="loadWarehouses"
-              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 active:scale-95 flex items-center gap-2 group">
-              <svg class="w-4 h-4 text-slate-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
-              <span>Actualizar</span>
+              <span>Refrescar</span>
             </button>
             
             <button
               @click="openCreateModal"
-              class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-slate-400/60 dark:hover:shadow-slate-900/70 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+              class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
               </svg>
               <span>Nueva Sede</span>
             </button>
@@ -43,18 +40,18 @@
           <template v-else-if="activeTab === 'transfers'">
             <button
               @click="refreshTransfers"
-              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 active:scale-95 flex items-center gap-2 group">
-              <svg class="w-4 h-4 text-slate-400 dark:text-zinc-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
-              <span>Actualizar</span>
+              <span>Refrescar</span>
             </button>
             
             <button
               @click="openTransferModal"
-              class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-slate-400/60 dark:hover:shadow-slate-900/70 transition-all duration-300 transform active:scale-95 flex items-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+              class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
               </svg>
               <span>Nuevo Traslado</span>
             </button>
@@ -63,18 +60,18 @@
       </div>
 
       <!-- Pestañas de navegación -->
-      <div class="flex items-center gap-2 border-b border-gray-300 dark:border-zinc-700">
+      <div class="flex items-center gap-1 bg-gray-100/80 dark:bg-zinc-900/80 rounded-xl p-1 border border-gray-200 dark:border-zinc-800 w-fit">
         <button
           @click="activeTab = 'warehouses'"
           :class="[
-            'px-6 py-3 text-sm font-bold rounded-t-xl transition-all duration-200',
+            'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
             activeTab === 'warehouses'
-              ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white border-t-2 border-x-2 border-gray-300 dark:border-zinc-700 border-b-0 -mb-px'
-              : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
           ]">
           <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
             </svg>
             <span>Sedes</span>
           </div>
@@ -83,203 +80,213 @@
         <button
           @click="activeTab = 'transfers'"
           :class="[
-            'px-6 py-3 text-sm font-bold rounded-t-xl transition-all duration-200',
+            'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
             activeTab === 'transfers'
-              ? 'bg-white dark:bg-zinc-900 text-slate-900 dark:text-white border-t-2 border-x-2 border-gray-300 dark:border-zinc-700 border-b-0 -mb-px'
-              : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+              ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
           ]">
           <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
             </svg>
             <span>Traslados</span>
           </div>
         </button>
       </div>
+    </div>
 
-      <!-- Contenido según pestaña activa -->
-      <div v-if="activeTab === 'warehouses'" class="space-y-6">
-        <!-- KPIs Ejecutivos - Grid de 4 Columnas (Estilo Fantasma) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            
-            <!-- KPI: Sedes Activas (Estilo Fantasma) -->
-            <div class="bg-white/80 dark:bg-zinc-800/40  rounded-2xl px-5 py-4 border-0 hover:bg-white dark:hover:bg-zinc-800/60 transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)]">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Sedes Activas</p>
-                  <p class="text-2xl font-bold text-gray-800 dark:text-white mt-0.5">{{ activeWarehouses }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- KPI: Stock Global (Estilo Fantasma) -->
-            <div class="bg-white/80 dark:bg-zinc-800/40  rounded-2xl px-5 py-4 border-0 hover:bg-white dark:hover:bg-zinc-800/60 transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)]">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-purple-50 dark:bg-purple-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6 text-purple-500 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                  </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Stock Global</p>
-                  <p class="text-2xl font-bold text-gray-800 dark:text-white mt-0.5">{{ totalProducts }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- KPI: Sede Principal (Estilo Fantasma) -->
-            <div class="bg-white/80 dark:bg-zinc-800/40  rounded-2xl px-5 py-4 border-0 hover:bg-white dark:hover:bg-zinc-800/60 transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)]">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                  </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Sede Principal</p>
-                  <p class="text-sm font-bold text-gray-800 dark:text-white mt-0.5 truncate">{{ defaultWarehouse || '-' }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- KPI: Uso del Plan (Estilo Fantasma) -->
-            <div v-if="planInfo" class="bg-white/80 dark:bg-zinc-800/40  rounded-2xl px-5 py-4 border-0 hover:bg-white dark:hover:bg-zinc-800/60 transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)]">
-              <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <svg class="w-6 h-6 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                  </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Uso del Plan</p>
-                  <p class="text-2xl font-bold text-gray-800 dark:text-white mt-0.5">
-                    {{ planInfo.max_allowed === -1 ? 'Ilimitado' : `${planInfo.current_count}/${planInfo.max_allowed}` }}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-        </div>
-
-        <!-- Master-Detail Layout Enterprise: 30/70 - Unificado como WhatsApp -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="height: calc(100vh - 280px); min-height: 550px;">
-          <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
+      <!-- Contenido Sedes -->
+      <div v-if="activeTab === 'warehouses'" class="flex-1 flex flex-col min-h-0 px-6 lg:px-8 pb-6 space-y-5">
         
-          <!-- PANEL IZQUIERDO: Lista Minimalista (30%) -->
-          <div class="lg:col-span-3 overflow-hidden flex flex-col border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
-            
-            <!-- Header minimalista con búsqueda -->
-            <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900">
-              <!-- Búsqueda limpia -->
-              <div class="relative mb-4">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        <!-- KPIs con glassmorphism -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 flex-shrink-0">
+          
+          <!-- KPI: Sedes Activas -->
+          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 dark:bg-emerald-950 border border-emerald-100 dark:border-emerald-800">
+                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <input
-                  v-model="searchTerm"
-                  type="text"
-                  placeholder="Buscar sedes..."
-                  class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300">
               </div>
-              
-              <!-- Contador -->
-              <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium">
-                {{ filteredWarehouses.length }} sede{{ filteredWarehouses.length !== 1 ? 's' : '' }} encontrada{{ filteredWarehouses.length !== 1 ? 's' : '' }}
-              </div>
-            </div>
-            
-            <!-- Lista minimalista estilo WhatsApp -->
-            <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 px-2">
-              
-              <div
-                v-for="warehouse in filteredWarehouses"
-                :key="warehouse.id"
-                @click="selectWarehouse(warehouse)"
-                class="px-3 py-3.5 my-1 cursor-pointer transition-all rounded-xl group relative"
-                :class="[
-                  selectedWarehouse?.id === warehouse.id 
-                    ? 'bg-indigo-50 dark:bg-indigo-500/10 shadow-sm' 
-                    : 'bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800/60'
-                ]"
-              >
-                <!-- Borde izquierdo de selección -->
-                <div 
-                  v-if="selectedWarehouse?.id === warehouse.id"
-                  class="absolute left-0 top-2 bottom-2 w-1 bg-indigo-500 rounded-r-full"
-                ></div>
-                
-                <div class="flex items-center justify-between gap-3">
-                  <!-- Info principal -->
-                  <div class="flex items-center gap-3 flex-1 min-w-0">
-                    <!-- Icono de sede -->
-                    <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                         :class="warehouse.is_default 
-                           ? 'bg-emerald-50 dark:bg-emerald-500/10' 
-                           : 'bg-blue-50 dark:bg-blue-500/10'">
-                      <svg class="w-5 h-5" :class="warehouse.is_default ? 'text-emerald-500 dark:text-emerald-400' : 'text-blue-500 dark:text-blue-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                      </svg>
-                    </div>
-                    
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2">
-                        <p class="text-[13px] font-semibold text-gray-800 dark:text-zinc-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                          {{ warehouse.name }}
-                        </p>
-                        <span v-if="warehouse.is_default" class="text-[9px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800">
-                          Principal
-                        </span>
-                      </div>
-                      <div class="flex items-center gap-2 mt-1">
-                        <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">
-                          {{ warehouse.address || 'Sin dirección' }}
-                        </p>
-                        <span class="text-[10px] text-gray-400 dark:text-zinc-500">•</span>
-                        <span class="text-[10px] text-gray-400 dark:text-zinc-500 flex-shrink-0">
-                          {{ warehouse.products_count || 0 }} productos
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- Badge de estado -->
-                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0"
-                        :class="warehouse.active 
-                          ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' 
-                          : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-200 dark:border-zinc-700'">
-                    {{ warehouse.active ? 'Activa' : 'Inactiva' }}
-                  </span>
-                </div>
-              </div>
-              
-              <!-- Estado vacío -->
-              <div v-if="filteredWarehouses.length === 0" class="flex flex-col items-center justify-center py-8 text-center">
-                <svg class="w-8 h-8 text-gray-300 dark:text-zinc-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                </svg>
-                <p class="text-xs font-semibold text-gray-600 dark:text-zinc-300">Sin resultados</p>
-                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Intenta con otra búsqueda</p>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Sedes Activas</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ activeWarehouses }}</p>
               </div>
             </div>
           </div>
 
-          <!-- PANEL DERECHO: Detalle Amplio (70%) -->
-          <div class="lg:col-span-7 overflow-hidden flex flex-col bg-gray-50/30 dark:bg-zinc-950/30 transition-colors duration-300">
+          <!-- KPI: Stock Global -->
+          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-800">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Stock Global</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ totalProducts }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI: Sede Principal -->
+          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-indigo-50 dark:bg-indigo-950 border border-indigo-100 dark:border-indigo-800">
+                <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Sede Principal</p>
+                <p class="text-base font-bold text-gray-900 dark:text-white mt-0.5 truncate">{{ defaultWarehouse || '—' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI: Sede Seleccionada -->
+          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-purple-50 dark:bg-purple-950 border border-purple-100 dark:border-purple-800">
+                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Seleccionada</p>
+                <p class="text-base font-bold text-gray-900 dark:text-white mt-0.5 truncate">{{ selectedWarehouse?.name || '—' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI: Uso del Plan -->
+          <div v-if="planInfo" class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-50 dark:bg-amber-950 border border-amber-100 dark:border-amber-800">
+                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Uso del Plan</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
+                  {{ planInfo.max_allowed === -1 ? 'Ilimitado' : `${planInfo.current_count}/${planInfo.max_allowed}` }}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+    
+    <!-- Master-Detail Panel -->
+    <div class="flex-1 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300">
+      <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
+        
+        <!-- PANEL IZQUIERDO: Selector de Sedes (30%) -->
+        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-gray-50 dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
+          
+          <!-- Búsqueda -->
+          <div class="p-3 border-b border-gray-200 dark:border-zinc-800">
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                v-model="searchTerm"
+                type="text"
+                placeholder="Buscar sede..."
+                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+            </div>
+          </div>
+          
+          <!-- Lista de sedes -->
+          <div class="flex-1 overflow-y-auto px-2 py-2">
             
-            <!-- Estado: No seleccionado - Empty State Profesional estilo WhatsApp -->
-            <div v-if="!selectedWarehouse" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-zinc-900/50 dark:via-zinc-900/30 dark:to-zinc-900/50 relative">
-            
-              <!-- Ilustración SVG profesional - Estilo igual a Facturas -->
-              <div class="mb-8 relative">
-                <!-- Efecto glow suave de fondo -->
-                <div class="absolute inset-0 bg-gradient-to-br from-indigo-200/30 via-transparent to-purple-200/30 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-3xl blur-3xl scale-150"></div>
+            <div
+              v-for="warehouse in filteredWarehouses"
+              :key="warehouse.id"
+              @click="selectWarehouse(warehouse)"
+              class="px-4 py-3.5 my-1 cursor-pointer transition-all duration-200 rounded-xl group relative"
+              :class="[
+                selectedWarehouse?.id === warehouse.id 
+                  ? 'bg-white dark:bg-zinc-800 shadow-md dark:shadow-black/30 border border-gray-200 dark:border-zinc-700' 
+                  : 'hover:bg-white dark:hover:bg-zinc-800/50 border border-transparent'
+              ]"
+            >
+              <!-- Indicador de selección fuerte -->
+              <div 
+                v-if="selectedWarehouse?.id === warehouse.id"
+                class="absolute left-0 top-3 bottom-3 w-[3px] bg-slate-900 dark:bg-blue-400 rounded-r-full"
+              ></div>
+              
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <!-- Icono de sede -->
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border"
+                       :class="warehouse.is_default 
+                         ? 'bg-emerald-50 dark:bg-emerald-950 border-emerald-100 dark:border-emerald-800' 
+                         : 'bg-blue-50 dark:bg-blue-950 border-blue-100 dark:border-blue-800'">
+                    <svg class="w-5 h-5" :class="warehouse.is_default ? 'text-emerald-600 dark:text-emerald-400' : 'text-blue-600 dark:text-blue-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                  </div>
+                  
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <p class="text-sm font-semibold truncate"
+                         :class="selectedWarehouse?.id === warehouse.id ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-zinc-300'">
+                        {{ warehouse.name }}
+                      </p>
+                      <span v-if="warehouse.is_default" class="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 uppercase">
+                        Principal
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-2 mt-1">
+                      <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">
+                        {{ warehouse.address || 'Sin dirección' }}
+                      </p>
+                      <span class="text-[10px] text-gray-300 dark:text-zinc-600">•</span>
+                      <span class="text-xs text-gray-400 dark:text-zinc-500 flex-shrink-0 font-medium">
+                        {{ warehouse.products_count || 0 }} prod.
+                      </span>
+                    </div>
+                  </div>
+                </div>
                 
-                <!-- Ilustración profesional estilo dashboard -->
+                <!-- Badge de estado -->
+                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 border uppercase tracking-wide"
+                      :class="warehouse.active 
+                        ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' 
+                        : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'">
+                  {{ warehouse.active ? 'Activa' : 'Inactiva' }}
+                </span>
+              </div>
+            </div>
+            
+            <!-- Estado vacío -->
+            <div v-if="filteredWarehouses.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+              <svg class="w-10 h-10 text-gray-300 dark:text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <p class="text-sm font-medium text-gray-600 dark:text-zinc-300">Sin resultados</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Intenta con otra búsqueda</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL DERECHO: Dashboard de Sede (70%) -->
+        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-white dark:bg-zinc-900 transition-colors duration-300">
+            
+            <!-- Empty State -->
+            <div v-if="!selectedWarehouse" class="flex-1 flex flex-col items-center justify-center p-12 text-center relative">
+            
+              <div class="mb-8 relative">
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-200/20 via-transparent to-blue-200/20 dark:from-purple-500/5 dark:to-blue-500/5 rounded-3xl blur-3xl scale-150"></div>
+                
+                <!-- Ilustración principal -->
                 <svg class="w-48 h-48 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <!-- Sombra del documento -->
                   <rect x="48" y="38" width="88" height="110" rx="6" class="fill-gray-200/50 dark:fill-zinc-700/30"/>
@@ -288,7 +295,7 @@
                   <rect x="44" y="32" width="88" height="110" rx="6" class="fill-white dark:fill-zinc-800" stroke-width="0"/>
                   <rect x="44" y="32" width="88" height="110" rx="6" class="fill-none stroke-gray-200 dark:stroke-zinc-700" stroke-width="1.5"/>
                   
-                  <!-- Header del documento con icono de edificio -->
+                  <!-- Header con icono de edificio -->
                   <rect x="54" y="44" width="40" height="5" rx="2.5" class="fill-gray-300 dark:fill-zinc-600"/>
                   <rect x="54" y="54" width="68" height="3" rx="1.5" class="fill-gray-100 dark:fill-zinc-700"/>
                   <rect x="54" y="62" width="55" height="3" rx="1.5" class="fill-gray-100 dark:fill-zinc-700"/>
@@ -297,102 +304,83 @@
                   <!-- Línea separadora -->
                   <line x1="54" y1="82" x2="122" y2="82" class="stroke-gray-200 dark:stroke-zinc-700" stroke-width="1"/>
                   
-                  <!-- Área de inventario/stock -->
+                  <!-- Área de inventario -->
                   <rect x="54" y="90" width="30" height="3" rx="1.5" class="fill-gray-200 dark:fill-zinc-600"/>
-                  <rect x="94" y="88" width="28" height="7" rx="3.5" class="fill-indigo-100 dark:fill-indigo-500/20"/>
-                  <rect x="98" y="90" width="20" height="3" rx="1.5" class="fill-indigo-500 dark:fill-indigo-400"/>
+                  <rect x="94" y="88" width="28" height="7" rx="3.5" class="fill-purple-100 dark:fill-purple-500/20"/>
+                  <rect x="98" y="90" width="20" height="3" rx="1.5" class="fill-purple-500 dark:fill-purple-400"/>
                   
                   <!-- Segunda línea -->
                   <rect x="54" y="102" width="25" height="3" rx="1.5" class="fill-gray-200 dark:fill-zinc-600"/>
                   <rect x="94" y="100" width="28" height="7" rx="3.5" class="fill-gray-100 dark:fill-zinc-700"/>
                   
-                  <!-- Total/resumen -->
+                  <!-- Total -->
                   <rect x="54" y="118" width="35" height="4" rx="2" class="fill-gray-300 dark:fill-zinc-500"/>
-                  <rect x="94" y="116" width="28" height="8" rx="4" class="fill-purple-500 dark:fill-purple-400"/>
+                  <rect x="94" y="116" width="28" height="8" rx="4" class="fill-emerald-500 dark:fill-emerald-400"/>
                   
-                  <!-- Icono de ubicación/sede -->
-                  <circle cx="120" cy="48" r="14" class="fill-indigo-100 dark:fill-indigo-500/20"/>
-                  <circle cx="120" cy="48" r="10" class="fill-indigo-500 dark:fill-indigo-400"/>
-                  <path d="M120 43V48M120 48V53M120 48H115M120 48H125" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
+                  <!-- Icono de sede -->
+                  <circle cx="120" cy="48" r="14" class="fill-blue-100 dark:fill-blue-500/20"/>
+                  <circle cx="120" cy="48" r="10" class="fill-blue-500 dark:fill-blue-400"/>
+                  <path d="M116 52V45M120 52V43M124 52V47" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
                   
                   <!-- Cajas de inventario -->
-                  <rect x="142" y="95" width="24" height="20" rx="4" class="fill-purple-100 dark:fill-purple-500/20"/>
-                  <rect x="145" y="98" width="18" height="14" rx="2" class="fill-purple-400 dark:fill-purple-500"/>
-                  <path d="M149 105H159" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
-                  
-                  <rect x="142" y="118" width="24" height="16" rx="4" class="fill-emerald-100 dark:fill-emerald-500/20"/>
-                  <rect x="145" y="121" width="18" height="10" rx="2" class="fill-emerald-400 dark:fill-emerald-500"/>
-                  
-                  <!-- Gráfico de barras pequeño -->
-                  <rect x="18" y="125" width="8" height="20" rx="2" class="fill-indigo-300 dark:fill-indigo-400/50"/>
-                  <rect x="30" y="115" width="8" height="30" rx="2" class="fill-indigo-400 dark:fill-indigo-400/70"/>
-                  <rect x="42" y="105" width="8" height="40" rx="2" class="fill-indigo-500 dark:fill-indigo-400"/>
+                  <rect x="140" y="100" width="28" height="28" rx="4" class="fill-purple-100 dark:fill-purple-500/20"/>
+                  <rect x="144" y="104" width="20" height="20" rx="2" class="fill-purple-400 dark:fill-purple-500"/>
+                  <path d="M149 114H159" class="stroke-white" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </div>
               
               <!-- Texto de bienvenida profesional -->
               <div class="relative z-10 max-w-md">
-                <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+                <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-3">
                   Centro de Sedes
                 </h3>
                 <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
                   Selecciona una sede del panel izquierdo para visualizar el inventario completo, productos y estadísticas.
                 </p>
-                <p class="text-xs text-gray-400 dark:text-zinc-500">
-                  Gestiona el inventario de cada sede de forma rápida y segura.
-                </p>
-              </div>
-              
-              <!-- Footer de confianza estilo WhatsApp -->
-              <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-                <span>Datos de inventario sincronizados en tiempo real</span>
               </div>
             </div>
 
             <!-- Estado: Sede seleccionada - Loading -->
             <div v-else-if="loadingProducts" class="flex-1 flex items-center justify-center">
               <div class="text-center">
-                <div class="w-16 h-16 border-4 border-indigo-200 dark:border-indigo-900 border-t-indigo-600 dark:border-t-indigo-400 rounded-full animate-spin mx-auto mb-4"></div>
-                <p class="text-sm text-gray-600 dark:text-zinc-400">Cargando productos...</p>
+                <div class="w-12 h-12 border-4 border-gray-200 dark:border-zinc-700 border-t-gray-600 dark:border-t-zinc-300 rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-sm text-gray-500 dark:text-zinc-400">Cargando productos...</p>
               </div>
             </div>
 
-            <!-- Estado: Productos cargados -->
-            <div v-else-if="warehouseDetails" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900/50 transition-colors duration-300">
+            <!-- Productos cargados -->
+            <div v-else-if="warehouseDetails" class="flex-1 flex flex-col overflow-hidden transition-colors duration-200">
               
-              <!-- Header del detalle con acciones contextuales -->
-              <div class="p-8 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+              <!-- Dashboard Header -->
+              <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-800">
                 <div class="flex items-start justify-between">
                   <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-3">
-                      <h2 class="text-3xl font-black text-gray-900 dark:text-zinc-200 tracking-tight">
+                    <div class="flex items-center gap-3 mb-2">
+                      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
                         {{ selectedWarehouse.name }}
                       </h2>
                       <span v-if="selectedWarehouse.is_default"
-                        class="px-3 py-1 rounded-full text-xs font-bold border bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
+                        class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800">
                         PRINCIPAL
                       </span>
                       <span
-                        class="px-3 py-1 rounded-full text-xs font-bold border"
+                        class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide"
                         :class="selectedWarehouse.active 
-                          ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' 
-                          : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-200 dark:border-zinc-700'">
+                          ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' 
+                          : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'">
                         {{ selectedWarehouse.active ? 'ACTIVA' : 'INACTIVA' }}
                       </span>
                     </div>
-                    <div class="flex items-center gap-6 text-sm text-gray-500 dark:text-zinc-400 font-medium">
-                      <span v-if="selectedWarehouse.address" class="flex items-center gap-2">
+                    <div class="flex items-center gap-5 text-sm text-gray-600 dark:text-zinc-400">
+                      <span v-if="selectedWarehouse.address" class="flex items-center gap-1.5">
                         <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                         {{ selectedWarehouse.address }}
                       </span>
-                      <span v-if="selectedWarehouse.phone" class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <span v-if="selectedWarehouse.phone" class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                         </svg>
                         {{ selectedWarehouse.phone }}
@@ -400,18 +388,20 @@
                     </div>
                   </div>
 
-                  <!-- Botones de acción -->
-                  <div class="flex items-center gap-2">
+                  <!-- Acciones -->
+                  <div class="flex items-center gap-1.5">
                     <button
                       @click="editWarehouse(selectedWarehouse)"
-                      class="p-2 text-gray-600 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg border border-transparent hover:border-amber-100 dark:hover:border-amber-900/30 transition-all duration-200">
+                      class="p-2.5 text-slate-400 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-xl border border-transparent hover:border-amber-100 dark:hover:border-amber-900/30 transition-all duration-200"
+                      title="Editar sede">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                       </svg>
                     </button>
                     <button
                       @click="viewInventory(selectedWarehouse)"
-                      class="p-2 text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 transition-all duration-200">
+                      class="p-2.5 text-slate-400 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30 transition-all duration-200"
+                      title="Ver inventario completo">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -420,7 +410,8 @@
                     <button
                       v-if="!selectedWarehouse.is_default"
                       @click="deleteWarehouse(selectedWarehouse)"
-                      class="p-2 text-gray-600 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200">
+                      class="p-2.5 text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
+                      title="Eliminar sede">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                       </svg>
@@ -428,29 +419,49 @@
                   </div>
                 </div>
 
-                <!-- KPIs de la sede -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
-                    <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide mb-1">Productos</p>
+                <!-- Métricas de la sede -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-5">
+                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl px-4 py-3 border border-gray-200 dark:border-zinc-700/50">
+                    <div class="flex items-center gap-2 mb-1">
+                      <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                      </svg>
+                      <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Productos</p>
+                    </div>
                     <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ warehouseDetails?.summary?.total_products || 0 }}</p>
                   </div>
-                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
-                    <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide mb-1">Stock Total</p>
+                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl px-4 py-3 border border-gray-200 dark:border-zinc-700/50">
+                    <div class="flex items-center gap-2 mb-1">
+                      <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                      </svg>
+                      <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Stock Total</p>
+                    </div>
                     <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ warehouseDetails?.summary?.total_stock || 0 }}</p>
                   </div>
-                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
-                    <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide mb-1">Valor Inventario</p>
+                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl px-4 py-3 border border-gray-200 dark:border-zinc-700/50">
+                    <div class="flex items-center gap-2 mb-1">
+                      <svg class="w-4 h-4 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Valor Inventario</p>
+                    </div>
                     <p class="text-xl font-bold text-gray-900 dark:text-white">${{ formatNumber(warehouseDetails?.summary?.total_value || 0) }}</p>
                   </div>
-                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
-                    <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide mb-1">Stock Bajo</p>
-                    <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ warehouseDetails?.summary?.low_stock_count || 0 }}</p>
+                  <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl px-4 py-3 border border-gray-200 dark:border-zinc-700/50">
+                    <div class="flex items-center gap-2 mb-1">
+                      <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
+                      </svg>
+                      <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Stock Bajo</p>
+                    </div>
+                    <p class="text-2xl font-bold" :class="(warehouseDetails?.summary?.low_stock_count || 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'">{{ warehouseDetails?.summary?.low_stock_count || 0 }}</p>
                   </div>
                 </div>
               </div>
 
-              <!-- Contenido scrolleable: Tabla de productos -->
-              <div class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-zinc-900/50">
+              <!-- Inventario de productos -->
+              <div class="flex-1 overflow-y-auto px-6 py-5 bg-gray-50 dark:bg-zinc-900/50">
                 
                 <!-- Búsqueda de productos -->
                 <div class="mb-4">
@@ -462,48 +473,48 @@
                       v-model="productSearchTerm"
                       type="text"
                       placeholder="Buscar productos por nombre o SKU..."
-                      class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all duration-300">
+                      class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
                   </div>
                 </div>
 
                 <!-- Tabla de productos -->
-                <div class="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-sm">
-                  <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-800">
-                    <thead class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
-                      <tr>
-                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Producto</th>
-                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">SKU</th>
-                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Categoría</th>
-                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Stock</th>
-                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Min/Max</th>
-                        <th class="px-4 py-3 text-right text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Precio</th>
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+                  <table class="min-w-full">
+                    <thead>
+                      <tr class="border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
+                        <th class="px-5 py-3.5 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Producto</th>
+                        <th class="px-4 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">SKU</th>
+                        <th class="px-4 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Categoría</th>
+                        <th class="px-4 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Stock</th>
+                        <th class="px-4 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Min/Max</th>
+                        <th class="px-5 py-3.5 text-right text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Precio</th>
                       </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
+                    <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
                       <tr v-for="product in filteredProducts" :key="product.id" 
-                          class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-all duration-200">
-                        <td class="px-4 py-3">
+                          class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-200">
+                        <td class="px-5 py-3">
                           <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                            <div class="w-10 h-10 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
                               <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover" />
                               <svg v-else class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                               </svg>
                             </div>
                             <div class="flex-1 min-w-0">
-                              <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ product.name }}</p>
+                              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ product.name }}</p>
                               <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">{{ product.barcode || 'Sin código' }}</p>
                             </div>
                           </div>
                         </td>
                         <td class="px-4 py-3 text-center">
-                          <span class="text-xs font-mono text-gray-600 dark:text-zinc-400">{{ product.sku }}</span>
+                          <span class="text-xs font-mono text-gray-500 dark:text-zinc-400">{{ product.sku }}</span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                          <span class="text-xs text-gray-600 dark:text-zinc-400">{{ product.category_name || 'Sin categoría' }}</span>
+                          <span class="text-xs text-gray-500 dark:text-zinc-400">{{ product.category_name || 'Sin categoría' }}</span>
                         </td>
                         <td class="px-4 py-3 text-center">
-                          <span class="font-bold text-sm"
+                          <span class="font-medium text-sm"
                                 :class="product.stock === 0 ? 'text-rose-600 dark:text-rose-400' : product.stock <= product.min_stock ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'">
                             {{ product.stock }}
                           </span>
@@ -513,7 +524,7 @@
                           <span class="text-xs text-gray-500 dark:text-zinc-400">{{ product.min_stock }}/{{ product.max_stock || '-' }}</span>
                         </td>
                         <td class="px-4 py-3 text-right">
-                          <div class="font-mono text-sm font-bold text-gray-900 dark:text-white">${{ formatNumber(product.sale_price) }}</div>
+                          <div class="font-mono text-sm font-medium text-gray-900 dark:text-white">${{ formatNumber(product.sale_price) }}</div>
                           <div class="text-xs text-gray-500 dark:text-zinc-400">Costo: ${{ formatNumber(product.cost_price) }}</div>
                         </td>
                       </tr>
@@ -525,24 +536,23 @@
                     <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
-                    <p class="text-sm font-semibold text-gray-600 dark:text-zinc-300">No hay productos</p>
-                    <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Esta sede no tiene productos registrados</p>
+                    <p class="text-sm font-medium text-gray-500 dark:text-zinc-400">No hay productos</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1">Esta sede no tiene productos registrados</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          </div>
         </div>
       </div>
+    </div>
       <!-- Fin contenido Sedes -->
 
       <!-- Contenido Traslados -->
-      <div v-if="activeTab === 'transfers'" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+      <div v-if="activeTab === 'transfers'" class="flex-1 flex flex-col min-h-0 px-6 lg:px-8 pb-6">
         <StockTransfersView ref="transfersComponent" :embedded="true" />
       </div>
 
-    </div>
   </div>
 
     <!-- Modal Crear/Editar Sede -->
@@ -559,24 +569,24 @@
         v-if="showLimitModal" 
         class="fixed top-0 left-0 right-0 bottom-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4"
         style="z-index: 99999; position: fixed; inset: 0;">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/50 max-w-md w-full overflow-hidden border border-gray-300 dark:border-zinc-800 animate-scale-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-2xl dark:shadow-black/50 animate-scale-in">
           
-          <!-- Header profesional -->
-          <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4">
+          <!-- Header -->
+          <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4">
             <div class="flex items-center space-x-3">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950">
-                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-amber-50 dark:bg-amber-950 border border-amber-100 dark:border-amber-800">
+                <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <div class="flex-1">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Límite de Sedes Alcanzado</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Límite de Sedes Alcanzado</h3>
                 <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Plan {{ planInfo?.plan_name || 'Actual' }}</p>
               </div>
               <button 
                 @click="showLimitModal = false"
                 class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
-                <svg class="w-5 h-5 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
@@ -586,24 +596,24 @@
           <!-- Contenido -->
           <div class="px-6 py-5">
             <p class="text-sm text-gray-700 dark:text-zinc-300 leading-relaxed">
-              Has alcanzado el límite de <span class="font-bold text-blue-600 dark:text-blue-400">{{ planInfo?.max_allowed }} sedes</span> para tu plan actual.
+              Has alcanzado el límite de <span class="font-semibold text-gray-900 dark:text-white">{{ planInfo?.max_allowed }} sedes</span> para tu plan actual.
             </p>
-            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-3 bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-3 border border-gray-200 dark:border-zinc-700/50">
-              Actualiza a <span class="font-bold text-gray-900 dark:text-white">Enterprise</span> para gestionar sedes ilimitadas y desbloquear todo el potencial de tu negocio.
+            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-3 bg-gray-50 dark:bg-zinc-800 rounded-xl p-3 border border-gray-200 dark:border-zinc-700">
+              Actualiza a <span class="font-semibold text-gray-900 dark:text-white">Enterprise</span> para gestionar sedes ilimitadas y desbloquear todo el potencial de tu negocio.
             </p>
           </div>
 
           <!-- Footer -->
-          <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-end space-x-3">
+          <div class="bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-end space-x-3">
             <button 
               @click="showLimitModal = false"
               type="button"
-              class="px-5 py-2.5 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+              class="px-5 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300 text-sm font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors">
               Cerrar
             </button>
             <button 
               @click="goToPlans"
-              class="px-5 py-2.5 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-600 text-white text-sm font-bold rounded-lg shadow-lg shadow-blue-400/40 dark:shadow-blue-900/50 transition-all duration-300 flex items-center space-x-2">
+              class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center space-x-2">
               <span>Ver Planes</span>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />

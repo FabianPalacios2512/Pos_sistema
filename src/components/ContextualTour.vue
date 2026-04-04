@@ -3,29 +3,29 @@
     <!-- Modal de Bienvenida (Pregunta antes de iniciar) -->
     <Transition name="fade">
       <div v-if="showWelcomeModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50  p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-scale-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-scale-in border border-gray-200 dark:border-zinc-800">
           <div class="p-6 text-center">
-            <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-indigo-600">
-              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-950/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
-            <h2 class="text-xl font-black text-slate-900 mb-2">¡Bienvenido a 105 POS! 👋</h2>
-            <p class="text-slate-500 text-sm leading-relaxed mb-6">
+            <h2 class="text-xl font-black text-gray-900 dark:text-white mb-2">¡Bienvenido a 105 POS!</h2>
+            <p class="text-gray-500 dark:text-zinc-400 text-sm leading-relaxed mb-6">
               Vemos que es tu primera vez aquí. ¿Te gustaría hacer un recorrido rápido para conocer las funciones principales?
             </p>
             <div class="flex gap-3">
               <button 
                 @click="skipTour"
-                class="flex-1 px-4 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-colors"
+                class="flex-1 px-4 py-3 rounded-xl bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 font-bold text-sm hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
               >
                 No, gracias
               </button>
               <button 
                 @click="startTourConfirmed"
-                class="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+                class="flex-1 px-4 py-3 rounded-xl bg-slate-900 dark:bg-slate-700 text-white font-bold text-sm hover:bg-black dark:hover:bg-slate-600 transition-colors shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50"
               >
-                ¡Sí, vamos! 🚀
+                ¡Sí, vamos!
               </button>
             </div>
           </div>
@@ -77,15 +77,15 @@
             :class="{ 'opacity-0': isTransitioning, 'opacity-100': !isTransitioning }"
           >
             <!-- Popover Blanco Profesional con Elevación por Luminosidad -->
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-200 dark:border dark:border-white/10 overflow-hidden mx-2 sm:mx-0">
+            <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden mx-2 sm:mx-0">
               
               <!-- Header Limpio con Contador -->
-              <div class="px-5 pt-4 pb-3 flex items-start justify-between border-b border-gray-100 dark:border-white/10">
+              <div class="px-5 pt-4 pb-3 flex items-start justify-between border-b border-gray-100 dark:border-zinc-800">
                 <div class="flex-1 min-w-0">
-                  <h3 class="text-gray-900 dark:text-gray-100 font-bold text-base leading-tight">{{ currentStep.title }}</h3>
+                  <h3 class="text-gray-900 dark:text-white font-bold text-base leading-tight">{{ currentStep.title }}</h3>
                 </div>
                 <div class="ml-3 flex-shrink-0">
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 text-xs font-semibold">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 text-xs font-semibold">
                     {{ currentStepIndex + 1 }}/{{ steps.length }}
                   </span>
                 </div>
@@ -93,16 +93,16 @@
 
               <!-- Contenido Limpio (Sin cajas de colores) -->
               <div class="px-5 py-4 max-h-[45vh] overflow-y-auto">
-                <div class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm space-y-3" v-html="currentStep.content"></div>
+                <div class="text-gray-600 dark:text-zinc-400 leading-relaxed text-sm space-y-3" v-html="currentStep.content"></div>
               </div>
 
               <!-- Footer con Botones -->
-              <div class="px-5 py-3 bg-gray-50 dark:bg-slate-900 border-t border-gray-100 dark:border-white/10 flex items-center justify-between gap-3">
+              <div class="px-5 py-3 bg-gray-50 dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 flex items-center justify-between gap-3">
                 <!-- Lado izquierdo: Omitir (solo primer paso) -->
                 <button 
                   v-if="currentStepIndex === 0"
                   @click="skipTour"
-                  class="text-xs text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-400 font-medium transition-colors"
+                  class="text-xs text-gray-500 dark:text-zinc-500 hover:text-gray-700 dark:hover:text-zinc-300 font-medium transition-colors"
                 >
                   Omitir Tour
                 </button>
@@ -111,7 +111,7 @@
                 <button 
                   v-if="currentStepIndex > 0"
                   @click="previousStep"
-                  class="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 font-semibold text-sm hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors border border-gray-200 dark:border-white/10"
+                  class="px-4 py-2 rounded-lg text-gray-600 dark:text-zinc-300 font-semibold text-sm hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors border border-gray-200 dark:border-zinc-700"
                 >
                   Anterior
                 </button>
@@ -122,7 +122,7 @@
                 <!-- Botón Siguiente (Verde Esmeralda Optimizado) -->
                 <button 
                   @click="nextStep"
-                  class="px-5 py-2 rounded-lg bg-emerald-600 dark:bg-emerald-600 hover:bg-emerald-700 dark:hover:bg-emerald-500 text-white dark:text-slate-900 font-bold text-sm transition-all shadow-lg shadow-emerald-600/20 dark:shadow-emerald-500/20 flex items-center gap-2"
+                  class="px-5 py-2 rounded-lg bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold text-sm transition-all shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 flex items-center gap-2"
                 >
                   <span>{{ currentStepIndex === steps.length - 1 ? 'Finalizar' : 'Siguiente' }}</span>
                   <svg v-if="currentStepIndex < steps.length - 1" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,12 +137,12 @@
 
             <!-- Flecha/Arrow apuntando al elemento con bordes definidos -->
             <div 
-              class="absolute w-3 h-3 bg-white dark:bg-slate-800 transform rotate-45 hidden sm:block"
+              class="absolute w-3 h-3 bg-white dark:bg-zinc-900 transform rotate-45 hidden sm:block"
               :class="{
-                'border-l border-t border-gray-200 dark:border-white/10': currentTooltipPosition.arrowSide === 'bottom',
-                'border-r border-b border-gray-200 dark:border-white/10': currentTooltipPosition.arrowSide === 'top',
-                'border-t border-r border-gray-200 dark:border-white/10': currentTooltipPosition.arrowSide === 'left',
-                'border-l border-b border-gray-200 dark:border-white/10': currentTooltipPosition.arrowSide === 'right'
+                'border-l border-t border-gray-200 dark:border-zinc-800': currentTooltipPosition.arrowSide === 'bottom',
+                'border-r border-b border-gray-200 dark:border-zinc-800': currentTooltipPosition.arrowSide === 'top',
+                'border-t border-r border-gray-200 dark:border-zinc-800': currentTooltipPosition.arrowSide === 'left',
+                'border-l border-b border-gray-200 dark:border-zinc-800': currentTooltipPosition.arrowSide === 'right'
               }"
               :style="{
                 left: '50%',

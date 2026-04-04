@@ -1,358 +1,10 @@
-<template>
-  <!-- 🎨 PREMIUM SPLIT SCREEN - Diseño SaaS Empresarial 2025 -->
-  <div class="flex bg-slate-50" style="height: 100%; min-height: 100%;">
-    
-    <!-- 📸 LADO IZQUIERDO: Panel de Marca Premium -->
-    <div class="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden" style="height: 100%;">
-      <!-- Gradiente base oscuro elegante -->
-      <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
-      
-      <!-- Imagen con overlay profesional -->
-      <div class="absolute inset-0">
-        <img 
-          src="/login.png" 
-          alt="105 POS Pro - Sistema de Punto de Venta" 
-          class="w-full h-full object-cover transition-opacity duration-1000 ease-out"
-          :class="imageLoaded ? 'opacity-100' : 'opacity-0'"
-          @load="imageLoaded = true"
-          loading="eager"
-          decoding="async"
-        />
-        <!-- Overlay con gradiente premium -->
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-slate-900/30"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-transparent to-transparent"></div>
-      </div>
-      
-      <!-- Skeleton mientras carga -->
-      <div 
-        v-if="!imageLoaded" 
-        class="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"
-      >
-        <div class="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-slate-700/20 to-transparent"></div>
-      </div>
-
-      <!-- Contenido superpuesto -->
-      <div class="relative z-10 flex flex-col justify-between w-full h-full p-10 xl:p-14">
-        
-        <!-- Logo y marca superior -->
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-white/10  border border-white/20 flex items-center justify-center">
-            <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <span class="text-white/90 font-bold text-xl tracking-tight">105 POS</span>
-        </div>
-
-        <!-- Contenido central con estadísticas -->
-        <div class="flex-1 flex flex-col justify-center max-w-lg">
-          <transition
-            enter-active-class="transition ease-out duration-700 delay-200"
-            enter-from-class="translate-y-8 opacity-0"
-            enter-to-class="translate-y-0 opacity-100"
-          >
-            <div v-if="imageLoaded" class="space-y-8">
-              <div>
-                <h2 class="text-4xl xl:text-5xl font-bold text-white leading-tight">
-                  Potencia tu negocio con
-                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-                    tecnología inteligente
-                  </span>
-                </h2>
-                <p class="mt-4 text-lg text-slate-300 leading-relaxed">
-                  El sistema POS más completo para empresas que buscan crecer. 
-                  Controla ventas, inventario y clientes desde cualquier lugar.
-                </p>
-              </div>
-
-              <!-- Stats Grid -->
-              <div class="grid grid-cols-3 gap-4">
-                <div class="bg-white/5  rounded-2xl p-4 border border-white/10">
-                  <div class="text-3xl font-bold text-white">99.9%</div>
-                  <div class="text-sm text-slate-400 mt-1">Uptime garantizado</div>
-                </div>
-                <div class="bg-white/5  rounded-2xl p-4 border border-white/10">
-                  <div class="text-3xl font-bold text-white">+2K</div>
-                  <div class="text-sm text-slate-400 mt-1">Negocios activos</div>
-                </div>
-                <div class="bg-white/5  rounded-2xl p-4 border border-white/10">
-                  <div class="text-3xl font-bold text-white">24/7</div>
-                  <div class="text-sm text-slate-400 mt-1">Soporte técnico</div>
-                </div>
-              </div>
-            </div>
-          </transition>
-        </div>
-
-        <!-- Testimonial Card inferior -->
-        <transition
-          enter-active-class="transition ease-out duration-700 delay-500"
-          enter-from-class="translate-y-6 opacity-0"
-          enter-to-class="translate-y-0 opacity-100"
-        >
-          <div v-if="imageLoaded" class="bg-white/10  rounded-2xl p-6 border border-white/20">
-            <div class="flex items-start gap-4">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center flex-shrink-0">
-                <span class="text-white font-bold text-lg">CP</span>
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-2">
-                  <div class="flex gap-0.5">
-                    <svg v-for="i in 5" :key="i" class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                  </div>
-                </div>
-                <p class="text-white/90 text-sm leading-relaxed italic">
-                  "Desde que implementamos 105 POS, nuestras ventas aumentaron un 40% y el control de inventario es impecable."
-                </p>
-                <p class="text-slate-400 text-sm mt-3 font-medium">Carlos Pérez — CEO, Supermercados del Valle</p>
-              </div>
-            </div>
-          </div>
-        </transition>
-      </div>
-    </div>
-
-    <!-- 📝 LADO DERECHO: Formulario de Login Premium -->
-    <div class="flex-1 flex items-center justify-center px-6 sm:px-8 lg:px-12 xl:px-16 bg-white relative">
-      <!-- Patrón de fondo sutil -->
-      <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-50"></div>
-      
-      <div class="w-full max-w-[420px] relative z-10">
-        
-        <!-- Badge versión móvil -->
-        <div class="lg:hidden flex items-center gap-2.5 mb-10">
-          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg shadow-slate-900/20">
-            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <span class="text-slate-900 font-bold text-xl tracking-tight">105 POS Pro</span>
-        </div>
-
-        <!-- Header del formulario -->
-        <div class="mb-8">
-          <div class="hidden lg:block">
-            <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-4 border border-emerald-100">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Plataforma activa
-            </span>
-          </div>
-          <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
-            Bienvenido de nuevo
-          </h1>
-          <p class="mt-2 text-slate-500">
-            Ingresa tus credenciales para acceder al sistema
-          </p>
-        </div>
-
-        <!-- Mensajes de Error/Éxito mejorados -->
-        <transition
-          enter-active-class="transition ease-out duration-300"
-          enter-from-class="-translate-y-2 opacity-0"
-          enter-to-class="translate-y-0 opacity-100"
-          leave-active-class="transition ease-in duration-200"
-          leave-from-class="translate-y-0 opacity-100"
-          leave-to-class="-translate-y-2 opacity-0"
-        >
-          <div v-if="message.text" 
-               :class="[
-                 'mb-6 px-4 py-3.5 rounded-xl text-sm font-medium flex items-center gap-3',
-                 message.type === 'error' 
-                   ? 'bg-red-50 text-red-700 border border-red-100' 
-                   : message.type === 'info'
-                     ? 'bg-blue-50 text-blue-700 border border-blue-100'
-                     : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-               ]">
-            <svg v-if="message.type === 'error'" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <svg v-else-if="message.type === 'info'" class="w-5 h-5 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <svg v-else class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span>{{ message.text }}</span>
-          </div>
-        </transition>
-
-        <form @submit.prevent="handleLogin" class="space-y-5">
-          
-          <!-- Campo Email -->
-          <div class="space-y-2">
-            <label for="email" class="block text-sm font-semibold text-slate-700">
-              Correo Electrónico
-            </label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </div>
-              <input
-                id="email"
-                v-model="credentials.email"
-                type="email"
-                autocomplete="email"
-                required
-                placeholder="tu@email.com"
-                class="block w-full pl-12 pr-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200"
-                :class="{ 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/10': errors.email }"
-              />
-            </div>
-            <p v-if="errors.email" class="text-sm text-red-600 flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-              </svg>
-              {{ errors.email }}
-            </p>
-          </div>
-
-          <!-- Campo Contraseña -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <label for="password" class="block text-sm font-semibold text-slate-700">
-                Contraseña
-              </label>
-              <router-link 
-                to="/forgot-password" 
-                class="text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </router-link>
-            </div>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-              </div>
-              <input
-                id="password"
-                v-model="credentials.password"
-                :type="showPassword ? 'text' : 'password'"
-                autocomplete="current-password"
-                required
-                placeholder="••••••••"
-                class="block w-full pl-12 pr-12 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200"
-                :class="{ 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-500/10': errors.password }"
-              />
-              <button
-                type="button"
-                @click="showPassword = !showPassword"
-                class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                <svg v-if="showPassword" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-                <svg v-else class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
-                </svg>
-              </button>
-            </div>
-            <p v-if="errors.password" class="text-sm text-red-600 flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-              </svg>
-              {{ errors.password }}
-            </p>
-          </div>
-
-          <!-- Botón Principal Premium -->
-          <div class="pt-2">
-            <button
-              type="submit"
-              :disabled="loading"
-              class="group w-full flex items-center justify-center gap-2 py-4 px-6 text-base font-semibold text-white bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-900 hover:to-black rounded-xl shadow-lg shadow-slate-900/25 focus:outline-none focus:ring-4 focus:ring-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-            >
-              <svg v-if="loading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>{{ loading ? 'Verificando...' : 'Iniciar Sesión' }}</span>
-              <svg v-if="!loading" class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-              </svg>
-            </button>
-          </div>
-        </form>
-
-        <!-- Separador Premium -->
-        <div class="relative my-8">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-slate-200"></div>
-          </div>
-          <div class="relative flex justify-center">
-            <span class="px-4 text-sm text-slate-400 bg-white">o continúa con</span>
-          </div>
-        </div>
-
-        <!-- Botón Google Premium -->
-        <button
-          type="button"
-          @click="loginWithGoogle"
-          :disabled="isGoogleLoading"
-          class="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-white border-2 border-slate-200 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <svg v-if="!isGoogleLoading" class="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          <svg v-else class="w-5 h-5 animate-spin text-slate-400" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span>{{ isGoogleLoading ? 'Conectando...' : 'Continuar con Google' }}</span>
-        </button>
-
-        <!-- Link de Registro Premium -->
-        <div class="mt-8 text-center">
-          <p class="text-sm text-slate-500">
-            ¿Nuevo en 105 POS? 
-            <a 
-              href="https://105pos.pro/register" 
-              class="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors hover:underline underline-offset-2"
-            >
-              Crea tu cuenta gratis
-            </a>
-          </p>
-        </div>
-
-        <!-- Footer con features -->
-        <div class="mt-10 pt-8 border-t border-slate-100">
-          <div class="flex items-center justify-center gap-6 text-xs text-slate-400">
-            <div class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span>Conexión segura</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-              </svg>
-              <span>Datos encriptados</span>
-            </div>
-          </div>
-          <p class="text-center text-xs text-slate-400 mt-4">© 2025 105 POS Pro. Todos los derechos reservados.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import authService from '../services/authService.js'
 import googleAuthService from '../services/googleAuthService.js'
+import RadioPlayerModal from './RadioPlayerModal.vue'
 
 // Router
 const router = useRouter()
@@ -362,6 +14,8 @@ const loading = ref(false)
 const showPassword = ref(false)
 const isGoogleLoading = ref(false)
 const imageLoaded = ref(false) // 🖼️ Estado de carga de imagen
+const showNotFoundModal = ref(false)
+const radioOpen = ref(false)
 
 // Credenciales del formulario
 const credentials = reactive({
@@ -430,7 +84,7 @@ onMounted(async () => {
       const user = response.data?.user || response.user
       
       if (user?.is_super_admin || user?.role?.name === 'superadmin') {
-        router.push('/admin/god-mode')
+        window.location.href = '/admin/god-mode'
         return
       }
       
@@ -459,11 +113,10 @@ onMounted(async () => {
       }
       
       // Si todo está bien, ir al POS
-      router.push('/pos')
+      window.location.href = '/pos'
       
       return
     } catch (error) {
-      console.error('❌ Error en auto-login:', error)
       sessionStorage.removeItem('auto_login_credentials')
       message.text = 'Error al iniciar sesión. Por favor, intenta manualmente.'
       message.type = 'error'
@@ -490,6 +143,7 @@ onMounted(async () => {
   // 🎯 Verificar si hay un token de login con Google en la URL
   const urlParams = new URLSearchParams(window.location.search)
   const googleLoginToken = urlParams.get('google_login_token')
+  const centralLoginToken = urlParams.get('central_login_token')
   
   // 🚨 Verificar si hay un mensaje de error de tenant
   const reason = urlParams.get('reason')
@@ -506,13 +160,23 @@ onMounted(async () => {
     window.history.replaceState({}, document.title, '/login')
   }
 
-  if (googleLoginToken) {
+  // 🔐 AUTO-LOGIN DESDE DOMINIO CENTRAL (con token seguro)
+  if (centralLoginToken) {
     try {
       loading.value = true
-      message.text = 'Iniciando sesión con Google...'
+      message.text = 'Ingresando a tu cuenta...'
       message.type = 'info'
       
-      // 🔥 Crear instancia de axios sin interceptores para evitar redirección
+      // Limpiar URL inmediatamente para evitar reuso del token
+      window.history.replaceState({}, document.title, '/login')
+      
+      // Limpiar cualquier estado de auth previo para evitar conflictos
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('user')
+      localStorage.removeItem('sanctum_token')
+      delete axios.defaults.headers.common['Authorization']
+      
+      // Crear instancia de axios sin interceptores
       const cleanAxios = axios.create({
         baseURL: window.location.origin,
         headers: {
@@ -520,32 +184,36 @@ onMounted(async () => {
         }
       })
       
-      // Obtener sesión usando el token
-      const response = await cleanAxios.get(`/api/auth/google/login-session?token=${googleLoginToken}`)
+      // Obtener sesión usando el token (con retry)
+      let response
+      try {
+        response = await cleanAxios.get(`/api/central/login-session?token=${centralLoginToken}`)
+      } catch (firstError) {
+        // Retry una vez en caso de timeout o error de red
+        if (firstError.code === 'ECONNABORTED' || !firstError.response) {
+          await new Promise(r => setTimeout(r, 1000))
+          response = await cleanAxios.get(`/api/central/login-session?token=${centralLoginToken}`)
+        } else {
+          throw firstError
+        }
+      }
       
       if (response.data.success && response.data.data) {
         const { token, user } = response.data.data
         
-        // 🔥 IMPORTANTE: Guardar token Sanctum real y datos de usuario
+        // Guardar token Sanctum y datos de usuario
         localStorage.setItem('authToken', token)
         localStorage.setItem('user', JSON.stringify(user))
-        
-        // 🔥 Marcar que este usuario inició sesión con Google
-        localStorage.setItem('google_login', 'true')
+        localStorage.setItem('loginTimestamp', Date.now().toString())
         
         // Configurar token en axios global
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
         
-        message.text = '✅ Inicio de sesión exitoso. Redirigiendo...'
+        message.text = 'Inicio de sesión exitoso. Redirigiendo...'
         message.type = 'success'
         
-        // 🔥 VERIFICAR SI EL BACKEND INDICA QUE NECESITA SELECCIONAR PLAN
-        console.log('🔍 DEBUG Google Login - Respuesta completa:', JSON.stringify(response.data, null, 2))
-        console.log('🔍 DEBUG - needs_plan_selection:', response.data.needs_plan_selection)
-        console.log('🔍 DEBUG - tenant:', response.data.tenant)
-        
+        // Verificar si necesita seleccionar plan
         if (response.data.needs_plan_selection && response.data.tenant) {
-          console.log('🚨 DETECTADO: Usuario sin plan válido - REDIRIGIENDO A SELECT-PLAN')
           const tenant = response.data.tenant
           const subdomain = tenant.id
           const companyName = tenant.business_name || ''
@@ -557,52 +225,105 @@ onMounted(async () => {
           if (subdomain) params.append('tenant_id', subdomain)
           if (subdomain) params.append('subdomain', subdomain)
           if (companyName) params.append('company', companyName)
+          params.append('auth_token', encodeURIComponent(token))
           
-          // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
-          const currentToken = localStorage.getItem('authToken')
-          if (currentToken) {
-            params.append('auth_token', encodeURIComponent(currentToken))
-          }
-          
-          const redirectUrl = `${baseUrl}/select-plan?${params.toString()}`
-          console.log('🚀 REDIRECT URL:', redirectUrl.substring(0, 100) + '...')
-          
-          message.text = '⚠️ Necesitas seleccionar un plan. Redirigiendo...'
+          message.text = 'Necesitas seleccionar un plan. Redirigiendo...'
           message.type = 'info'
           
           setTimeout(() => {
-            console.log('⏰ Ejecutando redirect a:', redirectUrl.substring(0, 100) + '...')
-            window.location.href = redirectUrl
-          }, 1000)
-          return // 🛑 PARAR AQUÍ - NO IR AL POS
+            window.location.href = `${baseUrl}/select-plan?${params.toString()}`
+          }, 800)
+          return
         }
         
-        console.log('✅ Usuario con plan válido - Redirigiendo a POS')
-        // Pequeño delay para que el usuario vea el mensaje de éxito
-        setTimeout(() => {
+        // Verificar si es super admin
+        if (user?.is_super_admin || user?.role?.name === 'superadmin') {
           window.location.href = '/pos'
-        }, 500)
-      } else {
-        console.error('❌ Error en respuesta del servidor:', response.data.message)
-        message.text = response.data.message || 'Error al iniciar sesión con Google.'
-        message.type = 'error'
+          return
+        }
         
-        // Limpiar URL
-        window.history.replaceState({}, document.title, '/login')
+        // Navegar directamente con window.location para full reload con auth
+        window.location.href = '/pos'
+        return
+      } else {
+        message.text = response.data.message || 'Error al iniciar sesión.'
+        message.type = 'error'
       }
     } catch (error) {
-      console.error('❌ Error obteniendo sesión de Google:', error)
-      console.error('Detalles del error:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status
+      message.text = error.response?.data?.message || 'Error al iniciar sesión. Por favor, intenta nuevamente.'
+      message.type = 'error'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  if (googleLoginToken) {
+    try {
+      loading.value = true
+      message.text = 'Iniciando sesión con Google...'
+      message.type = 'info'
+      
+      // Limpiar URL inmediatamente para evitar reuso del token
+      window.history.replaceState({}, document.title, '/login')
+      
+      // Limpiar auth previa
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('user')
+      localStorage.removeItem('sanctum_token')
+      delete axios.defaults.headers.common['Authorization']
+      
+      const cleanAxios = axios.create({
+        baseURL: window.location.origin,
+        headers: { 'Content-Type': 'application/json' }
       })
       
+      const response = await cleanAxios.get(`/api/auth/google/login-session?token=${googleLoginToken}`)
+      
+      if (response.data.success && response.data.data) {
+        const { token, user } = response.data.data
+        
+        localStorage.setItem('authToken', token)
+        localStorage.setItem('user', JSON.stringify(user))
+        localStorage.setItem('loginTimestamp', Date.now().toString())
+        localStorage.setItem('google_login', 'true')
+        
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        
+        message.text = 'Inicio de sesión exitoso. Redirigiendo...'
+        message.type = 'success'
+        
+        if (response.data.needs_plan_selection && response.data.tenant) {
+          const tenant = response.data.tenant
+          const subdomain = tenant.id
+          const companyName = tenant.business_name || ''
+          
+          const isLocalhost = window.location.hostname.includes('localhost') || window.location.hostname === '127.0.0.1'
+          const baseUrl = isLocalhost ? `http://localhost:${window.location.port || 3000}` : 'https://105pos.pro'
+          
+          const params = new URLSearchParams()
+          if (subdomain) params.append('tenant_id', subdomain)
+          if (subdomain) params.append('subdomain', subdomain)
+          if (companyName) params.append('company', companyName)
+          params.append('auth_token', encodeURIComponent(token))
+          
+          message.text = 'Necesitas seleccionar un plan. Redirigiendo...'
+          message.type = 'info'
+          
+          setTimeout(() => {
+            window.location.href = `${baseUrl}/select-plan?${params.toString()}`
+          }, 800)
+          return
+        }
+        
+        // Navegar con window.location para full reload con auth correcta
+        window.location.href = '/pos'
+      } else {
+        message.text = response.data.message || 'Error al iniciar sesión con Google.'
+        message.type = 'error'
+      }
+    } catch (error) {
       message.text = error.response?.data?.message || 'Error al iniciar sesión con Google. Intenta nuevamente.'
       message.type = 'error'
-      
-      // Limpiar URL
-      window.history.replaceState({}, document.title, '/login')
     } finally {
       loading.value = false
     }
@@ -613,6 +334,15 @@ onMounted(async () => {
 const isDevelopment = computed(() => {
   return process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost'
 })
+
+// Modal: Cuenta no encontrada
+const closeNotFoundModal = () => {
+  showNotFoundModal.value = false
+}
+const goToRegister = () => {
+  showNotFoundModal.value = false
+  router.push('/register')
+}
 
 // Limpiar mensajes
 const clearMessages = () => {
@@ -680,21 +410,29 @@ const handleLogin = async () => {
         message.text = '✅ Accediendo a tu cuenta...'
         message.type = 'success'
         
-        // Guardar credenciales temporalmente para auto-login silencioso en el tenant
-        sessionStorage.setItem('auto_login_credentials', JSON.stringify({
-          email: credentials.email.trim(),
-          password: credentials.password
-        }))
+        // � SUPER ADMIN: Guardar token y usuario ANTES de redirigir
+        if (response.data.data.is_super_admin) {
+          localStorage.setItem('authToken', response.data.data.token)
+          localStorage.setItem('user', JSON.stringify(response.data.data.user))
+          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`
+          
+          setTimeout(() => {
+            window.location.href = response.data.data.redirect_url
+          }, 500)
+          return
+        }
         
-        // 🔥 CRÍTICO: Limpiar tokens viejos ANTES de redirigir
+        // 🔥 CRÍTICO: Limpiar tokens viejos ANTES de redirigir (para tenants)
         // Los tokens de Sanctum NO funcionan entre dominios
+        localStorage.removeItem('authToken')
         localStorage.removeItem('sanctum_token')
         localStorage.removeItem('user')
         
-        // Redirigir al subdominio del tenant
+        // 🔐 La URL ya incluye el token temporal para auto-login
+        // redirect_url ahora es: https://tenant.105pos.pro/login?central_login_token=XXX
         setTimeout(() => {
-          window.location.href = response.data.data.redirect_url + '/login'
-        }, 800)
+          window.location.href = response.data.data.redirect_url
+        }, 500)
         
         return
       }
@@ -845,11 +583,20 @@ const handleLogin = async () => {
 
   } catch (error) {
     console.error('Error en login:', error)
-    
-    // Manejar respuestas 422 (Unprocessable Entity) del backend
-    if (error.response?.status === 422) {
+
+    // Detectar error de "usuario no encontrado" → mostrar modal de conversión
+    const responseMsg = (error.response?.data?.message || error.message || '').toLowerCase()
+    const responseEmailError = (error.response?.data?.errors?.email?.[0] || '').toLowerCase()
+    const notFoundKeywords = ['no encontramos', 'no está registrado', 'not found', 'no existe', 'no encontrado', 'not registered', 'account not found', 'user not found', 'no se encontró']
+    const isUserNotFound = error.response?.status === 404 ||
+      notFoundKeywords.some(kw => responseMsg.includes(kw) || responseEmailError.includes(kw))
+
+    if (isUserNotFound) {
+      showNotFoundModal.value = true
+    } else if (error.response?.status === 422) {
+      // Manejar respuestas 422 (Unprocessable Entity) del backend
       const errorData = error.response.data
-      
+
       // Mostrar errores específicos por campo
       if (errorData.errors) {
         if (errorData.errors.email) {
@@ -859,7 +606,7 @@ const handleLogin = async () => {
           errors.password = errorData.errors.password[0]
         }
       }
-      
+
       // Mostrar mensaje general
       message.text = errorData.message || 'Credenciales incorrectas'
       message.type = 'error'
@@ -954,57 +701,292 @@ if (authService.isAuthenticated()) {
   checkPlanAndRedirect()
 }
 </script>
+<template>
+  <div class="font-['Inter',sans-serif] bg-[#f4f5f7] text-slate-900 min-h-screen">
+    
+    <!-- LADO IZQUIERDO: Panel de Marca Corporativo Premium (40%) -->
+    <div class="hidden lg:flex lg:w-[40%] lg:fixed lg:left-0 lg:top-0 h-full relative overflow-hidden bg-[#0a0b0f] flex-col p-12 text-white shadow-2xl shadow-black/50 z-10" style="min-height: 100vh;">
+      <!-- Imagen de fondo corporativa -->
+      <div class="absolute inset-0">
+        <img src="/login.png" alt="POS Empresarial" class="w-full h-full object-cover object-center" />
+      </div>
+      <!-- Overlay oscuro con gradiente - deja ver la imagen -->
+      <div class="absolute inset-0 bg-gradient-to-b from-[#0a0b0f]/[0.82] via-[#0d0e14]/[0.75] to-[#060710]/[0.88]"></div>
+      <!-- Reflejo sutil de luz -->
+      <div class="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-transparent"></div>
+      <!-- Red de datos global sutil -->
+      <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle at 25% 25%, rgba(0,180,160,0.4) 1px, transparent 1px), radial-gradient(circle at 75% 75%, rgba(0,180,160,0.3) 1px, transparent 1px), radial-gradient(circle at 50% 50%, rgba(0,180,160,0.2) 0.5px, transparent 0.5px); background-size: 60px 60px, 80px 80px, 40px 40px;"></div>
+      
+      <!-- Top: Logo + Botón Radio -->
+      <div class="relative z-10 flex items-center justify-between mb-8 animate-fade-in-up">
+        <div>
+          <h1 class="text-2xl font-extrabold tracking-tight text-white font-['Inter',sans-serif]" style="text-shadow: 0 1px 8px rgba(0,0,0,0.5);">105 POS Pro</h1>
+          <p class="text-[10px] text-[#00b894] font-bold uppercase tracking-[0.25em] mt-1.5" style="text-shadow: 0 1px 4px rgba(0,0,0,0.4);">Plataforma Empresarial</p>
+        </div>
+
+        <!-- Botón Radio -->
+        <button
+          @click="radioOpen = true"
+          title="Abrir Radio 105"
+          class="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] backdrop-blur-md border border-white/[0.08] hover:border-white/[0.15] text-white hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30 transition-all duration-300 group"
+        >
+          <!-- Ícono nota musical -->
+          <svg class="w-[17px] h-[17px] flex-shrink-0 text-white/60 group-hover:text-[#00b894] transition-colors duration-300" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 3v10.55A4 4 0 1 0 11 17V7h4V3H9Z"/>
+          </svg>
+          <!-- Texto + punto live -->
+          <span class="flex items-center gap-2">
+            <span class="text-[13px] font-medium text-white/80 font-['Inter',sans-serif]">Radio</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#00b894] animate-pulse flex-shrink-0"></span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Centro: Mensaje Corporativo -->
+      <div class="relative z-10 flex-1 flex flex-col justify-center max-w-md pr-6 animate-fade-in-up style-delay-150">
+        <h2 class="text-[36px] font-extrabold text-white mb-6 tracking-[-0.02em] leading-[1.12] font-['Inter',sans-serif]" style="text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4);">
+          Gestión inteligente para<br/><span class="text-[#00b894]">negocios en expansión.</span>
+        </h2>
+        <p class="text-white/90 text-[15px] font-normal leading-[1.75] tracking-wide" style="text-shadow: 0 1px 6px rgba(0,0,0,0.5);">
+          Sistema integral de Punto de Venta diseñado para la alta dirección. Optimización, control unificado y escalabilidad para operaciones comerciales de alto volumen.
+        </p>
+      </div>
+
+      <!-- Bottom: Testimonio anclado en la base -->
+      <div class="relative z-10 pt-8 mt-auto border-t border-white/[0.06] animate-fade-in-up style-delay-300">
+        <p class="text-slate-200/90 text-[15px] mb-6 leading-relaxed font-normal italic drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">"Una herramienta sólida que nos permite controlar las ventas de todas nuestras sucursales con total precisión y sin interrupciones."</p>
+        <div class="flex items-center gap-4">
+           <div class="w-11 h-11 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center text-sm font-bold text-white uppercase border border-white/[0.08] shadow-lg shadow-black/30">
+             MJ
+           </div>
+           <div>
+             <p class="text-sm font-semibold text-white tracking-wide" style="text-shadow: 0 1px 4px rgba(0,0,0,0.4);">María José G.B.</p>
+             <p class="text-xs text-[#00b894] font-semibold mt-0.5 tracking-wider" style="text-shadow: 0 1px 3px rgba(0,0,0,0.3);">Directora de Operaciones</p>
+           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LADO DERECHO: Formulario (60%) -->
+    <div class="w-full lg:ml-[40%] lg:w-[60%] bg-[#f4f5f7] relative min-h-screen" style="display: flex; flex-direction: column;">
+      <!-- Superficie de porcelana mate -->
+      <div class="absolute inset-0 bg-gradient-to-b from-[#f0f1f3] via-[#f4f5f7] to-[#ecedf0] pointer-events-none"></div>
+      <!-- Data-mesh grid sofisticada -->
+      <div class="absolute inset-0 pointer-events-none" style="background-image: radial-gradient(circle, #c8cdd3 0.5px, transparent 0.5px), linear-gradient(to right, #e4e7ec 0.5px, transparent 0.5px), linear-gradient(to bottom, #e4e7ec 0.5px, transparent 0.5px); background-size: 32px 32px, 64px 64px, 64px 64px; opacity: 0.35; mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 50%, transparent 100%);"></div>
+
+      <!-- 📱 MOBILE STICKY HEADER: Logo + Radio (solo en móviles) -->
+      <div class="lg:hidden sticky top-0 z-20 px-5 py-3.5 flex items-center justify-between bg-white/95 backdrop-blur-sm border-b border-slate-100/60 shadow-sm">
+        <div>
+          <h1 class="text-[19px] font-extrabold text-slate-900 tracking-tight font-['Inter',sans-serif] leading-tight">105 POS Pro</h1>
+          <p class="text-[9px] text-[#00b894] font-bold uppercase tracking-[0.25em] mt-0.5">Plataforma Empresarial</p>
+        </div>
+        <!-- Botón Radio (compacto para móvil) -->
+        <button
+          @click="radioOpen = true"
+          title="Abrir Radio 105"
+          class="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#0f172a] hover:bg-[#1e293b] border border-slate-800 text-white transition-all duration-300 group"
+        >
+          <svg class="w-4 h-4 flex-shrink-0 text-white/80 group-hover:text-[#00b894] transition-colors duration-300" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 3v10.55A4 4 0 1 0 11 17V7h4V3H9Z"/>
+          </svg>
+          <span class="flex items-center gap-1.5">
+            <span class="text-xs font-medium">Radio</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#00b894] animate-pulse flex-shrink-0"></span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Área del formulario (centrada verticalmente en desktop) -->
+      <div class="py-8" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+        <!-- Formulario expandido (max-w-xl igual que Register) -->
+        <div class="w-full max-w-xl mx-auto px-6 sm:px-10 relative z-10">
+
+        <div class="mb-7 text-center lg:text-left animate-fade-in-up">
+          <h2 class="text-[32px] font-extrabold text-slate-900 mb-2 tracking-[-0.02em] font-['Inter',sans-serif]">Accede a tu panel</h2>
+          <p class="text-slate-500 text-[15px] font-normal tracking-wide">Ingresa tus credenciales corporativas para continuar.</p>
+        </div>
+
+        <!-- Alertas -->
+        <div v-if="message.text" 
+             :class="message.type === 'error' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-[#00b894]/10 text-[#00b894] border-[#00b894]/20'" 
+             class="mb-6 p-4 rounded-2xl border text-[14px] font-medium flex items-start gap-3 shadow-sm animate-fade-in-up">
+          <span class="leading-relaxed">{{ message.text }}</span>
+        </div>
+
+        <!-- Botón Google Corporativo -->
+        <button 
+           @click="loginWithGoogle" 
+           :disabled="isGoogleLoading"
+           class="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border border-slate-200/80 hover:border-slate-300 rounded-2xl text-slate-700 font-semibold transition-all duration-300 hover:bg-white hover:shadow-lg hover:shadow-slate-200/60 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed animate-fade-in-up style-delay-75 group"
+        >
+          <img v-if="!isGoogleLoading" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5 transition-transform group-hover:scale-110" />
+          <span class="text-[15px]">{{ isGoogleLoading ? 'Conectando...' : 'Continuar con Google' }}</span>
+        </button>
+
+        <div class="relative mb-8 mt-8 animate-fade-in-up style-delay-150">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+          <div class="relative flex justify-center"><span class="px-4 bg-[#f4f5f7] text-sm text-slate-400 font-medium tracking-wide">o ingresa con tu correo</span></div>
+        </div>
+
+        <form @submit.prevent="handleLogin" class="space-y-5">
+          <!-- Input Correo -->
+          <div class="space-y-2 animate-fade-in-up style-delay-225">
+            <label for="email" class="text-[13px] font-semibold text-slate-600 uppercase tracking-wider">Correo Electrónico</label>
+            <div class="relative group">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-300 group-focus-within:text-slate-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <input 
+                id="email"
+                v-model="credentials.email" 
+                type="email" 
+                class="w-full h-14 pl-12 pr-4 bg-white border border-slate-200/80 rounded-2xl focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-900/5 focus:shadow-lg focus:shadow-slate-200/50 transition-all duration-300 outline-none text-slate-900 placeholder-slate-400 font-medium"
+                :class="{'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20 bg-rose-50/50': errors.email}"
+                placeholder="tu@empresa.com"
+              >
+            </div>
+            <p v-if="errors.email" class="text-[13px] font-medium text-rose-500 mt-1 pl-1">{{ errors.email }}</p>
+          </div>
+
+          <!-- Input Contraseña -->
+          <div class="space-y-2 animate-fade-in-up style-delay-225">
+            <label for="password" class="text-[13px] font-semibold text-slate-600 uppercase tracking-wider">Contraseña</label>
+            <div class="relative group security-halo-wrapper">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-300 group-focus-within:text-slate-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </div>
+              <input 
+                id="password"
+                v-model="credentials.password" 
+                :type="showPassword ? 'text' : 'password'" 
+                class="w-full h-14 pl-12 pr-14 bg-white border border-slate-200/80 rounded-2xl focus:bg-white focus:border-cyan-400/60 focus:ring-4 focus:ring-cyan-400/10 focus:shadow-[0_0_20px_rgba(0,200,180,0.08)] transition-all duration-300 outline-none text-slate-900 placeholder-slate-400 font-medium"
+                :class="{'border-rose-400 focus:border-rose-400 focus:ring-rose-400/20 bg-rose-50/50': errors.password}"
+                placeholder="••••••••"
+              >
+              <button 
+                type="button" 
+                @click="showPassword = !showPassword" 
+                class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                aria-label="Toggle password visibility"
+              >
+                 <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                 </svg>
+                 <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                 </svg>
+              </button>
+            </div>
+            <p v-if="errors.password" class="text-[13px] font-medium text-rose-500 mt-1 pl-1">{{ errors.password }}</p>
+          </div>
+
+          <!-- Controles Extra -->
+          <div class="flex items-center justify-between pt-1 animate-fade-in-up style-delay-300">
+            <div class="flex items-center">
+              <input id="remember" type="checkbox" v-model="credentials.remember" class="w-4 h-4 rounded border-slate-300 text-[#00b894] focus:ring-[#00b894] focus:ring-offset-0 transition-colors cursor-pointer bg-white">
+              <label for="remember" class="ml-2.5 block text-[13px] font-semibold text-slate-600 cursor-pointer select-none">Mantener sesión</label>
+            </div>
+            <router-link to="/forgot-password" class="text-[13px] font-bold text-[#00b894] hover:text-[#009d80] transition-colors duration-300">
+              ¿Olvidó su contraseña?
+            </router-link>
+          </div>
+
+          <!-- Submit Botón Principal -->
+          <div class="pt-2 animate-fade-in-up style-delay-300">
+            <button 
+              type="submit" 
+              :disabled="loading"
+              class="btn-security-glow group w-full h-14 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#0f172a] hover:from-[#1e293b] hover:via-[#334155] hover:to-[#1e293b] text-white font-bold rounded-2xl shadow-lg shadow-slate-900/30 hover:shadow-xl hover:shadow-slate-900/40 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed"
+            >
+              <span>{{ loading ? 'Iniciando Sesión...' : 'Iniciar Sesión' }}</span>
+              <svg v-if="!loading" class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </button>
+          </div>
+        </form>
+        
+        <!-- Enlace de registro -->
+        <div class="mt-10 text-center flex flex-col gap-1 animate-fade-in-up style-delay-[400ms]">
+          <p class="text-[14px] font-semibold text-slate-500">
+            ¿Nuevo en 105 POS? 
+          </p>
+          <router-link to="/register" class="text-[15px] font-bold text-[#00b894] hover:text-[#009d80] transition-colors duration-300 relative inline-block mx-auto group">
+             Crea tu cuenta corporativa
+             <span class="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#00b894] transition-all duration-300 group-hover:w-full"></span>
+          </router-link>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Radio -->
+  <RadioPlayerModal :is-open="radioOpen" @close="radioOpen = false" />
+
+  <!-- ================================================================
+       MODAL: Cuenta no encontrada (Diseño Enterprise - Sin futurismo)
+       ================================================================ -->
+  <Teleport to="body">
+    <Transition name="modal-enterprise">
+      <div
+        v-if="showNotFoundModal"
+        class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-800/35 backdrop-blur-[2px]"
+        @click.self="closeNotFoundModal"
+      >
+        <div class="modal-enterprise-content bg-white border border-slate-200/80 rounded-xl shadow-2xl shadow-slate-800/8 w-full max-w-2xl">
+
+          <!-- Cuerpo del modal -->
+          <div class="px-10 pt-10 pb-7">
+            <h3 class="text-[28px] font-extrabold text-slate-900 tracking-[-0.02em] leading-snug mb-4 font-['Inter',sans-serif]">
+              Cuenta no encontrada
+            </h3>
+            <p class="text-[16px] text-slate-500 leading-[1.75] font-['Inter',sans-serif]">
+              No encontramos ninguna cuenta asociada a ese correo en 105 POS.<br/>
+              ¿Quieres crear una cuenta y empezar a gestionar tu negocio hoy?
+            </p>
+          </div>
+
+          <!-- Divisor -->
+          <div class="border-t border-slate-100 mx-10"></div>
+
+          <!-- Botones lado a lado -->
+          <div class="px-10 py-7 flex flex-col sm:flex-row justify-end gap-3">
+            <!-- Botón secundario: Intentar de nuevo -->
+            <button
+              @click="closeNotFoundModal"
+              class="px-7 py-3 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-600 font-semibold text-[15px] rounded-xl transition-all duration-300 focus:outline-none font-['Inter',sans-serif]"
+            >
+              Intentar de nuevo
+            </button>
+
+            <!-- Botón principal: Registrar ahora -->
+            <button
+              @click="goToRegister"
+              class="px-7 py-3 bg-[#00b894] hover:bg-[#009d80] text-white font-bold text-[15px] rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-[#00b894]/20 focus:outline-none font-['Inter',sans-serif]"
+            >
+              Registrar ahora →
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
+</template>
 
 <style scoped>
-/* 🎨 PREMIUM LOGIN DESIGN - Estilos Personalizados 2025 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* Animación de spinner */
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Animación pulse para indicador de estado */
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* Focus ring premium para inputs */
-input:focus {
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
-}
-
-/* Smooth transitions globales */
-input,
-button,
-a {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Efecto hover premium en botón principal */
-button[type="submit"]:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3);
-}
-
-button[type="submit"]:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-/* Animación de entrada del formulario */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -1012,80 +994,84 @@ button[type="submit"]:active:not(:disabled) {
   }
 }
 
-/* Contenedor principal con animación */
-.max-w-\[420px\] {
-  animation: fadeInUp 0.8s ease-out;
+@keyframes securityPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 200, 180, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(0, 200, 180, 0.06); }
 }
 
-/* Efecto shimmer para skeleton loader */
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
 }
 
-/* Transición suave para imagen de fondo */
-img {
-  transition: opacity 1s ease-out, transform 0.3s ease;
+/* Security Halo - sutil glow en password fields */
+.security-halo-wrapper {
+  position: relative;
+}
+.security-halo-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 1rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.security-halo-wrapper:focus-within::after {
+  animation: securityPulse 2.5s ease-in-out infinite;
+  opacity: 1;
 }
 
-/* Glassmorphism mejorado para cards */
-. {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+/* Button security glow */
+.btn-security-glow {
+  position: relative;
+}
+.btn-security-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(0, 200, 180, 0.1), rgba(15, 23, 42, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+.btn-security-glow:hover::after {
+  opacity: 1;
 }
 
-. {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
+/* Staggered Delays para coreografía */
+.style-delay-75 { animation-delay: 75ms; }
+.style-delay-150 { animation-delay: 150ms; }
+.style-delay-225 { animation-delay: 225ms; }
+.style-delay-300 { animation-delay: 300ms; }
+.style-delay-\[400ms\] { animation-delay: 400ms; }
 
-. {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
+/* Refined scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+</style>
 
-/* Hover sutil en stats */
-.bg-white\/5:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-  transition: all 0.3s ease;
+<style>
+/* Transición del Modal Enterprise */
+.modal-enterprise-enter-active,
+.modal-enterprise-leave-active {
+  transition: opacity 0.2s ease;
 }
-
-/* Grid pattern sutil */
-.bg-\[radial-gradient\(\#e5e7eb_1px\,transparent_1px\)\] {
-  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+.modal-enterprise-enter-active .modal-enterprise-content,
+.modal-enterprise-leave-active .modal-enterprise-content {
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-
-/* Underline offset para links */
-.underline-offset-2 {
-  text-underline-offset: 2px;
+.modal-enterprise-enter-from,
+.modal-enterprise-leave-to {
+  opacity: 0;
 }
-
-/* Scroll suave */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Selección de texto con color de marca */
-::selection {
-  background-color: rgba(16, 185, 129, 0.2);
-  color: inherit;
-}
-
-/* Media query para pantallas pequeñas */
-@media (max-width: 1024px) {
-  .max-w-\[420px\] {
-    max-width: 100%;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
-
-/* Efecto de focus visible mejorado */
-button:focus-visible,
-input:focus-visible,
-a:focus-visible {
-  outline: 2px solid #10b981;
-  outline-offset: 2px;
+.modal-enterprise-enter-from .modal-enterprise-content,
+.modal-enterprise-leave-to .modal-enterprise-content {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
 }
 </style>

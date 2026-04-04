@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\AlertService;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected static function boot()
     {
@@ -56,7 +57,9 @@ class Product extends Model
         'tags',
         'is_public',
         'public_description',
-        'public_image'
+        'public_image',
+        'deleted_by',
+        'deleted_reason'
     ];
 
     protected $casts = [

@@ -23,7 +23,225 @@ class EPaycoPaymentController extends Controller
     }
 
     /**
-     * Inicializar transacción (Guardar PendingPayment)
+     * 🚀 CHECKOUT 2.0: Crear sesión de Smart Checkout
+     * Autentica con Apify y crea una sesión, devolviendo sessionId al frontend
+     */
+    public function createCheckoutSession(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'amount' => 'required|numeric|min:100',
+                'reference' => 'required|string',
+                'customer_email' => 'required|email',
+                'payment_frequency' => 'required|in:monthly,yearly,24months',
+                'plan' => 'required|in:basic,premium,enterprise',
+                'tenant_id' => 'required|string',
+                'company_name' => 'sometimes|string',
+                'description' => 'sometimes|string',
+                'response_url' => 'required|string',
+            ]);
+
+            // 🔐 Generar token de verificación único y seguro
+            $verificationToken = hash('sha256', $validated['reference'] . config('app.key') . microtime(true));
+
+            // Guardar datos del pago pendiente
+            PendingPayment::create([
+                'reference' => $validated['reference'],
+                'tenant_id' => $validated['tenant_id'],
+                'plan' => $validated['plan'],
+                'payment_frequency' => $validated['payment_frequency'],
+                'amount_in_cents' => $validated['amount'] * 100,
+                'customer_email' => $validated['customer_email'],
+                'status' => 'pending',
+                'gateway' => 'epayco',
+                'verification_token' => $verificationToken
+            ]);
+
+            // 1️⃣ Autenticarse con Apify para obtener token
+            $authToken = $this->getApifyToken();
+            
+            if (!$authToken) {
+                throw new \Exception('No se pudo autenticar con ePayco Apify');
+            }
+
+            // 2️⃣ Crear sesión de checkout con Apify
+            $sessionData = $this->createApifySession($authToken, $validated);
+
+            if (!$sessionData || !isset($sessionData['sessionId'])) {
+                throw new \Exception('No se pudo crear la sesión de checkout');
+            }
+
+            Log::info('ePayco Checkout 2.0: Sesión creada', [
+                'reference' => $validated['reference'],
+                'sessionId' => $sessionData['sessionId'],
+                'plan' => $validated['plan'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'sessionId' => $sessionData['sessionId'],
+                'verification_token' => $verificationToken
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error creando sesión ePayco Checkout 2.0: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener token de autenticación de Apify
+     */
+    private function getApifyToken()
+    {
+        try {
+            $credentials = base64_encode($this->publicKey . ':' . $this->privateKey);
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://apify.epayco.co/login');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . $credentials
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                return $data['token'] ?? null;
+            }
+
+            Log::error('ePayco Apify auth failed', [
+                'httpCode' => $httpCode,
+                'response' => $response
+            ]);
+
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Error autenticando con Apify: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Crear sesión de checkout con Apify
+     */
+    private function createApifySession($authToken, $data)
+    {
+        try {
+            // 🔥 IMPORTANTE: ePayco NO puede enviar webhooks a localhost
+            // La confirmación siempre debe ser una URL pública
+            $confirmationUrl = 'https://105pos.pro/api/epayco/webhook';
+            
+            // 🔥 IMPORTANTE: ePayco rechaza localhost en response URL durante creación de sesión
+            // Usamos URL pública para la creación, pero la redirección real funciona
+            // porque ePayco permite que el usuario vuelva a cualquier URL después
+            $responseUrl = 'https://105pos.pro/payment/success';
+            
+            // Agregar parámetros de referencia a la URL pública
+            $responseParams = http_build_query([
+                'tenant_id' => $data['tenant_id'] ?? '',
+                'plan' => $data['plan'] ?? '',
+                'reference' => $data['reference'] ?? '',
+            ]);
+            $responseUrl .= '?' . $responseParams;
+
+            // Construir payload según documentación oficial de ePayco Checkout 2.0
+            $sessionPayload = [
+                // ✅ CAMPOS REQUERIDOS
+                'checkout_version' => '2',
+                'name' => $data['company_name'] ?? '105POS Pro',
+                'currency' => 'COP',
+                'amount' => (int) $data['amount'],
+                
+                // ✅ MODO PRODUCCIÓN (false) o PRUEBA (true)
+                'test' => config('services.epayco.test_mode', false),
+                
+                // ✅ CAMPOS DE IMPUESTOS (requeridos aunque sean 0)
+                'taxBase' => 0,
+                'tax' => 0,
+                
+                // ✅ Descripción e Invoice
+                'description' => $data['description'] ?? 'Suscripción 105POS Pro',
+                'invoice' => $data['reference'] ?? 'inv_' . time(),
+                
+                // ✅ URLs (ambas deben ser públicas para que ePayco las acepte)
+                'response' => $responseUrl,
+                'confirmation' => $confirmationUrl,
+            ];
+
+            // Extras para identificar la transacción
+            $sessionPayload['extras'] = [
+                'extra1' => $data['tenant_id'] ?? '',
+                'extra2' => $data['plan'] ?? '',
+                'extra3' => $data['payment_frequency'] ?? '',
+            ];
+
+            // Billing básico
+            if (!empty($data['customer_email'])) {
+                $sessionPayload['billing'] = [
+                    'email' => $data['customer_email'],
+                    'name' => $data['company_name'] ?? 'Cliente 105POS',
+                ];
+            }
+
+            // Log del payload para debugging
+            Log::info('ePayco Apify session payload', [
+                'payload' => $sessionPayload,
+                'tokenLength' => strlen($authToken)
+            ]);
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://apify.epayco.co/payment/session/create');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($sessionPayload));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $authToken
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            Log::info('ePayco Apify session response', [
+                'httpCode' => $httpCode,
+                'response' => substr($response, 0, 500)
+            ]);
+
+            if ($httpCode === 200 && $response) {
+                $responseData = json_decode($response, true);
+                
+                if (isset($responseData['success']) && $responseData['success'] && isset($responseData['data']['sessionId'])) {
+                    return [
+                        'sessionId' => $responseData['data']['sessionId'],
+                        'token' => $responseData['data']['token'] ?? null
+                    ];
+                }
+            }
+
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Error creando sesión Apify: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * @deprecated Usar createCheckoutSession para Checkout 2.0
+     * Inicializar transacción (Guardar PendingPayment) - Checkout v1 legacy
      * Esto se llama desde el frontend antes de abrir el checkout de ePayco
      */
     public function initTransaction(Request $request)

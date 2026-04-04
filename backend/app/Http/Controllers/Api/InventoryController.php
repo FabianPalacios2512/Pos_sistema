@@ -43,15 +43,32 @@ class InventoryController extends Controller
                 ->get();
 
             // Top productos más vendidos (último mes)
-            $topSellingProducts = Product::select('products.*')
-                ->selectRaw('SUM(invoice_items.quantity) as total_sold')
+            $topSellingProducts = Product::select([
+                    'products.id',
+                    'products.name',
+                    'products.sku',
+                    'products.sale_price',
+                    'products.cost_price',
+                    'products.current_stock',
+                    'products.image_url'
+                ])
+                ->selectRaw('SUM(invoice_items.quantity) as total_quantity_sold')
+                ->selectRaw('SUM(invoice_items.quantity * invoice_items.unit_price) as total_revenue')
                 ->join('invoice_items', 'products.id', '=', 'invoice_items.product_id')
                 ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
                 ->where('invoices.date', '>=', Carbon::now()->subMonth())
                 ->where('invoices.status', 'paid')
-                ->groupBy('products.id')
-                ->orderBy('total_sold', 'desc')
-                ->limit(5)
+                ->groupBy([
+                    'products.id',
+                    'products.name',
+                    'products.sku',
+                    'products.sale_price',
+                    'products.cost_price',
+                    'products.current_stock',
+                    'products.image_url'
+                ])
+                ->orderBy('total_quantity_sold', 'desc')
+                ->limit(10)
                 ->get();
 
             // Productos con stock bajo

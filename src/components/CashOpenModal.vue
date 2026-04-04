@@ -1,91 +1,89 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[60] p-4">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl border border-gray-200">
-      <!-- Header Compacto con saludo personalizado -->
-      <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 px-6 py-5">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center shadow-sm">
-              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+  <div v-if="show" class="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 w-full max-w-2xl border border-gray-200 dark:border-zinc-800">
+      <!-- Header con info integrada -->
+      <div class="px-6 pt-5 pb-4 bg-gradient-to-r from-emerald-50/80 to-transparent dark:from-emerald-950/20 dark:to-transparent rounded-t-2xl">
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center border border-emerald-200/60 dark:border-emerald-800/40">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
               </svg>
             </div>
             <div>
-              <h3 class="text-lg font-black text-gray-900">¡Hola, {{ userInfo.name ? userInfo.name.split(' ')[0] : 'Compañero' }}! 👋</h3>
-              <p class="text-sm text-gray-600 font-medium">Vamos a abrir la caja para comenzar</p>
+              <h3 class="text-xl font-bold text-gray-900 dark:text-white">Apertura de Caja</h3>
+              <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Inicia tu jornada registrando el dinero base en caja</p>
             </div>
           </div>
           <button 
             v-if="!forceOpen"
             @click="$emit('close')" 
-            class="text-gray-400 hover:text-gray-600 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+            class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 mt-1"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
           </button>
         </div>
+        <!-- Info inline en el header -->
+        <div class="grid grid-cols-4 gap-4">
+          <div>
+            <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">Operador</p>
+            <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200 truncate">{{ userInfo.name || 'Usuario' }}</p>
+          </div>
+          <div>
+            <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">Fecha</p>
+            <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200">{{ currentDate }}</p>
+          </div>
+          <div>
+            <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">Hora</p>
+            <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200">{{ currentTime }}</p>
+          </div>
+          <div>
+            <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-0.5">Terminal</p>
+            <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200">POS-001</p>
+          </div>
+        </div>
       </div>
 
       <!-- Body -->
-      <div class="p-6">
-        <!-- Grid horizontal de información -->
-        <div class="grid grid-cols-4 gap-3 mb-6">
-          <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
-            <p class="text-xs text-gray-500 mb-1">Usuario</p>
-            <p class="text-sm font-semibold text-gray-900 truncate">{{ userInfo.name || 'Usuario Actual' }}</p>
-          </div>
-          <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
-            <p class="text-xs text-gray-500 mb-1">Fecha</p>
-            <p class="text-sm font-semibold text-gray-900">{{ currentDate }}</p>
-          </div>
-          <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
-            <p class="text-xs text-gray-500 mb-1">Hora</p>
-            <p class="text-sm font-semibold text-gray-900">{{ currentTime }}</p>
-          </div>
-          <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
-            <p class="text-xs text-gray-500 mb-1">Terminal</p>
-            <p class="text-sm font-semibold text-gray-900">POS-001</p>
-          </div>
-        </div>
+      <div class="px-6 pb-6 pt-5">
 
-        <form @submit.prevent="handleSubmit" class="space-y-4">
-          <!-- Selector de Tienda/Bodega -->
-          <!-- Selector de Tienda/Sede (solo si es Premium/Enterprise y tiene más de una bodega) -->
+        <form @submit.prevent="handleSubmit" class="space-y-5">
+          <!-- Selector de Sede -->
           <div v-if="shouldShowWarehouseSelector">
-            <label for="warehouse_id" class="block text-sm font-semibold text-gray-900 mb-2">
-              Tienda / Sede <span class="text-red-600">*</span>
+            <label for="warehouse_id" class="block text-sm font-semibold text-gray-800 dark:text-zinc-200 mb-2">
+              Sede de trabajo <span class="text-red-500">*</span>
             </label>
             <div class="relative">
               <select
                 id="warehouse_id"
                 v-model="formData.warehouse_id"
-                class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium appearance-none"
+                class="w-full px-3 py-3 border border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 text-sm font-medium appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-300 dark:focus:border-emerald-600 transition-all"
                 :class="{ 'border-red-500 focus:ring-red-500': errors.warehouse_id }"
                 required
                 :disabled="loadingWarehouses"
               >
-                <option value="" disabled>{{ loadingWarehouses ? 'Cargando tiendas...' : 'Seleccionar tienda' }}</option>
+                <option value="" disabled>{{ loadingWarehouses ? 'Cargando sedes...' : 'Seleccionar sede' }}</option>
                 <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">
                   {{ warehouse.name }} {{ warehouse.is_default ? '(Principal)' : '' }}
                 </option>
               </select>
-              <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
             <p v-if="errors.warehouse_id" class="mt-1 text-xs text-red-600">{{ errors.warehouse_id }}</p>
-            <p class="mt-1 text-xs text-gray-500">Seleccione la tienda donde va a trabajar hoy</p>
+            <p class="mt-1.5 text-xs text-gray-500 dark:text-zinc-400">Selecciona la sede donde operarás durante esta jornada</p>
           </div>
 
-          <!-- Monto inicial -->
+          <!-- Fondo inicial - protagonista -->
           <div>
-            <label for="opening_amount" class="block text-sm font-semibold text-gray-900 mb-2">
-              Monto Inicial en Caja <span class="text-red-600">*</span>
+            <label for="opening_amount" class="block text-sm font-semibold text-gray-800 dark:text-zinc-200 mb-2">
+              Fondo inicial en caja <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">$</span>
+              <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-600 dark:text-emerald-400 text-lg font-bold">$</span>
               <input
                 id="opening_amount"
                 ref="amountInput"
@@ -94,85 +92,70 @@
                 step="0.01"
                 min="0"
                 placeholder="0.00"
-                class="w-full pl-8 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium"
+                class="w-full pl-10 pr-4 py-4 border-2 border-gray-300 dark:border-zinc-600 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-xl font-bold placeholder-gray-300 dark:placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-400 dark:focus:border-emerald-500 transition-all"
                 :class="{ 'border-red-500 focus:ring-red-500': errors.opening_amount }"
                 required
               />
             </div>
             <p v-if="errors.opening_amount" class="mt-1 text-xs text-red-600">{{ errors.opening_amount }}</p>
-            <p class="mt-1 text-xs text-gray-500">Ingrese el monto físico en la caja registradora</p>
+            <p class="mt-1.5 text-xs text-gray-500 dark:text-zinc-400">Ingresa el dinero físico con el que inicia la caja</p>
           </div>
 
-          <!-- Notas de apertura -->
+          <!-- Observaciones de apertura -->
           <div>
-            <label for="opening_notes" class="block text-sm font-semibold text-gray-900 mb-2">
-              Notas de Apertura <span class="text-gray-400 font-normal">(opcional)</span>
+            <label for="opening_notes" class="block text-sm font-semibold text-gray-800 dark:text-zinc-200 mb-2">
+              Observaciones de apertura <span class="text-gray-400 dark:text-zinc-500 font-normal">(opcional)</span>
             </label>
             <textarea
               id="opening_notes"
               v-model="formData.opening_notes"
               rows="2"
-              placeholder="Observaciones..."
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 resize-none text-sm"
+              placeholder="Ej: cambio inicial, billetes, monedas"
+              class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 resize-none text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-emerald-300 dark:focus:border-emerald-600 transition-all"
               :class="{ 'border-red-500 focus:ring-red-500': errors.opening_notes }"
               maxlength="500"
             ></textarea>
             <div class="flex justify-between mt-1">
               <p v-if="errors.opening_notes" class="text-xs text-red-600">{{ errors.opening_notes }}</p>
-              <p class="text-xs text-gray-500 ml-auto">{{ formData.opening_notes?.length || 0 }}/500</p>
+              <p class="text-xs text-gray-400 dark:text-zinc-500 ml-auto">{{ formData.opening_notes?.length || 0 }}/500</p>
             </div>
           </div>
 
-          <!-- Warning mejorado y amigable -->
-          <div v-if="forceOpen" class="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-start space-x-3">
-            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1">
-              <h4 class="text-sm font-bold text-blue-900 mb-1">Importante</h4>
-              <p class="text-sm text-blue-800">Es importante abrir una caja para llevar el control de las ventas. El modal ahora solo se abre al iniciar una venta cuando no hay una caja abierta, por lo que ya no es necesario mostrar el mensaje anterior.</p>
-            </div>
-          </div>
-          <div v-else class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start space-x-2">
-            <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          <!-- Mensaje informativo -->
+          <div class="flex items-center gap-2.5 py-3 px-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/40">
+            <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <div class="flex-1">
-              <h4 class="text-sm font-bold text-yellow-900">Importante</h4>
-              <p class="text-xs text-yellow-800 mt-0.5">Asegúrese de contar correctamente el dinero inicial.</p>
-            </div>
+            <p class="text-xs font-medium text-blue-800 dark:text-blue-300">Este valor será usado como base para el control de ventas del día</p>
           </div>
 
           <!-- Buttons -->
-          <div class="flex space-x-3 pt-2">
+          <div class="flex gap-3 pt-3">
             <button
               v-if="forceOpen"
               type="button"
               @click="$emit('quotation-mode')"
-              class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors flex items-center justify-center space-x-2"
+              class="flex-1 px-5 py-3 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 transition-all duration-200 flex items-center justify-center gap-2"
               :disabled="isLoading"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>
-              <span>Solo Cotizaciones</span>
+              <span>Iniciar solo cotizaciones</span>
             </button>
             
             <button
               v-if="!forceOpen"
               type="button"
               @click="$emit('close')"
-              class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors"
+              class="flex-1 px-5 py-3 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-600 dark:text-zinc-300 rounded-xl font-semibold text-sm border border-slate-200 dark:border-zinc-700 transition-all duration-200"
               :disabled="isLoading"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              class="px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              :class="forceOpen ? 'flex-1' : 'flex-1'"
+              class="flex-1 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-500/30 dark:shadow-emerald-900/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               :disabled="isLoading || !isFormValid"
             >
               <span v-if="isLoading">Abriendo...</span>
@@ -460,25 +443,22 @@ onMounted(() => {
 <style scoped>
 /* Animaciones para el modal */
 .fixed {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.bg-white {
+.bg-white,
+.dark\:bg-zinc-900 {
   animation: slideIn 0.3s ease-out;
 }
 
 @keyframes slideIn {
   from {
-    transform: translateY(-20px);
+    transform: translateY(-12px);
     opacity: 0;
   }
   to {
@@ -487,9 +467,19 @@ onMounted(() => {
   }
 }
 
-/* Estilos para inputs focus */
-input:focus, textarea:focus {
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+/* Focus ring */
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Remove number input spinners for cleaner amount field */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 /* Disabled button styles */
@@ -500,12 +490,8 @@ button:disabled {
 
 /* Loading spinner animation */
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .animate-spin {

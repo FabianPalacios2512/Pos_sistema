@@ -214,12 +214,12 @@
             </div>
             
             <!-- Leyenda -->
-            <div class="flex-1 space-y-2">
+            <div class="flex-1 min-w-0 overflow-hidden space-y-2">
               <div v-for="(product, index) in topProducts.slice(0, 5)" :key="index" 
                    class="flex items-center justify-between py-2 px-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group cursor-default">
-                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <div class="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
                   <div class="w-2 h-2 rounded-full flex-shrink-0" :style="{ backgroundColor: productColors[index] }"></div>
-                  <span class="text-sm text-gray-700 dark:text-zinc-300 truncate group-hover:text-gray-900 dark:group-hover:text-white transition-colors">{{ product.name }}</span>
+                  <span class="text-sm text-gray-700 dark:text-zinc-300 truncate group-hover:text-gray-900 dark:group-hover:text-white transition-colors" :title="product.name">{{ product.name }}</span>
                 </div>
                 <span class="text-sm font-semibold text-gray-900 dark:text-white ml-3 flex-shrink-0 tabular-nums">${{ formatCurrency(product.revenue) }}</span>
               </div>

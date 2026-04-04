@@ -73,11 +73,16 @@ export const requireSeller = requireRole(['admin', 'cajero', 'vendedor'])
 
 // Middleware para redirigir si ya está autenticado
 export const redirectIfAuth = (to, from, next) => {
-  // 🔥 IMPORTANTE: Permitir acceso a login si viene con token de Google OAuth
+  // 🔥 IMPORTANTE: Permitir acceso a login si viene con token pendiente de procesar
   const hasGoogleToken = to.query.google_login_token || to.query.google_token
+  const hasCentralToken = to.query.central_login_token
   
-  if (hasGoogleToken) {
-    console.log('🔑 Token de Google detectado, permitiendo acceso a login para procesar autenticación')
+  if (hasGoogleToken || hasCentralToken) {
+    // Limpiar auth previa para evitar conflictos con el token nuevo
+    if (hasCentralToken) {
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('user')
+    }
     next()
     return
   }
@@ -86,15 +91,12 @@ export const redirectIfAuth = (to, from, next) => {
     // ✅ Permitir acceso a rutas de onboarding aunque esté autenticado
     const onboardingRoutes = ['/welcome', '/onboarding']
     if (onboardingRoutes.includes(to.path)) {
-      console.log('✅ Permitiendo acceso a onboarding aunque esté autenticado')
       next()
       return
     }
     
-    console.log('✅ Usuario autenticado, redirigiendo al POS')
     next('/pos')
   } else {
-    console.log('❌ Usuario no autenticado, continuando al login')
     next()
   }
 }

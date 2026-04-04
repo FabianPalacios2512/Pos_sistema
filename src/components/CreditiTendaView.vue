@@ -1,19 +1,19 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-4 lg:px-6">
-    <div class="p-3 lg:p-4 space-y-4 pb-6 animate-fade-in">
+  <div class="h-full flex flex-col bg-white dark:bg-[#131314]">
+    <div class="flex-1 flex flex-col p-6 space-y-5 overflow-hidden">
       
       <!-- NIVEL 1: Header Minimalista con Botones -->
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">CrediTienda</h1>
+      <div class="flex-none flex items-center justify-between">
+        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">CrediTienda</h1>
         
         <!-- Botones de acción -->
         <div class="flex items-center gap-3">
           <!-- Botón Configuración -->
           <button 
             @click="showReminderSettingsModal = true"
-            class="px-4 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-800 shadow-sm transition-all duration-200 active:scale-95 flex items-center gap-2 group"
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-200 dark:hover:bg-[#2a2b2e] rounded-full transition-colors flex items-center gap-2"
             title="Configuración de recordatorios">
-            <svg class="w-4 h-4 text-slate-400 dark:text-zinc-500 group-hover:text-slate-600 dark:group-hover:text-zinc-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
@@ -23,178 +23,176 @@
           <!-- Botón Nuevo Crédito -->
           <button 
             @click="openCreateCreditModal"
-            class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 active:scale-95 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-full transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
             <span>Nuevo Crédito</span>
           </button>
         </div>
       </div>
 
-      <!-- NIVEL 2: KPIs Ejecutivos - Estilo Fantasma -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <!-- NIVEL 2: KPIs Compactos - Estilo Facturas (neutro y elegante) -->
+      <div class="flex-none flex items-center gap-3">
         
         <!-- KPI: Total por Cobrar -->
-        <div class="bg-white/80 dark:bg-zinc-800/40  rounded-2xl px-5 py-4 border-0 hover:bg-white dark:hover:bg-zinc-800/60 transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)]">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-rose-50 dark:bg-rose-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Total por Cobrar</p>
-              <p class="text-2xl font-bold text-gray-800 dark:text-white mt-0.5">${{ formatCurrency(totalDebt) }}</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Total por Cobrar</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">${{ formatCurrency(totalDebt) }}</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Clientes con Crédito -->
-        <div class="bg-white/80 dark:bg-zinc-800/40  rounded-2xl px-5 py-4 border-0 hover:bg-white dark:hover:bg-zinc-800/60 transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)]">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Clientes Activos</p>
-              <p class="text-2xl font-bold text-gray-800 dark:text-white mt-0.5">{{ customersWithDebt }}</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Clientes Activos</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">{{ customersWithDebt }}</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Recaudado Hoy -->
-        <div class="bg-white/80 dark:bg-zinc-800/40  rounded-2xl px-5 py-4 border-0 hover:bg-white dark:hover:bg-zinc-800/60 transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)]">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Recaudado Hoy</p>
-              <p class="text-2xl font-bold text-gray-800 dark:text-white mt-0.5">${{ formatCurrency(todayPayments) }}</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Recaudado Hoy</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">${{ formatCurrency(todayPayments) }}</p>
             </div>
           </div>
         </div>
 
         <!-- KPI: Mora Promedio -->
-        <div class="bg-white/80 dark:bg-zinc-800/40  rounded-2xl px-5 py-4 border-0 hover:bg-white dark:hover:bg-zinc-800/60 transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.3)] dark:hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)]">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-amber-50 dark:bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Mora Promedio</p>
-              <p class="text-2xl font-bold text-gray-800 dark:text-white mt-0.5">{{ averageDaysOverdue }} días</p>
+              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Mora Promedio</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">{{ averageDaysOverdue }} días</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Master-Detail Layout Enterprise: 30/70 -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300" style="height: calc(100vh - 210px); min-height: 550px;">
-        <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
+      <div class="flex-1 flex rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-800 min-h-0">
+        <div class="grid grid-cols-1 lg:grid-cols-10 h-full w-full">
         
         <!-- PANEL IZQUIERDO: Lista de Clientes (30%) -->
-        <div class="lg:col-span-3 overflow-hidden flex flex-col border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
+        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-white dark:bg-[#18181b] relative">
+          <!-- Sombra lateral para dar profundidad -->
+          <div class="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700"></div>
           
           <!-- Header con búsqueda -->
-          <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900">
+          <div class="p-4 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-[#1a1a1d] dark:to-[#18181b]">
             <!-- Búsqueda -->
             <div class="relative mb-3">
-              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
               <input
                 v-model="searchTerm"
                 type="text"
                 placeholder="Buscar por nombre o documento..."
-                class="w-full pl-10 pr-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-300">
+                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
             </div>
             
             <!-- Filtro de estado -->
             <select
               v-model="statusFilter"
-              class="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-300">
-              <option value="">📊 Todos los estados</option>
-              <option value="debt">💰 Con Deuda</option>
-              <option value="overdue">⚠️ En Mora</option>
-              <option value="critical">🔴 Crítico</option>
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+              <option value=""> Todos los estados</option>
+              <option value="debt"> Con Deuda</option>
+              <option value="overdue"> En Mora</option>
+              <option value="critical"> Crítico</option>
             </select>
           </div>
           
-          <!-- Lista de clientes estilo WhatsApp -->
-          <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 px-2">
+          <!-- Lista de clientes -->
+          <div class="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-[#131316] px-3 py-2">
             
             <!-- Loading state -->
             <div v-if="loading" class="flex items-center justify-center py-12">
-              <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <span class="ml-3 text-sm text-gray-500 dark:text-zinc-400">Cargando clientes...</span>
+              <div class="w-6 h-6 border-2 border-gray-300 dark:border-gray-600 border-t-gray-900 dark:border-t-white rounded-full animate-spin"></div>
+              <span class="ml-3 text-sm text-gray-500 dark:text-gray-400">Cargando clientes...</span>
             </div>
             
             <!-- Empty state -->
             <div v-else-if="filteredCustomers.length === 0" class="flex flex-col items-center justify-center py-12 text-center px-4">
-              <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-              </svg>
-              <p class="text-sm font-semibold text-gray-600 dark:text-zinc-300">Sin clientes</p>
-              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">No hay clientes con crédito activo</p>
+              <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800/50 flex items-center justify-center mb-3">
+                <svg class="w-7 h-7 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+              </div>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">Sin clientes</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">No hay clientes con crédito activo</p>
             </div>
             
-            <!-- Lista de clientes -->
-            <div
-              v-else
-              v-for="customer in filteredCustomers"
-              :key="customer.id"
-              @click="selectCustomer(customer)"
-              class="px-3 py-3.5 my-1 cursor-pointer transition-all rounded-xl group relative"
-              :class="[
-                selectedCustomer?.id === customer.id 
-                  ? 'bg-indigo-50 dark:bg-indigo-500/10 shadow-sm' 
-                  : 'bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800/60'
-              ]"
-            >
-              <!-- Borde izquierdo de selección -->
-              <div 
-                v-if="selectedCustomer?.id === customer.id"
-                class="absolute left-0 top-2 bottom-2 w-1 bg-indigo-500 rounded-r-full"
-              ></div>
+            <!-- Lista de clientes con tarjetas -->
+            <div v-else class="space-y-2">
+              <div
+                v-for="customer in filteredCustomers"
+                :key="customer.id"
+                @click="selectCustomer(customer)"
+                :class="[
+                  'p-3.5 cursor-pointer transition-all duration-200 rounded-lg border',
+                  selectedCustomer?.id === customer.id
+                    ? 'bg-white dark:bg-[#1e1f22] border-gray-900 dark:border-white shadow-md ring-1 ring-gray-900/5 dark:ring-white/10'
+                    : 'bg-white dark:bg-[#1a1a1d] border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm'
+                ]">
               
-              <div class="flex items-center gap-3">
-                <!-- Avatar con inicial o foto - CLICKABLE -->
-                <div 
-                  @click.stop="customer.credit_photo && openPhotoPreview(customer.credit_photo, customer.name)"
-                  class="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden transition-transform duration-200"
-                  :class="[
-                    customer.credit_photo ? 'cursor-pointer hover:scale-110 ring-2 ring-transparent hover:ring-blue-400' : 'text-white',
-                    !customer.credit_photo && 'dark:brightness-110'
-                  ]"
-                  :style="!customer.credit_photo ? getAvatarStyle(customer) : {}">
-                  <img v-if="customer.credit_photo" 
+                <div class="flex items-center gap-3">
+                  <!-- Avatar con inicial o foto -->
+                  <div 
+                    @click.stop="customer.credit_photo && openPhotoPreview(customer.credit_photo, customer.name)"
+                    class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden transition-transform duration-200"
+                    :class="[
+                      customer.credit_photo ? 'cursor-pointer hover:scale-110 ring-2 ring-transparent hover:ring-blue-400' : 'text-white',
+                      !customer.credit_photo && 'dark:brightness-110'
+                    ]"
+                    :style="!customer.credit_photo ? getAvatarStyle(customer) : {}">
+                    <img v-if="customer.credit_photo" 
                        :src="customer.credit_photo" 
                        :alt="customer.name"
                        class="w-full h-full object-cover" />
-                  <span v-else class="text-sm font-bold">{{ customer.name.charAt(0).toUpperCase() }}</span>
+                  <span v-else class="text-sm font-medium">{{ customer.name.charAt(0).toUpperCase() }}</span>
                 </div>
                 
                 <!-- Info del cliente -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <p class="text-[13px] font-semibold text-gray-800 dark:text-zinc-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">
                       {{ customer.name }}
                     </p>
-                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0"
+                    <span class="text-[9px] font-semibold px-2 py-0.5 rounded-full border flex-shrink-0 uppercase tracking-wide"
                           :class="getStatusColor(customer)">
                       {{ getStatusText(customer) }}
                     </span>
                   </div>
                   <div class="flex items-center gap-2 mt-1">
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {{ customer.document_type }}: {{ customer.document_number }}
                     </p>
                   </div>
@@ -205,58 +203,74 @@
                   <span class="text-sm font-bold" :class="customer.current_debt > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'">
                     ${{ formatCurrency(customer.current_debt || 0) }}
                   </span>
-                  <p class="text-[10px] text-gray-400 dark:text-zinc-500">Deuda</p>
+                  <p class="text-[10px] text-gray-400 dark:text-gray-500">Deuda</p>
                 </div>
+                
+                <!-- Indicador de selección -->
+                <svg v-if="selectedCustomer?.id === customer.id" class="w-4 h-4 text-gray-900 dark:text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
               </div>
             </div>
           </div>
         </div>
+        </div>
 
         <!-- PANEL DERECHO: Detalle del Cliente (70%) -->
-        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-gray-50/30 dark:bg-zinc-950/30 transition-colors duration-300">
+        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-gradient-to-br from-white via-gray-50/30 to-gray-100/50 dark:from-[#0f0f11] dark:via-[#131316] dark:to-[#0f0f11]">
           
-          <!-- Estado: No seleccionado - Empty State Profesional -->
-          <div v-if="!selectedCustomer" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gradient-to-b from-gray-50 via-white to-gray-50 dark:from-zinc-900/50 dark:via-zinc-900/30 dark:to-zinc-900/50 relative">
+          <!-- Estado: No seleccionado - Empty State mejorado -->
+          <div v-if="!selectedCustomer" class="flex-1 flex flex-col items-center justify-center p-12 text-center relative">
             
-            <!-- Ilustración SVG profesional -->
-            <div class="mb-8 relative">
-              <div class="absolute inset-0 bg-gradient-to-br from-indigo-200/30 via-transparent to-emerald-200/30 dark:from-indigo-500/10 dark:to-emerald-500/10 rounded-3xl blur-3xl scale-150"></div>
+            <!-- Fondo decorativo sutil -->
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.03),transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.05),transparent_50%)]"></div>
+            
+            <!-- Contenedor con glassmorphism -->
+            <div class="relative z-10 bg-white/50 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-10 border border-gray-200/50 dark:border-white/10 shadow-lg max-w-md">
+              <!-- Ilustración SVG profesional más compacta -->
+              <div class="mb-6 flex justify-center">
+                <div class="relative">
+                  <!-- Círculo principal con avatar -->
+                  <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center shadow-inner">
+                    <svg class="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                  </div>
+                  <!-- Badge de verificación -->
+                  <div class="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                  <!-- Badge de dinero -->
+                  <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                    <span class="text-white text-xs font-bold">$</span>
+                  </div>
+                </div>
+              </div>
               
-              <svg class="w-48 h-48 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Círculo de fondo -->
-                <circle cx="90" cy="90" r="70" class="fill-gray-100 dark:fill-zinc-800/50"/>
-                
-                <!-- Silueta de persona -->
-                <circle cx="90" cy="65" r="25" class="fill-indigo-200 dark:fill-indigo-500/30"/>
-                <path d="M50 130 C50 105, 70 95, 90 95 C110 95, 130 105, 130 130" class="fill-indigo-200 dark:fill-indigo-500/30"/>
-                
-                <!-- Icono de crédito/dinero -->
-                <circle cx="120" cy="120" r="25" class="fill-emerald-100 dark:fill-emerald-500/20"/>
-                <circle cx="120" cy="120" r="18" class="fill-emerald-500 dark:fill-emerald-400"/>
-                <text x="120" y="126" text-anchor="middle" class="fill-white font-bold" style="font-size: 18px; font-family: system-ui;">$</text>
-                
-                <!-- Badge de verificación -->
-                <circle cx="145" cy="55" r="15" class="fill-blue-100 dark:fill-blue-500/20"/>
-                <circle cx="145" cy="55" r="10" class="fill-blue-500 dark:fill-blue-400"/>
-                <path d="M140 55L143 58L150 51" class="stroke-white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            
-            <!-- Texto de bienvenida -->
-            <div class="relative z-10 max-w-md">
-              <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+              <!-- Texto de bienvenida profesional -->
+              <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">
                 Portal de Créditos
               </h3>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
+              <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-2">
                 Selecciona un cliente del panel izquierdo para visualizar su información completa, historial de crédito y registrar abonos.
               </p>
-              <p class="text-xs text-gray-400 dark:text-zinc-500">
+              <p class="text-xs text-gray-400 dark:text-gray-500">
                 Gestión segura de créditos para tu negocio.
               </p>
+              
+              <!-- Indicador visual -->
+              <div class="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                <span>Selecciona un cliente de la lista</span>
+              </div>
             </div>
             
             <!-- Footer de seguridad -->
-            <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
+            <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
               </svg>
@@ -2796,13 +2810,47 @@ watch(
     })
     
     uiContextStore.registerAction('cerrarModalCredito', () => {
+      // Lista de modales que estaban abiertos antes de cerrar
+      const modalesCerrados = []
+      
+      // Cerrar TODOS los modales posibles de CrediTienda
       if (showCreateCreditModal.value) {
         showCreateCreditModal.value = false
+        modalesCerrados.push('crear crédito')
       }
       if (showPaymentModal.value) {
         closePaymentModal()
+        modalesCerrados.push('registrar abono')
       }
-      return { success: true, message: 'Modal cerrado' }
+      if (showDetailModal.value) {
+        showDetailModal.value = false
+        modalesCerrados.push('detalles')
+      }
+      if (showDeleteModal.value) {
+        showDeleteModal.value = false
+        modalesCerrados.push('confirmación eliminación')
+      }
+      if (showEditCustomerModal.value) {
+        showEditCustomerModal.value = false
+        modalesCerrados.push('editar cliente')
+      }
+      if (showReminderSettingsModal.value) {
+        showReminderSettingsModal.value = false
+        modalesCerrados.push('configuración recordatorios')
+      }
+      if (showWhatsAppModal.value) {
+        showWhatsAppModal.value = false
+        modalesCerrados.push('WhatsApp')
+      }
+      if (showPhotoPreviewModal.value) {
+        showPhotoPreviewModal.value = false
+        modalesCerrados.push('previsualización foto')
+      }
+      
+      if (modalesCerrados.length > 0) {
+        return { success: true, message: `Modal cerrado: ${modalesCerrados.join(', ')}` }
+      }
+      return { success: true, message: 'No había modales abiertos' }
     })
   },
   { immediate: true, deep: true }
