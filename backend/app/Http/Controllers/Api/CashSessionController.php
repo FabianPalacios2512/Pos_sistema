@@ -41,6 +41,15 @@ class CashSessionController extends Controller
 
             $sessions = $query->get();
 
+            // Refresh totals for open sessions so admin sees current data
+            foreach ($sessions as $session) {
+                if ($session->status === 'open') {
+                    $session->updateSalesTotals();
+                    $session->calculateExpectedAmount();
+                    $session->save();
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Sesiones obtenidas correctamente',

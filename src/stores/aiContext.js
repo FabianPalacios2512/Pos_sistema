@@ -125,6 +125,44 @@ export const useAIContextStore = defineStore('aiContext', {
      * @returns {string} System prompt con el contexto
      */
     getSystemPrompt() {
+      // 🔒 Obtener rol y permisos del usuario actual
+      let roleContext = ''
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        const roleName = user.role?.name || ''
+        const permissions = Array.isArray(user.role?.permissions) ? user.role.permissions : []
+        const isAllPerms = permissions.includes('*') || permissions.includes('ALL') || permissions.includes('admin')
+        const isVendedor = !isAllPerms && (roleName.toLowerCase().includes('vendedor') || roleName.toLowerCase().includes('cajero'))
+        
+        if (isVendedor) {
+          const moduleNameMap = {
+            'dashboard': 'Panel Principal', 'pos': 'Punto de Venta', 'invoices': 'Facturas',
+            'returns': 'Devoluciones', 'products': 'Productos', 'categories': 'Categorías',
+            'stock': 'Gestión de Stock', 'inventory': 'Inventario', 'customers': 'Clientes',
+            'sales': 'Ventas', 'accounts-receivable': 'CrediTienda'
+          }
+          const modulosPermitidos = new Set()
+          permissions.forEach(p => {
+            const mod = p.split('.')[0]
+            if (moduleNameMap[mod]) modulosPermitidos.add(moduleNameMap[mod])
+          })
+          roleContext = `
+🔒 ROL DEL USUARIO: ${roleName} (VENDEDOR/CAJERO - ACCESO LIMITADO)
+Módulos permitidos: ${Array.from(modulosPermitidos).join(', ')}
+⚠️ NO tiene acceso a: Reportes, Gastos, Gestión de Usuarios, Configuración, Proveedores.
+- No le sugieras navegar a módulos restringidos.
+- No le muestres datos financieros globales (ganancias netas, márgenes, gastos).
+- Si pregunta por algo restringido, dile amablemente que eso lo maneja el administrador.
+- Sus ventas/facturas son solo las suyas, no las del negocio completo.
+`
+        } else {
+          roleContext = `
+👤 ROL DEL USUARIO: ${roleName || 'Administrador'} (ACCESO COMPLETO)
+Tiene acceso a todos los módulos y datos del sistema sin restricción.
+`
+        }
+      } catch {}
+
       // 🌐 Obtener datos globales del negocio desde uiContextStore
       let globalBusinessContext = ''
       try {
@@ -196,6 +234,7 @@ export const useAIContextStore = defineStore('aiContext', {
       if (!this.hasContext && globalBusinessContext) {
         return `
 [CONTEXTO DE NEGOCIO - INFORMACIÓN PARA RESPONDER PREGUNTAS]
+${roleContext}
 ${globalBusinessContext}
 INSTRUCCIONES PARA LA IA:
 - Usa estos datos globales para responder preguntas sobre el negocio
@@ -209,14 +248,14 @@ INSTRUCCIONES PARA LA IA:
       }
 
       if (!this.hasContext) {
-        return ''
+        return roleContext || ''
       }
 
       // Construir prompt estructurado pero conciso
       const prompt = `
 [CONTEXTO DE PANTALLA - INFORMACIÓN INVISIBLE PARA EL USUARIO]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+${roleContext}
 📍 UBICACIÓN ACTUAL: ${this.currentScreen}
 📝 DESCRIPCIÓN: ${this.screenDescription}
 

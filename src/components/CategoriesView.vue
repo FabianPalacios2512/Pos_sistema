@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
+  <div class="min-h-screen font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 px-8">
     <div class="max-w-6xl mx-auto p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Loading -->
@@ -24,7 +24,7 @@
         
         <div class="flex items-center gap-3">
           <button @click="exportCategories"
-                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-base font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
+                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-base font-semibold rounded-md border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
@@ -32,7 +32,7 @@
           </button>
           
           <button @click="openCreateModal"
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-base font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white text-base font-bold rounded-xl  hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
@@ -201,7 +201,7 @@
                   <button
                     v-if="statusFilter !== 'all' || searchTerm"
                     @click="clearFilters"
-                    class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-lg transition-all duration-200">
+                    class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white text-sm font-bold rounded-lg transition-all duration-200">
                     Limpiar filtros
                   </button>
                 </div>
@@ -274,7 +274,7 @@
             Cancelar
           </button>
           <button @click="confirmStatusChange" 
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl transition-all duration-200 font-bold text-sm shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white rounded-xl transition-all duration-200 font-bold text-sm ">
             Confirmar
           </button>
         </div>
@@ -369,7 +369,7 @@
             </button>
             <button
               @click="saveCategory"
-              class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-sm font-bold transition-all duration-200 shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50">
+              class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white rounded-xl text-sm font-bold transition-all duration-200 ">
               {{ showAddCategoryModal ? 'Crear' : 'Guardar' }}
             </button>
           </div>

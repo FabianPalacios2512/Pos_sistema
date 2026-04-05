@@ -692,9 +692,51 @@ class AIController extends Controller
             $screenContextBlock = "\n\n" . $screenContext . "\n";
         }
 
+        // 🔒 Construir bloque de permisos según rol del usuario
+        $roleBlock = '';
+        $user = auth()->user();
+        if ($user) {
+            $user->loadMissing('role');
+        }
+        if ($user && $user->role) {
+            $roleName = $user->role->name ?? '';
+            $permissions = is_array($user->role->permissions) ? $user->role->permissions : [];
+            $isAllPerms = in_array('*', $permissions) || in_array('ALL', $permissions) || in_array('admin', $permissions);
+            $isVendedor = !$isAllPerms && (stripos($roleName, 'vendedor') !== false || stripos($roleName, 'cajero') !== false);
+            
+            if ($isVendedor) {
+                $moduleNameMap = [
+                    'dashboard' => 'Panel Principal', 'pos' => 'Punto de Venta', 'invoices' => 'Facturas',
+                    'returns' => 'Devoluciones', 'products' => 'Productos', 'categories' => 'Categorías',
+                    'stock' => 'Gestión de Stock', 'inventory' => 'Inventario', 'customers' => 'Clientes',
+                    'sales' => 'Ventas', 'accounts-receivable' => 'CrediTienda'
+                ];
+                $modulosPermitidos = [];
+                foreach ($permissions as $perm) {
+                    $mod = explode('.', $perm)[0];
+                    if (isset($moduleNameMap[$mod]) && !in_array($moduleNameMap[$mod], $modulosPermitidos)) {
+                        $modulosPermitidos[] = $moduleNameMap[$mod];
+                    }
+                }
+                $listaModulos = implode(', ', $modulosPermitidos);
+                $roleBlock = <<<ROLE
+
+🔒 ROL DEL USUARIO: {$roleName} (VENDEDOR/CAJERO - ACCESO LIMITADO)
+Módulos permitidos: {$listaModulos}
+⚠️ NO tiene acceso a: Reportes, Gastos, Gestión de Usuarios, Configuración, Proveedores.
+- No le sugieras navegar a módulos restringidos ni le ofrezcas acciones administrativas.
+- No le muestres datos financieros globales (ganancias netas, márgenes, gastos del negocio).
+- Si pregunta por algo restringido, dile amablemente que eso lo maneja el administrador.
+- Sus ventas/facturas son solo las suyas, no las del negocio completo.
+ROLE;
+            } else {
+                $roleBlock = "\n👤 ROL DEL USUARIO: {$roleName} (ADMINISTRADOR - ACCESO COMPLETO)\n";
+            }
+        }
+
         return <<<EOT
 Eres "105 IA", asistente virtual inteligente del sistema POS. Sé amigable, conversacional y muy útil.
-{$screenContextBlock}
+{$roleBlock}{$screenContextBlock}
 🎯 TUS CAPACIDADES:
 
 📊 **DATOS DEL NEGOCIO EN CONTEXTO**:

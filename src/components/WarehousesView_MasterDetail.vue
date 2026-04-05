@@ -3,14 +3,14 @@
   <ToastContainer />
   
   <!-- Layout Full Height -->
-  <div class="h-full font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 overflow-hidden flex flex-col">
+  <div class="h-full font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 overflow-hidden flex flex-col">
     <div class="flex-none px-6 lg:px-8 pt-5 pb-4 space-y-5 animate-fade-in">
       
       <!-- Header -->
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Sedes</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Administra, controla y monitorea todas las sedes de tu empresa</p>
+          <h1 class="text-2xl font-black text-gray-900 dark:text-white">Gestión de Sedes</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Administra, controla y monitorea todas las sedes de tu empresa</p>
         </div>
     
         <!-- Botones de Acción -->
@@ -19,7 +19,7 @@
           <template v-if="activeTab === 'warehouses'">
             <button
               @click="loadWarehouses"
-              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
+              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-sm font-semibold rounded-md border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
@@ -28,7 +28,7 @@
             
             <button
               @click="openCreateModal"
-              class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+              class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
               </svg>
@@ -40,7 +40,7 @@
           <template v-else-if="activeTab === 'transfers'">
             <button
               @click="refreshTransfers"
-              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
+              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-sm font-semibold rounded-md border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
@@ -49,7 +49,7 @@
             
             <button
               @click="openTransferModal"
-              class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+              class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
               </svg>
@@ -101,7 +101,7 @@
         <!-- KPIs removidas - ruido visual eliminado -->
     
     <!-- Master-Detail Panel -->
-    <div class="flex-1 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300">
+    <div class="flex-1 rounded-md overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-sm transition-colors duration-300">
       <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
         <!-- PANEL IZQUIERDO: Selector de Sedes (30%) -->
@@ -128,18 +128,13 @@
               v-for="warehouse in filteredWarehouses"
               :key="warehouse.id"
               @click="selectWarehouse(warehouse)"
-              class="px-4 py-3.5 my-1 cursor-pointer transition-all duration-200 rounded-xl group relative"
+              class="px-4 py-3.5 my-1 cursor-pointer transition-all duration-200 rounded-md group relative"
               :class="[
                 selectedWarehouse?.id === warehouse.id 
-                  ? 'bg-white dark:bg-zinc-800 shadow-md dark:shadow-black/30 border border-gray-200 dark:border-zinc-700' 
-                  : 'hover:bg-white dark:hover:bg-zinc-800/50 border border-transparent'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-600 dark:border-emerald-500' 
+                  : 'hover:bg-gray-50 dark:hover:bg-zinc-800/40 border-l-4 border-transparent'
               ]"
             >
-              <!-- Indicador de selección fuerte -->
-              <div 
-                v-if="selectedWarehouse?.id === warehouse.id"
-                class="absolute left-0 top-3 bottom-3 w-[3px] bg-slate-900 dark:bg-blue-400 rounded-r-full"
-              ></div>
               
               <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -275,7 +270,7 @@
                 <div class="flex items-start justify-between">
                   <div class="flex-1">
                     <div class="flex items-center gap-3 mb-2">
-                      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                      <h2 class="text-2xl font-black text-gray-900 dark:text-white">
                         {{ selectedWarehouse.name }}
                       </h2>
                       <span v-if="selectedWarehouse.is_default"
@@ -347,7 +342,7 @@
                       </svg>
                       <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Productos</p>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ warehouseDetails?.summary?.total_products || 0 }}</p>
+                    <p class="text-2xl font-black text-gray-900 dark:text-white">{{ warehouseDetails?.summary?.total_products || 0 }}</p>
                   </div>
                   <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl px-4 py-3 border border-gray-200 dark:border-zinc-700/50">
                     <div class="flex items-center gap-2 mb-1">
@@ -356,7 +351,7 @@
                       </svg>
                       <p class="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Stock Total</p>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ warehouseDetails?.summary?.total_stock || 0 }}</p>
+                    <p class="text-2xl font-black text-gray-900 dark:text-white">{{ warehouseDetails?.summary?.total_stock || 0 }}</p>
                   </div>
                   <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl px-4 py-3 border border-gray-200 dark:border-zinc-700/50">
                     <div class="flex items-center gap-2 mb-1">
@@ -397,7 +392,7 @@
                 </div>
 
                 <!-- Tabla de productos -->
-                <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+                <div class="bg-white dark:bg-zinc-900 rounded-md overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-sm">
                   <table class="min-w-full">
                     <thead>
                       <tr class="border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
@@ -488,7 +483,7 @@
         v-if="showLimitModal" 
         class="fixed top-0 left-0 right-0 bottom-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4"
         style="z-index: 99999; position: fixed; inset: 0;">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-2xl dark:shadow-black/50 animate-scale-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl max-w-md w-full overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-2xl dark:shadow-black/50 animate-scale-in">
           
           <!-- Header -->
           <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4">
@@ -532,7 +527,7 @@
             </button>
             <button 
               @click="goToPlans"
-              class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center space-x-2">
+              class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center space-x-2">
               <span>Ver Planes</span>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />

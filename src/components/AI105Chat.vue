@@ -820,12 +820,12 @@ export default {
     }
     
     // Límites de voz en segundos por día según plan
-    // Presupuesto máximo diario: Premium ~$285 COP, Enterprise ~$2,850 COP
-    // ⚠️ En producción: premium=180 (3min), enterprise=1800 (30min)
+    // Presupuesto máximo diario: Premium ~$1,425 COP, Enterprise ~$2,850 COP
+    // ⚠️ En producción: premium=900 (15min), enterprise=1800 (30min)
     const VOICE_LIMITS = {
       'free_trial': DEV_MODE_UNLIMITED ? 0 : 0,      // Sin voz (0 = sin límite si DEV_MODE)
       'basico': DEV_MODE_UNLIMITED ? 0 : 0,          // Sin voz
-      'premium': DEV_MODE_UNLIMITED ? 0 : 180,       // 3 minutos/día (~$285 COP) - 0 = ilimitado en dev
+      'premium': DEV_MODE_UNLIMITED ? 0 : 900,       // 15 minutos/día (~$1,425 COP) - 0 = ilimitado en dev
       'enterprise': DEV_MODE_UNLIMITED ? 0 : 1800    // 30 minutos/día - 0 = ilimitado en dev
     }
     

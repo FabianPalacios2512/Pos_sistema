@@ -1,19 +1,19 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
+  <div class="min-h-screen font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Control de Inventario</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestiona stock, movimientos y alertas de productos</p>
+          <h1 class="text-2xl font-black text-gray-900 dark:text-white">Control de Inventario</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Gestiona stock, movimientos y alertas de productos</p>
         </div>
         
         <div class="flex items-center space-x-3">
           <!-- Botón Actualizar - Gemini style -->
           <button @click="refreshInventoryData" 
                   :disabled="loading"
-                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center space-x-2"
+                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-sm font-semibold rounded-md border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center space-x-2"
                   :class="{ 'opacity-50 cursor-not-allowed': loading }">
             <svg class="w-4 h-4" :class="{'animate-spin': loading}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -23,7 +23,7 @@
           
           <!-- Botón Principal - Negro/Slate como el resto del sistema -->
           <button @click="openMovementModal"
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center space-x-2">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
@@ -33,13 +33,13 @@
       </div>
       
       <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800 mb-4">
+      <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800 mb-4">
         <div class="flex flex-col gap-1 px-5 py-4">
           <div class="flex items-center justify-between">
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total Productos</p>
             <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ totalProducts }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ totalProducts }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">En inventario</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -55,7 +55,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Valor Total</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ totalInventoryValue.toLocaleString() }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ totalInventoryValue.toLocaleString() }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Valorización actual</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -63,7 +63,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Movimientos Hoy</p>
             <svg class="w-4 h-4 text-violet-500 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ todayMovements }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ todayMovements }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Actualizado hoy</p>
         </div>
       </div>
@@ -81,7 +81,7 @@
             <select 
               v-model="selectedWarehouse"
               @change="refreshInventoryData"
-              class="px-3 py-1.5 bg-transparent border-0 text-sm font-medium text-gray-900 dark:text-white focus:ring-0 cursor-pointer hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-full transition-colors"
+              class="px-3 py-1.5 bg-transparent border-0 text-sm font-medium text-gray-900 dark:text-white focus:ring-0 cursor-pointer hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-md transition-colors"
             >
               <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id" class="bg-white dark:bg-zinc-800">
                 {{ warehouse.name }}{{ warehouse.is_default ? ' (Principal)' : '' }}
@@ -99,7 +99,7 @@
       
       <!-- Contenedor Principal - Gemini Style -->
       <!-- Contenedor Principal -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden">
+      <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
         <!-- Tabs -->
         <div class="border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
           <nav class="flex px-6" aria-label="Tabs">
@@ -404,7 +404,7 @@
             </div>
           </div>
           <button @click="closeMovementModal" 
-                  class="p-2 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-full transition-colors">
+                  class="p-2 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -463,7 +463,7 @@
                   </div>
                 </div>
                 <button @click="clearProductSelection" 
-                        class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 rounded-full transition-colors">
+                        class="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 rounded-md transition-colors">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
@@ -597,12 +597,12 @@
                 </svg>
               </div>
               <div>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Ajustar Stock</h3>
+                <h3 class="text-xl font-black text-gray-900 dark:text-white">Ajustar Stock</h3>
                 <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Modifica la cantidad en inventario</p>
               </div>
             </div>
             <button @click="showAdjustModal = false" 
-                    class="p-2 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-full transition-all">
+                    class="p-2 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md transition-all">
               <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -729,7 +729,7 @@
                            type="number" 
                            min="0"
                            step="1"
-                           :class="['w-full px-4 py-3 pr-12 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm',
+                           :class="['w-full px-4 py-3 pr-12 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm',
                                     adjustForm.errors.new_stock 
                                       ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' 
                                       : 'bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white']"
@@ -749,7 +749,7 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-900 dark:text-white mb-2">Motivo del Ajuste</label>
                   <select v-model="adjustForm.reason" 
-                          :class="['w-full px-4 py-3 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm cursor-pointer',
+                          :class="['w-full px-4 py-3 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm cursor-pointer',
                                    adjustForm.errors.reason 
                                      ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' 
                                      : 'bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white']"
@@ -844,14 +844,14 @@
               </svg>
             </div>
             <div>
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Historial de Movimientos</h3>
+              <h3 class="text-xl font-black text-gray-900 dark:text-white">Historial de Movimientos</h3>
               <p class="text-sm text-gray-600 dark:text-zinc-400" v-if="selectedProductForHistory">
                 {{ selectedProductForHistory.name }} - {{ selectedProductForHistory.category }}
               </p>
             </div>
           </div>
           <button @click="showHistoryModal = false" 
-                  class="p-2 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-full transition-colors">
+                  class="p-2 text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -922,7 +922,7 @@
         </div>
 
         <!-- Lista de Movimientos - Gemini Style -->
-        <div class="bg-gray-50 dark:bg-zinc-800 rounded-2xl overflow-hidden max-h-96 overflow-y-auto">
+        <div class="bg-gray-50 dark:bg-zinc-800 rounded-md overflow-hidden max-h-96 overflow-y-auto">
           <div v-if="historyLoading" class="flex items-center justify-center py-12">
             <div class="text-center">
               <svg class="animate-spin w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24">

@@ -1,49 +1,49 @@
 <template>
   <!-- Master-Detail Layout Enterprise: 30/70 - Gemini Design Pattern -->
-  <div class="bg-white dark:bg-[#131314] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg transition-colors duration-300" style="flex: 1; min-height: 0;">
+  <div class="bg-white dark:bg-zinc-900 rounded-md overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-sm transition-colors duration-300" style="flex: 1; min-height: 0;">
     <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
     
     <!-- PANEL IZQUIERDO: Lista de Proveedores (30%) -->
-    <div class="lg:col-span-3 overflow-hidden flex flex-col border-r border-gray-200 dark:border-gray-800 transition-colors duration-300">
+    <div class="lg:col-span-3 overflow-hidden flex flex-col border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
         
         <!-- Filtros / Búsqueda -->
-        <div class="p-4 border-b border-gray-200 dark:border-gray-800 bg-[#f8f9fa] dark:bg-[#131314] flex-shrink-0">
+        <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 flex-shrink-0">
           <div class="relative">
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
             <input v-model="searchQuery"
                    type="text"
                    placeholder="Buscar proveedor..."
-                   class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
+                   class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
           </div>
           
           <!-- Filtros de estado -->
           <div class="flex items-center gap-2 mt-3">
             <button @click="filterActive = null"
                     :class="[
-                      'px-3 py-1.5 text-xs font-medium rounded-full transition-all',
+                      'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
                       filterActive === null
                         ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                        : 'bg-[#f8f9fa] dark:bg-[#1e1f20] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2d]'
+                        : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700'
                     ]">
               Todos
             </button>
             <button @click="filterActive = true"
                     :class="[
-                      'px-3 py-1.5 text-xs font-medium rounded-full transition-all',
+                      'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
                       filterActive === true
                         ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                        : 'bg-[#f8f9fa] dark:bg-[#1e1f20] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2d]'
+                        : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700'
                     ]">
               Activos
             </button>
             <button @click="filterActive = false"
                     :class="[
-                      'px-3 py-1.5 text-xs font-medium rounded-full transition-all',
+                      'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
                       filterActive === false
                         ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                        : 'bg-[#f8f9fa] dark:bg-[#1e1f20] text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-[#2a2a2d]'
+                        : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700'
                     ]">
               Inactivos
             </button>
@@ -55,18 +55,18 @@
           <!-- Loading -->
           <div v-if="loading" class="p-8 text-center">
             <div class="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-4">Cargando proveedores...</p>
+            <p class="text-sm text-gray-600 dark:text-zinc-400 mt-4">Cargando proveedores...</p>
           </div>
 
           <!-- Empty -->
           <div v-else-if="filteredSuppliers.length === 0" class="p-12 text-center">
-            <div class="w-20 h-20 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div class="w-20 h-20 bg-gray-50 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-4">
               <svg class="w-10 h-10 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
               </svg>
             </div>
             <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">Sin proveedores</p>
-            <p class="text-xs text-gray-500 dark:text-gray-500">No hay proveedores que coincidan</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-500">No hay proveedores que coincidan</p>
           </div>
 
           <!-- Supplier Cards -->
@@ -76,14 +76,14 @@
                  :class="[
                    'p-4 cursor-pointer transition-all duration-200',
                    selectedSupplier?.id === supplier.id
-                     ? 'bg-blue-50 dark:bg-blue-950/30 border-l-4 border-l-blue-600 dark:border-l-blue-500'
-                     : 'hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] border-l-4 border-l-transparent'
+                     ? 'bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-l-emerald-600 dark:border-l-emerald-500'
+                     : 'hover:bg-gray-50 dark:hover:bg-zinc-800/40 border-l-4 border-l-transparent'
                  ]">
               
               <div class="flex items-start justify-between mb-2">
                 <div class="flex-1 min-w-0 mr-3">
                   <p class="font-semibold text-sm text-gray-900 dark:text-white truncate">{{ supplier.name }}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-500 mt-0.5 truncate" v-if="supplier.contact_person">
+                  <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5 truncate" v-if="supplier.contact_person">
                     {{ supplier.contact_person }}
                   </p>
                 </div>
@@ -98,7 +98,7 @@
               </div>
 
               <div class="flex items-center justify-between text-xs mt-2">
-                <div class="flex items-center gap-3 text-gray-500 dark:text-gray-500">
+                <div class="flex items-center gap-3 text-gray-500 dark:text-zinc-500">
                   <span v-if="supplier.phone" class="flex items-center gap-1">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
@@ -117,9 +117,9 @@
                 </span>
               </div>
 
-              <div v-if="supplier.current_debt > 0" class="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+              <div v-if="supplier.current_debt > 0" class="mt-2 pt-2 border-t border-gray-100 dark:border-zinc-800">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs text-gray-600 dark:text-gray-400">Deuda:</span>
+                  <span class="text-xs text-gray-600 dark:text-zinc-400">Deuda:</span>
                   <span class="text-xs font-semibold text-red-600 dark:text-red-400">
                     ${{ formatNumber(supplier.current_debt) }}
                   </span>
@@ -131,9 +131,9 @@
       </div>
 
     <!-- PANEL DERECHO: Detalles del Proveedor (70%) -->
-    <div class="lg:col-span-7 overflow-hidden flex flex-col bg-white dark:bg-[#131314] transition-colors duration-300">
+    <div class="lg:col-span-7 overflow-hidden flex flex-col bg-white dark:bg-zinc-900 transition-colors duration-300">
       <!-- Estado vacío - Empty State Profesional estilo Gemini -->
-      <div v-if="!selectedSupplier" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-[#f8f9fa] dark:bg-[#1a1a1d] relative">
+      <div v-if="!selectedSupplier" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gray-50 dark:bg-zinc-900 relative">
             
           <!-- Ilustración SVG profesional y limpia -->
           <div class="mb-8 relative">
@@ -187,16 +187,16 @@
             <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-3">
               Selecciona un proveedor
             </h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-2">
+            <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
               Haz clic en un proveedor de la lista para ver sus detalles completos, historial de compras y gestionar la información.
             </p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">
+            <p class="text-xs text-gray-400 dark:text-zinc-500">
               Administra tus proveedores de forma rápida y segura.
             </p>
           </div>
           
           <!-- Footer de confianza -->
-          <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+          <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
             </svg>
@@ -205,17 +205,17 @@
       </div>
 
       <!-- Formulario de crear proveedor -->
-      <div v-else-if="viewMode === 'create'" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#212124]">
+      <div v-else-if="viewMode === 'create'" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900">
         
         <!-- Header -->
-        <div class="p-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1e1f20] flex-shrink-0">
+        <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 flex-shrink-0">
           <div class="flex items-center justify-between">
             <div>
-              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Nuevo Proveedor</h2>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Complete la información del proveedor</p>
+              <h2 class="text-xl font-black text-gray-900 dark:text-white">Nuevo Proveedor</h2>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Complete la información del proveedor</p>
             </div>
             <button @click="cancelCreate"
-                    class="p-2.5 text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all">
+                    class="p-2.5 text-gray-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -228,64 +228,64 @@
           <div class="space-y-6 max-w-2xl">
             
             <!-- Información básica -->
-            <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Información Básica</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre del Proveedor *</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Nombre del Proveedor *</label>
                   <input v-model="newSupplier.name" type="text" required
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Documento/NIT *</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Documento/NIT *</label>
                   <input v-model="newSupplier.document" type="text" required
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Persona de Contacto</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Persona de Contacto</label>
                   <input v-model="newSupplier.contact_person" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
               </div>
             </div>
             
             <!-- Información de contacto -->
-            <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Contacto</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Teléfono</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Teléfono</label>
                   <input v-model="newSupplier.phone" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Email</label>
                   <input v-model="newSupplier.email" type="email"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div class="col-span-2">
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Dirección</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Dirección</label>
                   <input v-model="newSupplier.address" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
               </div>
             </div>
             
             <!-- Términos comerciales -->
-            <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Términos Comerciales</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Plazo de Pago</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Plazo de Pago</label>
                   <select v-model="newSupplier.payment_terms"
-                          class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="immediate">Inmediato</option>
                     <option value="15_days">15 días</option>
                     <option value="30_days">30 días</option>
@@ -296,27 +296,27 @@
                 </div>
                 
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Límite de Crédito</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Límite de Crédito</label>
                   <input v-model.number="newSupplier.credit_limit" type="number" min="0"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div class="col-span-2">
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Notas</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Notas</label>
                   <textarea v-model="newSupplier.notes" rows="3"
-                            class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
               </div>
             </div>
             
             <!-- Estado -->
-            <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
               <label class="flex items-center gap-3 cursor-pointer">
                 <input v-model="newSupplier.active" type="checkbox"
                        class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 <div>
                   <div class="text-sm font-medium text-gray-900 dark:text-white">Proveedor Activo</div>
-                  <div class="text-xs text-gray-600 dark:text-gray-400">El proveedor estará disponible para órdenes de compra</div>
+                  <div class="text-xs text-gray-600 dark:text-zinc-400">El proveedor estará disponible para órdenes de compra</div>
                 </div>
               </label>
             </div>
@@ -325,15 +325,15 @@
         </div>
         
         <!-- Footer con botones -->
-        <div class="p-6 border-t border-gray-200 dark:border-gray-800 bg-[#f8f9fa] dark:bg-[#1e1f20] flex-shrink-0">
+        <div class="p-6 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800 flex-shrink-0">
           <div class="flex items-center justify-end gap-3">
             <button @click="cancelCreate"
-                    class="px-6 py-2.5 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#2a2a2d] text-gray-600 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
+                    class="px-6 py-2.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
               Cancelar
             </button>
             <button @click="saveNewSupplier"
                     :disabled="savingSupplier || !newSupplier.name || !newSupplier.document"
-                    class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               <svg v-if="savingSupplier" class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
@@ -344,10 +344,10 @@
       </div>
 
       <!-- Formulario de Edición COMPACTO -->
-      <div v-else-if="viewMode === 'edit' && editingSupplier" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#212124]">
+      <div v-else-if="viewMode === 'edit' && editingSupplier" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900">
         
         <!-- Header Compacto -->
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1e1f20] flex items-center justify-between flex-shrink-0">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 flex items-center justify-between flex-shrink-0">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
               <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -356,10 +356,10 @@
             </div>
             <div>
               <h3 class="text-base font-semibold text-gray-900 dark:text-white">Editar Proveedor</h3>
-              <p class="text-xs text-gray-600 dark:text-gray-400">{{ editingSupplier.name }}</p>
+              <p class="text-xs text-gray-600 dark:text-zinc-400">{{ editingSupplier.name }}</p>
             </div>
           </div>
-          <button @click="cancelEdit" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          <button @click="cancelEdit" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -371,41 +371,41 @@
           <div class="grid grid-cols-3 gap-3">
             <!-- Fila 1: Nombre completo en 3 columnas -->
             <div class="col-span-3">
-              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nombre del Proveedor *</label>
+              <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Nombre del Proveedor *</label>
               <input v-model="editingSupplier.name" type="text" required
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <!-- Fila 2: Documento, Contacto, Teléfono -->
             <div>
-              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Documento/NIT *</label>
+              <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Documento/NIT *</label>
               <input v-model="editingSupplier.document" type="text" required
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <div>
-              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Contacto</label>
+              <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Contacto</label>
               <input v-model="editingSupplier.contact_person" type="text"
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <div>
-              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Teléfono</label>
+              <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Teléfono</label>
               <input v-model="editingSupplier.phone" type="text"
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <!-- Fila 3: Email y Dirección (2 columnas) + Checkbox -->
             <div>
-              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
+              <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Email</label>
               <input v-model="editingSupplier.email" type="email"
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <div>
-              <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">Dirección</label>
+              <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Dirección</label>
               <input v-model="editingSupplier.address" type="text"
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <!-- Estado (alineado con los inputs) -->
@@ -420,14 +420,14 @@
         </div>
         
         <!-- Footer Compacto -->
-        <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-800 bg-[#f8f9fa] dark:bg-[#1e1f20] flex items-center justify-end gap-2.5 flex-shrink-0">
+        <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800 flex items-center justify-end gap-2.5 flex-shrink-0">
           <button @click="cancelEdit"
-                  class="px-4 py-2 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#2a2a2d] text-gray-600 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
+                  class="px-4 py-2 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
             Cancelar
           </button>
           <button @click="saveEditedSupplier"
                   :disabled="savingSupplier || !editingSupplier.name || !editingSupplier.document"
-                  class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                  class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
             <svg v-if="savingSupplier" class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -437,14 +437,14 @@
       </div>
       
       <!-- Detalles del proveedor seleccionado -->
-      <div v-else-if="viewMode === 'detail' && selectedSupplier" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#212124]">
+      <div v-else-if="viewMode === 'detail' && selectedSupplier" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-zinc-900">
         
         <!-- Header del proveedor -->
-        <div class="p-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1e1f20] flex-shrink-0">
+        <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 flex-shrink-0">
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ selectedSupplier.name }}</h2>
+                <h2 class="text-xl font-black text-gray-900 dark:text-white">{{ selectedSupplier.name }}</h2>
                 <span :class="[
                         'px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wide border',
                         selectedSupplier.active 
@@ -454,14 +454,14 @@
                   {{ selectedSupplier.active ? 'Activo' : 'Inactivo' }}
                 </span>
               </div>
-              <p class="text-sm text-gray-600 dark:text-gray-400" v-if="selectedSupplier.contact_person">
+              <p class="text-sm text-gray-600 dark:text-zinc-400" v-if="selectedSupplier.contact_person">
                 Contacto: {{ selectedSupplier.contact_person }}
               </p>
             </div>
             
             <div class="flex items-center gap-2">
               <button @click="editSupplier(selectedSupplier)"
-                      class="p-2.5 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg border border-transparent hover:border-amber-200 dark:hover:border-amber-900/30 transition-all duration-200">
+                      class="p-2.5 text-gray-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg border border-transparent hover:border-amber-200 dark:hover:border-amber-900/30 transition-all duration-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                 </svg>
@@ -471,8 +471,8 @@
                       :class="[
                         'p-2.5 rounded-lg border transition-all duration-200',
                         selectedSupplier.active
-                          ? 'text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 border-transparent hover:border-rose-200 dark:hover:border-rose-900/30'
-                          : 'text-gray-400 dark:text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border-transparent hover:border-emerald-200 dark:hover:border-emerald-900/30'
+                          ? 'text-gray-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 border-transparent hover:border-rose-200 dark:hover:border-rose-900/30'
+                          : 'text-gray-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border-transparent hover:border-emerald-200 dark:hover:border-emerald-900/30'
                       ]">
                 <svg v-if="selectedSupplier.active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
@@ -486,28 +486,28 @@
 
           <!-- KPIs rápidos -->
           <div class="grid grid-cols-3 gap-3 mt-4">
-            <div class="bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-              <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Total Compras</p>
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1">Total Compras</p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">
                 ${{ formatNumber(selectedSupplier.total_purchases_amount || 0) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
                 {{ selectedSupplier.purchase_orders_count || 0 }} órdenes
               </p>
             </div>
 
-            <div class="bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-              <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Productos</p>
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1">Productos</p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ selectedSupplier.products_count || 0 }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
                 en catálogo
               </p>
             </div>
 
-            <div class="bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-              <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Deuda Actual</p>
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1">Deuda Actual</p>
               <p :class="[
                     'text-lg font-semibold',
                     selectedSupplier.current_debt > 0 
@@ -516,7 +516,7 @@
                   ]">
                 ${{ formatNumber(selectedSupplier.current_debt || 0) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-500 mt-0.5">
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">
                 saldo pendiente
               </p>
             </div>
@@ -527,35 +527,35 @@
         <div class="flex-1 overflow-y-auto">
           
           <!-- RESUMEN - Información ULTRA Compacta (Solo 1 fila) -->
-          <div class="p-4 border-b border-gray-200 dark:border-gray-800 bg-[#f8f9fa] dark:bg-[#1a1a1d]">
+          <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
             <div class="grid grid-cols-6 gap-2">
-              <div v-if="selectedSupplier.phone" class="bg-white dark:bg-[#1e1f20] rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
-                <p class="text-[10px] text-gray-500 dark:text-gray-500 mb-0.5">Teléfono</p>
+              <div v-if="selectedSupplier.phone" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Teléfono</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ selectedSupplier.phone }}</p>
               </div>
 
-              <div v-if="selectedSupplier.email" class="bg-white dark:bg-[#1e1f20] rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
-                <p class="text-[10px] text-gray-500 dark:text-gray-500 mb-0.5">Email</p>
+              <div v-if="selectedSupplier.email" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Email</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ selectedSupplier.email }}</p>
               </div>
 
-              <div v-if="selectedSupplier.document" class="bg-white dark:bg-[#1e1f20] rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
-                <p class="text-[10px] text-gray-500 dark:text-gray-500 mb-0.5">Documento</p>
+              <div v-if="selectedSupplier.document" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Documento</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ selectedSupplier.document }}</p>
               </div>
 
-              <div v-if="selectedSupplier.payment_terms" class="bg-white dark:bg-[#1e1f20] rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
-                <p class="text-[10px] text-gray-500 dark:text-gray-500 mb-0.5">Plazo</p>
+              <div v-if="selectedSupplier.payment_terms" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Plazo</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ formatPaymentTerms(selectedSupplier.payment_terms) }}</p>
               </div>
 
-              <div v-if="selectedSupplier.last_purchase_date" class="bg-white dark:bg-[#1e1f20] rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
-                <p class="text-[10px] text-gray-500 dark:text-gray-500 mb-0.5">Última Compra</p>
+              <div v-if="selectedSupplier.last_purchase_date" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Última Compra</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ formatDate(selectedSupplier.last_purchase_date) }}</p>
               </div>
 
-              <div v-if="selectedSupplier.last_purchase_date" class="bg-white dark:bg-[#1e1f20] rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
-                <p class="text-[10px] text-gray-500 dark:text-gray-500 mb-0.5">Hace</p>
+              <div v-if="selectedSupplier.last_purchase_date" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Hace</p>
                 <p class="text-xs font-semibold text-gray-900 dark:text-white">{{ daysSinceLastPurchase(selectedSupplier.last_purchase_date) }}d</p>
               </div>
             </div>
@@ -581,42 +581,42 @@
             </div>
 
             <!-- Empty -->
-            <div v-else-if="supplierProducts.length === 0" class="text-center py-12 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-lg border border-gray-200 dark:border-gray-700">
-              <div class="w-16 h-16 bg-gray-100 dark:bg-[#2a2a2d] rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div v-else-if="supplierProducts.length === 0" class="text-center py-12 bg-gray-50 dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              <div class="w-16 h-16 bg-gray-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
               </div>
               <p class="text-sm font-medium text-gray-900 dark:text-white">Sin productos</p>
-              <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">Este proveedor no tiene productos asignados</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Este proveedor no tiene productos asignados</p>
             </div>
 
             <!-- Tabla de Productos COMPACTA -->
-            <div v-else class="bg-white dark:bg-[#1e1f20] rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div v-else class="bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-800 overflow-hidden">
               <table class="min-w-full">
-                <thead class="bg-[#f8f9fa] dark:bg-[#1a1a1d] border-b border-gray-200 dark:border-gray-800">
+                <thead class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
                   <tr>
-                    <th class="px-3 py-2 text-left text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">#</th>
-                    <th class="px-3 py-2 text-left text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">Producto</th>
-                    <th class="px-3 py-2 text-center text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">SKU</th>
-                    <th class="px-3 py-2 text-right text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">P. Compra</th>
-                    <th class="px-3 py-2 text-right text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">P. Venta</th>
-                    <th class="px-3 py-2 text-center text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">Stock</th>
-                    <th class="px-3 py-2 text-center text-[10px] font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wide">Estado</th>
+                    <th class="px-3 py-2 text-left text-[10px] font-medium text-gray-700 dark:text-zinc-300 uppercase tracking-wide">#</th>
+                    <th class="px-3 py-2 text-left text-[10px] font-medium text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Producto</th>
+                    <th class="px-3 py-2 text-center text-[10px] font-medium text-gray-700 dark:text-zinc-300 uppercase tracking-wide">SKU</th>
+                    <th class="px-3 py-2 text-right text-[10px] font-medium text-gray-700 dark:text-zinc-300 uppercase tracking-wide">P. Compra</th>
+                    <th class="px-3 py-2 text-right text-[10px] font-medium text-gray-700 dark:text-zinc-300 uppercase tracking-wide">P. Venta</th>
+                    <th class="px-3 py-2 text-center text-[10px] font-medium text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Stock</th>
+                    <th class="px-3 py-2 text-center text-[10px] font-medium text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Estado</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-[#1e1f20] divide-y divide-gray-200 dark:divide-gray-800">
+                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-gray-800">
                   <tr v-for="(product, index) in supplierProducts" :key="product?.id || `product-${index}`"
-                      class="hover:bg-[#f8f9fa] dark:hover:bg-[#2a2a2d] transition-all duration-200">
-                    <td class="px-3 py-2 text-xs text-gray-500 dark:text-gray-500">
+                      class="hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all duration-200">
+                    <td class="px-3 py-2 text-xs text-gray-500 dark:text-zinc-500">
                       {{ index + 1 }}
                     </td>
                     <td class="px-3 py-2">
                       <div class="flex items-center gap-2">
-                        <div v-if="product.image_url" class="w-8 h-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-[#2a2a2d] flex-shrink-0">
+                        <div v-if="product.image_url" class="w-8 h-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 flex-shrink-0">
                           <img :src="product.image_url" :alt="product.name" class="w-full h-full object-cover">
                         </div>
-                        <div v-else class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-[#2a2a2d] flex items-center justify-center flex-shrink-0">
+                        <div v-else class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
                           <svg class="w-4 h-4 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                           </svg>
@@ -627,7 +627,7 @@
                       </div>
                     </td>
                     <td class="px-3 py-2 text-center">
-                      <span class="text-[10px] font-mono text-gray-600 dark:text-gray-400">
+                      <span class="text-[10px] font-mono text-gray-600 dark:text-zinc-400">
                         {{ product.sku || '-' }}
                       </span>
                     </td>
@@ -681,10 +681,10 @@
          @click.self="cancelCreate"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
       
-      <div class="bg-white dark:bg-[#1e1f20] rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-gray-200 dark:border-gray-800 animate-modal-in">
+      <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-gray-200 dark:border-zinc-800 animate-modal-in">
         
         <!-- Header -->
-        <div class="p-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1e1f20] flex-shrink-0 rounded-t-xl">
+        <div class="p-6 border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-800 flex-shrink-0 rounded-t-xl">
           <div class="flex items-center gap-4">
             <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
               <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -692,11 +692,11 @@
               </svg>
             </div>
             <div class="flex-1">
-              <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Nuevo Proveedor</h2>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Complete la información del proveedor</p>
+              <h2 class="text-xl font-black text-gray-900 dark:text-white">Nuevo Proveedor</h2>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Complete la información del proveedor</p>
             </div>
             <button @click="cancelCreate"
-                    class="p-2.5 text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all">
+                    class="p-2.5 text-gray-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
@@ -709,64 +709,64 @@
           <div class="space-y-5">
             
             <!-- Información básica -->
-            <div class="bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Información Básica</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre del Proveedor *</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Nombre del Proveedor *</label>
                   <input v-model="newSupplier.name" type="text" required
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Documento/NIT *</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Documento/NIT *</label>
                   <input v-model="newSupplier.document" type="text" required
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Persona de Contacto</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Persona de Contacto</label>
                   <input v-model="newSupplier.contact_person" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
               </div>
             </div>
             
             <!-- Información de contacto -->
-            <div class="bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Contacto</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Teléfono</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Teléfono</label>
                   <input v-model="newSupplier.phone" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Email</label>
                   <input v-model="newSupplier.email" type="email"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div class="col-span-2">
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Dirección</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Dirección</label>
                   <input v-model="newSupplier.address" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
               </div>
             </div>
             
             <!-- Términos comerciales -->
-            <div class="bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Términos Comerciales</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Plazo de Pago</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Plazo de Pago</label>
                   <select v-model="newSupplier.payment_terms"
-                          class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="immediate">Inmediato</option>
                     <option value="15_days">15 días</option>
                     <option value="30_days">30 días</option>
@@ -777,27 +777,27 @@
                 </div>
                 
                 <div>
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Límite de Crédito</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Límite de Crédito</label>
                   <input v-model.number="newSupplier.credit_limit" type="number" min="0"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div class="col-span-2">
-                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Notas</label>
+                  <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Notas</label>
                   <textarea v-model="newSupplier.notes" rows="3"
-                            class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
               </div>
             </div>
             
             <!-- Estado -->
-            <div class="bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
               <label class="flex items-center gap-3 cursor-pointer">
                 <input v-model="newSupplier.active" type="checkbox"
                        class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 <div>
                   <div class="text-sm font-medium text-gray-900 dark:text-white">Proveedor Activo</div>
-                  <div class="text-xs text-gray-600 dark:text-gray-400">El proveedor estará disponible para órdenes de compra</div>
+                  <div class="text-xs text-gray-600 dark:text-zinc-400">El proveedor estará disponible para órdenes de compra</div>
                 </div>
               </label>
             </div>
@@ -806,15 +806,15 @@
         </div>
         
         <!-- Footer con botones -->
-        <div class="p-6 border-t border-gray-200 dark:border-gray-800 bg-[#f8f9fa] dark:bg-[#1e1f20] flex-shrink-0 rounded-b-xl">
+        <div class="p-6 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800 flex-shrink-0 rounded-b-xl">
           <div class="flex items-center justify-end gap-3">
             <button @click="cancelCreate"
-                    class="px-6 py-2.5 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#2a2a2d] text-gray-600 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
+                    class="px-6 py-2.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
               Cancelar
             </button>
             <button @click="saveNewSupplier"
                     :disabled="savingSupplier || !newSupplier.name || !newSupplier.document"
-                    class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               <svg v-if="savingSupplier" class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>

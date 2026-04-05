@@ -1,6 +1,6 @@
 <template>
   <!-- Executive Dashboard - Estilo Premium inspirado en el AI Chat -->
-  <div class="min-h-screen bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] font-sans antialiased">
+  <div class="min-h-screen bg-gray-50 dark:bg-[#131314] font-sans antialiased">
     
     <!-- Container Principal -->
     <div class="max-w-[1600px] mx-auto px-6 lg:px-10 py-8 space-y-8">
@@ -208,7 +208,7 @@
                 <span class="text-xs text-gray-400 dark:text-zinc-600">Sin datos</span>
               </div>
               <div v-if="topProducts.length > 0" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ totalItems }}</p>
+                <p class="text-2xl font-black text-gray-900 dark:text-white">{{ totalItems }}</p>
                 <p class="text-[10px] text-gray-500 dark:text-zinc-500 uppercase tracking-wider font-medium">Items</p>
               </div>
             </div>
@@ -234,7 +234,7 @@
       </div>
 
       <!-- Últimas Transacciones -->
-      <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl border border-gray-200/80 dark:border-zinc-800/60 overflow-hidden">
+      <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-md border border-gray-200/80 dark:border-zinc-800/60 overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800/60">
           <h3 class="text-base font-semibold text-gray-900 dark:text-white">Últimas Transacciones</h3>
           <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Actividad reciente del sistema</p>

@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-3 lg:px-5">
+  <div class="min-h-screen font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 px-3 lg:px-5">
     <div class="p-3 lg:p-5 space-y-6 pb-8 animate-fade-in">
 
       <!-- Header -->
       <div class="flex items-center justify-between pb-4">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Punteo de Jornada</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Control de asistencia y auditoría de personal</p>
+          <h1 class="text-2xl font-black text-gray-900 dark:text-white">Punteo de Jornada</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Control de asistencia y auditoría de personal</p>
         </div>
         <div class="flex items-center gap-3">
           <button @click="refreshAll"
-                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200">
+                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-sm font-semibold rounded-md border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200">
             <svg class="w-4 h-4 inline mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Refrescar
           </button>
@@ -18,13 +18,13 @@
       </div>
 
       <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
+      <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
         <div class="flex flex-col gap-1 px-5 py-4">
           <div class="flex items-center justify-between">
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Entradas Hoy</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ summary.entries_today ?? 0 }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ summary.entries_today ?? 0 }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Registros de entrada</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -32,7 +32,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Salidas Hoy</p>
             <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ summary.exits_today ?? 0 }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ summary.exits_today ?? 0 }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Registros de salida</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -40,7 +40,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Perfiles Biométricos</p>
             <svg class="w-4 h-4 text-violet-500 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a48.667 48.667 0 00-1.134 11.166M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">
             {{ summary.enrolled_users ?? 0 }}<span class="text-base font-normal text-gray-400 dark:text-zinc-600">/{{ summary.total_users ?? 0 }}</span>
           </p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Enrolados / Total</p>

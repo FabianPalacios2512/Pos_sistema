@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-[#f8f9fa] dark:bg-[#131314] font-sans transition-colors duration-300 px-8" style="height: 100%; display: flex; flex-direction: column;">
+  <div class="bg-gray-50 dark:bg-[#131314] font-sans transition-colors duration-300 px-8" style="height: 100%; display: flex; flex-direction: column;">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
       
       <!-- 🎨 Header Gemini -->
       <div class="flex items-center justify-between pb-4">
         <div class="flex items-center space-x-4">
           <div>
-            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Control de Cajas</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 font-normal">Administración y supervisión de sesiones de caja</p>
+            <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Control de Cajas</h1>
+            <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Administración y supervisión de sesiones de caja</p>
           </div>
         </div>
         
@@ -15,7 +15,7 @@
           <!-- Botón Secundario -->
           <button @click="refreshSessions"
                   :disabled="loading"
-                  class="px-5 py-2.5 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#2a2a2d] text-gray-700 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200 flex items-center space-x-2">
+                  class="px-5 py-2.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-zinc-700 transition-all duration-200 flex items-center space-x-2">
             <svg class="w-4 h-4" :class="{'animate-spin': loading}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
             </svg>
@@ -24,7 +24,7 @@
           
           <!-- Botón Principal -->
           <button @click="showNewSessionModal = true"
-                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full transition-all duration-300 flex items-center space-x-2">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md transition-all duration-300 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -34,13 +34,13 @@
       </div>
 
       <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
+      <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
         <div class="flex flex-col gap-1 px-5 py-4">
           <div class="flex items-center justify-between">
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Sesiones Activas</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ activeSessions.length }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ activeSessions.length }}</p>
           <p class="text-xs text-emerald-500 dark:text-emerald-400">Cajas abiertas</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -48,7 +48,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total en Cajas</p>
             <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ totalCashAmount.toLocaleString() }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ totalCashAmount.toLocaleString() }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Efectivo disponible</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -56,32 +56,32 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Ventas Hoy</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ totalSalesToday.toLocaleString() }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ totalSalesToday.toLocaleString() }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Actualizado hoy</p>
         </div>
       </div>
 
       <!-- Panel de Filtros Gemini -->
-      <div class="bg-white dark:bg-[#131314] rounded-xl shadow-lg p-4 border border-gray-200 dark:border-gray-800">
+      <div class="bg-white dark:bg-[#131314] rounded-md shadow-sm p-4 border border-gray-200 dark:border-zinc-800">
         <div class="flex flex-wrap items-center gap-4">
           
           <!-- Búsqueda -->
           <div class="flex-1 min-w-64 relative">
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Buscar usuario..."
-              class="w-full pl-10 pr-4 py-3 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+              class="w-full pl-10 pr-4 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
             />
           </div>
           
           <!-- Filtro Estado -->
           <select
             v-model="statusFilter"
-            class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+            class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           >
             <option value="">Todos los estados</option>
             <option value="open">🟢 Sesiones Activas</option>
@@ -92,13 +92,13 @@
           <input
             v-model="dateFilter"
             type="date"
-            class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+            class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           />
           
           <!-- Botón Exportar -->
           <button
             @click="exportData"
-            class="px-4 py-2.5 bg-emerald-600 dark:bg-emerald-600 hover:bg-emerald-700 dark:hover:bg-emerald-500 text-white text-sm font-medium rounded-full transition-all duration-200 flex items-center space-x-2"
+            class="px-4 py-2.5 bg-emerald-600 dark:bg-emerald-600 hover:bg-emerald-700 dark:hover:bg-emerald-500 text-white text-sm font-medium rounded-md transition-all duration-200 flex items-center space-x-2"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
@@ -109,7 +109,7 @@
           <!-- Botón Limpiar Filtros -->
           <button
             @click="clearFilters"
-            class="p-3 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-transparent hover:border-red-200 dark:hover:border-red-700/50 transition-colors duration-200"
+            class="p-3 text-gray-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-transparent hover:border-red-200 dark:hover:border-red-700/50 transition-colors duration-200"
             title="Limpiar filtros"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,8 +120,8 @@
       </div>
 
       <!-- Sessions Table -->
-      <div class="bg-white dark:bg-[#131314] rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-800" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] border-b border-gray-200 dark:border-gray-800 px-4 py-3" style="flex-shrink: 0;">
+      <div class="bg-white dark:bg-[#131314] rounded-md shadow-sm overflow-hidden border border-gray-200 dark:border-zinc-800" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+        <div class="bg-gray-50 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-800 px-4 py-3" style="flex-shrink: 0;">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
@@ -131,7 +131,7 @@
               </div>
               <div>
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Sesiones de Caja</h2>
-                <p class="text-gray-600 dark:text-gray-400 text-sm">{{ filteredSessions.length }} registros</p>
+                <p class="text-gray-600 dark:text-zinc-400 text-sm">{{ filteredSessions.length }} registros</p>
               </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -146,9 +146,9 @@
         
         <div class="overflow-x-auto flex-1 overflow-y-auto">
           <table class="min-w-full">
-            <thead class="border-b border-gray-200 dark:border-gray-800">
+            <thead class="border-b border-gray-200 dark:border-zinc-800">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <div class="flex items-center space-x-1">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -156,35 +156,38 @@
                     <span>Usuario</span>
                   </div>
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <span>Estado</span>
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <span>Apertura</span>
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <span>Cierre</span>
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <span>Inicial</span>
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <span>Ventas</span>
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
+                  <span>Ingresos Caja</span>
+                </th>
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <span>Estado Cierre</span>
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <span>Duración</span>
                 </th>
-                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                <th class="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">
                   <span>Acciones</span>
                 </th>
               </tr>
             </thead>
             <tbody class="bg-transparent">
               <tr v-for="session in paginatedSessions" :key="session.id" 
-                  class="hover:bg-gray-50 dark:hover:bg-[#1e1f20] transition-all duration-200 border-b border-gray-200 dark:border-gray-800">
+                  class="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all duration-200 border-b border-gray-200 dark:border-zinc-800">
                 <td class="px-4 py-3 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="relative">
@@ -197,7 +200,7 @@
                       <div class="text-sm font-medium text-gray-900 dark:text-white">
                         {{ session.user?.name || 'Usuario desconocido' }}
                       </div>
-                      <div class="text-xs text-gray-500 dark:text-gray-500">
+                      <div class="text-xs text-gray-500 dark:text-zinc-500">
                         ID: #{{ session.id }}
                       </div>
                     </div>
@@ -214,11 +217,11 @@
                 </td>
                 <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                   <div class="font-medium">{{ formatDate(session.opened_at) }}</div>
-                  <div class="text-gray-500 dark:text-gray-500 text-xs">{{ formatTime(session.opened_at) }}</div>
+                  <div class="text-gray-500 dark:text-zinc-500 text-xs">{{ formatTime(session.opened_at) }}</div>
                 </td>
                 <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                   <div v-if="session.status === 'closed' && session.closed_at" class="font-medium">{{ formatDate(session.closed_at) }}</div>
-                  <div v-if="session.status === 'closed' && session.closed_at" class="text-gray-500 dark:text-gray-500 text-xs">{{ formatTime(session.closed_at) }}</div>
+                  <div v-if="session.status === 'closed' && session.closed_at" class="text-gray-500 dark:text-zinc-500 text-xs">{{ formatTime(session.closed_at) }}</div>
                   <span v-if="session.status === 'open'" class="text-amber-600 dark:text-amber-400 text-xs font-medium">En curso...</span>
                 </td>
                 <td class="px-3 py-3 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
@@ -230,20 +233,26 @@
                   </span>
                 </td>
                 <td class="px-3 py-3 whitespace-nowrap text-sm">
+                  <span v-if="getSessionCashIncomes(session) > 0" class="font-medium text-emerald-600 dark:text-emerald-400">
+                    +${{ parseFloat(getSessionCashIncomes(session)).toLocaleString() }}
+                  </span>
+                  <span v-else class="text-gray-400 dark:text-zinc-500 text-xs">$0</span>
+                </td>
+                <td class="px-3 py-3 whitespace-nowrap text-sm">
                   <span v-if="session.status === 'closed'" :class="getClosingStatusClass(session.closing_status)" 
                         class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full">
                     {{ getClosingStatusText(session.closing_status) }}
                   </span>
-                  <span v-else class="text-gray-400 dark:text-gray-500 text-xs">En curso</span>
+                  <span v-else class="text-gray-400 dark:text-zinc-500 text-xs">En curso</span>
                 </td>
-                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-500">
+                <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-zinc-500">
                   {{ getSessionDuration(session) }}
                 </td>
                 <td class="px-3 py-3 whitespace-nowrap text-sm font-medium">
                   <div class="flex items-center space-x-1.5">
                     <button
                       @click="viewSessionDetails(session)"
-                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-transparent hover:border-blue-200 dark:hover:border-blue-700/50 transition-all duration-200"
+                      class="p-2 text-gray-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-transparent hover:border-blue-200 dark:hover:border-blue-700/50 transition-all duration-200"
                       title="Ver detalles"
                     >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,7 +262,7 @@
                     </button>
                     <button
                       @click="viewSessionAudit(session)"
-                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900/20 rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-700/50 transition-all duration-200"
+                      class="p-2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-900/20 rounded-lg border border-transparent hover:border-gray-200 dark:hover:border-gray-700/50 transition-all duration-200"
                       title="Ver auditoría completa"
                     >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,7 +272,7 @@
                     <button
                       v-if="session.status === 'open'"
                       @click="showCloseModal(session)"
-                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg border border-transparent hover:border-rose-200 dark:hover:border-rose-700/50 transition-all duration-200"
+                      class="p-2 text-gray-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg border border-transparent hover:border-rose-200 dark:hover:border-rose-700/50 transition-all duration-200"
                       title="Cerrar sesión"
                     >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,7 +281,7 @@
                     </button>
                     <button
                       @click="generateReport(session)"
-                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg border border-transparent hover:border-emerald-200 dark:hover:border-emerald-700/50 transition-all duration-200"
+                      class="p-2 text-gray-400 dark:text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg border border-transparent hover:border-emerald-200 dark:hover:border-emerald-700/50 transition-all duration-200"
                       title="Generar reporte"
                     >
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,38 +296,38 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="totalPages > 1" class="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#131314] px-4 py-3 flex items-center justify-between sm:px-6">
+        <div v-if="totalPages > 1" class="border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-[#131314] px-4 py-3 flex items-center justify-between sm:px-6">
           <div class="flex-1 flex justify-between sm:hidden">
             <button
               @click="prevPage"
               :disabled="currentPage === 1"
-              class="relative inline-flex items-center px-4 py-2 border border-gray-200 dark:border-gray-700 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1e1f20] hover:bg-gray-50 dark:hover:bg-[#2a2a2d] disabled:opacity-50 disabled:cursor-not-allowed"
+              class="relative inline-flex items-center px-4 py-2 border border-gray-200 dark:border-zinc-700 text-sm font-medium rounded-lg text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Anterior
             </button>
             <button
               @click="nextPage"
               :disabled="currentPage === totalPages"
-              class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-200 dark:border-gray-700 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1e1f20] hover:bg-gray-50 dark:hover:bg-[#2a2a2d] disabled:opacity-50 disabled:cursor-not-allowed"
+              class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-200 dark:border-zinc-700 text-sm font-medium rounded-lg text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Siguiente
             </button>
           </div>
           <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div class="flex items-center space-x-2">
-              <p class="text-sm text-gray-700 dark:text-gray-400">
+              <p class="text-sm text-gray-700 dark:text-zinc-400">
                 Mostrando
-                <span class="font-medium dark:text-gray-200">{{ paginationInfo.start }}</span>
+                <span class="font-medium dark:text-zinc-200">{{ paginationInfo.start }}</span>
                 a
-                <span class="font-medium dark:text-gray-200">{{ paginationInfo.end }}</span>
+                <span class="font-medium dark:text-zinc-200">{{ paginationInfo.end }}</span>
                 de
-                <span class="font-medium dark:text-gray-200">{{ paginationInfo.total }}</span>
+                <span class="font-medium dark:text-zinc-200">{{ paginationInfo.total }}</span>
                 resultados
               </p>
               <select
                 v-model="itemsPerPage"
                 @change="changeItemsPerPage(itemsPerPage)"
-                class="ml-4 px-3 py-1 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-gray-700 dark:text-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                class="ml-4 px-3 py-1 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
               >
                 <option v-for="option in itemsPerPageOptions" :key="option" :value="option">
                   {{ option }} por página
@@ -331,7 +340,7 @@
                 <button
                   @click="prevPage"
                   :disabled="currentPage === 1"
-                  class="relative inline-flex items-center px-2 py-2 rounded-l-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2d] disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="relative inline-flex items-center px-2 py-2 rounded-l-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -346,7 +355,7 @@
                     :class="[
                       page === currentPage
                         ? 'z-10 bg-blue-50 dark:bg-blue-900/30 border-blue-500 dark:border-blue-700 text-blue-600 dark:text-blue-400'
-                        : 'bg-white dark:bg-[#1e1f20] border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2d]',
+                        : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-700',
                       'relative inline-flex items-center px-4 py-2 border text-sm font-medium'
                     ]"
                   >
@@ -354,7 +363,7 @@
                   </button>
                   <span
                     v-else-if="(page === 2 && currentPage > 4) || (page === totalPages - 1 && currentPage < totalPages - 3)"
-                    class="relative inline-flex items-center px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-sm font-medium text-gray-700 dark:text-gray-400"
+                    class="relative inline-flex items-center px-4 py-2 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-gray-700 dark:text-zinc-400"
                   >
                     ...
                   </span>
@@ -364,7 +373,7 @@
                 <button
                   @click="nextPage"
                   :disabled="currentPage === totalPages"
-                  class="relative inline-flex items-center px-2 py-2 rounded-r-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1e1f20] text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#2a2a2d] disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="relative inline-flex items-center px-2 py-2 rounded-r-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium text-gray-500 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
@@ -383,7 +392,7 @@
             </svg>
           </div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No hay sesiones</h3>
-          <p class="text-gray-500 dark:text-gray-400 mb-4">Ajusta los filtros o crea una nueva sesión</p>
+          <p class="text-gray-500 dark:text-zinc-400 mb-4">Ajusta los filtros o crea una nueva sesión</p>
           <button
             @click="clearFilters"
             class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full hover:bg-black dark:hover:bg-gray-100 transition-all duration-300 text-sm font-medium"
@@ -396,9 +405,9 @@
 
     <!-- Session Details Modal Gemini -->
     <div v-if="selectedSession" class="fixed inset-0 bg-black/75 dark:bg-black/85 flex items-center justify-center z-50 p-4" @click.self="selectedSession = null">
-      <div class="bg-white dark:bg-[#131314] rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-800">
+      <div class="bg-white dark:bg-[#131314] rounded-md max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-sm border border-gray-200 dark:border-zinc-800">
         <!-- Header Gemini -->
-        <div class="bg-white dark:bg-[#131314] border-b border-gray-200 dark:border-gray-800 px-6 py-4 rounded-t-xl">
+        <div class="bg-white dark:bg-[#131314] border-b border-gray-200 dark:border-zinc-800 px-6 py-4 rounded-t-md">
           <div class="flex justify-between items-center">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
@@ -408,12 +417,12 @@
               </div>
               <div>
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detalles de Sesión</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">ID: #{{ selectedSession.id }} - {{ selectedSession.user?.name }}</p>
+                <p class="text-sm text-gray-600 dark:text-zinc-400">ID: #{{ selectedSession.id }} - {{ selectedSession.user?.name }}</p>
               </div>
             </div>
             <button 
               @click="selectedSession = null" 
-              class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -424,7 +433,7 @@
         
         <div class="p-6">
           <!-- User Info -->
-          <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-lg p-4 mb-6 border border-gray-200 dark:border-gray-800">
+          <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-4 mb-6 border border-gray-200 dark:border-zinc-800">
             <div class="flex items-center space-x-4">
               <div class="relative">
                 <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 font-semibold text-lg">
@@ -434,12 +443,12 @@
               </div>
               <div class="flex-1">
                 <h4 class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedSession.user?.name }}</h4>
-                <p class="text-sm text-gray-600 dark:text-gray-400">{{ selectedSession.user?.email }}</p>
+                <p class="text-sm text-gray-600 dark:text-zinc-400">{{ selectedSession.user?.email }}</p>
                 <div class="flex items-center mt-1 space-x-3">
                   <span :class="getStatusBadgeClass(selectedSession.status)" class="px-2 py-1 text-xs font-medium rounded-full">
                     {{ selectedSession.status === 'open' ? 'ACTIVA' : 'CERRADA' }}
                   </span>
-                  <span class="text-xs text-gray-500 dark:text-gray-500">
+                  <span class="text-xs text-gray-500 dark:text-zinc-500">
                     CC: {{ selectedSession.user?.cc }}
                   </span>
                 </div>
@@ -449,27 +458,27 @@
 
           <!-- Session Info Grid -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] p-3 rounded-xl border border-gray-200 dark:border-gray-800">
-              <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Fecha Apertura</label>
+            <div class="bg-gray-50 dark:bg-zinc-800 p-3 rounded-md border border-gray-200 dark:border-zinc-800">
+              <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Fecha Apertura</label>
               <p class="text-sm font-medium text-gray-900 dark:text-white">{{ formatDate(selectedSession.opening_date) }}</p>
             </div>
-            <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] p-3 rounded-xl border border-gray-200 dark:border-gray-800">
-              <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Hora Apertura</label>
+            <div class="bg-gray-50 dark:bg-zinc-800 p-3 rounded-md border border-gray-200 dark:border-zinc-800">
+              <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Hora Apertura</label>
               <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedSession.opening_time }}</p>
             </div>
-            <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] p-3 rounded-xl border border-gray-200 dark:border-gray-800">
-              <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Duración</label>
+            <div class="bg-gray-50 dark:bg-zinc-800 p-3 rounded-md border border-gray-200 dark:border-zinc-800">
+              <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Duración</label>
               <p class="text-sm font-medium text-gray-900 dark:text-white">{{ getSessionDuration(selectedSession) }}</p>
             </div>
-            <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] p-3 rounded-xl border border-gray-200 dark:border-gray-800">
-              <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Actualización</label>
+            <div class="bg-gray-50 dark:bg-zinc-800 p-3 rounded-md border border-gray-200 dark:border-zinc-800">
+              <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Actualización</label>
               <p class="text-sm font-medium text-gray-900 dark:text-white">{{ formatDate(selectedSession.updated_at) }}</p>
             </div>
           </div>
 
           <!-- Financial Summary -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-4 rounded-xl border border-emerald-200/60 dark:border-emerald-800/30">
+            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-4 rounded-md border border-emerald-200/60 dark:border-emerald-800/30">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Monto Inicial</p>
@@ -483,7 +492,7 @@
               </div>
             </div>
             
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 p-4 rounded-xl border border-blue-200/60 dark:border-blue-800/30">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 p-4 rounded-md border border-blue-200/60 dark:border-blue-800/30">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-xs font-medium text-blue-700 dark:text-blue-400">Total Ventas</p>
@@ -497,7 +506,7 @@
               </div>
             </div>
             
-            <div class="bg-gradient-to-br from-teal-50 to-teal-100/50 dark:from-teal-900/20 dark:to-teal-800/10 p-4 rounded-xl border border-teal-200/60 dark:border-teal-800/30">
+            <div class="bg-gradient-to-br from-teal-50 to-teal-100/50 dark:from-teal-900/20 dark:to-teal-800/10 p-4 rounded-md border border-teal-200/60 dark:border-teal-800/30">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-xs font-medium text-teal-700 dark:text-teal-400">Efectivo</p>
@@ -514,17 +523,17 @@
 
           <!-- Notes -->
           <div v-if="selectedSession.opening_notes" class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notas de Apertura</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Notas de Apertura</label>
             <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg p-3">
               <p class="text-sm text-gray-800 dark:text-amber-300">{{ selectedSession.opening_notes }}</p>
             </div>
           </div>
 
           <!-- Actions -->
-          <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-800">
+          <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-zinc-800">
             <button
               @click="selectedSession = null"
-              class="px-4 py-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-[#1e1f20] rounded-full hover:bg-gray-50 dark:hover:bg-[#2a2a2d] transition-colors text-sm font-medium"
+              class="px-4 py-2 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-800 rounded-full hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors text-sm font-medium"
             >
               Cerrar
             </button>
@@ -542,9 +551,9 @@
 
     <!-- Modal de Cierre Empresarial -->
     <div v-if="showCloseSessionModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-[100] p-4" @click.self="showCloseSessionModal = false">
-      <div class="bg-white dark:bg-[#131314] rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-800">
+      <div class="bg-white dark:bg-[#131314] rounded-md w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-sm border border-gray-200 dark:border-zinc-800">
         <!-- Header -->
-        <div class="bg-white dark:bg-[#131314] border-b border-gray-200 dark:border-gray-800 px-6 py-4 rounded-t-xl">
+        <div class="bg-white dark:bg-[#131314] border-b border-gray-200 dark:border-zinc-800 px-6 py-4 rounded-t-md">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-rose-50 dark:bg-rose-900/30 rounded-lg flex items-center justify-center">
@@ -554,10 +563,10 @@
               </div>
               <div>
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Cerrar Caja</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400">{{ sessionToClose?.user?.name }} - #{{ sessionToClose?.id }}</p>
+                <p class="text-sm text-gray-600 dark:text-zinc-400">{{ sessionToClose?.user?.name }} - #{{ sessionToClose?.id }}</p>
               </div>
             </div>
-            <button @click="showCloseSessionModal = false" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <button @click="showCloseSessionModal = false" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -568,11 +577,11 @@
         <div class="p-6">
           <!-- Resumen de la sesión -->
           <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-xl border border-emerald-200/60 dark:border-emerald-800/30">
+            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-md border border-emerald-200/60 dark:border-emerald-800/30">
               <label class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Monto Inicial</label>
               <p class="text-xl font-semibold text-emerald-900 dark:text-emerald-300">${{ parseFloat(sessionToClose?.opening_amount || 0).toLocaleString() }}</p>
             </div>
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 p-3 rounded-xl border border-blue-200/60 dark:border-blue-800/30">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 p-3 rounded-md border border-blue-200/60 dark:border-blue-800/30">
               <label class="text-xs font-medium text-blue-700 dark:text-blue-400">Ventas Totales</label>
               <p class="text-xl font-semibold text-blue-900 dark:text-blue-300">${{ parseFloat(sessionToClose?.total_sales || 0).toLocaleString() }}</p>
             </div>
@@ -580,15 +589,15 @@
 
           <!-- Desglose por método de pago -->
           <div class="grid grid-cols-3 gap-3 mb-4">
-            <div class="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10 p-3 rounded-xl border border-amber-200/60 dark:border-amber-800/30">
+            <div class="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10 p-3 rounded-md border border-amber-200/60 dark:border-amber-800/30">
               <label class="text-xs font-medium text-amber-700 dark:text-amber-400">Efectivo</label>
               <p class="text-base font-semibold text-amber-900 dark:text-amber-300">${{ parseFloat(sessionToClose?.cash_sales || 0).toLocaleString() }}</p>
             </div>
-            <div class="bg-gradient-to-br from-sky-50 to-sky-100/50 dark:from-sky-900/20 dark:to-sky-800/10 p-3 rounded-xl border border-sky-200/60 dark:border-sky-800/30">
+            <div class="bg-gradient-to-br from-sky-50 to-sky-100/50 dark:from-sky-900/20 dark:to-sky-800/10 p-3 rounded-md border border-sky-200/60 dark:border-sky-800/30">
               <label class="text-xs font-medium text-sky-700 dark:text-sky-400">Tarjetas</label>
               <p class="text-base font-semibold text-sky-900 dark:text-sky-300">${{ parseFloat(sessionToClose?.card_sales || 0).toLocaleString() }}</p>
             </div>
-            <div class="bg-gradient-to-br from-teal-50 to-teal-100/50 dark:from-teal-900/20 dark:to-teal-800/10 p-3 rounded-xl border border-teal-200/60 dark:border-teal-800/30">
+            <div class="bg-gradient-to-br from-teal-50 to-teal-100/50 dark:from-teal-900/20 dark:to-teal-800/10 p-3 rounded-md border border-teal-200/60 dark:border-teal-800/30">
               <label class="text-xs font-medium text-teal-700 dark:text-teal-400">Transferencias</label>
               <p class="text-base font-semibold text-teal-900 dark:text-teal-300">${{ parseFloat(sessionToClose?.transfer_sales || 0).toLocaleString() }}</p>
             </div>
@@ -597,33 +606,33 @@
           <!-- Formulario de cierre -->
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Monto Real en Caja ($) *</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Monto Real en Caja ($) *</label>
               <input
                 v-model="closeForm.actual_amount"
                 type="text"
                 inputmode="decimal"
-                class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-[#1e1f20] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold"
+                class="w-full px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold"
                 placeholder="0.00"
                 @input="closeForm.actual_amount = closeForm.actual_amount.replace(/[^0-9.]/g, '')"
               >
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notas de Cierre</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Notas de Cierre</label>
               <textarea
                 v-model="closeForm.closing_notes"
                 rows="3"
-                class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-[#1e1f20] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Observaciones sobre el cierre..."
               ></textarea>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gastos y Salidas (Opcional)</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Gastos y Salidas (Opcional)</label>
               <textarea
                 v-model="closeForm.expenses_detail"
                 rows="2"
-                class="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-[#1e1f20] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-4 py-3 border border-gray-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Detallar gastos realizados durante la sesión..."
               ></textarea>
             </div>
@@ -642,10 +651,10 @@
           </div>
 
           <!-- Acciones -->
-          <div class="flex space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-800">
+          <div class="flex space-x-3 mt-6 pt-4 border-t border-gray-200 dark:border-zinc-800">
             <button
               @click="showCloseSessionModal = false"
-              class="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-full hover:bg-gray-100 dark:hover:bg-[#2a2b2e] font-medium text-sm transition-colors"
+              class="flex-1 px-4 py-2.5 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 bg-gray-50 dark:bg-zinc-800 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700 font-medium text-sm transition-colors"
             >
               Cancelar
             </button>
@@ -663,9 +672,9 @@
 
     <!-- Modal de Auditoría Empresarial -->
     <div v-if="showAuditModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-[100] p-4" @click.self="showAuditModal = false">
-      <div class="bg-white dark:bg-[#131314] rounded-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-800">
+      <div class="bg-white dark:bg-[#131314] rounded-md w-full max-w-6xl max-h-[90vh] overflow-y-auto shadow-sm border border-gray-200 dark:border-zinc-800">
         <!-- Header -->
-        <div class="bg-white dark:bg-[#131314] border-b border-gray-200 dark:border-gray-800 px-6 py-4 rounded-t-xl">
+        <div class="bg-white dark:bg-[#131314] border-b border-gray-200 dark:border-zinc-800 px-6 py-4 rounded-t-md">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
@@ -675,10 +684,10 @@
               </div>
               <div>
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Auditoría de Sesión</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400">{{ auditData?.session?.user?.name }} - #{{ auditData?.session?.id }}</p>
+                <p class="text-sm text-gray-600 dark:text-zinc-400">{{ auditData?.session?.user?.name }} - #{{ auditData?.session?.id }}</p>
               </div>
             </div>
-            <button @click="showAuditModal = false" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <button @click="showAuditModal = false" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -689,19 +698,19 @@
         <div class="p-6">
           <!-- Estadísticas principales -->
           <div v-if="auditData?.statistics" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 p-3 rounded-xl border border-blue-200/60 dark:border-blue-800/30 text-center">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/10 p-3 rounded-md border border-blue-200/60 dark:border-blue-800/30 text-center">
               <p class="text-xl font-semibold text-blue-900 dark:text-blue-300">{{ auditData.statistics.total_transactions }}</p>
               <p class="text-xs font-medium text-blue-700 dark:text-blue-400">Ventas</p>
             </div>
-            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-xl border border-emerald-200/60 dark:border-emerald-800/30 text-center">
+            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-md border border-emerald-200/60 dark:border-emerald-800/30 text-center">
               <p class="text-xl font-semibold text-emerald-900 dark:text-emerald-300">${{ parseFloat(auditData.statistics.average_sale || 0).toLocaleString() }}</p>
               <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Venta Promedio</p>
             </div>
-            <div class="bg-gradient-to-br from-cyan-50 to-cyan-100/50 dark:from-cyan-900/20 dark:to-cyan-800/10 p-3 rounded-xl border border-cyan-200/60 dark:border-cyan-800/30 text-center">
+            <div class="bg-gradient-to-br from-cyan-50 to-cyan-100/50 dark:from-cyan-900/20 dark:to-cyan-800/10 p-3 rounded-md border border-cyan-200/60 dark:border-cyan-800/30 text-center">
               <p class="text-xl font-semibold text-cyan-900 dark:text-cyan-300">${{ parseFloat(auditData.statistics.largest_sale || 0).toLocaleString() }}</p>
               <p class="text-xs font-medium text-cyan-700 dark:text-cyan-400">Venta Mayor</p>
             </div>
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 p-3 rounded-xl border border-orange-200/60 dark:border-orange-800/30 text-center">
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 p-3 rounded-md border border-orange-200/60 dark:border-orange-800/30 text-center">
               <p class="text-xl font-semibold text-orange-900 dark:text-orange-300">{{ Math.floor(auditData.statistics.session_duration / 60) }}h</p>
               <p class="text-xs font-medium text-orange-700 dark:text-orange-400">Duración</p>
             </div>
@@ -709,27 +718,27 @@
 
           <!-- Estadísticas de devoluciones, gastos, ingresos y abonos (si existen) -->
           <div v-if="auditData?.statistics && (auditData.statistics.total_returns > 0 || auditData.statistics.total_expenses > 0 || auditData.statistics.total_abonos > 0 || auditData.statistics.total_cash_incomes > 0 || auditData.statistics.total_cash_egresos > 0)" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-            <div v-if="auditData.statistics.total_returns > 0" class="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10 p-3 rounded-xl border border-amber-200/60 dark:border-amber-800/30 text-center">
+            <div v-if="auditData.statistics.total_returns > 0" class="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10 p-3 rounded-md border border-amber-200/60 dark:border-amber-800/30 text-center">
               <p class="text-xl font-semibold text-amber-900 dark:text-amber-300">{{ auditData.statistics.total_returns }}</p>
               <p class="text-xs font-medium text-amber-700 dark:text-amber-400">Devoluciones</p>
               <p class="text-xs text-amber-600 dark:text-amber-500">-${{ parseFloat(auditData.statistics.total_returns_amount || 0).toLocaleString() }}</p>
             </div>
-            <div v-if="auditData.statistics.total_expenses > 0" class="bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/20 dark:to-rose-800/10 p-3 rounded-xl border border-rose-200/60 dark:border-rose-800/30 text-center">
+            <div v-if="auditData.statistics.total_expenses > 0" class="bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-900/20 dark:to-rose-800/10 p-3 rounded-md border border-rose-200/60 dark:border-rose-800/30 text-center">
               <p class="text-xl font-semibold text-rose-900 dark:text-rose-300">{{ auditData.statistics.total_expenses }}</p>
               <p class="text-xs font-medium text-rose-700 dark:text-rose-400">Gastos</p>
               <p class="text-xs text-rose-600 dark:text-rose-500">-${{ parseFloat(auditData.statistics.total_expenses_amount || 0).toLocaleString() }}</p>
             </div>
-            <div v-if="auditData.statistics.total_cash_incomes > 0" class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-xl border border-emerald-200/60 dark:border-emerald-800/30 text-center">
+            <div v-if="auditData.statistics.total_cash_incomes > 0" class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-md border border-emerald-200/60 dark:border-emerald-800/30 text-center">
               <p class="text-xl font-semibold text-emerald-900 dark:text-emerald-300">{{ auditData.statistics.total_cash_incomes }}</p>
               <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Ingresos Caja</p>
               <p class="text-xs text-emerald-600 dark:text-emerald-500">+${{ parseFloat(auditData.statistics.total_cash_incomes_amount || 0).toLocaleString() }}</p>
             </div>
-            <div v-if="auditData.statistics.total_cash_egresos > 0" class="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 p-3 rounded-xl border border-orange-200/60 dark:border-orange-800/30 text-center">
+            <div v-if="auditData.statistics.total_cash_egresos > 0" class="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 p-3 rounded-md border border-orange-200/60 dark:border-orange-800/30 text-center">
               <p class="text-xl font-semibold text-orange-900 dark:text-orange-300">{{ auditData.statistics.total_cash_egresos }}</p>
               <p class="text-xs font-medium text-orange-700 dark:text-orange-400">Egresos Caja</p>
               <p class="text-xs text-orange-600 dark:text-orange-500">-${{ parseFloat(auditData.statistics.total_cash_egresos_amount || 0).toLocaleString() }}</p>
             </div>
-            <div v-if="auditData.statistics.total_abonos > 0" class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-xl border border-emerald-200/60 dark:border-emerald-800/30 text-center">
+            <div v-if="auditData.statistics.total_abonos > 0" class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-md border border-emerald-200/60 dark:border-emerald-800/30 text-center">
               <p class="text-xl font-semibold text-emerald-900 dark:text-emerald-300">{{ auditData.statistics.total_abonos }}</p>
               <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Abonos</p>
               <p class="text-xs text-emerald-600 dark:text-emerald-500">+${{ parseFloat(auditData.statistics.total_abonos_amount || 0).toLocaleString() }}</p>
@@ -741,7 +750,7 @@
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Timeline de Eventos</h3>
             <div class="space-y-3 max-h-96 overflow-y-auto">
               <div v-for="(event, index) in auditData.timeline" :key="index" 
-                   class="flex items-start space-x-3 p-3 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-xl border border-gray-200 dark:border-gray-700/50">
+                   class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-zinc-800 rounded-md border border-gray-200 dark:border-zinc-700/50">
                 <div :class="getEventIconClass(event.type)" class="p-2 rounded-full">
                   <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path v-if="event.type === 'opening'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -757,46 +766,46 @@
                 <div class="flex-1">
                   <div class="flex items-center justify-between">
                     <p class="font-medium text-gray-900 dark:text-white">{{ event.description }}</p>
-                    <span class="text-sm text-gray-500 dark:text-gray-500">{{ formatTimestamp(event.timestamp) }}</span>
+                    <span class="text-sm text-gray-500 dark:text-zinc-500">{{ formatTimestamp(event.timestamp) }}</span>
                   </div>
                   <p class="text-lg font-semibold" :class="event.amount < 0 ? 'text-orange-600 dark:text-orange-400' : 'text-green-600 dark:text-green-400'">
                     ${{ parseFloat(event.amount || 0).toLocaleString() }}
                   </p>
-                  <div v-if="event.details.customer" class="text-sm text-gray-600 dark:text-gray-400">
+                  <div v-if="event.details.customer" class="text-sm text-gray-600 dark:text-zinc-400">
                     Cliente: {{ event.details.customer }}
                   </div>
-                  <div v-if="event.type === 'return' && event.details.original_invoice" class="text-sm text-gray-600 dark:text-gray-400">
+                  <div v-if="event.type === 'return' && event.details.original_invoice" class="text-sm text-gray-600 dark:text-zinc-400">
                     Factura original: {{ event.details.original_invoice }}
                   </div>
-                  <div v-if="event.type === 'return' && event.details.reason" class="text-sm text-gray-500 dark:text-gray-500 italic">
+                  <div v-if="event.type === 'return' && event.details.reason" class="text-sm text-gray-500 dark:text-zinc-500 italic">
                     Razón: {{ event.details.reason }}
                   </div>
                   <!-- Detalles de gastos -->
-                  <div v-if="event.type === 'expense' && event.details.category" class="text-sm text-gray-600 dark:text-gray-400">
+                  <div v-if="event.type === 'expense' && event.details.category" class="text-sm text-gray-600 dark:text-zinc-400">
                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" :style="{ backgroundColor: event.details.category_color + '20', color: event.details.category_color }">
                       {{ event.details.category }}
                     </span>
                   </div>
-                  <div v-if="event.type === 'expense' && event.details.supplier" class="text-sm text-gray-500 dark:text-gray-500">
+                  <div v-if="event.type === 'expense' && event.details.supplier" class="text-sm text-gray-500 dark:text-zinc-500">
                     Proveedor: {{ event.details.supplier }}
                   </div>
                   <div v-if="event.type === 'expense' && event.details.payment_method" class="text-xs text-gray-400 dark:text-gray-600">
                     Método: {{ event.details.payment_method }}
                   </div>
-                  <div v-if="(event.type === 'cash-income' || event.type === 'cash-expense') && event.details.reference" class="text-sm text-gray-500 dark:text-gray-500">
+                  <div v-if="(event.type === 'cash-income' || event.type === 'cash-expense') && event.details.reference" class="text-sm text-gray-500 dark:text-zinc-500">
                     Ref: {{ event.details.reference }}
                   </div>
-                  <div v-if="(event.type === 'cash-income' || event.type === 'cash-expense') && event.details.notes" class="text-sm text-gray-500 dark:text-gray-500 italic">
+                  <div v-if="(event.type === 'cash-income' || event.type === 'cash-expense') && event.details.notes" class="text-sm text-gray-500 dark:text-zinc-500 italic">
                     {{ event.details.notes }}
                   </div>
                   <!-- Detalles de abonos -->
-                  <div v-if="event.type === 'abono' && event.details.method" class="text-sm text-gray-600 dark:text-gray-400">
+                  <div v-if="event.type === 'abono' && event.details.method" class="text-sm text-gray-600 dark:text-zinc-400">
                     Método: {{ event.details.method }}
                   </div>
-                  <div v-if="event.type === 'abono' && event.details.reference" class="text-sm text-gray-500 dark:text-gray-500">
+                  <div v-if="event.type === 'abono' && event.details.reference" class="text-sm text-gray-500 dark:text-zinc-500">
                     Ref: {{ event.details.reference }}
                   </div>
-                  <div v-if="event.type === 'abono' && event.details.notes" class="text-sm text-gray-500 dark:text-gray-500 italic">
+                  <div v-if="event.type === 'abono' && event.details.notes" class="text-sm text-gray-500 dark:text-zinc-500 italic">
                     {{ event.details.notes }}
                   </div>
                 </div>
@@ -805,7 +814,7 @@
           </div>
 
           <!-- Botón cerrar -->
-          <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-800">
+          <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-zinc-800">
             <button
               @click="showAuditModal = false"
               class="px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full hover:bg-black dark:hover:bg-gray-100 font-medium text-sm transition-all duration-300"
@@ -820,7 +829,7 @@
 
   <!-- 🎯 Modal de Confirmación Profesional (reemplaza confirm() nativo) -->
   <div v-if="showConfirmModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-[200]" @click.self="showConfirmModal = false">
-    <div class="bg-white dark:bg-[#131314] rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-gray-200 dark:border-gray-800 animate-fade-in">
+    <div class="bg-white dark:bg-[#131314] rounded-md shadow-sm w-full max-w-md mx-4 overflow-hidden border border-gray-200 dark:border-zinc-800 animate-fade-in">
       <!-- Header con icono -->
       <div class="p-6 text-center">
         <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
@@ -828,25 +837,25 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Confirmar Cierre de Caja</h3>
-        <p class="text-gray-600 dark:text-gray-400 mb-4">
+        <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">Confirmar Cierre de Caja</h3>
+        <p class="text-gray-600 dark:text-zinc-400 mb-4">
           ¿Estás seguro que deseas cerrar la caja de <span class="font-semibold text-gray-900 dark:text-white">{{ sessionToClose?.user?.name }}</span>?
         </p>
         
         <!-- Resumen del monto -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div class="bg-gray-50 dark:bg-zinc-800 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
           <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-600 dark:text-gray-400">Monto a cerrar:</span>
+            <span class="text-sm text-gray-600 dark:text-zinc-400">Monto a cerrar:</span>
             <span class="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">${{ parseFloat(closeForm.actual_amount || 0).toLocaleString() }}</span>
           </div>
         </div>
       </div>
       
       <!-- Botones -->
-      <div class="flex border-t border-gray-200 dark:border-gray-800">
+      <div class="flex border-t border-gray-200 dark:border-zinc-800">
         <button 
           @click="showConfirmModal = false"
-          class="flex-1 px-6 py-4 text-gray-700 dark:text-gray-300 font-medium hover:bg-[#f8f9fa] dark:hover:bg-[#1e1f20] transition-colors duration-200"
+          class="flex-1 px-6 py-4 text-gray-700 dark:text-zinc-300 font-medium hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors duration-200"
         >
           Cancelar
         </button>
@@ -1043,7 +1052,7 @@ const getUserInitials = (name) => {
 const getStatusBadgeClass = (status) => {
   return status === 'open' 
     ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' 
-    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
 }
 
 const formatDate = (dateString) => {
@@ -1062,6 +1071,11 @@ const formatTime = (dateString) => {
     minute: '2-digit',
     hour12: true
   })
+}
+
+const getSessionCashIncomes = (session) => {
+  if (!session?.closing_breakdown?.cash_movements) return 0
+  return session.closing_breakdown.cash_movements.ingresos || 0
 }
 
 const getSessionDuration = (session) => {
@@ -1231,7 +1245,7 @@ const getClosingStatusClass = (status) => {
     deficit: 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800',
     with_expenses: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
   }
-  return classes[status] || 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+  return classes[status] || 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
 }
 
 const getClosingStatusText = (status) => {

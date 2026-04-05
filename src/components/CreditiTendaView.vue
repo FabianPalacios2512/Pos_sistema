@@ -1,17 +1,20 @@
 <template>
-  <div class="h-full flex flex-col bg-white dark:bg-[#131314]">
+  <div class="h-full flex flex-col bg-gray-50 dark:bg-[#131314]">
     <div class="flex-1 flex flex-col p-6 space-y-5 overflow-hidden">
       
       <!-- NIVEL 1: Header Minimalista con Botones -->
       <div class="flex-none flex items-center justify-between">
-        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">CrediTienda</h1>
+        <div>
+          <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">CrediTienda</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Gestión de créditos y cobros a clientes</p>
+        </div>
         
         <!-- Botones de acción -->
         <div class="flex items-center gap-3">
           <!-- Botón Configuración -->
           <button 
             @click="showReminderSettingsModal = true"
-            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-200 dark:hover:bg-[#2a2b2e] rounded-full transition-colors flex items-center gap-2"
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-200 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md border border-gray-300 dark:border-zinc-700 transition-colors flex items-center gap-2"
             title="Configuración de recordatorios">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -23,7 +26,7 @@
           <!-- Botón Nuevo Crédito -->
           <button 
             @click="openCreateCreditModal"
-            class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-full transition-colors flex items-center gap-2">
+            class="px-4 py-2 text-sm font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-md transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -33,13 +36,13 @@
       </div>
 
       <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
+      <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
         <div class="flex flex-col gap-1 px-5 py-4">
           <div class="flex items-center justify-between">
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total por Cobrar</p>
             <svg class="w-4 h-4 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(totalDebt) }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(totalDebt) }}</p>
           <p class="text-xs text-rose-500 dark:text-rose-400">Cartera pendiente</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -47,7 +50,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Clientes Activos</p>
             <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ customersWithDebt }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ customersWithDebt }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Con crédito vigente</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -55,7 +58,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Recaudado Hoy</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(todayPayments) }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(todayPayments) }}</p>
           <p class="text-xs text-emerald-500 dark:text-emerald-400">Cobrado hoy</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -63,22 +66,22 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Mora Promedio</p>
             <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ averageDaysOverdue }}<span class="text-base font-normal text-gray-400 dark:text-zinc-600"> días</span></p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ averageDaysOverdue }}<span class="text-base font-normal text-gray-400 dark:text-zinc-600"> días</span></p>
           <p class="text-xs text-amber-500 dark:text-amber-400">Promedio de atraso</p>
         </div>
       </div>
 
       <!-- Master-Detail Layout Enterprise: 30/70 -->
-      <div class="flex-1 flex rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-800 min-h-0">
+      <div class="flex-1 flex rounded-md overflow-hidden shadow-sm border border-gray-200 dark:border-zinc-800 min-h-0">
         <div class="grid grid-cols-1 lg:grid-cols-10 h-full w-full">
         
         <!-- PANEL IZQUIERDO: Lista de Clientes (30%) -->
-        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-white dark:bg-[#18181b] relative">
+        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-white dark:bg-zinc-900 relative">
           <!-- Sombra lateral para dar profundidad -->
-          <div class="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700"></div>
+          <div class="absolute inset-y-0 right-0 w-px bg-gray-200 dark:bg-zinc-800"></div>
           
           <!-- Header con búsqueda -->
-          <div class="p-4 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-[#1a1a1d] dark:to-[#18181b]">
+          <div class="p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
             <!-- Búsqueda -->
             <div class="relative mb-3">
               <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,13 +91,13 @@
                 v-model="searchTerm"
                 type="text"
                 placeholder="Buscar por nombre o documento..."
-                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
             </div>
             
             <!-- Filtro de estado -->
             <select
               v-model="statusFilter"
-              class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#2a2a2d] text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+              class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
               <option value=""> Todos los estados</option>
               <option value="debt"> Con Deuda</option>
               <option value="overdue"> En Mora</option>
@@ -103,12 +106,12 @@
           </div>
           
           <!-- Lista de clientes -->
-          <div class="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-[#131316] px-3 py-2">
+          <div class="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-zinc-900 px-3 py-2">
             
             <!-- Loading state -->
             <div v-if="loading" class="flex items-center justify-center py-12">
-              <div class="w-6 h-6 border-2 border-gray-300 dark:border-gray-600 border-t-gray-900 dark:border-t-white rounded-full animate-spin"></div>
-              <span class="ml-3 text-sm text-gray-500 dark:text-gray-400">Cargando clientes...</span>
+              <div class="w-6 h-6 border-2 border-gray-300 dark:border-zinc-600 border-t-gray-900 dark:border-t-white rounded-full animate-spin"></div>
+              <span class="ml-3 text-sm text-gray-500 dark:text-zinc-400">Cargando clientes...</span>
             </div>
             
             <!-- Empty state -->
@@ -129,10 +132,10 @@
                 :key="customer.id"
                 @click="selectCustomer(customer)"
                 :class="[
-                  'p-3.5 cursor-pointer transition-all duration-200 rounded-lg border',
+                  'p-3.5 cursor-pointer transition-all duration-200 rounded-md border-l-4',
                   selectedCustomer?.id === customer.id
-                    ? 'bg-white dark:bg-[#1e1f22] border-gray-900 dark:border-white shadow-md ring-1 ring-gray-900/5 dark:ring-white/10'
-                    : 'bg-white dark:bg-[#1a1a1d] border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/30 border-l-emerald-600 dark:border-l-emerald-500'
+                    : 'bg-white dark:bg-zinc-900 border-l-transparent hover:bg-gray-50 dark:hover:bg-zinc-800/40'
                 ]">
               
                 <div class="flex items-center gap-3">
@@ -189,7 +192,7 @@
         </div>
 
         <!-- PANEL DERECHO: Detalle del Cliente (70%) -->
-        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-gradient-to-br from-white via-gray-50/30 to-gray-100/50 dark:from-[#0f0f11] dark:via-[#131316] dark:to-[#0f0f11]">
+        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-white dark:bg-zinc-900">
           
           <!-- Estado: No seleccionado - Empty State mejorado -->
           <div v-if="!selectedCustomer" class="flex-1 flex flex-col items-center justify-center p-12 text-center relative">
@@ -198,24 +201,24 @@
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.03),transparent_50%)] dark:bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.05),transparent_50%)]"></div>
             
             <!-- Contenedor con glassmorphism -->
-            <div class="relative z-10 bg-white/50 dark:bg-white/5 backdrop-blur-sm rounded-2xl p-10 border border-gray-200/50 dark:border-white/10 shadow-lg max-w-md">
+            <div class="relative z-10 bg-white/50 dark:bg-zinc-800/50 backdrop-blur-sm rounded-md p-10 border border-gray-200 dark:border-zinc-700 shadow-sm max-w-md">
               <!-- Ilustración SVG profesional más compacta -->
               <div class="mb-6 flex justify-center">
                 <div class="relative">
                   <!-- Círculo principal con avatar -->
-                  <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center shadow-inner">
+                  <div class="w-20 h-20 rounded-md bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center shadow-inner">
                     <svg class="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                   </div>
                   <!-- Badge de verificación -->
-                  <div class="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                  <div class="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-sm">
                     <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
                   </div>
                   <!-- Badge de dinero -->
-                  <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                  <div class="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
                     <span class="text-white text-xs font-bold">$</span>
                   </div>
                 </div>
@@ -261,7 +264,7 @@
                   <!-- Avatar grande - CLICKABLE -->
                   <div 
                     @click="selectedCustomer.credit_photo && openPhotoPreview(selectedCustomer.credit_photo, selectedCustomer.name)"
-                    class="w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold shadow-lg overflow-hidden transition-all duration-200"
+                    class="w-16 h-16 rounded-md flex items-center justify-center text-xl font-bold shadow-sm overflow-hidden transition-all duration-200"
                     :class="[
                       selectedCustomer.credit_photo 
                         ? 'bg-gray-100 dark:bg-zinc-800 cursor-pointer hover:scale-105 hover:shadow-xl ring-2 ring-transparent hover:ring-blue-400' 
@@ -308,7 +311,7 @@
                   <!-- Botón Editar Cliente -->
                   <button
                     @click="openEditCustomerModal(selectedCustomer)"
-                    class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50"
+                    class="px-4 py-2.5 rounded-md text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50"
                     title="Editar información del cliente"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -321,7 +324,7 @@
                   <button
                     v-if="selectedCustomer.balance <= 0"
                     @click="confirmDeleteCredit(selectedCustomer)"
-                    class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-rose-100 hover:bg-rose-200 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50"
+                    class="px-4 py-2.5 rounded-md text-sm font-bold transition-all duration-300 flex items-center gap-2 bg-rose-100 hover:bg-rose-200 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50"
                     title="Eliminar crédito del cliente"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,7 +337,7 @@
                   <button
                     @click="sendReminder(selectedCustomer)"
                     :disabled="sendingReminder || selectedCustomer.balance <= 0"
-                    class="px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50"
+                    class="px-4 py-2.5 rounded-md text-sm font-bold transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50"
                     title="Enviar recordatorio de pago por WhatsApp"
                   >
                     <svg v-if="sendingReminder" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -351,7 +354,7 @@
                   <button
                     @click="openPaymentModal(selectedCustomer)"
                     :disabled="selectedCustomer.balance <= 0"
-                    class="px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/30"
+                    class="px-5 py-2.5 rounded-md text-sm font-bold transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white shadow-sm"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -364,7 +367,7 @@
               <!-- Cards de resumen financiero -->
               <div class="grid grid-cols-3 gap-4 mt-5">
                 <!-- Balance Total con desglose -->
-                <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/20 rounded-xl p-4 border border-amber-100 dark:border-amber-800/50">
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/20 rounded-md p-4 border border-amber-100 dark:border-amber-800/50">
                   <p class="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wide">Deuda Total</p>
                   <p class="text-2xl font-bold text-amber-700 dark:text-amber-300 mt-1">
                     ${{ formatNumber(selectedCustomer.balance || 0) }}
@@ -387,7 +390,7 @@
                 </div>
                 
                 <!-- Límite de crédito -->
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/50">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/20 rounded-md p-4 border border-blue-100 dark:border-blue-800/50">
                   <p class="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">Límite Crédito</p>
                   <p class="text-2xl font-bold text-blue-700 dark:text-blue-300 mt-1">
                     ${{ formatNumber(selectedCustomer.credit_limit || 0) }}
@@ -396,7 +399,7 @@
                 
                 <!-- Disponible -->
                 <div :class="[
-                  'rounded-xl p-4 border',
+                  'rounded-md p-4 border',
                   getAvailableCreditAmount(selectedCustomer) > 0 
                     ? 'bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/20 border-emerald-100 dark:border-emerald-800/50'
                     : 'bg-gradient-to-br from-rose-50 to-red-50 dark:from-rose-900/30 dark:to-red-900/20 border-rose-100 dark:border-rose-800/50'
@@ -426,12 +429,12 @@
             <div class="flex-1 overflow-y-auto p-5 space-y-6">
               
               <!-- Tabla de Facturas a Crédito -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+              <div class="bg-white dark:bg-zinc-900 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden">
                 <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
                   <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">
                     Facturas a Crédito
                   </h3>
-                  <span class="px-2.5 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-bold">
+                  <span class="px-2.5 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md text-xs font-bold">
                     {{ selectedCustomer.invoices?.length || 0 }} facturas
                   </span>
                 </div>
@@ -484,12 +487,12 @@
               </div>
 
               <!-- Historial de Pagos -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-lg dark:shadow-black/30 border border-gray-200 dark:border-zinc-800 overflow-hidden">
+              <div class="bg-white dark:bg-zinc-900 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden">
                 <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
                   <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">
                     Historial de Abonos
                   </h3>
-                  <span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-bold">
+                  <span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-md text-xs font-bold">
                     {{ selectedCustomer.payments?.length || 0 }} registros
                   </span>
                 </div>
@@ -547,7 +550,7 @@
           <div class="absolute inset-0 bg-black/70 dark:bg-black/85" @click="closePaymentModal"></div>
           
           <!-- Modal Content -->
-          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 animate-modal-enter">
+          <div class="relative bg-white dark:bg-zinc-900 rounded-md shadow-sm w-full max-w-md border border-gray-200 dark:border-zinc-700 animate-modal-enter">
             <!-- Header -->
             <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-zinc-700">
               <div>
@@ -671,11 +674,11 @@
           <div class="absolute inset-0 bg-black/70 dark:bg-black/85" @click="showCreateCreditModal = false"></div>
           
           <!-- Modal Content -->
-          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-auto border border-gray-200 dark:border-zinc-700 animate-modal-enter">
+          <div class="relative bg-white dark:bg-zinc-900 rounded-md shadow-sm w-full max-w-2xl max-h-[90vh] overflow-auto border border-gray-200 dark:border-zinc-700 animate-modal-enter">
             <!-- Header -->
             <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-zinc-700 sticky top-0 bg-white dark:bg-zinc-900 z-10">
               <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center">
+                <div class="w-11 h-11 bg-indigo-100 dark:bg-indigo-900/30 rounded-md flex items-center justify-center">
                   <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                   </svg>
@@ -697,7 +700,7 @@
               <!-- Foto del Cliente -->
               <div class="flex items-center gap-5 pb-5 border-b border-gray-100 dark:border-zinc-800">
                 <div class="relative">
-                  <div class="w-24 h-24 rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-zinc-600">
+                  <div class="w-24 h-24 rounded-md overflow-hidden bg-gray-100 dark:bg-zinc-800 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-zinc-600">
                     <img v-if="photoPreview || customerForm.credit_photo" 
                          :src="photoPreview || customerForm.credit_photo" 
                          class="w-full h-full object-cover"
@@ -706,7 +709,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                   </div>
-                  <div v-if="uploadingPhoto" class="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+                  <div v-if="uploadingPhoto" class="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
                     <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 </div>
@@ -852,14 +855,14 @@
               <button 
                 type="button"
                 @click="showCreateCreditModal = false"
-                class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-xl border border-gray-300 dark:border-zinc-700 transition-colors"
+                class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-md border border-gray-300 dark:border-zinc-700 transition-colors"
               >
                 Cancelar
               </button>
               <button 
                 @click="saveCustomerCredit"
                 :disabled="!customerForm.document_number || !customerForm.name || !customerForm.credit_limit || processing"
-                class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-indigo-500/30 transition-all duration-300 flex items-center gap-2"
+                class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-semibold rounded-md shadow-sm transition-all duration-300 flex items-center gap-2"
               >
                 <svg v-if="processing" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -881,11 +884,11 @@
           <div class="absolute inset-0 bg-black/70 dark:bg-black/85" @click="showReminderSettingsModal = false"></div>
           
           <!-- Modal Content -->
-          <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-zinc-700 animate-modal-enter">
+          <div class="relative bg-white dark:bg-zinc-900 rounded-md shadow-sm w-full max-w-md border border-gray-200 dark:border-zinc-700 animate-modal-enter">
             <!-- Header -->
             <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-zinc-700">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md flex items-center justify-center">
                   <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                   </svg>
@@ -905,7 +908,7 @@
             <!-- Body -->
             <div class="p-5 space-y-5">
               <!-- Estado WhatsApp -->
-              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
+              <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
                     <div class="w-9 h-9 bg-green-100 dark:bg-green-500/10 rounded-lg flex items-center justify-center">
@@ -934,7 +937,7 @@
                 <h4 class="text-sm font-semibold text-gray-700 dark:text-zinc-300">Funciones automáticas activas:</h4>
                 
                 <!-- Confirmación post-compra -->
-                <div class="flex items-start gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+                <div class="flex items-start gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-md border border-emerald-100 dark:border-emerald-800/30">
                   <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-800/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
                     <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -955,7 +958,7 @@
                 <div class="grid grid-cols-1 gap-2">
                   <!-- Modo Manual -->
                   <label 
-                    class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-200"
+                    class="flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-all duration-200"
                     :class="reminderSettings.frequency === 'manual' 
                       ? 'bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-600' 
                       : 'bg-white dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600'"
@@ -975,7 +978,7 @@
                   
                   <!-- Modo Inteligente -->
                   <label 
-                    class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-200"
+                    class="flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-all duration-200"
                     :class="reminderSettings.frequency === 'smart' 
                       ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30' 
                       : 'bg-white dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600'"
@@ -1006,7 +1009,7 @@
               </div>
               
               <!-- Info del modo inteligente -->
-              <div v-if="reminderSettings.frequency === 'smart'" class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-100 dark:border-blue-800/30">
+              <div v-if="reminderSettings.frequency === 'smart'" class="bg-blue-50 dark:bg-blue-900/20 rounded-md p-4 border border-blue-100 dark:border-blue-800/30">
                 <h4 class="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -1038,13 +1041,13 @@
             <div class="flex gap-3 p-5 border-t border-gray-200 dark:border-zinc-700">
               <button
                 @click="showReminderSettingsModal = false"
-                class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-xl transition-colors">
+                class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-md transition-colors">
                 Cancelar
               </button>
               <button
                 @click="saveReminderSettings"
                 :disabled="savingSettings"
-                class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2">
+                class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-md transition-colors flex items-center justify-center gap-2">
                 <svg v-if="savingSettings" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -1076,7 +1079,7 @@
             leave-from-class="opacity-100 scale-100 translate-y-0"
             leave-to-class="opacity-0 scale-95 translate-y-4"
           >
-            <div v-if="showEditCustomerModal" @click.stop class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-zinc-800">
+            <div v-if="showEditCustomerModal" @click.stop class="bg-white dark:bg-zinc-900 rounded-md shadow-sm w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-zinc-800">
               <!-- Header -->
               <div class="sticky top-0 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between z-10">
                 <div>
@@ -1094,12 +1097,12 @@
               <div class="p-6 space-y-5">
                 
                 <!-- Foto del Cliente -->
-                <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
+                <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-md p-4 border border-gray-200 dark:border-zinc-700">
                   <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3">Foto del Cliente</label>
                   
                   <div class="flex items-center gap-4">
                     <!-- Preview de la foto -->
-                    <div class="w-24 h-24 rounded-xl overflow-hidden bg-gray-200 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
+                    <div class="w-24 h-24 rounded-md overflow-hidden bg-gray-200 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
                       <img v-if="editPhotoPreview || editForm.credit_photo" 
                            :src="editPhotoPreview || editForm.credit_photo" 
                            class="w-full h-full object-cover" />
@@ -1183,10 +1186,10 @@
 
               <!-- Footer -->
               <div class="sticky bottom-0 bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3">
-                <button @click="showEditCustomerModal = false" type="button" class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-xl border border-gray-300 dark:border-zinc-700 transition-all duration-200">
+                <button @click="showEditCustomerModal = false" type="button" class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-md border border-gray-300 dark:border-zinc-700 transition-all duration-200">
                   Cancelar
                 </button>
-                <button @click="submitEditCustomer" :disabled="processingEdit || !editForm.name" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white text-sm font-bold rounded-xl shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                <button @click="submitEditCustomer" :disabled="processingEdit || !editForm.name" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white dark:text-gray-900 text-sm font-semibold rounded-md shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                   <svg v-if="processingEdit" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -1238,7 +1241,7 @@
                 <img 
                   :src="previewPhotoUrl" 
                   :alt="previewPhotoName"
-                  class="max-w-full max-h-[70vh] object-contain rounded-xl shadow-2xl"
+                  class="max-w-full max-h-[70vh] object-contain rounded-md shadow-sm"
                 />
               </div>
 
@@ -1273,7 +1276,7 @@
             leave-from-class="opacity-100 scale-100"
             leave-to-class="opacity-0 scale-95"
           >
-            <div v-if="showDeleteModal" @click.stop class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-200 dark:border-zinc-800">
+            <div v-if="showDeleteModal" @click.stop class="bg-white dark:bg-zinc-900 rounded-md shadow-sm max-w-md w-full overflow-hidden border border-gray-200 dark:border-zinc-800">
               
               <!-- Icono de advertencia -->
               <div class="p-6 text-center">
@@ -1296,7 +1299,7 @@
                 </p>
                 
                 <!-- Lista de lo que se eliminará -->
-                <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 text-left mb-6">
+                <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-md p-4 text-left mb-6">
                   <p class="text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wide mb-3">Se eliminará:</p>
                   <ul class="space-y-2 text-sm text-gray-600 dark:text-zinc-400">
                     <li class="flex items-center gap-2">
@@ -1331,14 +1334,14 @@
               <div class="bg-gray-50 dark:bg-zinc-800/50 px-6 py-4 flex gap-3">
                 <button
                   @click="showDeleteModal = false"
-                  class="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-xl border border-gray-300 dark:border-zinc-700 transition-all duration-200"
+                  class="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-md border border-gray-300 dark:border-zinc-700 transition-all duration-200"
                 >
                   Cancelar
                 </button>
                 <button
                   @click="executeDeleteCredit"
                   :disabled="deletingCredit"
-                  class="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 text-white font-bold rounded-xl transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  class="flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 text-white font-bold rounded-md transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <svg v-if="deletingCredit" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

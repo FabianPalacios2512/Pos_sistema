@@ -1136,7 +1136,8 @@ const handleSubmit = () => {
 defineExpose({
   setCategory,
   handleSubmit,
-  form
+  form,
+  simpleProduct
 })
 </script>
 

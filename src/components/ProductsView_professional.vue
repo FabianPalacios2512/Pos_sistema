@@ -1,6 +1,6 @@
 <template>
   <!-- Loading State durante inicialización (evita parpadeo) -->
-  <div v-if="isInitializing" class="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
+  <div v-if="isInitializing" class="min-h-screen font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 px-8">
     <div class="flex items-center justify-center min-h-screen">
       <div class="flex flex-col items-center space-y-4">
         <div class="w-16 h-16 border-4 border-slate-200 dark:border-zinc-700 border-t-slate-900 dark:border-t-slate-500 rounded-full animate-spin"></div>
@@ -10,7 +10,7 @@
   </div>
   
   <!-- Contenido principal (solo cuando la inicialización está completa) -->
-  <div v-else class="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
+  <div v-else class="min-h-screen font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Header - Condicional Fashion/Standard -->
@@ -22,7 +22,7 @@
         </div>
         <!-- Título Standard -->
         <div v-else>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Productos</h1>
+          <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Productos</h1>
           <p class="text-base text-gray-600 dark:text-zinc-400 mt-1 font-normal">Gestiona tu inventario y catalogo</p>
         </div>
         
@@ -282,7 +282,7 @@
           
           <button v-if="!searchTerm" 
                   @click="openCreateModal" 
-                  class="mt-6 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-[15px] font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 inline-flex items-center gap-2">
+                  class="mt-6 px-6 py-3 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white rounded-xl text-[15px] font-bold  transition-all duration-300 inline-flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
@@ -310,7 +310,7 @@
           <div v-for="product in paginatedProducts" 
                :key="product.id" 
                @click="viewProduct(product)"
-               class="bg-white dark:bg-[#1e1f20] rounded-2xl hover:bg-[#f8f9fa] dark:hover:bg-[#282a2c] transition-all duration-200 overflow-hidden group cursor-pointer">
+               class="bg-white dark:bg-[#1e1f20] rounded-2xl hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-all duration-200 overflow-hidden group cursor-pointer">
           
             <!-- Imagen del producto con overlay en hover -->
             <div class="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-50 dark:from-[#1e1f20] dark:to-[#282a2c] overflow-hidden">
@@ -397,7 +397,7 @@
                   'text-sm font-medium px-2.5 py-1 rounded-full',
                   (product.current_stock || 0) <= (product.min_stock || 0) 
                     ? 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#e37400] dark:text-[#f9ab00]' 
-                    : 'bg-[#f8f9fa] dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6]'
+                    : 'bg-gray-50 dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6]'
                 ]">
                   {{ product.current_stock || 0 }} uds
                 </span>
@@ -506,7 +506,7 @@
                 
                 <button v-if="!searchTerm" 
                         @click="openCreateModal" 
-                        class="mt-5 px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl text-[15px] font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 inline-flex items-center gap-2">
+                        class="mt-5 px-6 py-3 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white rounded-xl text-[15px] font-bold  transition-all duration-300 inline-flex items-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                   </svg>
@@ -799,7 +799,7 @@
             <!-- Actions -->
             <div class="bg-gray-50 dark:bg-zinc-900 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-zinc-800">
               <button @click="showStatusConfirmModal = false" 
-                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-[15px] font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
+                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-[15px] font-bold rounded-md border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
                 Cancelar
               </button>
               <button @click="confirmStatusChange" 
@@ -870,12 +870,12 @@
             <!-- Footer -->
             <div class="bg-gray-50 dark:bg-zinc-900/80 px-6 py-4 flex items-center justify-end gap-3 border-t border-gray-200 dark:border-zinc-800">
               <button @click="showDeleteConfirmModal = false; deleteReason = ''"
-                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
+                      class="px-5 py-2.5 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-md border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200">
                 Cancelar
               </button>
               <button @click="confirmDeleteProduct"
                       :disabled="deletingProduct"
-                      class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-red-500/25 dark:shadow-red-900/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                      class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white dark:text-gray-900 text-sm font-semibold rounded-md shadow-lg shadow-red-500/25 dark:shadow-red-900/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                 <svg v-if="!deletingProduct" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
@@ -949,7 +949,7 @@
            class="fixed inset-0 bg-gray-900/50 dark:bg-black/70  flex items-center justify-center"
            style="z-index: 50000"
            @click.self="showProductModal = false">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden border border-gray-300 dark:border-zinc-800 mx-4 flex flex-col">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-7xl shadow-2xl max-h-[95vh] overflow-hidden border border-gray-200 dark:border-zinc-800 mx-4 flex flex-col">
         
         <!-- Header -->
         <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-8 py-3 flex-shrink-0">
@@ -1409,14 +1409,14 @@
               <button v-if="isFashionMode" type="button"
                       @click="saveFashionProduct"
                       :disabled="loading"
-                      class="w-full px-4 h-[44px] bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-semibold text-[15px] shadow-lg transition-all disabled:opacity-50">
+                      class="w-full px-4 h-[44px] bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white rounded-xl font-semibold text-[15px] shadow-lg transition-all disabled:opacity-50">
                 {{ loading ? 'Guardando...' : 'Crear Producto' }}
               </button>
               
               <button v-else type="button" 
                       @click="saveProduct"
                       :disabled="loading"
-                      class="w-full px-4 h-[44px] bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl font-semibold text-[15px] shadow-lg transition-all disabled:opacity-50">
+                      class="w-full px-4 h-[44px] bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white rounded-xl font-semibold text-[15px] shadow-lg transition-all disabled:opacity-50">
                 {{ loading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear Producto') }}
               </button>
               
@@ -1696,7 +1696,7 @@
           </div>
           
           <!-- TABLA EXCEL-STYLE: Edición en Línea -->
-          <div class="bg-white dark:bg-zinc-900/60  rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm dark:shadow-none">
+          <div class="bg-white dark:bg-zinc-900/60  rounded-md border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm dark:shadow-none">
             <div class="bg-gray-50 dark:bg-zinc-800/50 px-5 py-3 border-b border-gray-200 dark:border-zinc-700/50">
               <h4 class="text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1869,7 +1869,7 @@
            class="bg-white dark:bg-[#1e1f20] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
         
         <!-- Header (Gemini clean) -->
-        <div class="bg-[#f8f9fa] dark:bg-[#282a2c] px-6 py-4">
+        <div class="bg-gray-50 dark:bg-[#282a2c] px-6 py-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#8ab4f8]/20 rounded-full flex items-center justify-center">
@@ -1884,7 +1884,7 @@
               </div>
             </div>
             <button @click="showViewModal = false" 
-                    class="p-2 hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] rounded-full transition-colors">
+                    class="p-2 hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] rounded-md transition-colors">
               <svg class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -1936,15 +1936,15 @@
           
           <!-- Detalles en grid (Gemini style) -->
           <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
+            <div class="bg-gray-50 dark:bg-[#282a2c] rounded-2xl p-4">
               <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">SKU</p>
               <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProduct.sku || 'Sin SKU' }}</p>
             </div>
-            <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
+            <div class="bg-gray-50 dark:bg-[#282a2c] rounded-2xl p-4">
               <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Precio</p>
               <p class="text-base font-semibold text-[#1e8e3e] dark:text-[#81c995]">${{ formatCurrency(selectedProduct.sale_price) }}</p>
             </div>
-            <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
+            <div class="bg-gray-50 dark:bg-[#282a2c] rounded-2xl p-4">
               <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Stock Actual</p>
               <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ selectedProduct.current_stock || 0 }}</p>
               <div class="flex items-center mt-1 text-[13px] text-[#5f6368] dark:text-[#9aa0a6]">
@@ -1953,7 +1953,7 @@
                 <span>Máx: {{ selectedProduct.max_stock || 0 }}</span>
               </div>
             </div>
-            <div class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4">
+            <div class="bg-gray-50 dark:bg-[#282a2c] rounded-2xl p-4">
               <p class="text-[13px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-1">Costo</p>
               <p class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">${{ formatCurrency(selectedProduct.cost_price) }}</p>
               <p class="text-[13px] text-[#5f6368] dark:text-[#9aa0a6] mt-1">
@@ -1965,7 +1965,7 @@
           </div>
           
           <!-- Sección de descripción -->
-          <div v-if="selectedProduct.description" class="bg-[#f8f9fa] dark:bg-[#282a2c] rounded-2xl p-4 mb-6">
+          <div v-if="selectedProduct.description" class="bg-gray-50 dark:bg-[#282a2c] rounded-2xl p-4 mb-6">
             <div class="flex items-center mb-2 space-x-2">
               <svg class="w-4 h-4 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/>
@@ -2002,7 +2002,7 @@
        class="fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black/80  flex items-center justify-center p-4"
        style="z-index: 60000"
        @click.self="showSupplierModal = false">
-    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full animate-fade-in">
+    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-800 max-w-md w-full animate-fade-in">
       <!-- Header -->
       <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
         <div class="flex items-center space-x-3">
@@ -2074,7 +2074,7 @@
           </button>
           <button type="submit" 
                   :disabled="!supplierForm.name || !supplierForm.document || loading"
-                  class="px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                  class="px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white font-bold rounded-lg  transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
             Crear Proveedor
           </button>
         </div>
@@ -2114,7 +2114,7 @@
          class="fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black/70  flex items-center justify-center p-4"
          style="z-index: 50000; margin: 0 !important;"
          @click.self="showNoCategoriesModal = false">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-md w-full p-6 animate-fade-in">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-800 max-w-md w-full p-6 animate-fade-in">
         <div class="text-center">
           <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2126,7 +2126,7 @@
           
           <div class="flex flex-col space-y-3">
             <button @click="openCategoryModal" 
-                    class="w-full px-4 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-200 flex items-center justify-center space-x-2">
+                    class="w-full px-4 py-3 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white font-bold rounded-lg  transition-all duration-200 flex items-center justify-center space-x-2">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
@@ -2148,7 +2148,7 @@
          class="fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-black/80  flex items-center justify-center p-4"
          style="z-index: 60000; margin: 0 !important;"
          @click.self="showCategoryModal = false">
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-300 dark:border-zinc-800 max-w-lg w-full animate-fade-in">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-800 max-w-lg w-full animate-fade-in">
         <!-- Header Simple -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
           <div class="flex items-center space-x-3">
@@ -2212,7 +2212,7 @@
             </button>
             <button type="submit" 
                     :disabled="!categoryForm.name"
-                    class="px-4 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white font-bold rounded-lg shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white font-bold rounded-lg  transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
               Crear Categoría
             </button>
           </div>
@@ -3215,6 +3215,87 @@ const updateScreenContextForAI = () => {
       return { success: false, message: 'Primero abre el modal con abrirCrearProducto' }
     }
     
+    // ═══════════════════════════════════════════════════════════
+    // MODO FASHION: Llenar FashionProductForm
+    // ═══════════════════════════════════════════════════════════
+    if (isFashionMode.value && fashionFormRef.value) {
+      const fashionForm = fashionFormRef.value.form
+      const camposFashion = {
+        'nombre': 'name', 'name': 'name',
+        'descripcion': 'description', 'description': 'description',
+        'sku': 'sku', 'codigo': 'sku',
+        'categoria': 'category_id', 'category': 'category_id', 'category_id': 'category_id',
+        'proveedor': 'supplier_id', 'supplier': 'supplier_id',
+        'talla': '_talla', 'tallas': '_talla', 'size': '_talla', 'sizes': '_talla',
+        'color': '_color', 'colores': '_color', 'colors': '_color',
+        'precio': '_precio', 'price': '_precio', 'precio_venta': '_precio',
+        'costo': '_costo', 'cost': '_costo', 'precio_costo': '_costo',
+        'stock': '_stock', 'stock_inicial': '_stock'
+      }
+      
+      const campoReal = camposFashion[campo.toLowerCase().trim()]
+      if (!campoReal) {
+        return { success: false, message: `Campo "${campo}" no reconocido. Campos válidos para moda: nombre, precio, costo, stock, categoria, tallas, colores, descripcion, sku, proveedor` }
+      }
+      
+      // Categoría
+      if (campoReal === 'category_id') {
+        const categoria = categories.value.find(c => c.name.toLowerCase().includes(valor.toLowerCase()))
+        if (categoria) {
+          fashionForm.category_id = categoria.id
+          return { success: true, message: `Categoría "${categoria.name}" seleccionada`, formularioActual: { nombre: fashionForm.name || '(vacío)', categoria: categoria.name } }
+        }
+        const cats = categories.value.map(c => c.name).join(', ')
+        return { success: false, message: `No encontré categoría "${valor}". Disponibles: ${cats}` }
+      }
+      
+      // Proveedor
+      if (campoReal === 'supplier_id') {
+        // Try to find by partial name - suppliers may already be loaded
+        return { success: true, message: `Proveedor se asigna manualmente en el formulario.` }
+      }
+      
+      // Tallas (valores separados por coma)
+      if (campoReal === '_talla') {
+        const tallaOption = fashionForm.options.find(o => o.name === 'Talla')
+        if (tallaOption) {
+          const nuevasTallas = valor.split(/[,;\/\s]+/).map(t => t.trim().toUpperCase()).filter(Boolean)
+          nuevasTallas.forEach(t => { if (!tallaOption.values.includes(t)) tallaOption.values.push(t) })
+          return { success: true, message: `Tallas agregadas: ${tallaOption.values.join(', ')}`, formularioActual: { nombre: fashionForm.name || '(vacío)', tallas: tallaOption.values.join(', '), colores: fashionForm.options.find(o => o.name === 'Color')?.values.join(', ') || '(vacío)' } }
+        }
+      }
+      
+      // Colores (valores separados por coma)
+      if (campoReal === '_color') {
+        const colorOption = fashionForm.options.find(o => o.name === 'Color')
+        if (colorOption) {
+          const nuevosColores = valor.split(/[,;\/]+/).map(c => c.trim()).filter(Boolean)
+          nuevosColores.forEach(c => { if (!colorOption.values.find(v => v.toLowerCase() === c.toLowerCase())) colorOption.values.push(c) })
+          return { success: true, message: `Colores agregados: ${colorOption.values.join(', ')}`, formularioActual: { nombre: fashionForm.name || '(vacío)', tallas: fashionForm.options.find(o => o.name === 'Talla')?.values.join(', ') || '(vacío)', colores: colorOption.values.join(', ') } }
+        }
+      }
+      
+      // Precio/Costo/Stock → se aplican a simpleProduct del fashion form
+      if (campoReal === '_precio' || campoReal === '_costo' || campoReal === '_stock') {
+        const numVal = parseFloat(valor) || 0
+        // Access the simpleProduct reactive from the exposed form ref
+        // Fashion form uses simpleProduct for base price/cost when no variants yet
+        const spKey = campoReal === '_precio' ? 'price' : campoReal === '_costo' ? 'cost' : 'stock'
+        // These will be applied when variants are generated, or if it's a simple fashion product
+        if (fashionFormRef.value.simpleProduct) {
+          fashionFormRef.value.simpleProduct[spKey] = numVal
+        }
+        return { success: true, message: `${campo} establecido a ${numVal}`, formularioActual: { nombre: fashionForm.name || '(vacío)', precio: fashionFormRef.value.simpleProduct?.price || '(vacío)', costo: fashionFormRef.value.simpleProduct?.cost || '(vacío)', stock: fashionFormRef.value.simpleProduct?.stock || 0 } }
+      }
+      
+      // Campos de texto directos
+      fashionForm[campoReal] = valor
+      return { success: true, message: `Campo "${campo}" actualizado a "${valor}"`, formularioActual: { nombre: fashionForm.name || '(vacío)', categoria: categories.value.find(c => c.id === fashionForm.category_id)?.name || '(sin categoría)', tallas: fashionForm.options.find(o => o.name === 'Talla')?.values.join(', ') || '(vacío)', colores: fashionForm.options.find(o => o.name === 'Color')?.values.join(', ') || '(vacío)' } }
+    }
+    
+    // ═══════════════════════════════════════════════════════════
+    // MODO GENERAL: Llenar productForm (formulario normal)
+    // ═══════════════════════════════════════════════════════════
     const camposValidos = {
       'nombre': 'name',
       'name': 'name',
@@ -3329,6 +3410,24 @@ const updateScreenContextForAI = () => {
       return { success: false, message: 'No hay formulario de producto abierto' }
     }
     
+    // ═══ MODO FASHION ═══
+    if (isFashionMode.value && fashionFormRef.value) {
+      const ff = fashionFormRef.value.form
+      const faltantes = []
+      if (!ff.name?.trim()) faltantes.push('nombre')
+      if (!ff.category_id) faltantes.push('categoría')
+      if (faltantes.length > 0) {
+        return { success: false, message: `Faltan campos obligatorios: ${faltantes.join(', ')}` }
+      }
+      try {
+        fashionFormRef.value.handleSubmit()
+        return { success: true, message: `Producto de moda "${ff.name}" guardado exitosamente.` }
+      } catch (error) {
+        return { success: false, message: `Error al guardar: ${error.message}` }
+      }
+    }
+    
+    // ═══ MODO GENERAL ═══
     // Verificar campos obligatorios
     const faltantes = []
     if (!productForm.value.name?.trim()) faltantes.push('nombre')

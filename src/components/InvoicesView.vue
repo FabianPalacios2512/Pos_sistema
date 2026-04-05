@@ -1,6 +1,6 @@
 <template>
   <!-- Layout Full Height estilo WhatsApp Web - Sin doble scroll -->
-  <div class="h-full font-sans bg-[#f8fafc] dark:bg-[#131314] transition-colors duration-300 overflow-hidden flex flex-col">
+  <div class="h-full font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 overflow-hidden flex flex-col">
     <div class="flex-none px-4 lg:px-6 pt-4 pb-2.5 space-y-3 animate-fade-in">
       
       <!-- NIVEL 1: Header con Título y Botones de Acción -->
@@ -8,7 +8,7 @@
             
             <!-- Título y Subtítulo -->
             <div>
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Facturas</h1>
+              <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Facturas</h1>
               <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">{{ isVendedor ? 'Mis facturas de hoy' : 'Gestión de documentos y cotizaciones' }}</p>
             </div>
         
@@ -16,7 +16,7 @@
         <div class="flex items-center gap-2">
           <button
             @click="loadInvoices"
-            class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-[13px] font-semibold rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
+            class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-[13px] font-semibold rounded-md border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -26,7 +26,7 @@
           <button
             v-if="!isVendedor"
             @click="navigateToPos"
-            class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-[13px] font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+            class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -37,13 +37,13 @@
       </div>
 
       <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
+      <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
         <div class="flex flex-col gap-1 px-5 py-4">
           <div class="flex items-center justify-between">
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Facturas del Mes</p>
             <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ monthlyInvoices }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ monthlyInvoices }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Este mes</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -51,7 +51,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total Facturado</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(totalInvoiced) }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(totalInvoiced) }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Acumulado del mes</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -59,7 +59,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Pendientes</p>
             <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ pendingInvoices }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ pendingInvoices }}</p>
           <p class="text-xs text-amber-500 dark:text-amber-400">Requieren atención</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -67,7 +67,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Cotizaciones</p>
             <svg class="w-4 h-4 text-violet-500 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ quotations }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ quotations }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">En proceso</p>
         </div>
       </div>
@@ -75,7 +75,7 @@
     </div>
     
     <!-- Master-Detail Layout - Workspace Unificado -->
-    <div class="flex-1 mx-3 lg:mx-4 mb-3 rounded-2xl overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+    <div class="flex-1 mx-3 lg:mx-4 mb-3 rounded-md overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-zinc-800 shadow-sm">
       <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
         <!-- PANEL IZQUIERDO: Lista refinada (Master) -->
@@ -128,8 +128,8 @@
               class="px-3 py-2.5 mb-0.5 cursor-pointer transition-all duration-150 rounded-lg group relative"
               :class="[
                 selectedInvoice?.id === invoice.id 
-                  ? 'bg-blue-50 dark:bg-blue-950/40 ring-1 ring-blue-200 dark:ring-blue-800/50 border-l-[3px] border-blue-500 dark:border-blue-400' 
-                  : 'hover:bg-gray-50 dark:hover:bg-zinc-800/40 border-l-[3px] border-transparent'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-600 dark:border-emerald-500' 
+                  : 'hover:bg-gray-50 dark:hover:bg-zinc-800/40 border-l-4 border-transparent'
               ]"
             >
               <div class="flex items-center justify-between gap-3">
@@ -223,7 +223,7 @@
             
             <!-- Texto de bienvenida -->
             <div class="relative z-10 max-w-sm mb-8">
-              <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2">
                 Centro de Facturación
               </h3>
               <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
@@ -280,7 +280,7 @@
                   <button
                     v-if="!isVendedor && (selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote')"
                     @click="openInPos(selectedInvoice)"
-                    class="px-5 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-[13px] font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
+                    class="px-5 py-2 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2"
                     title="Convertir a factura">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -342,7 +342,7 @@
                     
                     <!-- Dropdown menu -->
                     <div v-if="activeMenuId === selectedInvoice.id" 
-                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xl dark:shadow-black/50 z-50 py-1 overflow-hidden">
+                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-sm z-50 py-1 overflow-hidden">
                       <button @click="editInvoice(selectedInvoice); closeActionsMenu()" 
                               class="w-full text-left px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors">
                         <svg class="w-4 h-4 text-gray-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -360,7 +360,7 @@
             <div class="flex-1 overflow-y-auto p-5 bg-[#f5f7fa] dark:bg-[#141416]">
               
               <!-- Factura digital -->
-              <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm dark:shadow-black/30 overflow-hidden">
+              <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-sm dark:shadow-black/30 overflow-hidden">
                 
                 <!-- Encabezado de la factura digital -->
                 <div class="p-5 border-b border-gray-200 dark:border-zinc-800">
@@ -519,7 +519,7 @@
   <Teleport to="body">
     <Transition name="modal-fade">
       <div v-if="showEmailModal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[9999] p-4">
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-300 dark:border-zinc-800">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800">
           <!-- Header con icono -->
           <div class="p-6 pb-4">
             <div class="text-center">
@@ -646,7 +646,7 @@
                 
                 <button
                   @click="handleReturnFromModal"
-                  class="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition-all duration-200 flex items-center justify-center gap-2"
+                  class="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white dark:text-gray-900 text-sm font-semibold rounded-md shadow-lg shadow-emerald-600/30 transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
@@ -688,7 +688,7 @@
           </div>
 
           <!-- Título -->
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¡Mejora tu Plan!</h3>
+          <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-3">¡Mejora tu Plan!</h3>
           
           <!-- Mensaje -->
           <p class="text-base text-gray-600 dark:text-zinc-400 mb-6 leading-relaxed">

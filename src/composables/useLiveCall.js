@@ -504,9 +504,16 @@ export function useLiveCall(options = {}) {
       websocket.onopen = () => {
         // Obtener nombre del usuario para saludo personalizado
         let userName = '105 Code'
+        let userRole = ''
+        let userPermissions = []
+        let isVendedor = false
         try {
           const user = JSON.parse(localStorage.getItem('user') || '{}')
           userName = user.name?.split(' ')[0] || '105 Code'
+          userRole = user.role?.name || ''
+          userPermissions = Array.isArray(user.role?.permissions) ? user.role.permissions : []
+          const isAllPerms = userPermissions.includes('*') || userPermissions.includes('ALL') || userPermissions.includes('admin')
+          isVendedor = !isAllPerms && (userRole.toLowerCase().includes('vendedor') || userRole.toLowerCase().includes('cajero'))
         } catch {}
         
         // Obtener fecha actual en Colombia para el contexto
@@ -552,6 +559,56 @@ export function useLiveCall(options = {}) {
         }
         const tipoTiendaDescripcion = tiposTiendaMap[tipoTienda] || 'tienda general'
         
+        // Construir bloque de permisos según rol del usuario
+        const moduleNameMap = {
+          'dashboard': 'Panel Principal',
+          'pos': 'Punto de Venta',
+          'invoices': 'Facturas',
+          'returns': 'Devoluciones',
+          'products': 'Productos',
+          'categories': 'Categorías',
+          'stock': 'Gestión de Stock',
+          'inventory': 'Inventario',
+          'intelligent_inventory': 'Inventario Inteligente',
+          'customers': 'Clientes',
+          'suppliers': 'Proveedores',
+          'users': 'Gestión de Usuarios',
+          'cash_register': 'Control de Cajas',
+          'expenses': 'Gastos / Movimientos de Caja',
+          'reports': 'Reportes',
+          'settings': 'Configuración',
+          'sales': 'Ventas',
+          'accounts-receivable': 'CrediTienda'
+        }
+        
+        let permisoBlock = ''
+        if (isVendedor) {
+          const modulosPermitidos = new Set()
+          userPermissions.forEach(p => {
+            const mod = p.split('.')[0]
+            if (moduleNameMap[mod]) modulosPermitidos.add(moduleNameMap[mod])
+          })
+          const listaModulos = Array.from(modulosPermitidos).join(', ')
+          permisoBlock = `
+🔒 ROL DEL USUARIO: ${userRole} (VENDEDOR / CAJERO)
+⚠️ RESTRICCIÓN CRÍTICA - ESTE USUARIO NO ES ADMINISTRADOR:
+- Solo tiene acceso a: ${listaModulos}
+- NO puede acceder a: Reportes, Gastos, Gestión de Usuarios, Configuración, Proveedores
+- NO le hables de módulos a los que NO tiene acceso
+- NO le ofrezcas navegar a módulos restringidos
+- NO le muestres datos financieros globales (ganancias netas, márgenes, gastos del negocio)
+- Si pregunta por algo que no tiene permiso, dile amablemente: "Eso lo maneja el administrador, yo te puedo ayudar con ventas, productos o clientes"
+- Sus datos de ventas/facturas son SOLO los suyos (filtrados por su usuario), NO los del negocio completo
+- Cuando menciones ventas, di "tus ventas" no "las ventas del negocio"
+`
+        } else {
+          permisoBlock = `
+👤 ROL DEL USUARIO: ${userRole || 'Administrador'}
+Este usuario es ADMINISTRADOR y tiene acceso completo a todos los módulos del sistema.
+Puedes hablarle de cualquier módulo, dato financiero o configuración sin restricción.
+`
+        }
+
         // Enviar configuración inicial con instrucciones para que inicie la conversación
         const setupMessage = {
           setup: {
@@ -570,7 +627,7 @@ export function useLiveCall(options = {}) {
               parts: [{
                 text: `Eres el asistente de voz de ciento cinco pos. Tu nombre es "ciento cinco i a". El usuario se llama ${userName}.
 El negocio se llama "${nombreNegocio}" y es una ${tipoTiendaDescripcion}.
-
+${permisoBlock}
 📅 FECHA Y HORA (solo si te preguntan): ${fechaFormateada}, ${horaFormateada} (Bogotá, UTC-5)
 ⚠️ NO menciones la fecha ni hora al saludar. Solo dila si el usuario te la pregunta explícitamente.
 
@@ -1002,7 +1059,48 @@ IA: "Perfecto, stock inicial de 20 unidades. ¡Ya tenemos todo! ¿Lo guardo?"
 Usuario: "Sí"
 → crearProductoConversacional(accion: 'confirmar')
 
-�👥 CLIENTES - MÓDULO MASTER-DETAIL:
+👗 CREAR PRODUCTOS EN TIENDA DE MODA (store_type = 'fashion'):
+⚠️ IMPORTANTE: En tiendas de MODA, tu rol NO es llenar el formulario automáticamente.
+Tu rol es ser un GUÍA/INSTRUCTOR que acompaña al usuario mientras él llena el formulario visualmente.
+
+Cuando el usuario diga "quiero crear un producto" en una tienda de moda:
+1. Usa crearProductoConversacional(accion: 'iniciar') para abrir el formulario
+2. NO preguntes nombre, no preguntes campos uno por uno
+3. En su lugar, INSTRUYE al usuario así:
+
+INSTRUCCIONES QUE DEBES DAR AL USUARIO (adaptadas, no leer textualmente):
+- "Se abrió el formulario de nuevo producto. Te voy a guiar paso a paso."
+- "Primero, escribe el nombre del producto y selecciona la categoría en la parte superior."
+- "Si quieres, puedes agregar imágenes arrastrándolas o haciendo clic en la zona de imágenes. Puedes subir hasta 5 fotos y organizarlas como prefieras."
+- "También puedes agregar una descripción del producto si lo deseas, no es obligatorio pero ayuda."
+- "En la sección de Atributos y Variantes, verás los campos de Talla y Color. Escribe las tallas (como S, M, L, XL) y los colores que maneje el producto, presionando Enter después de cada uno."
+- "Si tu producto necesita variantes (combinaciones de talla y color), agrégalas. Si es un producto simple sin variantes, puedes continuar como producto simple."
+- "Abajo podrás poner el precio de costo, precio de venta y el stock inicial."
+- "Cuando tengas todo listo, dale clic a 'Crear Producto'."
+- "Si necesitas ayuda en cualquier paso, no dudes en preguntarme."
+
+⚠️ REGLAS PARA MODA:
+- NO uses crearProductoConversacional(accion: 'asignar') para llenar campos en moda
+- NO preguntes campo por campo (nombre, precio, etc.) - el usuario los llena en el formulario visual
+- SÍ puedes responder preguntas: "¿qué tallas pongo?", "¿cómo agrego colores?", "¿qué es una variante?"
+- SÍ puedes dar consejos: "Te recomiendo agregar al menos una foto para que se vea bien en el catálogo"
+- SÍ puedes explicar conceptos: variantes, atributos, producto simple vs variable
+- El formulario tiene: imágenes (drag&drop, máx 5), nombre, categoría, descripción, SKU, proveedor, atributos (Talla y Color con tags), sección de variantes, precio costo, precio venta, stock
+- Si el usuario pregunta algo sobre el formulario, responde con claridad
+- Si el usuario quiere cancelar: crearProductoConversacional(accion: 'cancelar')
+
+EJEMPLO FLUJO MODA:
+Usuario: "Quiero crear un producto"
+→ crearProductoConversacional(accion: 'iniciar')
+IA: "¡Perfecto! Se abrió el formulario de nuevo producto. Empieza escribiendo el nombre y seleccionando la categoría arriba. Luego puedes agregar las tallas y colores que maneje tu producto en la sección de Atributos. Si quieres subir fotos, puedes arrastrarlas a la zona de imágenes. Y abajo pones costo, precio y stock. Si necesitas ayuda en cualquier paso, pregúntame."
+Usuario: "¿Qué tallas le pongo a un vestido?"
+IA: "Para vestidos generalmente se usan S, M, L y XL. Si manejas tallas numéricas puedes usar 6, 8, 10, 12. Escríbelas una por una en el campo de Talla y presiona Enter después de cada una."
+Usuario: "¿Y si no tiene variantes?"
+IA: "Si tu producto no tiene variantes de talla o color, puedes dar clic en 'Continuar como Producto Simple'. Así solo le pones nombre, categoría, precio y stock."
+Usuario: "Ya quedó, ¿cómo lo guardo?"
+IA: "Dale clic al botón 'Crear Producto' que está abajo a la derecha. ¡Y listo!"
+
+👥 CLIENTES - MÓDULO MASTER-DETAIL:
 El módulo de Clientes tiene una vista Master-Detail como Facturas.
 - Panel izquierdo: Lista de clientes con búsqueda y filtros
 - Panel derecho: Información del cliente seleccionado (datos personales, crédito, historial)
@@ -1704,7 +1802,7 @@ Después de dar datos, ofrece llevar al módulo si tiene sentido.`
                       },
                       campo: { 
                         type: 'STRING', 
-                        description: 'Campo del producto a asignar',
+                        description: 'Campo del producto a asignar (solo para tiendas generales/comida)',
                         enum: ['nombre', 'precio', 'costo', 'stock', 'categoria', 'descripcion', 'sku', 'sede']
                       },
                       valor: { 

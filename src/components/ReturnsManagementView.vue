@@ -1,6 +1,6 @@
 <template>
   <!-- Layout Full Height estilo WhatsApp Web - Sin doble scroll -->
-  <div class="h-full font-sans bg-[#f8fafc] dark:bg-[#131314] transition-colors duration-300 overflow-hidden flex flex-col">
+  <div class="h-full font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 overflow-hidden flex flex-col">
     <div class="flex-none px-4 lg:px-6 pt-4 pb-2.5 space-y-3 animate-fade-in">
       
       <!-- NIVEL 1: Header con Título y Botones de Acción -->
@@ -8,7 +8,7 @@
             
             <!-- Título y Subtítulo -->
             <div>
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Devoluciones</h1>
+              <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Devoluciones</h1>
               <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Gestión de devoluciones y reembolsos</p>
             </div>
             
@@ -16,7 +16,7 @@
             <div class="flex items-center gap-2">
               <button
                 @click="loadReturns"
-                class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-[13px] font-semibold rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
+                class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-[13px] font-semibold rounded-md border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
@@ -25,7 +25,7 @@
               
               <button
                 @click="navigateToNewReturn"
-                class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-[13px] font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+                class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -36,13 +36,13 @@
           </div>
 
       <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
+      <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
         <div class="flex flex-col gap-1 px-5 py-4">
           <div class="flex items-center justify-between">
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total Devuelto</p>
             <svg class="w-4 h-4 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(stats.totalRefunded) }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(stats.totalRefunded) }}</p>
           <p class="text-xs text-rose-500 dark:text-rose-400">Monto reembolsado</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -50,7 +50,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Completadas</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ stats.completedCount }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ stats.completedCount }}</p>
           <p class="text-xs text-gray-400 dark:text-zinc-500">Procesadas correctamente</p>
         </div>
         <div class="flex flex-col gap-1 px-5 py-4">
@@ -58,7 +58,7 @@
             <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Pendientes</p>
             <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ stats.pendingCount }}</p>
+          <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ stats.pendingCount }}</p>
           <p class="text-xs text-amber-500 dark:text-amber-400">Requieren revisión</p>
         </div>
       </div>
@@ -66,7 +66,7 @@
     </div>
     
     <!-- Master-Detail Layout - Workspace Unificado -->
-    <div class="flex-1 mx-3 lg:mx-4 mb-3 rounded-2xl overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+    <div class="flex-1 mx-3 lg:mx-4 mb-3 rounded-md overflow-hidden transition-colors duration-300 border border-gray-200 dark:border-zinc-800 shadow-sm">
       <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
         <!-- PANEL IZQUIERDO: Lista refinada (Master) -->
@@ -109,11 +109,11 @@
               v-for="returnItem in filteredReturns"
               :key="returnItem.id"
               @click="selectReturn(returnItem)"
-              class="px-3.5 py-3.5 mb-1.5 cursor-pointer transition-all duration-200 rounded-xl group relative"
+              class="px-3.5 py-3.5 mb-1.5 cursor-pointer transition-all duration-200 rounded-md group relative"
               :class="[
                 selectedReturn?.id === returnItem.id 
-                  ? 'bg-blue-50 dark:bg-blue-950/40 shadow-sm ring-1 ring-blue-200 dark:ring-blue-800/50 border-l-[3px] border-blue-500 dark:border-blue-400' 
-                  : 'hover:bg-gray-50 dark:hover:bg-zinc-800/40 border-l-[3px] border-transparent'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-600 dark:border-emerald-500' 
+                  : 'hover:bg-gray-50 dark:hover:bg-zinc-800/40 border-l-4 border-transparent'
               ]"
             >
               <div class="flex items-start justify-between gap-3">
@@ -161,7 +161,7 @@
         <div class="lg:col-span-7 overflow-hidden flex flex-col bg-white dark:bg-zinc-900 transition-colors duration-300">
           
           <!-- Estado: No seleccionado - Empty State -->
-          <div v-if="!selectedReturn" class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[#f8fafc] dark:bg-zinc-900/50 relative">
+          <div v-if="!selectedReturn" class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gray-50 dark:bg-zinc-900/50 relative">
             
             <!-- Ilustración SVG profesional y limpia -->
             <div class="mb-8 relative">
@@ -319,7 +319,7 @@
             <div class="flex-1 overflow-y-auto p-7 bg-gray-50 dark:bg-zinc-950/50">
               
               <!-- Documento digital -->
-              <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-lg dark:shadow-black/30 p-7 space-y-7">
+              <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-sm p-7 space-y-7">
                 
                 <!-- Encabezado del documento -->
                 <div class="grid grid-cols-2 gap-6">
@@ -505,7 +505,7 @@
             </div>
 
             <!-- Título -->
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¡Mejora tu Plan!</h3>
+            <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-3">¡Mejora tu Plan!</h3>
             
             <!-- Mensaje -->
             <p class="text-base text-gray-600 dark:text-zinc-400 mb-6 leading-relaxed">

@@ -1,18 +1,18 @@
 <template>
   <!-- Layout Full Height estilo WhatsApp Web - Sin doble scroll -->
-  <div class="h-full font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 overflow-hidden flex flex-col">
-    <div class="flex-none px-4 lg:px-6 pt-4 pb-3 space-y-4 animate-fade-in">
+  <div class="h-full font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 overflow-hidden flex flex-col">
+    <div class="flex-none px-4 lg:px-6 pt-4 pb-2.5 space-y-3 animate-fade-in">
       
       <!-- NIVEL 1: Header Minimalista -->
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Clientes</h1>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Gestiona tu base de clientes y su historial</p>
+          <h1 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Clientes</h1>
+          <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Gestiona tu base de clientes y su historial</p>
         </div>
         
         <div class="flex items-center gap-2">
           <button @click="fetchCustomers" 
-                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
+                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-[13px] font-semibold rounded-md border border-gray-200 dark:border-zinc-800 shadow-sm transition-all duration-200 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -20,7 +20,7 @@
           </button>
           
           <button @click="openCreateModal" 
-                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -31,40 +31,42 @@
     </div>
     
     <!-- Master-Detail Layout WhatsApp Web Style - Ocupa todo el espacio restante -->
-    <div class="flex-1 mx-3 lg:mx-4 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 transition-colors duration-300">
+    <div class="flex-1 mx-3 lg:mx-4 mb-3 rounded-md overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-sm transition-colors duration-300">
       <div class="grid grid-cols-1 lg:grid-cols-10 h-full">
         
         <!-- PANEL IZQUIERDO: Lista de Clientes (30%) -->
-        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-gray-50 dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
+        <div class="lg:col-span-3 overflow-hidden flex flex-col bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 transition-colors duration-300">
           
-          <!-- Header compacto con búsqueda y filtros en UNA línea -->
-          <div class="p-3 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
+          <!-- Toolbar: búsqueda y filtros -->
+          <div class="px-4 pt-5 pb-4 bg-white dark:bg-zinc-900 space-y-3">
+            <!-- Búsqueda -->
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                v-model="searchTerm"
+                type="text"
+                placeholder="Buscar cliente..."
+                class="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-gray-50 dark:bg-zinc-800 border-2 border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent shadow-sm transition-all duration-200">
+            </div>
+            <!-- Filtro -->
             <div class="flex items-center gap-2">
-              <!-- Búsqueda -->
-              <div class="relative flex-1">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                <input
-                  v-model="searchTerm"
-                  type="text"
-                  placeholder="Buscar..."
-                  class="w-full pl-9 pr-3 py-2 text-[13px] rounded-xl bg-white dark:bg-zinc-800 border-none text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-zinc-600 transition-all duration-200">
-              </div>
-              
-              <!-- Filtro de estado compacto -->
               <select
                 v-model="statusFilter"
-                class="px-3 py-2 text-[13px] rounded-xl bg-white dark:bg-zinc-800 border-none text-gray-600 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-zinc-600 transition-colors duration-200">
+                class="flex-1 px-3 py-2.5 text-[13px] rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 shadow-sm transition-colors duration-200 cursor-pointer">
                 <option value="">Estado</option>
                 <option value="active">Activos</option>
                 <option value="inactive">Inactivos</option>
               </select>
             </div>
           </div>
+
+          <!-- Separador sutil -->
+          <div class="h-px bg-gray-200 dark:bg-zinc-800 mx-4"></div>
           
           <!-- Lista con scroll independiente - Fondo diferenciado -->
-          <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-zinc-900 px-2 py-1">
+          <div class="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 px-2 pt-2 pb-2">
             
             <!-- Loading state -->
             <div v-if="loading" class="flex items-center justify-center py-12">
@@ -87,18 +89,14 @@
               v-for="customer in filteredCustomers"
               :key="customer.id"
               @click="selectCustomer(customer)"
-              class="px-3 py-3 my-1 cursor-pointer transition-all rounded-xl group relative"
+              class="px-3 py-2.5 mb-0.5 cursor-pointer transition-all duration-150 rounded-lg group relative"
               :class="[
                 selectedCustomer?.id === customer.id 
-                  ? 'bg-white dark:bg-zinc-800 shadow-sm' 
-                  : 'hover:bg-white dark:hover:bg-zinc-800/70'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border-l-4 border-emerald-600 dark:border-emerald-500' 
+                  : 'hover:bg-gray-50 dark:hover:bg-zinc-800/40 border-l-4 border-transparent'
               ]"
             >
-              <!-- Borde izquierdo de selección -->
-              <div 
-                v-if="selectedCustomer?.id === customer.id"
-                class="absolute left-0 top-2 bottom-2 w-1 bg-gray-900 dark:bg-white rounded-r-full"
-              ></div>
+              <!-- Borde izquierdo de selección (ya inline via border-l-4) -->
               
               <div class="flex items-center gap-3">
                 <!-- Avatar con foto o inicial -->
@@ -118,16 +116,16 @@
                 <!-- Info del cliente -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
-                    <p class="text-[13px] font-medium text-gray-800 dark:text-zinc-200 truncate">
+                    <p class="text-sm font-bold text-gray-900 dark:text-zinc-100 truncate leading-tight">
                       {{ customer.name }}
                     </p>
-                    <span class="text-[9px] font-medium px-2 py-0.5 rounded-full flex-shrink-0"
-                          :class="customer.active ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400'">
+                    <span class="text-[9px] font-bold px-1.5 py-[2px] rounded flex-shrink-0 uppercase tracking-wider leading-none border"
+                          :class="customer.active ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800'">>
                       {{ customer.active ? 'ACTIVO' : 'INACTIVO' }}
                     </span>
                   </div>
                   <div class="flex items-center gap-2 mt-1">
-                    <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">
+                    <p class="text-xs text-gray-600 dark:text-zinc-400 truncate font-medium">
                       {{ customer.document_type }}: {{ customer.document_number }}
                     </p>
                   </div>
@@ -135,7 +133,7 @@
                 
                 <!-- Compras a la derecha -->
                 <div class="text-right flex-shrink-0">
-                  <span class="text-[13px] font-medium text-gray-700 dark:text-zinc-300">
+                  <span class="text-sm font-extrabold text-gray-900 dark:text-white tabular-nums leading-tight">
                     ${{ formatCurrency(customer.total_purchases || 0) }}
                   </span>
                   <p class="text-[10px] text-gray-400 dark:text-zinc-500">Compras</p>
@@ -146,18 +144,18 @@
         </div>
 
         <!-- PANEL DERECHO: Detalle del Cliente (70%) -->
-        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-white dark:bg-zinc-900 transition-colors duration-300">
+        <div class="lg:col-span-7 overflow-hidden flex flex-col bg-[#fafbfc] dark:bg-[#1a1a1d] transition-colors duration-300">
           
           <!-- Estado: No seleccionado - Empty State estilo WhatsApp Web -->
-          <div v-if="!selectedCustomer" class="flex-1 flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-zinc-900 relative">
+          <div v-if="!selectedCustomer" class="flex-1 flex flex-col items-center justify-center p-8 lg:p-12 text-center bg-[#fafbfc] dark:bg-[#1a1a1d] relative overflow-y-auto">
             
             <!-- Ilustración SVG profesional tipo documento de cliente -->
-            <div class="mb-8 relative">
+            <div class="mb-6 relative">
               <!-- Efecto glow suave de fondo -->
-              <div class="absolute inset-0 bg-gradient-to-br from-blue-200/30 via-transparent to-purple-200/30 dark:from-blue-500/10 dark:to-purple-500/10 rounded-3xl blur-3xl scale-150"></div>
+              <div class="absolute inset-0 bg-gradient-to-br from-blue-200/20 via-transparent to-purple-200/20 dark:from-blue-500/5 dark:to-purple-500/5 rounded-3xl blur-3xl scale-150"></div>
               
               <!-- Ilustración principal -->
-              <svg class="w-48 h-48 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg class="w-36 h-36 relative z-10" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <!-- Sombra del documento -->
                 <rect x="48" y="38" width="88" height="110" rx="6" class="fill-gray-200/50 dark:fill-zinc-700/30"/>
                 
@@ -199,12 +197,22 @@
             </div>
             
             <!-- Texto de bienvenida profesional -->
-            <div class="relative z-10 max-w-md">
-              <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-3">
+            <div class="relative z-10 max-w-sm mb-8">
+              <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2">
                 Gestión de Clientes
               </h3>
-              <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
+              <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
                 Selecciona un cliente del panel izquierdo para visualizar su información completa, historial de compras y puntos de fidelidad.
+              </p>
+            </div>
+
+            <!-- Hint inferior -->
+            <div class="relative z-10 mt-8">
+              <p class="text-[11px] text-gray-500 dark:text-zinc-500 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Haz clic en cualquier cliente de la lista para comenzar
               </p>
             </div>
           </div>
@@ -456,7 +464,7 @@
                             </td>
                             <td class="px-4 py-3 text-center">
                               <button @click="viewInvoiceDetails(invoice)" 
-                                class="p-1.5 text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all"
+                                class="p-1.5 text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-all"
                                 title="Ver detalles">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -711,7 +719,7 @@
               <div class="flex items-center gap-6">
                 <!-- Preview de la foto -->
                 <div class="relative">
-                  <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-dashed border-gray-300 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
+                  <div class="w-24 h-24 rounded-md overflow-hidden border-2 border-dashed border-gray-300 dark:border-zinc-700 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
                     <img v-if="customerForm.credit_photo" 
                          :src="customerForm.credit_photo" 
                          alt="Foto del cliente"
@@ -737,7 +745,7 @@
                 <div class="flex flex-col gap-2">
                   <button type="button"
                           @click="triggerPhotoUpload"
-                          class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full transition-colors flex items-center gap-2">
+                          class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
@@ -750,7 +758,7 @@
                          @change="handlePhotoUpload">
                   <button type="button"
                           @click="openCamera"
-                          class="px-4 py-2.5 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-full transition-colors flex items-center gap-2">
+                          class="px-4 py-2.5 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-zinc-600 text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-md transition-colors flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -951,7 +959,7 @@
           <!-- Footer -->
           <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-700 flex justify-end">
             <button @click="showInvoiceDetailModal = false"
-                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-full transition-colors">
+                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors">
               Cerrar
             </button>
           </div>
@@ -996,7 +1004,7 @@
             </button>
             <button
               @click="navigateToPlans"
-              class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium rounded-full transition-colors duration-200"
+              class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium rounded-md transition-colors duration-200"
             >
               Ver Planes
             </button>
@@ -1071,7 +1079,7 @@
             </div>
 
             <!-- Título -->
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">¿Eliminar Cliente?</h3>
+            <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-3">¿Eliminar Cliente?</h3>
             
             <!-- Mensaje -->
             <p class="text-base text-gray-600 dark:text-zinc-400 mb-2 leading-relaxed">
@@ -1133,7 +1141,7 @@
             <!-- Botón -->
             <button
               @click="cancelDeleteCustomer"
-              class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium rounded-full transition-colors duration-200"
+              class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium rounded-md transition-colors duration-200"
             >
               Entendido
             </button>
@@ -1620,7 +1628,7 @@ const openCamera = async () => {
     const modal = document.createElement('div')
     modal.className = 'fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-[99999] p-4'
     modal.innerHTML = `
-      <div class="bg-zinc-900 rounded-2xl overflow-hidden max-w-lg w-full">
+      <div class="bg-zinc-900 rounded-md overflow-hidden max-w-lg w-full">
         <div class="p-4 border-b border-zinc-700 flex justify-between items-center">
           <h3 class="text-white font-bold">Tomar Foto</h3>
           <button id="closeCamera" class="text-zinc-400 hover:text-white">

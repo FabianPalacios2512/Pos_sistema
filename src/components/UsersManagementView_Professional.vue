@@ -1,22 +1,22 @@
 <template>
   <!-- Terminal de Acceso Corporativa - Flat Enterprise -->
-  <div class="min-h-screen font-sans bg-gray-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300">
+  <div class="min-h-screen font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300">
     <div class="px-4 lg:px-6 py-4 space-y-4 pb-6 animate-fade-in">
       
-      <!-- Header: Dense Corporate -->
+      <!-- Header -->
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Centro de Control de Personal</h1>
-          <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 uppercase tracking-widest">Rendimiento operativo · Auditoría en tiempo real</p>
+          <h1 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Centro de Control de Personal</h1>
+          <p class="text-xs text-gray-500 dark:text-zinc-500 mt-0.5">Rendimiento operativo · Auditoría en tiempo real</p>
         </div>
         
         <div class="flex items-center gap-3">
           <!-- Indicador de Límite de Usuarios -->
           <div v-if="maxUsersAllowed !== null" 
-               class="hidden md:flex items-center gap-2 px-3 py-2 rounded-md text-xs font-semibold"
+               class="hidden md:flex items-center gap-2 px-3 py-1.5 text-xs font-medium"
                :class="canCreateMoreUsers 
-                 ? 'bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800' 
-                 : 'bg-white dark:bg-zinc-800 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800'">
+                 ? 'text-emerald-700 dark:text-emerald-400 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800' 
+                 : 'text-amber-700 dark:text-amber-400 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800'">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
@@ -25,27 +25,27 @@
           
           <!-- Badge Plan Enterprise -->
           <div v-if="maxUsersAllowed === null" 
-               class="hidden md:flex items-center gap-2 px-3 py-2 rounded-md text-xs font-semibold bg-white dark:bg-zinc-800 text-purple-700 dark:text-purple-400 border border-purple-300 dark:border-purple-800">
+               class="hidden md:flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
             </svg>
             <span>Usuarios ilimitados</span>
           </div>
           
-          <!-- Botón Refrescar: Outline -->
+          <!-- Botón Refrescar -->
           <button @click="refreshData"
                   :disabled="loading"
-                  class="p-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-600 dark:text-zinc-300 rounded-md border border-gray-300 dark:border-zinc-700 transition-all duration-200"
+                  class="p-2 bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-gray-500 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700 transition-colors duration-150"
                   :class="{ 'opacity-50 cursor-not-allowed': loading }">
             <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
           </button>
           
-          <!-- Botón Principal: Autoritario -->
+          <!-- Botón Principal -->
           <button @click="openCreateUserModal()"
                   :disabled="!canCreateMoreUsers"
-                  class="px-5 py-2.5 bg-gray-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-md transition-all duration-200 flex items-center gap-2">
+                  class="px-4 py-2 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-semibold transition-colors duration-150 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -57,15 +57,15 @@
       <!-- ============================================================ -->
       <!-- BARRA DE FILTROS TEMPORALES (Time Travel) -->
       <!-- ============================================================ -->
-      <div class="bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 py-2.5 px-5 flex items-center gap-3 flex-wrap">
+      <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 py-2 px-4 flex items-center gap-3 flex-wrap">
         <!-- Quick presets: Hoy / Ayer -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1">
           <button v-for="preset in datePresets" :key="preset.key"
             @click="selectDatePreset(preset.key)"
-            class="px-3 py-1.5 text-[11px] font-semibold rounded-md border transition-all duration-200 uppercase tracking-wide"
+            class="px-3 py-1.5 text-xs font-semibold border transition-colors duration-150 uppercase tracking-wide"
             :class="activeDatePreset === preset.key
-              ? 'bg-gray-900 dark:bg-slate-600 text-white border-gray-900 dark:border-slate-600'
-              : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'">
+              ? 'bg-gray-900 dark:bg-zinc-200 text-white dark:text-gray-900 border-gray-900 dark:border-zinc-200'
+              : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'">
             {{ preset.label }}
           </button>
         </div>
@@ -75,10 +75,10 @@
 
         <!-- Single date picker (visible when 'custom' is active) -->
         <div v-if="activeDatePreset === 'custom'" class="flex items-center gap-2">
-          <label class="text-xs font-medium text-gray-500 dark:text-zinc-400">Seleccionar fecha</label>
+          <label class="text-xs font-medium text-gray-500 dark:text-zinc-400">Fecha</label>
           <input type="date" v-model="filterDate"
             @change="onCustomDateChange"
-            class="px-2.5 py-1.5 text-xs border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 rounded-lg focus:ring-1 focus:ring-slate-500 focus:border-slate-500">
+            class="px-2.5 py-1.5 text-xs border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 focus:ring-1 focus:ring-gray-400 focus:border-gray-400">
         </div>
 
         <!-- Active filter indicator -->
@@ -95,41 +95,40 @@
       <!-- ============================================================ -->
       <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
       <!-- ============================================================ -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
+      <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-200 dark:divide-zinc-800">
         
         <!-- KPI 1: Personal Activo Ahora -->
-        <div class="flex flex-col gap-1 px-5 py-4">
+        <div class="flex flex-col gap-0.5 px-5 py-3">
           <div class="flex items-center justify-between">
-            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Personal Activo Ahora</p>
-            <span class="relative flex h-4 w-4">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
+            <p class="text-[11px] text-gray-500 dark:text-zinc-500 uppercase tracking-wider font-medium">Personal Activo Ahora</p>
+            <span class="flex h-2.5 w-2.5">
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ dashboardKpis.active_now_count }}</p>
-          <p class="text-xs text-emerald-500 dark:text-emerald-400">en línea</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">{{ dashboardKpis.active_now_count }}</p>
+          <p class="text-[11px] text-emerald-600 dark:text-emerald-400">en línea</p>
         </div>
 
         <!-- KPI 2: Ventas del Equipo (Hoy) -->
-        <div class="flex flex-col gap-1 px-5 py-4">
+        <div class="flex flex-col gap-0.5 px-5 py-3">
           <div class="flex items-center justify-between">
-            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Ventas del Equipo (Hoy)</p>
+            <p class="text-[11px] text-gray-500 dark:text-zinc-500 uppercase tracking-wider font-medium">Ventas del Equipo (Hoy)</p>
             <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
           </div>
-          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ formatCurrency(dashboardKpis.sales_today) }}</p>
-          <p class="text-xs text-gray-400 dark:text-zinc-500">{{ dashboardKpis.sales_count_today }} ventas</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">{{ formatCurrency(dashboardKpis.sales_today) }}</p>
+          <p class="text-[11px] text-gray-500 dark:text-zinc-500">{{ dashboardKpis.sales_count_today }} ventas</p>
         </div>
 
         <!-- KPI 3: Alertas Operativas (Clickable) -->
         <div @click="alertasTotal > 0 && (showAlertDetails = !showAlertDetails)"
           :class="[
-            'flex flex-col gap-1 px-5 py-4 transition-all duration-200',
+            'flex flex-col gap-0.5 px-5 py-3 transition-colors duration-150',
             alertasTotal > 0
               ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800/50'
               : ''
           ]">
           <div class="flex items-center justify-between">
-            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Alertas Operativas</p>
+            <p class="text-[11px] text-gray-500 dark:text-zinc-500 uppercase tracking-wider font-medium">Alertas Operativas</p>
             <div class="flex items-center gap-1.5">
               <svg :class="alertasTotal > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-500 dark:text-emerald-400'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path v-if="alertasTotal > 0" stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
@@ -142,10 +141,10 @@
           </div>
           <p class="text-2xl font-semibold tabular-nums" :class="alertasTotal > 0 ? 'text-amber-700 dark:text-amber-400' : 'text-gray-900 dark:text-white'">{{ alertasTotal }}</p>
           <div class="flex items-center gap-2">
-            <span v-if="dashboardKpis.discrepancies_today > 0" class="px-1.5 py-0.5 rounded-sm text-[10px] font-bold bg-white dark:bg-zinc-800 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-700">
+            <span v-if="dashboardKpis.discrepancies_today > 0" class="px-1.5 py-0.5 text-[10px] font-semibold bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
               {{ dashboardKpis.discrepancies_today }} descuadre{{ dashboardKpis.discrepancies_today > 1 ? 's' : '' }}
             </span>
-            <span v-if="dashboardKpis.returns_today_count > 0" class="px-1.5 py-0.5 rounded-sm text-[10px] font-bold bg-white dark:bg-zinc-800 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700">
+            <span v-if="dashboardKpis.returns_today_count > 0" class="px-1.5 py-0.5 text-[10px] font-semibold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
               {{ dashboardKpis.returns_today_count }} devolución{{ dashboardKpis.returns_today_count > 1 ? 'es' : '' }}
             </span>
             <span v-if="alertasTotal === 0" class="text-xs text-emerald-500 dark:text-emerald-400">Todo en orden</span>
@@ -157,8 +156,8 @@
       <!-- PANEL DE DETALLE DE ALERTAS (Expandible) -->
       <!-- ============================================================ -->
       <Transition enter-active-class="transition-all duration-300 ease-out" enter-from-class="opacity-0 -translate-y-2 max-h-0" enter-to-class="opacity-100 translate-y-0 max-h-[600px]" leave-active-class="transition-all duration-200 ease-in" leave-from-class="opacity-100 translate-y-0 max-h-[600px]" leave-to-class="opacity-0 -translate-y-2 max-h-0">
-        <div v-if="showAlertDetails && alertasTotal > 0" class="bg-white dark:bg-zinc-900 rounded-md border border-amber-300 dark:border-amber-800/40 overflow-hidden">
-          <div class="px-6 py-4 border-b border-amber-100 dark:border-amber-900/30 bg-amber-50/40 dark:bg-amber-950/10">
+        <div v-if="showAlertDetails && alertasTotal > 0" class="bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-800/40 overflow-hidden">
+          <div class="px-5 py-3 border-b border-amber-100 dark:border-amber-900/30 bg-amber-50/40 dark:bg-amber-950/10">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,12 +165,12 @@
                 </svg>
                 <h3 class="text-sm font-bold text-gray-900 dark:text-white">Detalle de Alertas de Hoy</h3>
               </div>
-              <button @click="showAlertDetails = false" class="p-1 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/30 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
+              <button @click="showAlertDetails = false" class="p-1 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>
           </div>
-          <div class="p-6 space-y-5">
+          <div class="p-5 space-y-4">
             <!-- Devoluciones -->
             <div v-if="dashboardKpis.returns_today_details?.length > 0">
               <h4 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -179,9 +178,9 @@
                 Devoluciones ({{ dashboardKpis.returns_today_details.length }})
               </h4>
               <div class="space-y-2">
-                <div v-for="ret in dashboardKpis.returns_today_details" :key="ret.id" class="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100 dark:border-amber-900/30">
+                <div v-for="ret in dashboardKpis.returns_today_details" :key="ret.id" class="flex items-center justify-between p-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100 dark:border-amber-900/30">
                   <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                    <div class="w-7 h-7 bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
                       <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
                     </div>
                     <div>
@@ -208,9 +207,9 @@
                 Descuadres de Caja ({{ dashboardKpis.discrepancies_today_details.length }})
               </h4>
               <div class="space-y-2">
-                <div v-for="(disc, idx) in dashboardKpis.discrepancies_today_details" :key="idx" class="flex items-center justify-between p-3 rounded-xl bg-rose-50/50 dark:bg-rose-950/10 border border-rose-100 dark:border-rose-900/30">
+                <div v-for="(disc, idx) in dashboardKpis.discrepancies_today_details" :key="idx" class="flex items-center justify-between p-3 bg-rose-50/50 dark:bg-rose-950/10 border border-rose-100 dark:border-rose-900/30">
                   <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center">
+                    <div class="w-7 h-7 bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center">
                       <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <div>
@@ -235,19 +234,16 @@
       <!-- ============================================================ -->
       <!-- DATA GRID DE ALTO RENDIMIENTO - Flat Enterprise -->
       <!-- ============================================================ -->
-      <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md overflow-hidden">
+      <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 overflow-hidden">
         <!-- Grid Header -->
-        <div class="px-5 py-3 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
+        <div class="px-4 py-2.5 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
           <div>
-            <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">Panel de Rendimiento</h3>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">Panel de Rendimiento</h3>
             <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5">Actividad y ventas del equipo en tiempo real</p>
           </div>
           <div class="flex items-center gap-2">
-            <span class="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-              <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
+            <span class="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+              <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
               En vivo
             </span>
           </div>
@@ -257,65 +253,64 @@
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
-              <tr class="bg-slate-800 dark:bg-zinc-800">
-                <th class="px-4 py-3 text-left text-[11px] font-semibold text-slate-200 dark:text-zinc-300 uppercase tracking-widest">Empleado</th>
-                <th class="px-4 py-3 text-center text-[11px] font-semibold text-slate-200 dark:text-zinc-300 uppercase tracking-widest">Biométrico</th>
-                <th class="px-4 py-3 text-left text-[11px] font-semibold text-slate-200 dark:text-zinc-300 uppercase tracking-widest">Último Ingreso</th>
-                <th class="px-4 py-3 text-left text-[11px] font-semibold text-slate-200 dark:text-zinc-300 uppercase tracking-widest">Sede Asignada</th>
-                <th class="px-4 py-3 text-right text-[11px] font-semibold text-slate-200 dark:text-zinc-300 uppercase tracking-widest">Ventas Hoy</th>
-                <th class="px-4 py-3 text-center text-[11px] font-semibold text-slate-200 dark:text-zinc-300 uppercase tracking-widest">Auditoría de Turno</th>
-                <th class="px-4 py-3 text-right text-[11px] font-semibold text-slate-200 dark:text-zinc-300 uppercase tracking-widest">Descuadre</th>
-                <th class="px-4 py-3 text-right text-[11px] font-semibold text-slate-200 dark:text-zinc-300 uppercase tracking-widest">Acciones</th>
+              <tr class="bg-gray-100 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700">
+                <th class="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Empleado</th>
+                <th class="px-4 py-2.5 text-center text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Biométrico</th>
+                <th class="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Último Ingreso</th>
+                <th class="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Sede Asignada</th>
+                <th class="px-4 py-2.5 text-right text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ventas Hoy</th>
+                <th class="px-4 py-2.5 text-center text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Auditoría de Turno</th>
+                <th class="px-4 py-2.5 text-right text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Descuadre</th>
+                <th class="px-4 py-2.5 text-right text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
             <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800">
               <tr 
                 v-for="emp in employeeGridData" 
                 :key="emp.id"
-                class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-150"
+                class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-100"
               >
                 <!-- EMPLEADO: Avatar + Nombre + Rol -->
-                <td class="px-4 py-3 whitespace-nowrap">
-                  <div class="flex items-center gap-3">
+                <td class="px-4 py-2.5 whitespace-nowrap">
+                  <div class="flex items-center gap-2.5">
                     <div class="relative">
-                      <div class="w-9 h-9 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0"
+                      <div class="w-8 h-8 flex items-center justify-center text-xs font-bold flex-shrink-0"
                            :class="emp.active
-                             ? 'bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-700'
-                             : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-600 border border-gray-200 dark:border-zinc-700'">
+                             ? 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
+                             : 'bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-zinc-600 border border-gray-200 dark:border-zinc-700'">
                         {{ getInitials(emp.name) }}
                       </div>
-                      <!-- Indicador online -->
                       <span v-if="emp.isOnline" class="absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900"></span>
                     </div>
                     <div>
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ emp.name }}</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white">{{ emp.name }}</p>
                       <p class="text-[11px] text-gray-500 dark:text-zinc-500">{{ emp.roleName }}</p>
                     </div>
                   </div>
                 </td>
 
                 <!-- ENROLAMIENTO BIOMÉTRICO STATUS -->
-                <td class="px-4 py-3 whitespace-nowrap text-center">
+                <td class="px-4 py-2.5 whitespace-nowrap text-center">
                   <span v-if="emp.entryTime"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 border border-emerald-400 dark:border-emerald-700">
+                    class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                     Completado
                   </span>
                   <span v-else
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide bg-white dark:bg-zinc-800 text-amber-700 dark:text-amber-400 border border-amber-400 dark:border-amber-700">
+                    class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                     Pendiente
                   </span>
                 </td>
 
                 <!-- ÚLTIMO INGRESO -->
-                <td class="px-4 py-3 whitespace-nowrap">
+                <td class="px-4 py-2.5 whitespace-nowrap">
                   <div v-if="emp.entryTime || emp.exitTime">
-                    <p class="text-sm font-medium text-slate-800 dark:text-zinc-200 tabular-nums">{{ emp.entryTime || '—' }}</p>
+                    <p class="text-sm font-medium text-gray-800 dark:text-zinc-200 tabular-nums">{{ emp.entryTime || '—' }}</p>
                     <p v-if="emp.exitTime" class="text-[10px] text-gray-400 dark:text-zinc-500 tabular-nums mt-0.5 flex items-center gap-1">
                       Salida: {{ emp.exitTime }}
                       <span v-if="emp.exitIsAutoClose"
-                        class="px-1 py-px rounded-sm text-[8px] font-bold uppercase bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                        class="px-1 py-px text-[8px] font-bold uppercase bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
                         SIS
                       </span>
                     </p>
@@ -324,38 +319,38 @@
                 </td>
 
                 <!-- SEDE ASIGNADA -->
-                <td class="px-4 py-3 whitespace-nowrap">
-                  <span class="px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700">
+                <td class="px-4 py-2.5 whitespace-nowrap">
+                  <span class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700">
                     {{ emp.sedeActual }}
                   </span>
                 </td>
 
                 <!-- VENTAS HOY -->
-                <td class="px-4 py-3 whitespace-nowrap text-right">
-                  <p class="text-sm font-bold tabular-nums" :class="emp.ventasHoy > 0 ? 'text-slate-900 dark:text-white' : 'text-gray-300 dark:text-zinc-600'">
+                <td class="px-4 py-2.5 whitespace-nowrap text-right">
+                  <p class="text-sm font-semibold tabular-nums" :class="emp.ventasHoy > 0 ? 'text-gray-900 dark:text-white' : 'text-gray-300 dark:text-zinc-600'">
                     {{ formatCurrency(emp.ventasHoy) }}
                   </p>
                 </td>
 
                 <!-- AUDITORÍA DE TURNO -->
-                <td class="px-4 py-3 whitespace-nowrap text-center">
+                <td class="px-4 py-2.5 whitespace-nowrap text-center">
                   <span v-if="emp.cajaForzada"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide bg-white dark:bg-zinc-800 text-orange-700 dark:text-orange-400 border border-orange-400 dark:border-orange-700">
+                    class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
                     Pendiente Arqueo
                   </span>
                   <span v-else-if="emp.cajaAbierta"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide bg-white dark:bg-zinc-800 text-emerald-700 dark:text-emerald-400 border border-emerald-400 dark:border-emerald-700">
+                    class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                     Turno Activo
                   </span>
                   <span v-else
-                    class="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-bold uppercase tracking-wide bg-white dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border border-gray-300 dark:border-zinc-700">
+                    class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border border-gray-200 dark:border-zinc-700">
                     Caja Cerrada
                   </span>
                 </td>
 
                 <!-- DESCUADRE -->
-                <td class="px-4 py-3 whitespace-nowrap text-right">
+                <td class="px-4 py-2.5 whitespace-nowrap text-right">
                   <template v-if="emp.cajaForzada">
                     <p class="text-[11px] text-gray-400 dark:text-zinc-600 italic">Esperando arqueo</p>
                   </template>
@@ -373,11 +368,11 @@
                 </td>
 
                 <!-- ACCIONES -->
-                <td class="px-4 py-3 whitespace-nowrap text-right">
-                  <div class="flex items-center justify-end gap-1.5">
+                <td class="px-4 py-2.5 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end gap-1">
                     <button
                       @click="openAttendanceModal(emp)"
-                      class="p-1.5 rounded-md border border-transparent text-gray-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-900/30 transition-all duration-200"
+                      class="p-1.5 border border-transparent text-gray-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800 transition-colors duration-150"
                       title="Gestionar asistencia"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,13 +381,13 @@
                     </button>
                     <button
                       @click="openAuditPanel(emp)"
-                      class="px-3 py-1.5 text-[11px] font-semibold rounded-md border transition-all duration-200 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-300 dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500"
+                      class="px-3 py-1.5 text-[11px] font-semibold border transition-colors duration-150 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700"
                     >
                       Auditar Perfil
                     </button>
                     <button
                       @click="openEditUserModal(findUserById(emp.id))"
-                      class="p-1.5 rounded-md border border-transparent text-gray-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-200 dark:hover:border-amber-900/30 transition-all duration-200"
+                      class="p-1.5 border border-transparent text-gray-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-200 dark:hover:border-amber-800 transition-colors duration-150"
                       title="Editar usuario"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -419,8 +414,8 @@
           </table>
         </div>
 
-        <!-- Footer corporativo del módulo -->
-        <div class="px-5 py-2.5 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/80 flex items-center justify-between">
+        <!-- Footer -->
+        <div class="px-4 py-2 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/80 flex items-center justify-between">
           <p class="text-[10px] text-gray-400 dark:text-zinc-600 tracking-wide">© 2026 105 POS Pro. Todos los derechos reservados. | Sistema Auditado de Alto Rendimiento.</p>
           <p class="text-[10px] text-gray-300 dark:text-zinc-700 font-mono tracking-widest">105 POS PRO</p>
         </div>
@@ -460,24 +455,24 @@
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-4">
                     <!-- Avatar grande -->
-                    <div class="w-14 h-14 rounded-md flex items-center justify-center bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-lg border border-slate-200 dark:border-zinc-700 relative">
+                    <div class="w-14 h-14 flex items-center justify-center bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-lg border border-slate-200 dark:border-zinc-700 relative">
                       {{ auditTarget ? getInitials(auditTarget.name) : '?' }}
                       <span v-if="auditTarget?.isOnline" class="absolute -bottom-1 -right-1 block h-4 w-4 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900"></span>
                     </div>
                     <div>
                       <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ auditTarget?.name || 'Empleado' }}</h2>
                       <div class="flex items-center gap-2 mt-1">
-                        <span class="px-2 py-0.5 rounded-md text-xs font-medium border bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border-purple-100 dark:border-purple-800">
+                        <span class="px-2 py-0.5 text-xs font-medium border bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border-purple-100 dark:border-purple-800">
                           {{ auditTarget?.roleName || 'Sin rol' }}
                         </span>
-                        <span class="px-2 py-0.5 rounded-md text-xs font-medium border bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+                        <span class="px-2 py-0.5 text-xs font-medium border bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
                           {{ auditTarget?.sedeActual || 'Sin sede' }}
                         </span>
                         <span 
                           :class="auditTarget?.cajaAbierta
                             ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'
                             : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border-gray-200 dark:border-zinc-700'"
-                          class="px-2 py-0.5 rounded-md text-xs font-medium border">
+                          class="px-2 py-0.5 text-xs font-medium border">
                           Caja {{ auditTarget?.cajaAbierta ? 'Abierta' : 'Cerrada' }}
                         </span>
                       </div>
@@ -485,7 +480,7 @@
                   </div>
                   <button 
                     @click="closeAuditPanel"
-                    class="p-2 rounded-lg border border-transparent text-slate-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
+                    class="p-2 border border-transparent text-slate-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-colors duration-150"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -511,7 +506,7 @@
                     <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Rendimiento del Mes</h3>
                     <div class="grid grid-cols-2 gap-3">
                       <!-- Ventas del Mes -->
-                      <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
+                      <div class="bg-gray-50 dark:bg-zinc-800/50 p-4 border border-gray-200 dark:border-zinc-700/50">
                         <div class="flex items-center justify-between mb-1">
                           <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Total Vendido</p>
                           <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -522,7 +517,7 @@
                         <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">{{ auditProfile.performance.invoices_count }} facturas emitidas</p>
                       </div>
                       <!-- Ticket Promedio -->
-                      <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
+                      <div class="bg-gray-50 dark:bg-zinc-800/50 p-4 border border-gray-200 dark:border-zinc-700/50">
                         <div class="flex items-center justify-between mb-1">
                           <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Ticket Promedio</p>
                           <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -533,7 +528,7 @@
                         <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">por transacción</p>
                       </div>
                       <!-- Devoluciones -->
-                      <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50" :class="auditProfile.performance.returns_count > 0 ? 'ring-1 ring-amber-200 dark:ring-amber-800/50' : ''">
+                      <div class="bg-gray-50 dark:bg-zinc-800/50 p-4 border border-gray-200 dark:border-zinc-700/50" :class="auditProfile.performance.returns_count > 0 ? 'ring-1 ring-amber-200 dark:ring-amber-800/50' : ''">
                         <div class="flex items-center justify-between mb-1">
                           <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Devoluciones</p>
                           <svg class="w-4 h-4" :class="auditProfile.performance.returns_count > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-gray-300 dark:text-zinc-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -546,7 +541,7 @@
                         <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">{{ formatCurrency(auditProfile.performance.returns_amount) }} en valor</p>
                       </div>
                       <!-- Descuadres -->
-                      <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50" :class="auditProfile.performance.discrepancies > 0 ? 'ring-1 ring-rose-200 dark:ring-rose-800/50' : ''">
+                      <div class="bg-gray-50 dark:bg-zinc-800/50 p-4 border border-gray-200 dark:border-zinc-700/50" :class="auditProfile.performance.discrepancies > 0 ? 'ring-1 ring-rose-200 dark:ring-rose-800/50' : ''">
                         <div class="flex items-center justify-between mb-1">
                           <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Descuadres</p>
                           <svg class="w-4 h-4" :class="auditProfile.performance.discrepancies > 0 ? 'text-rose-500 dark:text-rose-400' : 'text-gray-300 dark:text-zinc-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -562,8 +557,8 @@
                   </div>
 
                   <!-- ===== RESUMEN RÁPIDO HOY ===== -->
-                  <div class="bg-gray-50 dark:bg-zinc-800/30 rounded-xl border border-gray-200 dark:border-zinc-700/50 p-4">
-                    <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Resumen de Hoy</h3>
+                  <div class="bg-gray-50 dark:bg-zinc-800/30 border border-gray-200 dark:border-zinc-700/50 p-4">
+                    <h3 class="text-xs font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Resumen de Hoy</h3>
                     <div class="grid grid-cols-3 gap-4">
                       <div class="text-center">
                         <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(auditTarget.ventasHoy) }}</p>
@@ -608,7 +603,7 @@
                         </div>
                       </div>
                     </div>
-                    <div v-else class="text-center py-8 bg-gray-50 dark:bg-zinc-800/30 rounded-xl border border-gray-200 dark:border-zinc-700/50">
+                    <div v-else class="text-center py-8 bg-gray-50 dark:bg-zinc-800/30 border border-gray-200 dark:border-zinc-700/50">
                       <svg class="w-10 h-10 text-gray-300 dark:text-zinc-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                       </svg>
@@ -621,7 +616,7 @@
                     <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Sedes Trabajadas</h3>
                     <div class="flex flex-wrap gap-2">
                       <span v-for="wh in auditProfile.warehouses_worked" :key="wh.id"
-                            class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+                            class="px-2.5 py-1 text-[10px] font-semibold border uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
                         {{ wh.name }}
                       </span>
                     </div>
@@ -649,7 +644,7 @@
         <div v-if="attendanceModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/50" @click="closeAttendanceModal"></div>
 
-          <div class="relative w-full max-w-5xl bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 shadow-xl dark:shadow-black/60 overflow-hidden">
+          <div class="relative w-full max-w-5xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xl dark:shadow-black/60 overflow-hidden">
 
             <!-- Header corporativo -->
             <div class="flex items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-zinc-800">
@@ -657,7 +652,7 @@
                 <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Gestión de Asistencia</h2>
                 <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Registros de entrada y salida · {{ attendanceTarget?.name }}</p>
               </div>
-              <button @click="closeAttendanceModal" class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200">
+              <button @click="closeAttendanceModal" class="p-2 border border-transparent text-gray-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-colors duration-150">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>
@@ -668,7 +663,7 @@
               <!-- Panel izquierdo: Info empleado -->
               <div class="w-[38%] bg-gray-50 dark:bg-zinc-900/50 p-6">
                 <div class="flex items-center gap-3 mb-6">
-                  <div class="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 font-bold text-sm border border-blue-100 dark:border-blue-800">
+                  <div class="w-12 h-12 flex items-center justify-center bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 font-bold text-sm border border-blue-100 dark:border-blue-800">
                     {{ attendanceTarget ? getInitials(attendanceTarget.name) : '?' }}
                   </div>
                   <div>
@@ -678,7 +673,7 @@
                 </div>
 
                 <!-- Registros actuales -->
-                <div class="border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+                <div class="border border-gray-200 dark:border-zinc-800 overflow-hidden">
                   <div class="bg-gray-100 dark:bg-zinc-800/50 px-4 py-2.5">
                     <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Registros del {{ filterDateLabel }}</p>
                   </div>
@@ -704,7 +699,7 @@
                 </div>
 
                 <!-- Info nota -->
-                <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg">
+                <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50">
                   <div class="flex items-start gap-2">
                     <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -729,7 +724,7 @@
 
                 <div v-else>
                   <!-- Tabla de registros -->
-                  <div class="border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+                  <div class="border border-gray-200 dark:border-zinc-800 overflow-hidden">
                     <table class="w-full">
                       <thead>
                         <tr class="bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-800">
@@ -754,12 +749,12 @@
                               <input
                                 v-model="editLogDateTime"
                                 type="datetime-local"
-                                class="px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                class="px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               />
-                              <button @click="saveEditLog(log.id)" class="p-1.5 rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+                              <button @click="saveEditLog(log.id)" class="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                               </button>
-                              <button @click="cancelEditLog" class="p-1.5 rounded-md text-gray-400 dark:text-zinc-500 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+                              <button @click="cancelEditLog" class="p-1.5 text-gray-400 dark:text-zinc-500 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                               </button>
                             </div>
@@ -769,10 +764,10 @@
                           </td>
                           <!-- Origen -->
                           <td class="px-4 py-3 text-center">
-                            <span v-if="log.is_auto_closed" class="px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800">
+                            <span v-if="log.is_auto_closed" class="px-2 py-0.5 text-[10px] font-semibold border uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800">
                               Sistema
                             </span>
-                            <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border-gray-200 dark:border-zinc-700">
+                            <span v-else class="px-2 py-0.5 text-[10px] font-semibold border uppercase tracking-wide bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border-gray-200 dark:border-zinc-700">
                               Biométrico
                             </span>
                           </td>
@@ -781,14 +776,14 @@
                             <div class="flex items-center justify-end gap-1">
                               <button
                                 @click="startEditLog(log)"
-                                class="p-1.5 rounded-md border border-transparent text-slate-400 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-100 dark:hover:border-amber-900/30 transition-all duration-200"
+                                class="p-1.5 border border-transparent text-slate-400 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-100 dark:hover:border-amber-900/30 transition-colors duration-150"
                                 title="Editar hora"
                               >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                               </button>
                               <button
                                 @click="confirmDeleteLog(log)"
-                                class="p-1.5 rounded-md border border-transparent text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
+                                class="p-1.5 border border-transparent text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-colors duration-150"
                                 title="Eliminar registro"
                               >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -816,7 +811,7 @@
                     leave-from-class="opacity-100 translate-y-0"
                     leave-to-class="opacity-0 -translate-y-2"
                   >
-                    <div v-if="deleteConfirmLog" class="mt-4 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 rounded-lg">
+                    <div v-if="deleteConfirmLog" class="mt-4 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50">
                       <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                           <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -827,10 +822,10 @@
                           </p>
                         </div>
                         <div class="flex items-center gap-2">
-                          <button @click="deleteConfirmLog = null" class="px-3 py-1.5 text-xs font-bold rounded-md border border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 transition-colors">
+                          <button @click="deleteConfirmLog = null" class="px-3 py-1.5 text-xs font-bold border border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 transition-colors">
                             Cancelar
                           </button>
-                          <button @click="executeDeleteLog" :disabled="attendanceSaving" class="px-3 py-1.5 text-xs font-bold rounded-md bg-rose-600 hover:bg-rose-700 text-white transition-colors disabled:opacity-50">
+                          <button @click="executeDeleteLog" :disabled="attendanceSaving" class="px-3 py-1.5 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition-colors disabled:opacity-50">
                             Confirmar
                           </button>
                         </div>
@@ -842,7 +837,7 @@
                   <div v-if="attendanceLogs.length > 0" class="mt-4 flex items-center justify-between">
                     <button
                       @click="confirmDeleteAllLogs"
-                      class="px-4 py-2 text-xs font-bold rounded-md border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all duration-200"
+                      class="px-4 py-2 text-xs font-bold border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors duration-150"
                     >
                       Eliminar todos los registros del {{ filterDateLabel.toLowerCase() }}
                     </button>
@@ -860,16 +855,16 @@
                     leave-from-class="opacity-100 translate-y-0"
                     leave-to-class="opacity-0 -translate-y-2"
                   >
-                    <div v-if="deleteAllConfirm" class="mt-3 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 rounded-lg">
+                    <div v-if="deleteAllConfirm" class="mt-3 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50">
                       <div class="flex items-center justify-between">
                         <p class="text-sm font-medium text-rose-800 dark:text-rose-300">
                           ¿Eliminar <strong>todos los registros</strong> de {{ attendanceTarget?.name }} del día de hoy?
                         </p>
                         <div class="flex items-center gap-2">
-                          <button @click="deleteAllConfirm = false" class="px-3 py-1.5 text-xs font-bold rounded-md border border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 transition-colors">
+                          <button @click="deleteAllConfirm = false" class="px-3 py-1.5 text-xs font-bold border border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 transition-colors">
                             Cancelar
                           </button>
-                          <button @click="executeDeleteAllLogs" :disabled="attendanceSaving" class="px-3 py-1.5 text-xs font-bold rounded-md bg-rose-600 hover:bg-rose-700 text-white transition-colors disabled:opacity-50">
+                          <button @click="executeDeleteAllLogs" :disabled="attendanceSaving" class="px-3 py-1.5 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition-colors disabled:opacity-50">
                             Sí, Eliminar Todo
                           </button>
                         </div>
@@ -882,7 +877,7 @@
 
             <!-- Footer corporativo -->
             <div class="flex items-center justify-end px-8 py-4 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50">
-              <button @click="closeAttendanceModal" class="px-5 py-2.5 text-sm font-bold rounded-md border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+              <button @click="closeAttendanceModal" class="px-5 py-2.5 text-sm font-bold border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
                 Cerrar
               </button>
             </div>
