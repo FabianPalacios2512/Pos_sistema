@@ -18,7 +18,7 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = User::with('role')->get();
+            $users = User::with(['role', 'warehouse'])->get();
 
             return response()->json([
                 'success' => true,
@@ -45,6 +45,7 @@ class UserController extends Controller
                 'cc' => 'required|string|max:20|unique:users',
                 'password' => 'required|string|min:6',
                 'role_id' => 'nullable|exists:roles,id',
+                'warehouse_id' => 'nullable|exists:warehouses,id',
                 'phone' => 'nullable|string|max:20',
                 'active' => 'nullable|boolean'
             ]);
@@ -63,11 +64,12 @@ class UserController extends Controller
                 'cc' => $request->cc,
                 'password' => Hash::make($request->password),
                 'role_id' => $request->role_id,
+                'warehouse_id' => $request->warehouse_id,
                 'phone' => $request->phone,
                 'active' => $request->active ?? true
             ]);
 
-            $user->load('role');
+            $user->load(['role', 'warehouse']);
 
             return response()->json([
                 'success' => true,
@@ -118,6 +120,7 @@ class UserController extends Controller
                 'cc' => 'sometimes|required|string|max:20|unique:users,cc,' . $id,
                 'password' => 'sometimes|nullable|string|min:6',
                 'role_id' => 'sometimes|nullable|exists:roles,id',
+                'warehouse_id' => 'sometimes|nullable|exists:warehouses,id',
                 'phone' => 'sometimes|nullable|string|max:20',
                 'active' => 'sometimes|nullable|boolean',
                 'tour_completed' => 'sometimes|nullable|boolean'
@@ -131,14 +134,14 @@ class UserController extends Controller
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $updateData = $request->only(['name', 'email', 'cc', 'role_id', 'phone', 'active', 'tour_completed']);
+            $updateData = $request->only(['name', 'email', 'cc', 'role_id', 'warehouse_id', 'phone', 'active', 'tour_completed']);
 
             if ($request->has('password') && !empty($request->password)) {
                 $updateData['password'] = Hash::make($request->password);
             }
 
             $user->update($updateData);
-            $user->load('role');
+            $user->load(['role', 'warehouse']);
 
             return response()->json([
                 'success' => true,

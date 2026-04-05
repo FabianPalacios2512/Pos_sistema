@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CashSession;
+use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -80,6 +82,7 @@ class CashSessionController extends Controller
 
             // Actualizar totales antes de devolver
             $session->updateSalesTotals();
+            $session->calculateExpectedAmount();
             $session->save();
 
             return response()->json([
@@ -154,6 +157,31 @@ class CashSessionController extends Controller
                     'success' => false,
                     'message' => 'Ya tienes una sesión de caja abierta. Debes cerrarla antes de abrir una nueva.'
                 ], 400);
+            }
+
+            // Validar sede asignada (solo si el negocio tiene más de 1 sede)
+            // Administradores pueden abrir caja en cualquier sede
+            $totalWarehouses = Warehouse::where('active', true)->count();
+            if ($totalWarehouses > 1) {
+                $user = User::with('role')->find($userId);
+                $isAdmin = $user?->role && in_array(strtolower($user->role->name), ['administrador', 'admin']);
+
+                if (!$isAdmin) {
+                    if ($user && !$user->warehouse_id) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'No puedes abrir caja porque no tienes una sede asignada. Contacta a tu administrador para que te asigne una sede antes de abrir caja.'
+                        ], 403);
+                    }
+
+                    if ($user && $user->warehouse_id && $user->warehouse_id != $request->warehouse_id) {
+                        $sedeAsignada = Warehouse::find($user->warehouse_id)?->name ?? 'otra sede';
+                        return response()->json([
+                            'success' => false,
+                            'message' => "No puedes abrir caja en esta sede porque estás asignado(a) a \"{$sedeAsignada}\". Si esto es un error, contacta a tu administrador para que actualice tu sede."
+                        ], 403);
+                    }
+                }
             }
 
             $session = CashSession::openSession(
@@ -268,9 +296,12 @@ class CashSessionController extends Controller
             $session->save();
 
             // Calcular montos esperados
-            $expectedAmount = $session->opening_amount + $session->cash_sales;
+            $expectedAmount = $session->calculateExpectedAmount();
             $actualAmount = $request->actual_amount;
             $difference = $actualAmount - $expectedAmount;
+
+            $manualCashIncomes = $session->cashMovements()->where('type', 'ingreso')->sum('amount');
+            $manualCashEgresos = $session->cashMovements()->where('type', 'egreso')->sum('amount');
 
             // Determinar estado de cierre
             $closingStatus = 'exact';
@@ -290,6 +321,9 @@ class CashSessionController extends Controller
                 'card_sales' => $session->card_sales,
                 'transfer_sales' => $session->transfer_sales,
                 'total_sales' => $session->total_sales,
+                'manual_cash_incomes' => $manualCashIncomes,
+                'manual_cash_egresos' => $manualCashEgresos,
+                'total_expenses' => $session->total_expenses,
                 'expected_cash' => $expectedAmount,
                 'actual_cash' => $actualAmount,
                 'difference' => $difference,
@@ -360,6 +394,11 @@ class CashSessionController extends Controller
             // Obtener todos los gastos de esta sesión
             $expenses = \App\Models\Expense::where('cash_session_id', $sessionId)
                 ->with(['category', 'user'])
+                ->get();
+
+            // Obtener movimientos manuales de caja (ingresos / egresos)
+            $cashMovements = \App\Models\CashMovement::where('cash_session_id', $sessionId)
+                ->with(['user'])
                 ->get();
 
             // Crear timeline de eventos
@@ -456,6 +495,59 @@ class CashSessionController extends Controller
                 ];
             }
 
+            // Eventos de movimientos manuales de caja
+            foreach ($cashMovements as $movement) {
+                $timeline[] = [
+                    'type' => $movement->type === 'ingreso' ? 'cash-income' : 'cash-expense',
+                    'timestamp' => $movement->created_at,
+                    'description' => ($movement->type === 'ingreso' ? 'Ingreso: ' : 'Egreso: ') . $movement->concept,
+                    'amount' => $movement->type === 'ingreso' ? $movement->amount : -$movement->amount,
+                    'details' => [
+                        'movement_id' => $movement->id,
+                        'concept' => $movement->concept,
+                        'reference' => $movement->reference,
+                        'notes' => $movement->notes,
+                        'user' => $movement->user->name ?? 'Usuario',
+                        'movement_type' => $movement->type,
+                    ]
+                ];
+            }
+
+            // Eventos de abonos (pagos de crédito)
+            $creditPayments = \App\Models\CreditPayment::where('cash_session_id', $sessionId)
+                ->with(['customer', 'user'])
+                ->get();
+
+            // Fallback: si no hay por cash_session_id, buscar por user_id y rango de tiempo
+            if ($creditPayments->isEmpty() && $session->user_id) {
+                $creditPayments = \App\Models\CreditPayment::where('user_id', $session->user_id)
+                    ->whereBetween('created_at', [
+                        $session->created_at,
+                        $session->closed_at ?? now()
+                    ])
+                    ->with(['customer', 'user'])
+                    ->get();
+            }
+
+            foreach ($creditPayments as $payment) {
+                $methodLabels = ['cash' => 'Efectivo', 'card' => 'Tarjeta', 'transfer' => 'Transferencia'];
+                $timeline[] = [
+                    'type' => 'abono',
+                    'timestamp' => $payment->created_at,
+                    'description' => "Abono de " . ($payment->customer->name ?? 'Cliente'),
+                    'amount' => $payment->amount,
+                    'details' => [
+                        'payment_id' => $payment->id,
+                        'customer' => $payment->customer->name ?? 'Cliente',
+                        'customer_document' => $payment->customer->document_number ?? '',
+                        'method' => $methodLabels[$payment->method] ?? $payment->method,
+                        'reference' => $payment->reference,
+                        'notes' => $payment->notes,
+                        'user' => $payment->user->name ?? 'Usuario'
+                    ]
+                ];
+            }
+
             // Ordenar timeline cronológicamente (excluyendo apertura que debe estar primera)
             $opening = array_shift($timeline); // Remover apertura temporalmente
             usort($timeline, function($a, $b) {
@@ -494,6 +586,12 @@ class CashSessionController extends Controller
                 'total_returns_amount' => $returns->sum('total'),
                 'total_expenses' => $expenses->count(),
                 'total_expenses_amount' => $expenses->sum('amount'),
+                'total_cash_incomes' => $cashMovements->where('type', 'ingreso')->count(),
+                'total_cash_incomes_amount' => $cashMovements->where('type', 'ingreso')->sum('amount'),
+                'total_cash_egresos' => $cashMovements->where('type', 'egreso')->count(),
+                'total_cash_egresos_amount' => $cashMovements->where('type', 'egreso')->sum('amount'),
+                'total_abonos' => $creditPayments->count(),
+                'total_abonos_amount' => $creditPayments->sum('amount'),
                 'payment_methods_breakdown' => $invoices->groupBy('payment_method')->map(function($group) {
                     return [
                         'count' => $group->count(),
@@ -513,7 +611,9 @@ class CashSessionController extends Controller
                 'statistics' => $stats,
                 'invoices' => $invoices,
                 'returns' => $returns,
-                'expenses' => $expenses
+                'expenses' => $expenses,
+                'cashMovements' => $cashMovements,
+                'creditPayments' => $creditPayments
             ]);
 
         } catch (\Exception $e) {
@@ -575,6 +675,9 @@ class CashSessionController extends Controller
             $session->save();
 
             // Estadísticas adicionales
+            $manualCashIncomes = $session->cashMovements()->where('type', 'ingreso')->sum('amount');
+            $manualCashEgresos = $session->cashMovements()->where('type', 'egreso')->sum('amount');
+
             $stats = [
                 'session_info' => [
                     'id' => $session->id,
@@ -588,12 +691,14 @@ class CashSessionController extends Controller
                     'cash_sales' => $session->cash_sales,
                     'card_sales' => $session->card_sales,
                     'transfer_sales' => $session->transfer_sales,
-                    'total_expenses' => $session->total_expenses
+                    'total_expenses' => $session->total_expenses,
+                    'manual_cash_incomes' => $manualCashIncomes,
+                    'manual_cash_egresos' => $manualCashEgresos,
                 ],
                 'cash_flow' => [
                     'opening_amount' => $session->opening_amount,
                     'expected_amount' => $session->expected_amount,
-                    'net_cash_flow' => $session->cash_sales - $session->total_expenses
+                    'net_cash_flow' => $session->cash_sales + $manualCashIncomes - $session->total_expenses - $manualCashEgresos
                 ],
                 'transaction_count' => [
                     'invoices_count' => $session->invoices()->count(),
@@ -719,6 +824,128 @@ class CashSessionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al obtener la sesión: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Check if user has any forced-closed sessions pending audit
+     */
+    public function checkForcedClosed()
+    {
+        try {
+            $userId = Auth::id();
+
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Usuario no autenticado'
+                ], 401);
+            }
+
+            $forcedSession = CashSession::where('user_id', $userId)
+                ->where('status', CashSession::STATUS_FORCED_CLOSED)
+                ->with('warehouse:id,name', 'user:id,name')
+                ->orderBy('closed_at', 'asc')
+                ->first();
+
+            if (!$forcedSession) {
+                return response()->json([
+                    'success' => true,
+                    'has_forced_closed' => false,
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'has_forced_closed' => true,
+                'session' => [
+                    'id' => $forcedSession->id,
+                    'user_name' => $forcedSession->user?->name ?? 'Usuario',
+                    'created_at' => $forcedSession->created_at,
+                    'opened_at' => $forcedSession->opened_at,
+                    'closed_at' => $forcedSession->closed_at,
+                    'opening_amount' => (float) $forcedSession->opening_amount,
+                    'expected_amount' => (float) ($forcedSession->expected_amount ?? 0),
+                    'warehouse_name' => $forcedSession->warehouse?->name ?? 'Sin sede',
+                    'total_sales' => (float) $forcedSession->total_sales,
+                    'cash_sales' => (float) $forcedSession->cash_sales,
+                    'card_sales' => (float) ($forcedSession->closing_breakdown['sales']['card'] ?? 0),
+                    'transfer_sales' => (float) ($forcedSession->closing_breakdown['sales']['transfer'] ?? 0),
+                    'total_expenses' => (float) ($forcedSession->total_expenses ?? 0),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al verificar cierres forzados: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Resolve a forced-closed session with the cashier's actual count (audit)
+     */
+    public function resolveForcedClose(Request $request)
+    {
+        try {
+            $request->validate([
+                'session_id' => 'required|integer|exists:cash_sessions,id',
+                'actual_amount' => 'required|numeric|min:0',
+                'closing_notes' => 'nullable|string|max:500',
+            ]);
+
+            $userId = Auth::id();
+
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Usuario no autenticado'
+                ], 401);
+            }
+
+            $session = CashSession::where('id', $request->session_id)
+                ->where('user_id', $userId)
+                ->where('status', CashSession::STATUS_FORCED_CLOSED)
+                ->firstOrFail();
+
+            $expectedAmount = (float) ($session->expected_amount ?? 0);
+            $actualAmount = (float) $request->actual_amount;
+            $difference = $actualAmount - $expectedAmount;
+
+            $closingStatus = 'exact';
+            if ($difference > 0.01) {
+                $closingStatus = 'surplus';
+            } elseif ($difference < -0.01) {
+                $closingStatus = 'deficit';
+            }
+
+            $session->update([
+                'status' => CashSession::STATUS_CLOSED,
+                'actual_amount' => $actualAmount,
+                'difference_amount' => $difference,
+                'closing_status' => $closingStatus,
+                'closing_notes' => ($session->closing_notes ? $session->closing_notes . ' | ' : '')
+                    . 'Arqueo del cajero: ' . ($request->closing_notes ?? 'Sin observaciones'),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Arqueo registrado correctamente. Ya puedes operar.',
+                'session' => $session->fresh(),
+                'difference' => $difference,
+                'closing_status' => $closingStatus,
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Datos inválidos',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al resolver cierre forzado: ' . $e->getMessage()
             ], 500);
         }
     }

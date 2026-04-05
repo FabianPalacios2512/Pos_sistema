@@ -5,8 +5,8 @@
       <!-- Header sin icono -->
       <div class="flex items-center justify-between pb-4">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Gastos Operativos</h1>
-          <p class="text-sm text-gray-500 dark:text-gray-500 mt-1 font-normal">Gestiona los gastos del negocio</p>
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Movimientos de Caja</h1>
+          <p class="text-sm text-gray-500 dark:text-gray-500 mt-1 font-normal">Gestiona egresos operativos e ingresos manuales de caja</p>
         </div>
         
         <div class="flex items-center gap-3">
@@ -19,13 +19,21 @@
             Actualizar
           </button>
           
+          <button @click="openCashIncomeModal" 
+                  class="px-6 py-2.5 bg-white dark:bg-[#1e1f20] hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-sm font-medium rounded-full border border-emerald-200 dark:border-emerald-800/40 transition-all duration-300">
+            <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Registrar Ingreso Caja
+          </button>
+
           <!-- Botón Registrar Gasto -->
           <button @click="openCreateModal" 
                   class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full transition-all duration-300">
             <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
-            Registrar Nuevo Gasto
+            Registrar Egreso
           </button>
         </div>
       </div>
@@ -402,22 +410,25 @@
       </div>
     </div>
 
-    <!-- Modal Crear/Editar Gasto -->
+    <!-- Modal Crear/Editar Movimiento -->
     <div v-if="showModal" class="fixed inset-0 bg-black/60 dark:bg-black/75  flex items-center justify-center z-50 p-4">
       <div class="bg-white dark:bg-[#1e1f20] rounded-2xl shadow-2xl dark:shadow-black/40 border border-gray-200 dark:border-gray-800 max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <!-- Header Modal -->
         <div class="bg-[#f8f9fa] dark:bg-[#131314] border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div :class="entryMode === 'cash-income' ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800/50' : 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800/50'" class="w-11 h-11 border rounded-xl flex items-center justify-center">
+              <svg v-if="entryMode === 'cash-income'" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <svg v-else class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
             <div>
               <h3 class="text-base font-semibold text-gray-900 dark:text-white">
-                {{ isEditing ? 'Editar Gasto' : 'Registrar Nuevo Gasto' }}
+                {{ entryMode === 'cash-income' ? 'Registrar Ingreso de Caja' : (isEditing ? 'Editar Gasto' : 'Registrar Egreso') }}
               </h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Complete la información del gasto operativo</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ entryMode === 'cash-income' ? 'Registra base, sencillo o dinero entregado a la caja' : 'Complete la información del egreso operativo' }}</p>
             </div>
           </div>
           <button @click="closeModal" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
@@ -428,8 +439,29 @@
         </div>
 
         <!-- Body Modal con Layout Horizontal -->
-        <form @submit.prevent="saveExpense" class="flex-1 overflow-y-auto">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+        <form @submit.prevent="entryMode === 'cash-income' ? saveCashIncome() : saveExpense()" class="flex-1 overflow-y-auto">
+          <div v-if="!isEditing" class="px-6 pt-5">
+            <div class="inline-flex p-1 rounded-xl bg-gray-100 dark:bg-[#18181b] border border-gray-200 dark:border-gray-800">
+              <button
+                type="button"
+                @click="entryMode = 'expense'"
+                :class="entryMode === 'expense' ? 'bg-white dark:bg-[#27272a] text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'"
+                class="px-4 py-2 text-sm font-medium rounded-lg transition-all"
+              >
+                Egreso
+              </button>
+              <button
+                type="button"
+                @click="entryMode = 'cash-income'"
+                :class="entryMode === 'cash-income' ? 'bg-white dark:bg-[#27272a] text-emerald-700 dark:text-emerald-300 shadow-sm' : 'text-gray-500 dark:text-gray-400'"
+                class="px-4 py-2 text-sm font-medium rounded-lg transition-all"
+              >
+                Ingreso Caja
+              </button>
+            </div>
+          </div>
+
+          <div v-if="entryMode === 'expense'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
             
             <!-- Columna Izquierda: Información Principal (2/3) -->
             <div class="lg:col-span-2 space-y-5">
@@ -584,6 +616,78 @@
             </div>
           </div>
 
+          <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
+            <div class="lg:col-span-2 space-y-5">
+              <div class="bg-white dark:bg-[#1e1f20] border border-gray-200 dark:border-gray-800 rounded-xl p-5">
+                <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+                  <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Ingreso Manual a Caja</h4>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Monto *</label>
+                    <div class="relative">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm font-medium">$</span>
+                      <input v-model="cashMovementForm.amount"
+                             type="text"
+                             inputmode="decimal"
+                             @input="formatCashMovementAmountInput"
+                             required
+                             placeholder="0.00"
+                             class="w-full pl-8 pr-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-white rounded-lg text-sm font-semibold font-mono focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Referencia</label>
+                    <input v-model="cashMovementForm.reference"
+                           type="text"
+                           placeholder="Base caja, sencillo, aporte..."
+                           class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                  <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Concepto *</label>
+                  <textarea v-model="cashMovementForm.concept"
+                            rows="3"
+                            required
+                            placeholder="Ejemplo: Administrador dejó sencillo para vueltas"
+                            class="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none transition-all"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-5">
+              <div class="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl p-5">
+                <div class="flex items-center space-x-2 mb-4 pb-3 border-b border-emerald-200 dark:border-emerald-800/40">
+                  <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <h4 class="text-sm font-semibold text-gray-900 dark:text-white">Notas del Movimiento</h4>
+                </div>
+
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Notas</label>
+                    <textarea v-model="cashMovementForm.notes"
+                              rows="4"
+                              placeholder="Detalle opcional del ingreso a caja"
+                              class="w-full px-3 py-2.5 border border-emerald-200 dark:border-emerald-800/40 bg-white dark:bg-[#131314] text-gray-900 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none transition-all"></textarea>
+                  </div>
+
+                  <div class="rounded-xl bg-white dark:bg-[#131314] border border-emerald-200 dark:border-emerald-800/40 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Impacto</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Este ingreso se suma al efectivo esperado al cerrar caja y quedará visible en la auditoría de la sesión.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Footer Modal dentro del form -->
           <div class="bg-[#f8f9fa] dark:bg-[#131314] border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex justify-between items-center flex-shrink-0">
             <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -605,7 +709,7 @@
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span>{{ saving ? 'Guardando...' : (isEditing ? 'Actualizar Gasto' : 'Guardar Gasto') }}</span>
+                <span>{{ saving ? 'Guardando...' : (entryMode === 'cash-income' ? 'Guardar Ingreso' : (isEditing ? 'Actualizar Gasto' : 'Guardar Egreso')) }}</span>
               </button>
             </div>
           </div>
@@ -691,6 +795,7 @@
 <script>
 import apiClient from '@/services/apiClient';
 import { useUIContextStore } from '@/store/uiContextStore';
+import { appStore } from '@/store/appStore';
 
 export default {
   name: 'ExpensesManager',
@@ -712,6 +817,7 @@ export default {
       },
       categories: [],
       statistics: {},
+      entryMode: 'expense',
       filters: {
         search: '',
         category_id: '',
@@ -730,6 +836,12 @@ export default {
         date: '',
         receipt_number: '',
         supplier: '',
+        notes: '',
+      },
+      cashMovementForm: {
+        amount: '',
+        concept: '',
+        reference: '',
         notes: '',
       },
       selectedExpense: null,
@@ -767,8 +879,8 @@ export default {
       
       const screenData = {
         modulo: 'expenses',
-        titulo: 'Gastos Operativos',
-        descripcion: 'Gestión de gastos y egresos del negocio',
+        titulo: 'Movimientos de Caja',
+        descripcion: 'Gestión de movimientos de caja, egresos e ingresos manuales',
         
         // KPIs principales
         kpis: {
@@ -807,16 +919,17 @@ export default {
         },
         
         // Modal abierto
-        modalAbierto: this.showModal ? 'formulario_gasto' : null,
+        modalAbierto: this.showModal ? (this.entryMode === 'cash-income' ? 'formulario_ingreso_caja' : 'formulario_gasto') : null,
         editando: this.isEditing,
         
         // Guía para la IA
         guiaIA: `
-          Estás en Gastos Operativos. Puedes:
+          Estás en Movimientos de Caja. Puedes:
           1. Registrar gastos por voz: "registra un gasto de $50.000 en servicios públicos"
-          2. Consultar gastos: "¿cuánto hemos gastado este mes?", "¿en qué gastamos más?"
-          3. Ver categorías: Las categorías son ${this.categories.map(c => c.name).join(', ')}
-          4. Filtrar gastos por categoría, método de pago o fecha
+          2. Registrar ingresos manuales: "agrega $100.000 de base a la caja"
+          3. Consultar gastos: "¿cuánto hemos gastado este mes?", "¿en qué gastamos más?"
+          4. Ver categorías: Las categorías son ${this.categories.map(c => c.name).join(', ')}
+          5. Filtrar gastos por categoría, método de pago o fecha
           
           IMPORTANTE: Al registrar un gasto, siempre pregunta:
           - Si falta el monto
@@ -1098,12 +1211,21 @@ export default {
 
     openCreateModal() {
       this.isEditing = false;
+      this.entryMode = 'expense';
       this.resetForm();
+      this.showModal = true;
+    },
+
+    openCashIncomeModal() {
+      this.isEditing = false;
+      this.entryMode = 'cash-income';
+      this.resetCashMovementForm();
       this.showModal = true;
     },
 
     editExpense(expense) {
       this.isEditing = true;
+      this.entryMode = 'expense';
       this.form = {
         id: expense.id,
         category_id: expense.category_id,
@@ -1137,8 +1259,9 @@ export default {
           this.$toast?.success('Gasto eliminado exitosamente');
           this.showDeleteModal = false;
           this.expenseToDelete = null;
-          this.loadExpenses();
-          this.loadStatistics();
+          await this.loadExpenses();
+          await this.loadStatistics();
+          await appStore.loadCashSession(true);
         }
       } catch (error) {
         console.error('Error al eliminar gasto:', error);
@@ -1167,6 +1290,23 @@ export default {
       // Actualizar el valor del input
       event.target.value = value;
       this.form.amount = value;
+    },
+
+    formatCashMovementAmountInput(event) {
+      let value = event.target.value.replace(/[^\d.,]/g, '');
+      value = value.replace(/,/g, '.');
+
+      const parts = value.split('.');
+      if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+      }
+
+      if (parts.length === 2 && parts[1].length > 2) {
+        value = parts[0] + '.' + parts[1].substring(0, 2);
+      }
+
+      event.target.value = value;
+      this.cashMovementForm.amount = value;
     },
 
     async saveExpense() {
@@ -1222,8 +1362,9 @@ export default {
         if (response.data.success) {
           this.$toast?.success(response.data.message || 'Gasto guardado exitosamente');
           this.closeModal();
-          this.loadExpenses();
-          this.loadStatistics();
+          await this.loadExpenses();
+          await this.loadStatistics();
+          await appStore.loadCashSession(true);
         }
       } catch (error) {
         // Mostrar mensaje de error en toast
@@ -1245,9 +1386,61 @@ export default {
       }
     },
 
+    async saveCashIncome() {
+      const errors = [];
+
+      if (!this.cashMovementForm.amount || parseFloat(this.cashMovementForm.amount) <= 0) {
+        errors.push('El monto del ingreso debe ser mayor a 0');
+      }
+
+      if (!this.cashMovementForm.concept || this.cashMovementForm.concept.trim() === '') {
+        errors.push('El concepto del ingreso es obligatorio');
+      }
+
+      if (errors.length > 0) {
+        this.$toast?.error(errors.join('. '));
+        return;
+      }
+
+      this.saving = true;
+
+      try {
+        const response = await apiClient.post('/cash-movements', {
+          type: 'ingreso',
+          amount: parseFloat(this.cashMovementForm.amount) || 0,
+          concept: this.cashMovementForm.concept.trim(),
+          reference: this.cashMovementForm.reference || null,
+          notes: this.cashMovementForm.notes || null,
+        });
+
+        if (response.data.success) {
+          this.$toast?.success(response.data.message || 'Ingreso registrado correctamente');
+          this.closeModal();
+          await appStore.loadCashSession(true);
+        }
+      } catch (error) {
+        let errorMessage = 'Error al registrar el ingreso';
+
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response?.data?.errors) {
+          const errors = Object.values(error.response.data.errors).flat();
+          errorMessage = errors.join('. ');
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        this.$toast?.error(errorMessage);
+      } finally {
+        this.saving = false;
+      }
+    },
+
     closeModal() {
       this.showModal = false;
       this.resetForm();
+      this.resetCashMovementForm();
+      this.entryMode = 'expense';
     },
 
     resetForm() {
@@ -1256,10 +1449,20 @@ export default {
         amount: '',
         description: '',
         payment_method: 'efectivo',
+        expense_source: 'caja',
         date: '',
         receipt_number: '',
         supplier: '',
         notes: ''
+      };
+    },
+
+    resetCashMovementForm() {
+      this.cashMovementForm = {
+        amount: '',
+        concept: '',
+        reference: '',
+        notes: '',
       };
     },
 

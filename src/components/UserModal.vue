@@ -106,25 +106,48 @@
             />
           </div>
 
-          <!-- Rol -->
-          <div>
-            <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
-              Rol *
-            </label>
-            <select
-              v-model="form.role_id"
-              required
-              class="w-full px-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all"
-            >
-              <option value="" disabled>Selecciona un rol</option>
-              <option 
-                v-for="role in roles" 
-                :key="role.id" 
-                :value="role.id"
+          <!-- Rol y Sede (Grid) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Rol -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
+                Rol *
+              </label>
+              <select
+                v-model="form.role_id"
+                required
+                class="w-full px-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all"
               >
-                {{ role.name }}
-              </option>
-            </select>
+                <option value="" disabled>Selecciona un rol</option>
+                <option 
+                  v-for="role in roles" 
+                  :key="role.id" 
+                  :value="role.id"
+                >
+                  {{ role.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Sede Asignada -->
+            <div>
+              <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
+                Sede Asignada
+              </label>
+              <select
+                v-model="form.warehouse_id"
+                class="w-full px-4 py-3 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all"
+              >
+                <option value="">Sin sede asignada</option>
+                <option 
+                  v-for="wh in warehouses" 
+                  :key="wh.id" 
+                  :value="wh.id"
+                >
+                  {{ wh.name }}
+                </option>
+              </select>
+            </div>
           </div>
 
           <!-- Estado Activo -->
@@ -191,6 +214,10 @@ const props = defineProps({
   roles: {
     type: Array,
     required: true
+  },
+  warehouses: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -204,6 +231,7 @@ const form = ref({
   phone: '',
   password: '',
   role_id: '',
+  warehouse_id: '',
   active: true
 })
 
@@ -218,6 +246,7 @@ const resetForm = () => {
     phone: '',
     password: '',
     role_id: '',
+    warehouse_id: '',
     active: true
   }
 }
@@ -232,6 +261,7 @@ watch(() => props.user, (newUser) => {
       phone: newUser.phone || '',
       password: '', // No se carga la contraseña por seguridad
       role_id: newUser.role_id || '',
+      warehouse_id: newUser.warehouse_id || '',
       active: newUser.active !== undefined ? newUser.active : true
     }
   } else {
@@ -279,7 +309,10 @@ const setFieldValue = (campo, valor) => {
     'phone': 'phone',
     'telefono': 'phone',
     'role_id': 'role_id',
-    'rol': 'role_id'
+    'rol': 'role_id',
+    'warehouse_id': 'warehouse_id',
+    'sede': 'warehouse_id',
+    'bodega': 'warehouse_id'
   }
   
   const campoReal = campoMap[campo.toLowerCase()] || campo

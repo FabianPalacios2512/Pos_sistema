@@ -64,7 +64,9 @@ class CreditPaymentController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'amount' => 'required|numeric|min:0.01',
             'method' => 'required|string|in:cash,card,transfer',
-            'notes' => 'nullable|string|max:500'
+            'reference' => 'nullable|string|max:100',
+            'notes' => 'nullable|string|max:500',
+            'cash_session_id' => 'nullable|exists:cash_sessions,id'
         ]);
 
         if ($validator->fails()) {
@@ -93,8 +95,10 @@ class CreditPaymentController extends Controller
                 'customer_id' => $request->customer_id,
                 'amount' => $request->amount,
                 'method' => $request->method,
+                'reference' => $request->reference,
                 'notes' => $request->notes,
-                'user_id' => auth()->id() ?? null
+                'user_id' => auth()->id() ?? null,
+                'cash_session_id' => $request->cash_session_id
             ]);
 
             // 🎯 Calcular reducción proporcional de subtotal_debt
@@ -125,6 +129,9 @@ class CreditPaymentController extends Controller
             $customer->save();
 
             DB::commit();
+
+            // Reload with relationships for complete response
+            $payment->load('customer:id,name,document_number', 'user:id,name');
 
             Log::info('Credit payment registered', [
                 'payment_id' => $payment->id,

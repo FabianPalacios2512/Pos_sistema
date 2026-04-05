@@ -116,6 +116,36 @@ export const cashSessionService = {
       console.error('Error al obtener historial:', error)
       throw error
     }
+  },
+
+  /**
+   * Verificar si el usuario tiene cierres forzados pendientes de arqueo
+   */
+  async checkForcedClosed() {
+    try {
+      const response = await apiClient.get('/cash-sessions/check-forced-closed')
+      return response.data
+    } catch (error) {
+      console.error('Error al verificar cierres forzados:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Resolver un cierre forzado con el arqueo del cajero
+   * @param {Object} data
+   * @param {number} data.session_id - ID de la sesión forzada
+   * @param {number} data.actual_amount - Monto real contado
+   * @param {string} data.closing_notes - Observaciones
+   */
+  async resolveForcedClose(data) {
+    try {
+      const response = await apiClient.post('/cash-sessions/resolve-forced-close', data)
+      return response.data
+    } catch (error) {
+      console.error('Error al resolver cierre forzado:', error)
+      throw error
+    }
   }
 }
 

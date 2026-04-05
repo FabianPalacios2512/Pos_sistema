@@ -401,6 +401,10 @@ const currentDate = computed(() => {
 
 const cashAmount = computed(() => {
   if (!currentSession.value) return 0
+
+  if (currentSession.value.expected_amount !== undefined && currentSession.value.expected_amount !== null) {
+    return parseFloat(currentSession.value.expected_amount || 0)
+  }
   
   // Calcular total real de efectivo disponible
   const initialCash = parseFloat(currentSession.value.opening_amount || 0)
@@ -420,8 +424,10 @@ const cashAmount = computed(() => {
   }
   
   const expenses = parseFloat(currentSession.value.total_expenses || 0)
+  const manualIncomes = parseFloat(currentSession.value.closing_breakdown?.manual_cash_incomes || currentSession.value.closing_breakdown?.cash_movements?.ingresos || 0)
+  const manualEgresos = parseFloat(currentSession.value.closing_breakdown?.manual_cash_egresos || currentSession.value.closing_breakdown?.cash_movements?.egresos || 0)
   
-  return initialCash + cashSales - expenses
+  return initialCash + cashSales + manualIncomes - expenses - manualEgresos
 })
 
 const growthPercentage = computed(() => {

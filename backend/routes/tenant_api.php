@@ -271,6 +271,7 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     // Autenticación
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/auth/verify-password', [AuthController::class, 'verifyMyPassword']);
 
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
@@ -414,7 +415,11 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::post('/biometric/attendance', [\App\Http\Controllers\Api\BiometricController::class, 'recordAttendance']);
     Route::get('/biometric/attendance/history', [\App\Http\Controllers\Api\BiometricController::class, 'attendanceHistory']);
     Route::get('/biometric/attendance/today', [\App\Http\Controllers\Api\BiometricController::class, 'todaySummary']);
+    Route::post('/biometric/check-cash-before-exit', [\App\Http\Controllers\Api\BiometricController::class, 'checkCashBeforeExit']);
     Route::delete('/biometric/{userId}/profile', [\App\Http\Controllers\Api\BiometricController::class, 'deleteProfile']);
+    Route::put('/biometric/attendance/{id}', [\App\Http\Controllers\Api\BiometricController::class, 'updateAttendanceLog']);
+    Route::delete('/biometric/attendance/user/{userId}', [\App\Http\Controllers\Api\BiometricController::class, 'deleteUserAttendanceLogs']);
+    Route::delete('/biometric/attendance/{id}', [\App\Http\Controllers\Api\BiometricController::class, 'deleteAttendanceLog']);
 
     // Permisos
     Route::apiResource('permissions', PermissionController::class);
@@ -484,6 +489,8 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::post('/cash-sessions/update-totals', [CashSessionController::class, 'updateTotals']);
     Route::get('/cash-sessions/daily-summary', [CashSessionController::class, 'getDailySummary']);
     Route::get('/cash-sessions/history', [CashSessionController::class, 'getHistory']);
+    Route::get('/cash-sessions/check-forced-closed', [CashSessionController::class, 'checkForcedClosed']);
+    Route::post('/cash-sessions/resolve-forced-close', [CashSessionController::class, 'resolveForcedClose']);
 
     // ==================== INVENTARIO INTELIGENTE ====================
     // 1. Vista General del Inventario
@@ -545,6 +552,12 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::patch('/expense-categories/{id}/toggle', [ExpenseCategoryController::class, 'toggleActive']);
     Route::delete('/expense-categories/{id}', [ExpenseCategoryController::class, 'destroy']);
     // ==================== FIN GASTOS OPERATIVOS ====================
+
+    // ==================== MOVIMIENTOS DE CAJA (INGRESOS/EGRESOS) ====================
+    Route::get('/cash-movements', [\App\Http\Controllers\Api\CashMovementController::class, 'index']);
+    Route::post('/cash-movements', [\App\Http\Controllers\Api\CashMovementController::class, 'store']);
+    Route::delete('/cash-movements/{id}', [\App\Http\Controllers\Api\CashMovementController::class, 'destroy']);
+    // ==================== FIN MOVIMIENTOS DE CAJA ====================
 
     // ==================== CRÉDITOS Y CUENTAS POR COBRAR ====================
     Route::get('/credit-payments', [\App\Http\Controllers\Api\CreditPaymentController::class, 'index']);

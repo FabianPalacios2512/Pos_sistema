@@ -20,7 +20,7 @@
   <!-- Sidebar Premium - Linear/Notion Style -->
   <aside 
     class="sidebar-root fixed inset-y-0 left-0 z-50 flex flex-col lg:translate-x-0 bg-white dark:bg-[#111113] border-r border-gray-200/80 dark:border-zinc-800/80"
-    :style="{ width: sidebarCollapsed ? '68px' : '252px' }"
+    :style="{ width: sidebarCollapsed ? '68px' : '264px' }"
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
   >
     
@@ -61,7 +61,7 @@
     </div>
 
     <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto overflow-x-hidden py-3 sidebar-scrollbar" :class="sidebarCollapsed ? 'px-2' : 'px-3'"
+        <nav class="flex-1 overflow-y-auto overflow-x-hidden py-3 sidebar-scrollbar" :class="sidebarCollapsed ? 'px-2' : 'px-4'"
           @mousemove="handleNavHover"
           @mouseleave="hideTooltip(true)"
           @scroll="hideTooltip(true)"
@@ -83,9 +83,9 @@
       </div>
 
       <!-- OPERACIONES -->
-      <div v-if="hasModuleAccess('pos') || hasModuleAccess('invoices') || hasModuleAccess('returns')" class="mt-4">
+      <div v-if="hasModuleAccess('pos') || hasModuleAccess('invoices') || hasModuleAccess('returns')">
         <div v-if="sidebarCollapsed" class="section-divider"></div>
-        <h3 v-else class="section-title">Operaciones</h3>
+        <h3 v-else class="text-[11px] font-black text-gray-400 dark:text-zinc-600 uppercase tracking-[0.2em] mt-8 mb-3 px-4">Operaciones</h3>
         
         <div
           v-if="hasModuleAccess('pos')"
@@ -140,9 +140,9 @@
       </div>
 
       <!-- INVENTARIO -->
-      <div v-if="hasModuleAccess('products') || hasModuleAccess('categories') || hasModuleAccess('stock') || hasModuleAccess('intelligent_inventory')" class="mt-4">
+      <div v-if="hasModuleAccess('products') || hasModuleAccess('categories') || hasModuleAccess('stock') || hasModuleAccess('intelligent_inventory')">
         <div v-if="sidebarCollapsed" class="section-divider"></div>
-        <h3 v-else class="section-title">Inventario</h3>
+        <h3 v-else class="text-[11px] font-black text-gray-400 dark:text-zinc-600 uppercase tracking-[0.2em] mt-8 mb-3 px-4">Inventario</h3>
         
         <div
           v-if="hasModuleAccess('products')"
@@ -199,9 +199,9 @@
       </div>
 
       <!-- TIENDA ONLINE -->
-      <div v-if="showWebCatalog" class="mt-4">
+      <div v-if="showWebCatalog">
         <div v-if="sidebarCollapsed" class="section-divider"></div>
-        <h3 v-else class="section-title">Tienda Online</h3>
+        <h3 v-else class="text-[11px] font-black text-gray-400 dark:text-zinc-600 uppercase tracking-[0.2em] mt-8 mb-3 px-4">Tienda Online</h3>
         
         <div
           @click="$emit('change-module', 'web-catalog-config')"
@@ -217,9 +217,9 @@
       </div>
 
       <!-- MULTISEDE -->
-      <div v-if="showMultisede" class="mt-4">
+      <div v-if="showMultisede">
         <div v-if="sidebarCollapsed" class="section-divider"></div>
-        <h3 v-else class="section-title">Multisede</h3>
+        <h3 v-else class="text-[11px] font-black text-gray-400 dark:text-zinc-600 uppercase tracking-[0.2em] mt-8 mb-3 px-4">Multisede</h3>
         
         <div
           @click="$emit('change-module', 'warehouses')"
@@ -236,9 +236,9 @@
       </div>
 
       <!-- RELACIONES -->
-      <div v-if="hasModuleAccess('customers') || hasModuleAccess('suppliers')" class="mt-4">
+      <div v-if="hasModuleAccess('customers') || hasModuleAccess('suppliers')">
         <div v-if="sidebarCollapsed" class="section-divider"></div>
-        <h3 v-else class="section-title">Relaciones</h3>
+        <h3 v-else class="text-[11px] font-black text-gray-400 dark:text-zinc-600 uppercase tracking-[0.2em] mt-8 mb-3 px-4">Relaciones</h3>
         
         <div
           v-if="hasModuleAccess('customers')"
@@ -281,9 +281,9 @@
       </div>
 
       <!-- SISTEMA -->
-      <div class="mt-4 mb-2">
+      <div class="mb-2">
         <div v-if="sidebarCollapsed" class="section-divider"></div>
-        <h3 v-else class="section-title">Sistema</h3>
+        <h3 v-else class="text-[11px] font-black text-gray-400 dark:text-zinc-600 uppercase tracking-[0.2em] mt-8 mb-3 px-4">Sistema</h3>
         
         <div
           v-if="hasModuleAccess('users') && canAccessUsersModule"
@@ -326,16 +326,16 @@
         </div>
 
         <div
-          v-if="hasModuleAccess('expenses')"
+          v-if="hasModuleAccess('expenses') || hasModuleAccess('pos') || hasModuleAccess('cash_register')"
           @click="$emit('change-module', 'expenses')"
           class="menu-item group"
           :class="[currentModule === 'expenses' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"
-          :data-tooltip="sidebarCollapsed ? 'Gastos Operativos' : ''"
+          :data-tooltip="sidebarCollapsed ? 'Movimientos de Caja' : ''"
         >
           <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
           </svg>
-          <span v-if="!sidebarCollapsed" class="menu-text">Gastos Operativos</span>
+          <span v-if="!sidebarCollapsed" class="menu-text">Movimientos de Caja</span>
         </div>
 
         <div
@@ -368,19 +368,18 @@
       
     </nav>
 
-    <!-- Footer: subtle branding -->
-    <div class="border-t border-gray-100 dark:border-zinc-800/60 py-3 flex items-center justify-center">
-      <Transition
-        enter-active-class="transition-all duration-200 ease-out"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition-all duration-100 ease-in"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
+    <!-- Footer: Collapse toggle + branding -->
+    <div class="border-t border-gray-100 dark:border-zinc-800/60 p-3 flex items-center" :class="sidebarCollapsed ? 'justify-center' : 'justify-between'">
+      <p v-if="!sidebarCollapsed" class="text-[10px] text-gray-300 dark:text-zinc-700 font-medium tracking-wide select-none pl-1">105 POS &middot; v3</p>
+      <button 
+        @click="$emit('update:sidebarCollapsed', !sidebarCollapsed)"
+        class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 text-gray-400 dark:text-zinc-600 hover:text-gray-600 dark:hover:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
+        :title="sidebarCollapsed ? 'Expandir menú' : 'Colapsar menú'"
       >
-        <p v-if="!sidebarCollapsed" class="text-[10px] text-gray-300 dark:text-zinc-700 font-medium tracking-wide select-none">105 POS &middot; v3</p>
-        <div v-else class="w-1.5 h-1.5 rounded-full bg-gray-200 dark:bg-zinc-800"></div>
-      </Transition>
+        <svg class="w-4 h-4 transition-transform duration-200" :class="sidebarCollapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
     </div>
   </aside>
 
@@ -537,24 +536,10 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* === Section Titles === */
-.section-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #9CA3AF;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 4px;
-  padding: 0 12px;
-}
-.dark .section-title {
-  color: #52525b;
-}
-
 /* === Section Divider (collapsed) === */
 .section-divider {
   height: 1px;
-  margin: 8px 8px 10px;
+  margin: 12px 8px;
   background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
 }
 .dark .section-divider {
@@ -567,7 +552,11 @@ onMounted(async () => {
   height: 20px;
   flex-shrink: 0;
   stroke-width: 1.75;
+  color: #9CA3AF;
   transition: color 0.15s ease;
+}
+.dark .menu-icon {
+  color: #71717a;
 }
 .menu-item.collapsed .menu-icon {
   width: 22px;
@@ -579,14 +568,15 @@ onMounted(async () => {
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
+  gap: 12px;
+  padding: 10px 16px 10px 12px;
   margin-bottom: 2px;
   border-radius: 8px;
-  color: #4B5563;
+  border-left: 4px solid transparent;
+  color: #374151;
   font-size: 15px;
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.4;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
@@ -605,12 +595,16 @@ onMounted(async () => {
   width: 44px;
   height: 44px;
   border-radius: 10px;
+  border-left: none;
 }
 
 /* === Hover === */
 .menu-item:hover {
   background-color: #F3F4F6;
   color: #111827;
+}
+.menu-item:hover .menu-icon {
+  color: #6B7280;
 }
 .menu-item.collapsed:hover {
   background-color: #F3F4F6;
@@ -620,59 +614,57 @@ onMounted(async () => {
   background-color: rgba(255, 255, 255, 0.06);
   color: #e4e4e7;
 }
+.dark .menu-item:hover .menu-icon {
+  color: #a1a1aa;
+}
 .dark .menu-item.collapsed:hover {
   background-color: rgba(255, 255, 255, 0.08);
   color: #fafafa;
 }
 
-/* === Active State === */
+/* === Active State — Verde Corporativo === */
 .menu-item.active {
   background-color: #ECFDF5;
-  color: #065F46;
-  font-weight: 600;
+  color: #047857;
+  font-weight: 700;
+  border-left-color: #059669;
 }
 .dark .menu-item.active {
   background-color: rgba(16, 185, 129, 0.08);
   color: #6ee7b7;
-}
-
-/* Active indicator bar */
-.menu-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
-  background-color: #059669;
-  border-radius: 0 4px 4px 0;
-}
-.menu-item.collapsed.active::before {
-  left: 0;
-  width: 3px;
-  height: 20px;
-  border-radius: 0 4px 4px 0;
-}
-.dark .menu-item.active::before {
-  background-color: #34d399;
+  border-left-color: #34d399;
 }
 
 .menu-item.active .menu-icon {
   color: #059669;
 }
 .dark .menu-item.active .menu-icon {
-  color: #6ee7b7;
+  color: #34d399;
 }
 
-/* Active collapsed: stronger background */
+/* Active collapsed */
 .menu-item.collapsed.active {
   background-color: #ECFDF5;
   color: #059669;
+  border-left: none;
 }
 .dark .menu-item.collapsed.active {
   background-color: rgba(16, 185, 129, 0.12);
   color: #6ee7b7;
+}
+.menu-item.collapsed.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background-color: #059669;
+  border-radius: 0 4px 4px 0;
+}
+.dark .menu-item.collapsed.active::before {
+  background-color: #34d399;
 }
 
 /* === Menu Text === */

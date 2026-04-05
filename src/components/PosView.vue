@@ -223,6 +223,23 @@
             <svg class="w-4 h-4" :class="quotationMode ? 'text-gray-400 dark:text-zinc-600' : 'text-slate-500 dark:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
             <span class="text-sm font-semibold">Devoluciones</span>
           </button>
+
+          <!-- Abonos CrediTienda - Solo visible si hay clientes con deuda activa y caja abierta -->
+          <button
+            v-if="customersWithDebt.length > 0 && hasOpenSession"
+            @click="openAbonoModal"
+            :disabled="quotationMode"
+            class="hidden sm:flex items-center gap-2 px-4 h-10 rounded-lg transition-all duration-200 border"
+            :class="quotationMode 
+              ? 'bg-gray-100 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-400 dark:text-zinc-600 cursor-not-allowed' 
+              : 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-800/40 text-gray-800 dark:text-zinc-200 hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 hover:border-emerald-300 dark:hover:border-emerald-700/60 hover:shadow-sm'"
+          >
+            <svg class="w-4 h-4" :class="quotationMode ? 'text-gray-400 dark:text-zinc-600' : 'text-emerald-500 dark:text-emerald-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sm font-semibold">Abonos</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">{{ customersWithDebt.length }}</span>
+          </button>
           
           <!-- DIAN - Toggle Switch Profesional (TEMPORALMENTE DESHABILITADO) -->
           <!-- TODO: Reactivar cuando esté listo el módulo de facturación electrónica
@@ -1181,7 +1198,7 @@
           <!-- Indicador de estado -->
           <div class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-gray-200 dark:bg-zinc-700 border-2 border-white dark:border-[#141416]"></div>
         </div>
-        <p class="text-base font-bold text-gray-600 dark:text-zinc-300 leading-tight">Tu ticket estA vacío</p>
+        <p class="text-base font-bold text-gray-600 dark:text-zinc-300 leading-tight">Tu ticket esta vacío</p>
         <p class="text-sm font-medium text-gray-400 dark:text-zinc-500 mt-2 max-w-[220px] leading-relaxed">Busca, escanea o selecciona un producto para comenzar</p>
         
         <!-- Indicador de flujo -->
@@ -2225,6 +2242,237 @@
       @add-partial-stock="handleAddPartialStock"
     />
 
+    <!-- ===== MODAL: Cierre Forzado — Flat Enterprise ===== -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-all duration-200 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-all duration-150 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showForcedCloseModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <!-- Backdrop — NO dismissible -->
+          <div class="absolute inset-0 bg-black/50 dark:bg-black/70"></div>
+
+          <div class="relative bg-white dark:bg-zinc-900 w-full max-w-5xl border border-gray-200 dark:border-zinc-800 shadow-2xl dark:shadow-black/60 overflow-hidden rounded-lg">
+
+            <!-- ══ HEADER CORPORATIVO ══ -->
+            <div class="px-8 py-5 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
+              <div>
+                <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Finalizar Jornada y Arqueo de Caja</h2>
+                <p class="text-xs text-gray-500 dark:text-zinc-500 font-medium mt-1">Sesión pendiente de cierre · Resolución obligatoria antes de operar</p>
+              </div>
+              <span class="text-[11px] font-bold text-orange-700 dark:text-orange-400 uppercase tracking-widest bg-orange-50 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800/50 px-3 py-1.5 rounded">Pendiente</span>
+            </div>
+
+            <!-- ══ BODY: DOS PANELES ══ -->
+            <div class="flex flex-col lg:flex-row">
+
+              <!-- ▸ PANEL IZQUIERDO (42%): Contexto y Resumen -->
+              <div class="lg:w-[42%] bg-gray-50 dark:bg-zinc-950/50 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-zinc-800 p-7 space-y-6">
+
+                <!-- Info del operario -->
+                <div class="space-y-3">
+                  <p class="text-[11px] font-bold text-gray-400 dark:text-zinc-600 uppercase tracking-widest">Datos de la Sesión</p>
+                  <div class="space-y-2.5">
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-500 dark:text-zinc-500">Operario</span>
+                      <span class="text-sm font-bold text-gray-900 dark:text-white">{{ forcedCloseSession?.user_name || currentUser?.name || 'Usuario' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-500 dark:text-zinc-500">Ubicación</span>
+                      <span class="text-sm font-semibold text-gray-700 dark:text-zinc-300">{{ forcedCloseSession?.warehouse_name || 'Sin sede' }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-500 dark:text-zinc-500">Apertura</span>
+                      <span class="text-sm font-semibold text-gray-700 dark:text-zinc-300">{{ forcedCloseRealOpenDate }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-sm text-gray-500 dark:text-zinc-500">Cierre sistema</span>
+                      <span class="text-sm font-semibold text-gray-700 dark:text-zinc-300">{{ forcedCloseSession?.closed_at ? new Date(forcedCloseSession.closed_at).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' }) : '—' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Resumen operativo en cuadrícula -->
+                <div class="space-y-2.5">
+                  <p class="text-[11px] font-bold text-gray-400 dark:text-zinc-600 uppercase tracking-widest">Resumen Operativo</p>
+                  <div class="border border-gray-200 dark:border-zinc-800 rounded-md bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
+                    <div class="grid grid-cols-2 divide-x divide-gray-200 dark:divide-zinc-800">
+                      <div class="p-3.5">
+                        <p class="text-[11px] text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total Ventas</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums mt-1">{{ formatCurrency(forcedCloseSession?.total_sales || 0) }}</p>
+                      </div>
+                      <div class="p-3.5">
+                        <p class="text-[11px] text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Ventas Efectivo</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums mt-1">{{ formatCurrency(forcedCloseSession?.cash_sales || 0) }}</p>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-2 divide-x divide-gray-200 dark:divide-zinc-800">
+                      <div class="p-3.5">
+                        <p class="text-[11px] text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Monto Inicial</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums mt-1">{{ formatCurrency(forcedCloseSession?.opening_amount || 0) }}</p>
+                      </div>
+                      <div class="p-3.5">
+                        <p class="text-[11px] text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Efectivo Esperado</p>
+                        <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums mt-1">{{ formatCurrency(forcedCloseSession?.expected_amount || 0) }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Nota del sistema -->
+                <div class="space-y-2">
+                  <p class="text-[11px] font-bold text-gray-400 dark:text-zinc-600 uppercase tracking-widest">Observaciones del Sistema</p>
+                  <div class="bg-gray-100 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-md p-3.5">
+                    <p class="text-xs text-gray-600 dark:text-zinc-400 leading-relaxed">El sistema cerró esta sesión de caja automáticamente porque permaneció abierta al finalizar el día operativo. Para poder iniciar ventas hoy, debe completar el arqueo de esta sesión.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ▸ PANEL DERECHO (58%): Acción y Arqueo -->
+              <div class="lg:w-[58%] bg-white dark:bg-zinc-900 p-7 space-y-5">
+
+                <!-- Ingreso de monto -->
+                <div class="space-y-2">
+                  <label class="block text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">
+                    Ingrese monto real contado en caja
+                  </label>
+                  <p class="text-xs text-gray-400 dark:text-zinc-600">Ingrese el monto exacto del efectivo físico</p>
+                  <input
+                    type="number"
+                    v-model="forcedCloseAuditAmount"
+                    min="0"
+                    step="100"
+                    placeholder="0"
+                    class="w-full py-3.5 px-4 text-2xl font-semibold tabular-nums
+                      border-2 border-gray-300 dark:border-zinc-600 rounded-md
+                      bg-white dark:bg-zinc-800
+                      text-gray-900 dark:text-white
+                      placeholder-gray-300 dark:placeholder-zinc-600
+                      focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-zinc-400 focus:border-transparent"
+                    @keydown.enter="submitForcedCloseAudit"
+                  />
+                </div>
+
+                <!-- Diferencia calculada -->
+                <div class="space-y-2">
+                  <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Diferencia Calculada <span class="font-normal normal-case text-gray-400 dark:text-zinc-600">(Esperado vs Contado)</span></p>
+                  <div v-if="forcedCloseDifference !== null" class="flex items-baseline gap-3">
+                    <span class="text-3xl font-black tabular-nums"
+                      :class="forcedCloseDifference < -0.01
+                        ? 'text-red-700 dark:text-red-400'
+                        : forcedCloseDifference > 0.01
+                          ? 'text-gray-900 dark:text-white'
+                          : 'text-gray-900 dark:text-white'">
+                      {{ forcedCloseDifference > 0 ? '+' : '' }}{{ formatCurrency(forcedCloseDifference) }}
+                    </span>
+                    <span class="text-sm font-bold uppercase tracking-wide"
+                      :class="forcedCloseDifference < -0.01
+                        ? 'text-red-600 dark:text-red-400'
+                        : forcedCloseDifference > 0.01
+                          ? 'text-orange-600 dark:text-orange-400'
+                          : 'text-gray-500 dark:text-zinc-500'">
+                      {{ forcedCloseDifference < -0.01 ? 'Faltante' : forcedCloseDifference > 0.01 ? 'Sobrante' : 'Cuadre exacto' }}
+                    </span>
+                  </div>
+                  <div v-else class="text-base text-gray-300 dark:text-zinc-700 font-medium">—</div>
+
+                  <!-- Alerta si diferencia significativa -->
+                  <div v-if="forcedCloseDifference !== null && Math.abs(forcedCloseDifference) > 1000" class="flex items-start gap-2 mt-1">
+                    <svg class="w-4 h-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-xs text-orange-700 dark:text-orange-400 font-medium">Diferencia significativa detectada. Verifique nuevamente el conteo de efectivo antes de continuar.</p>
+                  </div>
+                </div>
+
+                <!-- Notas del cajero -->
+                <div class="space-y-2">
+                  <label class="block text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Observaciones del Cajero <span class="font-normal normal-case text-gray-400 dark:text-zinc-600">(opcional)</span></label>
+                  <input
+                    type="text"
+                    v-model="forcedCloseNotes"
+                    name="cash_close_obs_forced"
+                    placeholder="Ej: Faltó cambio de $5.000"
+                    autocomplete="one-time-code"
+                    data-form-type="other"
+                    class="w-full px-4 py-3 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-600 rounded-md focus:ring-2 focus:ring-gray-900 dark:focus:ring-zinc-400 focus:border-transparent"
+                  />
+                </div>
+
+                <!-- ═══ AUTORIZACIÓN CONDICIONAL ═══ -->
+
+                <!-- Admin: paso directo -->
+                <div v-if="isAdminUser" class="flex items-center gap-2 py-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                  <span class="text-sm font-semibold text-gray-600 dark:text-zinc-400">Cierre rápido habilitado · Modo Administrador</span>
+                </div>
+
+                <!-- Vendedor: requiere firma con contraseña -->
+                <div v-else class="space-y-2">
+                  <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Autorización de Cierre</p>
+                  <div class="relative">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2">
+                      <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                      </svg>
+                    </div>
+                    <input
+                      :type="showForcedClosePassword ? 'text' : 'password'"
+                      v-model="forcedClosePassword"
+                      name="cash_close_auth_forced"
+                      placeholder="Ingresa tu contraseña para firmar"
+                      autocomplete="new-password"
+                      data-form-type="other"
+                      class="w-full pl-10 pr-10 py-3 text-sm border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-600 rounded-md focus:ring-2 focus:ring-gray-900 dark:focus:ring-zinc-400 focus:border-transparent"
+                      @keydown.enter="submitForcedCloseAudit"
+                    />
+                    <button
+                      type="button"
+                      @click="showForcedClosePassword = !showForcedClosePassword"
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
+                    >
+                      <svg v-if="!showForcedClosePassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <p v-if="forcedClosePasswordError" class="text-xs text-red-700 dark:text-red-400 font-medium">{{ forcedClosePasswordError }}</p>
+                </div>
+
+                <!-- Error general -->
+                <p v-if="forcedCloseError" class="text-sm text-red-700 dark:text-red-400 font-semibold">{{ forcedCloseError }}</p>
+
+                <!-- ═══ BOTONES ═══ -->
+                <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-100 dark:border-zinc-800">
+                  <button
+                    @click="submitForcedCloseAudit"
+                    :disabled="forcedCloseSubmitting || !forcedCloseAuditAmount || (!isAdminUser && !forcedClosePassword)"
+                    class="px-7 py-3 text-sm font-semibold uppercase tracking-wide rounded-md transition-all duration-150
+                      bg-gray-900 dark:bg-zinc-200 text-white dark:text-zinc-900
+                      hover:bg-black dark:hover:bg-white
+                      disabled:opacity-40 disabled:cursor-not-allowed">
+                    <span v-if="forcedCloseSubmitting" class="inline-flex items-center gap-2">
+                      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                      Verificando...
+                    </span>
+                    <span v-else>Confirmar Datos y Finalizar Arqueo</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
     <!-- Modales de Control de Caja -->
     <CashOpenModal
       :show="showCashOpenModal"
@@ -2238,6 +2486,7 @@
     <CashCloseModal
       :show="showCashCloseModal"
       :session-data="currentSession"
+      :is-admin-user="isAdminUser"
       @close="showCashCloseModal = false"
       @success="handleCloseCashSession"
     />
@@ -2549,6 +2798,327 @@
       <span class="font-medium">{{ toastMessage }}</span>
     </div>
   </div>
+
+  <!-- MODAL: Registrar Abono desde POS -->
+  <Teleport to="body">
+    <div v-if="showAbonoModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/60 dark:bg-black/80" @click="closeAbonoModal"></div>
+      <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-3xl border border-gray-200 dark:border-zinc-800">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between px-7 py-5 border-b border-gray-100 dark:border-zinc-800">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center border border-emerald-100 dark:border-emerald-800/50">
+                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Registrar Abono</h3>
+                <p class="text-xs text-gray-400 dark:text-zinc-500">Pagos a créditos activos</p>
+              </div>
+            </div>
+            <button @click="closeAbonoModal" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <div class="p-7">
+            <!-- PASO 1: Buscar cliente por CC / Documento -->
+            <div v-if="!abonoFoundCustomer" class="mb-6">
+              <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+                Documento del cliente (CC / NIT)
+              </label>
+              <div class="flex gap-3">
+                <div class="relative flex-1">
+                  <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-zinc-500 z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                  <input v-model="abonoDocSearch" type="text"
+                    @keydown.enter.prevent="searchAbonoCustomer"
+                    @focus="showAbonoSuggestions = true"
+                    @keydown.escape="showAbonoSuggestions = false"
+                    :disabled="abonoSearching"
+                    autocomplete="off"
+                    class="w-full pl-11 pr-4 py-3 border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-400 dark:placeholder-zinc-500"
+                    placeholder="Ej: 1234567890"/>
+                  
+                  <!-- Dropdown de sugerencias -->
+                  <div v-if="showAbonoSuggestions && abonoSuggestions.length > 0" 
+                    class="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-zinc-800 rounded-xl border border-gray-200 dark:border-zinc-700 shadow-xl dark:shadow-black/50 z-30 overflow-hidden max-h-[240px] overflow-y-auto">
+                    <button v-for="s in abonoSuggestions" :key="s.id" type="button"
+                      @mousedown.prevent="selectAbonoSuggestion(s)"
+                      class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-700/60 transition-colors text-left border-b border-gray-100 dark:border-zinc-700/40 last:border-0">
+                      <div class="w-9 h-9 rounded-full bg-slate-100 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
+                        <span class="text-sm font-bold text-slate-500 dark:text-zinc-400">{{ s.name?.charAt(0)?.toUpperCase() }}</span>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-900 dark:text-zinc-200 truncate">{{ s.name }}</p>
+                        <p class="text-xs text-gray-400 dark:text-zinc-500">CC: {{ s.document_number }}</p>
+                      </div>
+                      <div class="text-right flex-shrink-0">
+                        <p class="text-sm font-bold text-amber-600 dark:text-amber-400">{{ formatCurrency(s.current_debt) }}</p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase">Deuda</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                <button type="button" @click="searchAbonoCustomer"
+                  :disabled="abonoSearching || !abonoDocSearch.trim()"
+                  class="px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/30 dark:shadow-slate-900/50 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 flex-shrink-0">
+                  <svg v-if="abonoSearching" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {{ abonoSearching ? 'Buscando...' : 'Buscar' }}
+                </button>
+              </div>
+              <!-- Error de búsqueda -->
+              <p v-if="abonoSearchError" class="mt-2 text-sm text-red-500 dark:text-red-400 flex items-center gap-1.5">
+                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                {{ abonoSearchError }}
+              </p>
+            </div>
+
+            <!-- PASO 2: Tarjeta cliente encontrado -->
+            <div v-if="abonoFoundCustomer" class="bg-gray-50 dark:bg-zinc-800/60 rounded-xl border border-gray-200 dark:border-zinc-700/60 p-5 mb-6">
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-full bg-slate-200 dark:bg-zinc-700 flex items-center justify-center">
+                    <span class="text-base font-bold text-slate-600 dark:text-zinc-300">{{ abonoFoundCustomer.name?.charAt(0)?.toUpperCase() }}</span>
+                  </div>
+                  <div>
+                    <p class="text-base font-bold text-gray-900 dark:text-white">{{ abonoFoundCustomer.name }}</p>
+                    <p class="text-sm text-gray-500 dark:text-zinc-400">CC: {{ abonoFoundCustomer.document_number }}</p>
+                  </div>
+                </div>
+                <button type="button" @click="clearAbonoSearch" class="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Cambiar cliente">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <div class="grid grid-cols-3 gap-4">
+                <div class="bg-white dark:bg-zinc-900/60 rounded-lg px-4 py-3 border border-gray-100 dark:border-zinc-700/40">
+                  <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Deuda Total</p>
+                  <p class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-0.5">{{ formatCurrency(abonoFoundCustomer.current_debt) }}</p>
+                </div>
+                <div class="bg-white dark:bg-zinc-900/60 rounded-lg px-4 py-3 border border-gray-100 dark:border-zinc-700/40">
+                  <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Límite Crédito</p>
+                  <p class="text-xl font-bold text-gray-700 dark:text-zinc-300 mt-0.5">{{ formatCurrency(abonoFoundCustomer.credit_limit || 0) }}</p>
+                </div>
+                <div class="bg-white dark:bg-zinc-900/60 rounded-lg px-4 py-3 border border-gray-100 dark:border-zinc-700/40">
+                  <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Disponible</p>
+                  <p class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">{{ formatCurrency(Math.max(0, parseFloat(abonoFoundCustomer.credit_limit || 0) - parseFloat(abonoFoundCustomer.current_debt || 0))) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- PASO 3: Formulario de pago (solo si hay cliente) -->
+            <form v-if="abonoFoundCustomer" @submit.prevent="submitAbono">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <!-- Monto -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+                    Monto a Abonar
+                  </label>
+                  <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 text-base font-semibold">$</span>
+                    <input v-model.number="abonoForm.amount" type="number" step="100" min="0" required
+                      class="w-full pl-9 pr-4 py-3 border-2 text-base font-semibold rounded-xl transition-colors focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      :class="abonoAmountError 
+                        ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400' 
+                        : 'border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200'"
+                      placeholder="0"/>
+                  </div>
+                  <p v-if="abonoAmountError" class="mt-1.5 text-xs text-red-500 dark:text-red-400 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                    {{ abonoAmountError }}
+                  </p>
+                </div>
+
+                <!-- Método de pago -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+                    Método de Pago
+                  </label>
+                  <select v-model="abonoForm.payment_method" required
+                    class="w-full px-4 py-3 border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors">
+                    <option value="cash">Efectivo</option>
+                    <option value="card">Tarjeta</option>
+                    <option value="transfer">Transferencia</option>
+                  </select>
+                </div>
+
+                <!-- Referencia -->
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+                    Referencia <span class="text-gray-300 dark:text-zinc-600 font-normal normal-case">(opcional)</span>
+                  </label>
+                  <input v-model="abonoForm.reference" type="text"
+                    class="w-full px-4 py-3 border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="No. operación, voucher..."/>
+                </div>
+              </div>
+
+              <!-- Notas (ancho completo) -->
+              <div class="mt-4">
+                <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+                  Notas <span class="text-gray-300 dark:text-zinc-600 font-normal normal-case">(opcional)</span>
+                </label>
+                <input v-model="abonoForm.notes" type="text"
+                  class="w-full px-4 py-3 border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  placeholder="Observaciones..."/>
+              </div>
+
+              <!-- Footer -->
+              <div class="flex items-center justify-end gap-3 mt-7 pt-5 border-t border-gray-100 dark:border-zinc-800">
+                <button type="button" @click="closeAbonoModal"
+                  class="px-6 py-3 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 text-sm font-bold rounded-xl border border-red-200 dark:border-red-800/50 transition-all duration-200 flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  Cancelar
+                </button>
+                <button type="submit"
+                  :disabled="abonoSubmitting || !!abonoAmountError || !abonoForm.amount || abonoForm.amount <= 0"
+                  class="px-6 py-3 bg-emerald-700 dark:bg-emerald-700 hover:bg-emerald-800 dark:hover:bg-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-800/25 dark:shadow-emerald-900/40 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none flex items-center gap-2">
+                  <svg v-if="abonoSubmitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  {{ abonoSubmitting ? 'Procesando...' : 'Registrar Abono' }}
+                </button>
+              </div>
+            </form>
+
+            <!-- Estado vacío si no hay cliente -->
+            <div v-if="!abonoFoundCustomer && !abonoSearchError" class="text-center py-8">
+              <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+              </svg>
+              <p class="text-sm text-gray-400 dark:text-zinc-500">Ingresa el documento del cliente para comenzar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+  </Teleport>
+
+  <!-- ========== RECIBO / COLILLA DE ABONO ========== -->
+  <Teleport to="body">
+    <div v-if="showAbonoReceipt && lastAbonoData" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showAbonoReceipt = false"></div>
+      <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/60 border border-gray-200 dark:border-zinc-800 w-full max-w-md overflow-hidden animate-fade-in">
+
+        <!-- Header con checkmark animado -->
+        <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 px-6 py-5 text-center">
+          <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-3">
+            <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white">Abono Registrado</h3>
+          <p class="text-emerald-100 text-sm mt-1">Comprobante de pago</p>
+        </div>
+
+        <!-- Contenido del recibo -->
+        <div class="px-6 py-5 space-y-4">
+          <!-- Nombre del negocio -->
+          <div class="text-center pb-3 border-b border-dashed border-gray-200 dark:border-zinc-700">
+            <p class="text-base font-bold text-gray-900 dark:text-white">{{ systemSettings?.company_name || systemSettings?.business_name || 'Mi Empresa' }}</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Comprobante de Abono a Crédito</p>
+          </div>
+
+          <!-- Datos del cliente -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-gray-500 dark:text-zinc-400">Cliente</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ lastAbonoData.customer?.name }}</span>
+            </div>
+            <div v-if="lastAbonoData.customer?.document_number" class="flex justify-between items-center">
+              <span class="text-xs text-gray-500 dark:text-zinc-400">Documento</span>
+              <span class="text-sm text-gray-700 dark:text-zinc-300">{{ lastAbonoData.customer.document_number }}</span>
+            </div>
+          </div>
+
+          <!-- Separador -->
+          <div class="border-t border-dashed border-gray-200 dark:border-zinc-700"></div>
+
+          <!-- Detalles del pago -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-gray-500 dark:text-zinc-400">Fecha</span>
+              <span class="text-sm text-gray-700 dark:text-zinc-300">{{ new Date(lastAbonoData.date).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-gray-500 dark:text-zinc-400">Método de pago</span>
+              <span class="text-sm text-gray-700 dark:text-zinc-300">{{ { cash: 'Efectivo', card: 'Tarjeta', transfer: 'Transferencia' }[lastAbonoData.method] || lastAbonoData.method }}</span>
+            </div>
+            <div v-if="lastAbonoData.reference" class="flex justify-between items-center">
+              <span class="text-xs text-gray-500 dark:text-zinc-400">Referencia</span>
+              <span class="text-sm text-gray-700 dark:text-zinc-300">{{ lastAbonoData.reference }}</span>
+            </div>
+            <div v-if="lastAbonoData.notes" class="flex justify-between items-start">
+              <span class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Notas</span>
+              <span class="text-sm text-gray-700 dark:text-zinc-300 text-right max-w-[60%]">{{ lastAbonoData.notes }}</span>
+            </div>
+          </div>
+
+          <!-- Separador -->
+          <div class="border-t border-dashed border-gray-200 dark:border-zinc-700"></div>
+
+          <!-- Monto pagado (destacado) -->
+          <div class="bg-emerald-50 dark:bg-emerald-950/50 rounded-xl p-4 text-center border border-emerald-100 dark:border-emerald-800/50">
+            <p class="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">Monto Abonado</p>
+            <p class="text-3xl font-bold text-emerald-700 dark:text-emerald-400">${{ Number(lastAbonoData.amount).toLocaleString('es-CO') }}</p>
+          </div>
+
+          <!-- Saldo restante -->
+          <div class="flex justify-between items-center bg-gray-50 dark:bg-zinc-800/50 rounded-lg px-4 py-2.5">
+            <span class="text-xs font-medium text-gray-500 dark:text-zinc-400">Saldo pendiente</span>
+            <span class="text-sm font-bold" :class="lastAbonoData.remaining_debt <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+              {{ lastAbonoData.remaining_debt <= 0 ? 'Pagado' : '$' + Number(lastAbonoData.remaining_debt).toLocaleString('es-CO') }}
+            </span>
+          </div>
+
+          <!-- ID de transacción -->
+          <div v-if="lastAbonoData.id" class="text-center">
+            <p class="text-[10px] text-gray-400 dark:text-zinc-500 font-mono">ID: #{{ lastAbonoData.id }}</p>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="px-6 pb-5 space-y-2">
+          <!-- Fila de acciones de envío -->
+          <div class="grid grid-cols-3 gap-2">
+            <button @click="handlePrintAbonoReceipt" class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700 transition-all duration-200">
+              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+              </svg>
+              <span class="text-[10px] font-medium text-gray-600 dark:text-zinc-300">Imprimir</span>
+            </button>
+            <button @click="handleSendAbonoWhatsApp" class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-gray-50 dark:bg-zinc-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 border border-gray-200 dark:border-zinc-700 hover:border-emerald-200 dark:hover:border-emerald-800/30 transition-all duration-200">
+              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.612.616l4.529-1.468A11.953 11.953 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.24 0-4.326-.732-6.012-1.97l-.168-.122-3.485 1.129 1.153-3.433-.135-.176A9.935 9.935 0 012 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/>
+              </svg>
+              <span class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">WhatsApp</span>
+            </button>
+            <button @click="handleSendAbonoEmail" class="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl bg-gray-50 dark:bg-zinc-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-gray-200 dark:border-zinc-700 hover:border-blue-200 dark:hover:border-blue-800/30 transition-all duration-200">
+              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              <span class="text-[10px] font-medium text-blue-600 dark:text-blue-400">Email</span>
+            </button>
+          </div>
+
+          <!-- Botón cerrar -->
+          <button @click="showAbonoReceipt = false; lastAbonoData = null" class="w-full py-2.5 text-sm font-medium text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all duration-200">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
   
 </template>
 
@@ -2564,7 +3134,7 @@ import { customersService } from '../services/customersService.js'
 import { invoicesService } from '../services/invoicesService.js'
 import { warehouseService } from '../services/warehouseService.js'
 import { generateInvoicePDF as generateInvoicePDFTemplate, generateQuotationPDF as generateQuotationPDFTemplate, getPDFBlob } from '../utils/pdfTemplates/pdfGenerator.js'
-import { useCashSession } from '../services/cashSessionService.js'
+import { useCashSession, cashSessionService } from '../services/cashSessionService.js'
 import { appStore } from '../store/appStore.js' // Importar store global
 import { useAutoRefresh } from '../composables/useRouteState.js'
 import { useScreenScaling } from '../composables/useScreenScaling.js'
@@ -2642,11 +3212,14 @@ const warehouses = ref([]) // 🏢 Lista de todas las warehouses/sedes
 
 // Current user info
 const currentUser = computed(() => {
-  // 🔍 DEBUG: Verificar qué usuario tenemos
   const userData = user.value || authService.getUser()
-  // console.log('🔍 [PosView] currentUser computed:', userData)
-  
   return userData || {}
+})
+
+// Determinar si el usuario es administrador (cierre rápido sin contraseña)
+const isAdminUser = computed(() => {
+  const role = currentUser.value?.role?.name || currentUser.value?.role || ''
+  return role.toLowerCase() === 'administrador' || role.toLowerCase() === 'admin'
 })
 
 // Loading state para WhatsApp y Email
@@ -3222,9 +3795,59 @@ const showCashOpenModal = ref(false)
 const showCashCloseModal = ref(false)
 const quotationMode = ref(false)
 
+// Forced-close audit state
+const showForcedCloseModal = ref(false)
+const forcedCloseSession = ref(null)
+const forcedCloseAuditAmount = ref('')
+const forcedCloseNotes = ref('')
+const forcedCloseSubmitting = ref(false)
+const forcedCloseError = ref('')
+const forcedClosePassword = ref('')
+const showForcedClosePassword = ref(false)
+const forcedClosePasswordError = ref('')
+
 // Estado del modal de devoluciones
 const showReturnsModal = ref(false)
 const preloadInvoiceNumber = ref('')
+
+// Estado del modal de abonos (pagos a créditos)
+const showAbonoModal = ref(false)
+const customersWithDebt = ref([])
+const abonoDocSearch = ref('')
+const abonoSearching = ref(false)
+const abonoSearchError = ref('')
+const abonoFoundCustomer = ref(null)
+const showAbonoSuggestions = ref(false)
+const abonoForm = ref({
+  amount: 0,
+  payment_method: 'cash',
+  reference: '',
+  notes: ''
+})
+const abonoSubmitting = ref(false)
+const showAbonoReceipt = ref(false)
+const lastAbonoData = ref(null)
+
+const abonoAmountError = computed(() => {
+  const amt = abonoForm.value.amount
+  if (!amt || amt <= 0) return ''
+  const cust = abonoFoundCustomer.value
+  if (!cust) return ''
+  const debt = parseFloat(cust.current_debt)
+  if (amt > debt) return `El monto excede la deuda de ${formatCurrency(debt)}`
+  return ''
+})
+
+const abonoSuggestions = computed(() => {
+  const q = abonoDocSearch.value.trim()
+  if (!q || q.length < 2 || abonoFoundCustomer.value) return []
+  const normalized = q.replace(/[\s\-\.]/g, '').toLowerCase()
+  return customersWithDebt.value.filter(c => {
+    const doc = (c.document_number || '').replace(/[\s\-\.]/g, '').toLowerCase()
+    const name = (c.name || '').toLowerCase()
+    return doc.includes(normalized) || name.includes(normalized)
+  }).slice(0, 6)
+})
 
 // Estado del modal de confirmación de cierre de venta
 const showCloseTabModal = ref(false)
@@ -6889,6 +7512,9 @@ const showLoadedQuotationDetails = () => {
 // Lifecycle hooks
 onMounted(async () => {
   try {
+    // Check for forced-closed sessions FIRST (blocks POS until resolved)
+    await checkForcedClosedSessions()
+
     // 🔧 FIX: SIEMPRE forzar recarga de sesión al montar el componente
     // Esto evita condiciones de carrera y asegura datos frescos
     await appStore.loadCashSession(true) // force = true
@@ -6943,6 +7569,9 @@ onMounted(async () => {
     
     // 🎯 Cargar drafts existentes de la base de datos
     await loadSalesDrafts()
+    
+    // 💳 Cargar clientes con deuda para botón Abonos (no bloqueante)
+    loadCustomersWithDebt()
     
     // Verificar productos con variantes para UI
     
@@ -7695,6 +8324,98 @@ const showCloseCashModal = async () => {
 }
 
 /**
+ * Check for forced-closed sessions on POS load
+ */
+const checkForcedClosedSessions = async () => {
+  try {
+    const response = await cashSessionService.checkForcedClosed()
+    if (response.success && response.has_forced_closed) {
+      forcedCloseSession.value = response.session
+      forcedCloseAuditAmount.value = ''
+      forcedCloseNotes.value = ''
+      forcedCloseError.value = ''
+      showForcedCloseModal.value = true
+    }
+  } catch {
+    // Silent — don't block POS for network errors
+  }
+}
+
+/**
+ * Submit the audit for a forced-closed session
+ */
+const submitForcedCloseAudit = async () => {
+  const amount = parseFloat(forcedCloseAuditAmount.value)
+  if (isNaN(amount) || amount < 0) {
+    forcedCloseError.value = 'Ingresa un monto válido (mayor o igual a 0)'
+    return
+  }
+
+  forcedCloseSubmitting.value = true
+  forcedCloseError.value = ''
+  forcedClosePasswordError.value = ''
+
+  try {
+    // Si es vendedor, verificar contraseña primero
+    if (!isAdminUser.value) {
+      if (!forcedClosePassword.value) {
+        forcedClosePasswordError.value = 'Debes ingresar tu contraseña'
+        forcedCloseSubmitting.value = false
+        return
+      }
+      const verify = await authService.verifyMyPassword(forcedClosePassword.value)
+      if (!verify.valid) {
+        forcedClosePasswordError.value = verify.message || 'Contraseña incorrecta'
+        forcedCloseSubmitting.value = false
+        return
+      }
+    }
+
+    const response = await cashSessionService.resolveForcedClose({
+      session_id: forcedCloseSession.value.id,
+      actual_amount: amount,
+      closing_notes: forcedCloseNotes.value || null,
+    })
+
+    if (response.success) {
+      showForcedCloseModal.value = false
+      forcedCloseSession.value = null
+      forcedClosePassword.value = ''
+      forcedClosePasswordError.value = ''
+      // Check if there are more forced-closed sessions
+      await checkForcedClosedSessions()
+    } else {
+      forcedCloseError.value = response.message || 'Error al resolver el arqueo'
+    }
+  } catch (error) {
+    forcedCloseError.value = error.response?.data?.message || 'Error de conexión'
+  } finally {
+    forcedCloseSubmitting.value = false
+  }
+}
+
+const forcedCloseRealOpenDate = computed(() => {
+  if (!forcedCloseSession.value) return '—'
+  const s = forcedCloseSession.value
+  // Use created_at as the real opening date when opened_at was corrupted (same as closed_at)
+  const openedAt = s.opened_at ? new Date(s.opened_at).getTime() : null
+  const closedAt = s.closed_at ? new Date(s.closed_at).getTime() : null
+  const createdAt = s.created_at ? new Date(s.created_at).getTime() : null
+  // If opened_at equals closed_at (or differs by less than 60s), prefer created_at
+  const useCreatedAt = createdAt && openedAt && closedAt && Math.abs(openedAt - closedAt) < 60000
+  const realDate = useCreatedAt ? new Date(s.created_at) : (s.opened_at ? new Date(s.opened_at) : null)
+  if (!realDate) return '—'
+  return realDate.toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' })
+})
+
+const forcedCloseDifference = computed(() => {
+  if (!forcedCloseSession.value || !forcedCloseAuditAmount.value) return null
+  const actual = parseFloat(forcedCloseAuditAmount.value)
+  if (isNaN(actual)) return null
+  return actual - (forcedCloseSession.value.expected_amount || 0)
+})
+
+/**
  * Validar que se puede procesar una venta
  */
 const validateCanProcessSale = () => {
@@ -7762,6 +8483,247 @@ const openReturnsModalWithInvoice = (invoiceNumber) => {
 }
 
 // ==================== FIN FUNCIONES DE DEVOLUCIONES ====================
+
+// ==================== FUNCIONES DE ABONOS (PAGOS A CRÉDITO) ====================
+
+const loadCustomersWithDebt = async () => {
+  try {
+    const customers = await customersService.getAll()
+    const list = Array.isArray(customers) ? customers : (customers?.data || customers?.customers || [])
+    customersWithDebt.value = list.filter(c => c.credit_active && parseFloat(c.current_debt || 0) > 0)
+  } catch {
+    customersWithDebt.value = []
+  }
+}
+
+const openAbonoModal = () => {
+  if (!hasOpenSession.value) {
+    showError('Debes abrir caja antes de registrar abonos')
+    return
+  }
+  abonoDocSearch.value = ''
+  abonoSearchError.value = ''
+  abonoFoundCustomer.value = null
+  showAbonoSuggestions.value = false
+  abonoForm.value = { amount: 0, payment_method: 'cash', reference: '', notes: '' }
+  showAbonoModal.value = true
+}
+
+const closeAbonoModal = () => {
+  showAbonoModal.value = false
+}
+
+const searchAbonoCustomer = async () => {
+  const doc = abonoDocSearch.value.trim()
+  if (!doc) return
+  abonoSearching.value = true
+  abonoSearchError.value = ''
+  abonoFoundCustomer.value = null
+  showAbonoSuggestions.value = false
+  try {
+    const found = await customersService.findByDocument(doc)
+    if (!found) {
+      abonoSearchError.value = 'No se encontró un cliente con ese documento'
+      return
+    }
+    if (!found.credit_active || parseFloat(found.current_debt || 0) <= 0) {
+      abonoSearchError.value = 'Este cliente no tiene deuda de crédito pendiente'
+      return
+    }
+    abonoFoundCustomer.value = found
+    abonoForm.value.amount = 0
+  } catch {
+    abonoSearchError.value = 'Error al buscar cliente'
+  } finally {
+    abonoSearching.value = false
+  }
+}
+
+const clearAbonoSearch = () => {
+  abonoDocSearch.value = ''
+  abonoSearchError.value = ''
+  abonoFoundCustomer.value = null
+  showAbonoSuggestions.value = false
+  abonoForm.value = { amount: 0, payment_method: 'cash', reference: '', notes: '' }
+}
+
+const selectAbonoSuggestion = (customer) => {
+  showAbonoSuggestions.value = false
+  if (!customer.credit_active || parseFloat(customer.current_debt || 0) <= 0) {
+    abonoSearchError.value = 'Este cliente no tiene deuda de crédito pendiente'
+    return
+  }
+  abonoDocSearch.value = customer.document_number || ''
+  abonoFoundCustomer.value = customer
+  abonoForm.value.amount = 0
+  abonoSearchError.value = ''
+}
+
+const submitAbono = async () => {
+  if (abonoSubmitting.value) return
+  const cust = abonoFoundCustomer.value
+  if (!cust) return showError('Busca un cliente por su documento primero')
+  if (!abonoForm.value.amount || abonoForm.value.amount <= 0) return showError('Ingresa un monto válido')
+  if (abonoAmountError.value) return showError(abonoAmountError.value)
+
+  abonoSubmitting.value = true
+  try {
+    const response = await axiosInstance.post('/credit-payments', {
+      customer_id: cust.id,
+      amount: abonoForm.value.amount,
+      method: abonoForm.value.payment_method,
+      reference: abonoForm.value.reference || null,
+      notes: abonoForm.value.notes || null,
+      cash_session_id: currentSession.value?.id || null
+    })
+    const paymentData = response.data?.data || response.data || response
+    closeAbonoModal()
+    // Show receipt modal
+    lastAbonoData.value = {
+      id: paymentData.id,
+      amount: abonoForm.value.amount,
+      method: abonoForm.value.payment_method,
+      reference: abonoForm.value.reference,
+      notes: abonoForm.value.notes,
+      customer: cust,
+      date: new Date().toISOString(),
+      remaining_debt: (response.data?.customer?.current_debt ?? parseFloat(cust.current_debt) - abonoForm.value.amount)
+    }
+    showAbonoReceipt.value = true
+    await loadCustomersWithDebt()
+  } catch (err) {
+    const msg = err.response?.data?.message || 'Error al registrar el abono'
+    showError(msg)
+  } finally {
+    abonoSubmitting.value = false
+  }
+}
+
+// --- Funciones de recibo de abono ---
+const generateAbonoReceiptText = () => {
+  if (!lastAbonoData.value) return ''
+  const d = lastAbonoData.value
+  const companyName = systemSettings.value?.company_name || systemSettings.value?.business_name || 'Mi Empresa'
+  const methodLabel = { cash: 'Efectivo', card: 'Tarjeta', transfer: 'Transferencia' }[d.method] || d.method
+  const fecha = new Date(d.date).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+  let text = `📄 *${companyName}*\n`
+  text += `Comprobante de Abono a Crédito\n`
+  text += `─────────────────────\n`
+  text += `👤 Cliente: ${d.customer?.name || 'Cliente'}\n`
+  if (d.customer?.document_number) text += `📋 Documento: ${d.customer.document_number}\n`
+  text += `📅 Fecha: ${fecha}\n`
+  text += `─────────────────────\n`
+  text += `💰 *Monto abonado: $${Number(d.amount).toLocaleString('es-CO')}*\n`
+  text += `💳 Método: ${methodLabel}\n`
+  if (d.reference) text += `🔖 Referencia: ${d.reference}\n`
+  if (d.notes) text += `📝 Notas: ${d.notes}\n`
+  text += `─────────────────────\n`
+  text += `📊 Saldo pendiente: $${d.remaining_debt > 0 ? Number(d.remaining_debt).toLocaleString('es-CO') : '0 (Pagado)'}\n`
+  if (d.id) text += `\n#${d.id}\n`
+  text += `\n¡Gracias por tu pago! 🙏`
+  return text
+}
+
+const handlePrintAbonoReceipt = () => {
+  if (!lastAbonoData.value) return
+  const d = lastAbonoData.value
+  const companyName = systemSettings.value?.company_name || systemSettings.value?.business_name || 'Mi Empresa'
+  const methodLabel = { cash: 'Efectivo', card: 'Tarjeta', transfer: 'Transferencia' }[d.method] || d.method
+  const fecha = new Date(d.date).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+  const printWindow = window.open('', '_blank', 'width=350,height=600')
+  if (!printWindow) { showError('No se pudo abrir la ventana de impresión'); return }
+
+  printWindow.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Recibo de Abono</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'Courier New', monospace; font-size: 12px; padding: 10px; width: 280px; color: #000; }
+      .center { text-align: center; }
+      .bold { font-weight: bold; }
+      .line { border-top: 1px dashed #000; margin: 8px 0; }
+      .row { display: flex; justify-content: space-between; margin: 3px 0; }
+      .big { font-size: 18px; font-weight: bold; }
+      h2 { font-size: 14px; margin: 4px 0; }
+      @media print { body { width: 72mm; padding: 2mm; } }
+    </style></head><body>
+    <div class="center">
+      <h2 class="bold">${companyName}</h2>
+      <p>Comprobante de Abono</p>
+    </div>
+    <div class="line"></div>
+    <div class="row"><span>Cliente:</span><span class="bold">${d.customer?.name || 'Cliente'}</span></div>
+    ${d.customer?.document_number ? `<div class="row"><span>Documento:</span><span>${d.customer.document_number}</span></div>` : ''}
+    <div class="row"><span>Fecha:</span><span>${fecha}</span></div>
+    <div class="line"></div>
+    <div class="center" style="margin: 10px 0;">
+      <p>Monto Abonado</p>
+      <p class="big">$${Number(d.amount).toLocaleString('es-CO')}</p>
+    </div>
+    <div class="row"><span>Método:</span><span>${methodLabel}</span></div>
+    ${d.reference ? `<div class="row"><span>Referencia:</span><span>${d.reference}</span></div>` : ''}
+    ${d.notes ? `<div class="row"><span>Notas:</span><span>${d.notes}</span></div>` : ''}
+    <div class="line"></div>
+    <div class="row"><span>Saldo pendiente:</span><span class="bold">${d.remaining_debt > 0 ? '$' + Number(d.remaining_debt).toLocaleString('es-CO') : '$0 (Pagado)'}</span></div>
+    <div class="line"></div>
+    <div class="center" style="margin-top: 8px;">
+      <p style="font-size: 10px;">${d.id ? '#' + d.id : ''}</p>
+      <p style="font-size: 10px; margin-top: 4px;">Gracias por su pago</p>
+    </div>
+  </body></html>`)
+  printWindow.document.close()
+  printWindow.focus()
+  setTimeout(() => { printWindow.print() }, 300)
+}
+
+const handleSendAbonoWhatsApp = async () => {
+  if (!lastAbonoData.value) return
+  const phone = lastAbonoData.value.customer?.phone || lastAbonoData.value.customer?.phone_number
+  if (!phone) {
+    showWarning('El cliente no tiene número de teléfono registrado')
+    return
+  }
+  const message = generateAbonoReceiptText().replace(/\*/g, '')
+  const cleanPhone = phone.replace(/\D/g, '')
+  window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank')
+  showInfo('Abriendo WhatsApp...')
+}
+
+const handleSendAbonoEmail = async () => {
+  if (!lastAbonoData.value) return
+  let email = lastAbonoData.value.customer?.email || lastAbonoData.value.customer?.customer_email
+  if (!email) {
+    showWarning('El cliente no tiene correo electrónico registrado')
+    return
+  }
+  try {
+    const d = lastAbonoData.value
+    const companyName = systemSettings.value?.company_name || systemSettings.value?.business_name || 'Mi Empresa'
+    const methodLabel = { cash: 'Efectivo', card: 'Tarjeta', transfer: 'Transferencia' }[d.method] || d.method
+    const fecha = new Date(d.date).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+    await axiosInstance.post('/send-abono-receipt', {
+      email,
+      customer_name: d.customer?.name,
+      company_name: companyName,
+      amount: d.amount,
+      method: methodLabel,
+      reference: d.reference,
+      notes: d.notes,
+      remaining_debt: d.remaining_debt,
+      date: fecha,
+      payment_id: d.id
+    })
+    showSuccess(`Comprobante enviado a ${email}`)
+  } catch {
+    const subject = encodeURIComponent(`Comprobante de Abono - ${systemSettings.value?.company_name || 'Mi Empresa'}`)
+    const body = encodeURIComponent(generateAbonoReceiptText().replace(/\*/g, ''))
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`)
+    showInfo('Abriendo cliente de correo...')
+  }
+}
+
+// ==================== FIN FUNCIONES DE ABONOS ====================
 
 // ==================== FUNCIONES DE PEDIDOS WEB ====================
 

@@ -7,7 +7,9 @@ use App\Models\User;
 use App\Models\CashSession;
 use App\Models\Invoice;
 use App\Models\ProductReturn;
+use App\Models\CreditPayment;
 use App\Models\Warehouse;
+use App\Models\AttendanceLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Carbon\Carbon;
@@ -59,7 +61,21 @@ class UserDashboardController extends Controller
     public function dashboardKpis(Request $request)
     {
         try {
-            $today = Carbon::today();
+            $dateFrom = null;
+            $dateTo = null;
+
+            if ($request->has('date')) {
+                $dateFrom = Carbon::parse($request->date)->startOfDay();
+                $dateTo = Carbon::parse($request->date)->endOfDay();
+            } elseif ($request->has('date_from') && $request->has('date_to')) {
+                $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+                $dateTo = Carbon::parse($request->date_to)->endOfDay();
+            } else {
+                $dateFrom = Carbon::today()->startOfDay();
+                $dateTo = Carbon::today()->endOfDay();
+            }
+
+            $isToday = $dateFrom->isToday();
             $tenant = tenant();
             $plan = $tenant?->plan ?? 'free_trial';
             $planLimits = $this->getPlanLimits($plan);
@@ -75,25 +91,37 @@ class UserDashboardController extends Controller
                     'opened_at' => $s->opened_at,
                 ]);
 
-            // Total sales today (from invoices linked to cash sessions)
-            $salesToday = Invoice::whereDate('created_at', $today)
+            // Total sales for the period
+            $salesToday = Invoice::whereBetween('created_at', [$dateFrom, $dateTo])
                 ->where('status', '!=', 'cancelled')
                 ->where('type', 'invoice')
                 ->sum('total');
 
-            // Sales count today
-            $salesCountToday = Invoice::whereDate('created_at', $today)
+            // Sales count for the period
+            $salesCountToday = Invoice::whereBetween('created_at', [$dateFrom, $dateTo])
                 ->where('status', '!=', 'cancelled')
                 ->where('type', 'invoice')
                 ->count();
 
-            // Return alerts: users with returns today
-            $returnsToday = ProductReturn::whereDate('created_at', $today)
-                ->with('user:id,name')
+            // Return alerts for the period
+            $returnsToday = ProductReturn::whereBetween('created_at', [$dateFrom, $dateTo])
+                ->with(['user:id,name', 'originalInvoice:id,number'])
                 ->get();
 
             $totalReturnsAmount = $returnsToday->sum('total');
             $totalReturnsCount = $returnsToday->count();
+
+            // Detailed return info for alert panel
+            $returnDetails = $returnsToday->map(fn($r) => [
+                'id' => $r->id,
+                'number' => $r->number ?? 'DEV-' . $r->id,
+                'total' => (float) $r->total,
+                'reason' => $r->reason,
+                'user_name' => $r->user?->name ?? 'Desconocido',
+                'user_id' => $r->user_id,
+                'invoice_number' => $r->originalInvoice?->number ?? null,
+                'created_at' => $r->created_at,
+            ])->values();
 
             // Per-user return counts for alerts (flag if > 3 returns in a day)
             $returnsByUser = $returnsToday->groupBy('user_id')->map(function ($returns) {
@@ -104,6 +132,27 @@ class UserDashboardController extends Controller
                     'alert' => $returns->count() >= 3,
                 ];
             })->values();
+
+            // Cash discrepancies for the period (closed sessions with difference)
+            $discrepancySessions = CashSession::whereBetween('closed_at', [$dateFrom, $dateTo])
+                ->where('status', 'closed')
+                ->whereNotNull('difference_amount')
+                ->whereRaw('ABS(difference_amount) > 0')
+                ->with(['user:id,name', 'warehouse:id,name'])
+                ->get();
+
+            $discrepanciesToday = $discrepancySessions->count();
+
+            // Detailed discrepancy info for alert panel
+            $discrepancyDetails = $discrepancySessions->map(fn($s) => [
+                'user_name' => $s->user?->name ?? 'Desconocido',
+                'user_id' => $s->user_id,
+                'warehouse' => $s->warehouse?->name ?? 'Principal',
+                'difference' => (float) $s->difference_amount,
+                'opening_amount' => (float) $s->opening_amount,
+                'closing_amount' => (float) $s->closing_amount,
+                'closed_at' => $s->closed_at,
+            ])->values();
 
             // Total users and limits
             $totalUsers = User::count();
@@ -118,7 +167,10 @@ class UserDashboardController extends Controller
                     'sales_count_today' => $salesCountToday,
                     'returns_today_amount' => (float) $totalReturnsAmount,
                     'returns_today_count' => $totalReturnsCount,
+                    'returns_today_details' => $returnDetails,
                     'return_alerts' => $returnsByUser->filter(fn($r) => $r['alert'])->values(),
+                    'discrepancies_today' => $discrepanciesToday,
+                    'discrepancies_today_details' => $discrepancyDetails,
                     'total_users' => $totalUsers,
                     'active_users' => $activeUsersCount,
                     'plan' => $plan,
@@ -135,43 +187,105 @@ class UserDashboardController extends Controller
     }
 
     /**
-     * Enriched user list with today's performance data
+     * Enriched user list with performance data for a given date range
      */
     public function usersWithPerformance(Request $request)
     {
         try {
-            $today = Carbon::today();
+            // Support date range filters: date, date_from, date_to
+            $dateFrom = null;
+            $dateTo = null;
 
-            $users = User::with('role')->get()->map(function ($user) use ($today) {
-                // Current open cash session
+            if ($request->has('date')) {
+                $dateFrom = Carbon::parse($request->date)->startOfDay();
+                $dateTo = Carbon::parse($request->date)->endOfDay();
+            } elseif ($request->has('date_from') && $request->has('date_to')) {
+                $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+                $dateTo = Carbon::parse($request->date_to)->endOfDay();
+            } else {
+                $dateFrom = Carbon::today()->startOfDay();
+                $dateTo = Carbon::today()->endOfDay();
+            }
+
+            $users = User::with(['role', 'warehouse:id,name'])->get()->map(function ($user) use ($dateFrom, $dateTo) {
+                // Current open cash session (always real-time)
                 $openSession = CashSession::where('user_id', $user->id)
                     ->where('status', 'open')
                     ->with('warehouse:id,name')
                     ->first();
 
-                // Sales today for this user (via cash sessions)
-                $userSessionIds = CashSession::where('user_id', $user->id)
-                    ->whereDate('opened_at', $today)
-                    ->pluck('id');
+                // Sales for the date range (via cash sessions)
+                $userSessionIds = CashSession::where('user_id', $user->id)->pluck('id');
 
-                $salesToday = 0;
-                $salesCountToday = 0;
+                $salesPeriod = 0;
+                $salesCountPeriod = 0;
                 if ($userSessionIds->isNotEmpty()) {
-                    $salesToday = Invoice::whereIn('cash_session_id', $userSessionIds)
+                    $salesPeriod = Invoice::whereIn('cash_session_id', $userSessionIds)
+                        ->whereBetween('created_at', [$dateFrom, $dateTo])
                         ->where('status', '!=', 'cancelled')
                         ->where('type', 'invoice')
                         ->sum('total');
 
-                    $salesCountToday = Invoice::whereIn('cash_session_id', $userSessionIds)
+                    $salesCountPeriod = Invoice::whereIn('cash_session_id', $userSessionIds)
+                        ->whereBetween('created_at', [$dateFrom, $dateTo])
                         ->where('status', '!=', 'cancelled')
                         ->where('type', 'invoice')
                         ->count();
                 }
 
-                // Returns today
-                $returnsToday = ProductReturn::where('user_id', $user->id)
-                    ->whereDate('created_at', $today)
+                // Returns for the period
+                $returnsPeriod = ProductReturn::where('user_id', $user->id)
+                    ->whereBetween('created_at', [$dateFrom, $dateTo])
                     ->count();
+
+                // Attendance: entry/exit for the date range
+                $attendanceLogs = AttendanceLog::where('user_id', $user->id)
+                    ->whereBetween('event_at', [$dateFrom, $dateTo])
+                    ->orderBy('event_at', 'asc')
+                    ->get();
+
+                $firstEntry = $attendanceLogs->where('event_type', 'entry')->first();
+                $lastExit = $attendanceLogs->where('event_type', 'exit')->last();
+
+                // Check if exit was auto-closed by system
+                $exitIsAutoClose = $lastExit && $lastExit->is_auto_closed;
+                $exitClosedBy = $lastExit ? $lastExit->closed_by : null;
+
+                // Cash discrepancy for the period (closed sessions)
+                $cashDiscrepancy = null;
+                $closedSession = CashSession::where('user_id', $user->id)
+                    ->where('status', 'closed')
+                    ->whereBetween('closed_at', [$dateFrom, $dateTo])
+                    ->whereNotNull('difference_amount')
+                    ->orderBy('closed_at', 'desc')
+                    ->first();
+
+                if ($closedSession) {
+                    $cashDiscrepancy = (float) $closedSession->difference_amount;
+                }
+
+                // Check if user has any forced-closed session (pending audit)
+                $hasForcedClosed = CashSession::where('user_id', $user->id)
+                    ->where('status', 'forced_closed')
+                    ->exists();
+
+                // Determine cash_status: open > forced_closed > closed
+                $cashStatus = 'closed';
+                if ($openSession) {
+                    $cashStatus = 'open';
+                } elseif ($hasForcedClosed) {
+                    $cashStatus = 'forced_closed';
+                }
+
+                // Determine last ingress
+                $lastIngress = null;
+                if ($firstEntry) {
+                    $lastIngress = $firstEntry->event_at;
+                } elseif ($openSession?->opened_at) {
+                    $lastIngress = $openSession->opened_at;
+                } elseif ($user->last_login && Carbon::parse($user->last_login)->between($dateFrom, $dateTo)) {
+                    $lastIngress = $user->last_login;
+                }
 
                 return [
                     'id' => $user->id,
@@ -184,12 +298,21 @@ class UserDashboardController extends Controller
                     'role' => $user->role,
                     'role_id' => $user->role_id,
                     // Performance data
-                    'current_warehouse' => $openSession?->warehouse?->name ?? null,
-                    'cash_status' => $openSession ? 'open' : 'closed',
+                    'current_warehouse' => $openSession?->warehouse?->name ?? $user->warehouse?->name ?? null,
+                    'warehouse_id' => $openSession?->warehouse_id ?? $user->warehouse_id,
+                    'cash_status' => $cashStatus,
                     'cash_session_opened_at' => $openSession?->opened_at,
-                    'sales_today' => (float) $salesToday,
-                    'sales_count_today' => $salesCountToday,
-                    'returns_today' => $returnsToday,
+                    'last_ingress' => $lastIngress,
+                    'sales_today' => (float) $salesPeriod,
+                    'sales_count_today' => $salesCountPeriod,
+                    'returns_today' => $returnsPeriod,
+                    // New: attendance entry/exit times
+                    'entry_time' => $firstEntry?->event_at,
+                    'exit_time' => $lastExit?->event_at,
+                    'exit_is_auto_closed' => $exitIsAutoClose,
+                    'exit_closed_by' => $exitClosedBy,
+                    // New: cash discrepancy
+                    'cash_discrepancy' => $cashDiscrepancy,
                 ];
             });
 
@@ -314,17 +437,55 @@ class UserDashboardController extends Controller
 
             $events = collect();
 
-            // 1. Cash session events (open/close)
+            // 1. Login event (always first if exists)
+            if ($user->last_login && Carbon::parse($user->last_login)->isSameDay($targetDate)) {
+                $events->push([
+                    'type' => 'login',
+                    'timestamp' => $user->last_login,
+                    'icon' => 'login',
+                    'color' => 'slate',
+                    'title' => 'Inició sesión',
+                    'description' => 'Acceso al sistema',
+                    '_order' => 0, // Login siempre primero
+                ]);
+            }
+
+            // 2. Cash sessions with their invoices/returns grouped inside
             $sessions = CashSession::where('user_id', $user->id)
-                ->whereDate('opened_at', $targetDate)
-                ->orWhere(function ($q) use ($user, $targetDate) {
-                    $q->where('user_id', $user->id)
-                        ->whereDate('closed_at', $targetDate);
+                ->where(function ($q) use ($targetDate) {
+                    $q->whereDate('opened_at', $targetDate)
+                      ->orWhereDate('closed_at', $targetDate);
                 })
                 ->with('warehouse:id,name')
+                ->orderBy('opened_at')
                 ->get();
 
-            foreach ($sessions as $session) {
+            // Get all invoices and returns for this user today, indexed by cash_session_id
+            $allSessionIds = $sessions->pluck('id');
+
+            $invoicesBySession = Invoice::whereIn('cash_session_id', $allSessionIds)
+                ->whereDate('created_at', $targetDate)
+                ->where('status', '!=', 'cancelled')
+                ->where('type', 'invoice')
+                ->orderBy('created_at')
+                ->get(['id', 'number', 'total', 'payment_method', 'created_at', 'cash_session_id'])
+                ->groupBy('cash_session_id');
+
+            $returnsBySession = ProductReturn::where('user_id', $user->id)
+                ->whereDate('created_at', $targetDate)
+                ->orderBy('created_at')
+                ->get(['id', 'number', 'total', 'reason', 'created_at']);
+
+            // Get all credit payments (abonos) for this user today
+            $abonosBySession = CreditPayment::where('user_id', $user->id)
+                ->whereDate('created_at', $targetDate)
+                ->with('customer:id,name')
+                ->orderBy('created_at')
+                ->get();
+
+            foreach ($sessions as $sessionIdx => $session) {
+                $sessionOrder = ($sessionIdx + 1) * 1000; // Base order per session
+
                 // Open event
                 if ($session->opened_at && Carbon::parse($session->opened_at)->isSameDay($targetDate)) {
                     $events->push([
@@ -334,6 +495,61 @@ class UserDashboardController extends Controller
                         'color' => 'emerald',
                         'title' => 'Abrió caja',
                         'description' => 'Sede: ' . ($session->warehouse?->name ?? 'Principal') . ' con $' . number_format((float) $session->opening_amount, 0, ',', '.'),
+                        '_order' => $sessionOrder,
+                    ]);
+                }
+
+                // Invoices belonging to this session (sandwiched between open and close)
+                $sessionInvoices = $invoicesBySession->get($session->id, collect());
+                foreach ($sessionInvoices as $invoiceIdx => $invoice) {
+                    $events->push([
+                        'type' => 'sale',
+                        'timestamp' => $invoice->created_at,
+                        'icon' => 'sale',
+                        'color' => 'blue',
+                        'title' => 'Venta procesada',
+                        'description' => $invoice->number . ' - $' . number_format((float) $invoice->total, 0, ',', '.') . ' (' . ($invoice->payment_method ?? 'Efectivo') . ')',
+                        '_order' => $sessionOrder + 1 + $invoiceIdx,
+                    ]);
+                }
+
+                // Returns that fall within this session's time range
+                $sessionStart = Carbon::parse($session->opened_at);
+                $sessionEnd = $session->closed_at ? Carbon::parse($session->closed_at) : Carbon::now();
+                $sessionReturns = $returnsBySession->filter(function ($r) use ($sessionStart, $sessionEnd) {
+                    $t = Carbon::parse($r->created_at);
+                    return $t->between($sessionStart, $sessionEnd);
+                });
+                foreach ($sessionReturns as $return) {
+                    $events->push([
+                        'type' => 'return',
+                        'timestamp' => $return->created_at,
+                        'icon' => 'return',
+                        'color' => 'amber',
+                        'title' => 'Procesó devolución',
+                        'description' => ($return->number ?? 'DEV') . ' - $' . number_format((float) $return->total, 0, ',', '.') . ($return->reason ? ' (' . $return->reason . ')' : ''),
+                        '_order' => $sessionOrder + 500,
+                    ]);
+                }
+
+                // Abonos (Credit payments) that fall within this session's time range
+                $sessionAbonos = $abonosBySession->filter(function ($a) use ($session) {
+                    return $a->cash_session_id === $session->id || 
+                           (!$a->cash_session_id && Carbon::parse($a->created_at)->between(
+                               Carbon::parse($session->opened_at),
+                               $session->closed_at ? Carbon::parse($session->closed_at) : Carbon::now()
+                           ));
+                });
+                $methodLabels = ['cash' => 'Efectivo', 'card' => 'Tarjeta', 'transfer' => 'Transferencia'];
+                foreach ($sessionAbonos as $abono) {
+                    $events->push([
+                        'type' => 'abono',
+                        'timestamp' => $abono->created_at,
+                        'icon' => 'credit-payment',
+                        'color' => 'emerald',
+                        'title' => 'Registró abono',
+                        'description' => ($abono->customer->name ?? 'Cliente') . ' - $' . number_format((float) $abono->amount, 0, ',', '.') . ' (' . ($methodLabels[$abono->method] ?? $abono->method) . ')',
+                        '_order' => $sessionOrder + 600,
                     ]);
                 }
 
@@ -350,62 +566,16 @@ class UserDashboardController extends Controller
                         'color' => $color,
                         'title' => 'Cerró caja',
                         'description' => 'Total: $' . number_format((float) $session->closing_amount, 0, ',', '.') . $diffText,
+                        '_order' => $sessionOrder + 999,
                     ]);
                 }
             }
 
-            // 2. Invoice events (sales)
-            $sessionIds = CashSession::where('user_id', $user->id)->pluck('id');
-
-            $invoices = Invoice::whereIn('cash_session_id', $sessionIds)
-                ->whereDate('created_at', $targetDate)
-                ->where('status', '!=', 'cancelled')
-                ->where('type', 'invoice')
-                ->orderBy('created_at')
-                ->get(['id', 'number', 'total', 'payment_method', 'created_at']);
-
-            foreach ($invoices as $invoice) {
-                $events->push([
-                    'type' => 'sale',
-                    'timestamp' => $invoice->created_at,
-                    'icon' => 'sale',
-                    'color' => 'blue',
-                    'title' => 'Venta procesada',
-                    'description' => $invoice->number . ' - $' . number_format((float) $invoice->total, 0, ',', '.') . ' (' . ($invoice->payment_method ?? 'Efectivo') . ')',
-                ]);
-            }
-
-            // 3. Return events
-            $returns = ProductReturn::where('user_id', $user->id)
-                ->whereDate('created_at', $targetDate)
-                ->orderBy('created_at')
-                ->get(['id', 'number', 'total', 'reason', 'created_at']);
-
-            foreach ($returns as $return) {
-                $events->push([
-                    'type' => 'return',
-                    'timestamp' => $return->created_at,
-                    'icon' => 'return',
-                    'color' => 'amber',
-                    'title' => 'Procesó devolución',
-                    'description' => ($return->number ?? 'DEV') . ' - $' . number_format((float) $return->total, 0, ',', '.') . ($return->reason ? ' (' . $return->reason . ')' : ''),
-                ]);
-            }
-
-            // 4. Login event (from last_login if it matches target date)
-            if ($user->last_login && Carbon::parse($user->last_login)->isSameDay($targetDate)) {
-                $events->push([
-                    'type' => 'login',
-                    'timestamp' => $user->last_login,
-                    'icon' => 'login',
-                    'color' => 'slate',
-                    'title' => 'Inició sesión',
-                    'description' => 'Acceso al sistema',
-                ]);
-            }
-
-            // Sort by timestamp
-            $sortedEvents = $events->sortBy('timestamp')->values();
+            // Sort by _order to maintain logical grouping (login → open → sales → returns → close)
+            $sortedEvents = $events->sortBy('_order')->values()->map(function ($e) {
+                unset($e['_order']);
+                return $e;
+            });
 
             return response()->json([
                 'success' => true,

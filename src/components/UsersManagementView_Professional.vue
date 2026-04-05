@@ -1,24 +1,22 @@
 <template>
-  <!-- 🎨 Diseño Gemini - Sistema de Usuarios y Roles -->
-  <div class="min-h-screen font-sans bg-[#f8f9fa] dark:bg-[#131314] transition-colors duration-300 px-8">
+  <!-- Dashboard Ejecutivo ERP - Gestión de Rendimiento y Auditoría -->
+  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
-      <!-- Header sin borde, sin icono -->
+      <!-- Header -->
       <div class="flex items-center justify-between pb-4">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white tracking-tight">Usuarios y Roles</h1>
-          <p class="text-sm text-gray-500 dark:text-gray-500 mt-1 font-normal">
-            {{ activeTab === 'users' ? 'Administra empleados y su acceso al sistema' : 'Configura roles y permisos granulares' }}
-          </p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Centro de Control de Personal</h1>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Rendimiento del equipo en tiempo real</p>
         </div>
         
         <div class="flex items-center gap-3">
-          <!-- Indicador de Límite de Usuarios (solo en tab usuarios) -->
-          <div v-if="activeTab === 'users' && maxUsersAllowed !== null" 
-               class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium"
+          <!-- Indicador de Límite de Usuarios -->
+          <div v-if="maxUsersAllowed !== null" 
+               class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold"
                :class="canCreateMoreUsers 
-                 ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' 
-                 : 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'">
+                 ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800' 
+                 : 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800'">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
@@ -26,18 +24,18 @@
           </div>
           
           <!-- Badge Plan Enterprise -->
-          <div v-if="activeTab === 'users' && maxUsersAllowed === null" 
-               class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+          <div v-if="maxUsersAllowed === null" 
+               class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-800">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
             </svg>
             <span>Usuarios ilimitados</span>
           </div>
           
-          <!-- Botón Secundario -->
+          <!-- Botón Refrescar -->
           <button @click="refreshData"
                   :disabled="loading"
-                  class="px-5 py-2.5 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-100 dark:hover:bg-[#2a2a2d] text-gray-700 dark:text-gray-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200"
+                  class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200"
                   :class="{ 'opacity-50 cursor-not-allowed': loading }">
             <svg class="w-4 h-4" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -45,196 +43,866 @@
           </button>
           
           <!-- Botón Principal -->
-          <button @click="activeTab === 'users' ? openCreateUserModal() : openCreateRoleModal()"
-                  :disabled="activeTab === 'users' && !canCreateMoreUsers"
-                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-medium rounded-full transition-all duration-300 flex items-center gap-2">
+          <button @click="openCreateUserModal()"
+                  :disabled="!canCreateMoreUsers"
+                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
             </svg>
-            <span>{{ activeTab === 'users' ? 'Nuevo Usuario' : 'Nuevo Rol' }}</span>
+            <span>Nuevo Usuario</span>
           </button>
         </div>
       </div>
 
-      <!-- Tabs Navigation -->
-      <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-full p-1 inline-flex border border-gray-200 dark:border-gray-700 h-[46px]">
-        <button @click="activeTab = 'users'"
-                :class="[
-                  'px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2',
-                  activeTab === 'users'
-                    ? 'bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                ]">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-          </svg>
-          <span>Usuarios</span>
-          <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-            {{ users.length }}
+      <!-- ============================================================ -->
+      <!-- BARRA DE FILTROS TEMPORALES (Time Travel) -->
+      <!-- ============================================================ -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 py-3 px-6 flex items-center gap-3 flex-wrap">
+        <!-- Quick presets: Hoy / Ayer -->
+        <div class="flex items-center gap-2">
+          <button v-for="preset in datePresets" :key="preset.key"
+            @click="selectDatePreset(preset.key)"
+            class="px-3 py-1.5 text-xs font-bold rounded-lg border transition-all duration-200"
+            :class="activeDatePreset === preset.key
+              ? 'bg-slate-900 dark:bg-slate-600 text-white border-slate-900 dark:border-slate-600 shadow-sm'
+              : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'">
+            {{ preset.label }}
+          </button>
+        </div>
+
+        <!-- Separator -->
+        <div class="h-6 w-px bg-gray-200 dark:bg-zinc-700 hidden sm:block"></div>
+
+        <!-- Single date picker (visible when 'custom' is active) -->
+        <div v-if="activeDatePreset === 'custom'" class="flex items-center gap-2">
+          <label class="text-xs font-medium text-gray-500 dark:text-zinc-400">Seleccionar fecha</label>
+          <input type="date" v-model="filterDate"
+            @change="onCustomDateChange"
+            class="px-2.5 py-1.5 text-xs border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-200 rounded-lg focus:ring-1 focus:ring-slate-500 focus:border-slate-500">
+        </div>
+
+        <!-- Active filter indicator -->
+        <div v-if="activeDatePreset !== 'today'" class="ml-auto flex items-center gap-2">
+          <span class="text-[10px] font-medium text-gray-400 dark:text-zinc-500">
+            Mostrando: {{ filterDateLabel }}
           </span>
-        </button>
+          <button @click="selectDatePreset('today')" class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" title="Volver a Hoy">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- KPIs EJECUTIVOS - Tab Usuarios (Dashboard ERP) -->
+      <!-- ============================================================ -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         
-        <button @click="activeTab = 'roles'"
-                :class="[
-                  'px-5 py-2.5 text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2',
-                  activeTab === 'roles'
-                    ? 'bg-white dark:bg-[#2a2a2d] text-gray-900 dark:text-white shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                ]">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-          </svg>
-          <span>Roles</span>
-          <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
-            {{ roles.length }}
-          </span>
-        </button>
-      </div>
-
-      <!-- KPIs con estilo Gemini -->
-      <div v-if="activeTab === 'users'" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- Total Usuarios -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
+        <!-- KPI 1: Personal Activo Ahora -->
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-              </svg>
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+              <!-- Punto verde parpadeante -->
+              <span class="relative flex h-4 w-4">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
+              </span>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Usuarios</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ users.length }}</p>
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Personal Activo Ahora</p>
+              <div class="flex items-baseline gap-2 mt-0.5">
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ dashboardKpis.active_now_count }}</p>
+                <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">en línea</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Usuarios Activos -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
+        <!-- KPI 2: Ventas del Equipo (Hoy) -->
+        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+              <!-- Gráfico de barras ascendente -->
               <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Activos</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ activeUsersCount }}</p>
+              <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Ventas del Equipo (Hoy)</p>
+              <div class="flex items-baseline gap-2 mt-0.5">
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(dashboardKpis.sales_today) }}</p>
+                <span class="text-xs font-medium text-gray-500 dark:text-zinc-500 flex items-center gap-0.5">
+                  {{ dashboardKpis.sales_count_today }} ventas
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Usuarios Inactivos -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
+        <!-- KPI 3: Alertas Operativas (Clickable) -->
+        <div @click="alertasTotal > 0 && (showAlertDetails = !showAlertDetails)"
+          :class="[
+            alertasTotal > 0
+              ? 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/40 hover:border-amber-300 dark:hover:border-amber-700/60 cursor-pointer'
+              : 'bg-white dark:bg-zinc-900/80 border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80'
+          ]"
+          class="backdrop-blur-sm rounded-xl px-4 py-3 border transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+            <div :class="alertasTotal > 0
+              ? 'bg-amber-100 dark:bg-amber-900/40 border-amber-200 dark:border-amber-800/50'
+              : 'bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-white/5'"
+              class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border">
+              <svg :class="alertasTotal > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path v-if="alertasTotal > 0" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Inactivos</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ inactiveUsersCount }}</p>
+              <p class="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">Alertas Operativas</p>
+              <div class="flex items-baseline gap-2 mt-0.5">
+                <p class="text-2xl font-bold text-amber-800 dark:text-amber-300">{{ alertasTotal }}</p>
+                <div class="flex flex-wrap gap-1.5">
+                  <span v-if="dashboardKpis.discrepancies_today > 0" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                    {{ dashboardKpis.discrepancies_today }} descuadre{{ dashboardKpis.discrepancies_today > 1 ? 's' : '' }}
+                  </span>
+                  <span v-if="dashboardKpis.returns_today_count > 0" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                    {{ dashboardKpis.returns_today_count }} devolución{{ dashboardKpis.returns_today_count > 1 ? 'es' : '' }}
+                  </span>
+                  <span v-if="alertasTotal === 0" class="text-xs font-medium text-emerald-600 dark:text-emerald-400">Todo en orden</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <!-- Roles Configurados -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Roles</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ roles.length }}</p>
-            </div>
+            <!-- Chevron indicator when there are alerts -->
+            <svg v-if="alertasTotal > 0" class="w-4 h-4 text-amber-500 dark:text-amber-400 transition-transform duration-200" :class="showAlertDetails ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
           </div>
         </div>
       </div>
 
-      <!-- KPIs para Roles -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- Total Roles -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-              </svg>
+      <!-- ============================================================ -->
+      <!-- PANEL DE DETALLE DE ALERTAS (Expandible) -->
+      <!-- ============================================================ -->
+      <Transition enter-active-class="transition-all duration-300 ease-out" enter-from-class="opacity-0 -translate-y-2 max-h-0" enter-to-class="opacity-100 translate-y-0 max-h-[600px]" leave-active-class="transition-all duration-200 ease-in" leave-from-class="opacity-100 translate-y-0 max-h-[600px]" leave-to-class="opacity-0 -translate-y-2 max-h-0">
+        <div v-if="showAlertDetails && alertasTotal > 0" class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-amber-200 dark:border-amber-800/40 overflow-hidden">
+          <div class="px-6 py-4 border-b border-amber-100 dark:border-amber-900/30 bg-amber-50/40 dark:bg-amber-950/10">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                </svg>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">Detalle de Alertas de Hoy</h3>
+              </div>
+              <button @click="showAlertDetails = false" class="p-1 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/30 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
             </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Roles</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ roles.length }}</p>
+          </div>
+          <div class="p-6 space-y-5">
+            <!-- Devoluciones -->
+            <div v-if="dashboardKpis.returns_today_details?.length > 0">
+              <h4 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                Devoluciones ({{ dashboardKpis.returns_today_details.length }})
+              </h4>
+              <div class="space-y-2">
+                <div v-for="ret in dashboardKpis.returns_today_details" :key="ret.id" class="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100 dark:border-amber-900/30">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ ret.number }}</p>
+                      <p class="text-[11px] text-gray-500 dark:text-zinc-400">
+                        {{ ret.user_name }}
+                        <span v-if="ret.invoice_number" class="text-gray-400 dark:text-zinc-500"> &middot; Factura {{ ret.invoice_number }}</span>
+                      </p>
+                      <p v-if="ret.reason" class="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5">Motivo: {{ ret.reason }}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-bold text-amber-700 dark:text-amber-300">{{ formatCurrency(ret.total) }}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-zinc-500">{{ formatAlertTime(ret.created_at) }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Descuadres -->
+            <div v-if="dashboardKpis.discrepancies_today_details?.length > 0">
+              <h4 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Descuadres de Caja ({{ dashboardKpis.discrepancies_today_details.length }})
+              </h4>
+              <div class="space-y-2">
+                <div v-for="(disc, idx) in dashboardKpis.discrepancies_today_details" :key="idx" class="flex items-center justify-between p-3 rounded-xl bg-rose-50/50 dark:bg-rose-950/10 border border-rose-100 dark:border-rose-900/30">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ disc.user_name }}</p>
+                      <p class="text-[11px] text-gray-500 dark:text-zinc-400">
+                        {{ disc.warehouse }}
+                        <span class="text-gray-400 dark:text-zinc-500"> &middot; Apertura: {{ formatCurrency(disc.opening_amount) }} → Cierre: {{ formatCurrency(disc.closing_amount) }}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-bold text-rose-700 dark:text-rose-300">{{ disc.difference > 0 ? '+' : '' }}{{ formatCurrency(disc.difference) }}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-zinc-500">{{ formatAlertTime(disc.closed_at) }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+
+      <!-- ============================================================ -->
+      <!-- DATA GRID ERP - Rendimiento del Equipo -->
+      <!-- ============================================================ -->
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
+        <!-- Grid Header -->
+        <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Panel de Rendimiento</h3>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Actividad y ventas del equipo en tiempo real</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                En vivo
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- Permisos Disponibles -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Permisos</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ totalPermissions }}</p>
-            </div>
-          </div>
-        </div>
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="border-b border-gray-200 dark:border-zinc-800">
+              <tr class="bg-gray-50 dark:bg-zinc-900">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Empleado</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Entrada</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Salida</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Sede Actual</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ventas Hoy</th>
+                <th class="px-6 py-3 text-center text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Caja</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Descuadre</th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-zinc-900">
+              <tr 
+                v-for="emp in employeeGridData" 
+                :key="emp.id"
+                class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-200 border-b border-gray-100 dark:border-zinc-800"
+              >
+                <!-- EMPLEADO: Avatar + Nombre + Rol -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <div class="relative">
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                           :class="emp.active
+                             ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-800'
+                             : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 border border-gray-200 dark:border-zinc-700'">
+                        {{ getInitials(emp.name) }}
+                      </div>
+                      <!-- Indicador online -->
+                      <span v-if="emp.isOnline" class="absolute -bottom-0.5 -right-0.5 block h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900"></span>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ emp.name }}</p>
+                      <p class="text-xs text-gray-500 dark:text-zinc-500">{{ emp.roleName }}</p>
+                    </div>
+                  </div>
+                </td>
 
-        <!-- Módulos del Sistema -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Módulos</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ permissionsModules.length }}</p>
-            </div>
-          </div>
-        </div>
+                <!-- ENTRADA -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p v-if="emp.entryTime" class="text-sm font-medium text-gray-700 dark:text-zinc-300 tabular-nums">{{ emp.entryTime }}</p>
+                  <span v-else class="text-xs text-gray-400 dark:text-zinc-600">—</span>
+                </td>
 
-        <!-- Roles Activos -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Roles en Uso</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ activeRolesCount }}</p>
-            </div>
-          </div>
+                <!-- SALIDA -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div v-if="emp.exitTime" class="flex items-center gap-1.5">
+                    <p class="text-sm font-medium tabular-nums" :class="emp.exitIsAutoClose ? 'text-amber-600 dark:text-amber-400' : 'text-gray-700 dark:text-zinc-300'">
+                      {{ emp.exitTime }}
+                    </p>
+                    <span v-if="emp.exitIsAutoClose"
+                      class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
+                      title="Cierre automático del sistema a medianoche">
+                      SISTEMA
+                    </span>
+                  </div>
+                  <span v-else class="text-xs text-gray-400 dark:text-zinc-600">—</span>
+                </td>
+
+                <!-- SEDE ACTUAL -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+                    {{ emp.sedeActual }}
+                  </span>
+                </td>
+
+                <!-- VENTAS HOY -->
+                <td class="px-6 py-4 whitespace-nowrap text-right">
+                  <p class="text-sm font-bold" :class="emp.ventasHoy > 0 ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-zinc-600'">
+                    {{ formatCurrency(emp.ventasHoy) }}
+                  </p>
+                </td>
+
+                <!-- CAJA -->
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <span v-if="emp.cajaForzada"
+                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+                    Pendiente Arqueo
+                  </span>
+                  <span v-else
+                    :class="emp.cajaAbierta
+                      ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'
+                      : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border-gray-200 dark:border-zinc-700'"
+                    class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide">
+                    {{ emp.cajaAbierta ? 'ABIERTA' : 'CERRADA' }}
+                  </span>
+                </td>
+
+                <!-- DESCUADRE -->
+                <td class="px-6 py-4 whitespace-nowrap text-right">
+                  <template v-if="emp.cajaForzada">
+                    <p class="text-xs text-gray-400 dark:text-zinc-600 italic">Esperando arqueo del cajero</p>
+                  </template>
+                  <template v-else-if="emp.cashDiscrepancy !== null">
+                    <p class="text-sm font-bold tabular-nums" 
+                       :class="emp.cashDiscrepancy < 0 
+                         ? 'text-rose-600 dark:text-rose-400' 
+                         : emp.cashDiscrepancy > 0 
+                           ? 'text-amber-600 dark:text-amber-400' 
+                           : 'text-emerald-600 dark:text-emerald-400'">
+                      {{ emp.cashDiscrepancy > 0 ? '+' : '' }}{{ formatCurrency(emp.cashDiscrepancy) }}
+                    </p>
+                  </template>
+                  <span v-else class="text-xs text-gray-400 dark:text-zinc-600">—</span>
+                </td>
+
+                <!-- ACCIONES -->
+                <td class="px-6 py-4 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button
+                      @click="openAttendanceModal(emp)"
+                      class="p-2 rounded-lg border border-transparent text-slate-400 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-100 dark:hover:border-blue-900/30 transition-all duration-200"
+                      title="Gestionar asistencia"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    </button>
+                    <button
+                      @click="openAuditPanel(emp)"
+                      class="px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 text-slate-600 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-800 hover:border-slate-300 dark:hover:border-zinc-600"
+                    >
+                      Auditar Perfil
+                    </button>
+                    <button
+                      @click="openEditUserModal(findUserById(emp.id))"
+                      class="p-2 rounded-lg border border-transparent text-slate-400 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-100 dark:hover:border-amber-900/30 transition-all duration-200"
+                      title="Editar usuario"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty State -->
+              <tr v-if="employeeGridData.length === 0">
+                <td colspan="8" class="px-6 py-12 text-center">
+                  <div class="flex flex-col items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-300 dark:text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <p class="text-gray-500 dark:text-zinc-400 font-medium">No hay empleados registrados</p>
+                    <p class="text-sm text-gray-400 dark:text-zinc-500 mt-1">Crea tu primer usuario para comenzar</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-
-      <!-- Contenido según Tab Activo -->
-      <UsersTable 
-        v-if="activeTab === 'users'"
-        :users="users"
-        @edit="openEditUserModal"
-        @delete="deleteUser"
-        @toggle-status="toggleUserStatus"
-        @change-password="openPasswordModal"
-      />
-      
-      <RolesTable 
-        v-if="activeTab === 'roles'"
-        :roles="roles"
-        @edit="openEditRoleModal"
-        @delete="deleteRole"
-      />
 
     </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE-OVER: Perfil Ejecutivo del Empleado -->
+    <!-- ============================================================ -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="auditPanelOpen" class="fixed inset-0 z-50">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="closeAuditPanel"></div>
+          
+          <!-- Panel -->
+          <Transition
+            enter-active-class="transition-transform duration-300 ease-out"
+            enter-from-class="translate-x-full"
+            enter-to-class="translate-x-0"
+            leave-active-class="transition-transform duration-200 ease-in"
+            leave-from-class="translate-x-0"
+            leave-to-class="translate-x-full"
+          >
+            <div v-if="auditPanelOpen" class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-zinc-900 shadow-2xl dark:shadow-black/80 border-l border-gray-200 dark:border-zinc-800 flex flex-col">
+              
+              <!-- Panel Header: Identidad del Empleado -->
+              <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <!-- Avatar grande -->
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 font-bold text-xl border border-blue-100 dark:border-blue-800 relative">
+                      {{ auditTarget ? getInitials(auditTarget.name) : '?' }}
+                      <span v-if="auditTarget?.isOnline" class="absolute -bottom-1 -right-1 block h-4 w-4 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900"></span>
+                    </div>
+                    <div>
+                      <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ auditTarget?.name || 'Empleado' }}</h2>
+                      <div class="flex items-center gap-2 mt-1">
+                        <span class="px-2 py-0.5 rounded-md text-xs font-medium border bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 border-purple-100 dark:border-purple-800">
+                          {{ auditTarget?.roleName || 'Sin rol' }}
+                        </span>
+                        <span class="px-2 py-0.5 rounded-md text-xs font-medium border bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+                          {{ auditTarget?.sedeActual || 'Sin sede' }}
+                        </span>
+                        <span 
+                          :class="auditTarget?.cajaAbierta
+                            ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'
+                            : 'bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border-gray-200 dark:border-zinc-700'"
+                          class="px-2 py-0.5 rounded-md text-xs font-medium border">
+                          Caja {{ auditTarget?.cajaAbierta ? 'Abierta' : 'Cerrada' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button 
+                    @click="closeAuditPanel"
+                    class="p-2 rounded-lg border border-transparent text-slate-400 dark:text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Panel Body -->
+              <div class="flex-1 overflow-y-auto p-6">
+                <!-- Loading -->
+                <div v-if="auditLoading" class="flex items-center justify-center py-16">
+                  <svg class="animate-spin h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                  </svg>
+                </div>
+
+                <div v-else-if="auditTarget" class="space-y-6">
+
+                  <!-- ===== MÉTRICAS DEL MES ===== -->
+                  <div v-if="auditProfile?.performance">
+                    <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Rendimiento del Mes</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                      <!-- Ventas del Mes -->
+                      <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
+                        <div class="flex items-center justify-between mb-1">
+                          <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Total Vendido</p>
+                          <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                          </svg>
+                        </div>
+                        <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(auditProfile.performance.total_sold_month) }}</p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">{{ auditProfile.performance.invoices_count }} facturas emitidas</p>
+                      </div>
+                      <!-- Ticket Promedio -->
+                      <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50">
+                        <div class="flex items-center justify-between mb-1">
+                          <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Ticket Promedio</p>
+                          <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                          </svg>
+                        </div>
+                        <p class="text-xl font-bold text-gray-900 dark:text-white">{{ formatCurrency(auditProfile.performance.avg_ticket) }}</p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">por transacción</p>
+                      </div>
+                      <!-- Devoluciones -->
+                      <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50" :class="auditProfile.performance.returns_count > 0 ? 'ring-1 ring-amber-200 dark:ring-amber-800/50' : ''">
+                        <div class="flex items-center justify-between mb-1">
+                          <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Devoluciones</p>
+                          <svg class="w-4 h-4" :class="auditProfile.performance.returns_count > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-gray-300 dark:text-zinc-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3"/>
+                          </svg>
+                        </div>
+                        <p class="text-xl font-bold" :class="auditProfile.performance.returns_count > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'">
+                          {{ auditProfile.performance.returns_count }}
+                        </p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">{{ formatCurrency(auditProfile.performance.returns_amount) }} en valor</p>
+                      </div>
+                      <!-- Descuadres -->
+                      <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50" :class="auditProfile.performance.discrepancies > 0 ? 'ring-1 ring-rose-200 dark:ring-rose-800/50' : ''">
+                        <div class="flex items-center justify-between mb-1">
+                          <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider">Descuadres</p>
+                          <svg class="w-4 h-4" :class="auditProfile.performance.discrepancies > 0 ? 'text-rose-500 dark:text-rose-400' : 'text-gray-300 dark:text-zinc-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                          </svg>
+                        </div>
+                        <p class="text-xl font-bold" :class="auditProfile.performance.discrepancies > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-gray-900 dark:text-white'">
+                          {{ auditProfile.performance.discrepancies }}
+                        </p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">{{ auditProfile.performance.cash_sessions_count }} sesiones de caja</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ===== RESUMEN RÁPIDO HOY ===== -->
+                  <div class="bg-gray-50 dark:bg-zinc-800/30 rounded-xl border border-gray-200 dark:border-zinc-700/50 p-4">
+                    <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Resumen de Hoy</h3>
+                    <div class="grid grid-cols-3 gap-4">
+                      <div class="text-center">
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ formatCurrency(auditTarget.ventasHoy) }}</p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Ventas</p>
+                      </div>
+                      <div class="text-center border-x border-gray-200 dark:border-zinc-700/50">
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ auditTarget.salesCount || 0 }}</p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Transacciones</p>
+                      </div>
+                      <div class="text-center">
+                        <p class="text-lg font-bold" :class="auditTarget.returnsToday > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'">{{ auditTarget.returnsToday || 0 }}</p>
+                        <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-wide">Devoluciones</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ===== TIMELINE DE ACTIVIDAD ===== -->
+                  <div>
+                    <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Registro de Actividad</h3>
+                    <div v-if="auditTimeline.length > 0" class="relative">
+                      <!-- Línea vertical -->
+                      <div class="absolute left-[7px] top-2 bottom-2 w-px bg-gray-200 dark:bg-zinc-700/60"></div>
+                      
+                      <div v-for="(event, idx) in auditTimeline" :key="idx" class="relative flex items-start gap-3 pb-4 last:pb-0">
+                        <!-- Punto con color -->
+                        <div class="relative z-10 flex-shrink-0 w-[15px] h-[15px] rounded-full border-2 mt-0.5"
+                             :class="{
+                               'bg-emerald-500 border-emerald-200 dark:border-emerald-800': event.color === 'emerald',
+                               'bg-blue-500 border-blue-200 dark:border-blue-800': event.color === 'blue',
+                               'bg-amber-500 border-amber-200 dark:border-amber-800': event.color === 'amber',
+                               'bg-rose-500 border-rose-200 dark:border-rose-800': event.color === 'rose',
+                               'bg-slate-400 border-slate-200 dark:border-slate-700': event.color === 'slate'
+                             }"></div>
+                        <div class="flex-1 min-w-0 -mt-0.5">
+                          <div class="flex items-center justify-between gap-2">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ event.title }}</p>
+                            <span class="text-[11px] font-mono text-gray-400 dark:text-zinc-500 flex-shrink-0">
+                              {{ new Date(event.timestamp).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false }) }}
+                            </span>
+                          </div>
+                          <p class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ event.description }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else class="text-center py-8 bg-gray-50 dark:bg-zinc-800/30 rounded-xl border border-gray-200 dark:border-zinc-700/50">
+                      <svg class="w-10 h-10 text-gray-300 dark:text-zinc-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <p class="text-sm text-gray-400 dark:text-zinc-500">Sin actividad registrada hoy</p>
+                    </div>
+                  </div>
+
+                  <!-- ===== SEDES TRABAJADAS ===== -->
+                  <div v-if="auditProfile?.warehouses_worked?.length">
+                    <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-3">Sedes Trabajadas</h3>
+                    <div class="flex flex-wrap gap-2">
+                      <span v-for="wh in auditProfile.warehouses_worked" :key="wh.id"
+                            class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+                        {{ wh.name }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Gestión de Registros de Asistencia - Flat Enterprise -->
+    <!-- ============================================================ -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-200 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-150 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="attendanceModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/50" @click="closeAttendanceModal"></div>
+
+          <div class="relative w-full max-w-5xl bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-2xl dark:shadow-black/60 overflow-hidden">
+
+            <!-- Header corporativo -->
+            <div class="flex items-center justify-between px-8 py-5 border-b border-gray-200 dark:border-zinc-800">
+              <div>
+                <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Gestión de Asistencia</h2>
+                <p class="text-xs text-gray-500 dark:text-zinc-500 mt-1">Registros de entrada y salida · {{ attendanceTarget?.name }}</p>
+              </div>
+              <button @click="closeAttendanceModal" class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+
+            <!-- Body: dos paneles -->
+            <div class="flex divide-x divide-gray-200 dark:divide-zinc-800">
+
+              <!-- Panel izquierdo: Info empleado -->
+              <div class="w-[38%] bg-gray-50 dark:bg-zinc-900/50 p-6">
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 font-bold text-sm border border-blue-100 dark:border-blue-800">
+                    {{ attendanceTarget ? getInitials(attendanceTarget.name) : '?' }}
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-gray-900 dark:text-white">{{ attendanceTarget?.name }}</p>
+                    <p class="text-xs text-gray-500 dark:text-zinc-500">{{ attendanceTarget?.roleName }}</p>
+                  </div>
+                </div>
+
+                <!-- Registros actuales -->
+                <div class="border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+                  <div class="bg-gray-100 dark:bg-zinc-800/50 px-4 py-2.5">
+                    <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Registros del {{ filterDateLabel }}</p>
+                  </div>
+                  <div class="divide-y divide-gray-100 dark:divide-zinc-800">
+                    <div class="px-4 py-3 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="text-xs font-medium text-gray-600 dark:text-zinc-400">Entrada</span>
+                      </div>
+                      <span class="text-sm font-semibold text-gray-900 dark:text-white tabular-nums">{{ attendanceTarget?.entryTime || '—' }}</span>
+                    </div>
+                    <div class="px-4 py-3 flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span class="text-xs font-medium text-gray-600 dark:text-zinc-400">Salida</span>
+                      </div>
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-sm font-semibold text-gray-900 dark:text-white tabular-nums">{{ attendanceTarget?.exitTime || '—' }}</span>
+                        <span v-if="attendanceTarget?.exitIsAutoClose" class="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">SIS</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Info nota -->
+                <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg">
+                  <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p class="text-[11px] text-amber-700 dark:text-amber-400 leading-relaxed">
+                      Los cambios en los registros de asistencia son permanentes y quedarán reflejados en el historial.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Panel derecho: Tabla de registros + acciones -->
+              <div class="w-[62%] p-6">
+
+                <!-- Loading -->
+                <div v-if="attendanceLoading" class="flex items-center justify-center py-16">
+                  <svg class="animate-spin h-7 w-7 text-gray-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                  </svg>
+                </div>
+
+                <div v-else>
+                  <!-- Tabla de registros -->
+                  <div class="border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+                    <table class="w-full">
+                      <thead>
+                        <tr class="bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-800">
+                          <th class="px-4 py-2.5 text-left text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Evento</th>
+                          <th class="px-4 py-2.5 text-left text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Fecha y Hora</th>
+                          <th class="px-4 py-2.5 text-center text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Origen</th>
+                          <th class="px-4 py-2.5 text-right text-[11px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
+                        <tr v-for="log in attendanceLogs" :key="log.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-150">
+                          <!-- Tipo -->
+                          <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                              <span class="w-2 h-2 rounded-full" :class="{'bg-emerald-500': log.event_type === 'entry', 'bg-blue-500': log.event_type === 'exit', 'bg-amber-500': log.event_type === 'break_start', 'bg-violet-500': log.event_type === 'break_end'}[true] || 'bg-gray-400'"></span>
+                              <span class="text-sm font-medium text-gray-900 dark:text-white">{{ {entry: 'Entrada', exit: 'Salida', break_start: 'Inicio Break', break_end: 'Fin Break'}[log.event_type] || log.event_type }}</span>
+                            </div>
+                          </td>
+                          <!-- Hora -->
+                          <td class="px-4 py-3">
+                            <div v-if="editingLogId === log.id" class="flex items-center gap-2">
+                              <input
+                                v-model="editLogDateTime"
+                                type="datetime-local"
+                                class="px-2 py-1.5 text-sm border border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                              <button @click="saveEditLog(log.id)" class="p-1.5 rounded-md text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                              </button>
+                              <button @click="cancelEditLog" class="p-1.5 rounded-md text-gray-400 dark:text-zinc-500 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                              </button>
+                            </div>
+                            <span v-else class="text-sm text-gray-700 dark:text-zinc-300 tabular-nums">
+                              {{ formatLogDateTime(log.event_at) }}
+                            </span>
+                          </td>
+                          <!-- Origen -->
+                          <td class="px-4 py-3 text-center">
+                            <span v-if="log.is_auto_closed" class="px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800">
+                              Sistema
+                            </span>
+                            <span v-else class="px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border-gray-200 dark:border-zinc-700">
+                              Biométrico
+                            </span>
+                          </td>
+                          <!-- Acciones -->
+                          <td class="px-4 py-3 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                              <button
+                                @click="startEditLog(log)"
+                                class="p-1.5 rounded-md border border-transparent text-slate-400 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-100 dark:hover:border-amber-900/30 transition-all duration-200"
+                                title="Editar hora"
+                              >
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                              </button>
+                              <button
+                                @click="confirmDeleteLog(log)"
+                                class="p-1.5 rounded-md border border-transparent text-slate-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-900/30 transition-all duration-200"
+                                title="Eliminar registro"
+                              >
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <!-- Empty state -->
+                    <div v-if="attendanceLogs.length === 0" class="px-4 py-10 text-center">
+                      <svg class="w-10 h-10 text-gray-300 dark:text-zinc-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <p class="text-sm text-gray-400 dark:text-zinc-500">Sin registros de asistencia hoy</p>
+                    </div>
+                  </div>
+
+                  <!-- Confirmación de eliminación inline -->
+                  <Transition
+                    enter-active-class="transition-all duration-200 ease-out"
+                    enter-from-class="opacity-0 -translate-y-2"
+                    enter-to-class="opacity-100 translate-y-0"
+                    leave-active-class="transition-all duration-150 ease-in"
+                    leave-from-class="opacity-100 translate-y-0"
+                    leave-to-class="opacity-0 -translate-y-2"
+                  >
+                    <div v-if="deleteConfirmLog" class="mt-4 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 rounded-lg">
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                          </svg>
+                          <p class="text-sm font-medium text-rose-800 dark:text-rose-300">
+                            ¿Eliminar registro de <strong>{{ {entry: 'entrada', exit: 'salida', break_start: 'inicio break', break_end: 'fin break'}[deleteConfirmLog.event_type] || deleteConfirmLog.event_type }}</strong> ({{ formatLogDateTime(deleteConfirmLog.event_at) }})?
+                          </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <button @click="deleteConfirmLog = null" class="px-3 py-1.5 text-xs font-bold rounded-md border border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 transition-colors">
+                            Cancelar
+                          </button>
+                          <button @click="executeDeleteLog" :disabled="attendanceSaving" class="px-3 py-1.5 text-xs font-bold rounded-md bg-rose-600 hover:bg-rose-700 text-white transition-colors disabled:opacity-50">
+                            Confirmar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
+
+                  <!-- Botón Eliminar Todos -->
+                  <div v-if="attendanceLogs.length > 0" class="mt-4 flex items-center justify-between">
+                    <button
+                      @click="confirmDeleteAllLogs"
+                      class="px-4 py-2 text-xs font-bold rounded-md border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all duration-200"
+                    >
+                      Eliminar todos los registros del {{ filterDateLabel.toLowerCase() }}
+                    </button>
+                    <p v-if="attendanceMessage" class="text-xs font-medium" :class="attendanceMessageType === 'success' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                      {{ attendanceMessage }}
+                    </p>
+                  </div>
+
+                  <!-- Confirmación eliminar todos -->
+                  <Transition
+                    enter-active-class="transition-all duration-200 ease-out"
+                    enter-from-class="opacity-0 -translate-y-2"
+                    enter-to-class="opacity-100 translate-y-0"
+                    leave-active-class="transition-all duration-150 ease-in"
+                    leave-from-class="opacity-100 translate-y-0"
+                    leave-to-class="opacity-0 -translate-y-2"
+                  >
+                    <div v-if="deleteAllConfirm" class="mt-3 p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 rounded-lg">
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-rose-800 dark:text-rose-300">
+                          ¿Eliminar <strong>todos los registros</strong> de {{ attendanceTarget?.name }} del día de hoy?
+                        </p>
+                        <div class="flex items-center gap-2">
+                          <button @click="deleteAllConfirm = false" class="px-3 py-1.5 text-xs font-bold rounded-md border border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-800 transition-colors">
+                            Cancelar
+                          </button>
+                          <button @click="executeDeleteAllLogs" :disabled="attendanceSaving" class="px-3 py-1.5 text-xs font-bold rounded-md bg-rose-600 hover:bg-rose-700 text-white transition-colors disabled:opacity-50">
+                            Sí, Eliminar Todo
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Transition>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer corporativo -->
+            <div class="flex items-center justify-end px-8 py-4 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50">
+              <button @click="closeAttendanceModal" class="px-5 py-2.5 text-sm font-bold rounded-md border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- MODAL: Crear/Editar Usuario -->
     <UserModal 
@@ -242,17 +910,9 @@
       :show="showUserModal"
       :user="selectedUser"
       :roles="roles"
+      :warehouses="warehouses"
       @close="closeUserModal"
       @save="saveUser"
-    />
-
-    <!-- MODAL: Crear/Editar Rol -->
-    <RoleModal 
-      :show="showRoleModal"
-      :role="selectedRole"
-      :permissionsModules="permissionsModules"
-      @close="closeRoleModal"
-      @save="saveRole"
     />
 
     <!-- MODAL: Cambiar Contraseña -->
@@ -270,13 +930,12 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import usersService from '../services/usersService.js'
 import rolesService from '../services/rolesService.js'
+import { warehouseService } from '../services/warehouseService.js'
 import { appStore } from '../store/appStore.js'
 import { useUIContextStore } from '../store/uiContextStore.js'
-import UsersTable from './UsersTable.vue'
-import RolesTable from './RolesTable.vue'
 import UserModal from './UserModal.vue'
-import RoleModal from './RoleModal.vue'
 import PasswordModal from './PasswordModal.vue'
+import biometricService from '../services/biometricService.js'
 
 // ===== CONTEXTO AI =====
 const uiContextStore = useUIContextStore()
@@ -286,17 +945,341 @@ const userModalRef = ref(null)
 
 // ===== ESTADO REACTIVO =====
 const loading = ref(false)
-const activeTab = ref('users')
 
 // Usuarios
 const users = ref([])
 const showUserModal = ref(false)
 const selectedUser = ref(null)
 
-// Roles
+// Roles (se mantiene para mapeo interno)
 const roles = ref([])
-const showRoleModal = ref(false)
-const selectedRole = ref(null)
+
+// Warehouses / Sedes
+const warehouses = ref([])
+
+// ===== ALERTAS OPERATIVAS =====
+const showAlertDetails = ref(false)
+
+// ===== FILTROS DE FECHA (Single Date Selection) =====
+const activeDatePreset = ref('today')
+const filterDate = ref(new Date().toISOString().split('T')[0])
+
+const datePresets = [
+  { key: 'today', label: 'Hoy' },
+  { key: 'yesterday', label: 'Ayer' },
+  { key: 'custom', label: 'Personalizado' },
+]
+
+const filterDateLabel = computed(() => {
+  if (activeDatePreset.value === 'today') return 'Hoy'
+  if (activeDatePreset.value === 'yesterday') return 'Ayer'
+  return filterDate.value
+})
+
+const getDateParams = () => {
+  return { date: filterDate.value }
+}
+
+const selectDatePreset = (key) => {
+  const today = new Date()
+  const fmt = (d) => d.toISOString().split('T')[0]
+
+  if (key === 'today') {
+    filterDate.value = fmt(today)
+  } else if (key === 'yesterday') {
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    filterDate.value = fmt(yesterday)
+  } else if (key === 'custom') {
+    activeDatePreset.value = 'custom'
+    return
+  }
+  activeDatePreset.value = key
+  loadDashboardData()
+}
+
+const onCustomDateChange = () => {
+  if (filterDate.value) {
+    loadDashboardData()
+  }
+}
+
+const formatAlertTime = (dateStr) => {
+  if (!dateStr) return ''
+  try {
+    return new Date(dateStr).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true })
+  } catch { return '' }
+}
+
+// ===== PANEL DE AUDITORÍA (Slide-over) =====
+const auditPanelOpen = ref(false)
+const auditTarget = ref(null)
+const auditProfile = ref(null)
+const auditTimeline = ref([])
+const auditLoading = ref(false)
+
+const openAuditPanel = async (employee) => {
+  auditTarget.value = employee
+  auditPanelOpen.value = true
+  auditLoading.value = true
+  try {
+    const [profileRes, timelineRes] = await Promise.all([
+      usersService.getUserProfile(employee.id),
+      usersService.getUserTimeline(employee.id)
+    ])
+    auditProfile.value = profileRes.data || null
+    auditTimeline.value = timelineRes.data?.events || []
+  } catch (e) {
+    console.error('Error cargando auditoría:', e)
+  } finally {
+    auditLoading.value = false
+  }
+}
+
+const closeAuditPanel = () => {
+  auditPanelOpen.value = false
+  auditTarget.value = null
+  auditProfile.value = null
+  auditTimeline.value = []
+}
+
+// ===== GESTIÓN DE ASISTENCIA (Admin) =====
+const attendanceModalOpen = ref(false)
+const attendanceTarget = ref(null)
+const attendanceLogs = ref([])
+const attendanceLoading = ref(false)
+const attendanceSaving = ref(false)
+const attendanceMessage = ref('')
+const attendanceMessageType = ref('success')
+const editingLogId = ref(null)
+const editLogDateTime = ref('')
+const deleteConfirmLog = ref(null)
+const deleteAllConfirm = ref(false)
+
+const openAttendanceModal = async (emp) => {
+  attendanceTarget.value = emp
+  attendanceModalOpen.value = true
+  attendanceLoading.value = true
+  attendanceMessage.value = ''
+  deleteConfirmLog.value = null
+  deleteAllConfirm.value = false
+  editingLogId.value = null
+  try {
+    const res = await biometricService.getAttendanceHistory({ user_id: emp.id, date: filterDate.value })
+    attendanceLogs.value = res.data || []
+  } catch (e) {
+    attendanceLogs.value = []
+  } finally {
+    attendanceLoading.value = false
+  }
+}
+
+const closeAttendanceModal = () => {
+  attendanceModalOpen.value = false
+  attendanceTarget.value = null
+  attendanceLogs.value = []
+  editingLogId.value = null
+  deleteConfirmLog.value = null
+  deleteAllConfirm.value = false
+  attendanceMessage.value = ''
+}
+
+const formatLogDateTime = (dt) => {
+  if (!dt) return '—'
+  try {
+    const d = new Date(dt)
+    return d.toLocaleString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })
+  } catch {
+    return dt
+  }
+}
+
+const toLocalDatetimeValue = (dt) => {
+  if (!dt) return ''
+  const d = new Date(dt)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+const startEditLog = (log) => {
+  editingLogId.value = log.id
+  editLogDateTime.value = toLocalDatetimeValue(log.event_at)
+  deleteConfirmLog.value = null
+  deleteAllConfirm.value = false
+}
+
+const cancelEditLog = () => {
+  editingLogId.value = null
+  editLogDateTime.value = ''
+}
+
+const saveEditLog = async (logId) => {
+  if (!editLogDateTime.value) return
+  attendanceSaving.value = true
+  try {
+    await biometricService.updateAttendanceLog(logId, editLogDateTime.value)
+    const res = await biometricService.getAttendanceHistory({ user_id: attendanceTarget.value.id, date: filterDate.value })
+    attendanceLogs.value = res.data || []
+    editingLogId.value = null
+    editLogDateTime.value = ''
+    showAttendanceMsg('Registro actualizado', 'success')
+    loadDashboardData()
+  } catch {
+    showAttendanceMsg('Error al actualizar', 'error')
+  } finally {
+    attendanceSaving.value = false
+  }
+}
+
+const confirmDeleteLog = (log) => {
+  deleteConfirmLog.value = log
+  deleteAllConfirm.value = false
+  editingLogId.value = null
+}
+
+const executeDeleteLog = async () => {
+  if (!deleteConfirmLog.value) return
+  attendanceSaving.value = true
+  try {
+    await biometricService.deleteAttendanceLog(deleteConfirmLog.value.id)
+    const res = await biometricService.getAttendanceHistory({ user_id: attendanceTarget.value.id, date: filterDate.value })
+    attendanceLogs.value = res.data || []
+    deleteConfirmLog.value = null
+    showAttendanceMsg('Registro eliminado', 'success')
+    loadDashboardData()
+  } catch {
+    showAttendanceMsg('Error al eliminar', 'error')
+  } finally {
+    attendanceSaving.value = false
+  }
+}
+
+const confirmDeleteAllLogs = () => {
+  deleteAllConfirm.value = true
+  deleteConfirmLog.value = null
+  editingLogId.value = null
+}
+
+const executeDeleteAllLogs = async () => {
+  if (!attendanceTarget.value) return
+  attendanceSaving.value = true
+  try {
+    await biometricService.deleteUserAttendanceLogs(attendanceTarget.value.id, filterDate.value)
+    attendanceLogs.value = []
+    deleteAllConfirm.value = false
+    showAttendanceMsg('Todos los registros eliminados', 'success')
+    loadDashboardData()
+  } catch {
+    showAttendanceMsg('Error al eliminar registros', 'error')
+  } finally {
+    attendanceSaving.value = false
+  }
+}
+
+const showAttendanceMsg = (msg, type) => {
+  attendanceMessage.value = msg
+  attendanceMessageType.value = type
+  setTimeout(() => { attendanceMessage.value = '' }, 3000)
+}
+
+// ===== DATOS REALES DEL DASHBOARD ERP =====
+const dashboardKpis = ref({
+  active_now: [],
+  active_now_count: 0,
+  sales_today: 0,
+  sales_count_today: 0,
+  returns_today_amount: 0,
+  returns_today_count: 0,
+  discrepancies_today: 0,
+  return_alerts: []
+})
+
+// Usuarios enriquecidos con datos de rendimiento del backend
+const usersWithPerformance = ref([])
+
+// ===== GRID DATA: Datos reales del backend =====
+const employeeGridData = computed(() => {
+  return usersWithPerformance.value.map(user => ({
+    id: user.id,
+    name: user.name,
+    active: user.active,
+    roleName: user.role?.name || 'Sin rol',
+    ultimoIngreso: formatIngress(user.last_ingress),
+    entryTime: user.entry_time ? formatTimeOnly(user.entry_time) : null,
+    exitTime: user.exit_time ? formatTimeOnly(user.exit_time) : null,
+    exitIsAutoClose: user.exit_is_auto_closed || false,
+    exitClosedBy: user.exit_closed_by || 'user',
+    sedeActual: user.current_warehouse || 'Sin sede',
+    ventasHoy: user.sales_today || 0,
+    salesCount: user.sales_count_today || 0,
+    cajaAbierta: user.cash_status === 'open',
+    cajaForzada: user.cash_status === 'forced_closed',
+    cashStatus: user.cash_status || 'closed',
+    isOnline: user.cash_status === 'open' && user.active,
+    returnsToday: user.returns_today || 0,
+    cashDiscrepancy: user.cash_discrepancy ?? null,
+  }))
+})
+
+const findUserById = (id) => users.value.find(u => u.id === id)
+
+const getInitials = (name) => {
+  if (!name) return '?'
+  const parts = name.trim().split(' ')
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
+  return name.substring(0, 2).toUpperCase()
+}
+
+const formatCurrency = (value) => {
+  if (!value && value !== 0) return '$0'
+  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value)
+}
+
+const formatIngress = (dateStr) => {
+  if (!dateStr) return 'Sin registro'
+  try {
+    const date = new Date(dateStr)
+    const now = new Date()
+    const isToday = date.toDateString() === now.toDateString()
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const isYesterday = date.toDateString() === yesterday.toDateString()
+    
+    const timeStr = date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true })
+    if (isToday) return `Hoy, ${timeStr}`
+    if (isYesterday) return `Ayer, ${timeStr}`
+    return date.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) + `, ${timeStr}`
+  } catch {
+    return 'Sin registro'
+  }
+}
+
+const formatTimeOnly = (dateStr) => {
+  if (!dateStr) return null
+  try {
+    const date = new Date(dateStr)
+    return date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true })
+  } catch {
+    return null
+  }
+}
+
+// ===== CARGA DE DATOS REALES =====
+const alertasTotal = computed(() => (dashboardKpis.value.discrepancies_today || 0) + (dashboardKpis.value.returns_today_count || 0))
+
+const loadDashboardData = async () => {
+  try {
+    const dateParams = getDateParams()
+    const [kpisRes, perfRes] = await Promise.all([
+      usersService.getDashboardKpis(dateParams),
+      usersService.getUsersWithPerformance(dateParams)
+    ])
+    if (kpisRes.success) dashboardKpis.value = kpisRes.data
+    if (perfRes.success) usersWithPerformance.value = perfRes.data || []
+  } catch (e) {
+    console.error('Error cargando dashboard:', e)
+  }
+}
 
 // Contraseña
 const showPasswordModal = ref(false)
@@ -327,11 +1310,6 @@ const remainingUserSlots = computed(() => {
 // ===== COMPUTED PROPERTIES =====
 const activeUsersCount = computed(() => users.value.filter(u => u.active).length)
 const inactiveUsersCount = computed(() => users.value.filter(u => !u.active).length)
-const activeRolesCount = computed(() => roles.value.filter(r => r.users_count > 0).length)
-const totalPermissions = computed(() => {
-  // Ahora son 17 módulos = 17 permisos
-  return permissionsModules.value.length
-})
 
 // ===== PERMISOS ULTRA SIMPLIFICADOS: SOLO MÓDULOS =====
 // 17 módulos = 17 permisos
@@ -466,7 +1444,7 @@ const permissionsModules = ref([
 const refreshData = async () => {
   try {
     loading.value = true
-    await Promise.all([loadUsers(), loadRoles()])
+    await Promise.all([loadUsers(), loadRoles(), loadWarehouses(), loadDashboardData()])
   } catch (error) {
     console.error('Error actualizando datos:', error)
   } finally {
@@ -489,6 +1467,16 @@ const loadRoles = async () => {
     roles.value = response.data || []
   } catch (error) {
     console.error('Error cargando roles:', error)
+  }
+}
+
+const loadWarehouses = async () => {
+  try {
+    const response = await warehouseService.getAll()
+    // api.get returns parsed JSON directly: { warehouses: [...], plan_info: {...} }
+    warehouses.value = response.warehouses || response.data || []
+  } catch (error) {
+    console.error('Error cargando sedes:', error)
   }
 }
 
@@ -598,80 +1586,6 @@ const openPasswordModal = (user) => {
   showPasswordModal.value = true
 }
 
-// Roles
-const openCreateRoleModal = () => {
-  selectedRole.value = null
-  showRoleModal.value = true
-}
-
-const openEditRoleModal = (role) => {
-  selectedRole.value = role
-  showRoleModal.value = true
-}
-
-const closeRoleModal = () => {
-  showRoleModal.value = false
-  selectedRole.value = null
-}
-
-const saveRole = async (roleData) => {
-  if (!roleData.name) {
-    alert('❌ El nombre del rol es obligatorio')
-    return
-  }
-  
-  if (roleData.permissions.length === 0) {
-    alert('❌ Debes seleccionar al menos un permiso')
-    return
-  }
-  
-  try {
-    loading.value = true
-    
-    if (selectedRole.value) {
-      // Editar rol existente
-      await rolesService.updateRole(selectedRole.value.id, roleData)
-      alert('✅ Rol actualizado exitosamente')
-    } else {
-      // Crear nuevo rol
-      await rolesService.createRole(roleData)
-      alert('✅ Rol creado exitosamente')
-    }
-    
-    await loadRoles()
-    closeRoleModal()
-  } catch (error) {
-    console.error('Error guardando rol:', error)
-    alert('❌ Error al guardar el rol')
-  } finally {
-    loading.value = false
-  }
-}
-
-const deleteRole = async (role) => {
-  // Validar que no tenga usuarios asignados
-  if (role.users_count > 0) {
-    alert(`⚠️ No se puede eliminar el rol "${role.name}" porque tiene ${role.users_count} usuario(s) asignado(s)`)
-    return
-  }
-  
-  if (!confirm(`¿Estás seguro de eliminar el rol "${role.name}"?`)) {
-    return
-  }
-  
-  try {
-    loading.value = true
-    await rolesService.deleteRole(role.id)
-    alert('✅ Rol eliminado exitosamente')
-    await loadRoles()
-  } catch (error) {
-    console.error('Error eliminando rol:', error)
-    alert('❌ Error al eliminar el rol')
-  } finally {
-    loading.value = false
-  }
-}
-
 // Contraseña
 const closePasswordModal = () => {
   showPasswordModal.value = false
@@ -696,7 +1610,6 @@ const savePassword = async (passwordData) => {
 const updateAIContext = () => {
   const contextData = {
     modulo: 'usuarios',
-    pestanaActual: activeTab.value === 'users' ? 'Usuarios' : 'Roles',
     
     // Información de usuarios
     usuarios: {
@@ -718,38 +1631,16 @@ const updateAIContext = () => {
       }))
     },
     
-    // Información de roles
-    roles: {
-      total: roles.value.length,
-      enUso: activeRolesCount.value,
-      lista: roles.value.map(r => ({
-        id: r.id,
-        nombre: r.name,
-        descripcion: r.description,
-        usuariosAsignados: r.users_count || 0,
-        permisos: r.permissions || []
-      }))
-    },
-    
-    // Permisos disponibles (módulos)
-    permisosDisponibles: permissionsModules.value.map(p => ({
-      id: p.id,
-      nombre: p.name,
-      descripcion: p.description
-    })),
+    // Sedes disponibles
+    sedes: warehouses.value.map(w => ({ id: w.id, nombre: w.name })),
     
     // Estado de modales
     modales: {
       usuarioAbierto: showUserModal.value,
-      rolAbierto: showRoleModal.value,
       passwordAbierto: showPasswordModal.value,
       usuarioEditando: selectedUser.value ? {
         id: selectedUser.value.id,
         nombre: selectedUser.value.name
-      } : null,
-      rolEditando: selectedRole.value ? {
-        id: selectedRole.value.id,
-        nombre: selectedRole.value.name
       } : null
     },
     
@@ -764,14 +1655,6 @@ const updateAIContext = () => {
 }
 
 const registerAIActions = () => {
-  // Cambiar pestaña
-  uiContextStore.registerAction('cambiarPestanaUsuarios', ({ pestana }) => {
-    const tab = pestana.toLowerCase().includes('rol') ? 'roles' : 'users'
-    activeTab.value = tab
-    updateAIContext()
-    return { success: true, message: `Cambiado a pestaña de ${tab === 'roles' ? 'Roles' : 'Usuarios'}` }
-  })
-  
   // Listar usuarios
   uiContextStore.registerAction('listarUsuarios', () => {
     const lista = users.value.map(u => ({
@@ -787,21 +1670,6 @@ const registerAIActions = () => {
     }
   })
   
-  // Listar roles
-  uiContextStore.registerAction('listarRoles', () => {
-    const lista = roles.value.map(r => ({
-      nombre: r.name,
-      descripcion: r.description,
-      usuariosAsignados: r.users_count || 0,
-      permisos: (r.permissions || []).length
-    }))
-    return {
-      success: true,
-      message: `Hay ${roles.value.length} roles configurados.`,
-      roles: lista
-    }
-  })
-  
   // Abrir modal crear usuario
   uiContextStore.registerAction('abrirCrearUsuario', () => {
     if (!canCreateMoreUsers.value) {
@@ -814,17 +1682,7 @@ const registerAIActions = () => {
     updateAIContext()
     return { 
       success: true, 
-      message: 'Modal de nuevo usuario abierto. Campos: nombre, email, cédula, teléfono, contraseña, rol.' 
-    }
-  })
-  
-  // Abrir modal crear rol
-  uiContextStore.registerAction('abrirCrearRol', () => {
-    openCreateRoleModal()
-    updateAIContext()
-    return { 
-      success: true, 
-      message: 'Modal de nuevo rol abierto. Debes indicar nombre y seleccionar los permisos/módulos.' 
+      message: 'Modal de nuevo usuario abierto. Campos: nombre, email, cédula, teléfono, contraseña, rol, sede.' 
     }
   })
   
@@ -835,19 +1693,12 @@ const registerAIActions = () => {
     return { success: true, message: 'Modal de usuario cerrado.' }
   })
   
-  uiContextStore.registerAction('cerrarModalRol', () => {
-    closeRoleModal()
-    updateAIContext()
-    return { success: true, message: 'Modal de rol cerrado.' }
-  })
-  
   // Llenar campo de usuario
   uiContextStore.registerAction('llenarCampoUsuario', ({ campo, valor }) => {
     if (!showUserModal.value) {
       return { success: false, message: 'Primero debes abrir el modal de crear usuario.' }
     }
     
-    // Usar el ref del modal para llenar el campo
     if (!userModalRef.value) {
       return { success: false, message: 'Modal no disponible.' }
     }
@@ -866,12 +1717,26 @@ const registerAIActions = () => {
       }
     }
     
+    // Mapear sede por nombre
+    if (campo.toLowerCase() === 'sede' || campo.toLowerCase() === 'warehouse_id') {
+      const sedeEncontrada = warehouses.value.find(w =>
+        w.id.toString() === valor ||
+        w.name.toLowerCase().includes(valor.toLowerCase())
+      )
+      if (sedeEncontrada) {
+        userModalRef.value.setFieldValue('warehouse_id', sedeEncontrada.id)
+        return { success: true, message: `Sede asignada: ${sedeEncontrada.name}` }
+      } else {
+        return { success: false, message: `No encontré la sede "${valor}". Sedes disponibles: ${warehouses.value.map(w => w.name).join(', ')}` }
+      }
+    }
+    
     const result = userModalRef.value.setFieldValue(campo, valor)
     if (result) {
       return { success: true, message: `Campo ${campo} establecido: ${campo === 'password' ? '***' : valor}` }
     }
     
-    return { success: false, message: `Campo "${campo}" no reconocido. Usa: nombre, email, password, rol, cedula, telefono` }
+    return { success: false, message: `Campo "${campo}" no reconocido. Usa: nombre, email, password, rol, sede, cedula, telefono` }
   })
   
   // Guardar usuario
@@ -974,7 +1839,7 @@ const registerAIActions = () => {
 }
 
 // Observar cambios para actualizar contexto
-watch([users, roles, activeTab, showUserModal, showRoleModal], () => {
+watch([users, roles, showUserModal], () => {
   updateAIContext()
 }, { deep: true })
 

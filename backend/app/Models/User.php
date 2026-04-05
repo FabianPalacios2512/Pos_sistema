@@ -24,6 +24,7 @@ class User extends Authenticatable
         'cc',
         'password',
         'role_id',
+        'warehouse_id',
         'phone',
         'active',
         'last_login',
@@ -61,6 +62,11 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(\App\Models\Warehouse::class);
     }
 
     public function sales()

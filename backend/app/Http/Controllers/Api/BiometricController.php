@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BiometricProfile;
 use App\Models\AttendanceLog;
+use App\Models\CashSession;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -264,28 +265,21 @@ class BiometricController extends Controller
             }
 
             if ($eventType === 'exit' && $onBreak) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Debe finalizar el break antes de registrar la salida.',
-                ], 422);
-            }
-
-            // Guardar imagen de auditoría
-            $capturedImagePath = null;
-            if ($request->image) {
-                $imageData = $this->decodeBase64Image($request->image);
-                if ($imageData) {
-                    $filename = 'attendance/' . $request->user_id . '_' . $request->event_type . '_' . time() . '.' . $imageData['extension'];
-                    Storage::disk('local')->put($filename, $imageData['data']);
-                    $capturedImagePath = $filename;
-                }
+                // Auto-cerrar break abierto al registrar salida
+                AttendanceLog::create([
+                    'user_id'             => $request->user_id,
+                    'event_type'          => 'break_end',
+                    'event_at'            => now(),
+                    'verification_score'  => $request->verification_score,
+                    'ip_address'          => $request->ip(),
+                    'user_agent'          => $request->userAgent(),
+                ]);
             }
 
             $log = AttendanceLog::create([
                 'user_id'             => $request->user_id,
                 'event_type'          => $request->event_type,
                 'event_at'            => now(),
-                'captured_image_path' => $capturedImagePath,
                 'verification_score'  => $request->verification_score,
                 'ip_address'          => $request->ip(),
                 'user_agent'          => $request->userAgent(),
@@ -310,9 +304,16 @@ class BiometricController extends Controller
                 ],
             ], 201);
         } catch (\Exception $e) {
+            \Log::error('Error en recordAttendance', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => $request->user_id,
+                'event_type' => $request->event_type,
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Error al registrar asistencia',
+                'message' => 'Error al registrar asistencia: ' . $e->getMessage(),
                 'error'   => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -345,6 +346,8 @@ class BiometricController extends Controller
                 'event_type'         => $log->event_type,
                 'event_at'           => $log->event_at,
                 'verification_score' => (float) $log->verification_score,
+                'closed_by'          => $log->closed_by ?? 'user',
+                'is_auto_closed'     => (bool) $log->is_auto_closed,
             ]);
 
             return response()->json([
@@ -424,6 +427,55 @@ class BiometricController extends Controller
                 'success' => false,
                 'message' => 'Error al eliminar perfil biométrico',
                 'error'   => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Check if user can end their shift (must close cash register first)
+     */
+    public function checkCashBeforeExit(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'user_id es requerido',
+            ], 422);
+        }
+
+        try {
+            $userId = $request->user_id;
+
+            $openSession = CashSession::where('user_id', $userId)
+                ->where('status', 'open')
+                ->with('warehouse:id,name')
+                ->first();
+
+            if ($openSession) {
+                return response()->json([
+                    'success' => true,
+                    'can_exit' => true,
+                    'has_open_cash' => true,
+                    'warehouse_name' => $openSession->warehouse?->name ?? 'Principal',
+                    'opened_at' => $openSession->opened_at,
+                    'message' => 'Tienes una caja abierta en la sede ' . ($openSession->warehouse?->name ?? 'Principal') . '. Se recomienda realizar el cierre de caja antes de finalizar la jornada.',
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'can_exit' => true,
+                'has_open_cash' => false,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al verificar estado de caja',
+                'error' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -515,6 +567,110 @@ class BiometricController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al buscar el usuario',
+                'error'   => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Actualizar un registro de asistencia (admin)
+     */
+    public function updateAttendanceLog(Request $request, int $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'event_at' => 'required|date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Datos inválidos',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $log = AttendanceLog::findOrFail($id);
+            $log->event_at = Carbon::parse($request->event_at);
+            $log->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registro de asistencia actualizado',
+                'data'    => [
+                    'id'         => $log->id,
+                    'user_id'    => $log->user_id,
+                    'event_type' => $log->event_type,
+                    'event_at'   => $log->event_at,
+                ],
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registro no encontrado',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar registro',
+                'error'   => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Eliminar un registro de asistencia (admin)
+     */
+    public function deleteAttendanceLog(int $id)
+    {
+        try {
+            $log = AttendanceLog::findOrFail($id);
+            $userName = $log->user?->name ?? 'Desconocido';
+            $eventType = $log->event_type;
+            $log->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Registro de {$eventType} de {$userName} eliminado",
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registro no encontrado',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar registro',
+                'error'   => $e->getMessage(),
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Eliminar todos los registros de asistencia de un usuario en una fecha (admin)
+     */
+    public function deleteUserAttendanceLogs(Request $request, int $userId)
+    {
+        try {
+            $date = $request->input('date', today()->toDateString());
+
+            $deleted = AttendanceLog::where('user_id', $userId)
+                ->whereDate('event_at', $date)
+                ->delete();
+
+            $user = User::find($userId);
+            $userName = $user?->name ?? 'Desconocido';
+
+            return response()->json([
+                'success' => true,
+                'message' => "Se eliminaron {$deleted} registros de {$userName} del {$date}",
+                'deleted_count' => $deleted,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar registros',
                 'error'   => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

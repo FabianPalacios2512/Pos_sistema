@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('attendance_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->enum('event_type', ['entry', 'exit'])->comment('Tipo de evento: entrada o salida');
+            $table->enum('event_type', ['entry', 'exit', 'break_start', 'break_end'])->comment('Tipo de evento: entrada, salida, inicio/fin de break');
             $table->timestamp('event_at')->useCurrent()->comment('Momento exacto del punteo');
             $table->text('captured_image_path')->nullable()->comment('Ruta de imagen capturada para auditoría');
             $table->decimal('verification_score', 5, 4)->comment('Distancia euclidiana (0=perfecto, <0.4=match)');

@@ -728,8 +728,8 @@
             </div>
           </div>
 
-          <!-- Estadísticas de devoluciones y gastos (si existen) -->
-          <div v-if="auditData?.statistics && (auditData.statistics.total_returns > 0 || auditData.statistics.total_expenses > 0)" class="grid grid-cols-2 gap-3 mb-6">
+          <!-- Estadísticas de devoluciones, gastos, ingresos y abonos (si existen) -->
+          <div v-if="auditData?.statistics && (auditData.statistics.total_returns > 0 || auditData.statistics.total_expenses > 0 || auditData.statistics.total_abonos > 0 || auditData.statistics.total_cash_incomes > 0 || auditData.statistics.total_cash_egresos > 0)" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
             <div v-if="auditData.statistics.total_returns > 0" class="bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/10 p-3 rounded-xl border border-amber-200/60 dark:border-amber-800/30 text-center">
               <p class="text-xl font-semibold text-amber-900 dark:text-amber-300">{{ auditData.statistics.total_returns }}</p>
               <p class="text-xs font-medium text-amber-700 dark:text-amber-400">Devoluciones</p>
@@ -739,6 +739,21 @@
               <p class="text-xl font-semibold text-rose-900 dark:text-rose-300">{{ auditData.statistics.total_expenses }}</p>
               <p class="text-xs font-medium text-rose-700 dark:text-rose-400">Gastos</p>
               <p class="text-xs text-rose-600 dark:text-rose-500">-${{ parseFloat(auditData.statistics.total_expenses_amount || 0).toLocaleString() }}</p>
+            </div>
+            <div v-if="auditData.statistics.total_cash_incomes > 0" class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-xl border border-emerald-200/60 dark:border-emerald-800/30 text-center">
+              <p class="text-xl font-semibold text-emerald-900 dark:text-emerald-300">{{ auditData.statistics.total_cash_incomes }}</p>
+              <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Ingresos Caja</p>
+              <p class="text-xs text-emerald-600 dark:text-emerald-500">+${{ parseFloat(auditData.statistics.total_cash_incomes_amount || 0).toLocaleString() }}</p>
+            </div>
+            <div v-if="auditData.statistics.total_cash_egresos > 0" class="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/20 dark:to-orange-800/10 p-3 rounded-xl border border-orange-200/60 dark:border-orange-800/30 text-center">
+              <p class="text-xl font-semibold text-orange-900 dark:text-orange-300">{{ auditData.statistics.total_cash_egresos }}</p>
+              <p class="text-xs font-medium text-orange-700 dark:text-orange-400">Egresos Caja</p>
+              <p class="text-xs text-orange-600 dark:text-orange-500">-${{ parseFloat(auditData.statistics.total_cash_egresos_amount || 0).toLocaleString() }}</p>
+            </div>
+            <div v-if="auditData.statistics.total_abonos > 0" class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-800/10 p-3 rounded-xl border border-emerald-200/60 dark:border-emerald-800/30 text-center">
+              <p class="text-xl font-semibold text-emerald-900 dark:text-emerald-300">{{ auditData.statistics.total_abonos }}</p>
+              <p class="text-xs font-medium text-emerald-700 dark:text-emerald-400">Abonos</p>
+              <p class="text-xs text-emerald-600 dark:text-emerald-500">+${{ parseFloat(auditData.statistics.total_abonos_amount || 0).toLocaleString() }}</p>
             </div>
           </div>
 
@@ -754,6 +769,9 @@
                     <path v-else-if="event.type === 'sale'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                     <path v-else-if="event.type === 'return'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                     <path v-else-if="event.type === 'expense'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    <path v-else-if="event.type === 'cash-income'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    <path v-else-if="event.type === 'cash-expense'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    <path v-else-if="event.type === 'abono'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
                     <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </div>
@@ -785,6 +803,22 @@
                   </div>
                   <div v-if="event.type === 'expense' && event.details.payment_method" class="text-xs text-gray-400 dark:text-gray-600">
                     Método: {{ event.details.payment_method }}
+                  </div>
+                  <div v-if="(event.type === 'cash-income' || event.type === 'cash-expense') && event.details.reference" class="text-sm text-gray-500 dark:text-gray-500">
+                    Ref: {{ event.details.reference }}
+                  </div>
+                  <div v-if="(event.type === 'cash-income' || event.type === 'cash-expense') && event.details.notes" class="text-sm text-gray-500 dark:text-gray-500 italic">
+                    {{ event.details.notes }}
+                  </div>
+                  <!-- Detalles de abonos -->
+                  <div v-if="event.type === 'abono' && event.details.method" class="text-sm text-gray-600 dark:text-gray-400">
+                    Método: {{ event.details.method }}
+                  </div>
+                  <div v-if="event.type === 'abono' && event.details.reference" class="text-sm text-gray-500 dark:text-gray-500">
+                    Ref: {{ event.details.reference }}
+                  </div>
+                  <div v-if="event.type === 'abono' && event.details.notes" class="text-sm text-gray-500 dark:text-gray-500 italic">
+                    {{ event.details.notes }}
                   </div>
                 </div>
               </div>
@@ -911,7 +945,10 @@ const uniqueUsers = computed(() => {
 
 const totalCashAmount = computed(() => {
   return activeSessions.value.reduce((total, session) => {
-    return total + parseFloat(session.opening_amount || 0) + parseFloat(session.total_sales || 0) - parseFloat(session.total_expenses || 0)
+    const expected = session.expected_amount !== undefined && session.expected_amount !== null
+      ? parseFloat(session.expected_amount || 0)
+      : parseFloat(session.opening_amount || 0) + parseFloat(session.cash_sales || 0) + parseFloat(session.closing_breakdown?.manual_cash_incomes || session.closing_breakdown?.cash_movements?.ingresos || 0) - parseFloat(session.total_expenses || 0) - parseFloat(session.closing_breakdown?.manual_cash_egresos || session.closing_breakdown?.cash_movements?.egresos || 0)
+    return total + expected
   }, 0)
 })
 
@@ -1096,7 +1133,7 @@ const viewSessionDetails = (session) => {
 // Métodos para cálculos de cierre
 const getDifference = () => {
   if (!closeForm.value.actual_amount || !sessionToClose.value) return 0
-  const expected = parseFloat(sessionToClose.value.opening_amount || 0) + parseFloat(sessionToClose.value.cash_sales || 0)
+  const expected = parseFloat(sessionToClose.value.expected_amount || 0)
   const actual = parseFloat(closeForm.value.actual_amount)
   return actual - expected
 }
@@ -1190,6 +1227,9 @@ const getEventIconClass = (type) => {
     sale: 'bg-blue-500', 
     return: 'bg-orange-500',
     expense: 'bg-rose-500',
+    'cash-income': 'bg-emerald-500',
+    'cash-expense': 'bg-orange-500',
+    abono: 'bg-emerald-500',
     closing: 'bg-red-500'
   }
   return classes[type] || 'bg-gray-500'
@@ -1230,7 +1270,7 @@ const closeSession = async (session) => {
   sessionToClose.value = session
   
   // Pre-fill form with calculated values (como strings)
-  const expectedCash = parseFloat(session.opening_amount || 0) + parseFloat(session.cash_sales || 0)
+  const expectedCash = parseFloat(session.expected_amount || 0)
   const finalAmount = expectedCash > 0 ? expectedCash : parseFloat(session.opening_amount || 0)
   closeForm.value = {
     actual_amount: finalAmount.toFixed(2), // String con 2 decimales
@@ -1245,7 +1285,7 @@ const closeSession = async (session) => {
 const showCloseModal = (session) => {
   sessionToClose.value = session
   // Pre-rellenar formulario con datos calculados (como strings para el backend)
-  const expectedCash = parseFloat(session.opening_amount || 0) + parseFloat(session.cash_sales || 0)
+  const expectedCash = parseFloat(session.expected_amount || 0)
   closeForm.value = {
     actual_amount: expectedCash.toFixed(2), // Convertir a string con 2 decimales
     closing_notes: '',
@@ -1377,12 +1417,14 @@ const generateReport = async (session) => {
       ['Monto Inicial', `$${parseFloat(session.opening_amount || 0).toLocaleString()}`],
       ['Total Ventas', `$${parseFloat(session.total_sales || 0).toLocaleString()}`],
       ['Ventas en Efectivo', `$${parseFloat(session.cash_sales || 0).toLocaleString()}`],
-      ['Efectivo Esperado', `$${(parseFloat(session.opening_amount || 0) + parseFloat(session.cash_sales || 0)).toLocaleString()}`]
+      ['Ingresos Manuales', `$${parseFloat(session.closing_breakdown?.manual_cash_incomes || session.closing_breakdown?.cash_movements?.ingresos || 0).toLocaleString()}`],
+      ['Egresos Manuales', `$${parseFloat(session.closing_breakdown?.manual_cash_egresos || session.closing_breakdown?.cash_movements?.egresos || 0).toLocaleString()}`],
+      ['Efectivo Esperado', `$${parseFloat(session.expected_amount || 0).toLocaleString()}`]
     ]
     
     if (session.status === 'closed') {
       financialData.push(['Efectivo Contado', `$${parseFloat(session.closing_amount || 0).toLocaleString()}`])
-      const diferencia = parseFloat(session.closing_amount || 0) - (parseFloat(session.opening_amount || 0) + parseFloat(session.cash_sales || 0))
+      const diferencia = parseFloat(session.closing_amount || 0) - parseFloat(session.expected_amount || 0)
       financialData.push(['Diferencia', `$${diferencia.toLocaleString()}`])
     }
     
@@ -1608,7 +1650,7 @@ const obtenerMiCajaVsEmpleados = () => {
       montoInicial: parseFloat(miSesion.opening_amount || 0),
       ventas: parseFloat(miSesion.total_sales || 0),
       efectivo: parseFloat(miSesion.cash_sales || 0),
-      totalEnCaja: parseFloat(miSesion.opening_amount || 0) + parseFloat(miSesion.total_sales || 0)
+      totalEnCaja: parseFloat(miSesion.expected_amount || 0)
     } : null,
     cajasEmpleados: cajasEmpleados.map(s => ({
       id: s.id,

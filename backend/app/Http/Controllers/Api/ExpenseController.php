@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
+use App\Models\CashMovement;
 use App\Models\CashSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -143,7 +144,20 @@ class ExpenseController extends Controller
                     }
 
                     // Verificar fondos disponibles
-                    $availableCash = $cashSession->opening_amount + $cashSession->cash_sales;
+                    $cashSession->updateSalesTotals();
+
+                    $manualIngresos = CashMovement::where('cash_session_id', $cashSession->id)
+                        ->where('type', 'ingreso')
+                        ->sum('amount');
+
+                    $manualEgresos = CashMovement::where('cash_session_id', $cashSession->id)
+                        ->where('type', 'egreso')
+                        ->sum('amount');
+
+                    $existingCashExpenses = Expense::where('cash_session_id', $cashSession->id)
+                        ->sum('amount');
+
+                    $availableCash = $cashSession->opening_amount + $cashSession->cash_sales + $manualIngresos - $existingCashExpenses - $manualEgresos;
 
                     if ($data['amount'] > $availableCash) {
                         return response()->json([

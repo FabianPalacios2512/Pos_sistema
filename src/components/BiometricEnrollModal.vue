@@ -137,9 +137,24 @@
                 <p class="text-[11px] text-gray-700 dark:text-zinc-300">Sin perfil biométrico. Proceda con la captura facial.</p>
               </div>
 
-              <!-- Capture success alert -->
-              <div v-if="capturedImage && phase === 'capture'" class="bg-white dark:bg-zinc-900 rounded-lg p-2.5 border border-gray-200 dark:border-zinc-700 border-l-4 border-l-emerald-600 dark:border-l-emerald-500">
-                <p class="text-[11px] text-gray-700 dark:text-zinc-300">Descriptor facial calculado. Puede guardar el perfil.</p>
+              <!-- Capture success alert + Face identity check -->
+              <div v-if="capturedImage && phase === 'capture'" class="space-y-2">
+                <!-- Checking identity -->
+                <div v-if="!faceMatchResult" class="bg-white dark:bg-zinc-900 rounded-lg p-2.5 border border-gray-200 dark:border-zinc-700 border-l-4 border-l-blue-500">
+                  <div class="flex items-center gap-2">
+                    <svg class="animate-spin w-3 h-3 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    <p class="text-[11px] text-gray-700 dark:text-zinc-300">Verificando identidad facial...</p>
+                  </div>
+                </div>
+                <!-- DUPLICATE: Face matches another user -->
+                <div v-else-if="faceMatchResult.matched" class="bg-white dark:bg-zinc-900 rounded-lg p-2.5 border border-gray-200 dark:border-zinc-700 border-l-4 border-l-rose-500">
+                  <p class="text-[11px] font-bold text-rose-700 dark:text-rose-400">⚠️ Rostro ya registrado</p>
+                  <p class="text-[11px] text-gray-700 dark:text-zinc-300 mt-0.5">Este rostro pertenece a <strong>{{ faceMatchResult.name }}</strong> (CC: {{ faceMatchResult.cc }}). No se permite enrolar la misma cara bajo otro usuario.</p>
+                </div>
+                <!-- OK: No matches, safe to enroll -->
+                <div v-else class="bg-white dark:bg-zinc-900 rounded-lg p-2.5 border border-gray-200 dark:border-zinc-700 border-l-4 border-l-emerald-600 dark:border-l-emerald-500">
+                  <p class="text-[11px] text-gray-700 dark:text-zinc-300">✅ Rostro verificado — no coincide con ningún perfil existente. Puede guardar el perfil.</p>
+                </div>
               </div>
             </div>
 
@@ -164,10 +179,10 @@
               <!-- Capture: Retake + Save -->
               <button v-if="phase === 'capture'"
                       @click="saveProfile"
-                      :disabled="saving"
-                      class="w-full px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 disabled:opacity-50 text-white dark:text-gray-900 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                      :disabled="saving || !faceMatchResult || faceMatchResult.matched"
+                      class="w-full px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 <svg v-if="saving" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                {{ saving ? 'Guardando...' : 'Guardar Perfil' }}
+                {{ saving ? 'Guardando...' : faceMatchResult?.matched ? 'Bloqueado — Rostro duplicado' : 'Guardar Perfil' }}
               </button>
               <button v-if="phase === 'capture' && !saving"
                       @click="retake"
@@ -324,6 +339,9 @@ const capturedDescriptor = ref(null)
 const saving = ref(false)
 const autoCapturing = ref(false)
 const autoCaptureCountdown = ref(0)
+
+// Face identity check result after capture
+const faceMatchResult = ref(null) // null | { matched: false } | { matched: true, name, cc, distance }
 let faceStableStart = null
 let autoCaptureTick = null
 const AUTO_CAPTURE_DELAY = 2000 // ms de rostro estable antes de capturar
@@ -430,7 +448,8 @@ const startAutoCaptureWatch = () => {
         autoCaptureCountdown.value = 0
         stopAutoCaptureWatch()
         await captureProfile()
-        if (capturedImage.value) {
+        // Only auto-save if face identity check passed (no duplicate)
+        if (capturedImage.value && faceMatchResult.value && !faceMatchResult.value.matched) {
           await saveProfile()
         }
         autoCapturing.value = false
@@ -464,12 +483,50 @@ const captureProfile = async () => {
 
   capturedDescriptor.value = descriptor
   capturedImage.value = captureImage(videoRef.value)
+  faceMatchResult.value = null
   phase.value = 'capture'
+
+  // Run face identification against all enrolled profiles
+  try {
+    const allResponse = await biometricService.getAllDescriptors()
+    if (allResponse.success && allResponse.data?.length > 0) {
+      const faceapi = await import('face-api.js')
+      const newDesc = new Float32Array(descriptor)
+      let bestMatch = null
+      let bestDistance = Infinity
+
+      for (const profile of allResponse.data) {
+        if (profile.user_id === foundUser.value.id) continue
+        const existingDesc = new Float32Array(profile.descriptors)
+        const distance = faceapi.euclideanDistance(newDesc, existingDesc)
+        if (distance < bestDistance) {
+          bestDistance = distance
+          bestMatch = profile
+        }
+      }
+
+      if (bestMatch && bestDistance < 0.4) {
+        faceMatchResult.value = {
+          matched: true,
+          name: bestMatch.name,
+          cc: bestMatch.cc,
+          distance: Math.round(bestDistance * 10000) / 10000
+        }
+      } else {
+        faceMatchResult.value = { matched: false }
+      }
+    } else {
+      faceMatchResult.value = { matched: false }
+    }
+  } catch (e) {
+    faceMatchResult.value = { matched: false }
+  }
 }
 
 const retake = async () => {
   capturedImage.value = null
   capturedDescriptor.value = null
+  faceMatchResult.value = null
   phase.value = 'camera'
   await nextTick()
   if (overlayRef.value && videoRef.value) {
@@ -531,6 +588,7 @@ const goBackToSearch = () => {
   foundUser.value = {}
   capturedImage.value = null
   capturedDescriptor.value = null
+  faceMatchResult.value = null
   searchError.value = ''
 }
 
@@ -543,6 +601,7 @@ const handleClose = () => {
   foundUser.value = {}
   capturedImage.value = null
   capturedDescriptor.value = null
+  faceMatchResult.value = null
   emit('close')
 }
 

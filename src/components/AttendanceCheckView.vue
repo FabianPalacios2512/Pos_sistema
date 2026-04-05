@@ -141,6 +141,11 @@
                       <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                       Turno en curso
                     </span>
+                    <span v-else-if="emp.lastExit && emp.isAutoClosed"
+                          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-800">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                      Cierre Sistema
+                    </span>
                     <span v-else-if="emp.lastExit"
                           class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-800">
                       Jornada completa
@@ -189,6 +194,10 @@
                             <span class="text-xs font-medium"
                                   :class="getScoreColor(log.verification_score)">
                               Confianza: {{ getScorePercent(log.verification_score) }}%
+                            </span>
+                            <span v-if="log.is_auto_closed"
+                                  class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                              Sistema
                             </span>
                           </div>
                           <!-- Score label -->
@@ -634,6 +643,7 @@ const groupedHistory = computed(() => {
     const firstEntry = entries[0] || null
     const lastExit = exits[exits.length - 1] || null
     const isActive = entries.length > 0 && exits.length === 0
+    const isAutoClosed = lastExit?.is_auto_closed === true
     const onBreak = breakStarts.length > breakEnds.length
 
     let workedMs = 0
@@ -660,6 +670,7 @@ const groupedHistory = computed(() => {
       firstEntry,
       lastExit,
       isActive,
+      isAutoClosed,
       onBreak,
       workedMs,
       workedLabel: firstEntry ? `${workedHours}h ${workedMinutes}m` : '—',
@@ -899,13 +910,10 @@ const registerEvent = async (eventType) => {
 
   recording.value = true
   try {
-    const capturedImg = captureImage(verifyVideoRef.value)
-
     const response = await biometricService.recordAttendance(
       identifiedUser.value.user_id,
       eventType,
-      identifiedUser.value.distance,
-      capturedImg
+      identifiedUser.value.distance
     )
 
     showToast(

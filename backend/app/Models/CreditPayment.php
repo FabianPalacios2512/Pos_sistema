@@ -12,8 +12,10 @@ class CreditPayment extends Model
     protected $fillable = [
         'customer_id',
         'user_id',
+        'cash_session_id',
         'amount',
         'method',
+        'reference',
         'notes'
     ];
 
@@ -31,6 +33,11 @@ class CreditPayment extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function cashSession()
+    {
+        return $this->belongsTo(CashSession::class);
     }
 
     public function recordedBy()

@@ -29,3 +29,11 @@ Schedule::command('conversation:clean --hours=1')
     ->hourly()
     ->withoutOverlapping()
     ->onOneServer();
+
+// ⏰ CRON: Auto-cierre de jornadas y cajas abiertas
+// Ejecutar a medianoche para cerrar turnos y cajas pendientes
+Schedule::command('shifts:auto-close')
+    ->dailyAt('00:00')
+    ->timezone('America/Bogota')
+    ->withoutOverlapping()
+    ->onOneServer();

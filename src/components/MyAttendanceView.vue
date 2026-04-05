@@ -72,13 +72,15 @@
               <!-- CTA -->
               <div v-if="suggestedAction" class="mt-8 flex items-center gap-3">
                 <button
-                  @click="openModal(suggestedAction)"
-                  class="py-3.5 px-10 rounded-md bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-400 text-white text-sm font-semibold transition-colors flex items-center gap-2.5"
+                  @click="handleCtaClick(suggestedAction)"
+                  :disabled="checkingCash"
+                  class="py-3.5 px-10 rounded-md bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-400 text-white text-sm font-semibold transition-colors flex items-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <svg v-if="checkingCash" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                  <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 0 0 3.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0 1 20.25 6v1.5M20.25 16.5V18A2.25 2.25 0 0 1 18 20.25h-1.5M3.75 16.5V18A2.25 2.25 0 0 0 6 20.25h1.5M9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z"/>
                   </svg>
-                  {{ ctaLabel }}
+                  {{ checkingCash ? 'Verificando caja...' : ctaLabel }}
                 </button>
                 <button
                   v-if="suggestedAction === 'exit' && !onBreak"
@@ -87,6 +89,14 @@
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg>
                   Break
+                </button>
+                <button
+                  v-if="onBreak"
+                  @click="openModal('break_end')"
+                  class="py-3.5 px-5 rounded-md bg-white dark:bg-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-700 text-amber-600 dark:text-amber-400 text-sm font-medium border border-amber-200 dark:border-amber-700 transition-colors flex items-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"/></svg>
+                  Fin Break
                 </button>
               </div>
 
@@ -159,6 +169,84 @@
       </template>
   </div>
 
+  <!-- ===== MODAL: Cash Open Recommendation (Flat Enterprise) ===== -->
+  <Teleport to="body">
+    <Transition
+      enter-active-class="transition-all duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-all duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="showCashBlockModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-[2px]" @click="showCashBlockModal = false"></div>
+
+        <div class="relative bg-white dark:bg-zinc-900 rounded-md max-w-lg w-full border border-gray-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
+
+          <!-- Header -->
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-800">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-md bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-gray-900 dark:text-white uppercase tracking-tight">Caja Abierta Detectada</h3>
+                <p class="text-sm text-gray-500 dark:text-zinc-400 mt-0.5">Recomendación antes de finalizar jornada</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="px-6 py-5">
+            <!-- Info grid -->
+            <div class="rounded-md border border-gray-200 dark:border-zinc-700 divide-y divide-gray-200 dark:divide-zinc-700">
+              <div class="flex">
+                <div class="w-1/2 px-4 py-3 border-r border-gray-200 dark:border-zinc-700">
+                  <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">Sede</p>
+                  <p class="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{{ cashBlockWarehouse }}</p>
+                </div>
+                <div class="w-1/2 px-4 py-3">
+                  <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">Abierta desde</p>
+                  <p class="text-sm font-bold text-gray-900 dark:text-white mt-0.5">{{ cashOpenedAtFormatted }}</p>
+                </div>
+              </div>
+              <div class="px-4 py-3">
+                <p class="text-[11px] font-semibold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">Estado</p>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                  <p class="text-sm font-semibold text-amber-600 dark:text-amber-400">Sesión de caja activa sin cerrar</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recommendation -->
+            <div class="mt-4 px-4 py-3 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/50 rounded-md">
+              <p class="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
+                <span class="font-bold">Recomendación:</span> Realice el cierre de caja y arqueo antes de finalizar su jornada para evitar inconsistencias en el cuadre del día.
+              </p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-800 flex items-center justify-end gap-3">
+            <button @click="proceedExitAnyway"
+              class="px-5 py-2.5 text-sm font-semibold text-gray-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-md hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+              Hacer Después
+            </button>
+            <button @click="goToPos"
+              class="px-5 py-2.5 text-sm font-bold text-white bg-gray-900 dark:bg-gray-700 hover:bg-black dark:hover:bg-gray-600 rounded-md transition-colors flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+              Cerrar Caja
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
+
   <!-- ===== MODAL: Camera Verification ===== -->
   <Teleport to="body">
     <Transition name="modal">
@@ -186,6 +274,7 @@
             <!-- Camera -->
             <div class="relative bg-[#111827] dark:bg-zinc-950" style="min-height: 420px;">
               <video ref="videoRef" class="absolute inset-0 w-full h-full object-cover" playsinline muted></video>
+              <canvas ref="overlayRef" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
 
               <!-- Loading -->
               <div v-if="!isCameraActive" class="absolute inset-0 flex items-center justify-center">
@@ -338,9 +427,12 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 import { useFaceRecognition } from '../composables/useFaceRecognition.js'
 import biometricService from '../services/biometricService.js'
 import authService from '../services/authService.js'
+
+const router = useRouter()
 
 defineOptions({ inheritAttrs: false })
 
@@ -348,16 +440,19 @@ const {
   isModelLoading,
   modelError,
   isCameraActive,
+  faceDetected,
   MATCH_THRESHOLD,
   loadModels,
   startCamera,
   stopCamera,
   compareFace,
   captureImage,
+  startFaceGuide,
 } = useFaceRecognition()
 
 // ── Refs ──
 const videoRef = ref(null)
+const overlayRef = ref(null)
 const ready = ref(false)
 const isEnrolled = ref(false)
 const myDescriptor = ref(null)
@@ -375,6 +470,12 @@ const verificationDistance = ref(null)
 const scanning = ref(false)
 const recording = ref(false)
 const showScanHint = ref(false)
+
+// Cash validation before exit
+const checkingCash = ref(false)
+const showCashBlockModal = ref(false)
+const cashBlockWarehouse = ref('')
+const cashBlockOpenedAt = ref('')
 
 let scanInterval = null
 let scanHintTimer = null
@@ -436,7 +537,6 @@ const suggestedAction = computed(() => {
   const hasExit = types.includes('exit')
   if (hasEntry && hasExit) return null
   if (!hasEntry) return 'entry'
-  if (onBreak.value) return 'break_end'
   return 'exit'
 })
 
@@ -587,6 +687,43 @@ const refreshHistory = async () => {
   } catch { /* silent */ }
 }
 
+// ── Cash validation before exit ──
+const handleCtaClick = async (action) => {
+  if (action === 'exit') {
+    checkingCash.value = true
+    try {
+      const res = await biometricService.checkCashBeforeExit(userId.value)
+      if (res.success && res.has_open_cash) {
+        cashBlockWarehouse.value = res.warehouse_name || 'desconocida'
+        cashBlockOpenedAt.value = res.opened_at || ''
+        showCashBlockModal.value = true
+        return
+      }
+    } catch {
+      // If check fails, allow exit attempt (backend will validate again)
+    } finally {
+      checkingCash.value = false
+    }
+  }
+  openModal(action)
+}
+
+const cashOpenedAtFormatted = computed(() => {
+  if (!cashBlockOpenedAt.value) return '—'
+  const d = new Date(cashBlockOpenedAt.value)
+  return d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase()
+})
+
+const goToPos = () => {
+  showCashBlockModal.value = false
+  router.push({ name: 'POS' })
+}
+
+const proceedExitAnyway = () => {
+  showCashBlockModal.value = false
+  openModal('exit')
+}
+
 // ── Modal open/close ──
 const openModal = async (action) => {
   if (!myDescriptor.value) return
@@ -610,12 +747,21 @@ const closeModal = () => {
 
 const initCamera = async () => {
   const loaded = await loadModels()
-  if (!loaded) return
+  if (!loaded || !showModal.value) return
   await nextTick()
   if (!videoRef.value) return
   const started = await startCamera(videoRef.value)
-  if (!started) return
-  const begin = () => startScanning()
+  if (!started || !videoRef.value) return
+  const begin = () => {
+    if (!videoRef.value) return
+    // Set up face guide canvas (green box on face)
+    if (overlayRef.value && videoRef.value) {
+      overlayRef.value.width = videoRef.value.videoWidth
+      overlayRef.value.height = videoRef.value.videoHeight
+    }
+    startFaceGuide(videoRef.value, overlayRef.value, 250)
+    startScanning()
+  }
   if (videoRef.value.readyState >= 1) begin()
   else videoRef.value.addEventListener('loadedmetadata', begin, { once: true })
 }
@@ -631,6 +777,8 @@ const startScanning = () => {
 
   scanInterval = setInterval(async () => {
     if (verified.value || recording.value || !isCameraActive.value) return
+    // Only attempt expensive comparison when face is detected by the guide
+    if (!faceDetected.value) { consecutiveMatches = 0; return }
     try {
       const result = await compareFace(videoRef.value, myDescriptor.value)
       if (result && result.match) {
@@ -644,7 +792,7 @@ const startScanning = () => {
         consecutiveMatches = 0
       }
     } catch { /* retry */ }
-  }, 500)
+  }, 350)
 }
 
 const stopScanning = () => {
@@ -659,8 +807,7 @@ const confirmRegistration = async () => {
   if (!verified.value || !pendingAction.value || recording.value) return
   recording.value = true
   try {
-    const img = captureImage(videoRef.value)
-    const res = await biometricService.recordAttendance(userId.value, pendingAction.value, verificationDistance.value, img)
+    const res = await biometricService.recordAttendance(userId.value, pendingAction.value, verificationDistance.value)
     showToast(res.message || 'Registro exitoso', 'success')
     closeModal()
     await refreshHistory()

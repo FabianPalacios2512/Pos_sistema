@@ -290,6 +290,16 @@ const authService = {
         throw error.response?.data || { message: 'Error validando credenciales' };
       }
     }
+  },
+
+  // Verificar contraseña del usuario actual (firma de cierre de caja)
+  async verifyMyPassword(password) {
+    try {
+      const response = await apiClient.post('/auth/verify-password', { password });
+      return response.data;
+    } catch (error) {
+      return { valid: false, message: error.response?.data?.message || 'Contraseña incorrecta' };
+    }
   }
 };
 

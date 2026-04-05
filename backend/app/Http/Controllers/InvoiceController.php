@@ -80,8 +80,17 @@ class InvoiceController extends Controller
             // Vendedor: solo sus facturas de hoy
             if ($this->isVendedor()) {
                 $userId = Auth::id();
-                $query->whereHas('cashSession', function ($q) use ($userId) {
-                    $q->where('user_id', $userId);
+                $userName = Auth::user()->name;
+                $query->where(function ($q) use ($userId, $userName) {
+                    // Facturas con sesión de caja del vendedor
+                    $q->whereHas('cashSession', function ($sub) use ($userId) {
+                        $sub->where('user_id', $userId);
+                    })
+                    // O facturas a crédito creadas por el vendedor (sin sesión de caja)
+                    ->orWhere(function ($sub) use ($userName) {
+                        $sub->whereNull('cash_session_id')
+                            ->where('seller_name', $userName);
+                    });
                 })->whereDate('date', now()->format('Y-m-d'));
             }
 

@@ -19,7 +19,7 @@
     <!-- Contenedor Principal con Chat IA Lateral -->
     <div class="flex flex-1 min-h-0 transition-all duration-300"
          :class="{
-           'lg:ml-[252px]': !sidebarCollapsed,
+           'lg:ml-[264px]': !sidebarCollapsed,
            'lg:ml-[68px]': sidebarCollapsed
          }">
       
@@ -313,7 +313,8 @@ const PlaceholderView = defineAsyncComponent(() => import('../components/Placeho
 // Configuración UI
 const isDarkMode = ref(false)
 const sidebarOpen = ref(false) // Inicia cerrado - handleResize lo abrirá en desktop
-const sidebarCollapsed = ref(localStorage.getItem('pos-sidebar-collapsed') !== 'false') // Persist collapsed state
+const sidebarCollapsed = ref(localStorage.getItem('sidebarOpen') === 'false') // Default: open (sidebarOpen !== 'false')
+watch(sidebarCollapsed, (val) => localStorage.setItem('sidebarOpen', (!val).toString()))
 const isMobileDevice = ref(false) // Detectar dispositivos táctiles
 const currentModule = ref('pos') // Módulo inicial: POS
 const moduleQueryParams = ref({}) // Query params para módulos (ej: {filter: 'inactive'})
@@ -1289,7 +1290,6 @@ const toggleSidebar = () => {
   } else {
     // En desktop: colapsar/expandir
     sidebarCollapsed.value = !sidebarCollapsed.value
-    localStorage.setItem('pos-sidebar-collapsed', sidebarCollapsed.value.toString())
   }
 }
 
@@ -1468,7 +1468,7 @@ const getModuleName = (module) => {
     'intelligent_inventory': 'Inventario Inteligente',
     'customers': 'Clientes',
     'purchase-orders': 'Proveedores',
-    'expenses': 'Gastos Operativos',
+    'expenses': 'Movimientos de Caja',
     'expense-categories': 'Categorías de Gastos',
     'reports': 'Reportes',
     'settings': 'Configuración'
@@ -1593,7 +1593,7 @@ const getModuleDescription = () => {
     customers: 'Base de Clientes • CRM integrado y seguimiento',
     invoices: 'Facturación • Historial completo de ventas',
     'returns-management': 'Devoluciones • Control y seguimiento administrativo',
-    expenses: 'Gastos Operativos • Control de egresos y caja',
+    expenses: 'Movimientos de Caja • Ingresos, egresos y gastos',
     'expense-categories': 'Categorías de Gastos • Organización de egresos',
     users: 'Usuarios • Gestión de accesos y perfiles',
     roles: 'Roles y Permisos • Control de seguridad avanzado',

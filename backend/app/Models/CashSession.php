@@ -48,6 +48,7 @@ class CashSession extends Model
 
     const STATUS_OPEN = 'open';
     const STATUS_CLOSED = 'closed';
+    const STATUS_FORCED_CLOSED = 'forced_closed';
 
     /**
      * Relación con el usuario que maneja la caja
@@ -92,6 +93,22 @@ class CashSession extends Model
     }
 
     /**
+     * Abonos de crédito asociados a esta sesión de caja
+     */
+    public function creditPayments(): HasMany
+    {
+        return $this->hasMany(\App\Models\CreditPayment::class);
+    }
+
+    /**
+     * Movimientos de caja (ingresos/egresos)
+     */
+    public function cashMovements(): HasMany
+    {
+        return $this->hasMany(\App\Models\CashMovement::class);
+    }
+
+    /**
      * Scope para sesiones abiertas
      */
     public function scopeOpen($query)
@@ -105,6 +122,14 @@ class CashSession extends Model
     public function scopeClosed($query)
     {
         return $query->where('status', self::STATUS_CLOSED);
+    }
+
+    /**
+     * Scope para sesiones con cierre forzado pendiente de arqueo
+     */
+    public function scopeForcedClosed($query)
+    {
+        return $query->where('status', self::STATUS_FORCED_CLOSED);
     }
 
     /**
@@ -137,10 +162,13 @@ class CashSession extends Model
 
     /**
      * Calcular el monto esperado en caja
+     * Incluye: apertura + ventas_efectivo + ingresos - gastos - egresos
      */
     public function calculateExpectedAmount()
     {
-        $this->expected_amount = $this->opening_amount + $this->cash_sales - $this->total_expenses;
+        $totalIngresos = $this->cashMovements()->where('type', 'ingreso')->sum('amount');
+        $totalEgresos = $this->cashMovements()->where('type', 'egreso')->sum('amount');
+        $this->expected_amount = $this->opening_amount + $this->cash_sales + $totalIngresos - $this->total_expenses - $totalEgresos;
         return $this->expected_amount;
     }
 
@@ -222,12 +250,17 @@ class CashSession extends Model
         }
 
         // 2. Totales de Abonos (CreditPayments)
-        // Buscamos pagos realizados por este usuario durante la sesión
         $endTime = $this->closed_at ?? now();
-        $creditPayments = \App\Models\CreditPayment::where('user_id', $this->user_id)
-            ->where('payment_date', '>=', $this->opened_at)
-            ->where('payment_date', '<=', $endTime)
-            ->get();
+        // Buscar por cash_session_id primero, fallback a user_id + fecha
+        $creditPayments = \App\Models\CreditPayment::where('cash_session_id', $this->id)->get();
+        if ($creditPayments->isEmpty()) {
+            // Fallback: buscar por user_id y rango de tiempo (sesiones antiguas sin cash_session_id)
+            $creditPayments = \App\Models\CreditPayment::where('user_id', $this->user_id)
+                ->whereNull('cash_session_id')
+                ->where('created_at', '>=', $this->opened_at)
+                ->where('created_at', '<=', $endTime)
+                ->get();
+        }
 
         $paymentCash = 0;
         $paymentCard = 0;
@@ -247,6 +280,10 @@ class CashSession extends Model
         // Actualizar gastos de esta sesión de caja
         $this->total_expenses = $this->expenses()->sum('amount');
 
+        // 4. Totales de Movimientos de Caja (Ingresos/Egresos manuales)
+        $totalIngresos = $this->cashMovements()->where('type', 'ingreso')->sum('amount');
+        $totalEgresos = $this->cashMovements()->where('type', 'egreso')->sum('amount');
+
         // Actualizar closing_breakdown
         $breakdown = $this->closing_breakdown ?? [];
         $breakdown['sales'] = [
@@ -256,6 +293,10 @@ class CashSession extends Model
             'transfer' => $transferSales,
             'invoices_total' => $invoiceCash + $invoiceCard + $invoiceTransfer,
             'credit_payments_total' => $paymentCash + $paymentCard + $paymentTransfer
+        ];
+        $breakdown['cash_movements'] = [
+            'ingresos' => (float) $totalIngresos,
+            'egresos' => (float) $totalEgresos,
         ];
 
         $this->closing_breakdown = $breakdown;

@@ -373,4 +373,28 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Verificar contraseña del usuario autenticado (firma de cierre de caja)
+     */
+    public function verifyMyPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string'
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Contraseña incorrecta'
+            ], 401);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'message' => 'Contraseña verificada'
+        ]);
+    }
 }

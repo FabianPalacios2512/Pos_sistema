@@ -35,10 +35,9 @@ class UsersService {
         phone: userData.phone,
         password: userData.password,
         role_id: userData.role_id,
+        warehouse_id: userData.warehouse_id || null,
         active: userData.active !== undefined ? userData.active : true
       }
-      
-      console.log('📤 Datos que se envían al servidor:', payload)
       
       const response = await apiClient.post(USERS_ENDPOINT, payload)
       return response.data
@@ -57,6 +56,7 @@ class UsersService {
         cc: userData.cc, // Corregido para usar 'cc'
         phone: userData.phone,
         role_id: userData.role_id,
+        warehouse_id: userData.warehouse_id || null,
         active: userData.active
       }
 
@@ -197,13 +197,13 @@ class UsersService {
   // Dashboard de Rendimiento & Auditoría
   // ═══════════════════════════════════════════
 
-  async getDashboardKpis() {
-    const response = await apiClient.get('/users-dashboard/kpis')
+  async getDashboardKpis(params = {}) {
+    const response = await apiClient.get('/users-dashboard/kpis', { params })
     return response.data
   }
 
-  async getUsersWithPerformance() {
-    const response = await apiClient.get('/users-dashboard/with-performance')
+  async getUsersWithPerformance(params = {}) {
+    const response = await apiClient.get('/users-dashboard/with-performance', { params })
     return response.data
   }
 

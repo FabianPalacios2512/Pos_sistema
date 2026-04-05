@@ -130,6 +130,40 @@ class BiometricService {
       throw error
     }
   }
+
+  /**
+   * Verificar si el usuario puede finalizar jornada (caja debe estar cerrada)
+   */
+  async checkCashBeforeExit(userId) {
+    try {
+      const response = await apiClient.post(`${BIOMETRIC_ENDPOINT}/check-cash-before-exit`, {
+        user_id: userId
+      })
+      return response.data
+    } catch (error) {
+      console.error('Error checking cash before exit:', error)
+      throw error
+    }
+  }
+
+  async updateAttendanceLog(logId, eventAt) {
+    const response = await apiClient.put(`${BIOMETRIC_ENDPOINT}/attendance/${logId}`, {
+      event_at: eventAt
+    })
+    return response.data
+  }
+
+  async deleteAttendanceLog(logId) {
+    const response = await apiClient.delete(`${BIOMETRIC_ENDPOINT}/attendance/${logId}`)
+    return response.data
+  }
+
+  async deleteUserAttendanceLogs(userId, date) {
+    const response = await apiClient.delete(`${BIOMETRIC_ENDPOINT}/attendance/user/${userId}`, {
+      params: { date }
+    })
+    return response.data
+  }
 }
 
 export default new BiometricService()

@@ -17,6 +17,9 @@ class AttendanceLog extends Model
         'verification_score',
         'ip_address',
         'user_agent',
+        'closed_by',
+        'is_auto_closed',
+        'auto_close_note',
     ];
 
     protected function casts(): array
@@ -24,6 +27,7 @@ class AttendanceLog extends Model
         return [
             'event_at' => 'datetime',
             'verification_score' => 'decimal:4',
+            'is_auto_closed' => 'boolean',
         ];
     }
 
