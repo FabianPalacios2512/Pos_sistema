@@ -32,67 +32,39 @@
         </div>
       </div>
 
-      <!-- NIVEL 2: KPIs Compactos - Estilo Facturas (neutro y elegante) -->
-      <div class="flex-none flex items-center gap-3">
-        
-        <!-- KPI: Total por Cobrar -->
-        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Total por Cobrar</p>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">${{ formatCurrency(totalDebt) }}</p>
-            </div>
+      <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total por Cobrar</p>
+            <svg class="w-4 h-4 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(totalDebt) }}</p>
+          <p class="text-xs text-rose-500 dark:text-rose-400">Cartera pendiente</p>
         </div>
-
-        <!-- KPI: Clientes con Crédito -->
-        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Clientes Activos</p>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">{{ customersWithDebt }}</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Clientes Activos</p>
+            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ customersWithDebt }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Con crédito vigente</p>
         </div>
-
-        <!-- KPI: Recaudado Hoy -->
-        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Recaudado Hoy</p>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">${{ formatCurrency(todayPayments) }}</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Recaudado Hoy</p>
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(todayPayments) }}</p>
+          <p class="text-xs text-emerald-500 dark:text-emerald-400">Cobrado hoy</p>
         </div>
-
-        <!-- KPI: Mora Promedio -->
-        <div class="flex-1 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl px-4 py-3 hover:bg-gray-100 dark:hover:bg-[#282a2c] transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white dark:bg-[#282a2c] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-[11px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Mora Promedio</p>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">{{ averageDaysOverdue }} días</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Mora Promedio</p>
+            <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ averageDaysOverdue }}<span class="text-base font-normal text-gray-400 dark:text-zinc-600"> días</span></p>
+          <p class="text-xs text-amber-500 dark:text-amber-400">Promedio de atraso</p>
         </div>
       </div>
 

@@ -36,69 +36,40 @@
         
       </div>
 
-      <!-- NIVEL 2: KPIs Enterprise - Compactas, value-first -->
-      <div class="grid grid-cols-4 gap-2.5">
-        
-        <!-- KPI: Facturas del Mes -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-blue-100 dark:border-blue-900/40">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">{{ monthlyInvoices }}</p>
-              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Facturas del mes</p>
-            </div>
+      <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Facturas del Mes</p>
+            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ monthlyInvoices }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Este mes</p>
         </div>
-
-        <!-- KPI: Total Facturado -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-100 dark:border-emerald-900/40">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">${{ formatCurrency(totalInvoiced) }}</p>
-              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Total facturado</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total Facturado</p>
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(totalInvoiced) }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Acumulado del mes</p>
         </div>
-
-        <!-- KPI: Pendientes -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-amber-100 dark:border-amber-900/40">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">{{ pendingInvoices }}</p>
-              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Pendientes</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Pendientes</p>
+            <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ pendingInvoices }}</p>
+          <p class="text-xs text-amber-500 dark:text-amber-400">Requieren atención</p>
         </div>
-
-        <!-- KPI: Cotizaciones -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-purple-50 dark:bg-purple-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-purple-100 dark:border-purple-900/40">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">{{ quotations }}</p>
-              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Cotizaciones</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Cotizaciones</p>
+            <svg class="w-4 h-4 text-violet-500 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ quotations }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">En proceso</p>
         </div>
-        
       </div>
 
     </div>
@@ -258,73 +229,6 @@
               <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">
                 Selecciona una factura del panel izquierdo para ver su desglose completo, imprimir o exportar.
               </p>
-            </div>
-
-            <!-- Acciones rápidas -->
-            <div v-if="!isVendedor" class="relative z-10 flex items-center gap-3 mb-8">
-              <button
-                @click="navigateToPos"
-                class="px-6 py-3 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Crear nueva factura
-              </button>
-            </div>
-
-            <!-- Capacidades del módulo - Grid informativo -->
-            <div class="relative z-10 w-full max-w-lg">
-              <div class="grid grid-cols-2 gap-3">
-                <!-- Capability 1 -->
-                <div class="flex items-start gap-3 bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3.5 text-left border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-sm">
-                  <div class="w-9 h-9 bg-blue-50 dark:bg-blue-950/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-blue-100 dark:border-blue-900/40">
-                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">Ver detalle</p>
-                    <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 leading-snug">Desglose completo de productos y totales</p>
-                  </div>
-                </div>
-                <!-- Capability 2 -->
-                <div class="flex items-start gap-3 bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3.5 text-left border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-sm">
-                  <div class="w-9 h-9 bg-emerald-50 dark:bg-emerald-950/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-emerald-100 dark:border-emerald-900/40">
-                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">Imprimir</p>
-                    <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 leading-snug">Impresión directa de facturas y cotizaciones</p>
-                  </div>
-                </div>
-                <!-- Capability 3 -->
-                <div class="flex items-start gap-3 bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3.5 text-left border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-sm">
-                  <div class="w-9 h-9 bg-purple-50 dark:bg-purple-950/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-purple-100 dark:border-purple-900/40">
-                    <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">Exportar PDF</p>
-                    <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 leading-snug">Descarga documentos en formato PDF</p>
-                  </div>
-                </div>
-                <!-- Capability 4 -->
-                <div class="flex items-start gap-3 bg-white dark:bg-zinc-900/80 rounded-xl px-4 py-3.5 text-left border border-gray-100 dark:border-zinc-800/60 hover:border-gray-200 dark:hover:border-zinc-700 transition-all duration-200 hover:shadow-sm">
-                  <div class="w-9 h-9 bg-amber-50 dark:bg-amber-950/50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 border border-amber-100 dark:border-amber-900/40">
-                    <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">Enviar</p>
-                    <p class="text-[11px] text-gray-500 dark:text-zinc-500 mt-0.5 leading-snug">Email y WhatsApp directo al cliente</p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <!-- Hint inferior -->

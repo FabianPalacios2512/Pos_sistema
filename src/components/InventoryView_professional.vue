@@ -32,66 +32,39 @@
         </div>
       </div>
       
-      <!-- KPIs - Gemini Style -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <!-- Total Productos -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-4 py-4 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-purple-50 dark:bg-zinc-800/50 rounded-xl border border-purple-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Total Productos</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ totalProducts }}</p>
-            </div>
+      <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800 mb-4">
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total Productos</p>
+            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ totalProducts }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">En inventario</p>
         </div>
-
-        <!-- Stock Bajo -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-4 py-4 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-amber-50 dark:bg-zinc-800/50 rounded-xl border border-amber-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-amber-500 dark:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Stock Bajo</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ lowStockProducts }}</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Stock Bajo</p>
+            <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           </div>
+          <p class="text-2xl font-semibold tabular-nums" :class="lowStockProducts > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'">{{ lowStockProducts }}</p>
+          <p class="text-xs" :class="lowStockProducts > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400 dark:text-zinc-500'">{{ lowStockProducts > 0 ? 'Requieren reposición' : 'Todo abastecido' }}</p>
         </div>
-
-        <!-- Valor Inventario -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-4 py-4 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-emerald-50 dark:bg-zinc-800/50 rounded-xl border border-emerald-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Valor Total</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">${{ totalInventoryValue.toLocaleString() }}</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Valor Total</p>
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ totalInventoryValue.toLocaleString() }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Valorización actual</p>
         </div>
-
-        <!-- Movimientos Hoy -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-2xl px-4 py-4 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-blue-50 dark:bg-zinc-800/50 rounded-xl border border-blue-100 dark:border-white/5 flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Movimientos Hoy</p>
-              <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ todayMovements }}</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Movimientos Hoy</p>
+            <svg class="w-4 h-4 text-violet-500 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ todayMovements }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Actualizado hoy</p>
         </div>
       </div>
 

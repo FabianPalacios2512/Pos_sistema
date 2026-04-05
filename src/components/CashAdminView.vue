@@ -33,52 +33,31 @@
         </div>
       </div>
 
-      <!-- Métricas Principales Gemini -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
-        <!-- Sesiones Activas -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Sesiones Activas</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">{{ activeSessions.length }}</p>
-            </div>
+      <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Sesiones Activas</p>
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ activeSessions.length }}</p>
+          <p class="text-xs text-emerald-500 dark:text-emerald-400">Cajas abiertas</p>
         </div>
-        
-        <!-- Total en Cajas -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50">
-              <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total en Cajas</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">${{ totalCashAmount.toLocaleString() }}</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total en Cajas</p>
+            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ totalCashAmount.toLocaleString() }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Efectivo disponible</p>
         </div>
-        
-        <!-- Ventas del Día -->
-        <div class="bg-white dark:bg-[#131314] rounded-xl px-4 py-3 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ventas Hoy</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white mt-0.5">${{ totalSalesToday.toLocaleString() }}</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Ventas Hoy</p>
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ totalSalesToday.toLocaleString() }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Actualizado hoy</p>
         </div>
       </div>
 

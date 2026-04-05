@@ -35,54 +35,32 @@
             
           </div>
 
-      <!-- NIVEL 2: KPIs Enterprise -->
-      <div class="grid grid-cols-3 gap-2.5">
-        
-        <!-- KPI: Total Devuelto -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-rose-50 dark:bg-rose-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-rose-100 dark:border-rose-900/40">
-              <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">${{ formatCurrency(stats.totalRefunded) }}</p>
-              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Total Devuelto</p>
-            </div>
+      <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Total Devuelto</p>
+            <svg class="w-4 h-4 text-rose-500 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(stats.totalRefunded) }}</p>
+          <p class="text-xs text-rose-500 dark:text-rose-400">Monto reembolsado</p>
         </div>
-
-        <!-- KPI: Completadas -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-100 dark:border-emerald-900/40">
-              <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">{{ stats.completedCount }}</p>
-              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Completadas</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Completadas</p>
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ stats.completedCount }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Procesadas correctamente</p>
         </div>
-
-        <!-- KPI: Pendientes -->
-        <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3.5 border border-gray-200 dark:border-zinc-800/60 hover:border-gray-300 dark:hover:border-zinc-700/80 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md dark:shadow-black/30">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-amber-50 dark:bg-amber-950/50 rounded-xl flex items-center justify-center flex-shrink-0 border border-amber-100 dark:border-amber-900/40">
-              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none tabular-nums">{{ stats.pendingCount }}</p>
-              <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-400 mt-1 uppercase tracking-wider">Pendientes</p>
-            </div>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Pendientes</p>
+            <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ stats.pendingCount }}</p>
+          <p class="text-xs text-amber-500 dark:text-amber-400">Requieren revisión</p>
         </div>
-        
       </div>
 
     </div>

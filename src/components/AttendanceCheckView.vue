@@ -17,38 +17,45 @@
         </div>
       </div>
 
-      <!-- KPIs — Métricas corporativas de alta densidad -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-gray-200 dark:bg-zinc-800 rounded-lg overflow-hidden border border-gray-200 dark:border-zinc-800">
-
-        <!-- Entradas Hoy -->
-        <div class="bg-white dark:bg-zinc-900 px-5 py-4">
-          <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Entradas Hoy</p>
-          <p class="text-4xl font-extrabold text-gray-900 dark:text-white mt-1 tabular-nums leading-none">{{ summary.entries_today ?? 0 }}</p>
+      <!-- KPIs — Metrics Ribbon (Vercel/Linear) -->
+      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Entradas Hoy</p>
+            <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ summary.entries_today ?? 0 }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Registros de entrada</p>
         </div>
-
-        <!-- Salidas Hoy -->
-        <div class="bg-white dark:bg-zinc-900 px-5 py-4">
-          <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Salidas Hoy</p>
-          <p class="text-4xl font-extrabold text-gray-900 dark:text-white mt-1 tabular-nums leading-none">{{ summary.exits_today ?? 0 }}</p>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Salidas Hoy</p>
+            <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">{{ summary.exits_today ?? 0 }}</p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Registros de salida</p>
         </div>
-
-        <!-- Perfiles Biométricos -->
-        <div class="bg-white dark:bg-zinc-900 px-5 py-4">
-          <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Perfiles Biométricos</p>
-          <p class="text-4xl font-extrabold text-gray-900 dark:text-white mt-1 tabular-nums leading-none">
-            {{ summary.enrolled_users ?? 0 }}<span class="text-lg font-normal text-gray-400 dark:text-zinc-600">/{{ summary.total_users ?? 0 }}</span>
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Perfiles Biométricos</p>
+            <svg class="w-4 h-4 text-violet-500 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a48.667 48.667 0 00-1.134 11.166M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white tabular-nums">
+            {{ summary.enrolled_users ?? 0 }}<span class="text-base font-normal text-gray-400 dark:text-zinc-600">/{{ summary.total_users ?? 0 }}</span>
           </p>
+          <p class="text-xs text-gray-400 dark:text-zinc-500">Enrolados / Total</p>
         </div>
-
-        <!-- Sin Enrolar -->
-        <div class="bg-white dark:bg-zinc-900 px-5 py-4">
-          <p class="text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Sin Enrolar</p>
-          <p class="text-4xl font-extrabold mt-1 tabular-nums leading-none"
+        <div class="flex flex-col gap-1 px-5 py-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Sin Enrolar</p>
+            <svg class="w-4 h-4 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <p class="text-2xl font-semibold tabular-nums"
              :class="(summary.pending_enroll ?? 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'">
             {{ summary.pending_enroll ?? 0 }}
           </p>
+          <p class="text-xs" :class="(summary.pending_enroll ?? 0) > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400 dark:text-zinc-500'">{{ (summary.pending_enroll ?? 0) > 0 ? 'Pendientes de registro' : 'Todos registrados' }}</p>
         </div>
-
       </div>
 
       <!-- Layout Principal: Timeline (70%) + Gestión (30%) -->

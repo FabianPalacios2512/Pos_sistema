@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
-    <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
+    <div class="max-w-6xl mx-auto p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Loading -->
       <div v-if="loading" class="flex justify-center items-center py-20">
@@ -42,7 +42,7 @@
       </div>
 
       <!-- Tabla principal -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+      <div class="bg-white dark:bg-zinc-900 rounded-md overflow-hidden border border-gray-200 dark:border-zinc-800">
         <!-- Barra de filtros -->
         <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
           <div class="flex flex-wrap items-center gap-3">
@@ -84,23 +84,23 @@
         <!-- Tabla -->
         <table class="min-w-full">
           <thead>
-            <tr class="border-b border-gray-200 dark:border-zinc-800">
-              <th class="px-6 py-3.5 text-left text-sm font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+            <tr class="border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
                 Categoría
               </th>
-              <th class="px-6 py-3.5 text-center text-sm font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-32">
+              <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-32">
                 Productos
               </th>
-              <th class="px-6 py-3.5 text-right text-sm font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-40">
+              <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-40">
                 Ventas
               </th>
-              <th class="px-6 py-3.5 text-center text-sm font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-32">
+              <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-32">
                 Estado
               </th>
-              <th class="px-6 py-3.5 text-left text-sm font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-36">
+              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-36">
                 Creación
               </th>
-              <th class="px-6 py-3.5 text-right text-sm font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-36">
+              <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider w-36">
               </th>
             </tr>
           </thead>
@@ -110,87 +110,74 @@
               :key="category.id"
               @click="viewCategoryProducts(category)"
               :class="[
-                'group transition-all duration-150 cursor-pointer',
+                'group transition-colors duration-150 cursor-pointer',
                 category.active 
                   ? 'hover:bg-gray-50 dark:hover:bg-zinc-800/50' 
-                  : 'opacity-50 hover:opacity-75 hover:bg-gray-50/50 dark:hover:bg-zinc-800/30'
+                  : 'opacity-60 hover:opacity-100 hover:bg-gray-50 dark:hover:bg-zinc-800/50'
               ]">
-              <!-- Categoría: avatar + nombre + descripción -->
-              <td class="px-6 py-5">
-                <div class="flex items-center gap-3.5">
-                  <div class="w-11 h-11 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/50 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
-                  </div>
-                  <div class="min-w-0">
-                    <span class="text-base font-semibold text-gray-900 dark:text-white block leading-tight">{{ category.name }}</span>
-                    <span v-if="category.description" class="text-sm text-gray-400 dark:text-zinc-500 mt-0.5 block line-clamp-1">{{ category.description }}</span>
-                  </div>
+              <!-- Categoría: nombre + descripción -->
+              <td class="px-6 py-3">
+                <div class="min-w-0">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white block leading-tight">{{ category.name }}</span>
+                  <span v-if="category.description" class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5 block line-clamp-1">{{ category.description }}</span>
                 </div>
               </td>
               <!-- Productos -->
-              <td class="px-6 py-5 text-center">
+              <td class="px-6 py-3 text-center">
                 <span 
                   :class="[
-                    'text-base tabular-nums',
+                    'text-sm font-medium tabular-nums',
                     (category.products_count || 0) > 0 
-                      ? 'font-semibold text-gray-900 dark:text-white' 
-                      : 'font-normal text-gray-300 dark:text-zinc-600'
+                      ? 'text-gray-600 dark:text-zinc-300' 
+                      : 'text-gray-400 dark:text-zinc-600'
                   ]">
                   {{ category.products_count || 0 }}
                 </span>
               </td>
               <!-- Ventas -->
-              <td class="px-6 py-5 text-right">
+              <td class="px-6 py-3 text-right">
                 <span 
                   :class="[
-                    'text-base tabular-nums',
+                    'text-sm font-medium tabular-nums',
                     (category.revenue || 0) > 0 
-                      ? 'font-semibold text-emerald-600 dark:text-emerald-400' 
-                      : 'font-normal text-gray-300 dark:text-zinc-600'
+                      ? 'text-gray-900 dark:text-white' 
+                      : 'text-gray-400 dark:text-zinc-600'
                   ]">
                   ${{ formatCurrency(category.revenue || 0) }}
                 </span>
               </td>
               <!-- Estado -->
-              <td class="px-6 py-5 text-center">
-                <span
-                  :class="[
-                    'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border',
-                    category.active 
-                      ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800' 
-                      : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'
-                  ]">
-                  {{ category.active ? 'Activa' : 'Inactiva' }}
-                </span>
+              <td class="px-6 py-3 text-center">
+                <div class="inline-flex items-center justify-center gap-1.5" :class="category.active ? 'text-gray-700' : 'text-gray-500'">
+                  <span :class="category.active ? 'bg-emerald-500' : 'bg-gray-400 dark:bg-zinc-500'" class="w-2 h-2 rounded-full"></span>
+                  <span class="text-xs font-medium dark:text-zinc-400 uppercase tracking-wider">
+                    {{ category.active ? 'Activa' : 'Inactiva' }}
+                  </span>
+                </div>
               </td>
               <!-- Fecha -->
-              <td class="px-6 py-5">
-                <span class="text-base text-gray-500 dark:text-zinc-400 tabular-nums">{{ formatDate(category.created_at) }}</span>
+              <td class="px-6 py-3">
+                <span class="text-sm font-medium text-gray-500 dark:text-zinc-400 tabular-nums">{{ formatDate(category.created_at) }}</span>
               </td>
               <!-- Acciones -->
-              <td class="px-6 py-5">
-                <div class="flex items-center justify-end gap-2">
+              <td class="px-6 py-3 text-right">
+                <div class="flex items-center justify-end gap-1">
                   <button
                     @click.stop="editCategory(category)"
-                    class="p-2.5 text-gray-400 dark:text-zinc-600 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all duration-200"
+                    class="p-1.5 text-gray-400 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
                     title="Editar">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path>
                     </svg>
                   </button>
                   <button
                     @click.stop="toggleCategoryStatus(category)"
-                    class="p-2.5 rounded-lg transition-all duration-200"
-                    :class="category.active 
-                      ? 'text-gray-400 dark:text-zinc-600 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20' 
-                      : 'text-gray-400 dark:text-zinc-600 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20'"
+                    class="p-1.5 text-gray-400 dark:text-zinc-500 transition-colors duration-200 hover:text-gray-900 dark:hover:text-white"
                     :title="category.active ? 'Desactivar' : 'Activar'">
-                    <svg v-if="category.active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <svg v-if="category.active" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path>
                     </svg>
-                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                   </button>
