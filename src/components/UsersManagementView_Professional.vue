@@ -254,14 +254,14 @@
           <table class="w-full">
             <thead>
               <tr class="bg-gray-100 dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700">
-                <th class="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Empleado</th>
-                <th class="px-4 py-2.5 text-center text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Biométrico</th>
-                <th class="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Último Ingreso</th>
-                <th class="px-4 py-2.5 text-left text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Sede Asignada</th>
-                <th class="px-4 py-2.5 text-right text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ventas Hoy</th>
-                <th class="px-4 py-2.5 text-center text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Auditoría de Turno</th>
-                <th class="px-4 py-2.5 text-right text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Descuadre</th>
-                <th class="px-4 py-2.5 text-right text-[11px] font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Acciones</th>
+                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Empleado</th>
+                <th class="px-5 py-3 text-center text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Inicio Jornada</th>
+                <th class="px-5 py-3 text-center text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Fin Jornada</th>
+                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Sede Asignada</th>
+                <th class="px-5 py-3 text-right text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Ventas Hoy</th>
+                <th class="px-5 py-3 text-center text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Auditoría de Turno</th>
+                <th class="px-5 py-3 text-right text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Descuadre</th>
+                <th class="px-5 py-3 text-right text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
             <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800">
@@ -271,10 +271,10 @@
                 class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-100"
               >
                 <!-- EMPLEADO: Avatar + Nombre + Rol -->
-                <td class="px-4 py-2.5 whitespace-nowrap">
-                  <div class="flex items-center gap-2.5">
+                <td class="px-5 py-3 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
                     <div class="relative">
-                      <div class="w-8 h-8 flex items-center justify-center text-xs font-bold flex-shrink-0"
+                      <div class="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0"
                            :class="emp.active
                              ? 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
                              : 'bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-zinc-600 border border-gray-200 dark:border-zinc-700'">
@@ -283,76 +283,67 @@
                       <span v-if="emp.isOnline" class="absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900"></span>
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">{{ emp.name }}</p>
-                      <p class="text-[11px] text-gray-500 dark:text-zinc-500">{{ emp.roleName }}</p>
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ emp.name }}</p>
+                      <p class="text-xs text-gray-500 dark:text-zinc-500">{{ emp.roleName }}</p>
                     </div>
                   </div>
                 </td>
 
-                <!-- ENROLAMIENTO BIOMÉTRICO STATUS -->
-                <td class="px-4 py-2.5 whitespace-nowrap text-center">
-                  <span v-if="emp.entryTime"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    Completado
-                  </span>
-                  <span v-else
-                    class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                    Pendiente
-                  </span>
+                <!-- INICIO DE JORNADA -->
+                <td class="px-5 py-3 whitespace-nowrap text-center">
+                  <div v-if="emp.entryTime">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200 tabular-nums">{{ emp.entryTime }}</p>
+                  </div>
+                  <span v-else class="text-xs text-gray-400 dark:text-zinc-600">—</span>
                 </td>
 
-                <!-- ÚLTIMO INGRESO -->
-                <td class="px-4 py-2.5 whitespace-nowrap">
-                  <div v-if="emp.entryTime || emp.exitTime">
-                    <p class="text-sm font-medium text-gray-800 dark:text-zinc-200 tabular-nums">{{ emp.entryTime || '—' }}</p>
-                    <p v-if="emp.exitTime" class="text-[10px] text-gray-400 dark:text-zinc-500 tabular-nums mt-0.5 flex items-center gap-1">
-                      Salida: {{ emp.exitTime }}
-                      <span v-if="emp.exitIsAutoClose"
-                        class="px-1 py-px text-[8px] font-bold uppercase bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                        SIS
-                      </span>
-                    </p>
+                <!-- FIN DE JORNADA -->
+                <td class="px-5 py-3 whitespace-nowrap text-center">
+                  <div v-if="emp.exitTime">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-zinc-200 tabular-nums">{{ emp.exitTime }}</p>
+                    <span v-if="emp.exitIsAutoClose"
+                      class="inline-flex items-center px-1.5 py-0.5 mt-0.5 text-[9px] font-bold uppercase bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800 rounded">
+                      Auto-cierre
+                    </span>
                   </div>
-                  <span v-else class="text-[11px] text-gray-400 dark:text-zinc-600">Sin registro</span>
+                  <span v-else class="text-xs text-gray-400 dark:text-zinc-600">—</span>
                 </td>
 
                 <!-- SEDE ASIGNADA -->
-                <td class="px-4 py-2.5 whitespace-nowrap">
-                  <span class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700">
+                <td class="px-5 py-3 whitespace-nowrap">
+                  <span class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wide bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700 rounded">
                     {{ emp.sedeActual }}
                   </span>
                 </td>
 
                 <!-- VENTAS HOY -->
-                <td class="px-4 py-2.5 whitespace-nowrap text-right">
-                  <p class="text-sm font-semibold tabular-nums" :class="emp.ventasHoy > 0 ? 'text-gray-900 dark:text-white' : 'text-gray-300 dark:text-zinc-600'">
+                <td class="px-5 py-3 whitespace-nowrap text-right">
+                  <p class="text-sm font-bold tabular-nums" :class="emp.ventasHoy > 0 ? 'text-gray-900 dark:text-white' : 'text-gray-300 dark:text-zinc-600'">
                     {{ formatCurrency(emp.ventasHoy) }}
                   </p>
                 </td>
 
                 <!-- AUDITORÍA DE TURNO -->
-                <td class="px-4 py-2.5 whitespace-nowrap text-center">
+                <td class="px-5 py-3 whitespace-nowrap text-center">
                   <span v-if="emp.cajaForzada"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800">
+                    class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800 rounded">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
                     Pendiente Arqueo
                   </span>
                   <span v-else-if="emp.cajaAbierta"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                    class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded">
                     Turno Activo
                   </span>
                   <span v-else
-                    class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border border-gray-200 dark:border-zinc-700">
+                    class="inline-flex items-center px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-zinc-500 border border-gray-200 dark:border-zinc-700 rounded">
                     Caja Cerrada
                   </span>
                 </td>
 
                 <!-- DESCUADRE -->
-                <td class="px-4 py-2.5 whitespace-nowrap text-right">
+                <td class="px-5 py-3 whitespace-nowrap text-right">
                   <template v-if="emp.cajaForzada">
-                    <p class="text-[11px] text-gray-400 dark:text-zinc-600 italic">Esperando arqueo</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-600 italic">Esperando arqueo</p>
                   </template>
                   <template v-else-if="emp.cashDiscrepancy !== null">
                     <p class="text-sm font-bold tabular-nums" 
@@ -364,12 +355,12 @@
                       {{ emp.cashDiscrepancy > 0 ? '+' : '' }}{{ formatCurrency(emp.cashDiscrepancy) }}
                     </p>
                   </template>
-                  <span v-else class="text-[11px] text-gray-400 dark:text-zinc-600">$0</span>
+                  <span v-else class="text-xs text-gray-400 dark:text-zinc-600">$0</span>
                 </td>
 
                 <!-- ACCIONES -->
-                <td class="px-4 py-2.5 whitespace-nowrap text-right">
-                  <div class="flex items-center justify-end gap-1">
+                <td class="px-5 py-3 whitespace-nowrap text-right">
+                  <div class="flex items-center justify-end gap-1.5">
                     <button
                       @click="openAttendanceModal(emp)"
                       class="p-1.5 border border-transparent text-gray-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-800 transition-colors duration-150"
@@ -400,7 +391,7 @@
 
               <!-- Empty State -->
               <tr v-if="employeeGridData.length === 0">
-                <td colspan="8" class="px-6 py-12 text-center">
+                <td colspan="9" class="px-6 py-12 text-center">
                   <div class="flex flex-col items-center justify-center">
                     <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>

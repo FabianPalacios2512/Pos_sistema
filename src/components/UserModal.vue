@@ -107,7 +107,7 @@
           </div>
 
           <!-- Rol y Sede (Grid) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div :class="warehouses.length > 1 ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''">
             <!-- Rol -->
             <div>
               <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
@@ -129,8 +129,8 @@
               </select>
             </div>
 
-            <!-- Sede Asignada -->
-            <div>
+            <!-- Sede Asignada (solo si hay más de 1 sede) -->
+            <div v-if="warehouses.length > 1">
               <label class="block text-sm font-bold text-gray-700 dark:text-zinc-300 mb-2">
                 Sede Asignada
               </label>
