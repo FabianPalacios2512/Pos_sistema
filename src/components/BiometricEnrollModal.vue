@@ -37,7 +37,7 @@
                      :class="stepIndex > i
                        ? 'bg-emerald-600 dark:bg-emerald-700 border-emerald-600 dark:border-emerald-700 text-white'
                        : stepIndex === i
-                         ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-gray-900'
+                         ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-zinc-900'
                          : 'bg-white dark:bg-zinc-800 border-gray-300 dark:border-zinc-600 text-gray-400 dark:text-zinc-500'">
                   <template v-if="stepIndex > i">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
@@ -68,7 +68,7 @@
               </div>
               <button @click="searchUser"
                       :disabled="!searchCC.trim() || searching"
-                      class="w-full px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                      class="w-full px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 <svg v-if="searching" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                 <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                 Buscar Empleado
@@ -148,12 +148,12 @@
                 </div>
                 <!-- DUPLICATE: Face matches another user -->
                 <div v-else-if="faceMatchResult.matched" class="bg-white dark:bg-zinc-900 rounded-lg p-2.5 border border-gray-200 dark:border-zinc-700 border-l-4 border-l-rose-500">
-                  <p class="text-[11px] font-bold text-rose-700 dark:text-rose-400">⚠️ Rostro ya registrado</p>
+                  <p class="text-[11px] font-bold text-rose-700 dark:text-rose-400">Rostro ya registrado</p>
                   <p class="text-[11px] text-gray-700 dark:text-zinc-300 mt-0.5">Este rostro pertenece a <strong>{{ faceMatchResult.name }}</strong> (CC: {{ faceMatchResult.cc }}). No se permite enrolar la misma cara bajo otro usuario.</p>
                 </div>
                 <!-- OK: No matches, safe to enroll -->
                 <div v-else class="bg-white dark:bg-zinc-900 rounded-lg p-2.5 border border-gray-200 dark:border-zinc-700 border-l-4 border-l-emerald-600 dark:border-l-emerald-500">
-                  <p class="text-[11px] text-gray-700 dark:text-zinc-300">✅ Rostro verificado — no coincide con ningún perfil existente. Puede guardar el perfil.</p>
+                  <p class="text-[11px] text-gray-700 dark:text-zinc-300">Rostro verificado — no coincide con ningún perfil existente. Puede guardar el perfil.</p>
                 </div>
               </div>
             </div>
@@ -163,7 +163,7 @@
               <!-- Found: Start enrollment -->
               <button v-if="phase === 'found'"
                       @click="startEnrollment"
-                      class="w-full px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 text-white dark:text-gray-900 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                      class="w-full px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 text-white dark:text-zinc-900 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 {{ foundUser.enrolled ? 'Re-enrolar' : 'Iniciar Captura' }}
               </button>
 
@@ -180,7 +180,7 @@
               <button v-if="phase === 'capture'"
                       @click="saveProfile"
                       :disabled="saving || !faceMatchResult || faceMatchResult.matched"
-                      class="w-full px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                      class="w-full px-4 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 <svg v-if="saving" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                 {{ saving ? 'Guardando...' : faceMatchResult?.matched ? 'Bloqueado — Rostro duplicado' : 'Guardar Perfil' }}
               </button>
@@ -229,7 +229,7 @@
               <template v-else-if="modelError">
                 <svg class="w-8 h-8 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
                 <p class="text-sm text-gray-800 dark:text-zinc-300">{{ modelError }}</p>
-                <button @click="startEnrollment" class="mt-3 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-semibold rounded-lg transition-colors hover:bg-black dark:hover:bg-gray-200">Reintentar</button>
+                <button @click="startEnrollment" class="mt-3 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 text-sm font-semibold rounded-lg transition-colors hover:bg-black dark:hover:bg-gray-200">Reintentar</button>
               </template>
             </div>
 

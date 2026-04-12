@@ -175,7 +175,6 @@ export const createReturnTemplate = async (returnData, systemSettings = {}) => {
         pdf.addImage(companyLogo, 'PNG', centerX - 10, yPos, 20, 12, '', 'FAST')
         yPos += 15
       } catch (err) {
-        console.log('No se pudo cargar el logo')
       }
     }
 

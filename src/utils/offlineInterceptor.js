@@ -1,5 +1,5 @@
 /**
- * 🌐 Axios Interceptor para Modo Offline
+ * Axios Interceptor para Modo Offline
  * Captura peticiones fallidas y las guarda para sincronización posterior
  */
 
@@ -89,8 +89,6 @@ export function setupOfflineInterceptor() {
       const isTimeout = error.code === 'ECONNABORTED'
       
       if ((isNetworkError || isTimeout) && !navigator.onLine) {
-        console.log('🔴 Sin conexión detectada para:', config.url)
-        
         // Verificar si es una operación sincronizable
         const syncInfo = isSyncableOperation(config)
         
@@ -108,8 +106,6 @@ export function setupOfflineInterceptor() {
               headers: config.headers
             })
             
-            console.log(`💾 ${syncInfo.label} guardado para sincronización offline`)
-            
             // Retornar una respuesta simulada de éxito
             return Promise.resolve({
               data: {
@@ -123,11 +119,10 @@ export function setupOfflineInterceptor() {
               config
             })
           } catch (dbError) {
-            console.error('❌ Error guardando operación offline:', dbError)
+            console.error('Error guardando operación offline:', dbError)
           }
         } else {
           // Operación no sincronizable
-          console.log('⚠️ Operación no sincronizable en modo offline:', config.url)
         }
       }
       

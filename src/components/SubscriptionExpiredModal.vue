@@ -332,7 +332,7 @@ const getPlanPrice = () => {
   return prices[selectedPlan.value] || ''
 }
 
-// 🔐 Sistema de verificación seguro
+// Sistema de verificación seguro
 let verificationToken = null
 let paymentReference = null
 let verificationInterval = null
@@ -359,7 +359,7 @@ const preventKeyboardShortcuts = (e) => {
 }
 
 /**
- * 🔄 LÓGICA SIMPLIFICADA: Consultar backend y decidir
+ * LÓGICA SIMPLIFICADA: Consultar backend y decidir
  * - Si active === true → NO bloquear
  * - Si active === false → bloquear
  */
@@ -370,13 +370,13 @@ const checkSubscriptionFromBackend = async () => {
     
     if (response.data.success) {
       if (response.data.active === true) {
-        // ✅ Suscripción ACTIVA - no bloquear
+        // Suscripción ACTIVA - no bloquear
         showModal.value = false
         appStore.isSubscriptionExpired = false
         stopAllIntervals()
         return false // No expirada
       } else {
-        // ⛔ Suscripción EXPIRADA - bloquear
+        // Suscripción EXPIRADA - bloquear
         appStore.isSubscriptionExpired = true
         showModal.value = true
         tenantId.value = response.data.tenant?.id || ''
@@ -392,19 +392,16 @@ const checkSubscriptionFromBackend = async () => {
 }
 
 /**
- * 🔄 Iniciar polling para detectar cuando se paga
+ * Iniciar polling para detectar cuando se paga
  */
 const startSubscriptionPolling = () => {
   if (subscriptionPollingInterval) return
-  
-  console.log('🔄 [Subscription] Iniciando polling cada 8 segundos...')
   
   subscriptionPollingInterval = setInterval(async () => {
     const isExpired = await checkSubscriptionFromBackend()
     
     if (!isExpired) {
-      // ✅ Ya no está expirada - recargar página
-      console.log('✅ [Subscription] Suscripción reactivada! Recargando...')
+      // Ya no está expirada - recargar página
       stopAllIntervals()
       setTimeout(() => window.location.reload(), 1000)
     }
@@ -485,7 +482,7 @@ const proceedToPayment = async () => {
     const epaycoPlan = planData.epaycoName
     const reference = `renewal_${tenantId.value}_${Date.now()}`
     
-    // 🔐 PASO 1: Inicializar transacción en backend y obtener token de verificación
+    // PASO 1: Inicializar transacción en backend y obtener token de verificación
     const initResponse = await apiClient.post('/epayco/init-transaction', {
       reference,
       plan: epaycoPlan,
@@ -505,8 +502,8 @@ const proceedToPayment = async () => {
 
     // Configurar ePayco con la API Key correcta - PRODUCCIÓN
     const handler = window.ePayco.checkout.configure({
-      key: 'de4263d3e7094669c4d837ad7dadb69e', // ✅ PUBLIC_KEY Producción
-      test: false // ✅ MODO PRODUCCIÓN - Usar tarjetas reales
+      key: 'de4263d3e7094669c4d837ad7dadb69e', // PUBLIC_KEY Producción
+      test: false // MODO PRODUCCIÓN - Usar tarjetas reales
     })
 
     // Obtener URL de respuesta correcta (usar verificación)
@@ -539,7 +536,7 @@ const proceedToPayment = async () => {
     
     showPayment.value = true
 
-    // 🔎 PASO 2: Iniciar verificación periódica del estado del pago
+    // PASO 2: Iniciar verificación periódica del estado del pago
     startPaymentVerification()
     
   } catch (error) {
@@ -551,7 +548,7 @@ const proceedToPayment = async () => {
 }
 
 /**
- * 🔎 Verificar periódicamente el estado del pago con token seguro
+ * Verificar periódicamente el estado del pago con token seguro
  * Funciona tanto en localhost como en producción
  */
 const startPaymentVerification = () => {
@@ -575,16 +572,16 @@ const startPaymentVerification = () => {
         const status = response.data.status
 
         if (status === 'approved') {
-          // ✅ Pago aprobado
+          // Pago aprobado
           clearInterval(verificationInterval)
           appStore.isSubscriptionExpired = false
           showModal.value = false
-          alert('✅ Pago aprobado correctamente. Tu suscripción ha sido renovada.')
+          alert('Pago aprobado correctamente. Tu suscripción ha sido renovada.')
           window.location.reload()
         } else if (status === 'rejected' || status === 'failed') {
-          // ❌ Pago rechazado
+          // Pago rechazado
           clearInterval(verificationInterval)
-          alert('❌ El pago fue rechazado. Por favor intenta de nuevo con otro método de pago.')
+          alert('El pago fue rechazado. Por favor intenta de nuevo con otro método de pago.')
         }
         // Si está 'pending', seguimos esperando
       }

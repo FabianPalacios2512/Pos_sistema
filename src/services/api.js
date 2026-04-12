@@ -87,7 +87,7 @@ export const handleApiResponse = async (response) => {
   // Si no es JSON, mostrar el texto de la respuesta
   if (!contentType || !contentType.includes('application/json')) {
     const text = await response.text().catch(() => 'Sin respuesta')
-    console.error('❌ Respuesta no-JSON del servidor:', {
+    console.error('Respuesta no-JSON del servidor:', {
       status: response.status,
       statusText: response.statusText,
       contentType,
@@ -115,7 +115,7 @@ export const handleApiResponse = async (response) => {
       throw error
     }
 
-    // ⛔ MANEJO DE ERROR 403 (Suscripción Expirada)
+    // MANEJO DE ERROR 403 (Suscripción Expirada)
     if (response.status === 403) {
       const error = new Error(data.message || 'Acceso denegado')
       error.response = {
@@ -130,7 +130,6 @@ export const handleApiResponse = async (response) => {
           data.message.includes('plan ha expirado') ||
           data.message.includes('renueva tu plan')
       ))) {
-        console.log('⛔ [API] Suscripción expirada detectada')
         // NO redirigir si ya estamos en rutas permitidas para usuarios expirados
         const allowedExpiredRoutes = ['/subscription-expired', '/select-plan', '/payment/success', '/payment/failure']
         const currentPath = window.location.pathname
@@ -139,13 +138,11 @@ export const handleApiResponse = async (response) => {
           // Evitar redirecciones múltiples con un flag temporal
           if (!window.__redirecting_to_expired) {
             window.__redirecting_to_expired = true
-            console.log('⛔ [API] Redirigiendo a /subscription-expired desde:', currentPath)
             setTimeout(() => {
               window.location.href = '/subscription-expired'
             }, 100)
           }
         } else {
-          console.log('✅ [API] Ya en ruta permitida, no redirigir:', currentPath)
         }
       }
       
@@ -187,7 +184,7 @@ export const apiCall = async (endpoint, options = {}) => {
   } catch (error) {
     // Solo mostrar error en consola si no es silencioso
     if (!silent) {
-      console.error('❌ API Call Error:', error)
+      console.error('API Call Error:', error)
     }
     throw error
   }

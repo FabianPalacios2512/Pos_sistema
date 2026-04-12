@@ -20,7 +20,7 @@
     <!-- Product Content -->
     <template v-else-if="product">
       
-      <!-- 📌 STICKY HEADER: Volver + Compartir + Carrito -->
+      <!-- STICKY HEADER: Volver + Compartir + Carrito -->
       <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm" style="box-shadow: 0 1px 0 rgba(0,0,0,0.06);">
         <div class="flex items-center justify-between px-4 h-12">
           <button 
@@ -60,7 +60,7 @@
         </div>
       </header>
 
-      <!-- 📸 HERO GALLERY: Smart-Cropped Container -->
+      <!-- HERO GALLERY: Smart-Cropped Container -->
       <div class="relative w-full bg-gray-50">
         <div 
           class="relative w-full max-h-[52vh] aspect-[4/5] overflow-hidden touch-pan-y"
@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <!-- 📝 PRODUCT INFO -->
+      <!-- PRODUCT INFO -->
       <div class="bg-white">
         
         <!-- Category + Title + Price -->
@@ -136,7 +136,7 @@
 
         <div class="h-px bg-gray-100"></div>
 
-        <!-- 🎨 VARIANT SELECTORS -->
+        <!-- VARIANT SELECTORS -->
         <div v-if="product.options && product.options.length > 0" class="px-5 py-4 space-y-4">
           <div v-for="option in product.options" :key="'opt-'+option.id">
             
@@ -235,7 +235,7 @@
           </div>
         </div>
 
-        <!-- 📄 Description accordion -->
+        <!-- Description accordion -->
         <div v-if="product.description" class="px-5 py-3">
           <button 
             @click="showDescription = !showDescription"
@@ -259,7 +259,7 @@
 
         <div class="h-px bg-gray-100"></div>
 
-        <!-- 🛍️ CROSS-SELLING: "También te podría interesar" -->
+        <!-- CROSS-SELLING: "También te podría interesar" -->
         <div v-if="relatedProducts.length > 0" class="py-5">
           <h3 class="px-5 text-xs font-bold text-gray-900 uppercase tracking-[0.12em] mb-4">
             También te podría interesar
@@ -289,7 +289,7 @@
         <div class="h-24"></div>
       </div>
 
-      <!-- 🔴 STICKY CTA BAR -->
+      <!-- STICKY CTA BAR -->
       <div class="fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-gray-100" style="box-shadow: 0 -2px 10px rgba(0,0,0,0.06);">
         <div class="px-4 py-3 flex items-center gap-3">
           <div class="flex-shrink-0">
@@ -319,7 +319,7 @@
       </div>
     </template>
 
-    <!-- 🍞 TOAST NOTIFICATION - Minimal pill -->
+    <!-- TOAST NOTIFICATION - Minimal pill -->
     <Transition name="toast">
       <div 
         v-if="toast.show" 

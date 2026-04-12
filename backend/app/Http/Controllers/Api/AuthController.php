@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\SecurityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -70,8 +71,14 @@ class AuthController extends Controller
 
         // SEGUNDO: Si no es super admin, buscar en tenant
         $user = User::with('role')->where('email', $request->email)->first();
+        $security = new SecurityService();
+        $ip = $request->ip();
+        $ua = $request->userAgent() ?? '';
+        $tenantId = tenant()?->id;
 
         if (!$user) {
+            $security->recordAttempt($request->email, $ip, $ua, 'fail', 'user_not_found', $tenantId);
+            $security->analyzeAfterFailedAttempt($request->email, $ip);
             return response()->json([
                 'success' => false,
                 'message' => 'No encontramos una cuenta con este correo electrónico.',
@@ -82,6 +89,20 @@ class AuthController extends Controller
         }
 
         if (!Hash::check($request->password, $user->password)) {
+            $security->recordAttempt($request->email, $ip, $ua, 'fail', 'wrong_password', $tenantId);
+            $actions = $security->analyzeAfterFailedAttempt($request->email, $ip);
+
+            // Si la cuenta acaba de ser bloqueada, informar inmediatamente
+            if (in_array('account_blocked', $actions)) {
+                return response()->json([
+                    'success' => false,
+                    'blocked' => true,
+                    'block_type' => 'account',
+                    'message' => 'Tu cuenta ha sido bloqueada por seguridad debido a múltiples intentos fallidos de inicio de sesión.',
+                    'support_url' => 'https://wa.me/573217355070?text=' . urlencode('Hola, mi cuenta fue bloqueada en 105POS, necesito ayuda para recuperar el acceso.'),
+                ], 423);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'La contraseña es incorrecta.',
@@ -92,6 +113,7 @@ class AuthController extends Controller
         }
 
         if (!$user->active) {
+            $security->recordAttempt($request->email, $ip, $ua, 'fail', 'account_inactive', $tenantId);
             return response()->json([
                 'success' => false,
                 'message' => 'Tu cuenta está desactivada. Contacta al administrador.',
@@ -100,6 +122,10 @@ class AuthController extends Controller
                 ]
             ], 422);
         }
+
+        // Login exitoso: registrar y analizar
+        $security->recordAttempt($request->email, $ip, $ua, 'success', null, $tenantId);
+        $security->analyzeSuccessfulLogin($request->email, $ip);
 
         // Actualizar último login
         $user->updateLastLogin();
@@ -164,12 +190,6 @@ class AuthController extends Controller
      */
     public function adminLogin(Request $request)
     {
-        \Log::info('🔑 adminLogin: Inicio del método', [
-            'email' => $request->email,
-            'path' => $request->path(),
-            'host' => $request->getHost()
-        ]);
-
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',

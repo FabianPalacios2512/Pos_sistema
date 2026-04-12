@@ -1,7 +1,7 @@
 <!--
  PRODUCTO VIEW MODAL
  
- ⚠️ IMPORTANTE: Este modal SOLO debe usarse dentro del POS (PosCompleto.vue o módulos relacionados)
+ IMPORTANTE: Este modal SOLO debe usarse dentro del POS (PosCompleto.vue o módulos relacionados)
  NO debe aparecer en:
  - Registro (SaasRegister.vue)
  - Selección de planes (PlanSelection.vue)
@@ -16,13 +16,13 @@
 -->
 <template>
   <div class="fixed inset-0 bg-black/50  flex items-center justify-center z-50 p-4" @click.self="$emit('close')">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
+    <div class="bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in flex flex-col">
       
       <!-- Header (fixed) -->
-      <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+      <div class="p-6 border-b border-gray-200 dark:border-zinc-700 flex-shrink-0">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700">
+            <div class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-zinc-600 bg-gray-100 dark:bg-zinc-700">
               <img 
                 v-if="product.image"
                 :src="product.image" 
@@ -37,7 +37,7 @@
             </div>
             <div>
               <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ product.name }}</h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">{{ product.barcode }}</p>
+              <p class="text-sm text-gray-500 dark:text-zinc-400">{{ product.barcode }}</p>
             </div>
           </div>
           
@@ -69,7 +69,7 @@
           <div class="lg:col-span-2 space-y-6">
             
             <!-- Información General -->
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-xl p-6">
               <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -79,12 +79,12 @@
               
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300">Nombre</label>
                   <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ product.name }}</p>
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300">Categoría</label>
                   <span class="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
                         :style="{ backgroundColor: product.category_color + '20', color: product.category_color }">
                     {{ product.category_name }}
@@ -92,22 +92,22 @@
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Código de Barras</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300">Código de Barras</label>
                   <p class="mt-1 text-sm text-gray-900 dark:text-white font-mono">{{ product.barcode || 'No asignado' }}</p>
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">SKU</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300">SKU</label>
                   <p class="mt-1 text-sm text-gray-900 dark:text-white font-mono">{{ product.sku || 'No asignado' }}</p>
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Unidad de Medida</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300">Unidad de Medida</label>
                   <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ product.unit || 'unidad' }}</p>
                 </div>
                 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300">Estado</label>
                   <span :class="[
                     'mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
                     product.active 
@@ -120,13 +120,13 @@
               </div>
               
               <div v-if="product.description" class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300">Descripción</label>
                 <p class="mt-1 text-sm text-gray-900 dark:text-white leading-relaxed">{{ product.description }}</p>
               </div>
             </div>
 
             <!-- Precios -->
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-xl p-6">
               <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
@@ -135,18 +135,18 @@
               </h4>
               
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div class="text-center p-4 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
                   <div class="text-2xl font-bold text-gray-900 dark:text-white">
                     ${{ product.cost?.toLocaleString() || '0' }}
                   </div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">Precio de Costo</div>
+                  <div class="text-sm text-gray-500 dark:text-zinc-400">Precio de Costo</div>
                 </div>
                 
-                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div class="text-center p-4 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
                   <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                     ${{ product.price.toLocaleString() }}
                   </div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">Precio de Venta</div>
+                  <div class="text-sm text-gray-500 dark:text-zinc-400">Precio de Venta</div>
                 </div>
                 
                 <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
@@ -154,7 +154,7 @@
                     {{ marginPercentage }}%
                   </div>
                   <div class="text-sm text-green-600 dark:text-green-400">Margen de Ganancia</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <div class="text-xs text-gray-500 dark:text-zinc-400 mt-1">
                     ${{ profitAmount.toLocaleString() }}
                   </div>
                 </div>
@@ -162,7 +162,7 @@
             </div>
 
             <!-- Historial de Movimientos (simulado) -->
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-xl p-6">
               <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -172,7 +172,7 @@
               
               <div class="space-y-3">
                 <div v-for="movement in recentMovements" :key="movement.id" 
-                     class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                     class="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
                   <div class="flex items-center space-x-3">
                     <div :class="[
                       'w-8 h-8 rounded-full flex items-center justify-center',
@@ -192,14 +192,14 @@
                     </div>
                     <div>
                       <div class="text-sm font-medium text-gray-900 dark:text-white">{{ movement.description }}</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">{{ movement.date }}</div>
+                      <div class="text-xs text-gray-500 dark:text-zinc-400">{{ movement.date }}</div>
                     </div>
                   </div>
                   <div class="text-right">
                     <div class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ movement.type === 'sale' ? '-' : '+' }}{{ movement.quantity }}
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">unidades</div>
+                    <div class="text-xs text-gray-500 dark:text-zinc-400">unidades</div>
                   </div>
                 </div>
               </div>
@@ -210,7 +210,7 @@
           <div class="space-y-6">
             
             <!-- Stock e Inventario -->
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-xl p-6">
               <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
@@ -220,13 +220,13 @@
               
               <div class="space-y-4">
                 <!-- Stock Actual -->
-                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div class="text-center p-4 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
                   <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ product.stock }}</div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">Stock Actual</div>
+                  <div class="text-sm text-gray-500 dark:text-zinc-400">Stock Actual</div>
                 </div>
                 
                 <!-- Stock Mínimo -->
-                <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between p-3 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
                   <div>
                     <div class="text-sm font-medium text-gray-900 dark:text-white">Stock Mínimo</div>
                     <div class="text-lg font-semibold text-orange-600 dark:text-orange-400">{{ product.min_stock }}</div>
@@ -272,7 +272,7 @@
             </div>
 
             <!-- Estadísticas de Ventas -->
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-xl p-6">
               <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -281,23 +281,23 @@
               </h4>
               
               <div class="space-y-3">
-                <div class="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Ventas este mes</span>
+                <div class="flex justify-between items-center p-3 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
+                  <span class="text-sm text-gray-600 dark:text-zinc-400">Ventas este mes</span>
                   <span class="font-semibold text-gray-900 dark:text-white">23 unidades</span>
                 </div>
                 
-                <div class="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Ingresos generados</span>
+                <div class="flex justify-between items-center p-3 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
+                  <span class="text-sm text-gray-600 dark:text-zinc-400">Ingresos generados</span>
                   <span class="font-semibold text-green-600 dark:text-green-400">${{ (product.price * 23).toLocaleString() }}</span>
                 </div>
                 
-                <div class="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Rotación promedio</span>
+                <div class="flex justify-between items-center p-3 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
+                  <span class="text-sm text-gray-600 dark:text-zinc-400">Rotación promedio</span>
                   <span class="font-semibold text-gray-900 dark:text-white">5.2 días</span>
                 </div>
                 
-                <div class="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Fecha creación</span>
+                <div class="flex justify-between items-center p-3 bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
+                  <span class="text-sm text-gray-600 dark:text-zinc-400">Fecha creación</span>
                   <span class="font-semibold text-gray-900 dark:text-white">
                     {{ formatDate(product.created_at) }}
                   </span>
@@ -306,7 +306,7 @@
             </div>
 
             <!-- Acciones Rápidas -->
-            <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-xl p-6">
               <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Acciones Rápidas</h4>
               
               <div class="space-y-2">

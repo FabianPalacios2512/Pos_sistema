@@ -1,5 +1,5 @@
 /**
- * 🔄 Composable para Persistencia de Estado y Auto-refresh
+ * Composable para Persistencia de Estado y Auto-refresh
  * 
  * Funcionalidades:
  * 1. Guardar y restaurar la ruta/módulo actual al hacer refresh
@@ -99,7 +99,7 @@ export function useRouteState() {
 }
 
 /**
- * 🔄 Hook para Auto-refresh de Datos
+ * Hook para Auto-refresh de Datos
  * 
  * Dispara una función de carga cuando:
  * 1. El componente se monta por primera vez

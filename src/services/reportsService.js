@@ -170,7 +170,7 @@ export const reportsService = {
         return sum + Math.abs(total)
       }, 0)
       
-      // 🔧 NUEVA LÓGICA: Las facturas ya están ajustadas por las devoluciones
+      // NUEVA LÓGICA: Las facturas ya están ajustadas por las devoluciones
       // No necesitamos restar devoluciones porque ya se aplicaron a las facturas
       const totalReturns = 0 // Siempre 0 porque las devoluciones ya modificaron las facturas
       
@@ -377,14 +377,6 @@ export const reportsService = {
             
             // Debug para los primeros items - comentado para reducir ruido
             if (false && itemIndex < 3) {
-              console.log(`   - Producto: ${productName}`)
-              console.log(`   - Cantidad: ${quantity}`)
-              console.log(`   - Precio unitario: ${unitPrice}`)
-              console.log(`   - Revenue calculado: ${revenue}`)
-              console.log(`   - item.unit_price: ${item.unit_price}`)
-              console.log(`   - item.price: ${item.price}`)
-              console.log(`   - item.sale_price: ${item.sale_price}`)
-              console.log(`   - Item completo:`, item)
             }
             
             // Obtener datos de imagen del producto desde el mapa de productos
@@ -393,16 +385,7 @@ export const reportsService = {
             const productImageUrl = fullProduct?.imageUrl || fullProduct?.image_url || item.product?.imageUrl || item.product?.image_url || item.imageUrl || item.image_url
             
             if (false && itemIndex < 3) {
-              console.log(`   - fullProduct:`, fullProduct ? 'encontrado' : 'no encontrado')
-              console.log(`   - productImage: ${productImage || 'sin imagen'}`)
-              console.log(`   - productImageUrl: ${productImageUrl || 'sin URL'}`)
               if (fullProduct) {
-                console.log(`   - Campos imagen en fullProduct:`, {
-                  image: fullProduct.image,
-                  img: fullProduct.img,
-                  imageUrl: fullProduct.imageUrl,
-                  image_url: fullProduct.image_url
-                })
               }
             }
             
@@ -747,12 +730,10 @@ export const reportsService = {
   // Obtener datos de devoluciones por período - USANDO ENDPOINT DE MÉTRICAS
   async getReturnsData(period = 'month') {
     try {
-      console.log('🔄 getReturnsData usando endpoint de métricas para período:', period)
-      
       const response = await apiClient.get(`/returns/metrics/${period}`)
       
       if (!response.data.success) {
-        console.warn('❌ No se pudieron obtener métricas de devoluciones:', response.data.message)
+        console.warn('No se pudieron obtener métricas de devoluciones:', response.data.message)
         return {
           success: false,
           error: response.data.message || 'Error obteniendo métricas de devoluciones',
@@ -760,15 +741,13 @@ export const reportsService = {
         }
       }
 
-      console.log('✅ Métricas de devoluciones obtenidas:', response.data.data)
-      
       return {
         success: true,
         data: response.data.data
       }
 
     } catch (error) {
-      console.error('❌ Error en getReturnsData:', error.message)
+      console.error('Error en getReturnsData:', error.message)
       // En caso de error, devolver 0 para que el dashboard funcione
       return {
         success: false,

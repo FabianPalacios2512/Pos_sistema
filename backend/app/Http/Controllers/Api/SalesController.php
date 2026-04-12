@@ -63,7 +63,6 @@ class SalesController extends Controller
     public function store(Request $request)
     {
         // Log de datos recibidos para debugging
-        \Log::info('Datos recibidos para crear venta/cotización:', $request->all());
 
         $validator = Validator::make($request->all(), [
             'invoice_number' => 'required|string|unique:sales,invoice_number',
@@ -548,9 +547,6 @@ class SalesController extends Controller
     {
         try {
             if (!$customer->phone) {
-                \Log::info('CRM: Cliente sin teléfono, omitiendo confirmación WhatsApp', [
-                    'customer_id' => $customer->id
-                ]);
                 return;
             }
 
@@ -604,11 +600,6 @@ class SalesController extends Controller
             if ($response->successful()) {
                 $responseData = $response->json();
                 if (isset($responseData['success']) && $responseData['success']) {
-                    \Log::info('✅ CRM: Confirmación de compra enviada por WhatsApp', [
-                        'customer_id' => $customer->id,
-                        'sale_id' => $sale->id,
-                        'phone' => $phone
-                    ]);
                 }
             }
         } catch (\Exception $e) {

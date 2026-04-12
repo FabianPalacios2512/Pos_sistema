@@ -49,13 +49,6 @@ class PaymentController extends Controller
             $title = ($planTitles[$validated['plan']] ?? 'Plan') . ' - ' . ($frequencyLabels[$validated['payment_frequency']] ?? '');
             $description = 'Suscripción ' . $title . ' para ' . ($validated['company_name'] ?? 'tu negocio');
 
-            Log::info('📝 Creando preferencia de pago', [
-                'tenant_id' => $validated['tenant_id'],
-                'plan' => $validated['plan'],
-                'amount' => $validated['amount'],
-                'frequency' => $validated['payment_frequency'],
-                'title' => $title
-            ]);
 
             // ✅ Usar PreferenceClient (SDK v3.x)
             $client = new PreferenceClient();
@@ -66,12 +59,6 @@ class PaymentController extends Controller
             $pendingUrl = $this->getRedirectUrl($request, '/payment/pending');
             $webhookUrl = $this->getRedirectUrl($request, '/api/mercadopago/webhook');
 
-            Log::info('🔗 URLs de redirección', [
-                'success' => $successUrl,
-                'failure' => $failureUrl,
-                'pending' => $pendingUrl,
-                'webhook' => $webhookUrl
-            ]);
 
             // Preparar datos de preferencia - MODO TEST OPTIMIZADO
             $preferenceData = [
@@ -115,11 +102,6 @@ class PaymentController extends Controller
             // ✅ Crear preferencia con SDK v3.x
             $preference = $client->create($preferenceData);
 
-            Log::info('✅ Preferencia de pago creada', [
-                'preference_id' => $preference->id,
-                'tenant_id' => $validated['tenant_id'],
-                'init_point' => $preference->init_point
-            ]);
 
             // Registrar transacción pendiente en BD
             PaymentTransaction::create([
@@ -191,7 +173,6 @@ class PaymentController extends Controller
     public function webhook(Request $request)
     {
         try {
-            Log::info('📨 Webhook recibido de Mercado Pago', $request->all());
 
             // Verificar que sea notificación de pago
             if ($request->type !== 'payment') {
@@ -213,12 +194,6 @@ class PaymentController extends Controller
             $tenantId = $payment->external_reference;
             $metadata = $payment->metadata;
 
-            Log::info('💳 Pago procesado', [
-                'payment_id' => $paymentId,
-                'status' => $payment->status,
-                'tenant_id' => $tenantId,
-                'amount' => $payment->transaction_amount
-            ]);
 
             // Actualizar transacción en BD
             $transaction = PaymentTransaction::where('preference_id', $payment->preference_id ?? null)
@@ -257,11 +232,6 @@ class PaymentController extends Controller
                         'status' => 'active'
                     ]);
 
-                    Log::info('✅ Plan activado', [
-                        'tenant_id' => $tenantId,
-                        'plan' => $plan,
-                        'expires_at' => $expiresAt
-                    ]);
                 }
             }
 

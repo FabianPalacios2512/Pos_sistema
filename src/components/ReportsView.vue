@@ -6,7 +6,7 @@
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Reportes Generales</h1>
-          <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Análisis integral de rendimiento • {{ getPeriodLabel() }}</p>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Análisis integral de rendimiento • {{ getPeriodLabel() }}</p>
         </div>
           
         <div class="flex items-center gap-3">
@@ -18,8 +18,7 @@
             <select 
               v-model="selectedPeriod" 
               @change="loadReportsData"
-              class="pl-10 pr-5 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/30 appearance-none cursor-pointer shadow-sm hover:shadow-md transition-shadow border-0"
-              style="box-shadow: 0 2px 8px rgba(0,0,0,0.04);"
+              class="pl-10 pr-5 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent appearance-none cursor-pointer border border-gray-200 dark:border-zinc-700 shadow-sm hover:shadow-md transition-all duration-200"
             >
               <option value="today">Hoy</option>
               <option value="week">Esta semana</option>
@@ -31,7 +30,7 @@
           <!-- Export Button - Subtle -->
           <button 
             @click="exportReport" 
-            class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
+            class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -42,18 +41,18 @@
       </div>
     
     <!-- Indicador de carga - Clean -->
-    <div v-if="loading" class="bg-white dark:bg-zinc-900 rounded-2xl p-12 text-center" style="box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+    <div v-if="loading" class="bg-white dark:bg-zinc-900 rounded-2xl p-12 text-center border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
       <div class="inline-flex items-center space-x-3">
         <svg class="animate-spin h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span class="text-gray-500 dark:text-gray-400 font-medium">Cargando datos...</span>
+        <span class="text-gray-500 dark:text-zinc-400 font-medium">Cargando datos...</span>
       </div>
     </div>
 
     <!-- Mensaje de error - Clean -->
-    <div v-else-if="error" class="bg-white dark:bg-zinc-900 rounded-2xl p-8" style="box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+    <div v-else-if="error" class="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
       <div class="flex items-center space-x-4">
         <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
           <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,10 +61,10 @@
         </div>
         <div>
           <h3 class="text-gray-900 dark:text-white font-semibold">Error al cargar reportes</h3>
-          <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{{ error }}</p>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm mt-0.5">{{ error }}</p>
         </div>
       </div>
-      <button @click="loadReportsData" class="mt-6 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl transition-all font-medium text-sm hover:shadow-md">
+      <button @click="loadReportsData" class="mt-6 px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl transition-all duration-300 font-bold text-sm shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50">
         Reintentar
       </button>
     </div>
@@ -154,7 +153,7 @@
           <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800">
             <div>
               <h2 class="text-base font-semibold text-gray-900 dark:text-white">Tendencia de Ventas</h2>
-              <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Rendimiento para {{ getPeriodLabel() }}</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Rendimiento para {{ getPeriodLabel() }}</p>
             </div>
             <svg class="w-5 h-5 text-emerald-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
@@ -165,12 +164,12 @@
               <Line :data="lineChartData" :options="lineChartOptions" />
             </div>
             <div class="mt-6 grid grid-cols-2 gap-4">
-              <div class="text-center p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-500/5">
-                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-1">Crecimiento</p>
+              <div class="text-center p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-100 dark:border-emerald-800/50">
+                <p class="text-xs text-gray-600 dark:text-zinc-400 font-medium uppercase tracking-wide mb-1">Crecimiento</p>
                 <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">+{{ dailySales && dailySales.length > 0 ? Math.round((dailySales.reduce((a, b) => a + b, 0) / dailySales.length) * 0.0015) : 15 }}%</p>
               </div>
-              <div class="text-center p-4 rounded-xl bg-blue-50/50 dark:bg-blue-500/5">
-                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-1">Pico Máximo</p>
+              <div class="text-center p-4 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-800/50">
+                <p class="text-xs text-gray-600 dark:text-zinc-400 font-medium uppercase tracking-wide mb-1">Pico Máximo</p>
                 <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">${{ dailySales && dailySales.length > 0 ? Math.max(...dailySales).toLocaleString() : '2,800' }}</p>
               </div>
             </div>
@@ -182,7 +181,7 @@
           <div class="px-7 py-6 flex items-center justify-between">
             <div>
               <h2 class="text-base font-semibold text-gray-900 dark:text-white">Top Productos</h2>
-              <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Productos más vendidos por ingresos</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Productos más vendidos por ingresos</p>
             </div>
             <svg class="w-5 h-5 text-emerald-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -200,7 +199,7 @@
           <div class="px-7 py-6 flex items-center justify-between">
             <div>
               <h2 class="text-base font-semibold text-gray-900 dark:text-white">Ventas por Categoría</h2>
-              <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Distribución de ventas por categorías</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Distribución de ventas por categorías</p>
             </div>
             <svg class="w-5 h-5 text-violet-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
@@ -219,7 +218,7 @@
           <div class="px-7 py-6 flex items-center justify-between">
             <div>
               <h2 class="text-base font-semibold text-gray-900 dark:text-white">Stock Crítico</h2>
-              <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5">Productos con inventario bajo</p>
+              <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Productos con inventario bajo</p>
             </div>
             <svg class="w-5 h-5 text-rose-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
@@ -240,7 +239,7 @@
                   </svg>
                 </div>
                 <p class="font-semibold text-gray-900 dark:text-white">Sin productos críticos</p>
-                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Todo el inventario está en niveles óptimos</p>
+                <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Todo el inventario está en niveles óptimos</p>
               </div>
             </div>
           </div>
@@ -339,10 +338,6 @@ const loadReportsData = async () => {
       reportsService.getCustomerStats(selectedPeriod.value)
     ])
     
-    console.log('🔍 DEBUG - Top Products:', topProductsData)
-    console.log('🔍 DEBUG - Categories:', categoryData)
-    console.log('🔍 DEBUG - Sales Data:', salesData)
-    
     // Actualizar datos si las respuestas son exitosas
     if (salesData.success) {
       totalSales.value = salesData.data.totalSales
@@ -366,10 +361,8 @@ const loadReportsData = async () => {
     }
     
     if (topProductsData.success) {
-      console.log('✅ TOP PRODUCTS recibidos:', topProductsData.data)
       topProducts.value = topProductsData.data
     } else {
-      console.warn('❌ topProductsData.success es false')
       // Datos de ejemplo
       topProducts.value = [
         { id: 1, name: 'Producto A', sold: 45, revenue: 4500 },
@@ -379,10 +372,8 @@ const loadReportsData = async () => {
     }
     
     if (categoryData.success) {
-      console.log('✅ CATEGORIES recibidas:', categoryData.data)
       salesByCategory.value = categoryData.data
     } else {
-      console.warn('❌ categoryData.success es false')
       // Datos de ejemplo
       salesByCategory.value = [
         { name: 'Bebidas', sales: 5600 },
@@ -400,7 +391,6 @@ const loadReportsData = async () => {
         ...product,
         color: colors[index % colors.length]
       }))
-      console.log('📦 Low Stock Products cargados:', lowStockProducts.value.length, 'productos:', lowStockProducts.value.map(p => p.name))
     }
     
     if (customerData.success) {
@@ -439,7 +429,7 @@ const loadHourlyReportsData = async () => {
     // USAR cashReportsService IGUAL QUE EL DASHBOARD (ya procesa las horas correctamente)
     const [salesData, hourlyResponse, topProductsData, categoryData, lowStockData, customerData] = await Promise.all([
       reportsService.getSalesData('today'),
-      cashReportsService.getHourlyEfficiency('today'), // ✅ MISMO SERVICIO DEL DASHBOARD
+      cashReportsService.getHourlyEfficiency('today'), // MISMO SERVICIO DEL DASHBOARD
       reportsService.getTopProducts('today', 5),
       reportsService.getSalesByCategory('today'),
       reportsService.getLowStockProducts(20),
@@ -497,7 +487,6 @@ const loadHourlyReportsData = async () => {
         ...product,
         color: colors[index % colors.length]
       }))
-      console.log('📦 [Hourly] Low Stock Products cargados:', lowStockProducts.value.length, 'productos:', lowStockProducts.value.map(p => p.name))
     }
     
     if (customerData.success) {
@@ -505,7 +494,6 @@ const loadHourlyReportsData = async () => {
     }
     
   } catch (err) {
-    console.error('❌ Error cargando datos por horas:', err)
     error.value = 'Error al cargar datos por horas'
     
     // Datos de ejemplo por horas en caso de error
@@ -526,7 +514,7 @@ watch(selectedPeriod, () => {
 })
 
 // ═══════════════════════════════════════════════════════════════
-// 🤖 CONTEXTO IA - Reportes Generales
+// CONTEXTO IA - Reportes Generales
 // ═══════════════════════════════════════════════════════════════
 const uiContextStore = useUIContextStore()
 
@@ -597,27 +585,27 @@ const registrarAccionesIA = () => {
       let mensaje = ''
       switch (tipoConsulta) {
         case 'ventas':
-          mensaje = `💰 Ventas totales del ${getPeriodLabel()}: ${formatMoney(totalSales.value)} en ${totalTransactions.value} transacciones`
+          mensaje = `Ventas totales del ${getPeriodLabel()}: ${formatMoney(totalSales.value)} en ${totalTransactions.value} transacciones`
           break
         case 'productos':
           const topProd = topProducts.value.slice(0, 5)
-          mensaje = `🏆 Top productos del ${getPeriodLabel()}:\n` + topProd.map((p, i) => 
+          mensaje = `Top productos del ${getPeriodLabel()}:\n` + topProd.map((p, i) => 
             `${i+1}. ${p.name}: ${p.sold} vendidos (${formatMoney(p.revenue)})`
           ).join('\n')
           break
         case 'categorias':
           const cats = salesByCategory.value.slice(0, 5)
-          mensaje = `📊 Ventas por categoría del ${getPeriodLabel()}:\n` + cats.map(c => 
+          mensaje = `Ventas por categoría del ${getPeriodLabel()}:\n` + cats.map(c => 
             `• ${c.name}: ${formatMoney(c.sales)}`
           ).join('\n')
           break
         case 'tendencia':
           const dias = dailySales.value.length
           const promedio = dias > 0 ? dailySales.value.reduce((a,b) => a+b, 0) / dias : 0
-          mensaje = `📈 Tendencia del ${getPeriodLabel()}: ${dias} ${selectedPeriod.value === 'today' ? 'horas' : 'días'} registrados, promedio de ${formatMoney(promedio)}`
+          mensaje = `Tendencia del ${getPeriodLabel()}: ${dias} ${selectedPeriod.value === 'today' ? 'horas' : 'días'} registrados, promedio de ${formatMoney(promedio)}`
           break
         default:
-          mensaje = `📊 RESUMEN DEL ${getPeriodLabel().toUpperCase()}:
+          mensaje = `RESUMEN DEL ${getPeriodLabel().toUpperCase()}:
 • Ventas totales: ${formatMoney(totalSales.value)}
 • Transacciones: ${totalTransactions.value}
 • Ticket promedio: ${formatMoney(averageTicket.value)}
@@ -830,7 +818,7 @@ const getProChartOptions = (isHorizontal = false, showLegend = false) => ({
   scales: {
     x: { 
       grid: { 
-        display: false // ❌ ELIMINAR grid para look premium
+        display: false // ELIMINAR grid para look premium
       },
       border: {
         display: false
@@ -859,7 +847,7 @@ const getProChartOptions = (isHorizontal = false, showLegend = false) => ({
     },
     y: { 
       grid: { 
-        display: false // ❌ ELIMINAR grid para look premium
+        display: false // ELIMINAR grid para look premium
       },
       border: {
         display: false
@@ -1053,7 +1041,7 @@ const lineChartOptions = computed(() => ({
   scales: {
     x: {
       grid: {
-        display: false // ❌ ELIMINAR grid vertical
+        display: false // ELIMINAR grid vertical
       },
       border: {
         display: false
@@ -1073,7 +1061,7 @@ const lineChartOptions = computed(() => ({
     },
     y: {
       grid: {
-        display: false // ❌ ELIMINAR grid horizontal
+        display: false // ELIMINAR grid horizontal
       },
       border: {
         display: false

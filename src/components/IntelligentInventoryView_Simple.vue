@@ -387,16 +387,16 @@
               </option>
             </select>
 
-            <!-- 🏪 Selector de Bodega/Tienda (solo para Premium/Enterprise con múltiples bodegas) -->
+            <!-- Selector de Bodega/Tienda (solo para Premium/Enterprise con múltiples bodegas) -->
             <select 
               v-if="showWarehouseSelector"
               v-model="selectedWarehouse"
               @change="loadProductsData"
               class="px-4 py-2.5 text-sm rounded-full bg-[#f3e8ff] dark:bg-[#7c3aed]/20 text-[#7c3aed] dark:text-[#a78bfa] font-medium focus:outline-none focus:ring-2 focus:ring-[#7c3aed] dark:focus:ring-[#a78bfa] min-w-48"
             >
-              <option value="">📍 Todas las Sedes</option>
+              <option value="">Todas las Sedes</option>
               <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">
-                {{ warehouse.is_default ? '🏢 ' : '🏪 ' }}{{ warehouse.name }}
+                {{ warehouse.is_default ? '' : '' }}{{ warehouse.name }}
               </option>
             </select>
 
@@ -2394,7 +2394,7 @@ export default {
   setup() {
     const API_BASE_URL = API_CONFIG.BASE_URL
     
-    // 🔗 Composable para navegación entre módulos
+    // Composable para navegación entre módulos
     const { navigateToModule } = useModuleNavigation()
 
     // Estado reactivo
@@ -2422,8 +2422,8 @@ export default {
     const productsData = ref(null)
     const availableCategories = ref([])
     const availableSuppliers = ref([])
-    const warehouses = ref([]) // 🏪 Lista de bodegas/tiendas
-    const selectedWarehouse = ref('') // 🏪 Bodega seleccionada ('' = todas)
+    const warehouses = ref([]) // Lista de bodegas/tiendas
+    const selectedWarehouse = ref('') // Bodega seleccionada ('' = todas)
     const filters = reactive({
       category: '',
       supplier: '',
@@ -2432,7 +2432,7 @@ export default {
       itemsPerPage: 25
     })
     
-    // 🏪 Computed para mostrar/ocultar selector de bodega
+    // Computed para mostrar/ocultar selector de bodega
     const showWarehouseSelector = computed(() => {
       // Solo mostrar si:
       // 1. El plan es premium o enterprise
@@ -2443,7 +2443,7 @@ export default {
       return isPremiumOrEnterprise && hasMultipleWarehouses
     })
     
-    // 📊 Computed para paginación de productos
+    // Computed para paginación de productos
     const totalProductItems = computed(() => {
       return productsData.value?.products?.length || 0
     })
@@ -2568,7 +2568,7 @@ export default {
       return new Intl.NumberFormat('es-CO').format(number)
     }
 
-    // 🏭 Función para formatear unidades de medida
+    // Función para formatear unidades de medida
     const getMeasurementUnitLabel = (unit) => {
       const units = {
         'unit': 'unidades',
@@ -2617,8 +2617,8 @@ export default {
     const getRotationTooltip = (rotationClass) => {
       const tooltips = {
         'A': '⭐ Alta rotación: Se agota en menos de 30 días. Producto de alta demanda.',
-        'B': '🔵 Rotación media: Se agota entre 31-90 días. Velocidad normal.',
-        'C': '⚠️ Rotación lenta: Tardaría más de 90 días en agotarse. Revisar inventario.'
+        'B': 'Rotación media: Se agota entre 31-90 días. Velocidad normal.',
+        'C': 'Rotación lenta: Tardaría más de 90 días en agotarse. Revisar inventario.'
       }
       return tooltips[rotationClass] || tooltips['C']
     }
@@ -2674,7 +2674,6 @@ export default {
 
     // Función para refrescar la sección actual
     const refreshCurrentSection = () => {
-      console.log('🔄 Refrescando sección:', activeSection.value)
       switch (activeSection.value) {
         case 'overview':
           loadDashboardData()
@@ -2821,33 +2820,42 @@ export default {
     
     // Función para ver detalles de alerta (navegar a factura, producto, etc)
     const viewAlertDetails = (alert) => {
-      console.log('Ver detalles de alerta:', alert)
+      // Navegación según tipo de alerta
+      if (alert.invoice_id) {
+        navigateToModule('invoices', { search: alert.invoice_id })
+        return
+      }
+      if (alert.product_id) {
+        activeSection.value = 'products'
+        return
+      }
+      if (alert.category === 'stock') {
+        activeSection.value = 'products'
+        return
+      }
       
       if (toastRef.value) {
         toastRef.value.show({
-          title: 'Navegación',
-          message: `Abriendo detalles de: ${alert.title}`,
+          title: 'Detalle de alerta',
+          message: alert.title,
           type: 'info',
           autoClose: true,
           duration: 2000
         })
       }
-      
-      // TODO: Implementar navegación real según tipo de alerta
-      // if (alert.invoice_id) -> router.push(`/invoices/${alert.invoice_id}`)
-      // if (alert.product_id) -> router.push(`/products/${alert.product_id}`)
-      // if (alert.action_url) -> window.open(alert.action_url, '_blank')
     }
     
     // Función para marcar alerta como revisada
     const markAlertAsReviewed = async (alert) => {
       try {
-        // TODO: Implementar llamada al backend
-        // await fetch(`${API_BASE_URL}/alerts/${alert.id}/reviewed`, { method: 'POST' })
+        await apiCall('/inventory/test/alerts/dismiss', {
+          method: 'POST',
+          body: JSON.stringify({ alert_id: alert.id })
+        })
         
         if (toastRef.value) {
           toastRef.value.show({
-            title: '✓ Alerta marcada como revisada',
+            title: 'Alerta marcada como revisada',
             message: `La alerta "${alert.title}" ha sido marcada como revisada`,
             type: 'success',
             autoClose: true,
@@ -2862,8 +2870,6 @@ export default {
             alertsData.value.alerts.splice(index, 1)
           }
         }
-        
-        console.log('Alerta marcada como revisada:', alert.id)
       } catch (error) {
         console.error('Error marcando alerta como revisada:', error)
         
@@ -2881,21 +2887,19 @@ export default {
     
     // Función para justificar alerta (descuentos, fraude)
     const justifyAlert = async (alert) => {
-      // TODO: Abrir modal de justificación
       const justification = prompt(`Justifica la acción para: ${alert.title}`)
       
       if (!justification) return
       
       try {
-        // TODO: Implementar llamada al backend
-        // await fetch(`${API_BASE_URL}/alerts/${alert.id}/justify`, {
-        //   method: 'POST',
-        //   body: JSON.stringify({ justification })
-        // })
+        await apiCall('/inventory/test/alerts/dismiss', {
+          method: 'POST',
+          body: JSON.stringify({ alert_id: alert.id, justification })
+        })
         
         if (toastRef.value) {
           toastRef.value.show({
-            title: '✓ Alerta justificada',
+            title: 'Alerta justificada',
             message: `La justificación ha sido guardada: "${justification.substring(0, 40)}..."`,
             type: 'success',
             autoClose: true,
@@ -2910,8 +2914,6 @@ export default {
             alertsData.value.alerts.splice(index, 1)
           }
         }
-        
-        console.log('Alerta justificada:', alert.id, justification)
       } catch (error) {
         console.error('Error justificando alerta:', error)
         
@@ -2932,12 +2934,15 @@ export default {
       if (!confirm('¿Estás seguro de marcar todas las alertas como revisadas?')) return
       
       try {
-        // TODO: Implementar llamada al backend
-        // await fetch(`${API_BASE_URL}/alerts/reviewed-all`, { method: 'POST' })
+        const alertIds = (alertsData.value?.alerts || []).map(a => a.id)
+        await apiCall('/inventory/test/alerts/dismiss', {
+          method: 'POST',
+          body: JSON.stringify({ alert_ids: alertIds, dismiss_all: true })
+        })
         
         if (toastRef.value) {
           toastRef.value.show({
-            title: '✓ Todas las alertas revisadas',
+            title: 'Todas las alertas revisadas',
             message: `${alertsData.value?.alerts?.length || 0} alertas marcadas como revisadas`,
             type: 'success',
             autoClose: true,
@@ -2949,8 +2954,6 @@ export default {
         if (alertsData.value) {
           alertsData.value.alerts = []
         }
-        
-        console.log('Todas las alertas marcadas como revisadas')
       } catch (error) {
         console.error('Error marcando todas las alertas:', error)
         
@@ -2974,19 +2977,19 @@ export default {
       if (!confirm(`¿Resolver todas las ${alertCount} alertas de "${groupName}"?\n\nEsto marcará todas las alertas del grupo como revisadas.`)) return
       
       try {
-        // TODO: Implementar llamada al backend para resolver grupo
-        // await fetch(`${API_BASE_URL}/alerts/resolve-group`, {
-        //   method: 'POST',
-        //   body: JSON.stringify({
-        //     category: group.category,
-        //     severity: group.severity,
-        //     alert_ids: group.alerts.map(a => a.id)
-        //   })
-        // })
+        const alertIds = group.alerts.map(a => a.id)
+        await apiCall('/inventory/test/alerts/dismiss', {
+          method: 'POST',
+          body: JSON.stringify({
+            alert_ids: alertIds,
+            category: group.category,
+            severity: group.severity
+          })
+        })
         
         if (toastRef.value) {
           toastRef.value.show({
-            title: `✅ Grupo Resuelto`,
+            title: `Grupo Resuelto`,
             message: `${alertCount} alertas de "${groupName}" marcadas como revisadas`,
             type: 'success',
             autoClose: true,
@@ -3008,8 +3011,6 @@ export default {
         if (index > -1) {
           expandedGroups.value.splice(index, 1)
         }
-        
-        console.log(`Grupo resuelto: ${group.category} (${alertCount} alertas)`)
       } catch (error) {
         console.error('Error resolviendo grupo de alertas:', error)
         
@@ -3031,27 +3032,25 @@ export default {
     
     // Función para ver documento de movimiento (factura, orden de compra, etc)
     const viewMovementDocument = (movement) => {
-      console.log('Ver documento de movimiento:', movement)
+      // Navegar según tipo de movimiento
+      if (movement.movement_reason && movement.movement_reason.toLowerCase().includes('venta')) {
+        navigateToModule('invoices', { search: movement.document_number })
+        return
+      }
+      if (movement.movement_reason && movement.movement_reason.toLowerCase().includes('compra')) {
+        navigateToModule('purchase-orders', { search: movement.document_number })
+        return
+      }
       
       if (toastRef.value) {
         toastRef.value.show({
-          title: '📄 Abriendo Documento',
-          message: `Documento: ${movement.document_number}\nTipo: ${movement.movement_reason}`,
+          title: 'Documento',
+          message: `${movement.document_number} - ${movement.movement_reason}`,
           type: 'info',
           autoClose: true,
           duration: 2500
         })
       }
-      
-      // TODO: Implementar navegación real según tipo de documento
-      // Ejemplo de lógica de navegación:
-      // if (movement.movement_reason.includes('Venta')) {
-      //   router.push(`/facturas/${movement.reference_id}`)
-      // } else if (movement.movement_reason.includes('Compra')) {
-      //   router.push(`/compras/${movement.reference_id}`)
-      // } else if (movement.document_url) {
-      //   window.open(movement.document_url, '_blank')
-      // }
     }
 
     // Renombrar testConnection a loadDashboardData para mayor claridad
@@ -3121,10 +3120,8 @@ export default {
     }
 
     const handleAlertAction = (alert) => {
-      console.log('Acción de alerta:', alert)
       if (alert.action_url) {
         // Aquí podrías navegar a una página específica o abrir un modal
-        console.log('Navegando a:', alert.action_url)
       }
     }
 
@@ -3141,7 +3138,6 @@ export default {
         })
         
         if (data.success) {
-          console.log('Alerta descartada correctamente')
           // Opcional: mostrar mensaje de confirmación
           if (toastRef.value) {
             toastRef.value.show({
@@ -3204,7 +3200,7 @@ export default {
             // Las alertas automáticas ya no se cargan aquí
             // Solo se mostrarán en el dashboard principal del POS
           } else {
-            console.warn('⚠️ Respuesta sin success o data:', inventoryData)
+            console.warn('Respuesta sin success o data:', inventoryData)
           }
         } else {
           // const errorText = await inventoryResponse.text()
@@ -3270,7 +3266,7 @@ export default {
       await loadDashboardData()
     }
 
-    // 🏪 Cargar bodegas activas
+    // Cargar bodegas activas
     const loadWarehouses = async () => {
       try {
         const data = await apiCall('/warehouses/active', { silent: true })
@@ -3304,7 +3300,7 @@ export default {
         if (filters.supplier) params.append('supplier', filters.supplier) 
         if (filters.search) params.append('search', filters.search)
         
-        // 🏪 Agregar bodega si está seleccionada
+        // Agregar bodega si está seleccionada
         if (selectedWarehouse.value) {
           params.append('warehouse_id', selectedWarehouse.value)
         }
@@ -3429,7 +3425,7 @@ export default {
       }
     }
 
-    // 🎨 Generar color consistente para avatar de proveedor
+    // Generar color consistente para avatar de proveedor
     const getSupplierColor = (name) => {
       const colors = [
         '#3B82F6', '#8B5CF6', '#EC4899', '#EF4444', '#F97316', 
@@ -3442,14 +3438,14 @@ export default {
       return colors[Math.abs(hash) % colors.length]
     }
 
-    // 🔗 Navegar a Gestión de Proveedores (va al tab de proveedores en purchase-orders)
+    // Navegar a Gestión de Proveedores (va al tab de proveedores en purchase-orders)
     const navigateToSuppliers = () => {
       navigateToModule('purchase-orders', { 
         activeTab: 'suppliers' 
       })
     }
 
-    // 👁️ Ver productos de un proveedor (abre en master detail)
+    // Ver productos de un proveedor (abre en master detail)
     const viewSupplierProducts = (supplier) => {
       // Navegar al módulo de órdenes de compra con el proveedor seleccionado
       navigateToModule('purchase-orders', { 
@@ -3460,7 +3456,7 @@ export default {
       })
     }
 
-    // 📝 Crear orden de compra para un proveedor
+    // Crear orden de compra para un proveedor
     const createOrderForSupplier = (supplier) => {
       // Navegar al módulo de órdenes de compra con el proveedor preseleccionado
       navigateToModule('purchase-orders', { 
@@ -3471,7 +3467,7 @@ export default {
       })
     }
 
-    // 💾 Guardar preferencia de paginador en localStorage
+    // Guardar preferencia de paginador en localStorage
     const savePaginatorPreference = (key, value) => {
       try {
         const prefs = JSON.parse(localStorage.getItem('pos_paginator_prefs') || '{}')
@@ -3482,7 +3478,7 @@ export default {
       }
     }
 
-    // 📖 Cargar preferencias de paginador desde localStorage
+    // Cargar preferencias de paginador desde localStorage
     const loadPaginatorPreferences = () => {
       try {
         const prefs = JSON.parse(localStorage.getItem('pos_paginator_prefs') || '{}')
@@ -3551,7 +3547,7 @@ export default {
           loadDashboardData()
           break
         case 'products':
-          // 🏪 Cargar bodegas primero, luego productos
+          // Cargar bodegas primero, luego productos
           loadWarehouses().then(() => loadProductsData())
           break
         case 'movements':
@@ -3670,58 +3666,48 @@ export default {
     }
 
     // Función para crear orden de compra (nuevo feature)
-    const createPurchaseOrder = (item) => {
-      console.log('📦 Creando orden de compra para:', item)
-      
-      // Determinar cantidad sugerida
+    const createPurchaseOrder = async (item) => {
       const quantity = item.recommended_purchase || item.current_stock * 2
       const estimatedCost = item.estimated_cost || 0
       
-      // Mostrar confirmación con toast
-      if (toastRef.value) {
-        toastRef.value.show({
-          title: '🛒 Orden de Compra Creada',
-          message: `Producto: ${item.product_name}\nCantidad: ${quantity} unidades\nCosto estimado: ${formatCurrency(estimatedCost)}`,
-          type: 'success',
-          autoClose: true,
-          duration: 5000,
-          actions: [
-            {
-              label: 'Ver Orden',
-              onClick: () => {
-                console.log('Ver orden de compra')
-                // Aquí puedes navegar a la vista de órdenes de compra
-              }
-            },
-            {
-              label: 'Imprimir',
-              onClick: () => {
-                console.log('Imprimir orden de compra')
-                // Aquí puedes generar PDF de la orden
-              }
-            }
-          ]
+      try {
+        await apiCall('/purchase-orders', {
+          method: 'POST',
+          body: JSON.stringify({
+            product_id: item.product_id,
+            quantity: quantity,
+            estimated_cost: estimatedCost,
+            priority: item.priority || item.urgency,
+            notes: `Orden generada desde predicción de agotamiento`
+          })
         })
-      } else {
-        // Fallback si no hay toast disponible
-        alert(`✅ Orden de compra creada:\n\nProducto: ${item.product_name}\nCantidad: ${quantity} unidades\nCosto: ${formatCurrency(estimatedCost)}`)
+        
+        if (toastRef.value) {
+          toastRef.value.show({
+            title: 'Orden de Compra Creada',
+            message: `Producto: ${item.product_name}\nCantidad: ${quantity} unidades\nCosto estimado: ${formatCurrency(estimatedCost)}`,
+            type: 'success',
+            autoClose: true,
+            duration: 5000,
+            actions: [
+              {
+                label: 'Ver Ordenes',
+                onClick: () => navigateToModule('purchase-orders')
+              }
+            ]
+          })
+        }
+      } catch (error) {
+        // Fallback: navegar al módulo de órdenes de compra
+        navigateToModule('purchase-orders', {
+          action: 'new',
+          product_id: item.product_id,
+          quantity: quantity
+        })
       }
-      
-      // TODO: Integrar con backend para crear orden de compra real
-      // const response = await fetch(`${API_BASE_URL}/purchase-orders`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     product_id: item.product_id,
-      //     quantity: quantity,
-      //     estimated_cost: estimatedCost,
-      //     priority: item.priority || item.urgency,
-      //     notes: `Orden generada automáticamente por predicción de agotamiento`
-      //   })
-      // })
     }
 
-    // 🧠 CONCIENCIA DE PANTALLA PARA IA - Inventario Inteligente
+    // CONCIENCIA DE PANTALLA PARA IA - Inventario Inteligente
     const updateScreenContextForAI = () => {
       const uiContext = useUIContextStore()
       
@@ -3836,7 +3822,7 @@ export default {
           proveedor: filters.supplier || null
         },
         
-        // 👥 Datos de Clientes (pestaña Clientes)
+        // Datos de Clientes (pestaña Clientes)
         clientes: activeSection.value === 'customers' && customersData.value ? {
           totalClientes: customersData.value.summary?.total_customers || 0,
           ingresos: formatCurrency(customersData.value.summary?.total_revenue || 0),
@@ -3854,7 +3840,7 @@ export default {
           }))
         } : null,
         
-        // 🏭 Datos de Proveedores (pestaña Proveedores)
+        // Datos de Proveedores (pestaña Proveedores)
         proveedores: activeSection.value === 'suppliers' && suppliersData.value ? {
           totalProveedores: suppliersData.value.summary?.total_suppliers || 0,
           activos: suppliersData.value.summary?.active_suppliers || 0,
@@ -3870,7 +3856,7 @@ export default {
           }))
         } : null,
         
-        // ⚠️ Datos de Alertas (pestaña Alertas)
+        // Datos de Alertas (pestaña Alertas)
         alertas: activeSection.value === 'alerts' && alertsData.value ? {
           criticas: alertsData.value.summary?.critical || 0,
           advertencias: alertsData.value.summary?.warning || 0,
@@ -3884,7 +3870,7 @@ export default {
           }))
         } : null,
         
-        // 🔮 Datos de Predicciones (pestaña Predicciones) - MUY IMPORTANTE PARA LA IA
+        // Datos de Predicciones (pestaña Predicciones) - MUY IMPORTANTE PARA LA IA
         predicciones: activeSection.value === 'predictions' && predictionsData.value ? {
           // Tendencias actuales vs anteriores
           tendencias: {
@@ -4008,7 +3994,7 @@ export default {
         }
       })
       
-      // 👥 Acción para buscar cliente en Inventario Inteligente
+      // Acción para buscar cliente en Inventario Inteligente
       uiContext.registerAction('buscarClienteInventarioInteligente', (params) => {
         const texto = params?.texto || ''
         if (activeSection.value !== 'customers') {
@@ -4022,7 +4008,7 @@ export default {
         }
       })
       
-      // 🏭 Acción para buscar proveedor en Inventario Inteligente
+      // Acción para buscar proveedor en Inventario Inteligente
       uiContext.registerAction('buscarProveedorInventarioInteligente', (params) => {
         const texto = params?.texto || ''
         if (activeSection.value !== 'suppliers') {
@@ -4036,7 +4022,7 @@ export default {
         }
       })
       
-      // 🌐 ACTUALIZAR DATOS GLOBALES DEL NEGOCIO
+      // ACTUALIZAR DATOS GLOBALES DEL NEGOCIO
       // Estos datos estarán disponibles para la IA desde CUALQUIER módulo
       uiContext.updateGlobalBusinessSection('inventario', {
         productosActivos: metrics.activeProducts,
@@ -4072,25 +4058,25 @@ export default {
 
     // Cargar datos automáticamente al montar el componente
     onMounted(() => {
-      // 💾 Primero cargar preferencias de paginador
+      // Primero cargar preferencias de paginador
       loadPaginatorPreferences()
       
       loadDashboardData()
       loadProductsData()
       loadMovementsData()
       loadCustomersData()
-      loadSuppliersData() // 🏭 Cargar proveedores
+      loadSuppliersData() // Cargar proveedores
       
-      // 🧠 Inicializar contexto para IA
+      // Inicializar contexto para IA
       setTimeout(() => updateScreenContextForAI(), 1000)
     })
 
-    // 🧠 Watcher para actualizar contexto cuando cambian los datos
+    // Watcher para actualizar contexto cuando cambian los datos
     watch([activeSection, overviewData, productsData, movementsData, customersData, suppliersData, alertsData, predictionsData], () => {
       updateScreenContextForAI()
     }, { deep: true })
 
-    // 👁️ Watchers para guardar preferencias de paginador automáticamente
+    // Watchers para guardar preferencias de paginador automáticamente
     watch(() => filters.itemsPerPage, (newValue) => {
       savePaginatorPreference('products', newValue)
     })
@@ -4240,7 +4226,7 @@ export default {
         }
       }
       
-      // ✅ Usar summary del backend que ya viene filtrado por bodega
+      // Usar summary del backend que ya viene filtrado por bodega
       const summary = productsData.value.summary || {}
       
       return {
@@ -4283,11 +4269,11 @@ export default {
       productsMetrics,
       availableCategories,
       availableSuppliers,
-      warehouses, // 🏪 Lista de bodegas
-      selectedWarehouse, // 🏪 Bodega seleccionada
-      showWarehouseSelector, // 🏪 Mostrar selector (computed)
+      warehouses, // Lista de bodegas
+      selectedWarehouse, // Bodega seleccionada
+      showWarehouseSelector, // Mostrar selector (computed)
       filters,
-      // 📊 Paginación de productos
+      // Paginación de productos
       totalProductItems,
       totalProductPages,
       paginatedProductsList,
@@ -4301,7 +4287,7 @@ export default {
       customersFilters,
       customersTotalPages,
       customersPaginationInfo,
-      isPremiumOrEnterprise, // 🔒 Plan detection para features premium
+      isPremiumOrEnterprise, // Plan detection para features premium
       suppliersData,
       suppliersFilters,
       suppliersTotalPages,
@@ -4331,8 +4317,8 @@ export default {
       formatCurrency,
       formatDate,
       formatNumber,
-      getMeasurementUnitLabel, // 🏭 Formatear unidades de medida
-      getRotationTooltip, // 💡 Tooltips para rotación ABC
+      getMeasurementUnitLabel, // Formatear unidades de medida
+      getRotationTooltip, // Tooltips para rotación ABC
       calculateProfitMargin,
       formatPercentage,
       getChangeClass,
@@ -4349,7 +4335,7 @@ export default {
       refreshOverviewData,
       refreshCurrentSection,
       testConnection,
-      loadWarehouses, // 🏪 Cargar bodegas
+      loadWarehouses, // Cargar bodegas
       loadProductsData,
       changeItemsPerPage,
       loadMovementsData,
@@ -4390,7 +4376,7 @@ export default {
       viewSupplierProducts,
       createOrderForSupplier,
       
-      // 💾 Funciones de persistencia de paginador
+      // Funciones de persistencia de paginador
       savePaginatorPreference,
       loadPaginatorPreferences
     }

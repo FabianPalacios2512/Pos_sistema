@@ -14,7 +14,6 @@ export function useModuleNavigation() {
   
   // Navegar a un módulo con query params opcionales
   const navigateToModule = (moduleName, queryParams = {}) => {
-    console.log('🚀 [useModuleNavigation] Navegando a:', moduleName, 'con query:', queryParams)
     currentModuleGlobal.value = moduleName
     currentQueryGlobal.value = queryParams
     

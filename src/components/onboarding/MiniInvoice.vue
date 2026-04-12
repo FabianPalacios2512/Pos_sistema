@@ -1,6 +1,6 @@
 <template>
   <!-- 
-    ✅ COMPONENTE QUE USA LOS TEMPLATES REALES DEL SISTEMA
+    COMPONENTE QUE USA LOS TEMPLATES REALES DEL SISTEMA
     Este componente simplemente renderiza los templates reales que ya existen
     en src/components/invoiceTemplates/ - NO creamos código nuevo
   -->

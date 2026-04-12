@@ -30,14 +30,9 @@ class InvoiceController extends Controller
         try {
             $type = $request->input('type', 'invoice');
 
-            \Log::info('📋 Solicitando próximo número de factura', [
-                'type' => $type,
-                'tenant_id' => tenant('id')
-            ]);
 
             $nextNumber = Invoice::generateNextNumber($type);
 
-            \Log::info('✅ Número generado', ['next_number' => $nextNumber]);
 
             return response()->json([
                 'success' => true,
@@ -298,15 +293,6 @@ class InvoiceController extends Controller
                                 $warehouseId = $preferredWarehouseId;
                                 $sourceWarehouseId = $preferredWarehouseId; // ✅ GUARDAR para invoice_item
 
-                                \Log::info('✅ Stock descontado de bodega preferida (store)', [
-                                    'product_id' => $item['product_id'],
-                                    'variant_id' => $variantId,
-                                    'product_name' => $product->name,
-                                    'warehouse_id' => $warehouseId,
-                                    'stock_anterior' => $preferredStock,
-                                    'cantidad_vendida' => $item['quantity'],
-                                    'stock_restante' => $preferredStock - $item['quantity']
-                                ]);
                             } else {
                                 // ⚠️ NO HAY STOCK suficiente en bodega preferida, buscar en otras bodegas
                                 \Log::warning('⚠️ Stock insuficiente en bodega preferida, buscando en otras (store)', [
@@ -350,15 +336,6 @@ class InvoiceController extends Controller
                                 $warehouseId = $availableWarehouse->warehouse_id;
                                 $sourceWarehouseId = $availableWarehouse->warehouse_id; // ✅ GUARDAR para invoice_item
 
-                                \Log::info('✅ Stock descontado de bodega alternativa (store)', [
-                                    'product_id' => $item['product_id'],
-                                    'variant_id' => $variantId,
-                                    'product_name' => $product->name,
-                                    'warehouse_id' => $warehouseId,
-                                    'stock_anterior' => $availableWarehouse->stock,
-                                    'cantidad_vendida' => $item['quantity'],
-                                    'stock_restante' => $availableWarehouse->stock - $item['quantity']
-                                ]);
                             } else {
                                 // ❌ NO HAY STOCK en ninguna bodega (esto no debería pasar si el frontend valida correctamente)
                                 \Log::error('❌ ERROR: No hay stock disponible en ninguna bodega (store)', [
@@ -529,12 +506,6 @@ class InvoiceController extends Controller
                         // Recargar la factura con los datos de Factus
                         $invoice->refresh();
                         
-                        \Log::info('✅ Factura validada automáticamente ante DIAN', [
-                            'invoice_id' => $invoice->id,
-                            'number' => $invoice->number,
-                            'cufe' => $billData['cufe'] ?? 'N/A',
-                            'tenant' => tenant('id')
-                        ]);
                     }
                 } catch (\Exception $factusError) {
                     // Si falla Factus, no bloqueamos la venta - solo loggeamos el error
@@ -681,12 +652,6 @@ class InvoiceController extends Controller
             $invoice = Invoice::with(['invoiceItems', 'customer'])->findOrFail($id);
 
             // Log para auditoria
-            \Log::info("Eliminando factura {$invoice->number}", [
-                'invoice_id' => $id,
-                'total' => $invoice->total,
-                'items_count' => $invoice->invoiceItems->count(),
-                'deleted_by' => auth()->user()->email ?? 'sistema'
-            ]);
 
             \DB::transaction(function () use ($invoice) {
                 // 1. Restaurar inventario en las bodegas ORIGINALES usando source_warehouse_id
@@ -710,7 +675,6 @@ class InvoiceController extends Controller
                             $product->current_stock = $totalStock;
                             $product->save();
 
-                            \Log::info("✅ Stock restaurado en bodega original: {$product->name} +{$item->quantity} bodega:{$warehouseId}");
                         }
                     }
                 }
@@ -723,7 +687,6 @@ class InvoiceController extends Controller
                             if ($product) {
                                 $quantity = $item['quantity'] ?? 1;
                                 $product->increment('stock', $quantity);
-                                \Log::info("Stock restaurado (JSON): {$product->name} +{$quantity} = {$product->stock}");
                             }
                         }
                     }
@@ -738,7 +701,6 @@ class InvoiceController extends Controller
                 // 5. Actualizar estado de sesión de caja si aplica
                 if ($invoice->cash_session_id) {
                     // Aquí podrías actualizar los totales de la sesión de caja
-                    \Log::info("Factura eliminada de sesión de caja: {$invoice->cash_session_id}");
                 }
 
                 // 6. Finalmente eliminar la factura
@@ -838,14 +800,12 @@ class InvoiceController extends Controller
             }
 
             // Log para debug
-            \Log::info('POS Invoice Request Data:', $request->all());
 
             // Fix for legacy frontend sending customer_id 7 (Cliente Final) which might not exist
             if ($request->customer_id == 7) {
                 $customerExists = DB::table('customers')->where('id', 7)->exists();
                 if (!$customerExists) {
                     $request->merge(['customer_id' => 1]);
-                    \Log::info('Mapped customer_id 7 to 1 because 7 does not exist.');
                 }
             }
 
@@ -862,12 +822,6 @@ class InvoiceController extends Controller
             }
 
             // 🐛 DEBUG: Ver qué payment_method llega desde el frontend
-            \Log::info('🔍 Payment Method Debug:', [
-                'received_payment_method' => $request->payment_method,
-                'valid_payment_methods' => $validPaymentMethods,
-                'type_of_received' => gettype($request->payment_method),
-                'creditienda_enabled' => $systemSettings->creditienda_enabled ?? false
-            ]);
 
             $validator = Validator::make($request->all(), [
                 'type' => 'required|in:invoice,quote,credit_note',
@@ -912,9 +866,7 @@ class InvoiceController extends Controller
 
             $data = $validator->validated();
 
-            \Log::info('📝 Generando número de factura para tipo: ' . $data['type']);
             $data['number'] = Invoice::generateNextNumber($data['type']);
-            \Log::info('✅ Número generado: ' . $data['number']);
 
             // Establecer status según el tipo de documento
             if ($data['type'] === 'quote') {
@@ -928,12 +880,6 @@ class InvoiceController extends Controller
                 // Obtener el usuario autenticado
                 $userId = Auth::id();
 
-                \Log::info('Auth check in createPosInvoice', [
-                    'user_id' => $userId,
-                    'auth_check' => Auth::check(),
-                    'auth_user' => Auth::user() ? Auth::user()->toArray() : null,
-                    'request_user' => $request->user() ? $request->user()->toArray() : null
-                ]);
 
                 if (!$userId) {
                     \Log::error('Usuario no autenticado en createPosInvoice');
@@ -948,7 +894,6 @@ class InvoiceController extends Controller
 
                 if ($currentCashSession) {
                     $data['cash_session_id'] = $currentCashSession->id;
-                    \Log::info("✅ Venta de contado asignada a sesión de caja {$currentCashSession->id}");
                 } else {
                     // Log warning pero no bloquear la venta
                     \Log::warning("Factura {$data['number']} creada sin sesión de caja abierta para usuario {$userId}");
@@ -956,16 +901,10 @@ class InvoiceController extends Controller
             } elseif (isset($data['payment_method']) && $data['payment_method'] === 'credit') {
                 // Las ventas a crédito NO se asignan a caja porque no hay dinero físico
                 $data['cash_session_id'] = null;
-                \Log::info("💳 Venta a crédito NO asignada a caja - El dinero entrará cuando se registre el abono");
             }
 
             // VALIDACIÓN CRÍTICA: VENTAS A CRÉDITO (antes de crear la factura)
             if (isset($data['payment_method']) && $data['payment_method'] === 'credit') {
-                \Log::info('💳 Validando venta a crédito', [
-                    'customer_id' => $data['customer_id'],
-                    'total' => $data['total'],
-                    'surcharge_amount' => $data['surcharge_amount'] ?? 0
-                ]);
 
                 // 1. Obtener cliente CON LOCK PESIMISTA 🔒 para evitar race condition BUG-002
                 $customer = \App\Models\Customer::where('id', $data['customer_id'])
@@ -1005,17 +944,6 @@ class InvoiceController extends Controller
                 $newTotalDebt = floatval($customer->current_debt ?? 0) + $totalWithSurcharge;
                 $newSubtotalDebt = $subtotalDebt + $subtotal;
 
-                \Log::info('🔍 Validación de cupo (basado en subtotal_debt)', [
-                    'customer_id' => $customer->id,
-                    'customer_name' => $customer->name,
-                    'credit_limit' => $creditLimit,
-                    'subtotal_debt_actual' => $subtotalDebt,
-                    'available_credit' => $availableCredit,
-                    'subtotal_compra' => $subtotal,
-                    'total_with_surcharge' => $totalWithSurcharge,
-                    'new_subtotal_debt_if_approved' => $newSubtotalDebt,
-                    'new_total_debt_if_approved' => $newTotalDebt
-                ]);
 
                 if ($subtotal > $availableCredit) {
                     \Log::error('❌ Crédito insuficiente', [
@@ -1035,15 +963,11 @@ class InvoiceController extends Controller
                     ], 400);
                 }
 
-                \Log::info('✅ Validación de cupo exitosa, procesando venta a crédito');
             }
 
             // Agregar discount_amount si hay descuento aplicado
             if (isset($request->applied_discount) && isset($request->applied_discount['amount'])) {
                 $data['discount_amount'] = $request->applied_discount['amount'];
-                \Log::info('💰 Descuento agregado a la factura', [
-                    'discount_amount' => $data['discount_amount']
-                ]);
             }
 
             // Agregar seller_name
@@ -1061,11 +985,6 @@ class InvoiceController extends Controller
                     $data['subtotal'] = $originalTotal; // Guardar el subtotal original
                     $data['total'] = $originalTotal + $surcharge; // Total = subtotal + recargo
 
-                    \Log::info('💳 Ajustando total de factura a crédito', [
-                        'subtotal' => $originalTotal,
-                        'surcharge' => $surcharge,
-                        'total_final' => $data['total']
-                    ]);
                 }
             }
 
@@ -1127,18 +1046,10 @@ class InvoiceController extends Controller
 
             // PROCESAR VENTA A CRÉDITO (después de crear y validar)
             if (isset($data['payment_method']) && $data['payment_method'] === 'credit') {
-                \Log::info('💳 Procesando venta a crédito', [
-                    'invoice_id' => $invoice->id,
-                    'invoice_number' => $invoice->number,
-                    'customer_id' => $data['customer_id'],
-                    'total' => $data['total'],
-                    'surcharge_amount' => $data['surcharge_amount'] ?? 0
-                ]);
 
                 // ✅ Factura a crédito: status='paid' (la venta se realizó)
                 // El payment_method='credit' indica que es a crédito
                 // La columna cash_session_id=null indica que no está en caja
-                \Log::info("✅ Factura a crédito con status='paid' - La venta está hecha, crédito se controla aparte");
 
                 // Actualizar deuda del cliente (ya validamos antes)
                 $customer = \App\Models\Customer::find($data['customer_id']);
@@ -1159,26 +1070,10 @@ class InvoiceController extends Controller
                     // Si el cliente pasa de $0 deuda a tener deuda, registrar fecha inicial
                     if ($previousDebt == 0 && $customer->current_debt > 0) {
                         $customer->debt_since = now();
-                        \Log::info('📅 Registrando inicio de deuda para cliente', [
-                            'customer_id' => $customer->id,
-                            'debt_since' => $customer->debt_since
-                        ]);
                     }
 
                     $customer->save();
 
-                    \Log::info('✅ Deuda del cliente actualizada', [
-                        'customer_id' => $customer->id,
-                        'customer_name' => $customer->name,
-                        'previous_debt' => $previousDebt,
-                        'added_total' => $totalWithSurcharge,
-                        'new_total_debt' => $customer->current_debt,
-                        'previous_subtotal_debt' => $previousSubtotalDebt,
-                        'added_subtotal' => $subtotalSinRecargo,
-                        'new_subtotal_debt' => $customer->subtotal_debt,
-                        'credit_limit' => $customer->credit_limit,
-                        'available_credit' => $customer->credit_limit - $customer->subtotal_debt
-                    ]);
                 }
             }
 
@@ -1267,15 +1162,6 @@ class InvoiceController extends Controller
                                 $warehouseId = $preferredWarehouseId;
                                 $sourceWarehouseId = $preferredWarehouseId; // ✅ GUARDAR para invoice_item
 
-                                \Log::info('✅ Stock descontado de bodega preferida (createPosInvoice)', [
-                                    'product_id' => $item['product_id'],
-                                    'variant_id' => $variantId,
-                                    'product_name' => $product->name,
-                                    'warehouse_id' => $warehouseId,
-                                    'stock_anterior' => $preferredStock,
-                                    'cantidad_vendida' => $item['quantity'],
-                                    'stock_restante' => $preferredStock - $item['quantity']
-                                ]);
                             } else {
                                 // ⚠️ NO HAY STOCK suficiente en bodega preferida, buscar en otras bodegas
                                 \Log::warning('⚠️ Stock insuficiente en bodega preferida, buscando en otras (createPosInvoice)', [
@@ -1319,15 +1205,6 @@ class InvoiceController extends Controller
                                 $warehouseId = $availableWarehouse->warehouse_id;
                                 $sourceWarehouseId = $availableWarehouse->warehouse_id; // ✅ GUARDAR para invoice_item
 
-                                \Log::info('✅ Stock descontado de bodega alternativa (createPosInvoice)', [
-                                    'product_id' => $item['product_id'],
-                                    'variant_id' => $variantId,
-                                    'product_name' => $product->name,
-                                    'warehouse_id' => $warehouseId,
-                                    'stock_anterior' => $availableWarehouse->stock,
-                                    'cantidad_vendida' => $item['quantity'],
-                                    'stock_restante' => $availableWarehouse->stock - $item['quantity']
-                                ]);
                             } else {
                                 // ❌ NO HAY STOCK en ninguna bodega (esto no debería pasar si el frontend valida correctamente)
                                 \Log::error('❌ ERROR: No hay stock disponible en ninguna bodega (createPosInvoice)', [
@@ -1371,14 +1248,6 @@ class InvoiceController extends Controller
                         $newStock = $totalStock;
                         $product->save();
 
-                        \Log::info('✅ Stock total actualizado', [
-                            'product_id' => $item['product_id'],
-                            'variant_id' => $variantId,
-                            'is_variable' => $product->isVariable(),
-                            'previous_total' => $previousStock,
-                            'new_total' => $newStock,
-                            'quantity_sold' => $item['quantity']
-                        ]);
 
                         // Log de movimiento de inventario
                         \App\Models\InventoryMovement::create([
@@ -1418,28 +1287,14 @@ class InvoiceController extends Controller
             $invoice->save();
 
             // Procesar descuento promocional si existe
-            \Log::info('🔍 Verificando descuento promocional', [
-                'has_applied_discount' => isset($data['applied_discount']),
-                'applied_discount_data' => $data['applied_discount'] ?? null
-            ]);
 
             if (isset($data['applied_discount']) && !empty($data['applied_discount'])) {
                 $discountData = $data['applied_discount'];
 
-                \Log::info('📋 Datos del descuento recibidos', [
-                    'discount_data' => $discountData,
-                    'has_discount_id' => isset($discountData['discount_id']),
-                    'discount_id' => $discountData['discount_id'] ?? null
-                ]);
 
                 if (isset($discountData['discount_id']) && $discountData['discount_id']) {
                     $discount = Discount::find($discountData['discount_id']);
 
-                    \Log::info('🔍 Buscando descuento en BD', [
-                        'discount_id' => $discountData['discount_id'],
-                        'discount_found' => $discount !== null,
-                        'discount_code' => $discount->code ?? 'N/A'
-                    ]);
 
                     if ($discount) {
                         // VALIDACIÓN CRÍTICA: Verificar si el descuento aún puede usarse
@@ -1465,15 +1320,6 @@ class InvoiceController extends Controller
                         $customerEmail = $request->customer_email;
                         $customerPhone = $request->customer_phone;
 
-                        \Log::info('🚀 Registrando uso del descuento', [
-                            'discount_code' => $discount->code,
-                            'invoice_number' => $invoice->number,
-                            'user_identifier' => $userIdentifier,
-                            'customer_email' => $customerEmail,
-                            'customer_phone' => $customerPhone,
-                            'discount_amount' => $discountData['amount'] ?? 0,
-                            'before_times_used' => $discount->times_used
-                        ]);
 
                         try {
                             // Registrar el uso del descuento
@@ -1490,10 +1336,6 @@ class InvoiceController extends Controller
                                 ]
                             );
 
-                            \Log::info('✅ Uso del descuento registrado exitosamente', [
-                                'discount_code' => $discount->code,
-                                'after_times_used' => $discount->fresh()->times_used
-                            ]);
 
                             // Crear registro en applied_discounts
                             AppliedDiscount::create([
@@ -1507,7 +1349,6 @@ class InvoiceController extends Controller
                                 'applied_at' => now()
                             ]);
 
-                            \Log::info("✅ Descuento promocional aplicado completamente - Código: {$discount->code}, Factura: {$invoice->number}, Usuario: {$userIdentifier}");
 
                         } catch (\Exception $e) {
                             \Log::error('❌ Error registrando uso del descuento', [
@@ -1528,7 +1369,6 @@ class InvoiceController extends Controller
                     ]);
                 }
             } else {
-                \Log::info('ℹ️ No hay descuento promocional en esta factura');
             }
 
             // ✅ Actualizar estadísticas del cliente (total_purchases y total_orders)
@@ -1541,11 +1381,6 @@ class InvoiceController extends Controller
                     $customer->last_purchase = now();
                     $customer->save();
 
-                    \Log::info('✅ Estadísticas del cliente actualizadas', [
-                        'customer_id' => $customer->id,
-                        'total_purchases' => $customer->total_purchases,
-                        'total_orders' => $customer->total_orders
-                    ]);
                 }
             }
 
@@ -1608,11 +1443,6 @@ class InvoiceController extends Controller
                     $systemSettings = DB::table('system_settings')->first();
                     $provider = $systemSettings->electronic_invoice_provider ?? 'none';
                     
-                    \Log::info('🧾 Facturación Electrónica: Verificando proveedor', [
-                        'provider' => $provider,
-                        'invoice_number' => $invoice->number,
-                        'tenant' => tenant('id')
-                    ]);
                     
                     if ($provider === 'alanube') {
                         // ═══════════════════════════════════════════════════════════════
@@ -1621,9 +1451,6 @@ class InvoiceController extends Controller
                         $alanube = \App\Services\AlanubeService::create();
                         
                         if ($alanube->isConfigured() && !empty($systemSettings->alanube_company_id)) {
-                            \Log::info('🚀 Alanube: Iniciando validación DIAN', [
-                                'company_id' => $systemSettings->alanube_company_id
-                            ]);
                             
                             // Preparar datos para Alanube
                             $invoiceForAlanube = [
@@ -1674,12 +1501,6 @@ class InvoiceController extends Controller
                                 $invoice->refresh();
                                 $invoice->load(['customer', 'invoiceItems']);
                                 
-                                \Log::info('✅ Factura validada por Alanube (DIAN)', [
-                                    'invoice_id' => $invoice->id,
-                                    'cufe' => $billData['cufe'] ?? 'N/A',
-                                    'time_ms' => $alanubeResponse['time_ms'] ?? 'N/A',
-                                    'tenant' => tenant('id')
-                                ]);
                             } else {
                                 throw new \Exception($alanubeResponse['message'] ?? 'Error desconocido de Alanube');
                             }
@@ -1699,16 +1520,8 @@ class InvoiceController extends Controller
                         // ═══════════════════════════════════════════════════════════════
                         $factus = \App\Services\FactusService::create();
                         
-                        \Log::info('🧾 Factus: Verificando si está habilitado', [
-                            'isEnabled' => $factus->isEnabled(),
-                            'isConfigured' => $factus->isConfigured()
-                        ]);
                         
                         if ($factus->isEnabled()) {
-                            \Log::info('🧾 Factus: Preparando datos para validación DIAN', [
-                                'invoice_number' => $invoice->number,
-                                'customer_name' => $invoice->customer->name ?? 'N/A'
-                            ]);
                             
                             // Preparar datos para Factus
                             $invoiceForFactus = [
@@ -1762,19 +1575,10 @@ class InvoiceController extends Controller
                             $invoice->refresh();
                             $invoice->load(['customer', 'invoiceItems']);
                             
-                            \Log::info('✅ Factura POS validada por Factus (DIAN)', [
-                                'invoice_id' => $invoice->id,
-                                'number' => $invoice->number,
-                                'cufe' => $billData['cufe'] ?? 'N/A',
-                                'factus_number' => $billData['number'] ?? 'N/A',
-                                'tenant' => tenant('id')
-                            ]);
                         } else {
-                            \Log::info('ℹ️ Factus no está habilitado - Factura sin validación DIAN');
                         }
                     } else {
                         // Proveedor = 'none' - No hacer nada
-                        \Log::info('ℹ️ Facturación electrónica desactivada (provider: none)');
                     }
                 } catch (\Exception $electronicError) {
                     // Si falla cualquier proveedor, no bloqueamos la venta - solo loggeamos
@@ -1795,21 +1599,8 @@ class InvoiceController extends Controller
                 ]);
                 $invoice->refresh();
                 
-                \Log::info('ℹ️ Facturación electrónica desactivada por usuario - CUFE local', [
-                    'invoice_id' => $invoice->id,
-                    'number' => $invoice->number,
-                    'local_cufe' => $localCufe,
-                    'tenant' => tenant('id')
-                ]);
             }
 
-            \Log::info('✅ Factura POS creada exitosamente', [
-                'invoice_id' => $invoice->id,
-                'invoice_number' => $invoice->number,
-                'total' => $invoice->total,
-                'seller_name' => $invoice->seller_name,
-                'cufe' => $invoice->cufe ?? 'Sin CUFE'
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -3042,15 +2833,6 @@ startxref
     {
         try {
             // Log de datos recibidos para debug
-            \Log::info('Recibiendo datos para sendQuotationWhatsAppPDF:', [
-                'phone' => $request->input('phone'),
-                'customerName' => $request->input('customerName'),
-                'message_length' => strlen($request->input('message', '')),
-                'has_pdf' => $request->hasFile('pdf'),
-                'pdf_size' => $request->hasFile('pdf') ? $request->file('pdf')->getSize() : 0,
-                'pdf_mime' => $request->hasFile('pdf') ? $request->file('pdf')->getMimeType() : null,
-                'pdf_extension' => $request->hasFile('pdf') ? $request->file('pdf')->getClientOriginalExtension() : null,
-            ]);
 
             $validator = Validator::make($request->all(), [
                 'phone' => 'required|string',

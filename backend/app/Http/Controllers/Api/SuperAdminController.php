@@ -51,6 +51,28 @@ class SuperAdminController extends Controller
             // Nuevos tenants hoy
             $newToday = Tenant::whereDate('created_at', today())->count();
 
+            // Error logs totals
+            $totalErrors = 0;
+            try {
+                $totalErrors = DB::connection('mysql')->table('tenant_error_logs')
+                    ->where('resolved', false)
+                    ->count();
+            } catch (\Throwable $e) {}
+
+            // Login stats today
+            $loginsToday = 0;
+            $failsToday = 0;
+            try {
+                $loginsToday = DB::connection('mysql')->table('login_attempts')
+                    ->where('result', 'success')
+                    ->where('attempted_at', '>=', today())
+                    ->count();
+                $failsToday = DB::connection('mysql')->table('login_attempts')
+                    ->where('result', 'fail')
+                    ->where('attempted_at', '>=', today())
+                    ->count();
+            } catch (\Throwable $e) {}
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -58,7 +80,10 @@ class SuperAdminController extends Controller
                     'total_clients' => $totalTenants,
                     'mrr' => $mrr,
                     'new_today' => $newToday,
-                    'ai_tokens_month' => 0 // TODO: Implementar tracking de tokens IA
+                    'ai_tokens_month' => 0,
+                    'total_errors' => $totalErrors,
+                    'logins_today' => $loginsToday,
+                    'login_fails_today' => $failsToday,
                 ]
             ]);
         } catch (\Exception $e) {
@@ -78,7 +103,19 @@ class SuperAdminController extends Controller
     public function getTenants()
     {
         try {
-            $tenants = Tenant::with('domains')->get()->map(function($tenant) {
+            // Get error counts per tenant
+            $errorCounts = [];
+            try {
+                $errorCounts = DB::connection('mysql')->table('tenant_error_logs')
+                    ->select('tenant_id', DB::raw('SUM(CASE WHEN resolved = 0 THEN 1 ELSE 0 END) as active_errors'))
+                    ->groupBy('tenant_id')
+                    ->pluck('active_errors', 'tenant_id')
+                    ->toArray();
+            } catch (\Throwable $e) {
+                // Table may not exist yet
+            }
+
+            $tenants = Tenant::with('domains')->get()->map(function($tenant) use ($errorCounts) {
                 // stancl/tenancy permite acceder a valores de JSON como propiedades directas
                 $subscriptionStart = $tenant->subscription_start ?? ($tenant->created_at ? $tenant->created_at->format('Y-m-d') : null);
                 $subscriptionEnd = $tenant->subscription_end ?? $tenant->subscription_ends_at;
@@ -103,6 +140,7 @@ class SuperAdminController extends Controller
                     'created_at' => $tenant->created_at->format('Y-m-d H:i:s'),
                     'subscription_start' => $subscriptionStart,
                     'subscription_end' => $subscriptionEnd ? (is_string($subscriptionEnd) ? $subscriptionEnd : $subscriptionEnd->format('Y-m-d')) : null,
+                    'error_count' => (int)($errorCounts[$tenant->id] ?? 0),
                 ];
             });
 
@@ -138,8 +176,9 @@ class SuperAdminController extends Controller
 
             // Obtener estadísticas del tenant ejecutando consultas en su base de datos
             $stats = [];
+            $adminUser = null;
             try {
-                $tenant->run(function() use (&$stats) {
+                $tenant->run(function() use (&$stats, &$adminUser) {
                     $stats = [
                         'total_users' => DB::table('users')->count(),
                         'total_products' => DB::table('products')->count(),
@@ -147,6 +186,8 @@ class SuperAdminController extends Controller
                         'total_customers' => DB::table('customers')->count(),
                         'total_revenue' => DB::table('sales')->sum('total') ?? 0
                     ];
+                    // Obtener el usuario admin (primer usuario creado)
+                    $adminUser = DB::table('users')->orderBy('id')->first();
                 });
             } catch (\Exception $e) {
                 $stats = ['error' => 'No se pudo conectar a la base de datos del tenant'];
@@ -172,6 +213,10 @@ class SuperAdminController extends Controller
                     'created_at' => $tenant->created_at->format('Y-m-d H:i:s'),
                     'subscription_start' => $subscriptionStart,
                     'subscription_end' => $subscriptionEnd,
+                    'owner_name' => $tenant->owner_name ?? null,
+                    'cedula' => $tenant->cedula ?? null,
+                    'admin_email' => $adminUser->email ?? null,
+                    'admin_phone' => $adminUser->phone ?? null,
                     'stats' => $stats
                 ]
             ]);
@@ -224,13 +269,6 @@ class SuperAdminController extends Controller
             $baseDomain = $isProduction ? '.' . $centralDomain : '.localhost';
             $checkDomain = $validated['subdomain'] . $baseDomain;
 
-            \Log::info('🌐 Determinando dominio', [
-                'app_env' => $appEnv,
-                'is_production' => $isProduction,
-                'central_domain' => $centralDomain,
-                'base_domain' => $baseDomain,
-                'check_domain' => $checkDomain
-            ]);
 
             // Validar que el dominio no exista
             if (DB::table('domains')->where('domain', $checkDomain)->exists()) {
@@ -290,13 +328,6 @@ class SuperAdminController extends Controller
                 ? $validated['subdomain'] . '.' . $centralDomain
                 : $validated['subdomain'] . '.localhost';
 
-            \Log::info('🌐 Creando tenant', [
-                'subdomain' => $validated['subdomain'],
-                'domain' => $domain,
-                'is_production' => $isProduction,
-                'app_env' => $appEnv,
-                'central_domain' => $centralDomain
-            ]);
 
             // Validar que el dominio final no exista
             if (DB::table('domains')->where('domain', $domain)->exists()) {
@@ -330,10 +361,8 @@ class SuperAdminController extends Controller
             // El seeder crea: roles (Administrador, Vendedor), usuario admin, system_settings, etc.
             $tenant->run(function () {
                 try {
-                    \Log::info('🌱 SuperAdmin: Ejecutando DatabaseSeeder...');
                     $seeder = new \Database\Seeders\DatabaseSeeder();
                     $seeder->run();
-                    \Log::info('✅ SuperAdmin: DatabaseSeeder ejecutado correctamente');
                 } catch (\Exception $e) {
                     \Log::error('❌ SuperAdmin: Error ejecutando DatabaseSeeder: ' . $e->getMessage());
                     throw $e; // Re-lanzar para que el catch externo maneje el error
@@ -360,10 +389,6 @@ class SuperAdminController extends Controller
                                 'updated_at' => now()
                             ]);
 
-                        \Log::info('✅ SuperAdmin: Usuario admin actualizado', [
-                            'name' => $validated['owner_name'],
-                            'email' => $validated['admin_email']
-                        ]);
                     }
 
                     // Actualizar configuración del sistema
@@ -376,7 +401,6 @@ class SuperAdminController extends Controller
                             'updated_at' => now()
                         ]);
 
-                    \Log::info('✅ SuperAdmin: Configuración del sistema actualizada');
 
                 } catch (\Exception $e) {
                     \Log::error('❌ SuperAdmin: Error actualizando datos del tenant: ' . $e->getMessage());
@@ -384,14 +408,6 @@ class SuperAdminController extends Controller
                 }
             });
 
-            \Log::info("✅ Tenant creado manualmente por super admin", [
-                'tenant_id' => $tenantId,
-                'business_name' => $validated['business_name'],
-                'domain' => $domain,  // ✅ Usar $domain en lugar de $fullDomain
-                'plan' => $validated['plan'],
-                'owner' => $validated['owner_name'],
-                'cedula' => $validated['cedula']
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -563,11 +579,6 @@ class SuperAdminController extends Controller
 
             $tenant->save();
 
-            \Log::info('✅ Tenant actualizado', [
-                'tenant_id' => $id,
-                'plan' => $validated['plan'] ?? null,
-                'status' => $validated['status'] ?? null
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -616,11 +627,6 @@ class SuperAdminController extends Controller
             $tenant->subscription_end = $validated['subscription_end'];
             $tenant->save();
 
-            \Log::info('✅ Fechas de suscripción actualizadas', [
-                'tenant_id' => $id,
-                'subscription_start' => $validated['subscription_start'],
-                'subscription_end' => $validated['subscription_end']
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -664,10 +670,6 @@ class SuperAdminController extends Controller
             $tenant->status = $validated['status'];
             $tenant->save();
 
-            \Log::info('✅ Estado de tenant actualizado', [
-                'tenant_id' => $id,
-                'new_status' => $validated['status']
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -707,19 +709,10 @@ class SuperAdminController extends Controller
             $tenantDomain = $tenant->domains->first()->domain ?? 'unknown';
             $tenantData = $tenant->data ?? [];
 
-            \Log::info('🗑️ Iniciando eliminación de tenant', [
-                'tenant_id' => $id,
-                'domain' => $tenantDomain,
-                'plan' => $tenant->plan ?? 'N/A'
-            ]);
 
             // Eliminar el tenant (esto también elimina su base de datos gracias al paquete)
             $tenant->delete();
 
-            \Log::info('✅ Tenant eliminado correctamente', [
-                'tenant_id' => $id,
-                'domain' => $tenantDomain
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -734,6 +727,287 @@ class SuperAdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al eliminar tenant: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener usuarios de un tenant
+     */
+    public function getTenantUsers($id)
+    {
+        try {
+            $tenant = Tenant::findOrFail($id);
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            $users = DB::connection('mysql')
+                ->table($tenantDbName . '.users')
+                ->leftJoin($tenantDbName . '.roles', $tenantDbName . '.users.role_id', '=', $tenantDbName . '.roles.id')
+                ->select(
+                    $tenantDbName . '.users.id',
+                    $tenantDbName . '.users.name',
+                    $tenantDbName . '.users.email',
+                    $tenantDbName . '.users.active',
+                    $tenantDbName . '.users.created_at',
+                    $tenantDbName . '.roles.name as role'
+                )
+                ->orderBy($tenantDbName . '.users.id', 'asc')
+                ->get();
+
+            return response()->json(['success' => true, 'data' => $users]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cargar usuarios: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener productos de un tenant
+     */
+    public function getTenantProducts($id)
+    {
+        try {
+            $tenant = Tenant::findOrFail($id);
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            $products = DB::connection('mysql')
+                ->table($tenantDbName . '.products')
+                ->select('id', 'name', 'price', 'stock', 'image_url', 'barcode', 'category_id', 'active', 'created_at')
+                ->orderBy('name', 'asc')
+                ->get();
+
+            return response()->json(['success' => true, 'data' => $products]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cargar productos: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Resetear contraseña de un usuario de un tenant
+     */
+    public function resetUserPassword($tenantId, $userId, Request $request)
+    {
+        try {
+            $tenant = Tenant::findOrFail($tenantId);
+            $newPassword = $request->input('password');
+
+            if (!$newPassword || strlen($newPassword) < 6) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La contraseña es requerida y debe tener al menos 6 caracteres'
+                ], 400);
+            }
+
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            DB::connection('mysql')
+                ->table($tenantDbName . '.users')
+                ->where('id', $userId)
+                ->update(['password' => Hash::make($newPassword)]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Contraseña actualizada correctamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al resetear contraseña: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Actualizar un producto de un tenant
+     */
+    public function updateTenantProduct($tenantId, $productId, Request $request)
+    {
+        try {
+            $tenant = Tenant::findOrFail($tenantId);
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            $updateData = [];
+            if ($request->has('name')) $updateData['name'] = $request->input('name');
+            if ($request->has('price')) $updateData['price'] = $request->input('price');
+            if ($request->has('stock')) $updateData['stock'] = $request->input('stock');
+            if ($request->has('active')) $updateData['active'] = $request->input('active');
+
+            if (empty($updateData)) {
+                return response()->json(['success' => false, 'message' => 'No hay datos para actualizar'], 400);
+            }
+
+            $updateData['updated_at'] = now();
+
+            DB::connection('mysql')
+                ->table($tenantDbName . '.products')
+                ->where('id', $productId)
+                ->update($updateData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Producto actualizado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar producto: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Eliminar un producto de un tenant
+     */
+    public function deleteTenantProduct($tenantId, $productId)
+    {
+        try {
+            $tenant = Tenant::findOrFail($tenantId);
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            DB::connection('mysql')
+                ->table($tenantDbName . '.products')
+                ->where('id', $productId)
+                ->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Producto eliminado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar producto: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Actualizar un usuario de un tenant (toggle active status)
+     */
+    public function updateTenantUser($tenantId, $userId, Request $request)
+    {
+        try {
+            $tenant = Tenant::findOrFail($tenantId);
+            $tenantDbName = 'tenant' . $tenant->id;
+
+            $updateData = [];
+            if ($request->has('active')) $updateData['active'] = $request->input('active') ? 1 : 0;
+            if ($request->has('name')) $updateData['name'] = $request->input('name');
+            if ($request->has('email')) $updateData['email'] = $request->input('email');
+
+            if (empty($updateData)) {
+                return response()->json(['success' => false, 'message' => 'No hay datos para actualizar'], 400);
+            }
+
+            $updateData['updated_at'] = now();
+
+            DB::connection('mysql')
+                ->table($tenantDbName . '.users')
+                ->where('id', $userId)
+                ->update($updateData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Usuario actualizado correctamente'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar usuario: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // ==================== TENANT ERROR LOGS ====================
+
+    /**
+     * Get errors for a specific tenant.
+     */
+    public function getTenantErrors(Request $request, $tenantId)
+    {
+        try {
+            $includeResolved = $request->boolean('include_resolved', false);
+            $logger = new \App\Services\TenantErrorLoggerService();
+            $errors = $logger->getTenantErrors($tenantId, $includeResolved);
+
+            return response()->json([
+                'success' => true,
+                'data' => $errors
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener logs: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Resolve (mark as fixed) a specific error.
+     */
+    public function resolveError(Request $request, $tenantId, $errorId)
+    {
+        try {
+            $logger = new \App\Services\TenantErrorLoggerService();
+            $resolved = $logger->resolveError((int)$errorId);
+
+            return response()->json([
+                'success' => $resolved,
+                'message' => $resolved ? 'Error marcado como resuelto' : 'Error no encontrado'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Trigger AI analysis for a specific error.
+     */
+    public function analyzeError(Request $request, $tenantId, $errorId)
+    {
+        try {
+            $logger = new \App\Services\TenantErrorLoggerService();
+            $summary = $logger->analyzeWithAI((int)$errorId);
+
+            return response()->json([
+                'success' => $summary !== null,
+                'data' => ['ai_summary' => $summary],
+                'message' => $summary ? 'Análisis completado' : 'No se pudo analizar'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al analizar: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Trigger AI analysis for all pending errors of a tenant.
+     */
+    public function analyzeAllErrors(Request $request, $tenantId)
+    {
+        try {
+            $logger = new \App\Services\TenantErrorLoggerService();
+            $analyzed = $logger->analyzeAllPending($tenantId, 10);
+
+            return response()->json([
+                'success' => true,
+                'data' => ['analyzed_count' => $analyzed],
+                'message' => "Se analizaron {$analyzed} errores"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }

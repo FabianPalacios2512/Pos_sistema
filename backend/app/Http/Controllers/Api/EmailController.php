@@ -29,10 +29,6 @@ class EmailController extends Controller
                     ->html($validated['html']);
             });
 
-            Log::info('📧 Email enviado correctamente', [
-                'to' => $validated['to'],
-                'subject' => $validated['subject']
-            ]);
 
             return response()->json([
                 'success' => true,

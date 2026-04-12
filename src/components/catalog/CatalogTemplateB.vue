@@ -65,7 +65,7 @@
               : 'bg-white text-gray-600 hover:bg-gray-50 active:bg-gray-100 border-gray-200 hover:border-gray-300'"
             :style="selectedCategory === null ? { backgroundColor: primaryColor } : {}"
           >
-            📦 Todos
+            Todos
           </button>
           <button
             v-for="cat in categories"
@@ -124,7 +124,7 @@
               
               <!-- Badge Stock Bajo -->
               <div v-else-if="product.stock < 5" class="absolute top-3 right-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg">
-                ⚡ Solo {{ product.stock }}
+                Solo {{ product.stock }}
               </div>
             </div>
 
@@ -685,7 +685,7 @@
       </Transition>
     </Teleport>
 
-    <!-- 👗 Modal de Selección de Variantes (Fashion) -->
+    <!-- Modal de Selección de Variantes (Fashion) -->
     <POSVariantSelector
       :show="showVariantModal"
       :product="selectedProduct"
@@ -693,7 +693,7 @@
       @confirm="handleVariantConfirmed"
     />
 
-    <!-- ⚖️ Modal de Cantidad (Productos por peso/medida) -->
+    <!-- Modal de Cantidad (Productos por peso/medida) -->
     <QuantityModal
       :show="showQuantityModal"
       :product="selectedProductForQuantity"
@@ -832,21 +832,11 @@ const addToCartWithAnimation = (product, event) => {
   if (product.stock === 0) return
   
   // Debug: Ver qué variantes tiene el producto
-  console.log('🛒 Producto clickeado:', product.name)
-  console.log('📦 Variantes disponibles:', product.variants)
-  console.log('📊 Cantidad de variantes:', product.variants ? product.variants.length : 0)
-  console.log('⚖️ Unidad de medida (unit):', product.unit)
-  console.log('⚖️ Measurement unit:', product.measurement_unit)
-  console.log('⚖️ Allow decimal:', product.allow_decimal)
-  
-  // 🚨 DETECCIÓN IGUAL QUE EL POS
+  // DETECCIÓN IGUAL QUE EL POS
   // Si el producto usa measurement_unit diferente de 'unit', requiere modal de cantidad
   const requiresQuantityInput = product.measurement_unit && product.measurement_unit !== 'unit'
   
-  console.log('⚖️ Requiere input de cantidad:', requiresQuantityInput)
-  
   if (requiresQuantityInput) {
-    console.log('✅ Abriendo modal de cantidad (peso/medida)')
     selectedProductForQuantity.value = product
     showQuantityModal.value = true
     return
@@ -856,13 +846,10 @@ const addToCartWithAnimation = (product, event) => {
   const hasVariants = product.variants && product.variants.length > 0
   
   if (hasVariants) {
-    console.log('✅ Abriendo modal de variantes')
     // Abrir modal de selección de variante
     openVariantModal(product)
     return
   }
-  
-  console.log('⚠️ Producto sin variantes y sin medida especial, agregando directamente')
   
   // 3️⃣ Si NO tiene variantes ni requiere cantidad, proceder con animación
   
@@ -917,7 +904,7 @@ const openVariantModal = (product) => {
   showVariantModal.value = true
 }
 
-// 👗 Manejar confirmación del modal de variantes (Fashion)
+// Manejar confirmación del modal de variantes (Fashion)
 const handleVariantConfirmed = ({ variant, selectedOptions }) => {
   if (!variant || !selectedProduct.value) return
   
@@ -952,10 +939,8 @@ const handleVariantConfirmed = ({ variant, selectedOptions }) => {
   showVariantModal.value = false
 }
 
-// ⚖️ Manejar confirmación del modal de cantidad (peso/medida)
+// Manejar confirmación del modal de cantidad (peso/medida)
 const handleQuantityConfirmed = ({ product, quantity }) => {
-  console.log(`⚖️ Agregando ${quantity} ${product.unit} de ${product.name}`)
-  
   // Crear producto con cantidad específica para el carrito
   const productWithQuantity = {
     ...product,
@@ -1081,14 +1066,12 @@ const searchCustomerByDocument = async () => {
       formData.value.customer_address = response.data.customer.address || ''
       
       // Feedback visual sutil (opcional: puedes agregar un toast o animación)
-      console.log('✅ Cliente encontrado:', response.data.customer.name)
     } else {
       // Cliente no encontrado - el usuario puede llenar manualmente
-      console.log('ℹ️ Cliente no encontrado, permitir llenado manual')
     }
   } catch (error) {
     // Error de red o servidor - permitir llenado manual sin mostrar error al usuario
-    console.error('⚠️ Error buscando cliente:', error)
+    console.error('Error buscando cliente:', error)
     // Fallar silenciosamente - el usuario puede seguir llenando el formulario manualmente
   } finally {
     searchingCustomer.value = false
@@ -1141,19 +1124,19 @@ const handleCheckoutSubmit = async () => {
       // Crear mensaje simple para WhatsApp usando el mensaje personalizado de configuración
       const greeting = props.storeConfig.custom_message || 'Hola, quiero hacer el siguiente pedido:'
       let message = `${greeting}\n\n`
-      message += `📋 *Código: ${order.order_number}*\n\n`
-      message += `👤 ${customerData.customer_name}\n`
-      message += `📱 ${customerData.customer_phone}\n\n`
+      message += `*Código: ${order.order_number}*\n\n`
+      message += `${customerData.customer_name}\n`
+      message += `${customerData.customer_phone}\n\n`
       
       // Tipo de entrega
       if (customerData.delivery_type === 'delivery') {
-        message += `🚚 Envío a: ${customerData.customer_address}\n\n`
+        message += `Envío a: ${customerData.customer_address}\n\n`
       } else {
-        message += `🏪 Recoger en tienda\n\n`
+        message += `Recoger en tienda\n\n`
       }
       
       // Lista simple de productos
-      message += `📦 *Productos:*\n`
+      message += `*Productos:*\n`
       orderItems.forEach((item, index) => {
         message += `${index + 1}. ${item.name} x${item.quantity}\n`
       })
@@ -1162,11 +1145,11 @@ const handleCheckoutSubmit = async () => {
       const deliveryCost = customerData.delivery_type === 'delivery' ? parseFloat(props.storeConfig.delivery_cost || 0) : 0
       const finalTotal = parseFloat(order.total) + deliveryCost
       
-      message += `\n💰 Total: ${props.storeConfig.currency_symbol}${formatPrice(finalTotal)}`
+      message += `\nTotal: ${props.storeConfig.currency_symbol}${formatPrice(finalTotal)}`
       
       // Notas si existen
       if (customerData.note) {
-        message += `\n\n📝 ${customerData.note}`
+        message += `\n\n${customerData.note}`
       }
       
       const whatsappUrl = `https://wa.me/${props.storeConfig.whatsapp_number}?text=${encodeURIComponent(message)}`
@@ -1177,7 +1160,7 @@ const handleCheckoutSubmit = async () => {
   } catch (error) {
     console.error('Error al crear pedido:', error)
     const errorMsg = error.response?.data?.message || error.response?.data?.errors || 'Error al procesar tu pedido. Por favor intenta nuevamente.'
-    alert(`❌ Error: ${typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg}`)
+    alert(`Error: ${typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : errorMsg}`)
   } finally {
     submittingOrder.value = false
   }
@@ -1190,13 +1173,10 @@ onMounted(() => {
     imageErrors.value[p.id] = false
   })
   
-  // 🔍 Debug: Ver todos los productos y sus variantes
-  console.log('📦 Total productos cargados:', props.storeConfig.catalog_products?.length)
+  // Debug: Ver todos los productos y sus variantes
   props.storeConfig.catalog_products?.forEach(p => {
     if (p.variants && p.variants.length > 0) {
-      console.log(`✅ Producto "${p.name}" tiene ${p.variants.length} variantes:`, p.variants)
     } else {
-      console.log(`⚠️ Producto "${p.name}" NO tiene variantes`)
     }
   })
 })

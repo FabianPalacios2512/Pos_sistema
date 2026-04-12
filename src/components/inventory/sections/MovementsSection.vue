@@ -366,8 +366,8 @@ export default {
         'transfer': 'Transferencia',
         'entry': 'Entrada',
         'exit': 'Salida',
-        'in': 'Entrada',      // 🔄 Backend usa 'in' para entradas
-        'out': 'Salida',      // 🔄 Backend usa 'out' para salidas (ventas)
+        'in': 'Entrada',      // Backend usa 'in' para entradas
+        'out': 'Salida',      // Backend usa 'out' para salidas (ventas)
         'manual_entry': 'Entrada Manual',
         'manual_exit': 'Salida Manual'
       }
@@ -383,8 +383,8 @@ export default {
         'transfer': 'bg-[#f3e8ff] text-[#7c3aed] dark:bg-[#7c3aed]/20 dark:text-[#a78bfa]',
         'entry': 'bg-[#e6f4ea] text-[#1e8e3e] dark:bg-[#1e8e3e]/20 dark:text-[#81c995]',
         'exit': 'bg-[#fce8e6] text-[#d93025] dark:bg-[#d93025]/20 dark:text-[#f28b82]',
-        'in': 'bg-[#e6f4ea] text-[#1e8e3e] dark:bg-[#1e8e3e]/20 dark:text-[#81c995]',   // 🔄 Backend usa 'in'
-        'out': 'bg-[#fce8e6] text-[#d93025] dark:bg-[#d93025]/20 dark:text-[#f28b82]',             // 🔄 Backend usa 'out'
+        'in': 'bg-[#e6f4ea] text-[#1e8e3e] dark:bg-[#1e8e3e]/20 dark:text-[#81c995]',   // Backend usa 'in'
+        'out': 'bg-[#fce8e6] text-[#d93025] dark:bg-[#d93025]/20 dark:text-[#f28b82]',             // Backend usa 'out'
         'manual_entry': 'bg-[#e6f4ea] text-[#1e8e3e] dark:bg-[#1e8e3e]/20 dark:text-[#81c995]',
         'manual_exit': 'bg-[#fce8e6] text-[#d93025] dark:bg-[#d93025]/20 dark:text-[#f28b82]'
       }

@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * 🧠 AI Context Store - Sistema de Conciencia de Pantalla
+ * AI Context Store - Sistema de Conciencia de Pantalla
  * ═══════════════════════════════════════════════════════════════════════════
  * 
  * Este store mantiene el contexto de lo que el usuario está viendo actualmente.
@@ -10,7 +10,7 @@
  * - Cada vista (Dashboard, Inventario, POS, etc.) actualiza este contexto
  * - El componente AI105Chat lee este contexto antes de enviar mensajes
  * - Se genera un "system prompt" invisible para la IA con los datos relevantes
- * - 🌐 NUEVO: También incluye datos globales del negocio desde uiContextStore
+ * - NUEVO: También incluye datos globales del negocio desde uiContextStore
  * 
  * USO:
  * - Vistas: Usan el composable useScreenContext() para actualizar datos
@@ -125,7 +125,7 @@ export const useAIContextStore = defineStore('aiContext', {
      * @returns {string} System prompt con el contexto
      */
     getSystemPrompt() {
-      // 🔒 Obtener rol y permisos del usuario actual
+      // Obtener rol y permisos del usuario actual
       let roleContext = ''
       try {
         const user = JSON.parse(localStorage.getItem('user') || '{}')
@@ -147,9 +147,9 @@ export const useAIContextStore = defineStore('aiContext', {
             if (moduleNameMap[mod]) modulosPermitidos.add(moduleNameMap[mod])
           })
           roleContext = `
-🔒 ROL DEL USUARIO: ${roleName} (VENDEDOR/CAJERO - ACCESO LIMITADO)
+ROL DEL USUARIO: ${roleName} (VENDEDOR/CAJERO - ACCESO LIMITADO)
 Módulos permitidos: ${Array.from(modulosPermitidos).join(', ')}
-⚠️ NO tiene acceso a: Reportes, Gastos, Gestión de Usuarios, Configuración, Proveedores.
+NO tiene acceso a: Reportes, Gastos, Gestión de Usuarios, Configuración, Proveedores.
 - No le sugieras navegar a módulos restringidos.
 - No le muestres datos financieros globales (ganancias netas, márgenes, gastos).
 - Si pregunta por algo restringido, dile amablemente que eso lo maneja el administrador.
@@ -157,13 +157,13 @@ Módulos permitidos: ${Array.from(modulosPermitidos).join(', ')}
 `
         } else {
           roleContext = `
-👤 ROL DEL USUARIO: ${roleName || 'Administrador'} (ACCESO COMPLETO)
+ROL DEL USUARIO: ${roleName || 'Administrador'} (ACCESO COMPLETO)
 Tiene acceso a todos los módulos y datos del sistema sin restricción.
 `
         }
       } catch {}
 
-      // 🌐 Obtener datos globales del negocio desde uiContextStore
+      // Obtener datos globales del negocio desde uiContextStore
       let globalBusinessContext = ''
       try {
         const uiContextStore = useUIContextStore()
@@ -174,15 +174,15 @@ Tiene acceso a todos los módulos y datos del sistema sin restricción.
           const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
           
           globalBusinessContext = `
-🌐 DATOS GLOBALES DEL NEGOCIO (Información Actualizada):
+DATOS GLOBALES DEL NEGOCIO (Información Actualizada):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-💰 VENTAS:
+VENTAS:
    • Ventas hoy: ${formatMoney(globalData.ventas?.ventasHoy)} (${globalData.ventas?.transaccionesHoy || 0} transacciones)
    • Ventas del mes: ${formatMoney(globalData.ventas?.ventasMes)} (${globalData.ventas?.transaccionesMes || 0} transacciones)
    • Ticket promedio: ${formatMoney(globalData.ventas?.ticketPromedio)}
 
-📦 INVENTARIO:
+INVENTARIO:
    • Productos activos: ${globalData.inventario?.productosActivos || 0}
    • Productos con stock bajo: ${globalData.inventario?.stockBajo || 0}
    • Productos sin stock: ${globalData.inventario?.sinStock || 0}
@@ -190,24 +190,24 @@ Tiene acceso a todos los módulos y datos del sistema sin restricción.
    • Valor potencial (venta): ${formatMoney(globalData.inventario?.valorPotencial)}
    • Ganancia estimada inventario: ${formatMoney(globalData.inventario?.gananciaEstimada)}
 
-💸 GASTOS:
+GASTOS:
    • Gastos hoy: ${formatMoney(globalData.gastos?.gastosHoy)}
    • Gastos del mes: ${formatMoney(globalData.gastos?.gastosMes)}
 
-📈 GANANCIAS Y RENTABILIDAD:
+GANANCIAS Y RENTABILIDAD:
    • Ganancia bruta del mes: ${formatMoney(globalData.ganancias?.gananciaBrutaMes)} (ventas - costo productos)
    • Ganancia neta del mes: ${formatMoney(globalData.ganancias?.gananciaNeta)} (bruta - gastos)
    • Margen promedio: ${(globalData.ganancias?.margenPromedio || 0).toFixed(1)}%
 
-🔄 DEVOLUCIONES:
+DEVOLUCIONES:
    • Devoluciones hoy: ${globalData.devoluciones?.devolucionesHoy || 0} (${formatMoney(globalData.devoluciones?.montoHoy)})
    • Devoluciones del mes: ${globalData.devoluciones?.devolucionesMes || 0} (${formatMoney(globalData.devoluciones?.montoMes)})
 
-🏦 ESTADO DE CAJA:
+ESTADO DE CAJA:
    • Estado: ${globalData.caja?.estado === 'abierta' ? 'ABIERTA' : 'CERRADA'}
    • Monto actual: ${formatMoney(globalData.caja?.montoActual)}
 
-🧾 ÚLTIMA FACTURA GENERADA:
+ÚLTIMA FACTURA GENERADA:
    • Número: ${globalData.ultimaFactura?.numero || 'N/A'}
    • Cliente: ${globalData.ultimaFactura?.cliente || 'N/A'}
    • Total: ${formatMoney(globalData.ultimaFactura?.total)}
@@ -215,11 +215,11 @@ Tiene acceso a todos los módulos y datos del sistema sin restricción.
    • Vendedor: ${globalData.ultimaFactura?.vendedor || 'N/A'}
    • Método de pago: ${globalData.ultimaFactura?.metodoPago || 'N/A'}
 
-⚠️ ALERTAS DE STOCK BAJO:${globalData.alertas?.productosStockBajo?.length > 0 
+ALERTAS DE STOCK BAJO:${globalData.alertas?.productosStockBajo?.length > 0 
   ? globalData.alertas.productosStockBajo.slice(0, 5).map(p => `\n   • ${p.nombre}: ${p.stock} unidades`).join('')
   : '\n   • No hay alertas de stock bajo'}
 
-🏆 TOP PRODUCTOS MÁS VENDIDOS HOY:${globalData.rankings?.topProductosHoy?.length > 0
+TOP PRODUCTOS MÁS VENDIDOS HOY:${globalData.rankings?.topProductosHoy?.length > 0
   ? globalData.rankings.topProductosHoy.slice(0, 5).map((p, i) => `\n   ${i+1}. ${p.nombre}: ${p.cantidad} unidades`).join('')
   : '\n   • Sin ventas registradas hoy'}
 
@@ -227,7 +227,7 @@ Tiene acceso a todos los módulos y datos del sistema sin restricción.
 `
         }
       } catch (e) {
-        console.warn('⚠️ [aiContext] No se pudo obtener datos globales:', e.message)
+        console.warn('[aiContext] No se pudo obtener datos globales:', e.message)
       }
 
       // Si no hay contexto de pantalla pero sí hay datos globales, devolver solo los globales
@@ -256,10 +256,10 @@ INSTRUCCIONES PARA LA IA:
 [CONTEXTO DE PANTALLA - INFORMACIÓN INVISIBLE PARA EL USUARIO]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${roleContext}
-📍 UBICACIÓN ACTUAL: ${this.currentScreen}
-📝 DESCRIPCIÓN: ${this.screenDescription}
+UBICACIÓN ACTUAL: ${this.currentScreen}
+DESCRIPCIÓN: ${this.screenDescription}
 
-📊 DATOS VISIBLES EN PANTALLA:
+DATOS VISIBLES EN PANTALLA:
 ${this.formattedData}
 
 ⏰ Última actualización: ${this.lastUpdated ? new Date(this.lastUpdated).toLocaleTimeString('es-CO') : 'N/A'}

@@ -1,5 +1,5 @@
 /**
- * 🎯 uiContextStore - Store global de contexto de UI para IA de voz
+ * uiContextStore - Store global de contexto de UI para IA de voz
  * 
  * Este store rastrea:
  * - Módulo actual en el que está el usuario
@@ -37,17 +37,17 @@ export const useUIContextStore = defineStore('uiContext', () => {
   // Callbacks para ejecutar acciones (registrados por los componentes)
   const actionCallbacks = ref({})
   
-  // 🧠 Datos de pantalla para la IA (estado de caja, ventas, KPIs, etc.)
+  // Datos de pantalla para la IA (estado de caja, ventas, KPIs, etc.)
   const screenData = ref({})
   // Estructura libre según el módulo. Ej para Dashboard:
   // { estadoCaja: {...}, ventasHoy: {...}, topProductos: [...], alertasStock: {...} }
   
-  // 🔒 Último error de navegación (para notificar a la IA cuando no tiene permisos)
+  // Último error de navegación (para notificar a la IA cuando no tiene permisos)
   const lastNavigationError = ref(null)
   // Estructura: { module: 'users', moduleName: 'Usuarios', roleName: 'Vendedor', message: '...' }
   
   // ═══════════════════════════════════════════════════════════════
-  // 🌐 DATOS GLOBALES DEL NEGOCIO (SIEMPRE DISPONIBLES PARA LA IA)
+  // DATOS GLOBALES DEL NEGOCIO (SIEMPRE DISPONIBLES PARA LA IA)
   // ═══════════════════════════════════════════════════════════════
   // Estos datos NUNCA se limpian al cambiar de módulo.
   // La IA siempre tiene acceso a esta información "de primera mano"
@@ -56,7 +56,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
     // Última actualización
     ultimaActualizacion: null,
     
-    // 📦 Inventario
+    // Inventario
     inventario: {
       productosActivos: 0,
       productosTotal: 0,
@@ -67,7 +67,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
       sinStock: 0
     },
     
-    // 💰 Ventas
+    // Ventas
     ventas: {
       ventasHoy: 0,
       ventasMes: 0,
@@ -76,38 +76,38 @@ export const useUIContextStore = defineStore('uiContext', () => {
       ticketPromedio: 0
     },
     
-    // 💸 Gastos
+    // Gastos
     gastos: {
       gastosMes: 0,
       gastosHoy: 0
     },
     
-    // 📈 Ganancias
+    // Ganancias
     ganancias: {
       gananciaBrutaMes: 0,        // Ventas - Costo productos
       gananciaNeta: 0,            // Bruta - Gastos
       margenPromedio: 0
     },
     
-    // 📊 Estado de Caja
+    // Estado de Caja
     caja: {
       estado: 'cerrada',          // 'abierta' | 'cerrada'
       montoActual: 0
     },
     
-    // ⚠️ Alertas
+    // Alertas
     alertas: {
       productosStockBajo: [],
       productosSinStock: []
     },
     
-    // 🏆 Rankings
+    // Rankings
     rankings: {
       topProductosHoy: [],
       topProductosMes: []
     },
     
-    // 🔄 Devoluciones
+    // Devoluciones
     devoluciones: {
       devolucionesHoy: 0,
       devolucionesMes: 0,
@@ -115,7 +115,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
       montoMes: 0
     },
     
-    // 🧾 Última Factura (para consultas rápidas de la IA)
+    // Última Factura (para consultas rápidas de la IA)
     ultimaFactura: {
       numero: null,
       cliente: null,
@@ -220,9 +220,9 @@ export const useUIContextStore = defineStore('uiContext', () => {
       summary += `\nAcciones disponibles: ${availableActions.value.map(a => a.label).join(', ')}`
     }
     
-    // 🧠 Agregar datos de pantalla (Dashboard KPIs, etc.)
+    // Agregar datos de pantalla (Dashboard KPIs, etc.)
     if (screenData.value && Object.keys(screenData.value).length > 0) {
-      summary += `\n\n📊 DATOS EN PANTALLA:`
+      summary += `\n\nDATOS EN PANTALLA:`
       
       // Estado de caja
       if (screenData.value.estadoCaja) {
@@ -263,7 +263,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
         summary += `\n• Puedes cambiar a: ${periodo.opcionesDisponibles.join(', ')}`
       }
       
-      // 📄 DATOS DE FACTURAS (módulo invoices)
+      // DATOS DE FACTURAS (módulo invoices)
       if (screenData.value.resumenFacturas) {
         const facturas = screenData.value.resumenFacturas
         summary += `\n• Total Facturas: ${facturas.total}`
@@ -274,10 +274,10 @@ export const useUIContextStore = defineStore('uiContext', () => {
         summary += `\n• Cotizaciones activas: ${facturas.cotizaciones}`
       }
       
-      // 📄 FACTURA SELECCIONADA (para acciones de envío)
+      // FACTURA SELECCIONADA (para acciones de envío)
       if (screenData.value.facturaSeleccionada) {
         const factura = screenData.value.facturaSeleccionada
-        summary += `\n\n🎯 FACTURA SELECCIONADA:`
+        summary += `\n\nFACTURA SELECCIONADA:`
         summary += `\n• Número: ${factura.numero} (${factura.tipo})`
         summary += `\n• Estado: ${factura.estado}`
         summary += `\n• Cliente: ${factura.cliente}`
@@ -287,14 +287,14 @@ export const useUIContextStore = defineStore('uiContext', () => {
         summary += `\n• Tiene Teléfono: ${factura.tieneTelefono ? 'SÍ (' + factura.telefono + ')' : 'NO'}`
       }
       
-      // 📋 INSTRUCCIONES PARA LA IA (sobre envíos)
+      // INSTRUCCIONES PARA LA IA (sobre envíos)
       if (screenData.value.instrucciones) {
-        summary += `\n\n⚠️ INSTRUCCIONES IMPORTANTES:`
+        summary += `\n\nINSTRUCCIONES IMPORTANTES:`
         summary += `\n• WhatsApp: ${screenData.value.instrucciones.enviarWhatsApp}`
         summary += `\n• Email: ${screenData.value.instrucciones.enviarEmail}`
       }
       
-      // 🔄 DATOS DE DEVOLUCIONES (módulo returns-management)
+      // DATOS DE DEVOLUCIONES (módulo returns-management)
       if (screenData.value.resumenDevoluciones) {
         const devs = screenData.value.resumenDevoluciones
         summary += `\n• Total Devoluciones: ${devs.total}`
@@ -304,10 +304,10 @@ export const useUIContextStore = defineStore('uiContext', () => {
         summary += `\n• Productos Devueltos: ${devs.productosDevueltos} unidades`
       }
       
-      // 🔄 DEVOLUCIÓN SELECCIONADA (para acciones de envío)
+      // DEVOLUCIÓN SELECCIONADA (para acciones de envío)
       if (screenData.value.devolucionSeleccionada) {
         const dev = screenData.value.devolucionSeleccionada
-        summary += `\n\n🎯 DEVOLUCIÓN SELECCIONADA:`
+        summary += `\n\nDEVOLUCIÓN SELECCIONADA:`
         summary += `\n• Número: ${dev.numero}`
         summary += `\n• Estado: ${dev.estado}`
         summary += `\n• Factura Original: ${dev.facturaOriginal}`
@@ -322,14 +322,14 @@ export const useUIContextStore = defineStore('uiContext', () => {
       }
       
       // ═══════════════════════════════════════════════════════════
-      // 💰 DATOS DE CONTROL DE CAJAS (módulo cash-admin)
+      // DATOS DE CONTROL DE CAJAS (módulo cash-admin)
       // ═══════════════════════════════════════════════════════════
       if (screenData.value.tipoReporte === 'cash-admin') {
-        summary += `\n\n💰 CONTROL DE CAJAS:`
+        summary += `\n\nCONTROL DE CAJAS:`
         
         if (screenData.value.kpis) {
           const kpis = screenData.value.kpis
-          summary += `\n\n📊 KPIs DE CAJAS:`
+          summary += `\n\nKPIs DE CAJAS:`
           summary += `\n• Sesiones activas: ${kpis.sesionesActivas || 0}`
           summary += `\n• Total en cajas: ${kpis.totalEnCajas || '$0'}`
           summary += `\n• Ventas hoy: ${kpis.ventasHoy || '$0'}`
@@ -339,7 +339,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
         }
         
         if (screenData.value.sesiones?.lista?.length > 0) {
-          summary += `\n\n👥 SESIONES DE CAJA (${screenData.value.sesiones.totalRegistros}):`
+          summary += `\n\nSESIONES DE CAJA (${screenData.value.sesiones.totalRegistros}):`
           screenData.value.sesiones.lista.slice(0, 5).forEach((s, i) => {
             summary += `\n${i+1}. ${s.usuario}: ${s.ventas} - ${s.estado} (${s.duracion})`
           })
@@ -349,7 +349,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
         }
         
         if (screenData.value.alertasEmpleados?.length > 0) {
-          summary += `\n\n⚠️ ALERTAS DE EMPLEADOS (${screenData.value.alertasEmpleados.length}):`
+          summary += `\n\nALERTAS DE EMPLEADOS (${screenData.value.alertasEmpleados.length}):`
           screenData.value.alertasEmpleados.forEach(a => {
             summary += `\n• [${a.tipo}] ${a.titulo}: ${a.descripcion}`
           })
@@ -358,17 +358,17 @@ export const useUIContextStore = defineStore('uiContext', () => {
         // Info de modales abiertos
         if (screenData.value.modales) {
           if (screenData.value.modales.auditoriaAbierta) {
-            summary += `\n\n📋 MODAL DE AUDITORÍA ABIERTO - Puedes consultar movimientos detallados`
+            summary += `\n\nMODAL DE AUDITORÍA ABIERTO - Puedes consultar movimientos detallados`
           }
           if (screenData.value.modales.detalleAbierto) {
-            summary += `\n\n📋 MODAL DE DETALLES ABIERTO`
+            summary += `\n\nMODAL DE DETALLES ABIERTO`
           }
         }
         
         // Datos de auditoría si están disponibles
         if (screenData.value.auditoriaActual) {
           const audit = screenData.value.auditoriaActual
-          summary += `\n\n🔍 AUDITORÍA DE SESIÓN (${audit.usuario}):`
+          summary += `\n\nAUDITORÍA DE SESIÓN (${audit.usuario}):`
           if (audit.estadisticas) {
             summary += `\n• Ventas: ${audit.estadisticas.totalTransacciones} (${audit.estadisticas.totalVentas})`
             summary += `\n• Venta promedio: ${audit.estadisticas.ventaPromedio}`
@@ -382,21 +382,21 @@ export const useUIContextStore = defineStore('uiContext', () => {
           }
         }
         
-        summary += `\n\n💡 ACCIONES DISPONIBLES:`
+        summary += `\n\nACCIONES DISPONIBLES:`
         summary += `\n• verAuditoriaSesion: Ver todos los movimientos (ventas, devoluciones, gastos) de una sesión`
         summary += `\n• verDetalleSesion: Ver resumen de una sesión`
         summary += `\n• consultarRendimientoEmpleado: Ver estadísticas de un empleado`
       }
       
       // ═══════════════════════════════════════════════════════════
-      // 🧾 DATOS DE FACTURAS (módulo invoices)
+      // DATOS DE FACTURAS (módulo invoices)
       // ═══════════════════════════════════════════════════════════
       if (screenData.value.tipoReporte === 'invoices') {
-        summary += `\n\n🧾 MÓDULO DE FACTURAS:`
+        summary += `\n\nMÓDULO DE FACTURAS:`
         
         if (screenData.value.resumenFacturas) {
           const resumen = screenData.value.resumenFacturas
-          summary += `\n\n📊 RESUMEN DE FACTURAS:`
+          summary += `\n\nRESUMEN DE FACTURAS:`
           summary += `\n• Total de facturas: ${resumen.total}`
           summary += `\n• Facturas del mes: ${resumen.facturasDelMes}`
           summary += `\n• Total facturado: ${resumen.totalFacturado}`
@@ -410,7 +410,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
         // Facturas de hoy
         if (screenData.value.facturasHoy) {
           const hoy = screenData.value.facturasHoy
-          summary += `\n\n📅 FACTURAS DE HOY:`
+          summary += `\n\nFACTURAS DE HOY:`
           summary += `\n• Cantidad: ${hoy.cantidad}`
           summary += `\n• Total: ${hoy.total}`
           if (hoy.lista?.length > 0) {
@@ -422,7 +422,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
         
         // Últimas facturas
         if (screenData.value.ultimasFacturas?.length > 0) {
-          summary += `\n\n📋 ÚLTIMAS ${screenData.value.ultimasFacturas.length} FACTURAS:`
+          summary += `\n\nÚLTIMAS ${screenData.value.ultimasFacturas.length} FACTURAS:`
           screenData.value.ultimasFacturas.forEach((f, i) => {
             summary += `\n${i+1}. ${f.numero}: ${f.cliente} - ${f.total} (${f.fecha}) [${f.estado}]`
           })
@@ -431,16 +431,16 @@ export const useUIContextStore = defineStore('uiContext', () => {
         // Primera y última del período
         if (screenData.value.primeraFacturaPeriodo) {
           const p = screenData.value.primeraFacturaPeriodo
-          summary += `\n\n📌 PRIMERA FACTURA DEL PERÍODO:`
+          summary += `\n\nPRIMERA FACTURA DEL PERÍODO:`
           summary += `\n• ${p.numero}: ${p.cliente} - ${p.total} (${p.fecha})`
         }
         if (screenData.value.ultimaFacturaPeriodo) {
           const u = screenData.value.ultimaFacturaPeriodo
-          summary += `\n\n📌 ÚLTIMA FACTURA (MÁS RECIENTE):`
+          summary += `\n\nÚLTIMA FACTURA (MÁS RECIENTE):`
           summary += `\n• ${u.numero}: ${u.cliente} - ${u.total} (${u.fecha})`
         }
         
-        summary += `\n\n💡 ACCIONES DISPONIBLES:`
+        summary += `\n\nACCIONES DISPONIBLES:`
         summary += `\n• seleccionarFactura: Seleccionar una factura por número o posición`
         summary += `\n• consultarFacturasHoy: Ver todas las facturas de hoy`
         summary += `\n• consultarFacturaEspecial: Ver primera/última factura del día/semana/mes`
@@ -448,10 +448,10 @@ export const useUIContextStore = defineStore('uiContext', () => {
         summary += `\n• sendEmail, sendWhatsApp, downloadPDF, printInvoice: Acciones sobre factura seleccionada`
       }
       
-      // 📦 DATOS DE PRODUCTOS (módulo products)
+      // DATOS DE PRODUCTOS (módulo products)
       if (screenData.value.resumenProductos) {
         const prods = screenData.value.resumenProductos
-        summary += `\n\n📦 PRODUCTOS EN PANTALLA:`
+        summary += `\n\nPRODUCTOS EN PANTALLA:`
         summary += `\n• Total: ${prods.total}`
         summary += `\n• Activos: ${prods.activos}`
         summary += `\n• Inactivos: ${prods.inactivos}`
@@ -461,20 +461,20 @@ export const useUIContextStore = defineStore('uiContext', () => {
         summary += `\n• Tipo Tienda: ${screenData.value.tipoTienda || 'general'}`
       }
       
-      // 📦 FILTROS ACTIVOS EN PRODUCTOS
+      // FILTROS ACTIVOS EN PRODUCTOS
       if (screenData.value.filtrosActivos) {
         const filtros = screenData.value.filtrosActivos
         if (filtros.busqueda || filtros.categoria || filtros.estado) {
-          summary += `\n\n🔍 FILTROS ACTIVOS:`
+          summary += `\n\nFILTROS ACTIVOS:`
           if (filtros.busqueda) summary += `\n• Búsqueda: "${filtros.busqueda}"`
           if (filtros.categoria) summary += `\n• Categoría: ${filtros.categoria}`
           if (filtros.estado) summary += `\n• Estado: ${filtros.estado}`
         }
       }
       
-      // 📦 ALERTAS DE STOCK BAJO
+      // ALERTAS DE STOCK BAJO
       if (screenData.value.alertasStockBajo && screenData.value.alertasStockBajo.length > 0) {
-        summary += `\n\n⚠️ PRODUCTOS CON STOCK BAJO (${screenData.value.alertasStockBajo.length}):`
+        summary += `\n\nPRODUCTOS CON STOCK BAJO (${screenData.value.alertasStockBajo.length}):`
         screenData.value.alertasStockBajo.slice(0, 5).forEach(p => {
           summary += `\n• ${p.nombre}: ${p.stockActual}/${p.stockMinimo} (${p.categoria})`
         })
@@ -483,10 +483,10 @@ export const useUIContextStore = defineStore('uiContext', () => {
         }
       }
       
-      // 📦 PRODUCTO SELECCIONADO
+      // PRODUCTO SELECCIONADO
       if (screenData.value.productoSeleccionado) {
         const prod = screenData.value.productoSeleccionado
-        summary += `\n\n🎯 PRODUCTO SELECCIONADO:`
+        summary += `\n\nPRODUCTO SELECCIONADO:`
         summary += `\n• ID: ${prod.id}`
         summary += `\n• Nombre: ${prod.nombre}`
         summary += `\n• SKU: ${prod.sku || 'Sin SKU'}`
@@ -497,24 +497,24 @@ export const useUIContextStore = defineStore('uiContext', () => {
         summary += `\n• Activo: ${prod.activo ? 'Sí' : 'No'}`
       }
       
-      // 📦 SEDES DISPONIBLES PARA PRODUCTOS
+      // SEDES DISPONIBLES PARA PRODUCTOS
       if (screenData.value.sedesDisponibles && screenData.value.sedesDisponibles.length > 1) {
-        summary += `\n\n🏢 SEDES DISPONIBLES (${screenData.value.sedesDisponibles.length}):`
+        summary += `\n\nSEDES DISPONIBLES (${screenData.value.sedesDisponibles.length}):`
         screenData.value.sedesDisponibles.forEach(s => {
           summary += `\n• ${s.nombre} (ID: ${s.id})`
         })
       }
       
-      // 📦 MODAL DE PRODUCTO ABIERTO
+      // MODAL DE PRODUCTO ABIERTO
       if (screenData.value.modalAbierto) {
-        summary += `\n\n📝 MODAL ABIERTO: ${screenData.value.modalAbierto === 'crear' ? 'Nuevo Producto' : 'Editar Producto'}`
+        summary += `\n\nMODAL ABIERTO: ${screenData.value.modalAbierto === 'crear' ? 'Nuevo Producto' : 'Editar Producto'}`
       }
       
       // ═══════════════════════════════════════════════════════════
-      // 🧠 INVENTARIO INTELIGENTE (módulo intelligent_inventory)
+      // INVENTARIO INTELIGENTE (módulo intelligent_inventory)
       // ═══════════════════════════════════════════════════════════
       if (currentModule.value === 'intelligent_inventory') {
-        summary += `\n\n🧠 INVENTARIO INTELIGENTE - ANÁLISIS AVANZADO:`
+        summary += `\n\nINVENTARIO INTELIGENTE - ANÁLISIS AVANZADO:`
         
         // Sección activa
         const seccionActiva = screenData.value.seccionActiva || 'overview'
@@ -533,7 +533,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
         // KPIs si están disponibles
         if (screenData.value.metrics) {
           const m = screenData.value.metrics
-          summary += `\n\n📊 KPIs INVENTARIO INTELIGENTE:`
+          summary += `\n\nKPIs INVENTARIO INTELIGENTE:`
           summary += `\n• Productos activos: ${m.activeProducts || 0} de ${m.totalProducts || 0}`
           summary += `\n• Valor invertido (costo): $${(m.totalInventoryValue || 0).toLocaleString('es-CO')}`
           summary += `\n• Valor potencial (venta): $${(m.totalSaleValue || 0).toLocaleString('es-CO')}`
@@ -544,9 +544,9 @@ export const useUIContextStore = defineStore('uiContext', () => {
         
         // Datos de rotación si están disponibles
         if (screenData.value.rotacion || screenData.value.topProductosVendidos) {
-          summary += `\n\n📈 DATOS DE ROTACIÓN Y VENTAS:`
+          summary += `\n\nDATOS DE ROTACIÓN Y VENTAS:`
           if (screenData.value.topProductosVendidos?.length > 0) {
-            summary += `\n\n🏆 TOP PRODUCTOS MÁS VENDIDOS:`
+            summary += `\n\nTOP PRODUCTOS MÁS VENDIDOS:`
             screenData.value.topProductosVendidos.slice(0, 5).forEach((p, i) => {
               summary += `\n${i+1}. ${p.nombre}: ${p.vendidos || p.cantidad || 0} unidades ($${(p.ingresos || p.total || 0).toLocaleString('es-CO')})`
             })
@@ -555,7 +555,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
         
         // Productos con stock bajo
         if (screenData.value.productosStockBajo?.length > 0) {
-          summary += `\n\n⚠️ PRODUCTOS CON STOCK BAJO (${screenData.value.productosStockBajo.length}):`
+          summary += `\n\nPRODUCTOS CON STOCK BAJO (${screenData.value.productosStockBajo.length}):`
           screenData.value.productosStockBajo.slice(0, 5).forEach(p => {
             summary += `\n• ${p.nombre}: ${p.stockActual || p.stock || 0}/${p.stockMinimo || p.min_stock || 0} unidades`
           })
@@ -563,7 +563,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
         
         // Predicciones si están disponibles
         if (screenData.value.predicciones) {
-          summary += `\n\n🔮 PREDICCIONES DE INVENTARIO:`
+          summary += `\n\nPREDICCIONES DE INVENTARIO:`
           if (screenData.value.predicciones.proximosAgotarse?.length > 0) {
             summary += `\n• Próximos a agotarse: ${screenData.value.predicciones.proximosAgotarse.map(p => p.nombre).join(', ')}`
           }
@@ -574,11 +574,11 @@ export const useUIContextStore = defineStore('uiContext', () => {
         
         // Instrucciones específicas
         if (screenData.value.instrucciones) {
-          summary += `\n\n📋 INFORMACIÓN DE NAVEGACIÓN:`
+          summary += `\n\nINFORMACIÓN DE NAVEGACIÓN:`
           summary += `\n${screenData.value.instrucciones.secciones || ''}`
         }
         
-        summary += `\n\n💡 ACCIONES DISPONIBLES EN INVENTARIO INTELIGENTE:`
+        summary += `\n\nACCIONES DISPONIBLES EN INVENTARIO INTELIGENTE:`
         summary += `\n• cambiarSeccionInventarioInteligente: Cambiar entre Vista General, Productos, Movimientos, etc.`
         summary += `\n• buscarProductoInventarioInteligente: Buscar productos`
         summary += `\n• cambiarPeriodoInventarioInteligente: Cambiar período (hoy, semana, mes, año)`
@@ -587,19 +587,19 @@ export const useUIContextStore = defineStore('uiContext', () => {
       }
       
       // ═══════════════════════════════════════════════════════════
-      // 📊 DATOS DE REPORTES
+      // DATOS DE REPORTES
       // ═══════════════════════════════════════════════════════════
       
 
-      // �📈 REPORTES DE CAJA
+      // �REPORTES DE CAJA
       if (screenData.value.tipoReporte === 'reports-caja') {
-        summary += `\n\n📊 REPORTE DE CAJAS ACTIVO:`
+        summary += `\n\nREPORTE DE CAJAS ACTIVO:`
         summary += `\n• Descripción: ${screenData.value.descripcion || 'Análisis de cajeros'}`
         summary += `\n• Período: ${screenData.value.periodoActual || 'No definido'}`
         
         if (screenData.value.kpis) {
           const kpis = screenData.value.kpis
-          summary += `\n\n💰 KPIs DE CAJA:`
+          summary += `\n\nKPIs DE CAJA:`
           summary += `\n• Sesiones activas: ${kpis.sesionesActivas || 0}`
           summary += `\n• Total ventas: ${kpis.totalVentas || '$0'}`
           summary += `\n• Transacciones: ${kpis.totalTransacciones || 0}`
@@ -608,35 +608,35 @@ export const useUIContextStore = defineStore('uiContext', () => {
         }
         
         if (screenData.value.cajeros && screenData.value.cajeros.length > 0) {
-          summary += `\n\n👥 COMPARATIVA DE CAJEROS (${screenData.value.cajeros.length}):`
+          summary += `\n\nCOMPARATIVA DE CAJEROS (${screenData.value.cajeros.length}):`
           screenData.value.cajeros.forEach((c, i) => {
             summary += `\n${i+1}. ${c.nombre}: ${c.ventas} (${c.transacciones} trans.) - Ticket: ${c.ticketPromedio}`
           })
         }
         
         if (screenData.value.topSesiones && screenData.value.topSesiones.length > 0) {
-          summary += `\n\n🏆 TOP SESIONES:`
+          summary += `\n\nTOP SESIONES:`
           screenData.value.topSesiones.forEach((s, i) => {
             summary += `\n${i+1}. ${s.cajero}: ${s.ventas} (${s.fecha})`
           })
         }
         
         if (screenData.value.alertas && screenData.value.alertas.length > 0) {
-          summary += `\n\n⚠️ ALERTAS DE CAJA (${screenData.value.alertas.length}):`
+          summary += `\n\nALERTAS DE CAJA (${screenData.value.alertas.length}):`
           screenData.value.alertas.forEach(a => {
             summary += `\n• [${a.tipo}] ${a.titulo}: ${a.mensaje}`
           })
         }
       }
       
-      // 📦 REPORTES DE INVENTARIO
+      // REPORTES DE INVENTARIO
       if (screenData.value.tipoReporte === 'reports-inventario') {
-        summary += `\n\n📦 REPORTE DE INVENTARIO ACTIVO:`
+        summary += `\n\nREPORTE DE INVENTARIO ACTIVO:`
         summary += `\n• Descripción: ${screenData.value.descripcion || 'Análisis de inventario'}`
         
         if (screenData.value.kpis) {
           const kpis = screenData.value.kpis
-          summary += `\n\n📊 KPIs DE INVENTARIO:`
+          summary += `\n\nKPIs DE INVENTARIO:`
           summary += `\n• Total productos: ${kpis.totalProductos || 0} (${kpis.productosActivos || 0} activos)`
           summary += `\n• Valor inventario (costo): ${kpis.valorInventario || '$0'}`
           summary += `\n• Valor venta potencial: ${kpis.valorVentaPotencial || '$0'}`
@@ -647,35 +647,35 @@ export const useUIContextStore = defineStore('uiContext', () => {
         
         if (screenData.value.analisisABC) {
           const abc = screenData.value.analisisABC
-          summary += `\n\n📈 ANÁLISIS ABC:`
+          summary += `\n\nANÁLISIS ABC:`
           summary += `\n• Clase A (alta rotación): ${abc.claseA || 0} productos`
           summary += `\n• Clase B (media rotación): ${abc.claseB || 0} productos`
           summary += `\n• Clase C (baja rotación): ${abc.claseC || 0} productos`
         }
         
         if (screenData.value.categorias && screenData.value.categorias.length > 0) {
-          summary += `\n\n📂 DISTRIBUCIÓN POR CATEGORÍA:`
+          summary += `\n\nDISTRIBUCIÓN POR CATEGORÍA:`
           screenData.value.categorias.forEach(c => {
             summary += `\n• ${c.nombre}: ${c.valor}`
           })
         }
         
         if (screenData.value.topVendidos && screenData.value.topVendidos.length > 0) {
-          summary += `\n\n🏆 TOP PRODUCTOS MÁS VENDIDOS:`
+          summary += `\n\nTOP PRODUCTOS MÁS VENDIDOS:`
           screenData.value.topVendidos.forEach((p, i) => {
             summary += `\n${i+1}. ${p.nombre}: ${p.vendidos} unidades (${p.ingresos})`
           })
         }
         
         if (screenData.value.stockBajo && screenData.value.stockBajo.length > 0) {
-          summary += `\n\n⚠️ PRODUCTOS CON STOCK BAJO (${screenData.value.stockBajo.length}):`
+          summary += `\n\nPRODUCTOS CON STOCK BAJO (${screenData.value.stockBajo.length}):`
           screenData.value.stockBajo.forEach(p => {
             summary += `\n• ${p.nombre}: ${p.stockActual}/${p.stockMinimo} unidades`
           })
         }
         
         if (screenData.value.sinMovimiento && screenData.value.sinMovimiento.length > 0) {
-          summary += `\n\n📦 PRODUCTOS SIN MOVIMIENTO (Capital Inmovilizado):`
+          summary += `\n\nPRODUCTOS SIN MOVIMIENTO (Capital Inmovilizado):`
           screenData.value.sinMovimiento.forEach(p => {
             summary += `\n• ${p.nombre}: ${p.stock} unidades (${p.valorInmovilizado})`
           })
@@ -684,13 +684,13 @@ export const useUIContextStore = defineStore('uiContext', () => {
       
       // � REPORTES GENERALES
       if (screenData.value.tipoReporte === 'reports-general') {
-        summary += `\n\n📊 REPORTE GENERAL ACTIVO:`
+        summary += `\n\nREPORTE GENERAL ACTIVO:`
         summary += `\n• Descripción: ${screenData.value.descripcion || 'Dashboard ejecutivo'}`
         summary += `\n• Período: ${screenData.value.periodoActual || 'No definido'}`
         
         if (screenData.value.kpis) {
           const kpis = screenData.value.kpis
-          summary += `\n\n💰 KPIs DE VENTAS:`
+          summary += `\n\nKPIs DE VENTAS:`
           summary += `\n• Ventas totales: ${kpis.ventasTotales || '$0'}`
           summary += `\n• Transacciones: ${kpis.transacciones || 0}`
           summary += `\n• Ticket promedio: ${kpis.ticketPromedio || '$0'}`
@@ -698,30 +698,30 @@ export const useUIContextStore = defineStore('uiContext', () => {
         }
         
         if (screenData.value.topProductos && screenData.value.topProductos.length > 0) {
-          summary += `\n\n🏆 TOP PRODUCTOS MÁS VENDIDOS:`
+          summary += `\n\nTOP PRODUCTOS MÁS VENDIDOS:`
           screenData.value.topProductos.forEach((p, i) => {
             summary += `\n${i+1}. ${p.nombre}: ${p.vendidos} vendidos (${p.ingresos})`
           })
         }
         
         if (screenData.value.ventasPorCategoria && screenData.value.ventasPorCategoria.length > 0) {
-          summary += `\n\n📂 VENTAS POR CATEGORÍA:`
+          summary += `\n\nVENTAS POR CATEGORÍA:`
           screenData.value.ventasPorCategoria.forEach(c => {
             summary += `\n• ${c.nombre}: ${c.ventas}`
           })
         }
         
         if (screenData.value.productosStockBajo && screenData.value.productosStockBajo.length > 0) {
-          summary += `\n\n⚠️ ALERTAS DE STOCK BAJO (${screenData.value.productosStockBajo.length}):`
+          summary += `\n\nALERTAS DE STOCK BAJO (${screenData.value.productosStockBajo.length}):`
           screenData.value.productosStockBajo.forEach(p => {
             summary += `\n• ${p.nombre}: ${p.stock} unidades`
           })
         }
       }
       
-      // �📋 MENÚ DE REPORTES
+      // �MENÚ DE REPORTES
       if (screenData.value.tipoReporte === 'reports-menu') {
-        summary += `\n\n📊 MENÚ DE REPORTES:`
+        summary += `\n\nMENÚ DE REPORTES:`
         summary += `\n• Reporte activo: ${screenData.value.reporteActivoNombre || 'Ninguno'}`
         summary += `\n• Reportes disponibles: ${(screenData.value.reportesDisponibles || []).join(', ')}`
         summary += `\n• Puedo cambiar entre: Reportes Generales, Reportes de Caja, Reportes de Inventario`
@@ -746,22 +746,22 @@ export const useUIContextStore = defineStore('uiContext', () => {
     screenData.value = {}
   }
   
-  // 🧠 Actualizar datos de pantalla (KPIs, métricas visibles)
+  // Actualizar datos de pantalla (KPIs, métricas visibles)
   const setScreenData = (data) => {
     screenData.value = data
   }
   
-  // 🧠 Actualizar parcialmente datos de pantalla
+  // Actualizar parcialmente datos de pantalla
   const updateScreenData = (partialData) => {
     screenData.value = { ...screenData.value, ...partialData }
   }
   
-  // 🔒 Establecer error de navegación (para la IA)
+  // Establecer error de navegación (para la IA)
   const setLastNavigationError = (error) => {
     lastNavigationError.value = error
   }
   
-  // 🔒 Obtener y limpiar error de navegación (para la IA)
+  // Obtener y limpiar error de navegación (para la IA)
   const getAndClearNavigationError = () => {
     const error = lastNavigationError.value
     lastNavigationError.value = null
@@ -769,7 +769,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
   }
   
   // ═══════════════════════════════════════════════════════════════
-  // 🌐 FUNCIONES PARA DATOS GLOBALES DEL NEGOCIO
+  // FUNCIONES PARA DATOS GLOBALES DEL NEGOCIO
   // ═══════════════════════════════════════════════════════════════
   
   // Actualizar datos globales completos
@@ -797,10 +797,10 @@ export const useUIContextStore = defineStore('uiContext', () => {
     const g = globalBusinessData.value
     const formatMoney = (n) => `$${(n || 0).toLocaleString('es-CO')}`
     
-    let summary = '\n\n🌐 RESUMEN GLOBAL DEL NEGOCIO (Datos de Primera Mano):'
+    let summary = '\n\nRESUMEN GLOBAL DEL NEGOCIO (Datos de Primera Mano):'
     
     // Inventario
-    summary += `\n📦 INVENTARIO:`
+    summary += `\nINVENTARIO:`
     summary += `\n   • Productos activos: ${g.inventario.productosActivos} de ${g.inventario.productosTotal}`
     summary += `\n   • Valor invertido: ${formatMoney(g.inventario.valorInvertido)}`
     summary += `\n   • Valor potencial (ventas): ${formatMoney(g.inventario.valorPotencial)}`
@@ -809,30 +809,30 @@ export const useUIContextStore = defineStore('uiContext', () => {
     summary += `\n   • Sin stock: ${g.inventario.sinStock} productos`
     
     // Ventas
-    summary += `\n💰 VENTAS:`
+    summary += `\nVENTAS:`
     summary += `\n   • Ventas hoy: ${formatMoney(g.ventas.ventasHoy)} (${g.ventas.transaccionesHoy} transacciones)`
     summary += `\n   • Ventas del mes: ${formatMoney(g.ventas.ventasMes)} (${g.ventas.transaccionesMes} transacciones)`
     summary += `\n   • Ticket promedio: ${formatMoney(g.ventas.ticketPromedio)}`
     
     // Gastos
-    summary += `\n💸 GASTOS:`
+    summary += `\nGASTOS:`
     summary += `\n   • Gastos del mes: ${formatMoney(g.gastos.gastosMes)}`
     summary += `\n   • Gastos hoy: ${formatMoney(g.gastos.gastosHoy)}`
     
     // Ganancias
-    summary += `\n📈 GANANCIAS:`
+    summary += `\nGANANCIAS:`
     summary += `\n   • Ganancia bruta del mes: ${formatMoney(g.ganancias.gananciaBrutaMes)}`
     summary += `\n   • Ganancia neta: ${formatMoney(g.ganancias.gananciaNeta)}`
     summary += `\n   • Margen promedio: ${g.ganancias.margenPromedio}%`
     
     // Caja
-    summary += `\n🏦 CAJA:`
+    summary += `\nCAJA:`
     summary += `\n   • Estado: ${g.caja.estado === 'abierta' ? 'ABIERTA' : 'CERRADA'}`
     summary += `\n   • Monto actual: ${formatMoney(g.caja.montoActual)}`
     
     // Alertas
     if (g.alertas.productosStockBajo.length > 0) {
-      summary += `\n⚠️ ALERTAS (${g.alertas.productosStockBajo.length} productos con stock bajo):`
+      summary += `\nALERTAS (${g.alertas.productosStockBajo.length} productos con stock bajo):`
       g.alertas.productosStockBajo.slice(0, 3).forEach(p => {
         summary += `\n   • ${p.nombre}: ${p.stock} unidades`
       })
@@ -843,7 +843,7 @@ export const useUIContextStore = defineStore('uiContext', () => {
     
     // Top productos
     if (g.rankings.topProductosHoy.length > 0) {
-      summary += `\n🏆 TOP PRODUCTOS HOY:`
+      summary += `\nTOP PRODUCTOS HOY:`
       g.rankings.topProductosHoy.slice(0, 3).forEach((p, i) => {
         summary += `\n   ${i + 1}. ${p.nombre}: ${formatMoney(p.ingresos)}`
       })
@@ -861,7 +861,6 @@ export const useUIContextStore = defineStore('uiContext', () => {
   const setSelectedElement = (type, data, actions = []) => {
     selectedElement.value = { type, data }
     availableActions.value = actions
-    console.log(`🎯 [UIContext] Elemento seleccionado: ${type}`, data?.name || data?.invoice_number || data?.id)
   }
   
   // Limpiar selección
@@ -873,7 +872,6 @@ export const useUIContextStore = defineStore('uiContext', () => {
   // Registrar modal abierto
   const setActiveModal = (modalName, data = null) => {
     activeModal.value = { name: modalName, data }
-    console.log(`🎯 [UIContext] Modal abierto: ${modalName}`)
   }
   
   // Cerrar modal
@@ -885,15 +883,11 @@ export const useUIContextStore = defineStore('uiContext', () => {
   const registerAction = (actionId, callback) => {
     actionCallbacks.value[actionId] = callback
     // Log reducido - comentado para evitar spam en consola
-    // console.log(`🎯 [UIContext] Acción registrada: ${actionId}`)
+    // console.log(`[UIContext] Acción registrada: ${actionId}`)
   }
   
   // Ejecutar una acción (ahora acepta parámetros)
   const executeAction = async (actionId, params = {}) => {
-    console.log(`🎯 [UIContext] Ejecutando: ${actionId}`, params)
-    // Log de acciones registradas removido - era muy verboso
-    // console.log(`🎯 [UIContext] Acciones registradas:`, Object.keys(actionCallbacks.value))
-    
     const callback = actionCallbacks.value[actionId]
     if (callback) {
       try {
@@ -920,9 +914,9 @@ export const useUIContextStore = defineStore('uiContext', () => {
       selectedElement: selectedElement.value,
       activeModal: activeModal.value?.name || null,
       availableActions: availableActions.value.map(a => a.id),
-      screenData: screenData.value, // 🧠 Incluir datos de pantalla
-      globalBusinessData: globalBusinessData.value, // 🌐 Siempre incluir datos globales
-      summary: contextSummary.value + getGlobalBusinessSummary() // 🌐 Añadir resumen global
+      screenData: screenData.value, // Incluir datos de pantalla
+      globalBusinessData: globalBusinessData.value, // Siempre incluir datos globales
+      summary: contextSummary.value + getGlobalBusinessSummary() // Añadir resumen global
     }
   }
   
@@ -932,9 +926,9 @@ export const useUIContextStore = defineStore('uiContext', () => {
     selectedElement,
     activeModal,
     availableActions,
-    screenData, // 🧠 Exponer datos de pantalla
-    globalBusinessData, // 🌐 Exponer datos globales
-    lastNavigationError, // 🔒 Error de navegación por permisos
+    screenData, // Exponer datos de pantalla
+    globalBusinessData, // Exponer datos globales
+    lastNavigationError, // Error de navegación por permisos
     
     // Computed
     contextSummary,
@@ -948,12 +942,12 @@ export const useUIContextStore = defineStore('uiContext', () => {
     registerAction,
     executeAction,
     getContextForAI,
-    setScreenData,     // 🧠 Nueva función
-    updateScreenData,  // 🧠 Nueva función
-    setLastNavigationError, // 🔒 Error de navegación
-    getAndClearNavigationError, // 🔒 Obtener y limpiar error
+    setScreenData,     // Nueva función
+    updateScreenData,  // Nueva función
+    setLastNavigationError, // Error de navegación
+    getAndClearNavigationError, // Obtener y limpiar error
     
-    // 🌐 Datos Globales del Negocio
+    // Datos Globales del Negocio
     setGlobalBusinessData,
     updateGlobalBusinessSection,
     getGlobalBusinessSummary

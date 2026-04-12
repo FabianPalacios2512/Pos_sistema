@@ -216,7 +216,7 @@
       <!-- Superficie de porcelana mate -->
       <div class="absolute inset-0 bg-gradient-to-b from-[#f0f1f3] via-[#f4f5f7] to-[#ecedf0] pointer-events-none"></div>
 
-      <!-- 📱 MOBILE HEADER: Solo en móviles -->
+      <!-- MOBILE HEADER: Solo en móviles -->
       <div class="lg:hidden sticky top-0 z-20 px-5 py-3.5 flex items-center justify-between bg-white/95 backdrop-blur-sm border-b border-slate-100/60 shadow-sm">
         <div>
           <h1 class="text-[19px] font-extrabold text-slate-900 tracking-tight font-['Inter',sans-serif] leading-tight">105 POS Pro</h1>
@@ -887,10 +887,6 @@ const checkAvailability = async () => {
       // VITE_API_URL es la URL base, se agrega /api
       const apiUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
       
-      console.log('ðŸ” Verificando disponibilidad:', {
-        subdomain: form.subdomain,
-        url: `${apiUrl}/check-domain`
-      })
       
       const response = await axios.post(`${apiUrl}/check-domain`, { 
         subdomain: form.subdomain 
@@ -901,8 +897,6 @@ const checkAvailability = async () => {
         },
         timeout: 10000 // 10 segundos timeout
       })
-      
-      console.log('âœ… Respuesta del servidor:', response.data)
       
       if (response.data && typeof response.data.available !== 'undefined') {
         availabilityStatus.value = response.data.available ? 'available' : 'taken'
@@ -938,12 +932,8 @@ const signInWithGoogle = async () => {
   try {
     isGoogleLoading.value = true
     
-    console.log('ðŸ” Iniciando autenticación con Google...')
-    
     // NO enviar datos de registro - solo iniciar OAuth
     const authUrl = await googleAuthService.initiateGoogleAuth({})
-    
-    console.log('âœ… URL de Google OAuth recibida:', authUrl)
     
     // Redirigir a Google para autenticación
     // Google luego redirigirí¡ a: /api/auth/google/callback
@@ -1186,7 +1176,6 @@ const goToPlanSelection = () => {
     
     // En producción sin subdominios DNS, ir directo a /select-plan en el dominio principal
     const targetUrl = `/select-plan?${params.toString()}`
-    console.log('âœ… Redirigiendo a selección de plan:', targetUrl)
     window.location.href = targetUrl
   } else {
     // Si no hay datos (caso raro), redirigir a la app central como fallback
@@ -1210,9 +1199,6 @@ const registerTenant = async () => {
     // VITE_API_URL es la URL base, se agrega /api
     const apiUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
     
-    console.log('ðŸ“¤ Enviando petición de registro a:', `${apiUrl}/register-tenant`)
-    console.log('ðŸ“¦ Datos del formulario:', form)
-    
     // ðŸ†• Si hay datos de Google, incluirlos en el registro
     const registrationPayload = {
       ...form,
@@ -1225,13 +1211,10 @@ const registerTenant = async () => {
       registrationPayload.google_name = googleUserData.value.name
       registrationPayload.google_picture = googleUserData.value.picture
       
-      console.log('ðŸ” Incluyendo datos de Google en registro:', googleUserData.value)
     }
     
     // Crear tenant SIN plan definido aíºn (o con plan temporal)
     const response = await axios.post(`${apiUrl}/register-tenant`, registrationPayload)
-    
-    console.log('ðŸ“¥ Respuesta completa recibida:', response)
     
     if (response.data.success) {
       // Guardar datos del tenant creado
@@ -1252,8 +1235,6 @@ const registerTenant = async () => {
         // Configurar axios para futuras peticiones
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
         
-        console.log('âœ… Usuario autenticado automí¡ticamente después del registro')
-        console.log('ðŸ”‘ Token guardado:', token.substring(0, 20) + '...')
       }
       
       // âœ… GUARDAR DATOS DEL REGISTRO EN LOCALSTORAGE para proceso de pago
@@ -1282,9 +1263,6 @@ const registerTenant = async () => {
     }
 
   } catch (error) {
-    console.log('ðŸ”¥ ERROR REGISTRO:', error)
-    console.log('ðŸ”¥ DATA:', error.response?.data)
-    
     step.value = 1 // Go back to step 1 on error
     isSubmitting.value = false
     clearInterval(messageInterval)
@@ -1303,8 +1281,6 @@ const registerTenant = async () => {
       message.toLowerCase().includes('nit/cédula');
 
     if (isDuplicateDocument) {
-      console.log('âœ… DETECTADO DUPLICADO DE Cí‰DULA - MOSTRANDO MODAL')
-      
       // Mostrar modal unificado con info de NIT/CC duplicado
       duplicateType.value = 'document'
       duplicateValue.value = form.cedula
@@ -1332,7 +1308,6 @@ const registerTenant = async () => {
     
     // ðŸ›¡ï¸ íšLTIMA DEFENSA: Si por alguna razón el check de arriba falló pero el mensaje es de duplicado
     if (errorMessage.toLowerCase().includes('ya existe una tienda') || errorMessage.toLowerCase().includes('identificación')) {
-      console.log('âœ… DETECTADO DUPLICADO EN FALLBACK - MOSTRANDO MODAL')
       duplicateType.value = 'document'
       duplicateValue.value = form.cedula
       duplicateTenants.value = [] // ðŸ”’ SECURITY FIX: No mostrar lista de tiendas
@@ -1355,7 +1330,6 @@ onMounted(async () => {
     localStorage.removeItem('user');
     localStorage.removeItem('welcome_seen');
     localStorage.removeItem('loginTimestamp');
-    console.log('âœ… [Security] Sesión anterior limpiada. Modo registro estrictamente en limpio.');
   }
 
   // ðŸ“ RESTAURAR datos del formulario si el usuario regresa de Términos/privacidad
@@ -1364,8 +1338,6 @@ onMounted(async () => {
     try {
       const parsedData = JSON.parse(savedFormData)
       Object.assign(form, parsedData)
-      console.log('âœ… Datos del formulario restaurados desde sessionStorage')
-      
       // Limpiar sessionStorage
       sessionStorage.removeItem('register_form_data')
       sessionStorage.removeItem('register_return_url')
@@ -1414,7 +1386,6 @@ onMounted(async () => {
   const googleToken = urlParams.get('google_token')
   
   if (googleToken) {
-    console.log('ðŸ” Google Auth completado - Cargando datos del usuario...')
     isGoogleLoading.value = true
     
     try {
@@ -1425,8 +1396,6 @@ onMounted(async () => {
       
       if (response.data.success && response.data.user) {
         const userData = response.data.user
-        
-        console.log('âœ… Datos de Google recibidos:', userData)
         
         googleUserData.value = userData
         

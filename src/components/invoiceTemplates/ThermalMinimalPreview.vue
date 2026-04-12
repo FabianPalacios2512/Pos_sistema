@@ -1,6 +1,6 @@
 <template>
   <!-- 
-    ✅ PREVIEW MINIMALISTA PURO del ticket térmico
+    PREVIEW MINIMALISTA PURO del ticket térmico
     Diseño basado en tipografía, espacio en blanco y líneas sutiles
     Sin cajas, sin bordes gruesos - Verdadero minimalismo
   -->

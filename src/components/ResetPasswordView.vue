@@ -1,8 +1,8 @@
 <template>
-  <!-- 🔓 Pantalla de Restablecer Contraseña -->
+  <!-- Pantalla de Restablecer Contraseña -->
   <div class="min-h-screen flex">
     
-    <!-- 📸 LADO IZQUIERDO: Imagen de Marca -->
+    <!-- LADO IZQUIERDO: Imagen de Marca -->
     <div class="hidden lg:flex lg:w-1/2 xl:w-[45%] relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900">
       <!-- Skeleton Loader -->
       <div 
@@ -28,14 +28,14 @@
       >
         <div v-if="imageLoaded" class="absolute bottom-8 left-8 right-8 z-10">
           <div class="bg-white/10  rounded-2xl p-6 border border-white/20">
-            <h3 class="text-2xl font-bold text-white mb-2">🔓 Nueva Contraseña</h3>
+            <h3 class="text-2xl font-bold text-white mb-2">Nueva Contraseña</h3>
             <p class="text-white/80 text-sm">Crea una contraseña segura y única para tu cuenta</p>
           </div>
         </div>
       </transition>
     </div>
 
-    <!-- 📝 LADO DERECHO: Formulario -->
+    <!-- LADO DERECHO: Formulario -->
     <div class="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-white">
       <div class="w-full max-w-md space-y-8">
         
@@ -111,7 +111,7 @@
                 </button>
               </div>
               <p class="mt-2 text-xs text-gray-500">
-                💡 Usa una combinación de letras, números y símbolos
+                Usa una combinación de letras, números y símbolos
               </p>
             </div>
 
@@ -200,7 +200,7 @@ const validating = ref(true)
 const tokenError = ref('')
 const success = ref(false)
 const loading = ref(false)
-const imageLoaded = ref(false) // 🖼️ Estado de carga de imagen
+const imageLoaded = ref(false) // Estado de carga de imagen
 
 const token = ref('')
 const email = ref('')

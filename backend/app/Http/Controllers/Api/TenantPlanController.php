@@ -14,11 +14,6 @@ class TenantPlanController extends Controller
      */
     public function updatePlan(Request $request)
     {
-        \Log::info('TenantPlanController::updatePlan - Peticion recibida', [
-            'request_data' => $request->all(),
-            'tenant_id' => $request->tenant_id,
-            'plan' => $request->plan
-        ]);
 
         // FIX: No usar exists:tenants,id porque puede fallar por conexion de BD
         // En su lugar, validamos manualmente despues
@@ -55,11 +50,6 @@ class TenantPlanController extends Controller
                 ], 404);
             }
 
-            \Log::info('TenantPlanController::updatePlan - Tenant encontrado', [
-                'tenant_id' => $tenant->id,
-                'current_plan' => $tenant->plan,
-                'current_data' => $tenant->data
-            ]);
 
             // Calcular nueva fecha de expiracion segun el plan
             $subscriptionEndsAt = null;
@@ -79,11 +69,6 @@ class TenantPlanController extends Controller
                 $trialDays = $plan === 'trial_express' ? 3 : 7;
                 $subscriptionEndsAt = now()->addDays($trialDays);
 
-                \Log::info('Activando trial', [
-                    'plan' => $plan,
-                    'days' => $trialDays,
-                    'ends_at' => $subscriptionEndsAt->toDateTimeString()
-                ]);
             } elseif (in_array($dbPlan, ['basic', 'premium', 'enterprise'])) {
                 // 🔥 BUSCAR pending_payment para obtener payment_frequency correcto
                 // Buscamos en 'pending' o 'completed' para manejar race conditions
@@ -95,11 +80,6 @@ class TenantPlanController extends Controller
                 if ($pendingPayment) {
                     // ✅ VALIDACIÓN IDEMPOTENTE: Si ya fue procesado, retornar éxito
                     if ($pendingPayment->status === 'completed' && $tenant->plan === $dbPlan) {
-                        \Log::info('TenantPlanController - Plan ya fue activado previamente (IDEMPOTENTE)', [
-                            'tenant_id' => $request->tenant_id,
-                            'plan' => $dbPlan,
-                            'payment_reference' => $pendingPayment->reference,
-                        ]);
 
                         return response()->json([
                             'success' => true,
@@ -134,11 +114,6 @@ class TenantPlanController extends Controller
                         }
                     }
 
-                    \Log::info('TenantPlanController - Subscription activada desde pending_payment', [
-                        'tenant_id' => $request->tenant_id,
-                        'payment_frequency' => $pendingPayment->payment_frequency,
-                        'subscription_ends_at' => $subscriptionEndsAt->toDateTimeString(),
-                    ]);
                 } else {
                     // Fallback: 1 mes si no hay pending_payment
                     $subscriptionEndsAt = now()->addMonth();
@@ -163,15 +138,6 @@ class TenantPlanController extends Controller
                 'data' => json_encode($data),
             ]);
 
-            \Log::info('Plan de tenant actualizado EXITOSAMENTE', [
-                'tenant_id' => $tenant->id,
-                'old_plan' => $tenant->getOriginal('plan'),
-                'new_plan' => $dbPlan,
-                'original_plan_name' => $plan,
-                'subscription_ends_at' => $subscriptionEndsAt,
-                'plan_pending' => false,
-                'payment_status' => $data['payment_status']
-            ]);
 
             return response()->json([
                 'success' => true,

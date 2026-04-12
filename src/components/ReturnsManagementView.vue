@@ -25,7 +25,7 @@
               
               <button
                 @click="navigateToNewReturn"
-                class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
+                class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -513,7 +513,7 @@
             </p>
             
             <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
-              💡 Desbloquea todas las funciones premium para potenciar tu negocio
+              Desbloquea todas las funciones premium para potenciar tu negocio
             </p>
 
             <!-- Botones -->
@@ -1048,7 +1048,7 @@ const handleKeyDown = (event) => {
   }
 }
 
-// 🧠 Actualizar contexto de pantalla para IA de voz
+// Actualizar contexto de pantalla para IA de voz
 const updateScreenContextForAI = () => {
   const contextData = {
     resumenDevoluciones: {
@@ -1070,7 +1070,7 @@ const updateScreenContextForAI = () => {
       fecha: formatDate(selectedReturn.value.return_date),
       motivo: selectedReturn.value.reason || 'Sin motivo especificado',
       metodoReembolso: getRefundMethodLabel(selectedReturn.value.refund_method),
-      // 🔥 Validación de datos de contacto
+      // Validación de datos de contacto
       tieneEmail: !!(selectedReturn.value.customer?.email),
       tieneTelefono: !!(selectedReturn.value.customer?.phone),
       email: selectedReturn.value.customer?.email || null,
@@ -1082,12 +1082,12 @@ const updateScreenContextForAI = () => {
       enviarWhatsApp: selectedReturn.value 
         ? (selectedReturn.value.customer?.phone 
             ? 'Puedes enviar el comprobante por WhatsApp - el cliente tiene teléfono registrado'
-            : '⚠️ El cliente NO tiene teléfono registrado. Pídele al usuario que ingrese el número manualmente o que actualice los datos del cliente primero')
+            : 'El cliente NO tiene teléfono registrado. Pídele al usuario que ingrese el número manualmente o que actualice los datos del cliente primero')
         : 'Primero debes seleccionar una devolución',
       enviarEmail: selectedReturn.value 
         ? (selectedReturn.value.customer?.email 
             ? 'Puedes enviar el comprobante por Email - el cliente tiene email registrado'
-            : '⚠️ El cliente NO tiene email registrado. Pídele al usuario que ingrese el email manualmente o que actualice los datos del cliente primero')
+            : 'El cliente NO tiene email registrado. Pídele al usuario que ingrese el email manualmente o que actualice los datos del cliente primero')
         : 'Primero debes seleccionar una devolución'
     }
   }
@@ -1100,10 +1100,10 @@ onMounted(() => {
   loadReturns()
   document.addEventListener('keydown', handleKeyDown)
   
-  // 🧠 Inicializar contexto para IA después de cargar
+  // Inicializar contexto para IA después de cargar
   setTimeout(() => updateScreenContextForAI(), 500)
   
-  // 🎯 Registrar acciones para la IA de voz
+  // Registrar acciones para la IA de voz
   uiContext.registerAction('sendEmail', async () => {
     if (!selectedReturn.value) {
       return { success: false, message: 'No hay devolución seleccionada. Primero selecciona una devolución de la lista.' }
@@ -1146,12 +1146,12 @@ onMounted(() => {
   })
 })
 
-// 🧠 Watcher para actualizar contexto cuando cambien las devoluciones
+// Watcher para actualizar contexto cuando cambien las devoluciones
 watch(() => returns.value.length, () => {
   updateScreenContextForAI()
 })
 
-// 🧠 Watcher para actualizar contexto cuando cambie la devolución seleccionada
+// Watcher para actualizar contexto cuando cambie la devolución seleccionada
 watch(selectedReturn, () => {
   updateScreenContextForAI()
 })

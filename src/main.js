@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router/index.js'
 import './style.css'
 
-// 🖥️ Inicializar adaptación de escalado de pantalla (Windows 125%, 150%)
+// Inicializar adaptación de escalado de pantalla (Windows 125%, 150%)
 import { initScreenScaling } from './composables/useScreenScaling.js'
 initScreenScaling()
 
@@ -16,9 +16,7 @@ const updateSW = registerSW({
 		// Auto-actualizar sin preguntar para forzar limpieza del SW viejo
 		updateSW(true)
 	},
-	onOfflineReady() {
-		console.log('✅ Aplicación lista para funcionar sin conexión')
-	},
+	onOfflineReady() {},
 	onRegistered(r) {
 		// Forzar verificación de actualización cada 30 segundos
 		r && setInterval(() => {

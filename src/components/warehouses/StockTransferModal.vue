@@ -230,28 +230,19 @@ const canSubmit = computed(() => {
 watch(() => form.value.source_warehouse_id, async (warehouseId) => {
   if (warehouseId) {
     try {
-      console.log(`🔄 [StockTransferModal] Cargando inventario para sede ${warehouseId}...`);
       const response = await warehouseService.getInventory(warehouseId);
-      console.log('📦 Respuesta getInventory:', response);
-      
       // El backend devuelve {success: true, data: {warehouse, summary, products}}
       const products = response.data?.products || response.products || [];
-      console.log(`📋 Total productos en respuesta: ${products.length}`);
-      
       availableProducts.value = products.filter(p => p.stock > 0); // Solo productos con stock
-      console.log(`✅ Productos con stock > 0: ${availableProducts.value.length}`);
-      
       // Mapear stock por producto
       warehouseInventory.value = {};
       availableProducts.value.forEach(p => {
         warehouseInventory.value[p.id] = p.stock;
       });
-      console.log('📦 warehouseInventory:', warehouseInventory.value);
-      
       // Limpiar items si cambia la bodega
       form.value.items = [];
     } catch (error) {
-      console.error('❌ Error al cargar inventario:', error);
+      console.error('Error al cargar inventario:', error);
       showError('Error al cargar productos de la sede. Por favor intenta de nuevo.');
     }
   } else {
@@ -264,7 +255,6 @@ watch(() => form.value.source_warehouse_id, async (warehouseId) => {
 
 const getProductStock = (productId) => {
   const stock = warehouseInventory.value[productId] || 0;
-  console.log(`📊 getProductStock(${productId}):`, stock);
   return stock;
 };
 
@@ -288,12 +278,8 @@ const updateProductStock = (index) => {
 };
 
 const handleSubmit = async () => {
-  console.log('🚀 [StockTransferModal] handleSubmit iniciado');
-  console.log('📦 canSubmit.value:', canSubmit.value);
-  console.log('📋 form.value:', JSON.stringify(form.value, null, 2));
-  
   if (!canSubmit.value) {
-    showWarning('⚠️ Por favor completa todos los campos requeridos');
+    showWarning('Por favor completa todos los campos requeridos');
     return;
   }
 
@@ -311,10 +297,10 @@ const handleSubmit = async () => {
   saving.value = true;
   try {
     const response = await stockTransferService.create(form.value);
-    showSuccess('✅ Traslado creado exitosamente');
+    showSuccess('Traslado creado exitosamente');
     emit('saved');
   } catch (error) {
-    console.error('❌ Error al crear traslado:', error);
+    console.error('Error al crear traslado:', error);
     showError(error.response?.data?.message || 'Error al crear el traslado');
   } finally {
     saving.value = false;

@@ -17,69 +17,56 @@ use Illuminate\Support\Facades\File;
 class ProductController extends Controller
 {
     /**
-     * ✅ Asegura que el symlink del tenant exista para servir archivos públicos
-     * Crea: public/storage/tenants/{tenant_id} -> storage/tenant{tenant_id}/app/public
-     *
-     * NOTA: Esta función NO debe detener la ejecución si falla - las imágenes
-     * se guardan correctamente en storage/, solo el acceso público podría fallar.
+     * Asegura que el symlink del tenant exista para servir archivos públicos.
+     * Usa base_path() en lugar de storage_path() para evitar duplicación del
+     * prefijo de tenant (storage_path() ya apunta a storage/tenant{id}/ en contexto tenant).
      */
     private function ensureTenantStorageLink()
     {
         try {
             $tenantId = tenant('id');
             if (!$tenantId) {
-                return; // No es multi-tenant
-            }
-
-            // ✅ CORRECCIÓN: El storage del tenant está en storage/tenant{id}/app/public
-            $tenantStoragePath = storage_path("tenant{$tenantId}/app/public");
-            $symlinkPath = public_path("storage/tenants/{$tenantId}");
-
-            // Si el symlink ya existe, no hacer nada
-            if (is_link($symlinkPath) || is_dir($symlinkPath)) {
                 return;
             }
 
-            // Asegurar que exista el directorio del tenant
+            // IMPORTANTE: usar base_path() para evitar duplicación.
+            // storage_path() en contexto tenant = storage/tenant{id}/
+            // Entonces storage_path("tenant{id}/...") = storage/tenant{id}/tenant{id}/... (MAL)
+            $tenantStoragePath = base_path("storage/tenant{$tenantId}/app/public");
+            $symlinkPath = public_path("storage/tenants/{$tenantId}");
+
+            // Si el symlink ya existe y apunta al target correcto, no hacer nada
+            if (is_link($symlinkPath)) {
+                $currentTarget = @readlink($symlinkPath);
+                if ($currentTarget === $tenantStoragePath) {
+                    return;
+                }
+                // Si apunta a un target incorrecto (path duplicado), eliminarlo
+                @unlink($symlinkPath);
+            } elseif (is_dir($symlinkPath)) {
+                return;
+            }
+
             if (!is_dir($tenantStoragePath)) {
                 if (!@mkdir($tenantStoragePath, 0755, true)) {
-                    \Log::warning("[Storage] No se pudo crear directorio tenant: {$tenantStoragePath}");
+                    \Log::warning("[Storage] No se pudo crear directorio: {$tenantStoragePath}");
                     return;
                 }
             }
 
-            // Asegurar que exista el directorio base public/storage
             $storagePublicDir = public_path('storage');
-            if (!is_dir($storagePublicDir)) {
-                if (!is_link($storagePublicDir)) {
-                    \Log::warning("[Storage] Directorio public/storage no existe. Ejecutar: php artisan storage:link");
-                    @mkdir($storagePublicDir, 0755, true);
-                }
+            if (!is_dir($storagePublicDir) && !is_link($storagePublicDir)) {
+                @mkdir($storagePublicDir, 0755, true);
             }
 
-            // Crear directorio tenants si no existe
             $tenantsDir = public_path('storage/tenants');
             if (!is_dir($tenantsDir)) {
-                if (!@mkdir($tenantsDir, 0755, true)) {
-                    \Log::warning("[Storage] No se pudo crear directorio tenants: {$tenantsDir}");
-                    return;
-                }
+                @mkdir($tenantsDir, 0755, true);
             }
 
-            // Crear el symlink apuntando al storage correcto del tenant
-            if (@symlink($tenantStoragePath, $symlinkPath)) {
-                \Log::info("✅ [Storage] Symlink creado para tenant: {$tenantId}", [
-                    'symlink' => $symlinkPath,
-                    'target' => $tenantStoragePath
-                ]);
-            } else {
-                \Log::warning("⚠️ [Storage] No se pudo crear symlink, continuando sin él", [
-                    'tenant' => $tenantId
-                ]);
-            }
+            @symlink($tenantStoragePath, $symlinkPath);
         } catch (\Exception $e) {
-            // NUNCA fallar por problemas de symlink - las imágenes igual se guardan en storage
-            \Log::error("❌ [Storage] Error en ensureTenantStorageLink (ignorando): {$e->getMessage()}");
+            \Log::error("[Storage] Error en ensureTenantStorageLink: {$e->getMessage()}");
         }
     }
 
@@ -353,9 +340,6 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // 🐛 DEBUG: Ver datos recibidos
-        \Log::info('🚀 [ProductController@store] REQUEST:', $request->all());
-
         // Normalizar input: permitir 'type' como alias de 'product_type'
         if ($request->has('type') && !$request->has('product_type')) {
             $request->merge(['product_type' => $request->type]);
@@ -471,17 +455,8 @@ class ProductController extends Controller
 
                 // ✅ Si se enviaron variantes (productos de moda), crear la variante
                 if ($request->has('variants') && is_array($request->variants) && count($request->variants) > 0) {
-                    \Log::info('✅ [ProductController@store] Producto simple CON variante explícita');
-
                     $variantData = $request->variants[0]; // Tomar la primera variante
                     $costPrice = $variantData['cost_price'] ?? $variantData['cost'] ?? 0;
-
-                    \Log::info('🐛 [ProductController@store] Variant Data:', [
-                        'sku' => $variantData['sku'] ?? null,
-                        'price' => $variantData['price'] ?? null,
-                        'cost_price' => $costPrice,
-                        'stock' => $variantData['stock'] ?? 0
-                    ]);
 
                     // Crear variante
                     $variant = $product->variants()->create([
@@ -493,20 +468,12 @@ class ProductController extends Controller
                         'options_summary' => null
                     ]);
 
-                    \Log::info('✅ [ProductController@store] Variant Created:', [
-                        'id' => $variant->id,
-                        'cost_price' => $variant->cost_price
-                    ]);
-
                     // Guardar stock en bodega vinculado a la variante
                     $product->warehouses()->attach($warehouseId, [
                         'stock' => $variantData['stock'] ?? 0,
                         'product_variant_id' => $variant->id
                     ]);
                 } else {
-                    // LÓGICA LEGACY: Sin variantes explícitas
-                    \Log::info('⚠️ [ProductController@store] Producto simple SIN variante (legacy)');
-
                     $stock = $request->current_stock ?? 0;
 
                     // Guardar en product_warehouse
@@ -551,7 +518,6 @@ class ProductController extends Controller
                 // ✅ Si no hay variantes o el array está vacío, crear variante por defecto
                 $variants = $request->variants ?? [];
                 if (empty($variants)) {
-                    \Log::info('⚠️ [ProductController@store] No variants provided, creating default variant');
                     $variants = [[
                         'sku' => $request->sku ?? 'SKU-' . time(),
                         'price' => $request->sale_price ?? $request->price ?? 0,
@@ -563,21 +529,7 @@ class ProductController extends Controller
 
                 if (is_array($variants)) {
                     foreach ($variants as $variantData) {
-                        // 🐛 DEBUG: Ver qué datos llegan para la variante
-                        \Log::info('🐛 [ProductController@store] Variant Data Received:', [
-                            'sku' => $variantData['sku'] ?? null,
-                            'price' => $variantData['price'] ?? null,
-                            'cost' => $variantData['cost'] ?? null,
-                            'cost_price' => $variantData['cost_price'] ?? null,
-                            'stock' => $variantData['stock'] ?? null,
-                            'all_data' => $variantData
-                        ]);
-
                         $costPrice = $variantData['cost'] ?? $variantData['cost_price'] ?? 0;
-
-                        \Log::info('🐛 [ProductController@store] Cost Price Calculated:', [
-                            'cost_price' => $costPrice
-                        ]);
 
                         // Crear Variante
                         $variant = $product->variants()->create([
@@ -586,11 +538,6 @@ class ProductController extends Controller
                             'cost_price' => $costPrice,
                             'stock' => $variantData['stock'] ?? 0,
                             'options_summary' => $variantData['options'] ?? null // JSON
-                        ]);
-
-                        \Log::info('🐛 [ProductController@store] Variant Created:', [
-                            'id' => $variant->id,
-                            'cost_price' => $variant->cost_price
                         ]);
 
                         $totalStock += ($variantData['stock'] ?? 0);
@@ -659,17 +606,9 @@ class ProductController extends Controller
                 $q->select('warehouses.id', 'warehouses.name', 'is_default')
                   ->withPivot('stock');
             },
-            'options.values', // Opciones del producto con sus valores
-            'variants', // Variantes sin eager loading de opciones
+            'options.values',
+            'variants',
             'images'
-        ]);
-
-        // 🐛 DEBUG: Verificar store_category
-        \Log::info('🔍 [ProductController@show] Product Data:', [
-            'id' => $product->id,
-            'name' => $product->name,
-            'store_category' => $product->store_category,
-            'product_type' => $product->product_type
         ]);
 
         // Formatear las variantes para incluir options como array simple
@@ -683,15 +622,6 @@ class ProductController extends Controller
                 } else {
                     $variant->options = [];
                 }
-
-                // 🐛 DEBUG: Verificar que cost_price venga en la variante
-                \Log::info('🐛 [ProductController@show] Variant Data:', [
-                    'id' => $variant->id,
-                    'sku' => $variant->sku,
-                    'price' => $variant->price,
-                    'cost_price' => $variant->cost_price,
-                    'stock' => $variant->stock
-                ]);
             });
         }
 
@@ -726,20 +656,6 @@ class ProductController extends Controller
             ]);
         }
 
-        \Log::info('🔄 [ProductController@update] Actualizando producto:', [
-            'product_id' => $product->id,
-            'current_type' => $product->product_type,
-            'new_type' => $request->product_type,
-            'has_files' => $request->hasFile('images'),
-            'all_files' => $request->allFiles(),
-            'images' => $request->images,
-            'request_all' => $request->all(),
-            'name' => $request->input('name'),
-            'sku' => $request->input('sku'),
-            'variants' => $request->variants,
-            'cost_price' => $request->cost_price
-        ]);
-
         return DB::transaction(function () use ($request, $product) {
             // 1. Actualizar tipo de producto si cambió
             $oldType = $product->product_type;
@@ -770,10 +686,6 @@ class ProductController extends Controller
             // ✅ Actualizar current_stock si viene en el request (edición directa por IA o manual)
             if ($request->has('current_stock')) {
                 $updateData['current_stock'] = (int) $request->input('current_stock');
-                \Log::info('📦 [ProductController@update] Actualizando stock directo:', [
-                    'product_id' => $product->id,
-                    'current_stock' => $updateData['current_stock']
-                ]);
             }
 
             // ✅ Actualizar store_category si viene en el request (permite cambiar entre moda/general)
@@ -793,30 +705,14 @@ class ProductController extends Controller
 
             // 3. Manejo de Imágenes
             if ($request->hasFile('images')) {
-                // ✅ Asegurar que el symlink existe antes de guardar imágenes
                 $this->ensureTenantStorageLink();
-
-                \Log::info('📸 [ProductController@update] Procesando imágenes', [
-                    'product_id' => $product->id,
-                    'num_files' => count($request->file('images'))
-                ]);
 
                 $currentMaxOrder = $product->images()->max('order') ?? 0;
                 foreach ($request->file('images') as $index => $file) {
                     try {
-                        \Log::info('🔍 [ProductController@update] Procesando archivo', [
-                            'index' => $index,
-                            'original_name' => $file->getClientOriginalName(),
-                            'size' => $file->getSize(),
-                            'mime' => $file->getMimeType(),
-                            'is_valid' => $file->isValid(),
-                            'error' => $file->getError()
-                        ]);
-
                         $path = $file->store('products', 'public');
 
                         if (!$path) {
-                            \Log::error('❌ [ProductController@update] store() retornó false/null');
                             continue;
                         }
 
@@ -828,27 +724,20 @@ class ProductController extends Controller
                             $url = Storage::url($path);
                         }
 
-                        \Log::info('💾 [ProductController@update] Imagen guardada', [
-                            'path' => $path,
-                            'url' => $url,
-                            'order' => $currentMaxOrder + $index + 1,
-                            'exists_in_disk' => Storage::disk('public')->exists($path)
-                        ]);
-
                         $product->images()->create([
                             'image_url' => $url,
                             'is_primary' => $currentMaxOrder === 0 && $index === 0,
                             'order' => $currentMaxOrder + $index + 1
                         ]);
                     } catch (\Exception $e) {
-                        \Log::error('❌ [ProductController@update] Error guardando imagen', [
+                        \Log::error('[ProductController@update] Error guardando imagen', [
                             'error' => $e->getMessage(),
                             'trace' => $e->getTraceAsString()
                         ]);
                     }
                 }
             } else {
-                \Log::warning('⚠️ [ProductController@update] No se detectaron archivos de imagen en el request');
+                // No files detected - this is normal for non-image updates
             }
 
             // 4. Manejar variantes y opciones
@@ -860,20 +749,10 @@ class ProductController extends Controller
 
                 // ✅ Si se enviaron variantes (productos de moda), actualizar/crear la variante
                 if ($request->has('variants') && is_array($request->variants) && count($request->variants) > 0) {
-                    \Log::info('✅ [ProductController@update] Producto simple CON variante explícita');
-
-                    // Eliminar variantes anteriores
                     $product->variants()->delete();
 
-                    $variantData = $request->variants[0]; // Tomar la primera variante
+                    $variantData = $request->variants[0];
                     $costPrice = $variantData['cost_price'] ?? $variantData['cost'] ?? 0;
-
-                    \Log::info('🐛 [ProductController@update] Variant Data:', [
-                        'sku' => $variantData['sku'] ?? null,
-                        'price' => $variantData['price'] ?? null,
-                        'cost_price' => $costPrice,
-                        'stock' => $variantData['stock'] ?? 0
-                    ]);
 
                     // Crear/actualizar variante
                     $variant = $product->variants()->create([
@@ -883,11 +762,6 @@ class ProductController extends Controller
                         'stock' => $variantData['stock'] ?? 0,
                         'active' => true,
                         'options_summary' => null
-                    ]);
-
-                    \Log::info('✅ [ProductController@update] Variant Updated:', [
-                        'id' => $variant->id,
-                        'cost_price' => $variant->cost_price
                     ]);
 
                     // Actualizar stock en bodega vinculado a la variante
@@ -904,21 +778,10 @@ class ProductController extends Controller
                     // Actualizar stock total
                     $product->update(['current_stock' => $variantData['stock'] ?? 0]);
                 } else {
-                    // LÓGICA LEGACY: Sin variantes explícitas, eliminar variantes
-                    \Log::info('⚠️ [ProductController@update] Producto simple SIN variante (legacy)');
-
                     $product->variants()->delete();
 
-                    // ✅ Obtener precio desde sale_price
                     $salePrice = $request->input('sale_price', 0);
                     $costPrice = $request->input('cost_price', 0);
-
-                    \Log::info('💰 [ProductController@update] Producto SIMPLE (legacy):', [
-                        'product_id' => $product->id,
-                        'sale_price' => $salePrice,
-                        'cost_price' => $costPrice,
-                        'warehouse_stocks' => $request->warehouse_stocks
-                    ]);
 
                     // ✅ Actualizar stock en warehouses SOLO si viene warehouse_stocks
                     if ($request->has('warehouse_stocks') && is_array($request->warehouse_stocks)) {
@@ -950,18 +813,12 @@ class ProductController extends Controller
                         'sale_price' => $salePrice,
                         'image_url' => $request->input('image_url') // ✅ Guardar imagen
                     ]);
-
-                    \Log::info('✅ [ProductController@update] Stock actualizado:', [
-                        'total_stock' => $totalStock,
-                        'warehouses' => count($request->warehouse_stocks)
-                    ]);
                     } else {
                         // Fallback: Si no viene warehouse_stocks, actualizar precio e imagen
                         $product->update([
                             'sale_price' => $salePrice,
                             'image_url' => $request->input('image_url')
                         ]);
-                        \Log::warning('⚠️ [ProductController@update] No se recibieron warehouse_stocks');
                     }
                 }
 
@@ -992,7 +849,6 @@ class ProductController extends Controller
                 // ✅ Si no hay variantes o el array está vacío, crear variante por defecto
                 $variants = $request->variants ?? [];
                 if (empty($variants)) {
-                    \Log::info('⚠️ [ProductController@update] No variants provided, creating default variant');
                     $variants = [[
                         'sku' => $request->sku ?? $product->sku ?? 'SKU-' . time(),
                         'price' => $request->sale_price ?? $request->price ?? $product->sale_price ?? 0,
@@ -1009,21 +865,7 @@ class ProductController extends Controller
                     $warehouseId = $request->warehouse_id ?? Warehouse::first()->id ?? 1;
 
                     foreach ($variants as $variantData) {
-                        // 🐛 DEBUG: Ver qué datos llegan para actualizar la variante
-                        \Log::info('🐛 [ProductController@update] Variant Data Received:', [
-                            'sku' => $variantData['sku'] ?? null,
-                            'price' => $variantData['price'] ?? null,
-                            'cost' => $variantData['cost'] ?? null,
-                            'cost_price' => $variantData['cost_price'] ?? null,
-                            'stock' => $variantData['stock'] ?? null,
-                            'all_data' => $variantData
-                        ]);
-
                         $costPrice = $variantData['cost'] ?? $variantData['cost_price'] ?? 0;
-
-                        \Log::info('🐛 [ProductController@update] Cost Price Calculated:', [
-                            'cost_price' => $costPrice
-                        ]);
 
                         $variant = $product->variants()->create([
                             'sku' => $variantData['sku'],
@@ -1032,11 +874,6 @@ class ProductController extends Controller
                             'stock' => $variantData['stock'] ?? 0,
                             'active' => $variantData['active'] ?? true,
                             'options_summary' => $variantData['options'] ?? null // ✅ Guardar resumen JSON
-                        ]);
-
-                        \Log::info('🐛 [ProductController@update] Variant Updated:', [
-                            'id' => $variant->id,
-                            'cost_price' => $variant->cost_price
                         ]);
 
                         // Vincular con Valores de Opción (Pivot)
@@ -1092,12 +929,6 @@ class ProductController extends Controller
                     $product->update(['current_stock' => $totalStock]);
                 }
             }
-
-            \Log::info('✅ Producto actualizado correctamente', [
-                'product_id' => $product->id,
-                'type' => $newType,
-                'variants_count' => $product->variants()->count()
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -1415,11 +1246,6 @@ class ProductController extends Controller
                 DB::table('products')
                     ->where('id', $productId)
                     ->update(['current_stock' => $totalStock]);
-
-                \Log::info('✅ Stock recalculado para producto variable:', [
-                    'product_id' => $productId,
-                    'new_total_stock' => $totalStock
-                ]);
             }
 
             return response()->json([
@@ -1450,13 +1276,6 @@ class ProductController extends Controller
         try {
             $image = ProductImage::findOrFail($imageId);
 
-            \Log::info('🗑️ [ProductController@deleteImage] Eliminando imagen', [
-                'image_id' => $imageId,
-                'image_url' => $image->image_url,
-                'product_id' => $image->product_id
-            ]);
-
-            // Extraer la ruta del archivo desde la URL
             $imageUrl = $image->image_url;
             $filePath = null;
 
@@ -1473,13 +1292,6 @@ class ProductController extends Controller
             if ($filePath) {
                 if (Storage::disk('public')->exists($filePath)) {
                     Storage::disk('public')->delete($filePath);
-                    \Log::info('✅ [ProductController@deleteImage] Archivo físico eliminado', [
-                        'path' => $filePath
-                    ]);
-                } else {
-                    \Log::warning('⚠️ [ProductController@deleteImage] Archivo físico no encontrado', [
-                        'path' => $filePath
-                    ]);
                 }
             }
 
@@ -1517,7 +1329,7 @@ class ProductController extends Controller
             ], 404);
 
         } catch (\Exception $e) {
-            \Log::error('❌ [ProductController@deleteImage] Error', [
+            \Log::error('[ProductController@deleteImage] Error', [
                 'image_id' => $imageId,
                 'error' => $e->getMessage()
             ]);
@@ -1538,12 +1350,6 @@ class ProductController extends Controller
         try {
             $product = Product::findOrFail($productId);
 
-            \Log::info('🗑️ [ProductController@deleteProductImage] Eliminando todas las imágenes del producto', [
-                'product_id' => $productId,
-                'product_name' => $product->name
-            ]);
-
-            // Obtener todas las imágenes del producto
             $images = ProductImage::where('product_id', $productId)->get();
 
             $deletedCount = 0;
@@ -1565,9 +1371,6 @@ class ProductController extends Controller
                 if ($filePath) {
                     if (Storage::disk('public')->exists($filePath)) {
                         Storage::disk('public')->delete($filePath);
-                        \Log::info('✅ [ProductController@deleteProductImage] Archivo físico eliminado', [
-                            'path' => $filePath
-                        ]);
                     }
                 }
 
@@ -1594,7 +1397,7 @@ class ProductController extends Controller
             ], 404);
 
         } catch (\Exception $e) {
-            \Log::error('❌ [ProductController@deleteProductImage] Error', [
+            \Log::error('[ProductController@deleteProductImage] Error', [
                 'product_id' => $productId,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()

@@ -15,7 +15,7 @@
             <input v-model="searchQuery"
                    type="text"
                    placeholder="Buscar proveedor..."
-                   class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
+                   class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
           </div>
           
           <!-- Filtros de estado -->
@@ -24,7 +24,7 @@
                     :class="[
                       'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
                       filterActive === null
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                        ? 'bg-gray-900 dark:bg-white text-white dark:text-zinc-900'
                         : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700'
                     ]">
               Todos
@@ -33,7 +33,7 @@
                     :class="[
                       'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
                       filterActive === true
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                        ? 'bg-gray-900 dark:bg-white text-white dark:text-zinc-900'
                         : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700'
                     ]">
               Activos
@@ -42,7 +42,7 @@
                     :class="[
                       'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
                       filterActive === false
-                        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                        ? 'bg-gray-900 dark:bg-white text-white dark:text-zinc-900'
                         : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-700'
                     ]">
               Inactivos
@@ -61,7 +61,7 @@
           <!-- Empty -->
           <div v-else-if="filteredSuppliers.length === 0" class="p-12 text-center">
             <div class="w-20 h-20 bg-gray-50 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <svg class="w-10 h-10 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-10 h-10 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
               </svg>
             </div>
@@ -70,7 +70,7 @@
           </div>
 
           <!-- Supplier Cards -->
-          <div v-else class="divide-y divide-gray-100 dark:divide-gray-800">
+          <div v-else class="divide-y divide-gray-100 dark:divide-zinc-800">
             <div v-for="supplier in filteredSuppliers" :key="supplier.id"
                  @click="selectSupplier(supplier)"
                  :class="[
@@ -228,64 +228,64 @@
           <div class="space-y-6 max-w-2xl">
             
             <!-- Información básica -->
-            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-zinc-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Información Básica</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Nombre del Proveedor *</label>
                   <input v-model="newSupplier.name" type="text" required
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Documento/NIT *</label>
                   <input v-model="newSupplier.document" type="text" required
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Persona de Contacto</label>
                   <input v-model="newSupplier.contact_person" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
               </div>
             </div>
             
             <!-- Información de contacto -->
-            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-zinc-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Contacto</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Teléfono</label>
                   <input v-model="newSupplier.phone" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Email</label>
                   <input v-model="newSupplier.email" type="email"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div class="col-span-2">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Dirección</label>
                   <input v-model="newSupplier.address" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
               </div>
             </div>
             
             <!-- Términos comerciales -->
-            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-zinc-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Términos Comerciales</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Plazo de Pago</label>
                   <select v-model="newSupplier.payment_terms"
-                          class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="immediate">Inmediato</option>
                     <option value="15_days">15 días</option>
                     <option value="30_days">30 días</option>
@@ -298,19 +298,19 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Límite de Crédito</label>
                   <input v-model.number="newSupplier.credit_limit" type="number" min="0"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div class="col-span-2">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Notas</label>
                   <textarea v-model="newSupplier.notes" rows="3"
-                            class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
               </div>
             </div>
             
             <!-- Estado -->
-            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-800 rounded-lg p-5 border border-gray-200 dark:border-zinc-700">
               <label class="flex items-center gap-3 cursor-pointer">
                 <input v-model="newSupplier.active" type="checkbox"
                        class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
@@ -328,12 +328,12 @@
         <div class="p-6 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800 flex-shrink-0">
           <div class="flex items-center justify-end gap-3">
             <button @click="cancelCreate"
-                    class="px-6 py-2.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
+                    class="px-6 py-2.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-zinc-700 transition-all duration-200">
               Cancelar
             </button>
             <button @click="saveNewSupplier"
                     :disabled="savingSupplier || !newSupplier.name || !newSupplier.document"
-                    class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-medium rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               <svg v-if="savingSupplier" class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
@@ -373,39 +373,39 @@
             <div class="col-span-3">
               <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Nombre del Proveedor *</label>
               <input v-model="editingSupplier.name" type="text" required
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <!-- Fila 2: Documento, Contacto, Teléfono -->
             <div>
               <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Documento/NIT *</label>
               <input v-model="editingSupplier.document" type="text" required
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <div>
               <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Contacto</label>
               <input v-model="editingSupplier.contact_person" type="text"
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <div>
               <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Teléfono</label>
               <input v-model="editingSupplier.phone" type="text"
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <!-- Fila 3: Email y Dirección (2 columnas) + Checkbox -->
             <div>
               <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Email</label>
               <input v-model="editingSupplier.email" type="email"
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <div>
               <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Dirección</label>
               <input v-model="editingSupplier.address" type="text"
-                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                     class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
             
             <!-- Estado (alineado con los inputs) -->
@@ -422,7 +422,7 @@
         <!-- Footer Compacto -->
         <div class="px-6 py-3 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800 flex items-center justify-end gap-2.5 flex-shrink-0">
           <button @click="cancelEdit"
-                  class="px-4 py-2 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
+                  class="px-4 py-2 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-zinc-700 transition-all duration-200">
             Cancelar
           </button>
           <button @click="saveEditedSupplier"
@@ -486,7 +486,7 @@
 
           <!-- KPIs rápidos -->
           <div class="grid grid-cols-3 gap-3 mt-4">
-            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
               <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1">Total Compras</p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">
                 ${{ formatNumber(selectedSupplier.total_purchases_amount || 0) }}
@@ -496,7 +496,7 @@
               </p>
             </div>
 
-            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
               <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1">Productos</p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ selectedSupplier.products_count || 0 }}
@@ -506,13 +506,13 @@
               </p>
             </div>
 
-            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-3 border border-gray-200 dark:border-zinc-700">
               <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1">Deuda Actual</p>
               <p :class="[
                     'text-lg font-semibold',
                     selectedSupplier.current_debt > 0 
                       ? 'text-red-600 dark:text-red-400' 
-                      : 'text-gray-400 dark:text-gray-600'
+                      : 'text-gray-400 dark:text-zinc-600'
                   ]">
                 ${{ formatNumber(selectedSupplier.current_debt || 0) }}
               </p>
@@ -529,32 +529,32 @@
           <!-- RESUMEN - Información ULTRA Compacta (Solo 1 fila) -->
           <div class="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
             <div class="grid grid-cols-6 gap-2">
-              <div v-if="selectedSupplier.phone" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+              <div v-if="selectedSupplier.phone" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-zinc-700">
                 <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Teléfono</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ selectedSupplier.phone }}</p>
               </div>
 
-              <div v-if="selectedSupplier.email" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+              <div v-if="selectedSupplier.email" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-zinc-700">
                 <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Email</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ selectedSupplier.email }}</p>
               </div>
 
-              <div v-if="selectedSupplier.document" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+              <div v-if="selectedSupplier.document" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-zinc-700">
                 <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Documento</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ selectedSupplier.document }}</p>
               </div>
 
-              <div v-if="selectedSupplier.payment_terms" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+              <div v-if="selectedSupplier.payment_terms" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-zinc-700">
                 <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Plazo</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ formatPaymentTerms(selectedSupplier.payment_terms) }}</p>
               </div>
 
-              <div v-if="selectedSupplier.last_purchase_date" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+              <div v-if="selectedSupplier.last_purchase_date" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-zinc-700">
                 <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Última Compra</p>
                 <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ formatDate(selectedSupplier.last_purchase_date) }}</p>
               </div>
 
-              <div v-if="selectedSupplier.last_purchase_date" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-gray-700">
+              <div v-if="selectedSupplier.last_purchase_date" class="bg-white dark:bg-zinc-800 rounded-lg px-2 py-1.5 border border-gray-200 dark:border-zinc-700">
                 <p class="text-[10px] text-gray-500 dark:text-zinc-500 mb-0.5">Hace</p>
                 <p class="text-xs font-semibold text-gray-900 dark:text-white">{{ daysSinceLastPurchase(selectedSupplier.last_purchase_date) }}d</p>
               </div>
@@ -581,9 +581,9 @@
             </div>
 
             <!-- Empty -->
-            <div v-else-if="supplierProducts.length === 0" class="text-center py-12 bg-gray-50 dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div v-else-if="supplierProducts.length === 0" class="text-center py-12 bg-gray-50 dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700">
               <div class="w-16 h-16 bg-gray-100 dark:bg-zinc-800 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-8 h-8 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
               </div>
@@ -605,7 +605,7 @@
                     <th class="px-3 py-2 text-center text-[10px] font-medium text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Estado</th>
                   </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-gray-800">
+                <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-800">
                   <tr v-for="(product, index) in supplierProducts" :key="product?.id || `product-${index}`"
                       class="hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all duration-200">
                     <td class="px-3 py-2 text-xs text-gray-500 dark:text-zinc-500">
@@ -617,7 +617,7 @@
                           <img :src="product.image_url" :alt="product.name" class="w-full h-full object-cover">
                         </div>
                         <div v-else class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center flex-shrink-0">
-                          <svg class="w-4 h-4 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg class="w-4 h-4 text-gray-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                           </svg>
                         </div>
@@ -675,7 +675,7 @@
   </div>
   </div>
 
-  <!-- 🎭 MODAL: Crear Proveedor -->
+  <!-- MODAL: Crear Proveedor -->
   <Transition name="modal">
     <div v-if="viewMode === 'create'" 
          @click.self="cancelCreate"
@@ -709,64 +709,64 @@
           <div class="space-y-5">
             
             <!-- Información básica -->
-            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-zinc-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Información Básica</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Nombre del Proveedor *</label>
                   <input v-model="newSupplier.name" type="text" required
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Documento/NIT *</label>
                   <input v-model="newSupplier.document" type="text" required
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Persona de Contacto</label>
                   <input v-model="newSupplier.contact_person" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
               </div>
             </div>
             
             <!-- Información de contacto -->
-            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-zinc-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Contacto</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Teléfono</label>
                   <input v-model="newSupplier.phone" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Email</label>
                   <input v-model="newSupplier.email" type="email"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div class="col-span-2">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Dirección</label>
                   <input v-model="newSupplier.address" type="text"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
               </div>
             </div>
             
             <!-- Términos comerciales -->
-            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-zinc-700">
               <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Términos Comerciales</h3>
               
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Plazo de Pago</label>
                   <select v-model="newSupplier.payment_terms"
-                          class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="immediate">Inmediato</option>
                     <option value="15_days">15 días</option>
                     <option value="30_days">30 días</option>
@@ -779,19 +779,19 @@
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Límite de Crédito</label>
                   <input v-model.number="newSupplier.credit_limit" type="number" min="0"
-                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                         class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 
                 <div class="col-span-2">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-2">Notas</label>
                   <textarea v-model="newSupplier.notes" rows="3"
-                            class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                            class="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                 </div>
               </div>
             </div>
             
             <!-- Estado -->
-            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-gray-700">
+            <div class="bg-gray-50 dark:bg-zinc-900 rounded-lg p-5 border border-gray-200 dark:border-zinc-700">
               <label class="flex items-center gap-3 cursor-pointer">
                 <input v-model="newSupplier.active" type="checkbox"
                        class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
@@ -809,12 +809,12 @@
         <div class="p-6 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800 flex-shrink-0 rounded-b-xl">
           <div class="flex items-center justify-end gap-3">
             <button @click="cancelCreate"
-                    class="px-6 py-2.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-200">
+                    class="px-6 py-2.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-200 text-sm font-medium rounded-full border border-gray-200 dark:border-zinc-700 transition-all duration-200">
               Cancelar
             </button>
             <button @click="saveNewSupplier"
                     :disabled="savingSupplier || !newSupplier.name || !newSupplier.document"
-                    class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-medium rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               <svg v-if="savingSupplier" class="animate-spin w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
@@ -850,7 +850,7 @@ export default {
       // Edición de proveedor
       editingSupplier: null,
       
-      // 🔗 QueryParams de navegación
+      // QueryParams de navegación
       navigationParams: null,
       
       // Formulario de nuevo proveedor
@@ -897,7 +897,7 @@ export default {
     // Handler para tecla ESC - deseleccionar proveedor
     document.addEventListener('keydown', this.handleKeyDown)
     
-    // 🔗 Registrar callback para navegación con queryParams
+    // Registrar callback para navegación con queryParams
     const { onModuleChange, currentQueryGlobal } = useModuleNavigation()
     
     // Verificar si hay queryParams actuales al montar
@@ -930,7 +930,7 @@ export default {
         if (response.success) {
           this.suppliers = response.data.suppliers || []
           
-          // 🔗 Si hay queryParams pendientes, procesarlos después de cargar
+          // Si hay queryParams pendientes, procesarlos después de cargar
           if (this.navigationParams) {
             this.$nextTick(() => {
               this.processNavigationParams()
@@ -945,7 +945,7 @@ export default {
       }
     },
     
-    // 🔗 Procesar parámetros de navegación
+    // Procesar parámetros de navegación
     processNavigationParams() {
       if (!this.navigationParams || !this.navigationParams.supplierId) return
       

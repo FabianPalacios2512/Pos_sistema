@@ -1,5 +1,5 @@
 /**
- * 🎨 Sistema de Diseño Oficial - POS Empresarial
+ * Sistema de Diseño Oficial - POS Empresarial
  * 
  * Basado en: Usuarios y Roles, Gastos Operativos, Control de Cajas
  * Última actualización: 5 de diciembre de 2025
@@ -7,7 +7,7 @@
 
 export const designSystem = {
   // ============================================
-  // 🌈 GRADIENTES DE FONDO
+  // GRADIENTES DE FONDO
   // ============================================
   gradients: {
     light: 'bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200',
@@ -16,7 +16,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 📦 CONTENEDORES Y PANELES
+  // CONTENEDORES Y PANELES
   // ============================================
   containers: {
     // Contenedor principal de página
@@ -30,7 +30,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 🎯 KPIs CON ESTILO MODERNO
+  // KPIs CON ESTILO MODERNO
   // ============================================
   kpis: {
     // Card de KPI (sin blur para mejor rendimiento)
@@ -56,7 +56,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 🔘 BOTONES
+  // BOTONES
   // ============================================
   buttons: {
     // Botón principal
@@ -76,7 +76,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 📋 TABS NAVIGATION
+  // TABS NAVIGATION
   // ============================================
   tabs: {
     container: 'bg-gray-50 dark:bg-zinc-800 rounded-xl p-1 inline-flex border border-gray-200 dark:border-zinc-700 h-[46px]',
@@ -86,7 +86,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 📊 TABLAS
+  // TABLAS
   // ============================================
   tables: {
     // Header de tabla
@@ -108,7 +108,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 📝 INPUTS Y FORMULARIOS
+  // INPUTS Y FORMULARIOS
   // ============================================
   inputs: {
     // Input de búsqueda
@@ -128,7 +128,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 🏷️ BADGES
+  // BADGES
   // ============================================
   badges: {
     // Éxito / Activo
@@ -154,7 +154,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 📄 MODALES
+  // MODALES
   // ============================================
   modals: {
     overlay: 'fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4',
@@ -165,7 +165,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 🎨 COLORES DE TEXTO
+  // COLORES DE TEXTO
   // ============================================
   text: {
     // Títulos
@@ -180,7 +180,7 @@ export const designSystem = {
   },
 
   // ============================================
-  // 📦 ELEMENTOS ESPECIALES
+  // ELEMENTOS ESPECIALES
   // ============================================
   special: {
     // Empty state

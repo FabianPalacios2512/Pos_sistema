@@ -132,12 +132,10 @@ class AIColumnMapperService
 
         // Si el mapeo local tiene alta confianza (>80%), usarlo
         if ($localMapping['confidence'] >= 80) {
-            Log::info('[AIColumnMapper] Using local mapping with confidence: ' . $localMapping['confidence']);
             return $localMapping;
         }
 
         // Si no, usar Groq para análisis más inteligente
-        Log::info('[AIColumnMapper] Local mapping confidence low, using Groq AI');
         return $this->analyzeWithGroq($headers, $sampleData, $localMapping);
     }
 
@@ -242,7 +240,6 @@ class AIColumnMapperService
                     $responseData = $response->json();
                     $content = $responseData['choices'][0]['message']['content'] ?? '';
 
-                    Log::info('[AIColumnMapper] Groq response: ' . $content);
 
                     // Parsear JSON de la respuesta
                     $aiResult = $this->parseAIResponse($content);

@@ -1,5 +1,5 @@
 <template>
-  <!-- 📜 TÉRMINOS Y CONDICIONES - 105 POS PRO -->
+  <!-- TÉRMINOS Y CONDICIONES - 105 POS PRO -->
   <div class="min-h-screen bg-slate-50 py-12 px-4">
     <div class="max-w-4xl mx-auto">
       

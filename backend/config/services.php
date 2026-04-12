@@ -82,6 +82,12 @@ return [
         'api_key_12' => env('GROQ_API_KEY_12'),
         'api_key_13' => env('GROQ_API_KEY_13'),
         'api_key_14' => env('GROQ_API_KEY_14'),
+        'api_key_15' => env('GROQ_API_KEY_15'),
+        'api_key_16' => env('GROQ_API_KEY_16'),
+        'api_key_17' => env('GROQ_API_KEY_17'),
+        'api_key_18' => env('GROQ_API_KEY_18'),
+        'api_key_19' => env('GROQ_API_KEY_19'),
+        'api_key_20' => env('GROQ_API_KEY_20'),
     ],
 
 ];

@@ -36,6 +36,45 @@
         
         <!-- Sección Derecha: Controles y Usuario -->
         <div class="flex items-center gap-2.5">
+
+          <!-- Zoom Controls - Lupas intuitivas -->
+          <div class="hidden md:flex items-center gap-0.5">
+            <button
+              @click="zoomOut"
+              :disabled="zoomLevel <= 70"
+              class="flex items-center justify-center w-9 h-9 text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-all duration-200"
+              title="Reducir zoom"
+            >
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11h4"/>
+              </svg>
+            </button>
+            <button
+              @click="resetZoom"
+              class="flex items-center justify-center min-w-[38px] h-7 px-1.5 text-[11px] font-bold rounded-md transition-all duration-150"
+              :class="zoomLevel !== 100 
+                ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 hover:bg-blue-100 dark:hover:bg-blue-900/40 cursor-pointer' 
+                : 'text-gray-400 dark:text-zinc-500 cursor-default'"
+              :title="zoomLevel !== 100 ? 'Restablecer al 100%' : 'Zoom actual'"
+            >
+              {{ zoomLabel }}
+            </button>
+            <button
+              @click="zoomIn"
+              :disabled="zoomLevel >= 120"
+              class="flex items-center justify-center w-9 h-9 text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg transition-all duration-200"
+              title="Aumentar zoom"
+            >
+              <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 8v6m3-3H7"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Separador sutil -->
+          <div class="hidden md:block w-px h-5 bg-gray-200 dark:bg-zinc-700"></div>
           
           <!-- Notificaciones - Icono Simple -->
           <div class="relative">
@@ -204,7 +243,7 @@
                 <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider leading-none">
                   En vivo
                 </span>
-                <span class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate max-w-[100px] leading-tight mt-0.5">
+                <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 truncate max-w-[100px] leading-tight mt-0.5">
                   {{ currentRadioName || 'Radio 105' }}
                 </span>
               </button>
@@ -489,7 +528,7 @@
     </div>
   </header>
 
-  <!-- 🚪 Modal de Confirmación de Logout - Diseño Elevation by Luminosity -->
+  <!-- Modal de Confirmación de Logout - Diseño Elevation by Luminosity -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition ease-out duration-200"
@@ -523,8 +562,8 @@
             <div class="px-6 pb-6 space-y-4">
               <!-- Título y Subtítulo -->
               <div class="text-center space-y-2">
-                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">¿Cerrar Sesión?</h2>
-                <p class="text-gray-600 dark:text-gray-400 text-sm">Estás a punto de salir del sistema. Deberás volver a iniciar sesión para continuar trabajando.</p>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-zinc-100">¿Cerrar Sesión?</h2>
+                <p class="text-gray-600 dark:text-zinc-400 text-sm">Estás a punto de salir del sistema. Deberás volver a iniciar sesión para continuar trabajando.</p>
               </div>
               
               <!-- Botones -->
@@ -532,7 +571,7 @@
                 <!-- Cancelar -->
                 <button 
                   @click="cancelLogout"
-                  class="flex-1 px-4 py-2.5 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 text-sm font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200"
+                  class="flex-1 px-4 py-2.5 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 text-gray-700 dark:text-zinc-200 text-sm font-bold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm transition-all duration-200"
                 >
                   Cancelar
                 </button>
@@ -568,18 +607,18 @@
         @click="closeVideoModal"
       >
         <div 
-          class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-6xl w-full mx-4 overflow-hidden"
+          class="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl max-w-6xl w-full mx-4 overflow-hidden"
           @click.stop
         >
           <!-- Header del Modal -->
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700 flex items-center justify-between">
             <div>
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tutorial: {{ currentModuleTitle }}</h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Video guía para esta sección</p>
+              <p class="text-sm text-gray-500 dark:text-zinc-400">Video guía para esta sección</p>
             </div>
             <button
               @click="closeVideoModal"
-              class="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              class="p-2 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -597,13 +636,13 @@
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
             ></iframe>
-            <div v-else class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+            <div v-else class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-zinc-900">
               <div class="text-center">
-                <svg class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-16 h-16 text-gray-400 dark:text-zinc-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 002 2v8a2 2 0 002 2z"></path>
                 </svg>
-                <p class="text-gray-500 dark:text-gray-400">No hay video tutorial disponible para esta sección</p>
-                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Pronto estará disponible</p>
+                <p class="text-gray-500 dark:text-zinc-400">No hay video tutorial disponible para esta sección</p>
+                <p class="text-sm text-gray-400 dark:text-zinc-500 mt-1">Pronto estará disponible</p>
               </div>
             </div>
           </div>
@@ -621,6 +660,7 @@ import { appStore } from '../store/appStore.js'
 import { aiChatStore } from '../store/aiChatStore.js'
 import { warehouseService } from '../services/warehouseService.js'
 import apiClient from '../services/apiClient.js'
+import { applyUserZoom } from '../composables/useScreenScaling.js'
 
 const router = useRouter()
 const radioStore = useRadioStore()
@@ -630,7 +670,7 @@ const isPlaying = computed(() => radioStore.isPlaying)
 const currentRadioName = computed(() => radioStore.currentStation?.name || '')
 const isRadioActive = computed(() => radioStore.isPlaying && radioStore.currentStation !== null)
 
-// 🏢 Warehouses para validar si mostrar sede
+// Warehouses para validar si mostrar sede
 const warehouses = ref([])
 
 // Props
@@ -687,6 +727,31 @@ const emit = defineEmits([
 // Estados reactivos
 const userDropdownOpen = ref(false)
 
+// ==================== ZOOM CONTROL ====================
+const zoomLevel = ref(parseFloat(localStorage.getItem('pos_zoom') || '100'))
+const zoomLabel = computed(() => `${Math.round(zoomLevel.value)}%`)
+
+const applyZoom = () => {
+  applyUserZoom(zoomLevel.value)
+  localStorage.setItem('pos_zoom', zoomLevel.value.toString())
+}
+const zoomIn = () => {
+  if (zoomLevel.value < 120) {
+    zoomLevel.value = Math.min(120, zoomLevel.value + 5)
+    applyZoom()
+  }
+}
+const zoomOut = () => {
+  if (zoomLevel.value > 70) {
+    zoomLevel.value = Math.max(70, zoomLevel.value - 5)
+    applyZoom()
+  }
+}
+const resetZoom = () => {
+  zoomLevel.value = 100
+  applyZoom()
+}
+
 // Watch para emitir evento cuando se abre el dropdown de perfil
 watch(userDropdownOpen, (newVal) => {
   if (newVal) {
@@ -739,7 +804,7 @@ const currentModuleTitle = computed(() => {
   return titles[props.currentModule] || props.moduleTitle
 })
 
-// 🏢 Computed para validar si debe mostrar la información de warehouse/sede
+// Computed para validar si debe mostrar la información de warehouse/sede
 const shouldShowWarehouseInfo = computed(() => {
   const plan = appStore.tenantPlan
   const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
@@ -750,7 +815,7 @@ const shouldShowWarehouseInfo = computed(() => {
   return isPremiumOrEnterprise && hasMultipleWarehouses && isInPosModule && hasCurrentWarehouse
 })
 
-// 🎯 Computed para badges de plan Premium/Enterprise
+// Computed para badges de plan Premium/Enterprise
 const isPremiumOrEnterprise = computed(() => {
   const plan = appStore.tenantPlan
   return plan === 'premium' || plan === 'enterprise'
@@ -811,18 +876,12 @@ const toggleNotificationsSilent = () => {
   notificationsSilent.value = !notificationsSilent.value
   emit('notifications-silenced', notificationsSilent.value)
   
-  // Mostrar feedback visual
-  if (notificationsSilent.value) {
-    console.log('🔕 Notificaciones silenciadas - Las alertas del dashboard no se mostrarán')
-  } else {
-    console.log('🔔 Notificaciones reactivadas - Las alertas del dashboard volverán a mostrarse')
-  }
+
 }
 
 // Limpiar todas las notificaciones
 const clearNotifications = () => {
   notifications.value = []
-  console.log('🗑️ Notificaciones limpiadas')
 }
 
 // Toggle del chat IA (usa store global)
@@ -832,26 +891,16 @@ const toggleAIChat = () => {
 
 // Manejar navegación desde el chat IA
 const handleAINavigation = async (payload) => {
-  console.log('🚀 [AppHeader] Navegación solicitada por IA:', payload)
-  
   try {
     // La navegación ya se ejecutó en AI105Chat.vue
-    // Solo logueamos aquí para tracking
-    console.log('✅ [AppHeader] Evento de navegación recibido')
-    
     // NO cerrar el chat - dejar que el usuario vea que navegó correctamente
-    // El usuario puede cerrar manualmente el chat cuando quiera
   } catch (error) {
-    console.error('❌ [AppHeader] Error en navegación:', error)
+    console.error('[AppHeader] Error en navegación:', error)
   }
 }
 
 // Mostrar video tutorial
 const showVideoTutorial = () => {
-  console.log('🎥 Abriendo video tutorial para módulo:', props.currentModule)
-  console.log('📹 Título del módulo:', currentModuleTitle.value)
-  console.log('🔗 URL del video:', currentVideoUrl.value)
-  
   videoModalOpen.value = true
   emit('show-video-tutorial', props.currentModule)
 }
@@ -861,12 +910,11 @@ const closeVideoModal = () => {
   videoModalOpen.value = false
 }
 
-// 🎨 Manejo del tema
+// Manejo del tema
 const setTheme = (theme) => {
   currentTheme.value = theme
   localStorage.setItem('theme-preference', theme)
   applyTheme(theme)
-  console.log('🎨 Tema cambiado a:', theme)
 }
 
 const applyTheme = (theme) => {
@@ -894,38 +942,34 @@ const loadThemePreference = () => {
   applyTheme(savedTheme)
 }
 
-// 👤 Manejar clic en Mi Perfil
+// Manejar clic en Mi Perfil
 const handleProfileClick = () => {
   userDropdownOpen.value = false
   emit('navigate-to-profile')
 }
 
-// ⚙️ Manejar clic en Configuración
+// Manejar clic en Configuración
 const handleSettingsClick = () => {
-  console.log('⚙️ Abrir configuración')
   userDropdownOpen.value = false
   emit('navigate-to-settings')
 }
 
-// 🚪 Manejar logout
+// Manejar logout
 const handleLogout = () => {
-  console.log('🚪 Mostrando modal de confirmación')
   userDropdownOpen.value = false
   showLogoutModal.value = true
 }
 
 const confirmLogout = () => {
-  console.log('✅ Cerrando sesión confirmada')
   showLogoutModal.value = false
   emit('logout')
 }
 
 const cancelLogout = () => {
-  console.log('❌ Logout cancelado')
   showLogoutModal.value = false
 }
 
-// 🎵 Control de reproducción de radio
+// Control de reproducción de radio
 const toggleRadioPlayback = () => {
   radioStore.togglePlay()
 }
@@ -947,7 +991,7 @@ const loadNotifications = async () => {
       notifications.value = response.data.data.notifications || []
     }
   } catch (error) {
-    console.error('❌ Error al cargar notificaciones:', error)
+    console.error('Error al cargar notificaciones:', error)
     notifications.value = []
   } finally {
     isLoadingNotifications.value = false
@@ -1057,7 +1101,7 @@ const handleEscape = (event) => {
   }
 }
 
-// 🏢 Cargar warehouses para validar si mostrar información de sede
+// Cargar warehouses para validar si mostrar información de sede
 const loadWarehouses = async () => {
   try {
     const response = await warehouseService.getAll()
@@ -1077,7 +1121,7 @@ const loadWarehouses = async () => {
   }
 }
 
-// 🔄 Watch para recargar warehouses cuando cambie currentWarehouse
+// Watch para recargar warehouses cuando cambie currentWarehouse
 watch(() => props.currentWarehouse, (newWarehouse) => {
   if (newWarehouse) {
     loadWarehouses()
@@ -1086,6 +1130,11 @@ watch(() => props.currentWarehouse, (newWarehouse) => {
 
 // Lifecycle hooks
 onMounted(() => {
+  // Aplicar zoom guardado
+  if (zoomLevel.value !== 100) {
+    applyZoom()
+  }
+
   // Cargar warehouses al iniciar
   loadWarehouses()
   
@@ -1162,7 +1211,7 @@ onMounted(() => {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   🎨 BOTÓN 105 IA - Estilo Premium con Borde Gradiente
+   BOTÓN 105 IA - Estilo Premium con Borde Gradiente
    Material You / Glassmorphism
 ════════════════════════════════════════════════════════════════════════════ */
 .ai-gradient-border {

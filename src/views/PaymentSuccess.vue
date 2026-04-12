@@ -37,7 +37,7 @@
         </svg>
       </div>
 
-      <h1 class="text-3xl font-bold text-gray-900 mb-4">¡Pago Exitoso! 🎉</h1>
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">¡Pago Exitoso! </h1>
       
       <p class="text-gray-600 mb-6 text-lg">
         Tu suscripción ha sido activada correctamente.
@@ -45,7 +45,7 @@
 
       <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 mb-6">
         <p class="text-sm text-emerald-800 space-y-1">
-          <span class="block font-semibold text-base mb-2">✅ Plan Activado</span>
+          <span class="block font-semibold text-base mb-2">Plan Activado</span>
           <span class="block"><strong>Plan:</strong> {{ planName }}</span>
           <span class="block" v-if="companyName"><strong>Empresa:</strong> {{ companyName }}</span>
           <span class="block text-emerald-600 font-semibold mt-2">Estado: Activo</span>
@@ -75,7 +75,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
-// 🔥 Crear instancia de axios con la URL base correcta del backend
+// Crear instancia de axios con la URL base correcta del backend
 // Wompi redirige desde su servidor externo, no desde localhost
 // Por eso necesitamos especificar explícitamente dónde está el backend
 const backendAPI = axios.create({
@@ -99,7 +99,7 @@ const backendAPI = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  // 🔥 IMPORTANTE: Permitir URLs absolutas para subdominios
+  // IMPORTANTE: Permitir URLs absolutas para subdominios
   allowAbsoluteUrls: true
 })
 
@@ -161,7 +161,7 @@ onMounted(async () => {
   
   paymentId.value = refPayco || reference
   
-  // 🔥 VALIDACIÓN CRÍTICA: Si ref_payco es 'undefined' o vacío, el pago NO fue completado
+  // VALIDACIÓN CRÍTICA: Si ref_payco es 'undefined' o vacío, el pago NO fue completado
   if (!refPayco || refPayco === 'undefined' || refPayco === 'null') {
     isVerifying.value = false
     paymentFailed.value = true
@@ -170,7 +170,7 @@ onMounted(async () => {
     return
   }
   
-  // 🔥 VERIFICAR CON EL BACKEND si el pago realmente fue aprobado
+  // VERIFICAR CON EL BACKEND si el pago realmente fue aprobado
   try {
     const verifyResponse = await backendAPI.get('/api/epayco/check-payment-status', {
       params: {
@@ -199,7 +199,7 @@ onMounted(async () => {
       return
     }
     
-    // ✅ Pago verificado como aprobado - Continuar con activación
+    // Pago verificado como aprobado - Continuar con activación
     isVerifying.value = false
     
     // Recuperar datos de localStorage si existen
@@ -218,14 +218,14 @@ onMounted(async () => {
     const finalPlan = plan || localData.plan || ''
     const finalReference = reference || localData.reference || ''
   
-  // 🔥 SI TENEMOS DATOS, ACTIVAR O MOSTRAR ÉXITO
+  // SI TENEMOS DATOS, ACTIVAR O MOSTRAR ÉXITO
   if ((finalReference || refPayco) && finalPlan) {
     
     try {
       // Limpiar localStorage para no reutilizar
       localStorage.removeItem('pending_payment')
 
-      // 🔥 DETECTAR SI ES UPGRADE O PAGO INICIAL
+      // DETECTAR SI ES UPGRADE O PAGO INICIAL
       if (isUpgrade) {
         // ==================== FLUJO DE UPGRADE ====================
         // Después de pago, Wompi redirige desde su servidor
@@ -335,7 +335,7 @@ const redirectToDashboard = async () => {
     // Limpiar datos de pago
     localStorage.removeItem('pending_payment')
     
-    // 🔥 Redirigir al dashboard SIN parámetros de pago en la URL
+    // Redirigir al dashboard SIN parámetros de pago en la URL
     // Usar replace() para no dejar params en la URL
     window.location.replace('/dashboard')
     return
@@ -349,22 +349,20 @@ const redirectToDashboard = async () => {
     // Limpiar datos de pago
     localStorage.removeItem('pending_payment')
     
-    // 🔐 Hacer auto-login en lugar de redirigir al login
+    // Hacer auto-login en lugar de redirigir al login
     await performAutoLogin()
   } else {
     window.location.href = '/login'
   }
 }
 
-// 🔑 Función para hacer auto-login después del pago exitoso
+// Función para hacer auto-login después del pago exitoso
 const performAutoLogin = async () => {
   try {
-    console.log('🔐 Iniciando auto-login después del pago...')
-    
     // Obtener credenciales guardadas temporalmente
     const registrationData = localStorage.getItem('registration_data')
     if (!registrationData) {
-      console.warn('⚠️ No hay datos de registro - redirigiendo al login manual')
+      console.warn('No hay datos de registro - redirigiendo al login manual')
       window.location.href = '/login'
       return
     }
@@ -374,7 +372,6 @@ const performAutoLogin = async () => {
 
     // Si es registro con Google, redirigir al welcome directamente
     if (is_google) {
-      console.log('✅ Usuario registrado con Google - redirigiendo a welcome')
       const targetUrl = subdomain 
         ? (window.location.hostname === 'localhost' 
             ? `http://${subdomain}.localhost:3000/welcome` 
@@ -390,7 +387,7 @@ const performAutoLogin = async () => {
 
     // Para registro con email/password, hacer login
     if (!temp_password) {
-      console.warn('⚠️ No hay password temporal - redirigiendo al login manual')
+      console.warn('No hay password temporal - redirigiendo al login manual')
       const targetUrl = subdomain 
         ? (window.location.hostname === 'localhost' 
             ? `http://${subdomain}.localhost:3000/login` 
@@ -407,15 +404,11 @@ const performAutoLogin = async () => {
           : `https://${subdomain}.105pos.pro/api`)
       : '/api'
 
-    console.log('📤 Haciendo login automático en:', apiUrl)
-
     // Hacer login
     const response = await axios.post(`${apiUrl}/login`, {
       email: email,
       password: temp_password
     })
-
-    console.log('✅ Login exitoso:', response.data)
 
     // Guardar token y usuario
     if (response.data.success && response.data.data?.token) {
@@ -438,14 +431,13 @@ const performAutoLogin = async () => {
             : `https://${subdomain}.105pos.pro/welcome`)
         : '/welcome'
       
-      console.log('🚀 Redirigiendo a:', targetUrl)
       window.location.href = targetUrl
     } else {
       throw new Error('No se recibió token de autenticación')
     }
 
   } catch (error) {
-    console.error('❌ Error en auto-login:', error)
+    console.error('Error en auto-login:', error)
     console.error('Detalles:', error.response?.data)
     
     // Si falla el auto-login, limpiar credenciales y redirigir al login manual

@@ -78,7 +78,7 @@ const routes = [
     }
   },
 
-  // 🎯 Portal Público de Créditos (SIN autenticación)
+  // Portal Público de Créditos (SIN autenticación)
   {
     path: '/mi-credito',
     name: 'CreditPortal',
@@ -96,7 +96,7 @@ const routes = [
     name: 'Register',
     component: SaasRegister,
     beforeEnter: (to, from, next) => {
-      // 🔒 PROTECCIÓN: Solo permitir /register en app central
+      // PROTECCIÓN: Solo permitir /register en app central
       const hostname = window.location.hostname
       const parts = hostname.split('.')
       
@@ -106,7 +106,7 @@ const routes = [
       
       // Si es un subdominio (no dominio principal), bloquear
       if (!isMainDomain && parts.length > 2) {
-        console.warn('⚠️ Acceso a /register bloqueado desde subdominio')
+        console.warn('Acceso a /register bloqueado desde subdominio')
         next('/login')
         return
       }
@@ -138,7 +138,7 @@ const routes = [
       requiresAuth: false
     }
   },
-  // 🔐 Recuperación de Contraseña
+  // Recuperación de Contraseña
   {
     path: '/forgot-password',
     name: 'ForgotPassword',
@@ -168,7 +168,7 @@ const routes = [
     }
   },
   // Rutas de resultado de pago
-  // 🔍 Ruta de verificación intermedia (ePayco redirige aquí SIEMPRE)
+  // Ruta de verificación intermedia (ePayco redirige aquí SIEMPRE)
   {
     path: '/payment/verify',
     name: 'PaymentVerification',
@@ -205,7 +205,7 @@ const routes = [
       requiresAuth: false
     }
   },
-  // 🔍 TEMPORAL - DEBUG para detectar parámetros de Wompi
+  // TEMPORAL - DEBUG para detectar parámetros de Wompi
   {
     path: '/payment/debug',
     name: 'PaymentDebug',
@@ -358,14 +358,12 @@ const router = createRouter({
   }
 })
 
-// 🔑 GUARD PRIORITARIO: Capturar token de URL (para cross-domain auth)
+// GUARD PRIORITARIO: Capturar token de URL (para cross-domain auth)
 router.beforeEach((to, from, next) => {
   const authToken = to.query.auth_token
   const userData = to.query.user_data
   
   if (authToken) {
-    console.log('🔑 Token detectado en URL - guardando en localStorage')
-    
     // Decodificar y guardar token
     const decodedToken = decodeURIComponent(authToken)
     localStorage.setItem('authToken', decodedToken)
@@ -376,9 +374,8 @@ router.beforeEach((to, from, next) => {
       try {
         const user = JSON.parse(decodeURIComponent(userData))
         localStorage.setItem('user', JSON.stringify(user))
-        console.log('👤 Usuario guardado:', user.name || user.email)
       } catch (e) {
-        console.warn('⚠️ No se pudo parsear user_data')
+        console.warn('No se pudo parsear user_data')
       }
     }
     
@@ -408,7 +405,7 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-// 🔥 GUARD CRÍTICO: Verificar si el tenant tiene plan válido ANTES de permitir acceso al POS
+// GUARD CRÍTICO: Verificar si el tenant tiene plan válido ANTES de permitir acceso al POS
 router.beforeEach(async (to, from, next) => {
   // Solo verificar en rutas protegidas (no públicas)
   const publicRoutes = [
@@ -440,7 +437,7 @@ router.beforeEach(async (to, from, next) => {
     return
   }
   
-  // 🛡️ Solo verificar plan si estamos en un subdominio de tenant (no en dominio central)
+  // Solo verificar plan si estamos en un subdominio de tenant (no en dominio central)
   const hostname = window.location.hostname
   const isCentralDomain = hostname === '105pos.pro' || hostname === 'www.105pos.pro' || hostname === 'localhost' || hostname === '127.0.0.1'
   
@@ -450,7 +447,7 @@ router.beforeEach(async (to, from, next) => {
     return
   }
   
-  // 🔥 Estamos en un subdominio de tenant - VERIFICAR PLAN
+  // Estamos en un subdominio de tenant - VERIFICAR PLAN
   try {
     const response = await apiClient.get('/tenant/info')
     const tenant = response.data?.tenant || response.data
@@ -461,7 +458,7 @@ router.beforeEach(async (to, from, next) => {
     
     // Si el plan NO es válido o la suscripción está pendiente
     if (!validPlans.includes(planType) || subscriptionStatus === 'pending' || planType === 'pending') {
-      console.log('🚨 [Router Guard] Tenant sin plan válido, redirigiendo a select-plan')
+      // Tenant sin plan válido, redirigiendo a select-plan
       
       // Extraer el subdominio REAL del hostname actual (no del tenant.id que puede tener underscores)
       const hostnameParts = window.location.hostname.split('.')
@@ -476,7 +473,7 @@ router.beforeEach(async (to, from, next) => {
       if (actualSubdomain) params.append('subdomain', actualSubdomain)
       if (companyName) params.append('company', companyName)
       
-      // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+      // CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
       const currentToken = localStorage.getItem('authToken')
       if (currentToken) {
         params.append('auth_token', encodeURIComponent(currentToken))
@@ -487,9 +484,9 @@ router.beforeEach(async (to, from, next) => {
       return // No llamar next() - estamos redirigiendo con window.location
     }
   } catch (error) {
-    // 🛑 Si hay error 401, el token es inválido - limpiar y redirigir a login
+    // Si hay error 401, el token es inválido - limpiar y redirigir a login
     if (error.response?.status === 401) {
-      console.warn('⚠️ [Router Guard] Token inválido, limpiando y redirigiendo a login')
+      console.warn('[Router Guard] Token inválido, limpiando y redirigiendo a login')
       localStorage.removeItem('authToken')
       localStorage.removeItem('user')
       localStorage.removeItem('sanctum_token')
@@ -497,7 +494,7 @@ router.beforeEach(async (to, from, next) => {
       return
     }
     // Para otros errores, permitir navegación (puede ser error de red temporal)
-    console.warn('⚠️ [Router Guard] Error verificando plan de tenant:', error)
+    console.warn('[Router Guard] Error verificando plan de tenant:', error)
   }
   
   next()
@@ -511,7 +508,7 @@ router.beforeEach(async (to, from, next) => {
     '/login', 
     '/register', 
     '/catalog', 
-    '/select-plan',  // ✅ CRÍTICO: Permitir acceso a selección de planes para renovación
+    '/select-plan',  // CRÍTICO: Permitir acceso a selección de planes para renovación
     '/payment/success', 
     '/payment/failure', 
     '/payment/pending',
@@ -527,27 +524,27 @@ router.beforeEach(async (to, from, next) => {
     return
   }
   if (authService.isAuthenticated()) {
-    // ✅ EXCEPCIÓN: Super admins NO pasan por onboarding (no tienen tenant)
+    // EXCEPCIÓN: Super admins NO pasan por onboarding (no tienen tenant)
     const user = authService.getUser()
     if (user?.role === 'superadmin' || user?.is_super_admin) {
-      // console.log('👑 Super Admin detectado - omitiendo validación de onboarding y systemSettings')
+      // console.log('Super Admin detectado - omitiendo validación de onboarding y systemSettings')
       next()
       return
     }
     
-    // ⛔ NUEVO FLUJO: Ya NO bloquear rutas cuando la suscripción expira
+    // NUEVO FLUJO: Ya NO bloquear rutas cuando la suscripción expira
     // El modal aparecerá automáticamente en el POS y bloqueará el acceso
     
-    // 🔧 FIX: SIEMPRE recargar systemSettings para asegurar datos frescos
+    // FIX: SIEMPRE recargar systemSettings para asegurar datos frescos
     // Esto evita que el router use datos stale o undefined
     try {
       await appStore.loadSystemSettings(true) // force = true
     } catch (error) {
       // Continuar navegación aunque falle (puede ser superadmin o admin central)
-      // console.error('⚠️ [Router] Error cargando systemSettings:', error)
+      // console.error('[Router] Error cargando systemSettings:', error)
     }
     
-    // 🔥 PRIORIDAD MÁXIMA: Si suscripción expirada, ir directo al POS
+    // PRIORIDAD MÁXIMA: Si suscripción expirada, ir directo al POS
     // El modal se encargará de bloquear todo
     if (appStore.isSubscriptionExpired) {
       if (to.path !== '/pos' && !to.path.startsWith('/payment/')) {
@@ -560,31 +557,29 @@ router.beforeEach(async (to, from, next) => {
     
     // Permitir navegación normal - el modal se encargará de bloquear si es necesario
 
-    // 🔥 PRIORIDAD: Verificar localStorage primero (más rápido y evita race conditions)
+    // PRIORIDAD: Verificar localStorage primero (más rápido y evita race conditions)
     const localOnboardingCompleted = localStorage.getItem('onboarding_completed') === 'true'
     
-    // 🔧 Verificar onboarding_completed del backend (puede ser boolean o int 0/1)
+    // Verificar onboarding_completed del backend (puede ser boolean o int 0/1)
     const backendOnboardingCompleted = appStore.systemSettings?.onboarding_completed === true || 
                                        appStore.systemSettings?.onboarding_completed === 1 ||
                                        appStore.systemSettings?.onboarding_completed === '1'
     
     const onboardingCompleted = localOnboardingCompleted || backendOnboardingCompleted
 
-    // 🎯 REGLA PRINCIPAL: Si ya completó onboarding (en BD o localStorage), permitir acceso normal
+    // REGLA PRINCIPAL: Si ya completó onboarding (en BD o localStorage), permitir acceso normal
     if (onboardingCompleted) {
-      // 🔒 Sincronizar localStorage con backend si no estaba en sync
+      // Sincronizar localStorage con backend si no estaba en sync
       if (!localOnboardingCompleted && backendOnboardingCompleted) {
         localStorage.setItem('onboarding_completed', 'true')
       }
       
-      // 🛡️ PROTECCIÓN: Sincronizar backend si localStorage dice que completó pero backend no
+      // PROTECCIÓN: Sincronizar backend si localStorage dice que completó pero backend no
       if (localOnboardingCompleted && !backendOnboardingCompleted) {
         // Forzar actualización en backend para prevenir loops
         try {
           await axios.post('/api/system-settings', { onboarding_completed: true })
-          console.log('✅ Onboarding sincronizado con backend')
         } catch (err) {
-          console.warn('⚠️ No se pudo sincronizar onboarding con backend:', err)
         }
       }
       
@@ -598,7 +593,7 @@ router.beforeEach(async (to, from, next) => {
       return
     }
 
-    // 🚨 CRÍTICO: Si NO ha completado onboarding, FORZAR completarlo
+    // CRÍTICO: Si NO ha completado onboarding, FORZAR completarlo
     
     // Permitir acceso SOLO a /welcome y /onboarding
     const allowedRoutes = ['/welcome', '/onboarding']

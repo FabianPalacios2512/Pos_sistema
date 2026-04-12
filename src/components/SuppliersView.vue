@@ -7,19 +7,19 @@
         <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Gestión de Comp</h1>
         
         <div class="flex items-center gap-3">
-          <button @click="refreshCurrentTab" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-200 dark:hover:bg-[#2a2b2e] rounded-full transition-colors flex items-center gap-2">
+          <button @click="refreshCurrentTab" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#1e1f20] hover:bg-gray-200 dark:hover:bg-[#2a2b2e] rounded-full transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             <span>Refrescar</span>
           </button>
-          <button v-if="activeTab === 'suppliers'" @click="showSupplierModal = true" class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-full transition-colors flex items-center gap-2">
+          <button v-if="activeTab === 'suppliers'" @click="showSupplierModal = true" class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-full transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             <span>Nuevo Proveedor</span>
           </button>
-          <button v-if="activeTab === 'orders'" @click="showOrderModal = true" class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-full transition-colors flex items-center gap-2">
+          <button v-if="activeTab === 'orders'" @click="showOrderModal = true" class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-full transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -36,7 +36,7 @@
             'px-4 py-2 text-sm font-medium rounded-full transition-colors flex items-center gap-2',
             activeTab === 'suppliers' 
               ? 'bg-white dark:bg-[#282a2c] text-gray-900 dark:text-white' 
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
           ]"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +50,7 @@
             'px-4 py-2 text-sm font-medium rounded-full transition-colors flex items-center gap-2',
             activeTab === 'orders' 
               ? 'bg-white dark:bg-[#282a2c] text-gray-900 dark:text-white' 
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+              : 'text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
           ]"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,11 +71,11 @@
             </svg>
           </div>
           <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Total Proveedores</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-400">Total Proveedores</p>
             <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ summary.total_suppliers || 0 }} <span class="text-xs font-normal text-gray-500">({{ summary.active_suppliers || 0 }} activos)</span></p>
           </div>
         </div>
-        <div class="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+        <div class="w-px h-8 bg-gray-300 dark:bg-zinc-700"></div>
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
             <svg class="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,11 +83,11 @@
             </svg>
           </div>
           <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Cuentas por Pagar</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-400">Cuentas por Pagar</p>
             <p class="text-lg font-semibold text-gray-900 dark:text-white">${{ formatNumber(summary.total_debt || 0) }}</p>
           </div>
         </div>
-        <div class="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+        <div class="w-px h-8 bg-gray-300 dark:bg-zinc-700"></div>
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
             <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +95,7 @@
             </svg>
           </div>
           <div>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Mejor Proveedor</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-400">Mejor Proveedor</p>
             <p class="text-lg font-semibold text-gray-900 dark:text-white truncate max-w-[200px]" :title="summary.best_supplier?.name">
               {{ summary.best_supplier?.name || 'N/A' }}
             </p>
@@ -105,52 +105,52 @@
 
       <!-- Tabla de Proveedores -->
       <div class="flex-1 flex flex-col min-h-0 bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-xl overflow-hidden">
-        <div class="flex-none flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+        <div class="flex-none flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-zinc-800">
           <h2 class="text-sm font-medium text-gray-900 dark:text-white">Lista de Proveedores</h2>
         </div>
 
         <div v-if="loading" class="flex-1 flex items-center justify-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 dark:border-gray-600 border-t-gray-900 dark:border-t-white"></div>
+          <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 dark:border-zinc-600 border-t-gray-900 dark:border-t-white"></div>
         </div>
 
         <div v-else-if="suppliers.length === 0" class="flex-1 flex flex-col items-center justify-center py-12">
-          <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-16 h-16 text-gray-300 dark:text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
           <p class="text-sm font-medium text-gray-900 dark:text-white">No hay proveedores</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Agrega proveedores para empezar</p>
+          <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Agrega proveedores para empezar</p>
         </div>
 
         <div v-else class="flex-1 overflow-auto">
           <table class="min-w-full">
-            <thead class="bg-[#f8f9fa] dark:bg-[#1a1a1d] border-b border-gray-200 dark:border-gray-800 sticky top-0">
+            <thead class="bg-[#f8f9fa] dark:bg-[#1a1a1d] border-b border-gray-200 dark:border-zinc-800 sticky top-0">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Proveedor</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Productos</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Última Compra</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Compras</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Deuda</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Estado</th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Acciones</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Proveedor</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Productos</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Última Compra</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Total Compras</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Deuda</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Estado</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Acciones</th>
               </tr>
             </thead>
-            <tbody class="bg-white dark:bg-[#212124] divide-y divide-gray-100 dark:divide-gray-800">
+            <tbody class="bg-white dark:bg-[#212124] divide-y divide-gray-100 dark:divide-zinc-800">
               <tr v-for="supplier in paginatedSuppliers" :key="supplier.id" class="hover:bg-gray-50 dark:hover:bg-[#2a2a2d] transition-colors">
                 <td class="px-4 py-3">
                   <div>
                     <div class="text-sm font-medium text-gray-900 dark:text-white">{{ supplier.name }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <div class="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
                       {{ supplier.contact_name }}
                     </div>
-                    <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-2">
-                      <span v-if="supplier.phone">📞 {{ supplier.phone }}</span>
-                      <span v-if="supplier.city">📍 {{ supplier.city }}</span>
+                    <div class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5 flex items-center gap-2">
+                      <span v-if="supplier.phone">{{ supplier.phone }}</span>
+                      <span v-if="supplier.city">{{ supplier.city }}</span>
                     </div>
                   </div>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ supplier.products_count }}</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">productos</div>
+                  <div class="text-xs text-gray-500 dark:text-zinc-400">productos</div>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <div class="text-sm text-gray-900 dark:text-white" v-if="supplier.last_purchase_date">
@@ -160,11 +160,11 @@
                 </td>
                 <td class="px-4 py-3 text-center">
                   <div class="text-sm font-semibold text-gray-900 dark:text-white">${{ formatNumber(supplier.total_purchases_amount) }}</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">{{ supplier.purchase_orders_count }} órdenes</div>
+                  <div class="text-xs text-gray-500 dark:text-zinc-400">{{ supplier.purchase_orders_count }} órdenes</div>
                 </td>
                 <td class="px-4 py-3 text-center">
                   <div class="text-sm font-semibold" :class="[
-                    supplier.current_debt > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400 dark:text-gray-500'
+                    supplier.current_debt > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400 dark:text-zinc-500'
                   ]">${{ formatNumber(supplier.current_debt) }}</div>
                 </td>
                 <td class="px-4 py-3 text-center">
@@ -177,7 +177,7 @@
                 </td>
                 <td class="px-4 py-3 text-center">
                   <div class="flex items-center justify-center gap-2">
-                    <button @click="viewProducts(supplier)" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#2a2a2d] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors">
+                    <button @click="viewProducts(supplier)" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-[#2a2a2d] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors">
                       Ver Productos
                     </button>
                   </div>
@@ -188,28 +188,28 @@
         </div>
 
         <!-- Paginación -->
-        <div v-if="suppliers.length > itemsPerPage" class="flex-none bg-[#f8f9fa] dark:bg-[#1a1a1d] border-t border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center justify-between">
+        <div v-if="suppliers.length > itemsPerPage" class="flex-none bg-[#f8f9fa] dark:bg-[#1a1a1d] border-t border-gray-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="flex items-center gap-2">
-              <span class="text-xs text-gray-500 dark:text-gray-400">Mostrar:</span>
-              <select v-model="itemsPerPage" @change="currentPage = 1" class="px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-gray-300 text-xs focus:outline-none focus:ring-1 focus:ring-gray-400">
+              <span class="text-xs text-gray-500 dark:text-zinc-400">Mostrar:</span>
+              <select v-model="itemsPerPage" @change="currentPage = 1" class="px-2 py-1 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-zinc-300 text-xs focus:outline-none focus:ring-1 focus:ring-gray-400">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
               </select>
             </div>
-            <div class="text-xs text-gray-500 dark:text-gray-400">
+            <div class="text-xs text-gray-500 dark:text-zinc-400">
               {{ (currentPage - 1) * itemsPerPage + 1 }}-{{ Math.min(currentPage * itemsPerPage, suppliers.length) }} de {{ suppliers.length }}
             </div>
           </div>
           
           <div class="flex items-center gap-1">
-            <button @click="currentPage = 1" :disabled="currentPage === 1" class="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d] rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <button @click="currentPage = 1" :disabled="currentPage === 1" class="p-1.5 text-gray-500 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d] rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
               </svg>
             </button>
-            <button @click="currentPage--" :disabled="currentPage === 1" class="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d] rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <button @click="currentPage--" :disabled="currentPage === 1" class="p-1.5 text-gray-500 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d] rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
@@ -219,19 +219,19 @@
               <button v-for="page in totalPages" :key="page" @click="currentPage = page" :class="[
                 'px-2.5 py-1 text-xs font-medium rounded transition-colors',
                 page === currentPage 
-                  ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' 
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d]'
+                  ? 'bg-gray-900 dark:bg-white text-white dark:text-zinc-900' 
+                  : 'text-gray-600 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d]'
               ]">
                 {{ page }}
               </button>
             </div>
             
-            <button @click="currentPage++" :disabled="currentPage === totalPages" class="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d] rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <button @click="currentPage++" :disabled="currentPage === totalPages" class="p-1.5 text-gray-500 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d] rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </button>
-            <button @click="currentPage = totalPages" :disabled="currentPage === totalPages" class="p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d] rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <button @click="currentPage = totalPages" :disabled="currentPage === totalPages" class="p-1.5 text-gray-500 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-[#2a2a2d] rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
               </svg>
@@ -253,11 +253,11 @@
               </svg>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Total Órdenes</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400">Total Órdenes</p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ ordersMetrics.total_orders || 0 }}</p>
             </div>
           </div>
-          <div class="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+          <div class="w-px h-8 bg-gray-300 dark:bg-zinc-700"></div>
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,11 +265,11 @@
               </svg>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Pendientes</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400">Pendientes</p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ ordersMetrics.pending_orders || 0 }}</p>
             </div>
           </div>
-          <div class="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+          <div class="w-px h-8 bg-gray-300 dark:bg-zinc-700"></div>
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,11 +277,11 @@
               </svg>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Recibidas</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400">Recibidas</p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ ordersMetrics.received_orders || 0 }}</p>
             </div>
           </div>
-          <div class="w-px h-8 bg-gray-300 dark:bg-gray-700"></div>
+          <div class="w-px h-8 bg-gray-300 dark:bg-zinc-700"></div>
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,7 +289,7 @@
               </svg>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Total Monto</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400">Total Monto</p>
               <p class="text-lg font-semibold text-gray-900 dark:text-white">${{ formatNumber(ordersMetrics.total_amount || 0) }}</p>
             </div>
           </div>
@@ -297,7 +297,7 @@
 
         <!-- Filtros -->
         <div class="flex-none flex items-center gap-3 px-4 py-3 bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-xl">
-          <select v-model="orderFilters.status" @change="loadOrders" class="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400">
+          <select v-model="orderFilters.status" @change="loadOrders" class="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-gray-400">
             <option value="">Todos los estados</option>
             <option value="draft">Borrador</option>
             <option value="pending">Pendiente</option>
@@ -306,66 +306,66 @@
             <option value="cancelled">Cancelada</option>
           </select>
 
-          <select v-model="orderFilters.supplier_id" @change="loadOrders" class="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400">
+          <select v-model="orderFilters.supplier_id" @change="loadOrders" class="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-gray-400">
             <option value="">Todos los proveedores</option>
             <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option>
           </select>
 
-          <input type="date" v-model="orderFilters.date_from" @change="loadOrders" class="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400">
+          <input type="date" v-model="orderFilters.date_from" @change="loadOrders" class="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-gray-400">
 
-          <input type="date" v-model="orderFilters.date_to" @change="loadOrders" class="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400">
+          <input type="date" v-model="orderFilters.date_to" @change="loadOrders" class="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-[#212124] text-gray-700 dark:text-zinc-300 focus:outline-none focus:ring-1 focus:ring-gray-400">
         </div>
 
         <!-- Tabla de Órdenes -->
         <div class="flex-1 flex flex-col min-h-0 bg-[#f8f9fa] dark:bg-[#1a1a1d] rounded-xl overflow-hidden">
-          <div class="flex-none flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+          <div class="flex-none flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-zinc-800">
             <h2 class="text-sm font-medium text-gray-900 dark:text-white">Órdenes de Compra</h2>
           </div>
 
           <div v-if="loadingOrders" class="flex-1 flex items-center justify-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 dark:border-gray-600 border-t-gray-900 dark:border-t-white"></div>
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 dark:border-zinc-600 border-t-gray-900 dark:border-t-white"></div>
           </div>
 
           <div v-else-if="purchaseOrders.length === 0" class="flex-1 flex flex-col items-center justify-center py-12">
-            <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-16 h-16 text-gray-300 dark:text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             <p class="text-sm font-medium text-gray-900 dark:text-white">No hay órdenes</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Crea tu primera orden de compra</p>
+            <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Crea tu primera orden de compra</p>
           </div>
 
           <div v-else class="flex-1 overflow-auto">
             <table class="min-w-full">
-              <thead class="bg-[#f8f9fa] dark:bg-[#1a1a1d] border-b border-gray-200 dark:border-gray-800 sticky top-0">
+              <thead class="bg-[#f8f9fa] dark:bg-[#1a1a1d] border-b border-gray-200 dark:border-zinc-800 sticky top-0">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Orden</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Proveedor</th>
-                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Fecha</th>
-                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Productos</th>
-                  <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total</th>
-                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Estado</th>
-                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Acciones</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Orden</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Proveedor</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Fecha</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Productos</th>
+                  <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Total</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Estado</th>
+                  <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wide">Acciones</th>
                 </tr>
               </thead>
-              <tbody class="bg-white dark:bg-[#212124] divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody class="bg-white dark:bg-[#212124] divide-y divide-gray-100 dark:divide-zinc-800">
                 <tr v-for="order in purchaseOrders" :key="order.id" class="hover:bg-gray-50 dark:hover:bg-[#2a2a2d] transition-colors">
                   <td class="px-4 py-3">
                     <div class="text-sm font-medium text-gray-900 dark:text-white">{{ order.order_number }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400" v-if="order.reference">Ref: {{ order.reference }}</div>
+                    <div class="text-xs text-gray-500 dark:text-zinc-400" v-if="order.reference">Ref: {{ order.reference }}</div>
                   </td>
                   <td class="px-4 py-3">
                     <div class="text-sm font-medium text-gray-900 dark:text-white">{{ order.supplier?.name }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400" v-if="order.warehouse">{{ order.warehouse.name }}</div>
+                    <div class="text-xs text-gray-500 dark:text-zinc-400" v-if="order.warehouse">{{ order.warehouse.name }}</div>
                   </td>
                   <td class="px-4 py-3 text-center">
                     <div class="text-sm text-gray-900 dark:text-white">{{ formatDate(order.order_date) }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400" v-if="order.expected_date">
+                    <div class="text-xs text-gray-500 dark:text-zinc-400" v-if="order.expected_date">
                       Esp: {{ formatDate(order.expected_date) }}
                     </div>
                   </td>
                   <td class="px-4 py-3 text-center">
                     <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ order.items?.length || 0 }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">productos</div>
+                    <div class="text-xs text-gray-500 dark:text-zinc-400">productos</div>
                   </td>
                   <td class="px-4 py-3 text-right">
                     <div class="text-sm font-semibold text-gray-900 dark:text-white">${{ formatNumber(order.total) }}</div>
@@ -377,18 +377,18 @@
                   </td>
                   <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-1">
-                      <button @click="viewOrder(order)" class="p-1.5 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors" title="Ver detalles">
+                      <button @click="viewOrder(order)" class="p-1.5 text-gray-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors" title="Ver detalles">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-                      <button v-if="order.status === 'pending' || order.status === 'partial'" @click="receiveOrder(order)" class="p-1.5 text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded transition-colors" title="Recibir mercancía">
+                      <button v-if="order.status === 'pending' || order.status === 'partial'" @click="receiveOrder(order)" class="p-1.5 text-gray-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded transition-colors" title="Recibir mercancía">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                         </svg>
                       </button>
-                      <button v-if="order.status === 'draft'" @click="editOrder(order)" class="p-1.5 text-gray-500 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded transition-colors" title="Editar">
+                      <button v-if="order.status === 'draft'" @click="editOrder(order)" class="p-1.5 text-gray-500 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded transition-colors" title="Editar">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
@@ -409,9 +409,9 @@
     <div v-if="showSupplierModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-50 p-4" @click.self="closeModal">
       <div class="bg-white dark:bg-[#1e1f20] rounded-xl max-w-2xl w-full max-h-[90vh] overflow-auto">
         <!-- Header -->
-        <div class="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
+        <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ isEditing ? 'Editar' : 'Nuevo' }} Proveedor</h3>
-          <button @click="closeModal" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          <button @click="closeModal" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -425,40 +425,40 @@
             <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-4">Información General</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nombre del Proveedor *</label>
-                <input v-model="supplierForm.name" type="text" :class="['w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-lg border focus:ring-1 focus:border-gray-400 transition-all text-sm', formErrors.name ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-gray-700']" placeholder="Ej: Distribuidora ABC" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Nombre del Proveedor *</label>
+                <input v-model="supplierForm.name" type="text" :class="['w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border focus:ring-1 focus:border-gray-400 transition-all text-sm', formErrors.name ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-zinc-700']" placeholder="Ej: Distribuidora ABC" />
                 <p v-if="formErrors.name" class="mt-1 text-xs text-red-500 dark:text-red-400">{{ formErrors.name }}</p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">NIT/RUT/Documento *</label>
-                <input v-model="supplierForm.document" type="text" :class="['w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-lg border focus:ring-1 focus:border-gray-400 transition-all text-sm', formErrors.document ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-gray-700']" placeholder="900123456-7" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">NIT/RUT/Documento *</label>
+                <input v-model="supplierForm.document" type="text" :class="['w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border focus:ring-1 focus:border-gray-400 transition-all text-sm', formErrors.document ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-zinc-700']" placeholder="900123456-7" />
                 <p v-if="formErrors.document" class="mt-1 text-xs text-red-500 dark:text-red-400">{{ formErrors.document }}</p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Persona de Contacto</label>
-                <input v-model="supplierForm.contact_person" type="text" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="Nombre del contacto" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Persona de Contacto</label>
+                <input v-model="supplierForm.contact_person" type="text" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="Nombre del contacto" />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Teléfono</label>
-                <input v-model="supplierForm.phone" type="text" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="300 123 4567" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Teléfono</label>
+                <input v-model="supplierForm.phone" type="text" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="300 123 4567" />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
-                <input v-model="supplierForm.email" type="email" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="proveedor@ejemplo.com" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Email</label>
+                <input v-model="supplierForm.email" type="email" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="proveedor@ejemplo.com" />
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Dirección</label>
-                <input v-model="supplierForm.address" type="text" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="Calle 123 #45-67" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Dirección</label>
+                <input v-model="supplierForm.address" type="text" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="Calle 123 #45-67" />
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Notas <span class="text-gray-400 dark:text-gray-500 font-normal">(opcional)</span></label>
-                <textarea v-model="supplierForm.notes" rows="3" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="Notas adicionales sobre el proveedor..."></textarea>
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Notas <span class="text-gray-400 dark:text-zinc-500 font-normal">(opcional)</span></label>
+                <textarea v-model="supplierForm.notes" rows="3" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-1 focus:border-gray-400 text-sm" placeholder="Notas adicionales sobre el proveedor..."></textarea>
               </div>
             </div>
           </div>
@@ -466,18 +466,18 @@
           <!-- Estado -->
           <div>
             <label class="flex items-center gap-3 cursor-pointer">
-              <input v-model="supplierForm.active" type="checkbox" class="w-4 h-4 bg-gray-100 dark:bg-[#212124] border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white focus:ring-1 focus:ring-gray-400" />
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Proveedor activo</span>
+              <input v-model="supplierForm.active" type="checkbox" class="w-4 h-4 bg-gray-100 dark:bg-[#212124] border-gray-300 dark:border-zinc-600 rounded text-gray-900 dark:text-white focus:ring-1 focus:ring-gray-400" />
+              <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">Proveedor activo</span>
             </label>
           </div>
         </div>
 
         <!-- Footer -->
-        <div class="border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex justify-end gap-3 sticky bottom-0 bg-white dark:bg-[#1e1f20]">
-          <button @click="closeModal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
+        <div class="border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-end gap-3 sticky bottom-0 bg-white dark:bg-[#1e1f20]">
+          <button @click="closeModal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
             Cancelar
           </button>
-          <button @click="saveSupplier" :disabled="saving" class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors">
+          <button @click="saveSupplier" :disabled="saving" class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors">
             {{ saving ? 'Guardando...' : 'Guardar Proveedor' }}
           </button>
         </div>
@@ -488,9 +488,9 @@
     <div v-if="showOrderModal" class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4" @click.self="closeOrderModal">
       <div class="bg-white dark:bg-[#1e1f20] rounded-xl max-w-5xl w-full max-h-[90vh] overflow-auto">
         <!-- Header -->
-        <div class="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
+        <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ editingOrder ? 'Editar' : 'Nueva' }} Orden de Compra</h3>
-          <button @click="closeOrderModal" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          <button @click="closeOrderModal" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -504,8 +504,8 @@
             <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-4">Información de la Orden</h4>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Proveedor *</label>
-                <select v-model="orderForm.supplier_id" :class="['w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white rounded-lg border focus:ring-1 focus:border-gray-400 transition-all text-sm', orderErrors.supplier_id ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-gray-700']">
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Proveedor *</label>
+                <select v-model="orderForm.supplier_id" :class="['w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white rounded-lg border focus:ring-1 focus:border-gray-400 transition-all text-sm', orderErrors.supplier_id ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-zinc-700']">
                   <option value="">Seleccionar proveedor...</option>
                   <option v-for="supplier in suppliers.filter(s => s.active)" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option>
                 </select>
@@ -513,26 +513,26 @@
               </div>
 
               <div v-if="shouldShowWarehouseSelector">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Bodega/Sede *</label>
-                <select v-model="orderForm.warehouse_id" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:border-gray-400 text-sm">
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Bodega/Sede *</label>
+                <select v-model="orderForm.warehouse_id" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:border-gray-400 text-sm">
                   <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">{{ warehouse.name }}</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Fecha de Orden *</label>
-                <input v-model="orderForm.order_date" type="date" :class="['w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white rounded-lg border focus:ring-1 focus:border-gray-400 text-sm', orderErrors.order_date ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-gray-700']" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Fecha de Orden *</label>
+                <input v-model="orderForm.order_date" type="date" :class="['w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white rounded-lg border focus:ring-1 focus:border-gray-400 text-sm', orderErrors.order_date ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-zinc-700']" />
                 <p v-if="orderErrors.order_date" class="mt-1 text-xs text-red-500 dark:text-red-400">{{ orderErrors.order_date }}</p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Fecha Esperada</label>
-                <input v-model="orderForm.expected_date" type="date" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:border-gray-400 text-sm" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Fecha Esperada</label>
+                <input v-model="orderForm.expected_date" type="date" class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:border-gray-400 text-sm" />
               </div>
 
               <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Referencia</label>
-                <input v-model="orderForm.reference" type="text" placeholder="OC-2024-001, Factura #123, etc." class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:border-gray-400 text-sm" />
+                <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Referencia</label>
+                <input v-model="orderForm.reference" type="text" placeholder="OC-2024-001, Factura #123, etc." class="w-full px-3 py-2 bg-white dark:bg-[#212124] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:border-gray-400 text-sm" />
               </div>
             </div>
           </div>
@@ -541,7 +541,7 @@
           <div>
             <div class="flex items-center justify-between mb-4">
               <h4 class="text-sm font-medium text-gray-900 dark:text-white">Productos</h4>
-              <button @click="showProductSelector = true" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#2a2a2d] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors flex items-center gap-2">
+              <button @click="showProductSelector = true" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-[#2a2a2d] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -549,12 +549,12 @@
               </button>
             </div>
 
-            <div v-if="orderForm.items.length === 0" class="text-center py-8 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
-              <svg class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div v-if="orderForm.items.length === 0" class="text-center py-8 border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-lg">
+              <svg class="w-12 h-12 text-gray-300 dark:text-zinc-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
               <p class="text-sm font-medium text-gray-900 dark:text-white">No hay productos</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Agrega productos a esta orden</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Agrega productos a esta orden</p>
             </div>
 
             <div v-else class="space-y-2">
@@ -562,10 +562,10 @@
                 <div class="flex-1 grid grid-cols-12 gap-3 items-center">
                   <div class="col-span-4">
                     <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.product?.name || 'Producto' }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">SKU: {{ item.product?.sku || 'N/A' }}</p>
+                    <p class="text-xs text-gray-500 dark:text-zinc-400">SKU: {{ item.product?.sku || 'N/A' }}</p>
                   </div>
                   <div class="col-span-3">
-                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Cantidad</label>
+                    <label class="block text-xs text-gray-500 dark:text-zinc-400 mb-1">Cantidad</label>
                     <input v-model.number="item.quantity" type="number" min="0.01" step="0.01" class="w-full px-3 py-2 bg-white dark:bg-zinc-900 text-gray-900 dark:text-white rounded-lg border border-gray-300 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm" @input="calculateItemTotal(index)" />
                   </div>
                   <div class="col-span-3">
@@ -610,14 +610,14 @@
         </div>
 
         <!-- Footer -->
-        <div class="border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex justify-end gap-3 sticky bottom-0 bg-white dark:bg-[#1e1f20]">
-          <button @click="closeOrderModal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
+        <div class="border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-end gap-3 sticky bottom-0 bg-white dark:bg-[#1e1f20]">
+          <button @click="closeOrderModal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
             Cancelar
           </button>
-          <button @click="saveOrderAsDraft" :disabled="savingOrder" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
+          <button @click="saveOrderAsDraft" :disabled="savingOrder" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
             {{ savingOrder ? 'Guardando...' : 'Guardar Borrador' }}
           </button>
-          <button @click="saveOrderAsPending" :disabled="savingOrder" class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors">
+          <button @click="saveOrderAsPending" :disabled="savingOrder" class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors">
             {{ savingOrder ? 'Enviando...' : 'Enviar Orden' }}
           </button>
         </div>
@@ -627,7 +627,7 @@
     <!-- Modal Selector de Productos -->
     <div v-if="showProductSelector" class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-[60] p-4" @click.self="showProductSelector = false">
       <div class="bg-white dark:bg-[#1e1f20] rounded-xl max-w-3xl w-full max-h-[80vh] overflow-auto">
-        <div class="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
+        <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
           <h3 class="text-lg font-bold text-gray-900 dark:text-white">Seleccionar Producto</h3>
           <button @click="showProductSelector = false" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -664,9 +664,9 @@
     <!-- Modal Ver Detalles de Orden -->
     <div v-if="showOrderDetailModal" class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4" @click.self="closeOrderDetailModal">
       <div class="bg-white dark:bg-[#1e1f20] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
-        <div class="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
+        <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ selectedOrder?.order_number }}</h3>
-          <button @click="closeOrderDetailModal" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          <button @click="closeOrderDetailModal" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -677,21 +677,21 @@
           <!-- Info General -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Estado</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Estado</p>
               <span :class="getOrderStatusClass(selectedOrder?.status)">
                 {{ getOrderStatusText(selectedOrder?.status) }}
               </span>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Proveedor</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Proveedor</p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedOrder?.supplier?.name }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Fecha Orden</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Fecha Orden</p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">{{ formatDate(selectedOrder?.order_date) }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Fecha Esperada</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mb-1">Fecha Esperada</p>
               <p class="text-sm font-medium text-gray-900 dark:text-white">{{ formatDate(selectedOrder?.expected_date) || 'N/A' }}</p>
             </div>
           </div>
@@ -704,17 +704,17 @@
                 <div class="flex justify-between items-start">
                   <div class="flex-1">
                     <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.product?.name }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">SKU: {{ item.product?.sku }}</p>
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">SKU: {{ item.product?.sku }}</p>
                   </div>
                   <div class="text-right">
                     <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ item.quantity_ordered }} {{ item.unit }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">x ${{ formatNumber(item.unit_cost) }}</p>
+                    <p class="text-xs text-gray-500 dark:text-zinc-400">x ${{ formatNumber(item.unit_cost) }}</p>
                     <p class="text-sm font-semibold text-blue-600 dark:text-blue-400 mt-1">${{ formatNumber(item.total) }}</p>
                   </div>
                 </div>
-                <div v-if="item.quantity_received > 0" class="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                <div v-if="item.quantity_received > 0" class="mt-2 pt-2 border-t border-gray-200 dark:border-zinc-700">
                   <p class="text-xs text-green-600 dark:text-green-400 font-medium">
-                    ✓ Recibido: {{ item.quantity_received }} de {{ item.quantity_ordered }}
+                    Recibido: {{ item.quantity_received }} de {{ item.quantity_ordered }}
                   </p>
                 </div>
               </div>
@@ -732,25 +732,25 @@
           <!-- Notas -->
           <div v-if="selectedOrder?.notes">
             <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Notas</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#212124] rounded-lg p-3">{{ selectedOrder.notes }}</p>
+            <p class="text-sm text-gray-600 dark:text-zinc-400 bg-gray-50 dark:bg-[#212124] rounded-lg p-3">{{ selectedOrder.notes }}</p>
           </div>
         </div>
 
-        <div class="border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex justify-between bg-white dark:bg-[#1e1f20]">
+        <div class="border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-between bg-white dark:bg-[#1e1f20]">
           <div class="flex gap-2">
-            <button @click="downloadOrderPDF(selectedOrder)" class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors flex items-center gap-2">
+            <button @click="downloadOrderPDF(selectedOrder)" class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               PDF
             </button>
-            <button @click="sendOrderByEmail(selectedOrder)" class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors flex items-center gap-2">
+            <button @click="sendOrderByEmail(selectedOrder)" class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               Email
             </button>
-            <button v-if="selectedOrder?.status !== 'received'" @click="showPaymentModal = true" class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors flex items-center gap-2">
+            <button v-if="selectedOrder?.status !== 'received'" @click="showPaymentModal = true" class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-lg transition-colors flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -758,10 +758,10 @@
             </button>
           </div>
           <div class="flex gap-3">
-            <button @click="closeOrderDetailModal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
+            <button @click="closeOrderDetailModal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
               Cerrar
             </button>
-            <button v-if="selectedOrder?.status === 'pending' || selectedOrder?.status === 'partial'" @click="receiveOrder(selectedOrder); closeOrderDetailModal()" class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-full transition-colors">
+            <button v-if="selectedOrder?.status === 'pending' || selectedOrder?.status === 'partial'" @click="receiveOrder(selectedOrder); closeOrderDetailModal()" class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-full transition-colors">
               Recibir Mercancía
             </button>
           </div>
@@ -772,7 +772,7 @@
     <!-- Modal Recibir Mercancía -->
     <div v-if="showReceiveModal" class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4" @click.self="closeReceiveModal">
       <div class="bg-white dark:bg-[#1e1f20] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
-        <div class="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
+        <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1e1f20] z-10">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -781,10 +781,10 @@
             </div>
             <div>
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recibir Mercancía</h3>
-              <p class="text-xs text-gray-500 dark:text-gray-400">{{ receivingOrder?.order_number }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400">{{ receivingOrder?.order_number }}</p>
             </div>
           </div>
-          <button @click="closeReceiveModal" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          <button @click="closeReceiveModal" class="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -794,7 +794,7 @@
         <div class="px-6 py-4 space-y-4">
           <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-3">
             <p class="text-sm text-blue-800 dark:text-blue-300">
-              <strong>💡 Nota:</strong> Ingresa la cantidad recibida para cada producto. El inventario se actualizará automáticamente.
+              <strong>Nota:</strong> Ingresa la cantidad recibida para cada producto. El inventario se actualizará automáticamente.
             </p>
           </div>
 
@@ -803,23 +803,23 @@
               <div class="flex items-start gap-4">
                 <div class="flex-1">
                   <p class="text-sm font-medium text-gray-900 dark:text-white">{{ item.product_name }}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">
                     SKU: {{ item.product_sku }} | 
                     Ordenado: {{ item.quantity_ordered }} | 
                     Ya recibido: {{ item.quantity_received }}
                   </p>
                   <div class="mt-2">
                     <div class="flex items-center gap-2">
-                      <label class="text-xs text-gray-500 dark:text-gray-400 min-w-[120px]">Cantidad a Recibir:</label>
-                      <input v-model.number="item.quantity_to_receive" type="number" min="0" :max="item.quantity_ordered - item.quantity_received" step="0.01" class="flex-1 px-3 py-2 bg-white dark:bg-[#2a2b2e] text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 text-sm" />
-                      <button @click="item.quantity_to_receive = item.quantity_ordered - item.quantity_received" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#333336] hover:bg-gray-200 dark:hover:bg-[#3d3d40] rounded-lg transition-colors">
+                      <label class="text-xs text-gray-500 dark:text-zinc-400 min-w-[120px]">Cantidad a Recibir:</label>
+                      <input v-model.number="item.quantity_to_receive" type="number" min="0" :max="item.quantity_ordered - item.quantity_received" step="0.01" class="flex-1 px-3 py-2 bg-white dark:bg-[#2a2b2e] text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 text-sm" />
+                      <button @click="item.quantity_to_receive = item.quantity_ordered - item.quantity_received" class="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-[#333336] hover:bg-gray-200 dark:hover:bg-[#3d3d40] rounded-lg transition-colors">
                         Completo
                       </button>
                     </div>
                   </div>
                 </div>
                 <div class="text-right">
-                  <p class="text-xs text-gray-500 dark:text-gray-400">Pendiente</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-400">Pendiente</p>
                   <p class="text-lg font-semibold text-amber-600 dark:text-amber-400">{{ item.quantity_ordered - item.quantity_received }}</p>
                 </div>
               </div>
@@ -827,11 +827,11 @@
           </div>
         </div>
 
-        <div class="border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex justify-end gap-3 bg-white dark:bg-[#1e1f20]">
-          <button @click="closeReceiveModal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
+        <div class="border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex justify-end gap-3 bg-white dark:bg-[#1e1f20]">
+          <button @click="closeReceiveModal" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-[#f8f9fa] dark:bg-[#2a2b2e] hover:bg-gray-200 dark:hover:bg-[#333336] rounded-full transition-colors">
             Cancelar
           </button>
-          <button @click="confirmReceive" :disabled="receivingMerchandise" class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors">
+          <button @click="confirmReceive" :disabled="receivingMerchandise" class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors">
             {{ receivingMerchandise ? 'Procesando...' : 'Confirmar Recepción' }}
           </button>
         </div>
@@ -841,7 +841,7 @@
     <!-- Modal Registrar Pago -->
     <div v-if="showPaymentModal" class="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-[70] p-4" @click.self="closePaymentModal">
       <div class="bg-white dark:bg-[#1e1f20] rounded-xl max-w-md w-full">
-        <div class="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+        <div class="border-b border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
               <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1208,7 +1208,7 @@ export default {
     
     getOrderStatusClass(status) {
       const classes = {
-        draft: 'px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300',
+        draft: 'px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300',
         pending: 'px-2 py-0.5 rounded text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
         partial: 'px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
         received: 'px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
@@ -1251,7 +1251,6 @@ export default {
         
         // Si no tiene items cargados, obtener detalles completos
         if (!order.items || order.items.length === 0) {
-          console.log('📦 Cargando items de la orden:', order.id)
           const response = await apiCall(`/purchase-orders/${order.id}`)
           if (response.success) {
             order = response.data
@@ -1260,8 +1259,6 @@ export default {
             return
           }
         }
-        
-        console.log('✅ Orden preparada para recepción:', order)
         
         this.receivingOrder = order
         this.receiveForm.items = (order.items || []).map(item => ({
@@ -1481,7 +1478,7 @@ export default {
       
       this.receivingMerchandise = true
       
-      // 🔧 Guardar ID antes de que se limpie por closeReceiveModal()
+      // Guardar ID antes de que se limpie por closeReceiveModal()
       const orderId = this.receivingOrder?.id
       
       try {
@@ -1507,7 +1504,7 @@ export default {
             window.appStore.loadProducts()
           }
           
-          // 🔄 CRÍTICO: Disparar evento global para refrescar TODAS las vistas de productos
+          // CRÍTICO: Disparar evento global para refrescar TODAS las vistas de productos
           window.dispatchEvent(new CustomEvent('products-updated', {
             detail: { source: 'purchase-order-receive', orderId: orderId }
           }))

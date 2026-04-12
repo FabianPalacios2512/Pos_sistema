@@ -1,5 +1,5 @@
 /**
- * 🔒 Sistema de Validación de Tiempo Offline
+ * Sistema de Validación de Tiempo Offline
  * Previene uso fraudulento limitando tiempo máximo sin conexión
  */
 
@@ -38,21 +38,18 @@ class OfflineTimeValidator {
   }
 
   handleOffline() {
-    console.log('🔴 Modo offline activado')
     this.isOnline = false
     
     // Guardar tiempo de inicio si es la primera vez
     if (!this.offlineStartTime) {
       this.offlineStartTime = Date.now()
       localStorage.setItem(STORAGE_KEY, this.offlineStartTime.toString())
-      console.log(`⏱️ Tiempo offline iniciado: ${new Date(this.offlineStartTime).toLocaleString()}`)
     }
 
     this.startChecking()
   }
 
   handleOnline() {
-    console.log('🟢 Conexión restaurada')
     this.isOnline = true
     this.hasExceededLimit = false
     
@@ -74,14 +71,12 @@ class OfflineTimeValidator {
       this.checkTimeLimit()
     }, CHECK_INTERVAL)
 
-    console.log('🔍 Iniciando verificación de tiempo offline')
   }
 
   stopChecking() {
     if (this.checkInterval) {
       clearInterval(this.checkInterval)
       this.checkInterval = null
-      console.log('⏹️ Verificación de tiempo offline detenida')
     }
   }
 
@@ -96,7 +91,7 @@ class OfflineTimeValidator {
 
     if (timeOffline >= OFFLINE_TIME_LIMIT && !this.hasExceededLimit) {
       this.hasExceededLimit = true
-      console.error(`⚠️ LÍMITE DE TIEMPO OFFLINE EXCEDIDO: ${Math.floor(timeOffline / 1000)}s`)
+      console.error(`LÍMITE DE TIEMPO OFFLINE EXCEDIDO: ${Math.floor(timeOffline / 1000)}s`)
       
       // Notificar a listeners
       this.notifyListeners({
@@ -110,7 +105,7 @@ class OfflineTimeValidator {
 
     // Log de advertencia cuando faltan 10 segundos
     if (remainingTime <= 10000 && remainingTime > 5000 && !this.hasExceededLimit) {
-      console.warn(`⚠️ Quedan ${Math.floor(remainingTime / 1000)} segundos antes de requerir conexión`)
+      console.warn(`Quedan ${Math.floor(remainingTime / 1000)} segundos antes de requerir conexión`)
       this.notifyListeners({
         type: 'time_limit_warning',
         remainingTime
@@ -191,7 +186,7 @@ class OfflineTimeValidator {
    * Resetear validación (solo para testing)
    */
   reset() {
-    console.warn('🔄 Reseteando validación de tiempo offline (SOLO TESTING)')
+    console.warn('Reseteando validación de tiempo offline (SOLO TESTING)')
     this.offlineStartTime = null
     this.hasExceededLimit = false
     localStorage.removeItem(STORAGE_KEY)

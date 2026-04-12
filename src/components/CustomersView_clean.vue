@@ -20,7 +20,7 @@
           </button>
           
           <button @click="openCreateModal" 
-                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -526,7 +526,7 @@
     </div>
   </div>
 
-  <!-- 🎨 MODAL CREAR/EDITAR CLIENTE - Teleport al Body (evita conflictos z-index) -->
+  <!-- MODAL CREAR/EDITAR CLIENTE - Teleport al Body (evita conflictos z-index) -->
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="showCustomerModal" 
@@ -535,7 +535,7 @@
         <div class="bg-gray-50 dark:bg-zinc-900 rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-hidden flex flex-col border border-gray-300 dark:border-zinc-700"
              @click.stop>
           
-          <!-- 🎯 Header Profesional -->
+          <!-- Header Profesional -->
           <div class="px-8 py-6 bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700">
             <div class="flex items-center gap-4">
               <div class="w-14 h-14 bg-blue-600 dark:bg-blue-400/20 rounded-2xl flex items-center justify-center">
@@ -554,11 +554,11 @@
             </div>
           </div>
           
-          <!-- 📋 Contenido con Grid Inteligente -->
+          <!-- Contenido con Grid Inteligente -->
           <div class="flex-1 overflow-y-auto px-8 py-6 bg-gray-50 dark:bg-zinc-950">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
               
-              <!-- 🧑 COLUMNA 1: Información Personal -->
+              <!-- COLUMNA 1: Información Personal -->
               <div class="space-y-5">
                 <div class="pb-3 border-b-2 border-blue-600/20 dark:border-blue-400/20">
                   <h4 class="text-base font-medium text-gray-900 dark:text-white uppercase tracking-wide">Información Personal</h4>
@@ -633,7 +633,7 @@
                 </div>
               </div>
 
-              <!-- 📞 COLUMNA 2: Contacto y Financiero -->
+              <!-- COLUMNA 2: Contacto y Financiero -->
               <div class="space-y-5">
                 <div class="pb-3 border-b-2 border-blue-600/20 dark:border-blue-400/20">
                   <h4 class="text-base font-medium text-gray-900 dark:text-white uppercase tracking-wide">Contacto</h4>
@@ -687,7 +687,7 @@
                          placeholder="Bogotá, Colombia">
                 </div>
                 
-                <!-- 💳 Crédito (si está habilitado) -->
+                <!-- Crédito (si está habilitado) -->
                 <div v-if="isCreditiendaEnabled" class="pt-2 border-t border-gray-200 dark:border-zinc-700">
                   <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-2">Límite de Crédito</label>
                   <div class="relative">
@@ -709,7 +709,7 @@
               </div>
             </div>
 
-            <!-- 📷 Foto del Cliente -->
+            <!-- Foto del Cliente -->
             <div class="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-700">
               <div class="pb-3">
                 <h4 class="text-base font-medium text-gray-900 dark:text-white uppercase tracking-wide">Foto del Cliente</h4>
@@ -769,7 +769,7 @@
               </div>
             </div>
 
-            <!-- ✅ Checkboxes de Estado -->
+            <!-- Checkboxes de Estado -->
             <div class="mt-8 pt-6 border-t border-gray-200 dark:border-zinc-700 flex flex-wrap items-center gap-6">
               <label class="flex items-center gap-3 cursor-pointer group">
                 <div class="relative">
@@ -802,7 +802,7 @@
             </div>
           </div>
           
-          <!-- 🎯 Footer con Botones Profesionales -->
+          <!-- Footer con Botones Profesionales -->
           <div class="px-8 py-5 bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-700 flex items-center justify-between">
             <p class="text-xs text-gray-600 dark:text-zinc-400">
               <span class="text-rose-600">*</span> Campos requeridos
@@ -828,7 +828,7 @@
     </Transition>
   </Teleport>
 
-  <!-- 🎨 MODAL DETALLES DE FACTURA - Diseño Profesional -->
+  <!-- MODAL DETALLES DE FACTURA - Diseño Profesional -->
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="showInvoiceDetailModal && selectedInvoice"
@@ -991,7 +991,7 @@
           </p>
           
           <p class="text-sm text-gray-600 dark:text-zinc-400 mb-8">
-            💡 Desbloquea todas las funciones premium para potenciar tu negocio
+            Desbloquea todas las funciones premium para potenciar tu negocio
           </p>
 
           <!-- Botones -->
@@ -1014,7 +1014,7 @@
     </div>
   </Teleport>
 
-  <!-- 🖼️ MODAL PREVIEW DE FOTO -->
+  <!-- MODAL PREVIEW DE FOTO -->
   <Teleport to="body">
     <Transition
       enter-active-class="transition-opacity duration-300 ease-out"
@@ -1166,7 +1166,7 @@ import { useUIContextStore } from '../store/uiContextStore.js'
 const { navigateToModule } = useModuleNavigation()
 const uiContextStore = useUIContextStore()
 
-// ✅ Definir props y emits para heredar correctamente desde el padre
+// Definir props y emits para heredar correctamente desde el padre
 const props = defineProps({
   moduleName: String,
   queryParams: Object,
@@ -1194,7 +1194,7 @@ const statusFilter = ref('')
 const cityFilter = ref('')
 const viewMode = ref('table')
 
-// 💾 Sistema de Preferencias del Usuario
+// Sistema de Preferencias del Usuario
 const USER_PREFERENCES_KEY = 'customers_user_preferences'
 
 // Paginación
@@ -1394,7 +1394,7 @@ const validateForm = () => {
 
 // Computed properties
 const filteredCustomers = computed(() => {
-  // 🛡️ Filtrar el Consumidor Final (cliente del sistema) - No debe mostrarse en la lista
+  // Filtrar el Consumidor Final (cliente del sistema) - No debe mostrarse en la lista
   let filtered = customers.value.filter(c => c.document_number !== '222222222222' && c.document_number !== '00000000000' && c.email !== 'general@sistema.local')
 
   if (searchTerm.value) {
@@ -1546,7 +1546,7 @@ const navigateToPlans = () => {
   showPremiumModal.value = false
   navigateToModule('settings', { section: 'plan' })
 }
-// 📷 Funciones para manejo de foto del cliente
+// Funciones para manejo de foto del cliente
 const photoInput = ref(null)
 
 const triggerPhotoUpload = () => {
@@ -2035,7 +2035,7 @@ watch(
       return { success: true, message: 'Formulario abierto. Ahora necesito los datos: nombre completo, número de documento (CC), teléfono y email son OBLIGATORIOS.' }
     })
     
-    // 📝 Acción para llenar campos del formulario visualmente
+    // Acción para llenar campos del formulario visualmente
     uiContextStore.registerAction('llenarCampoCliente', ({ campo, valor }) => {
       if (!showCustomerModal.value) {
         return { success: false, message: 'Primero abre el formulario con crearNuevoCliente' }
@@ -2089,7 +2089,7 @@ watch(
       }
     })
     
-    // 💾 Acción para guardar el cliente
+    // Acción para guardar el cliente
     uiContextStore.registerAction('guardarCliente', async () => {
       if (!showCustomerModal.value) {
         return { success: false, message: 'No hay formulario abierto para guardar' }
@@ -2120,7 +2120,7 @@ watch(
       }
     })
     
-    // ❌ Acción para cerrar el modal
+    // Acción para cerrar el modal
     uiContextStore.registerAction('cerrarModalCliente', () => {
       closeCustomerModal()
       return { success: true, message: 'Modal cerrado' }
@@ -2131,20 +2131,20 @@ watch(
 
 // Inicialización
 onMounted(async () => {
-  // 🔧 Cargar preferencias del usuario primero
+  // Cargar preferencias del usuario primero
   loadUserPreferences()
   
   await loadCustomers()
 })
 
-// 🔄 AUTO-REFRESH al reactivar el componente
+// AUTO-REFRESH al reactivar el componente
 onActivated(async () => {
   await loadCustomers()
 })
 </script>
 
 <style scoped>
-/* 🎨 ESTILOS EMPRESARIALES OBLIGATORIOS */
+/* ESTILOS EMPRESARIALES OBLIGATORIOS */
 
 /* Animación de entrada principal */
 @keyframes fade-in {
@@ -2265,7 +2265,7 @@ button:active {
   justify-content: center;
 }
 
-/* 🎭 Transiciones Modal - Animación suave entrada/salida Gemini */
+/* Transiciones Modal - Animación suave entrada/salida Gemini */
 .modal-enter-active,
 .modal-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

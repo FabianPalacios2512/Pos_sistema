@@ -40,7 +40,7 @@ export const productsService = {
       return await apiCall(`/products/${id}`, {
         method: 'POST',
         body: productData
-        // ✅ NO enviar headers: {}, dejar que apiCall maneje los headers de autenticación
+        // NO enviar headers: {}, dejar que apiCall maneje los headers de autenticación
       })
     }
     

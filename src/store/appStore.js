@@ -30,7 +30,7 @@ const updateCashContextForAI = async (hasOpenSession, currentSession) => {
   }
 }
 
-// 🌐 Helper para cargar datos globales del negocio para la IA
+// Helper para cargar datos globales del negocio para la IA
 const loadGlobalBusinessDataForAI = async () => {
   try {
     const uiContext = await getUIContextStore()
@@ -284,11 +284,11 @@ const loadGlobalBusinessDataForAI = async () => {
     }
     
   } catch (error) {
-    console.error('❌ [appStore] Error cargando datos globales para IA:', error)
+    console.error('[appStore] Error cargando datos globales para IA:', error)
   }
 }
 
-// 🏪 Store global de la aplicación para datos precargados
+// Store global de la aplicación para datos precargados
 export const appStore = reactive({
   // Estados de carga
   loading: {
@@ -327,7 +327,7 @@ export const appStore = reactive({
     // Si force=true, SIEMPRE recarga sin importar el estado de loading
     if (!force && this.loading.products) return // Evitar cargas duplicadas solo si NO es force
 
-    // 🔄 Si force=true, resetear el estado de loading por si quedó bloqueado
+    // Si force=true, resetear el estado de loading por si quedó bloqueado
     if (force) {
       this.loading.products = false
     }
@@ -335,7 +335,7 @@ export const appStore = reactive({
     try {
       this.loading.products = true
       
-      // 🏪 Si no se pasa warehouse_id, intentar usar el de la sesión activa
+      // Si no se pasa warehouse_id, intentar usar el de la sesión activa
       const targetWarehouseId = warehouseId || this.cashSession.current?.warehouse_id
       
       // Usar endpoint optimizado para POS con filtro de bodega y scope
@@ -347,19 +347,19 @@ export const appStore = reactive({
       const response = await productsService.getForPos(params)
       
       if (response.success) {
-        // 👗 Los productos ya vienen con sus variantes desde el backend
+        // Los productos ya vienen con sus variantes desde el backend
         const productsFormatted = response.data
           .filter(product => product.active)
           .map((product) => {
             return {
               ...product,
               variants: product.variants || [],
-              current_stock: product.current_stock || 0, // ✅ Campo real de la BD
+              current_stock: product.current_stock || 0, // Campo real de la BD
               stock: product.current_stock || 0, // Alias para compatibilidad
               warehouses: product.warehouse_stock || [],
               is_remote: product.is_remote || false,
               alternative_warehouses: product.alternative_warehouses || [],
-              // 💰 Precios - asegurar que ambos campos estén disponibles
+              // Precios - asegurar que ambos campos estén disponibles
               price: parseFloat(product.price || product.sale_price || 0),
               sale_price: parseFloat(product.sale_price || product.price || 0),
               cost_price: parseFloat(product.cost_price || 0),
@@ -371,10 +371,10 @@ export const appStore = reactive({
         
         this.products = productsFormatted
       } else {
-        console.warn('⚠️ [appStore] Respuesta sin datos de productos:', response)
+        console.warn('[appStore] Respuesta sin datos de productos:', response)
       }
     } catch (error) {
-      console.error('❌ Error precargando productos:', error)
+      console.error('Error precargando productos:', error)
     } finally {
       this.loading.products = false
     }
@@ -392,7 +392,7 @@ export const appStore = reactive({
         this.categories = response.data
       }
     } catch (error) {
-      // console.error('❌ Error precargando categorías:', error)
+      // console.error('Error precargando categorías:', error)
     } finally {
       this.loading.categories = false
     }
@@ -404,14 +404,14 @@ export const appStore = reactive({
     
     try {
       this.loading.customers = true
-  // console.log('👥 Precargando clientes...')
+  // console.log('Precargando clientes...')
       
       const response = await customersService.getAll()
       if (response.success) {
         this.customers = response.data
       }
     } catch (error) {
-  // console.error('❌ Error precargando clientes:', error)
+  // console.error('Error precargando clientes:', error)
     } finally {
       this.loading.customers = false
     }
@@ -429,7 +429,7 @@ export const appStore = reactive({
         this.paymentMethods = response.data.data
       }
     } catch (error) {
-      console.error('❌ Error precargando métodos de pago:', error.response?.data || error.message)
+      console.error('Error precargando métodos de pago:', error.response?.data || error.message)
     } finally {
       this.loading.paymentMethods = false
     }
@@ -438,10 +438,9 @@ export const appStore = reactive({
   async loadSystemSettings(force = false) {
     if (this.loading.systemSettings && !force) return
     
-    // 👑 Super Admin: No cargar settings de tenant
+    // Super Admin: No cargar settings de tenant
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user?.role === 'superadmin') {
-      console.log('👑 Super Admin - omitiendo loadSystemSettings');
       return;
     }
     
@@ -452,13 +451,13 @@ export const appStore = reactive({
       if (response.data.success) {
         // El backend devuelve un objeto directo, no un array de key-value
         this.systemSettings = response.data.data
-        // 🔒 Guardar el plan del tenant
+        // Guardar el plan del tenant
         this.tenantPlan = response.data.tenant_plan || 'free_trial'
         
-        // 🏪 Guardar nombre del negocio
+        // Guardar nombre del negocio
         this.businessName = response.data.data?.business_name || response.data.tenant?.business_name || 'Mi Tienda'
         
-        // 🏢 IMPORTANTE: Agregar business_name a systemSettings si no viene en settings pero sí en tenant
+        // IMPORTANTE: Agregar business_name a systemSettings si no viene en settings pero sí en tenant
         if (!this.systemSettings.business_name && response.data.tenant?.business_name) {
           this.systemSettings.business_name = response.data.tenant.business_name
         }
@@ -483,8 +482,6 @@ export const appStore = reactive({
       // Los errores 403 por suscripción se manejan en SubscriptionExpiredModal
       // NO bloquear aquí - solo establecer valores por defecto
       if (error.response?.status === 403) {
-        console.log('⚠️ [Store] Error 403 - dejando que el modal maneje el bloqueo')
-        
         // Establecer valores por defecto para evitar errores
         this.systemSettings = {
           onboarding_completed: true,
@@ -500,7 +497,7 @@ export const appStore = reactive({
       }
       // Para otros errores, establecer valores por defecto y continuar
       // Esto evita que la app quede en estado incompleto si el backend falla temporalmente
-      console.error('⚠️ [Store] Error cargando systemSettings:', error.response?.status, error.message)
+      console.error('[Store] Error cargando systemSettings:', error.response?.status, error.message)
       if (!this.systemSettings) {
         this.systemSettings = {
           onboarding_completed: false,
@@ -543,17 +540,17 @@ export const appStore = reactive({
       this.cashSession.lastChecked = new Date()
       this.cashSession.initialized = true
       
-      // 🧠 Actualizar contexto global para IA de voz
+      // Actualizar contexto global para IA de voz
       updateCashContextForAI(this.cashSession.hasOpenSession, this.cashSession.current)
       
     } catch (error) {
-      console.error('❌ Error precargando sesión de caja:', error)
+      console.error('Error precargando sesión de caja:', error)
       this.cashSession.current = null
       this.cashSession.hasOpenSession = false
       this.cashSession.lastChecked = new Date()
       this.cashSession.initialized = true
       
-      // 🧠 Actualizar contexto global para IA de voz (caja cerrada por error)
+      // Actualizar contexto global para IA de voz (caja cerrada por error)
       updateCashContextForAI(false, null)
     } finally {
       this.loading.cashSession = false
@@ -566,7 +563,7 @@ export const appStore = reactive({
     this.cashSession.hasOpenSession = hasOpen
     this.cashSession.lastChecked = new Date()
     
-    // 🧠 Actualizar contexto global para IA de voz
+    // Actualizar contexto global para IA de voz
     updateCashContextForAI(hasOpen, session)
   },
 
@@ -583,7 +580,7 @@ export const appStore = reactive({
   async initialize() {
     if (this.initialized) return
     
-    // 🚫 NO inicializar en rutas públicas sin subdominio (registro, login, select-plan)
+    // NO inicializar en rutas públicas sin subdominio (registro, login, select-plan)
     const publicRoutes = ['/register', '/login', '/select-plan', '/payment/success', '/payment/failed']
     const currentPath = window.location.pathname
     const hostname = window.location.hostname
@@ -593,7 +590,6 @@ export const appStore = reactive({
     const isPublicRoute = publicRoutes.some(route => currentPath.startsWith(route))
     
     if (isMainDomainLocalhost && isPublicRoute) {
-      console.log('🚫 Ruta pública sin subdominio - omitiendo inicialización del store')
       this.initialized = true
       return
     }
@@ -601,7 +597,6 @@ export const appStore = reactive({
     // Verificar si es super admin
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user?.role === 'superadmin' || user?.is_super_admin) {
-      console.log('👑 Super Admin detectado - omitiendo carga de datos de tenant');
       this.initialized = true;
       return;
     }
@@ -610,7 +605,7 @@ export const appStore = reactive({
     try {
       await this.loadSystemSettings()
     } catch (error) {
-      console.error('⚠️ Error cargando systemSettings:', error.message)
+      console.error('Error cargando systemSettings:', error.message)
       // Establecer valores por defecto para que la app funcione
       if (!this.systemSettings) {
         this.systemSettings = {
@@ -627,16 +622,15 @@ export const appStore = reactive({
       // Continuar inicialización aunque falle (los datos se cargarán después)
     }
     
-    // ⛔ Si la suscripción está expirada, NO cargar datos operacionales
+    // Si la suscripción está expirada, NO cargar datos operacionales
     if (this.isSubscriptionExpired) {
-      console.log('⛔ Suscripción expirada - omitiendo carga de datos operacionales')
       this.initialized = true
       return
     }
     
     // Si la suscripción está activa, cargar todos los datos
     try {
-      // 🏪 Cargar sesión de caja para obtener el warehouse_id
+      // Cargar sesión de caja para obtener el warehouse_id
       await this.loadCashSession()
       
       // Cargar productos usando el warehouse_id de la sesión (si existe)
@@ -649,10 +643,10 @@ export const appStore = reactive({
         this.loadPaymentMethods()
       ])
       
-      // 🌐 Cargar datos globales del negocio para la IA (esperar a que termine)
+      // Cargar datos globales del negocio para la IA (esperar a que termine)
       await loadGlobalBusinessDataForAI()
     } catch (error) {
-      console.error('⚠️ Error cargando datos operacionales:', error.message)
+      console.error('Error cargando datos operacionales:', error.message)
       // Continuar: la app funcionará con datos parciales y se recargarán cuando sea necesario
     }
     

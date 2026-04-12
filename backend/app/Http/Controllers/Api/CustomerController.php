@@ -384,7 +384,6 @@ class CustomerController extends Controller
             // Opcional: Eliminar historial de pagos de crédito
             // \App\Models\CreditPayment::where('customer_id', $id)->delete();
 
-            Log::info("🗑️ Crédito eliminado para cliente ID: {$id}, Nombre: {$customer->name}");
 
             return response()->json([
                 'success' => true,

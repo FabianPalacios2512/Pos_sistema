@@ -5,7 +5,6 @@ export const requireAuth = (to, from, next) => {
   if (authService.isAuthenticated()) {
     next()
   } else {
-    console.log('❌ Usuario no autenticado, redirigiendo a login')
     next('/login')
   }
 }
@@ -24,13 +23,9 @@ export const requireRole = (allowedRoles) => {
       return
     }
 
-    console.log('DEBUG: No hay usuario o rol')
-    console.log('Usuario:', user)
-    console.log('Rol:', user.role)
-
     // Si el usuario no tiene rol definido, asignar un rol por defecto
     if (!user.role) {
-      console.warn('⚠️ Usuario sin rol definido, asignando rol por defecto')
+      console.warn('Usuario sin rol definido, asignando rol por defecto')
       // Permitir acceso como cajero por defecto
       const mappedRole = 'cajero'
       if (allowedRoles.includes(mappedRole)) {
@@ -73,7 +68,7 @@ export const requireSeller = requireRole(['admin', 'cajero', 'vendedor'])
 
 // Middleware para redirigir si ya está autenticado
 export const redirectIfAuth = (to, from, next) => {
-  // 🔥 IMPORTANTE: Permitir acceso a login si viene con token pendiente de procesar
+  // IMPORTANTE: Permitir acceso a login si viene con token pendiente de procesar
   const hasGoogleToken = to.query.google_login_token || to.query.google_token
   const hasCentralToken = to.query.central_login_token
   
@@ -88,7 +83,7 @@ export const redirectIfAuth = (to, from, next) => {
   }
   
   if (authService.isAuthenticated()) {
-    // ✅ Permitir acceso a rutas de onboarding aunque esté autenticado
+    // Permitir acceso a rutas de onboarding aunque esté autenticado
     const onboardingRoutes = ['/welcome', '/onboarding']
     if (onboardingRoutes.includes(to.path)) {
       next()

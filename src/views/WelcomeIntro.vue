@@ -119,7 +119,7 @@
         <div v-else-if="loadingPhase === 2" key="greeting" class="text-center space-y-6 max-w-lg relative z-10">
           <!-- Emoji saludando -->
           <div class="flex justify-center mb-4">
-            <div class="text-8xl animate-wave-slow">👋</div>
+            <div class="text-8xl animate-wave-slow"></div>
           </div>
           <div class="space-y-3">
             <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
@@ -286,7 +286,7 @@ const selectStoreType = async (storeType) => {
     // Guardar temporalmente en localStorage
     localStorage.setItem('pending_store_type', storeType)
     
-    // ✅ Marcar welcome como visto para evitar bucle de redirección
+    // Marcar welcome como visto para evitar bucle de redirección
     localStorage.setItem('welcome_seen', 'true')
     
     // Actualizar el store local si existe
@@ -302,7 +302,7 @@ const selectStoreType = async (storeType) => {
     }, 800)
     
   } catch (error) {
-    console.error('❌ Error al guardar tipo de tienda:', error)
+    console.error('Error al guardar tipo de tienda:', error)
     alert('No se pudo guardar la configuración. Por favor intenta nuevamente.')
     savingStoreType.value = false
   }

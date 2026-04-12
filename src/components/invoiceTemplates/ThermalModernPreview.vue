@@ -1,6 +1,6 @@
 <template>
   <!-- 
-    ✅ PREVIEW MODERNO MINIMALISTA del ticket térmico
+    PREVIEW MODERNO MINIMALISTA del ticket térmico
     Diseño elegante, limpio y profesional
     Optimizado para impresión térmica 80mm
   -->

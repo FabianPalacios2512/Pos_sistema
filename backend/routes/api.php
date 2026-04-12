@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CentralLoginController;
 use App\Http\Controllers\Api\SuperAdminController;
+use App\Http\Controllers\Api\SecurityController;
 use App\Http\Controllers\Api\TenantRegisterController;
 use App\Http\Controllers\Api\PlanUpgradeController;
 use App\Http\Controllers\Api\PaymentHistoryController;
@@ -100,18 +101,50 @@ Route::middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(functio
     
     // AI Monitoring para Super Admin (todos los tenants)
     Route::get('/admin/ai-monitoring/dashboard', [\App\Http\Controllers\Api\SuperAdminAIMonitoringController::class, 'dashboard']);
+    Route::get('/admin/ai-monitoring/key/{keyIndex}', [\App\Http\Controllers\Api\SuperAdminAIMonitoringController::class, 'testKey']);
+
+    // System Tools (GOD MODE)
+    Route::get('/admin/system/health', [\App\Http\Controllers\Api\SystemToolsController::class, 'health']);
+    Route::get('/admin/system/logs', [\App\Http\Controllers\Api\SystemToolsController::class, 'getLogs']);
+    Route::delete('/admin/system/logs', [\App\Http\Controllers\Api\SystemToolsController::class, 'clearLogs']);
+    Route::post('/admin/system/maintenance', [\App\Http\Controllers\Api\SystemToolsController::class, 'maintenance']);
+    Route::get('/admin/system/environment', [\App\Http\Controllers\Api\SystemToolsController::class, 'environment']);
+    Route::get('/admin/system/tenant-db/{tenantId}', [\App\Http\Controllers\Api\SystemToolsController::class, 'tenantDatabaseInfo']);
+
+    // Security Dashboard (GOD MODE)
+    Route::get('/admin/security/dashboard', [SecurityController::class, 'dashboard']);
+    Route::post('/admin/security/unblock-user', [SecurityController::class, 'unblockUser']);
+    Route::post('/admin/security/unblock-ip', [SecurityController::class, 'unblockIp']);
+    Route::post('/admin/security/block-ip', [SecurityController::class, 'blockIp']);
+    Route::post('/admin/security/cleanup', [SecurityController::class, 'cleanup']);
+    Route::post('/admin/security/resolve-event', [SecurityController::class, 'resolveEvent']);
+
+    // Tenant Error Logs (GOD MODE)
+    Route::get('/admin/tenants/{id}/errors', [SuperAdminController::class, 'getTenantErrors']);
+    Route::post('/admin/tenants/{id}/errors/{errorId}/resolve', [SuperAdminController::class, 'resolveError']);
+    Route::post('/admin/tenants/{id}/errors/{errorId}/analyze', [SuperAdminController::class, 'analyzeError']);
+    Route::post('/admin/tenants/{id}/errors/analyze-all', [SuperAdminController::class, 'analyzeAllErrors']);
 });
 
 // ==================== SUPER ADMIN (GOD MODE) - Prefijo /admin/api/* ====================
 // Duplicar rutas para compatibilidad con frontend (usa ambos prefijos)
 Route::prefix('admin/api')->middleware(\App\Http\Middleware\PreventTenancyInit::class)->group(function () {
     Route::delete('/tenants/{id}', [SuperAdminController::class, 'deleteTenant']);
-    Route::put('/tenants/{id}', [SuperAdminController::class, 'updateTenant']); // Para actualizar plan/status
-    Route::put('/tenants/{id}/subscription', [SuperAdminController::class, 'updateTenantSubscription']); // Para actualizar fechas
+    Route::put('/tenants/{id}', [SuperAdminController::class, 'updateTenant']);
+    Route::put('/tenants/{id}/subscription', [SuperAdminController::class, 'updateTenantSubscription']);
     Route::get('/tenants/{id}/users', [SuperAdminController::class, 'getTenantUsers']);
     Route::get('/tenants/{id}/products', [SuperAdminController::class, 'getTenantProducts']);
     Route::post('/tenants/{id}/users/{userId}/reset-password', [SuperAdminController::class, 'resetUserPassword']);
+    Route::put('/tenants/{id}/users/{userId}', [SuperAdminController::class, 'updateTenantUser']);
+    Route::put('/tenants/{id}/products/{productId}', [SuperAdminController::class, 'updateTenantProduct']);
+    Route::delete('/tenants/{id}/products/{productId}', [SuperAdminController::class, 'deleteTenantProduct']);
     
+    // Tenant Error Logs
+    Route::get('/tenants/{id}/errors', [SuperAdminController::class, 'getTenantErrors']);
+    Route::post('/tenants/{id}/errors/{errorId}/resolve', [SuperAdminController::class, 'resolveError']);
+    Route::post('/tenants/{id}/errors/{errorId}/analyze', [SuperAdminController::class, 'analyzeError']);
+    Route::post('/tenants/{id}/errors/analyze-all', [SuperAdminController::class, 'analyzeAllErrors']);
+
     // AI Monitoring para Super Admin (frontend usa /admin/api/*)
     Route::get('/ai-monitoring/dashboard', [\App\Http\Controllers\Api\SuperAdminAIMonitoringController::class, 'dashboard']);
 });

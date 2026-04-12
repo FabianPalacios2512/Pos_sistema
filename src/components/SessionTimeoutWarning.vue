@@ -11,7 +11,7 @@
           </svg>
         </div>
         <h3 class="text-xl font-bold text-gray-900 mb-1">
-          ⚠️ Sesión por Expirar
+          Sesión por Expirar
         </h3>
         <p class="text-sm text-gray-600">
           Tu sesión se cerrará por inactividad en:
@@ -34,7 +34,7 @@
       <!-- Mensaje informativo -->
       <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
         <p class="text-sm text-amber-800">
-          <strong>💡 Sistema POS:</strong> Por seguridad, cerramos sesiones inactivas después de {{ inactivityHours }} horas.
+          <strong>Sistema POS:</strong> Por seguridad, cerramos sesiones inactivas después de {{ inactivityHours }} horas.
         </p>
       </div>
       

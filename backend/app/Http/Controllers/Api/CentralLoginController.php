@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\SecurityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -59,10 +60,6 @@ class CentralLoginController extends Controller
                 // Generar token especial para super admin (no expira, solo para identificación)
                 $superAdminToken = base64_encode('superadmin:' . time() . ':' . config('app.key'));
 
-                \Log::info('👑 Super Admin login detectado', [
-                    'email' => $request->email,
-                    'redirect_url' => $redirectUrl
-                ]);
 
                 return response()->json([
                     'success' => true,
@@ -85,6 +82,9 @@ class CentralLoginController extends Controller
             $tenantDomains = $this->findUserTenants($request->email);
 
             if (empty($tenantDomains)) {
+                $security = new SecurityService();
+                $security->recordAttempt($request->email, $request->ip(), $request->userAgent() ?? '', 'fail', 'user_not_found');
+                $security->analyzeAfterFailedAttempt($request->email, $request->ip());
                 return response()->json([
                     'success' => false,
                     'message' => 'No encontramos una cuenta asociada a este correo electrónico.',
@@ -101,6 +101,20 @@ class CentralLoginController extends Controller
             $authResult = $this->authenticateInTenant($tenantDomain['tenant_id'], $request->email, $request->password);
 
             if (!$authResult['success']) {
+                $security = new SecurityService();
+                $security->recordAttempt($request->email, $request->ip(), $request->userAgent() ?? '', 'fail', 'wrong_password');
+                $actions = $security->analyzeAfterFailedAttempt($request->email, $request->ip());
+
+                if (in_array('account_blocked', $actions)) {
+                    return response()->json([
+                        'success' => false,
+                        'blocked' => true,
+                        'block_type' => 'account',
+                        'message' => 'Tu cuenta ha sido bloqueada por seguridad debido a múltiples intentos fallidos de inicio de sesión.',
+                        'support_url' => 'https://wa.me/573217355070?text=' . urlencode('Hola, mi cuenta fue bloqueada en 105POS, necesito ayuda para recuperar el acceso.'),
+                    ], 423);
+                }
+
                 return response()->json([
                     'success' => false,
                     'message' => $authResult['message'],
@@ -111,6 +125,10 @@ class CentralLoginController extends Controller
             }
 
             // 🎯 PASO 3: Generar token temporal para auto-login cross-domain
+            $security = new SecurityService();
+            $security->recordAttempt($request->email, $request->ip(), $request->userAgent() ?? '', 'success', null, $tenantDomain['tenant_id']);
+            $security->analyzeSuccessfulLogin($request->email, $request->ip());
+
             $tempToken = \Str::random(60);
             
             // Guardar sesión temporal en cache (5 minutos)
@@ -121,11 +139,6 @@ class CentralLoginController extends Controller
                 'name' => $authResult['user']->name,
             ], now()->addMinutes(5));
             
-            \Log::info('🔐 Central Login Token generado', [
-                'token' => substr($tempToken, 0, 10) . '...',
-                'tenant_id' => $tenantDomain['tenant_id'],
-                'email' => $request->email
-            ]);
 
             // 🎯 PASO 4: Construir URL de redirección con token
             $protocol = app()->environment('local') ? (request()->secure() ? 'https://' : 'http://') : 'https://';
@@ -487,12 +500,6 @@ class CentralLoginController extends Controller
                 ];
             }
 
-            \Log::info('✅ Central Login Session exitosa', [
-                'user_id' => $sessionData['user_id'],
-                'tenant_id' => $sessionData['tenant_id'],
-                'email' => $sessionData['email'],
-                'needs_plan_selection' => $needsPlanSelection
-            ]);
 
             return response()->json([
                 'success' => true,

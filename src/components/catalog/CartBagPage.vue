@@ -407,27 +407,27 @@ const handleCheckoutSubmit = async () => {
       // Build WhatsApp message
       const greeting = storeConfig.value.custom_message || 'Hola, quiero hacer el siguiente pedido:'
       let message = `${greeting}\n\n`
-      message += `📋 *Código: ${order.order_number}*\n\n`
-      message += `👤 ${customerData.customer_name}\n`
-      message += `📱 ${customerData.customer_phone}\n\n`
+      message += `*Código: ${order.order_number}*\n\n`
+      message += `${customerData.customer_name}\n`
+      message += `${customerData.customer_phone}\n\n`
 
       if (customerData.delivery_type === 'delivery') {
-        message += `🚚 Envío a: ${customerData.customer_address}\n\n`
+        message += `Envío a: ${customerData.customer_address}\n\n`
       } else {
-        message += `🏪 Recoger en tienda\n\n`
+        message += `Recoger en tienda\n\n`
       }
 
-      message += `📦 *Productos:*\n`
+      message += `*Productos:*\n`
       orderItems.forEach((item, index) => {
         message += `${index + 1}. ${item.name} x${item.quantity || 1}\n`
       })
 
       const deliveryCost = customerData.delivery_type === 'delivery' ? parseFloat(storeConfig.value.delivery_cost || 0) : 0
       const finalTotal = parseFloat(order.total) + deliveryCost
-      message += `\n💰 Total: ${storeConfig.value.currency_symbol}${formatPrice(finalTotal)}`
+      message += `\nTotal: ${storeConfig.value.currency_symbol}${formatPrice(finalTotal)}`
 
       if (customerData.note) {
-        message += `\n\n📝 ${customerData.note}`
+        message += `\n\n${customerData.note}`
       }
 
       const whatsappUrl = `https://wa.me/${storeConfig.value.whatsapp_number}?text=${encodeURIComponent(message)}`

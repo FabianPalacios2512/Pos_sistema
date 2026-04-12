@@ -1,5 +1,5 @@
 <template>
-  <!-- 🎨 Mi Perfil - Diseño Ejecutivo SaaS Dashboard -->
+  <!-- Mi Perfil - Diseño Ejecutivo SaaS Dashboard -->
   <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-4 md:px-8">
     <div class="p-4 lg:p-6 max-w-6xl mx-auto space-y-5 pb-8 animate-fade-in">
       
@@ -315,10 +315,10 @@ const saveProfile = async () => {
     })
     
     await auth.updateUser()
-    alert('✅ Perfil actualizado correctamente')
+    alert('Perfil actualizado correctamente')
   } catch (error) {
     console.error('Error guardando perfil:', error)
-    alert('❌ Error al guardar el perfil')
+    alert('Error al guardar el perfil')
   } finally {
     savingProfile.value = false
   }
@@ -340,13 +340,13 @@ const changePassword = async () => {
     passwordData.new_password = ''
     passwordData.confirm_password = ''
     
-    alert('✅ Contraseña actualizada correctamente')
+    alert('Contraseña actualizada correctamente')
   } catch (error) {
     console.error('Error cambiando contraseña:', error)
     if (error.response?.status === 401) {
-      alert('❌ La contraseña actual es incorrecta')
+      alert('La contraseña actual es incorrecta')
     } else {
-      alert('❌ Error al cambiar la contraseña')
+      alert('Error al cambiar la contraseña')
     }
   } finally {
     savingPassword.value = false

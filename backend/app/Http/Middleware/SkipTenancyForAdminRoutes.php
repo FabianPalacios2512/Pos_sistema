@@ -29,7 +29,6 @@ class SkipTenancyForAdminRoutes
             'api/debug/*',
         ];
 
-        \Log::info('SkipTenancyForAdminRoutes: Checking path', ['path' => $request->path()]);
 
         foreach ($exemptRoutes as $pattern) {
             // Convertir patrón en regex
@@ -38,7 +37,6 @@ class SkipTenancyForAdminRoutes
             if (preg_match($regex, $request->path())) {
                 // Marcar request como "exempt from tenancy"
                 $request->attributes->set('tenancy_exempt', true);
-                \Log::info('SkipTenancyForAdminRoutes: Marked as exempt', ['path' => $request->path()]);
                 break;
             }
         }

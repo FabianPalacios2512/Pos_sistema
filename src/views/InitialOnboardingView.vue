@@ -20,7 +20,7 @@
           <div class="flex items-center gap-1.5 md:gap-2">
             <div class="w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold transition-all"
                  :class="currentStep >= 1 ? 'border-[#009F7A] bg-[#009F7A]/10 text-[#009F7A]' : 'border-slate-300 text-slate-400'">
-              <span v-if="currentStep > 1">✓</span><span v-else>1</span>
+              <span v-if="currentStep > 1"></span><span v-else>1</span>
             </div>
             <span class="text-[10px] font-bold uppercase tracking-widest hidden sm:inline" :class="currentStep >= 1 ? 'text-slate-900' : 'text-slate-400'">Diseño</span>
           </div>
@@ -31,7 +31,7 @@
           <div class="flex items-center gap-1.5 md:gap-2">
             <div class="w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold transition-all"
                  :class="currentStep >= 2 ? 'border-[#009F7A] bg-[#009F7A]/10 text-[#009F7A]' : 'border-slate-300 text-slate-400'">
-              <span v-if="currentStep > 2 || (!isPremiumPlan && currentStep === 2)">✓</span><span v-else>2</span>
+              <span v-if="currentStep > 2 || (!isPremiumPlan && currentStep === 2)"></span><span v-else>2</span>
             </div>
             <span class="text-[10px] font-bold uppercase tracking-widest hidden sm:inline" :class="currentStep >= 2 ? 'text-slate-900' : 'text-slate-400'">Datos</span>
           </div>
@@ -329,7 +329,7 @@
                     <div class="flex-1">
                       <p class="text-xs font-bold text-emerald-700 uppercase tracking-wide mb-0.5">Estado</p>
                       <p class="text-sm font-bold text-slate-900">
-                        {{ whatsappStatus.connected ? '✅ Conectado' : '⏳ Esperando conexión' }}
+                        {{ whatsappStatus.connected ? 'Conectado' : 'Esperando conexión' }}
                       </p>
                     </div>
                   </div>
@@ -451,11 +451,11 @@ import apiClient from '@/services/apiClient.js'
 import QRCode from 'qrcode'
 import { whatsappService } from '@/services/whatsappService.js'
 import { appStore } from '@/store/appStore.js'
-// ✅ IMPORTAR LOS TICKETS TÉRMICOS REALES (los que genera invoiceTemplate.js)
+// IMPORTAR LOS TICKETS TÉRMICOS REALES (los que genera invoiceTemplate.js)
 import ThermalClassicPreview from '@/components/invoiceTemplates/ThermalClassicPreview.vue'
 import ThermalModernPreview from '@/components/invoiceTemplates/ThermalModernPreview.vue'
 import ThermalMinimalPreview from '@/components/invoiceTemplates/ThermalMinimalPreview.vue'
-// 📊 Modal de importación de Excel
+// Modal de importación de Excel
 import ExcelImportModal from '@/components/ExcelImportModal.vue'
 
 const router = useRouter()
@@ -463,13 +463,13 @@ const currentStep = ref(1)
 const selectedTemplate = ref('classic')
 const isLoading = ref(true)
 
-// 🔐 Verificar si el plan permite WhatsApp (solo premium y enterprise)
+// Verificar si el plan permite WhatsApp (solo premium y enterprise)
 const isPremiumPlan = computed(() => {
   const plan = appStore.tenantPlan || 'free_trial'
   return ['premium', 'enterprise'].includes(plan)
 })
 
-// 👗 Verificar si es tienda de moda (no permite importar Excel porque usa variantes)
+// Verificar si es tienda de moda (no permite importar Excel porque usa variantes)
 const isFashionStore = computed(() => {
   return config.store_type === 'fashion'
 })
@@ -495,12 +495,12 @@ const refreshingQR = ref(false)
 let whatsappCheckInterval = null
 let qrAutoRefreshInterval = null // Auto-refresh del QR cada 45 segundos
 
-// 🏪 Leer tipo de tienda INMEDIATAMENTE del localStorage (antes del primer render)
+// Leer tipo de tienda INMEDIATAMENTE del localStorage (antes del primer render)
 const pendingStoreTypeInitial = localStorage.getItem('pending_store_type')
 
 const config = reactive({
   storeName: '',
-  store_type: pendingStoreTypeInitial || 'general', // 🏪 Cargar inmediatamente si existe
+  store_type: pendingStoreTypeInitial || 'general', // Cargar inmediatamente si existe
   nit: '',
   phone: '',
   email: '',
@@ -511,7 +511,7 @@ const config = reactive({
 })
 
 // Datos para el preview del Step 1 (estáticos para mostrar ejemplo)
-// ✅ ESTOS SON LOS DATOS QUE USAN LOS TEMPLATES REALES DEL SISTEMA
+// ESTOS SON LOS DATOS QUE USAN LOS TEMPLATES REALES DEL SISTEMA
 const previewDataStep1 = {
   storeName: 'MI EMPRESA',
   nit: 'N/A',
@@ -522,7 +522,7 @@ const previewDataStep1 = {
 }
 
 // Items de ejemplo para todas las previsualizaciones
-// ✅ MISMO FORMATO QUE USA EL POS REAL
+// MISMO FORMATO QUE USA EL POS REAL
 const dummyItems = [
   { name: 'Producto A', quantity: 2, price: 25000, total: 50000 },
   { name: 'Producto B', quantity: 1, price: 100000, total: 100000 }
@@ -750,14 +750,13 @@ const nextStep = async () => {
 
 // Cargar configuración existente al montar el componente
 onMounted(async () => {
-  // 🏪 PRIMERO: Leer tipo de tienda del Welcome si existe
+  // PRIMERO: Leer tipo de tienda del Welcome si existe
   const pendingStoreType = localStorage.getItem('pending_store_type')
   if (pendingStoreType) {
     config.store_type = pendingStoreType
-    console.log('✅ Tipo de tienda cargado desde Welcome:', pendingStoreType)
   }
 
-  // 🎯 SEGUNDO: Pre-llenar con datos del registro (localStorage)
+  // SEGUNDO: Pre-llenar con datos del registro (localStorage)
   const registrationData = JSON.parse(localStorage.getItem('registration_data') || '{}')
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   
@@ -793,7 +792,7 @@ onMounted(async () => {
         selectedTemplate.value = settings.invoice_template
       }
       
-      // 🏪 Solo sobrescribir store_type si NO viene de pending_store_type
+      // Solo sobrescribir store_type si NO viene de pending_store_type
       if (!pendingStoreType && settings.store_type) {
         config.store_type = settings.store_type
       }
@@ -814,7 +813,7 @@ const saveConfig = async () => {
   try {
     const response = await apiClient.put('/tenant/system-settings', {
       company_name: config.storeName,
-      store_type: config.store_type, // 🏪 Guardar tipo de tienda
+      store_type: config.store_type, // Guardar tipo de tienda
       company_document: config.nit,
       company_phone: config.phone,
       company_email: config.email,
@@ -824,16 +823,13 @@ const saveConfig = async () => {
       invoice_template: selectedTemplate.value
     })
     
-    // 🧹 Limpiar pending_store_type después de guardarlo
+    // Limpiar pending_store_type después de guardarlo
     localStorage.removeItem('pending_store_type')
-    console.log('✅ Tipo de tienda guardado en BD y limpiado de localStorage')
-    
     return response
   } catch (error) {
     // Si hay error 404 o 401, es porque aún no estamos autenticados en el tenant
     // Esto es normal en el onboarding inicial, simplemente lo ignoramos
     if (error.response && (error.response.status === 404 || error.response.status === 401)) {
-      console.log('Configuración se guardará después del primer login')
       return { success: true } // Retornamos éxito para continuar el flujo
     }
     console.error('Error guardando configuración:', error)
@@ -843,7 +839,7 @@ const saveConfig = async () => {
 
 const finishOnboarding = async () => {
   try {
-    // 🔥 CRÍTICO: Marcar en localStorage INMEDIATAMENTE como respaldo
+    // CRÍTICO: Marcar en localStorage INMEDIATAMENTE como respaldo
     // Esto evita el bucle si el router guard se ejecuta antes de que BD responda
     localStorage.setItem('onboarding_completed', 'true')
     
@@ -851,7 +847,7 @@ const finishOnboarding = async () => {
     try {
       await apiClient.put('/tenant/system-settings', {
         company_name: config.storeName,
-        store_type: config.store_type, // 🏪 Guardar tipo de tienda
+        store_type: config.store_type, // Guardar tipo de tienda
         company_document: config.nit,
         company_phone: config.phone,
         company_email: config.email,
@@ -863,11 +859,11 @@ const finishOnboarding = async () => {
         onboarding_completed: true
       })
       
-      // ✅ CRÍTICO: Recargar systemSettings para actualizar appStore
+      // CRÍTICO: Recargar systemSettings para actualizar appStore
       const { appStore } = await import('@/store/appStore.js')
       await appStore.loadSystemSettings(true) // force = true para recargar
       
-      // ✅ SOLUCIÓN: Recargar página para que el router guard lea el valor fresco de BD
+      // SOLUCIÓN: Recargar página para que el router guard lea el valor fresco de BD
       // El navigation guard se ejecuta antes de que Vue procese la reactividad
       window.location.href = '/pos'
       
@@ -878,7 +874,7 @@ const finishOnboarding = async () => {
         // Guardar en localStorage para aplicar después del login
         localStorage.setItem('pending_onboarding_config', JSON.stringify({
           company_name: config.storeName,
-          store_type: config.store_type, // 🏪 Guardar tipo de tienda
+          store_type: config.store_type, // Guardar tipo de tienda
           company_document: config.nit,
           company_phone: config.phone,
           company_email: config.email,
@@ -897,7 +893,7 @@ const finishOnboarding = async () => {
     }
   } catch (error) {
     console.error('Error finalizando onboarding:', error)
-    // 🔥 Revertir el flag si hay error real
+    // Revertir el flag si hay error real
     localStorage.removeItem('onboarding_completed')
     alert('Error al guardar la configuración. Por favor intenta de nuevo.')
   }

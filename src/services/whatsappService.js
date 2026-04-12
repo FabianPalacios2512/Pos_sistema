@@ -249,13 +249,6 @@ export const whatsappService = {
   // Enviar cotización por WhatsApp (usando PDF generado)
   async sendQuotationWithPDF(phone, pdfBlob, message, fileName, customerName = '') {
     try {
-      console.log('📤 Preparando envío de cotización por WhatsApp:', {
-        phone,
-        fileName,
-        customerName,
-        pdfSize: pdfBlob.size,
-        messageLength: message.length
-      })
 
       const { isDirect, client } = getWhatsAppClient()
       
@@ -324,8 +317,6 @@ export const whatsappService = {
   // Función simplificada para enviar cotización desde cualquier vista
   async sendQuotationFromData(quotationData, pdfBlob) {
     try {
-      console.log('📤 Enviando cotización desde datos:', quotationData)
-      
       // Extraer información necesaria
       let phone = quotationData.customer_phone
       
@@ -348,16 +339,14 @@ export const whatsappService = {
         
         // Validar formato final
         if (!/^\+57[3][0-9]{9}$/.test(phone)) {
-          console.warn('⚠️ Número de teléfono inválido:', phone, 'usando número por defecto')
+          console.warn('Número de teléfono inválido:', phone, 'usando número por defecto')
           phone = '+573134540533'
         }
       } else {
         // Si no hay teléfono del cliente, usar número por defecto
-        console.warn('⚠️ No se encontró teléfono del cliente, usando número por defecto')
+        console.warn('No se encontró teléfono del cliente, usando número por defecto')
         phone = '+573134540533'
       }
-      
-      console.log('📱 Teléfono a usar:', phone)
       
       const customerName = quotationData.customer || 'Cliente'
       const fileName = `cotizacion-${quotationData.code}.pdf`
@@ -384,11 +373,7 @@ export const whatsappService = {
         customer_name: customerName
       }
       
-      console.log('📡 Enviando request a API:', requestData)
-      
       const response = await apiClient.post('/whatsapp/send-quotation', requestData)
-      
-      console.log('📡 Response de API:', response.data)
       
       return response.data
     } catch (error) {
@@ -420,9 +405,9 @@ export const whatsappService = {
       
       // Generar mensaje según el tipo de documento con nombre del cliente
       const messages = {
-        invoice: `📄 *Factura ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás tu factura. ¡Gracias por tu compra!`,
-        quotation: `📋 *Cotización ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás la cotización solicitada. Quedamos atentos a tus comentarios.`,
-        purchase_order: `📦 *Orden de Compra ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás la orden de compra. Por favor confirmar recepción y disponibilidad de productos. ¡Gracias!`
+        invoice: `*Factura ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás tu factura. ¡Gracias por tu compra!`,
+        quotation: `*Cotización ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás la cotización solicitada. Quedamos atentos a tus comentarios.`,
+        purchase_order: `*Orden de Compra ${documentNumber}*\n\n¡Hola ${clientName}!\n\nAdjunto encontrarás la orden de compra. Por favor confirmar recepción y disponibilidad de productos. ¡Gracias!`
       }
 
       const fileNames = {

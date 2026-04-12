@@ -1,6 +1,6 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * 🎯 useScreenContext - Composable para Conciencia de Pantalla
+ * useScreenContext - Composable para Conciencia de Pantalla
  * ═══════════════════════════════════════════════════════════════════════════
  * 
  * Hook/Composable que permite a cualquier vista del sistema comunicar

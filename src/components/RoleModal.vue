@@ -138,7 +138,7 @@
                           v-if="isModuleFullySelected(module.id)"
                           class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-200 dark:border-emerald-800"
                         >
-                          ✓ PERMITIDO
+                          PERMITIDO
                         </span>
                       </h5>
                     </div>

@@ -94,8 +94,8 @@ onMounted(async () => {
   
   await authStore.actions.initialize()
   
-  // ✅ INICIALIZAR APPSTORE DESPUÉS DE LA AUTENTICACIÓN (incluye sesión de caja)
-  // 🛡️ PERO NO en el dominio central (105pos.pro) en rutas que no son de tenant
+  // INICIALIZAR APPSTORE DESPUÉS DE LA AUTENTICACIÓN (incluye sesión de caja)
+  // PERO NO en el dominio central (105pos.pro) en rutas que no son de tenant
   const hostname = window.location.hostname
   const isCentralDomain = hostname === '105pos.pro' || hostname === 'www.105pos.pro'
   const centralOnlyRoutes = ['/select-plan', '/register', '/payment/success', '/payment/failure', '/payment/pending', '/payment/verify']
@@ -113,10 +113,10 @@ onMounted(async () => {
     }
   }
   
-  // 🔧 TODO: Re-habilitar health-check cuando se arregle correctamente con tenancy
+  // TODO: Re-habilitar health-check cuando se arregle correctamente con tenancy
   // El problema era que intentaba acceder a la DB del tenant sin middleware de tenancy
   
-  // ✅ OCULTAR SPLASH SOLO DESPUÉS DE QUE TODO ESTÉ LISTO
+  // OCULTAR SPLASH SOLO DESPUÉS DE QUE TODO ESTÉ LISTO
   // Garantizar mínimo 1.2 segundos para que se vea la animación completa
   const elapsedTime = Date.now() - startTime
   const minimumDisplayTime = 1200

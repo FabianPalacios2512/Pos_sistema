@@ -194,7 +194,7 @@ watch(() => props.warehouse, (newWarehouse) => {
 
 const handleSubmit = async () => {
   if (!form.value.name) {
-    showError('⚠️ El nombre de la sede es obligatorio');
+    showError('El nombre de la sede es obligatorio');
     return;
   }
 
@@ -202,14 +202,14 @@ const handleSubmit = async () => {
   try {
     if (isEditing.value) {
       await warehouseService.update(props.warehouse.id, form.value);
-      showSuccess('✅ Sede actualizada correctamente');
+      showSuccess('Sede actualizada correctamente');
     } else {
       await warehouseService.create(form.value);
-      showSuccess('✅ Sede creada exitosamente');
+      showSuccess('Sede creada exitosamente');
     }
     emit('saved');
   } catch (error) {
-    console.error('❌ Error al guardar sede:', error);
+    console.error('Error al guardar sede:', error);
     showError(error.response?.data?.message || 'Error al guardar la sede. Intenta nuevamente.');
   } finally {
     saving.value = false;

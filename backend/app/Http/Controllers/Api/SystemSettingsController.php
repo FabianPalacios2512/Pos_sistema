@@ -102,10 +102,6 @@ class SystemSettingsController extends Controller
     public function update(Request $request)
     {
         try {
-            \Log::info('🏪 [SystemSettings] UPDATE REQUEST', [
-                'store_type' => $request->input('store_type'),
-                'all_data' => $request->all()
-            ]);
 
             $settings = SystemSetting::getSettings();
 
@@ -177,11 +173,6 @@ class SystemSettingsController extends Controller
                 $validated['enable_loyalty_system'] = false;
             }
 
-            \Log::info('🏪 [SystemSettings] BEFORE UPDATE', [
-                'current_store_type' => $settings->store_type,
-                'new_store_type' => $validated['store_type'] ?? 'NOT SET',
-                'settings_id' => $settings->id
-            ]);
 
             // ⚠️ DEBUG: Intentar UPDATE directo con DB
             if (isset($validated['store_type'])) {
@@ -189,16 +180,10 @@ class SystemSettingsController extends Controller
                     ->where('id', $settings->id)
                     ->update(['store_type' => $validated['store_type']]);
 
-                \Log::info('🏪 [SystemSettings] DIRECT UPDATE', [
-                    'store_type_set' => $validated['store_type']
-                ]);
             }
 
             $settings->update($validated);
 
-            \Log::info('🏪 [SystemSettings] AFTER UPDATE', [
-                'updated_store_type' => $settings->fresh()->store_type
-            ]);
 
             return response()->json([
                 'success' => true,

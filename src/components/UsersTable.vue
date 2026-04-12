@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-white dark:bg-[#131314] rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
+  <div class="bg-white dark:bg-[#131314] rounded-xl shadow-lg border border-gray-200 dark:border-zinc-800 overflow-hidden">
     <!-- Table Header -->
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-[#f8f9fa] dark:bg-[#1e1f20]">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800 bg-[#f8f9fa] dark:bg-[#1e1f20]">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Lista de Usuarios</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5">Gestiona los usuarios del sistema</p>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Gestiona los usuarios del sistema</p>
         </div>
       </div>
     </div>
@@ -13,16 +13,16 @@
     <!-- Table Content -->
     <div class="overflow-x-auto">
       <table class="w-full">
-        <thead class="bg-[#f8f9fa] dark:bg-[#1e1f20] border-b border-gray-200 dark:border-gray-800">
+        <thead class="bg-[#f8f9fa] dark:bg-[#1e1f20] border-b border-gray-200 dark:border-zinc-800">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Usuario</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Rol</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Estado</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Usuario</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Rol</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
-        <tbody class="bg-white dark:bg-[#131314] divide-y divide-gray-200 dark:divide-gray-800">
+        <tbody class="bg-white dark:bg-[#131314] divide-y divide-gray-200 dark:divide-zinc-800">
           <tr 
             v-for="user in users" 
             :key="user.id"
@@ -36,14 +36,14 @@
                 </div>
                 <div>
                   <p class="text-sm font-medium text-gray-900 dark:text-white">{{ user.name }}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-500">{{ user.cc || 'Sin CC' }}</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-500">{{ user.cc || 'Sin CC' }}</p>
                 </div>
               </div>
             </td>
 
             <!-- Email -->
             <td class="px-6 py-4 whitespace-nowrap">
-              <p class="text-sm text-gray-700 dark:text-gray-300">{{ user.email }}</p>
+              <p class="text-sm text-gray-700 dark:text-zinc-300">{{ user.email }}</p>
             </td>
 
             <!-- Rol -->
@@ -71,7 +71,7 @@
                 <!-- Editar -->
                 <button
                   @click="$emit('edit', user)"
-                  class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-200 dark:hover:border-amber-700/50 transition-all duration-200"
+                  class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:border-amber-200 dark:hover:border-amber-700/50 transition-all duration-200"
                   title="Editar usuario"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@
                 <!-- Cambiar Contraseña -->
                 <button
                   @click="$emit('change-password', user)"
-                  class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-700/50 transition-all duration-200"
+                  class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 dark:hover:border-blue-700/50 transition-all duration-200"
                   title="Cambiar contraseña"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@
                   :class="user.active 
                     ? 'hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-200 dark:hover:border-rose-700/50'
                     : 'hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:border-emerald-200 dark:hover:border-emerald-700/50'"
-                  class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-gray-500 transition-all duration-200"
+                  class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-zinc-500 transition-all duration-200"
                   :title="user.active ? 'Desactivar' : 'Activar'"
                 >
                   <svg v-if="user.active" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +110,7 @@
                 <!-- Eliminar -->
                 <button
                   @click="$emit('delete', user)"
-                  class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-gray-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-200 dark:hover:border-rose-700/50 transition-all duration-200"
+                  class="p-2 rounded-lg border border-transparent text-gray-400 dark:text-zinc-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-200 dark:hover:border-rose-700/50 transition-all duration-200"
                   title="Eliminar usuario"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,11 +125,11 @@
           <tr v-if="!users || users.length === 0">
             <td colspan="5" class="px-6 py-12 text-center">
               <div class="flex flex-col items-center justify-center">
-                <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-16 h-16 text-gray-300 dark:text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-                <p class="text-gray-500 dark:text-gray-400 font-medium">No hay usuarios registrados</p>
-                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Crea tu primer usuario para comenzar</p>
+                <p class="text-gray-500 dark:text-zinc-400 font-medium">No hay usuarios registrados</p>
+                <p class="text-sm text-gray-400 dark:text-zinc-500 mt-1">Crea tu primer usuario para comenzar</p>
               </div>
             </td>
           </tr>

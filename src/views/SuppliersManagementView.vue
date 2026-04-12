@@ -129,8 +129,8 @@
                       {{ supplier.contact_name }}
                     </div>
                     <div class="text-xs text-gray-400 mt-0.5 flex items-center space-x-2">
-                      <span v-if="supplier.phone">📞 {{ supplier.phone }}</span>
-                      <span v-if="supplier.city">📍 {{ supplier.city }}</span>
+                      <span v-if="supplier.phone">{{ supplier.phone }}</span>
+                      <span v-if="supplier.city">{{ supplier.city }}</span>
                     </div>
                   </div>
                 </td>

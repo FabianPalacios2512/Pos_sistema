@@ -13,9 +13,10 @@ const router = useRouter()
 const loading = ref(false)
 const showPassword = ref(false)
 const isGoogleLoading = ref(false)
-const imageLoaded = ref(false) // 🖼️ Estado de carga de imagen
+const imageLoaded = ref(false) // Estado de carga de imagen
 const showNotFoundModal = ref(false)
 const radioOpen = ref(false)
+const blockedState = ref(null) // { type: 'account'|'ip', message: '', supportUrl: '' }
 
 // Credenciales del formulario
 const credentials = reactive({
@@ -58,23 +59,20 @@ const loginWithGoogle = async () => {
 
 // Verificar mensaje de registro exitoso
 onMounted(async () => {
-  // 🎯 AUTO-LOGIN desde dominio central (SILENCIOSO - sin mostrar pantalla de login)
+  // AUTO-LOGIN desde dominio central (SILENCIOSO - sin mostrar pantalla de login)
   const autoLoginCreds = sessionStorage.getItem('auto_login_credentials')
   
   if (autoLoginCreds) {
     try {
-      console.log('✅ Iniciando auto-login...')
       loading.value = true
       message.text = 'Ingresando a tu cuenta...'
       message.type = 'info'
       
       const creds = JSON.parse(autoLoginCreds)
-      console.log('📧 Email auto-login:', creds.email)
-      
       // Limpiar credenciales temporales ANTES de hacer el login
       sessionStorage.removeItem('auto_login_credentials')
       
-      // 🔐 LOGIN DIRECTO EN EL TENANT (sin redirección)
+      // LOGIN DIRECTO EN EL TENANT (sin redirección)
       const response = await authService.login({
         email: creds.email,
         password: creds.password
@@ -88,7 +86,7 @@ onMounted(async () => {
         return
       }
       
-      // 🔥 VERIFICAR SI EL BACKEND INDICA QUE NECESITA SELECCIONAR PLAN
+      // VERIFICAR SI EL BACKEND INDICA QUE NECESITA SELECCIONAR PLAN
       if (response.needs_plan_selection && response.tenant) {
         const tenant = response.tenant
         const subdomain = tenant.id
@@ -102,7 +100,7 @@ onMounted(async () => {
         if (subdomain) params.append('subdomain', subdomain)
         if (companyName) params.append('company', companyName)
         
-        // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+        // CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
         const currentToken = localStorage.getItem('authToken')
         if (currentToken) {
           params.append('auth_token', encodeURIComponent(currentToken))
@@ -127,7 +125,7 @@ onMounted(async () => {
   const registrationSuccess = localStorage.getItem('registration_success')
   if (registrationSuccess) {
     const data = JSON.parse(registrationSuccess)
-    message.text = `🎉 ${data.message}`
+    message.text = `${data.message}`
     message.type = 'success'
     
     // Limpiar el mensaje después de mostrarlo
@@ -140,12 +138,12 @@ onMounted(async () => {
     }, 8000)
   }
 
-  // 🎯 Verificar si hay un token de login con Google en la URL
+  // Verificar si hay un token de login con Google en la URL
   const urlParams = new URLSearchParams(window.location.search)
   const googleLoginToken = urlParams.get('google_login_token')
   const centralLoginToken = urlParams.get('central_login_token')
   
-  // 🚨 Verificar si hay un mensaje de error de tenant
+  // Verificar si hay un mensaje de error de tenant
   const reason = urlParams.get('reason')
   const errorMsg = urlParams.get('message')
   
@@ -160,7 +158,7 @@ onMounted(async () => {
     window.history.replaceState({}, document.title, '/login')
   }
 
-  // 🔐 AUTO-LOGIN DESDE DOMINIO CENTRAL (con token seguro)
+  // AUTO-LOGIN DESDE DOMINIO CENTRAL (con token seguro)
   if (centralLoginToken) {
     try {
       loading.value = true
@@ -354,9 +352,9 @@ const clearMessages = () => {
 
 // Validar formulario
 const validateForm = () => {
-  // 🔥 SEGURIDAD: Verificar que credentials existe
+  // SEGURIDAD: Verificar que credentials existe
   if (!credentials) {
-    console.error('❌ ERROR CRÍTICO: credentials es undefined')
+    console.error('ERROR CRÍTICO: credentials es undefined')
     return false
   }
   
@@ -367,7 +365,7 @@ const validateForm = () => {
     errors.email = 'El correo es requerido'
     isValid = false
   } else if (!/^[^\s@]+@[^\s@]+/.test(credentials.email.trim())) {
-    // ✅ Validación flexible: acepta admin@superadmin, admin@admin, etc.
+    // Validación flexible: acepta admin@superadmin, admin@admin, etc.
     errors.email = 'Ingrese un correo válido'
     isValid = false
   }
@@ -391,13 +389,13 @@ const handleLogin = async () => {
   clearMessages()
 
   try {
-    // 🎯 DETECTAR SI ESTAMOS EN DOMINIO PRINCIPAL (login centralizado)
+    // DETECTAR SI ESTAMOS EN DOMINIO PRINCIPAL (login centralizado)
     const hostname = window.location.hostname
     const isMainDomain = ['localhost', '127.0.0.1', '105pos.pro', 'www.105pos.pro'].includes(hostname)
     
     if (isMainDomain) {
       // ============================================
-      // 🚀 LOGIN CENTRALIZADO (Smart Login)
+      // LOGIN CENTRALIZADO (Smart Login)
       // ============================================
       
       const response = await axios.post('/api/central/login', {
@@ -407,7 +405,7 @@ const handleLogin = async () => {
 
       // Manejar respuesta del login centralizado
       if (response.data && response.data.success) {
-        message.text = '✅ Accediendo a tu cuenta...'
+        message.text = 'Accediendo a tu cuenta...'
         message.type = 'success'
         
         // � SUPER ADMIN: Guardar token y usuario ANTES de redirigir
@@ -422,13 +420,13 @@ const handleLogin = async () => {
           return
         }
         
-        // 🔥 CRÍTICO: Limpiar tokens viejos ANTES de redirigir (para tenants)
+        // CRÍTICO: Limpiar tokens viejos ANTES de redirigir (para tenants)
         // Los tokens de Sanctum NO funcionan entre dominios
         localStorage.removeItem('authToken')
         localStorage.removeItem('sanctum_token')
         localStorage.removeItem('user')
         
-        // 🔐 La URL ya incluye el token temporal para auto-login
+        // La URL ya incluye el token temporal para auto-login
         // redirect_url ahora es: https://tenant.105pos.pro/login?central_login_token=XXX
         setTimeout(() => {
           window.location.href = response.data.data.redirect_url
@@ -439,7 +437,7 @@ const handleLogin = async () => {
     }
     
     // ============================================
-    // 🔐 LOGIN TRADICIONAL (en subdominio)
+    // LOGIN TRADICIONAL (en subdominio)
     // ============================================
     const response = await authService.login({
       email: credentials.email.trim(),
@@ -454,7 +452,7 @@ const handleLogin = async () => {
     if (pendingConfig) {
       try {
         const config = JSON.parse(pendingConfig)
-        // ✅ IMPORTANTE: Agregar onboarding_completed al guardar config pendiente
+        // IMPORTANTE: Agregar onboarding_completed al guardar config pendiente
         config.onboarding_completed = true
         await axios.put('/api/tenant/system-settings', config)
         localStorage.removeItem('pending_onboarding_config')
@@ -466,14 +464,14 @@ const handleLogin = async () => {
     // Verificar rol y redireccionar
     const user = response.data?.user || response.user // Compatibilidad con ambas estructuras
 
-    // 🎯 VERIFICAR SI HAY SUBDOMAIN PENDIENTE (desde registro trial)
+    // VERIFICAR SI HAY SUBDOMAIN PENDIENTE (desde registro trial)
     const registrationSuccess = localStorage.getItem('registration_success')
     if (registrationSuccess) {
       const data = JSON.parse(registrationSuccess)
       if (data.subdomain) {
         localStorage.removeItem('registration_success')
         
-        // 🔥 FIX: En local (puerto 3000 o 5173), NO redirigir a subdominio
+        // FIX: En local (puerto 3000 o 5173), NO redirigir a subdominio
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         
         // Esperar un momento para mostrar el mensaje
@@ -523,7 +521,7 @@ const handleLogin = async () => {
           if (subdomain) params.append('subdomain', subdomain)
           if (companyName) params.append('company', companyName)
           
-          // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+          // CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
           const currentToken = localStorage.getItem('authToken')
           if (currentToken) {
             params.append('auth_token', encodeURIComponent(currentToken))
@@ -537,7 +535,7 @@ const handleLogin = async () => {
         // Continuar de todos modos
       }
 
-      // �🔧 FIX: Cargar systemSettings ANTES de redireccionar
+      // �FIX: Cargar systemSettings ANTES de redireccionar
       // Esto evita que el router guard redirija a welcome/onboarding incorrectamente
       try {
         await appStore.loadSystemSettings()
@@ -545,7 +543,7 @@ const handleLogin = async () => {
         // Continuar de todos modos
       }
 
-      // 🎯 REDIRECCIÓN INTELIGENTE BASADA EN PERMISOS
+      // REDIRECCIÓN INTELIGENTE BASADA EN PERMISOS
       if (user?.role?.permissions) {
         const permissions = typeof user.role.permissions === 'string' 
           ? JSON.parse(user.role.permissions) 
@@ -583,6 +581,18 @@ const handleLogin = async () => {
 
   } catch (error) {
     console.error('Error en login:', error)
+
+    // Detectar cuenta/IP bloqueada (423 Locked o 429 Too Many Requests)
+    if (error.response?.status === 423 || error.response?.status === 429 || error.response?.data?.blocked) {
+      const data = error.response?.data || {}
+      blockedState.value = {
+        type: data.block_type || 'account',
+        message: data.message || 'Tu cuenta ha sido bloqueada por seguridad.',
+        supportUrl: data.support_url || 'https://wa.me/573217355070?text=' + encodeURIComponent('Hola, mi cuenta fue bloqueada en 105POS, necesito ayuda para recuperar el acceso.')
+      }
+      loading.value = false
+      return
+    }
 
     // Detectar error de "usuario no encontrado" → mostrar modal de conversión
     const responseMsg = (error.response?.data?.message || error.message || '').toLowerCase()
@@ -652,7 +662,7 @@ const setDemoCredentials = (role) => {
 
 // Verificar si ya está autenticado
 if (authService.isAuthenticated()) {
-  // 🔥 ANTES de redirigir al POS, verificar si tiene plan válido
+  // ANTES de redirigir al POS, verificar si tiene plan válido
   const checkPlanAndRedirect = async () => {
     try {
       const response = await axios.get('/api/tenant/info')
@@ -675,7 +685,7 @@ if (authService.isAuthenticated()) {
         if (subdomain) params.append('subdomain', subdomain)
         if (companyName) params.append('company', companyName)
         
-        // 🔑 CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
+        // CRÍTICO: Pasar el token para que PlanSelection pueda usarlo después
         const currentToken = localStorage.getItem('authToken')
         if (currentToken) {
           params.append('auth_token', encodeURIComponent(currentToken))
@@ -688,7 +698,7 @@ if (authService.isAuthenticated()) {
       // Si tiene plan válido, ir al POS
       router.push('/pos')
     } catch (error) {
-      // 🛑 CUALQUIER ERROR = limpiar tokens y quedarse en login
+      // CUALQUIER ERROR = limpiar tokens y quedarse en login
       // NO redirigir al POS bajo ninguna circunstancia si hay error
       localStorage.removeItem('authToken')
       localStorage.removeItem('user')
@@ -774,7 +784,7 @@ if (authService.isAuthenticated()) {
       <!-- Data-mesh grid sofisticada -->
       <div class="absolute inset-0 pointer-events-none" style="background-image: radial-gradient(circle, #c8cdd3 0.5px, transparent 0.5px), linear-gradient(to right, #e4e7ec 0.5px, transparent 0.5px), linear-gradient(to bottom, #e4e7ec 0.5px, transparent 0.5px); background-size: 32px 32px, 64px 64px, 64px 64px; opacity: 0.35; mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 50%, transparent 100%);"></div>
 
-      <!-- 📱 MOBILE STICKY HEADER: Logo + Radio (solo en móviles) -->
+      <!-- MOBILE STICKY HEADER: Logo + Radio (solo en móviles) -->
       <div class="lg:hidden sticky top-0 z-20 px-5 py-3.5 flex items-center justify-between bg-white/95 backdrop-blur-sm border-b border-slate-100/60 shadow-sm">
         <div>
           <h1 class="text-[19px] font-extrabold text-slate-900 tracking-tight font-['Inter',sans-serif] leading-tight">105 POS Pro</h1>
@@ -801,6 +811,46 @@ if (authService.isAuthenticated()) {
         <!-- Formulario expandido (max-w-xl igual que Register) -->
         <div class="w-full max-w-xl mx-auto px-6 sm:px-10 relative z-10">
 
+        <!-- Estado: Cuenta Bloqueada -->
+        <div v-if="blockedState" class="animate-fade-in-up">
+          <div class="bg-white rounded-2xl border border-rose-200 shadow-lg p-8 text-center">
+            <div class="w-16 h-16 mx-auto mb-5 rounded-full bg-rose-50 flex items-center justify-center">
+              <svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">Cuenta bloqueada</h3>
+            <p class="text-slate-600 text-sm leading-relaxed mb-6">
+              {{ blockedState.message }}
+            </p>
+            <p class="text-slate-500 text-sm mb-6">
+              Para recuperar el acceso, contacta con el administrador.
+            </p>
+            <div class="flex flex-col gap-3">
+              <a 
+                :href="blockedState.supportUrl" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-sm"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                  <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.69 0-3.27-.464-4.622-1.27l-.332-.197-2.87.852.852-2.87-.197-.332A7.96 7.96 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
+                </svg>
+                Contactar soporte
+              </a>
+              <button 
+                @click="blockedState = null"
+                class="w-full py-3 px-6 text-slate-500 hover:text-slate-700 font-medium text-sm rounded-xl hover:bg-slate-50 transition-all duration-200"
+              >
+                Volver al inicio de sesión
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado: Normal (formulario de login) -->
+        <template v-else>
         <div class="mb-7 text-center lg:text-left animate-fade-in-up">
           <h2 class="text-[32px] font-extrabold text-slate-900 mb-2 tracking-[-0.02em] font-['Inter',sans-serif]">Accede a tu panel</h2>
           <p class="text-slate-500 text-[15px] font-normal tracking-wide">Ingresa tus credenciales corporativas para continuar.</p>
@@ -920,6 +970,7 @@ if (authService.isAuthenticated()) {
           </router-link>
         </div>
 
+        </template>
         </div>
       </div>
     </div>

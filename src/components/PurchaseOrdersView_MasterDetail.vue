@@ -18,7 +18,7 @@
           
           <button v-if="activeTab === 'suppliers'"
                   @click="viewMode = 'create-supplier'"
-                  class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-md transition-colors flex items-center gap-2">
+                  class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-md transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -27,7 +27,7 @@
 
           <button v-if="activeTab === 'orders'"
                   @click="viewMode = 'create'"
-                  class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-md transition-colors flex items-center gap-2">
+                  class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-md transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -106,7 +106,7 @@
                       v-model="supplierForm.name"
                       type="text"
                       placeholder="Ej: Distribuidora XYZ"
-                      :class="['w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border focus:ring-1 focus:border-gray-400 transition-colors', supplierErrors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-700 focus:ring-gray-400']"
+                      :class="['w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border focus:ring-1 focus:border-gray-400 transition-colors', supplierErrors.name ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-zinc-700 focus:ring-gray-400']"
                     />
                     <p v-if="supplierErrors.name" class="mt-1 text-xs text-red-500">{{ supplierErrors.name }}</p>
                   </div>
@@ -117,7 +117,7 @@
                       v-model="supplierForm.document"
                       type="text"
                       placeholder="123456789-0"
-                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
+                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
                     />
                   </div>
 
@@ -127,7 +127,7 @@
                       v-model="supplierForm.phone"
                       type="text"
                       placeholder="3001234567"
-                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
+                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
                     />
                   </div>
 
@@ -137,7 +137,7 @@
                       v-model="supplierForm.email"
                       type="email"
                       placeholder="email@proveedor.com"
-                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
+                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
                     />
                   </div>
 
@@ -147,7 +147,7 @@
                       v-model="supplierForm.city"
                       type="text"
                       placeholder="Bogotá"
-                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
+                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
                     />
                   </div>
 
@@ -157,7 +157,7 @@
                       v-model="supplierForm.address"
                       type="text"
                       placeholder="Calle 123 #45-67"
-                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
+                      class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
                     />
                   </div>
                 </div>
@@ -175,7 +175,7 @@
                         v-model="supplierForm.contact_name"
                         type="text"
                         placeholder="Juan Pérez"
-                        class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
+                        class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
                       />
                     </div>
                     <div>
@@ -184,7 +184,7 @@
                         v-model="supplierForm.contact_phone"
                         type="text"
                         placeholder="3009876543"
-                        class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
+                        class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
                       />
                     </div>
                   </div>
@@ -197,7 +197,7 @@
                     v-model="supplierForm.notes"
                     rows="4"
                     placeholder="Información adicional sobre el proveedor..."
-                    class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors resize-none"
+                    class="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors resize-none"
                   ></textarea>
                 </div>
               </div>
@@ -205,10 +205,10 @@
 
             <!-- Footer -->
             <div class="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 px-5 py-3 flex justify-end gap-3">
-              <button @click="cancelCreateSupplier" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-lg border border-gray-200 dark:border-gray-700 transition-colors">
+              <button @click="cancelCreateSupplier" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-lg border border-gray-200 dark:border-zinc-700 transition-colors">
                 Cancelar
               </button>
-              <button @click="saveSupplier" :disabled="savingSupplier" class="px-4 py-2 text-sm font-medium text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors">
+              <button @click="saveSupplier" :disabled="savingSupplier" class="px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors">
                 {{ savingSupplier ? 'Guardando...' : 'Guardar Proveedor' }}
               </button>
             </div>
@@ -236,7 +236,7 @@
                         :class="[
                           'px-3.5 py-1.5 text-xs font-medium rounded-md transition-all duration-200',
                           filterStatus === status.value
-                            ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-md'
+                            ? 'bg-gray-900 dark:bg-white text-white dark:text-zinc-900 shadow-md'
                             : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 hover:bg-gray-200 dark:hover:bg-zinc-700 hover:shadow-sm'
                         ]">
                   {{ status.label }}
@@ -248,12 +248,12 @@
             <div class="flex-1 overflow-y-auto bg-gray-50/50 dark:bg-zinc-900 px-3 py-2">
               <!-- Loading -->
               <div v-if="loading" class="flex-1 flex items-center justify-center py-8">
-                <div class="w-8 h-8 border-2 border-gray-300 dark:border-gray-600 border-t-gray-900 dark:border-t-white rounded-full animate-spin"></div>
+                <div class="w-8 h-8 border-2 border-gray-300 dark:border-zinc-600 border-t-gray-900 dark:border-t-white rounded-full animate-spin"></div>
               </div>
 
               <!-- Empty -->
               <div v-else-if="filteredOrders.length === 0" class="flex-1 flex flex-col items-center justify-center py-12">
-                <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800/50 flex items-center justify-center mb-4">
+                <div class="w-16 h-16 rounded-full bg-gray-100 dark:bg-zinc-800/50 flex items-center justify-center mb-4">
                   <svg class="w-8 h-8 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
@@ -294,7 +294,7 @@
                     <span class="font-bold text-gray-900 dark:text-white">${{ formatCurrency(order.total) }}</span>
                   </div>
 
-                  <div v-if="order.items && order.items.length > 0" class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50">
+                  <div v-if="order.items && order.items.length > 0" class="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-700/50">
                     <div class="flex items-center justify-between text-xs">
                       <span class="text-gray-500 dark:text-zinc-400 flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -474,7 +474,7 @@
             <div class="p-6 flex-1 overflow-y-auto">
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                  <div class="w-9 h-9 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center">
                     <svg class="w-5 h-5 text-gray-600 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
@@ -499,7 +499,7 @@
                         <th class="px-4 py-3.5 text-right text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Subtotal</th>
                       </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
                       <tr v-for="item in selectedOrder.items" :key="item.id"
                           class="hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
                         <td class="px-4 py-3">
@@ -537,14 +537,14 @@
                         </td>
                         <td class="px-4 py-3">
                           <div class="flex items-center gap-2">
-                            <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div class="flex-1 bg-gray-200 dark:bg-zinc-700 rounded-full h-2">
                               <div :class="[
                                 'h-2 rounded-md transition-all duration-300',
                                 item.quantity_received >= item.quantity_ordered
                                   ? 'bg-emerald-500'
                                   : item.quantity_received > 0
                                     ? 'bg-amber-500'
-                                    : 'bg-gray-300 dark:bg-gray-600'
+                                    : 'bg-gray-300 dark:bg-zinc-600'
                               ]" :style="`width: ${Math.min(100, (item.quantity_received / item.quantity_ordered) * 100)}%`"></div>
                             </div>
                             <span class="text-xs font-medium text-gray-600 dark:text-zinc-400 w-10 text-right">
@@ -575,7 +575,7 @@
                 <div class="flex items-center gap-3">
                   <button v-if="selectedOrder.status === 'pending' || selectedOrder.status === 'partial'"
                           @click="openReceiveModal"
-                          class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md transition-colors flex items-center">
+                          class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-medium rounded-md transition-colors flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
@@ -621,7 +621,7 @@
               <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Proveedor *</label>
-                  <select v-model="orderForm.supplier_id" :class="['w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border focus:ring-2 focus:border-transparent transition-colors', orderErrors.supplier_id ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' : 'border-gray-200 dark:border-gray-700 focus:ring-blue-500 dark:focus:ring-blue-400']">
+                  <select v-model="orderForm.supplier_id" :class="['w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border focus:ring-2 focus:border-transparent transition-colors', orderErrors.supplier_id ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' : 'border-gray-200 dark:border-zinc-700 focus:ring-blue-500 dark:focus:ring-blue-400']">
                     <option value="">Seleccionar proveedor...</option>
                     <option v-for="supplier in suppliers.filter(s => s.active)" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option>
                   </select>
@@ -630,7 +630,7 @@
 
                 <div v-if="shouldShowWarehouseSelector">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Tienda/Sede *</label>
-                  <select v-model="orderForm.warehouse_id" class="w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors">
+                  <select v-model="orderForm.warehouse_id" class="w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors">
                     <option value="">Seleccionar tienda/sede...</option>
                     <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">{{ warehouse.name }}</option>
                   </select>
@@ -638,18 +638,18 @@
 
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Fecha de Orden *</label>
-                  <input v-model="orderForm.order_date" type="date" :class="['w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border focus:ring-2 focus:border-transparent transition-colors', orderErrors.order_date ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' : 'border-gray-200 dark:border-gray-700 focus:ring-blue-500 dark:focus:ring-blue-400']" />
+                  <input v-model="orderForm.order_date" type="date" :class="['w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border focus:ring-2 focus:border-transparent transition-colors', orderErrors.order_date ? 'border-red-500 dark:border-red-600 focus:ring-red-500 dark:focus:ring-red-400' : 'border-gray-200 dark:border-zinc-700 focus:ring-blue-500 dark:focus:ring-blue-400']" />
                   <p v-if="orderErrors.order_date" class="mt-1 text-xs text-red-500 dark:text-red-400">{{ orderErrors.order_date }}</p>
                 </div>
 
                 <div>
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Fecha Esperada</label>
-                  <input v-model="orderForm.expected_date" type="date" class="w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors" />
+                  <input v-model="orderForm.expected_date" type="date" class="w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors" />
                 </div>
 
                 <div class="md:col-span-2">
                   <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Referencia</label>
-                  <input v-model="orderForm.reference" type="text" placeholder="OC-2024-001, Factura #123, etc." class="w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors" />
+                  <input v-model="orderForm.reference" type="text" placeholder="OC-2024-001, Factura #123, etc." class="w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors" />
                 </div>
               </div>
             </div>
@@ -658,7 +658,7 @@
             <div>
               <div class="flex items-center justify-between mb-3 pb-1.5 border-b border-gray-200 dark:border-zinc-800">
                 <h4 class="text-xs font-medium text-gray-700 dark:text-zinc-300">Productos</h4>
-                <button @click="showProductSelector = true" class="px-3 py-1.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-xs font-medium rounded-md transition-colors flex items-center gap-2">
+                <button @click="showProductSelector = true" class="px-3 py-1.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-xs font-medium rounded-md transition-colors flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                   </svg>
@@ -666,7 +666,7 @@
                 </button>
               </div>
 
-              <div v-if="orderForm.items.length === 0" class="text-center py-6 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+              <div v-if="orderForm.items.length === 0" class="text-center py-6 border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-lg">
                 <div class="w-10 h-10 bg-gray-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-2">
                   <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -694,11 +694,11 @@
                     </div>
                     <div class="col-span-3">
                       <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Cantidad</label>
-                      <input v-model.number="item.quantity" type="number" min="0.01" step="0.01" class="w-full px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm" @input="calculateItemTotal(index)" />
+                      <input v-model.number="item.quantity" type="number" min="0.01" step="0.01" class="w-full px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm" @input="calculateItemTotal(index)" />
                     </div>
                     <div class="col-span-3">
                       <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Costo Unitario</label>
-                      <input v-model.number="item.unit_cost" type="number" min="0" step="0.01" class="w-full px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm" @input="calculateItemTotal(index)" />
+                      <input v-model.number="item.unit_cost" type="number" min="0" step="0.01" class="w-full px-3 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm" @input="calculateItemTotal(index)" />
                     </div>
                     <div class="col-span-2 text-right">
                       <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1">Subtotal</label>
@@ -724,7 +724,7 @@
                     <span class="text-xs font-medium text-gray-700 dark:text-zinc-300">Subtotal:</span>
                     <span class="text-sm font-semibold text-gray-900 dark:text-white">${{ formatNumber(orderSubtotal) }}</span>
                   </div>
-                  <div class="flex justify-between items-center pt-1.5 border-t border-gray-200 dark:border-gray-700">
+                  <div class="flex justify-between items-center pt-1.5 border-t border-gray-200 dark:border-zinc-700">
                     <span class="text-sm font-semibold text-gray-900 dark:text-white">Total:</span>
                     <span class="text-lg font-semibold text-gray-900 dark:text-white">${{ formatNumber(orderSubtotal) }}</span>
                   </div>
@@ -734,7 +734,7 @@
               <!-- Notas -->
               <div>
                 <label class="block text-xs font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Notas</label>
-                <textarea v-model="orderForm.notes" rows="2" placeholder="Comentarios adicionales..." class="w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors resize-none"></textarea>
+                <textarea v-model="orderForm.notes" rows="2" placeholder="Comentarios adicionales..." class="w-full px-3 py-2.5 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors resize-none"></textarea>
               </div>
             </div>
           </div>
@@ -747,7 +747,7 @@
             <button @click="saveOrderAsDraft" :disabled="savingOrder" class="px-4 py-2.5 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-md transition-colors">
               {{ savingOrder ? 'Guardando...' : 'Guardar Borrador' }}
             </button>
-            <button @click="saveAndShowSendOptions" :disabled="savingOrder" class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-medium rounded-md transition-colors">
+            <button @click="saveAndShowSendOptions" :disabled="savingOrder" class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-sm font-medium rounded-md transition-colors">
               {{ savingOrder ? 'Guardando...' : 'Crear Orden' }}
             </button>
           </div>
@@ -770,10 +770,10 @@
             </div>
 
             <div class="px-6 py-4">
-              <input v-model="productSearch" type="text" placeholder="Buscar producto por nombre o SKU..." class="w-full px-4 py-3 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors mb-4" />
+              <input v-model="productSearch" type="text" placeholder="Buscar producto por nombre o SKU..." class="w-full px-4 py-3 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors mb-4" />
 
               <div v-if="loadingProducts" class="flex items-center justify-center py-8">
-                <div class="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 dark:border-gray-700 border-t-blue-600 dark:border-t-blue-400"></div>
+                <div class="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 dark:border-zinc-700 border-t-blue-600 dark:border-t-blue-400"></div>
               </div>
 
               <div v-else class="space-y-2 max-h-96 overflow-y-auto">
@@ -826,7 +826,7 @@
 
             <!-- Loading -->
             <div v-if="loadingVariants" class="flex items-center justify-center py-12">
-              <div class="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 dark:border-gray-700 border-t-purple-600 dark:border-t-purple-400"></div>
+              <div class="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 dark:border-zinc-700 border-t-purple-600 dark:border-t-purple-400"></div>
             </div>
 
             <!-- Lista de Variantes -->
@@ -957,7 +957,7 @@
                                min="0"
                                step="1"
                                :disabled="item.received_all"
-                               class="w-32 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                               class="w-32 px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed">
                       </div>
                     </div>
 
@@ -983,7 +983,7 @@
                 </button>
                 <button @click="confirmReceive"
                         :disabled="receivingMerchandise"
-                        class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-zinc-900 rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
                   <svg v-if="receivingMerchandise" class="w-4 h-4 inline mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -1036,7 +1036,7 @@
               </button>
               <button
                 @click="navigateToPlans"
-                class="flex-1 py-3 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-base font-medium rounded-md transition-colors"
+                class="flex-1 py-3 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-base font-medium rounded-md transition-colors"
               >
                 Ver Planes
               </button>
@@ -1067,7 +1067,7 @@
                 v-model="emailInput"
                 type="email"
                 placeholder="ejemplo@proveedor.com"
-                class="w-full px-4 py-3 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors"
+                class="w-full px-4 py-3 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors"
                 @keyup.enter="confirmEmail"
               />
             </div>
@@ -1075,7 +1075,7 @@
               <button @click="cancelEmail" class="px-4 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">
                 Cancelar
               </button>
-              <button @click="confirmEmail" class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium rounded-md transition-colors">
+              <button @click="confirmEmail" class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-zinc-900 font-medium rounded-md transition-colors">
                 Enviar
               </button>
             </div>
@@ -1105,7 +1105,7 @@
                 v-model="phoneInput"
                 type="tel"
                 placeholder="3001234567"
-                class="w-full px-4 py-3 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors"
+                class="w-full px-4 py-3 text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg border border-gray-200 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-colors"
                 @keyup.enter="confirmPhone"
               />
             </div>
@@ -1113,7 +1113,7 @@
               <button @click="cancelPhone" class="px-4 py-2 text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white font-medium transition-colors">
                 Cancelar
               </button>
-              <button @click="confirmPhone" class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium rounded-md transition-colors">
+              <button @click="confirmPhone" class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-zinc-900 font-medium rounded-md transition-colors">
                 Enviar
               </button>
             </div>
@@ -1268,7 +1268,7 @@ export default {
       productSearch: '',
       savingOrder: false,
       
-      // 👗 NUEVO: Selector de variantes para productos moda
+      // NUEVO: Selector de variantes para productos moda
       showVariantSelector: false,
       selectedProductForVariant: null,
       productVariants: [],
@@ -1308,7 +1308,7 @@ export default {
         { value: 'received', label: 'Recibidas' }
       ],
       
-      // 🔗 QueryParams de navegación
+      // QueryParams de navegación
       navigationParams: null
     }
   },
@@ -1365,7 +1365,7 @@ export default {
       return filtered
     },
     shouldShowWarehouseSelector() {
-      // ✅ Solo mostrar si el usuario tiene plan Premium/Enterprise Y hay más de 1 bodega
+      // Solo mostrar si el usuario tiene plan Premium/Enterprise Y hay más de 1 bodega
       const hasMultiSedesPlan = ['premium', 'enterprise'].includes(this.tenantPlan)
       const hasMultipleWarehouses = this.warehouses.length > 1
       
@@ -1384,7 +1384,7 @@ export default {
     // Handler para tecla ESC - deseleccionar orden
     document.addEventListener('keydown', this.handleKeyDown)
     
-    // 🔗 Registrar callback para navegación con queryParams
+    // Registrar callback para navegación con queryParams
     const { onModuleChange, currentQueryGlobal } = useModuleNavigation()
     
     // Verificar si hay queryParams actuales al montar
@@ -1403,7 +1403,7 @@ export default {
       }
     })
     
-    // 🤖 CONTEXTO IA: Inicializar context awareness
+    // CONTEXTO IA: Inicializar context awareness
     this.setupAIContext()
   },
   beforeUnmount() {
@@ -1448,16 +1448,14 @@ export default {
       try {
         this.loading = true
         const response = await apiCall('/purchase-orders')
-        console.log('📦 Response de órdenes:', response)
         if (response.success) {
           // El backend devuelve {data: {orders: [...], metrics: {...}}}
           this.orders = response.data?.orders || []
-          console.log('✅ Órdenes cargadas:', this.orders.length, this.orders)
         } else {
-          console.warn('⚠️ Response sin success:', response)
+          console.warn('Response sin success:', response)
         }
       } catch (error) {
-        console.error('❌ Error cargando órdenes:', error)
+        console.error('Error cargando órdenes:', error)
         showError('Error al cargar las órdenes')
       } finally {
         this.loading = false
@@ -1494,8 +1492,8 @@ export default {
       this.receiveForm.items = this.selectedOrder.items.map(item => ({
         item_id: item.id,
         product_name: item.product?.name || 'Producto',
-        variant_id: item.variant_id || null,           // 👗 NUEVO
-        variant_options: item.variant_options || null, // 👗 NUEVO
+        variant_id: item.variant_id || null,           // NUEVO
+        variant_options: item.variant_options || null, // NUEVO
         quantity_ordered: item.quantity_ordered,
         quantity_received: item.quantity_received || 0,
         quantity_to_receive: 0,
@@ -1583,7 +1581,7 @@ export default {
         partial: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50',
         received: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50'
       }
-      return classes[status] || 'bg-gray-100 dark:bg-gray-800/50 text-gray-700 dark:text-zinc-400 border border-gray-200 dark:border-gray-700'
+      return classes[status] || 'bg-gray-100 dark:bg-zinc-800/50 text-gray-700 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700'
     },
 
     formatDate(date) {
@@ -1605,7 +1603,7 @@ export default {
       return new Intl.NumberFormat('es-CO').format(value)
     },
 
-    // 🔗 Procesar parámetros de navegación
+    // Procesar parámetros de navegación
     processNavigationParams() {
       if (!this.navigationParams) return
       
@@ -1646,9 +1644,7 @@ export default {
           
           // Debug: ver proveedores cargados
           const activos = this.suppliers.filter(s => s.active !== false && s.active !== 0)
-          console.log(`✅ Proveedores cargados: ${this.suppliers.length} (${activos.length} activos)`)
-          
-          // 🔗 Si hay queryParams pendientes, procesarlos después de cargar
+          // Si hay queryParams pendientes, procesarlos después de cargar
           if (this.navigationParams) {
             this.$nextTick(() => {
               this.processNavigationParams()
@@ -1685,7 +1681,7 @@ export default {
       return basicPlans.includes(this.tenantPlan)
     },
 
-    // 👗 NUEVO: Detectar si producto tiene variantes y mostrar selector
+    // NUEVO: Detectar si producto tiene variantes y mostrar selector
     async addProductToOrder(product) {
       // Si es producto con variantes (tipo moda), cargar variantes primero
       if (product.product_type === 'variable' || product.type === 'variable') {
@@ -1716,7 +1712,7 @@ export default {
       this.addSimpleProductToOrder(product)
     },
 
-    // 👗 Agregar producto simple (sin variantes)
+    // Agregar producto simple (sin variantes)
     addSimpleProductToOrder(product) {
       const exists = this.orderForm.items.find(i => i.product_id === product.id && !i.variant_id)
       if (exists) {
@@ -1738,7 +1734,7 @@ export default {
       this.productSearch = ''
     },
 
-    // 👗 NUEVO: Agregar variante específica a la orden
+    // NUEVO: Agregar variante específica a la orden
     addVariantToOrder(variant) {
       const product = this.selectedProductForVariant
       
@@ -1781,14 +1777,14 @@ export default {
       this.productSearch = ''
     },
 
-    // 👗 Cerrar selector de variantes
+    // Cerrar selector de variantes
     closeVariantSelector() {
       this.showVariantSelector = false
       this.selectedProductForVariant = null
       this.productVariants = []
     },
 
-    // 👗 Helper para formatear opciones de variante
+    // Helper para formatear opciones de variante
     formatVariantOptions(options) {
       if (!options) return ''
       const parsed = typeof options === 'string' ? JSON.parse(options) : options
@@ -1855,8 +1851,8 @@ export default {
           ...this.orderForm,
           items: this.orderForm.items.map(item => ({
             product_id: item.product_id,
-            variant_id: item.variant_id || null,           // 👗 NUEVO
-            variant_options: item.variant_options || null, // 👗 NUEVO
+            variant_id: item.variant_id || null,           // NUEVO
+            variant_options: item.variant_options || null, // NUEVO
             quantity: item.quantity,
             unit_cost: item.unit_cost,
             notes: item.notes
@@ -2080,7 +2076,7 @@ export default {
           this.selectedOrder.order_number
         )
         
-        showSuccess(`✅ Orden enviada exitosamente a ${supplierEmail}`)
+        showSuccess(`Orden enviada exitosamente a ${supplierEmail}`)
         
       } catch (error) {
         console.error('Error enviando email:', error)
@@ -2166,7 +2162,7 @@ export default {
           this.selectedOrder.supplier?.name || 'Proveedor'
         )
         
-        showSuccess('✅ Orden enviada por WhatsApp exitosamente')
+        showSuccess('Orden enviada por WhatsApp exitosamente')
         
       } catch (error) {
         console.error('Error enviando WhatsApp:', error)
@@ -2332,7 +2328,7 @@ export default {
       }
     },
     
-    // ========== 🤖 CONTEXTO IA - SCREEN AWARENESS ==========
+    // ========== CONTEXTO IA - SCREEN AWARENESS ==========
     
     setupAIContext() {
       // Inicializar contexto
@@ -2473,7 +2469,7 @@ export default {
           proveedorId: p.supplier_id
         })),
         
-        // 🔴 ORDEN SELECCIONADA (para ver detalles y acciones)
+        // ORDEN SELECCIONADA (para ver detalles y acciones)
         ordenSeleccionada: this.selectedOrder ? {
           id: this.selectedOrder.id,
           numero: this.selectedOrder.order_number,
@@ -2647,8 +2643,8 @@ export default {
         return { 
           success: seGuardo, 
           message: seGuardo 
-            ? `✅ Campo "${campo}" ahora muestra: "${valor}"`
-            : `⚠️ Error: El campo no se actualizó correctamente`,
+            ? `Campo "${campo}" ahora muestra: "${valor}"`
+            : `Error: El campo no se actualizó correctamente`,
           campoActualizado: campo,
           valorPuesto: valor,
           seGuardoCorrectamente: seGuardo,
@@ -2915,8 +2911,6 @@ export default {
       })
       
       uiContextStore.registerAction('agregarProductoOrden', async ({ nombre, cantidad, costo }) => {
-        console.log('📦 [agregarProductoOrden] viewMode:', self.viewMode, 'items:', self.orderForm.items.length)
-        
         // Si no estamos en modo crear, intentar abrir el formulario primero
         if (self.viewMode !== 'create') {
           self.viewMode = 'create'
@@ -2966,8 +2960,6 @@ export default {
           unit_cost: costoFinal,
           notes: ''
         })
-        
-        console.log('✅ [agregarProductoOrden] Producto agregado, total items:', self.orderForm.items.length)
         
         self.updateAIContext()
         

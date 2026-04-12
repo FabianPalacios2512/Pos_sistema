@@ -65,11 +65,11 @@
     </div>
   </transition>
 
-  <!-- 🏦 FONDO PROFESIONAL GRIS -->
+  <!-- FONDO PROFESIONAL GRIS -->
   <div class="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto">
       
-      <!-- 📋 HEADER: Centrado y Elegante -->
+      <!-- HEADER: Centrado y Elegante -->
       <div class="text-center mb-12 animate-fade-in">
         <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
           Elige el plan ideal para tu negocio
@@ -82,7 +82,7 @@
         </p>
       </div>
 
-      <!-- 💰 SELECTOR DE PERÍODO -->
+      <!-- SELECTOR DE PERÍODO -->
       <div class="flex flex-col items-center mb-10 gap-3">
         <div class="relative">
           <select 
@@ -109,11 +109,11 @@
         </div>
       </div>
 
-      <!-- 🏢 GRID DE PLANES: Centrado y Alineado -->
+      <!-- GRID DE PLANES: Centrado y Alineado -->
       <div class="flex justify-center">
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 w-full max-w-6xl items-start">
         
-        <!-- 🎁 PLAN TRIAL: 3 Días Gratis (Oculto en renovación) -->
+        <!-- PLAN TRIAL: 3 Días Gratis (Oculto en renovación) -->
         <div 
           v-if="!isRenewalMode"
           @click="selectedPlan = 'trial_express'"
@@ -183,7 +183,7 @@
           </div>
         </div>
         
-        <!-- 💼 PLAN BASIC -->
+        <!-- PLAN BASIC -->
         <div 
           @click="selectedPlan = 'basic'"
           class="relative bg-white rounded-2xl border shadow-sm transition-all duration-300 cursor-pointer p-5 flex flex-col min-h-[420px]"
@@ -418,7 +418,7 @@
           </div>
         </div>
 
-        <!-- 🏢 PLAN ENTERPRISE -->
+        <!-- PLAN ENTERPRISE -->
         <div 
           @click="selectedPlan = 'enterprise'"
           class="relative bg-white rounded-2xl border shadow-sm transition-all duration-300 cursor-pointer p-5 flex flex-col min-h-[420px]"
@@ -546,6 +546,18 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
+// Validar subdominio para prevenir open redirect
+const isValidSubdomain = (s) => /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/.test(s) && s.length <= 63
+
+// Construir URL base del tenant de forma segura
+const getTenantBaseUrl = (subdomain, path = '') => {
+  if (!subdomain || !isValidSubdomain(subdomain)) return `/${path}`
+  const base = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? `http://${subdomain}.localhost:3000`
+    : `https://${subdomain}.105pos.pro`
+  return `${base}${path ? '/' + path : ''}`
+}
+
 // Estado
 const selectedPlan = ref(null)
 const paymentFrequency = ref('monthly')
@@ -566,18 +578,17 @@ const isDevelopment = ref(
 
 // Cargar datos del registro desde URL params (cross-domain) o localStorage (fallback)
 onMounted(() => {
-  // 🔑 PRIORIDAD 1: Leer desde URL params (cuando vienes del registro en otro dominio)
+  // PRIORIDAD 1: Leer desde URL params (cuando vienes del registro en otro dominio)
   const urlParams = new URLSearchParams(window.location.search)
   const tenantIdParam = urlParams.get('tenant_id')
   const companyParam = urlParams.get('company')
-  const subdomainParam = urlParams.get('subdomain') // 🔥 LEER EL SUBDOMAIN
+  const subdomainParam = urlParams.get('subdomain') // LEER EL SUBDOMAIN
   const redirectParam = urlParams.get('redirect_url')
-  const authTokenParam = urlParams.get('auth_token') // 🔑 LEER TOKEN DE LA URL
+  const authTokenParam = urlParams.get('auth_token') // LEER TOKEN DE LA URL
   
-  // 🔑 CRÍTICO: Si viene un token en la URL, guardarlo en localStorage
+  // CRÍTICO: Si viene un token en la URL, guardarlo en localStorage
   if (authTokenParam) {
     const decodedToken = decodeURIComponent(authTokenParam)
-    console.log('🔑 Token recibido desde URL - guardando en localStorage')
     localStorage.setItem('authToken', decodedToken)
     
     // Limpiar el token de la URL por seguridad
@@ -588,7 +599,6 @@ onMounted(() => {
   
   if (tenantIdParam) {
     // Datos vienen de URL params (cross-domain desde registro)
-    console.log('📦 Cargando datos desde URL params')
     companyName.value = companyParam || ''
     tenantId.value = tenantIdParam
     redirectUrl.value = redirectParam || ''
@@ -597,23 +607,22 @@ onMounted(() => {
     const registrationData = {
       company_name: companyParam,
       tenant_id: tenantIdParam,
-      subdomain: subdomainParam || tenantIdParam, // 🔥 Usar subdomain si existe, sino tenant_id
+      subdomain: subdomainParam || tenantIdParam, // Usar subdomain si existe, sino tenant_id
       redirect_url: redirectParam
     }
     localStorage.setItem('registration_data', JSON.stringify(registrationData))
     return
   }
   
-  // 🔑 PRIORIDAD 2: Leer desde localStorage (mismo dominio)
+  // PRIORIDAD 2: Leer desde localStorage (mismo dominio)
   const registrationData = localStorage.getItem('registration_data')
   if (registrationData) {
-    console.log('📦 Cargando datos desde localStorage')
     const data = JSON.parse(registrationData)
     companyName.value = data.company_name || ''
     tenantId.value = data.tenant_id || null
     redirectUrl.value = data.redirect_url || ''
     
-    // ✅ Si no tiene subdomain pero tiene tenant_id, derivar subdomain
+    // Si no tiene subdomain pero tiene tenant_id, derivar subdomain
     // NOTA: tenant_id usa underscores (la_central) pero el dominio usa hyphens (la-central)
     if (!data.subdomain && data.tenant_id) {
       if (data.redirect_url) {
@@ -632,7 +641,7 @@ onMounted(() => {
   }
   
   // Si no hay datos de ninguna fuente, redirigir al registro
-  console.warn('⚠️ No hay datos de registro - redirigiendo a /register')
+  console.warn('No hay datos de registro - redirigiendo a /register')
   window.location.href = '/register'
 })
 
@@ -685,7 +694,7 @@ const handlePlanSelection = async (plan) => {
     // Generar referencia única
     const reference = `plan_${tenantId.value}_${Date.now()}`
     
-    // 🔥 Obtener subdomain del tenant desde localStorage
+    // Obtener subdomain del tenant desde localStorage
     const registrationData = localStorage.getItem('registration_data')
     let tenantSubdomain = ''
     if (registrationData) {
@@ -693,7 +702,7 @@ const handlePlanSelection = async (plan) => {
       tenantSubdomain = data.subdomain || ''
     }
     
-    // 🔥 Determinar URL de redirección correcta basada en el entorno
+    // Determinar URL de redirección correcta basada en el entorno
     const getRedirectUrl = () => {
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         return `http://localhost:3000/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
@@ -701,7 +710,7 @@ const handlePlanSelection = async (plan) => {
       return `https://105pos.pro/payment/success?tenant_id=${tenantId.value}&plan=${plan}&reference=${reference}&subdomain=${tenantSubdomain}`
     }
 
-    // 🚀 Checkout 2.0: Crear sesión en el backend
+    // Checkout 2.0: Crear sesión en el backend
     const sessionResponse = await axios.post('/api/epayco/create-session', {
       amount: finalPrice,
       reference: reference,
@@ -720,24 +729,22 @@ const handlePlanSelection = async (plan) => {
 
     const { sessionId, verification_token } = sessionResponse.data
 
-    // 🚀 Configurar ePayco Smart Checkout 2.0
+    // Configurar ePayco Smart Checkout 2.0
     const checkout = window.ePayco.checkout.configure({
       sessionId: sessionId,
       type: 'standard', // 'onpage' = modal embebido, 'standard' = redirige a página completa de ePayco
-      test: false // ✅ MODO PRODUCCIÓN
+      test: false // MODO PRODUCCIÓN
     })
 
     // Event handlers para Checkout 2.0
     checkout.onCreated(() => {
-      console.log('✅ ePayco Checkout creado exitosamente')
     })
 
     checkout.onErrors((errors) => {
-      console.error('❌ Error en ePayco Checkout:', errors)
+      console.error('Error en ePayco Checkout:', errors)
     })
 
     checkout.onClosed(() => {
-      console.log('🔒 ePayco Checkout cerrado')
       // Verificar estado del pago cuando se cierra el checkout
       isProcessing.value = false
     })
@@ -759,7 +766,7 @@ const handlePlanSelection = async (plan) => {
     
     // Mostrar error del servidor o mensaje genérico
     const errorMessage = error.response?.data?.error || error.message || 'Por favor, intenta nuevamente.'
-    alert('❌ Error al procesar el pago\n\n' + errorMessage)
+    alert('Error al procesar el pago\n\n' + errorMessage)
   } finally {
     isProcessing.value = false
   }
@@ -795,10 +802,7 @@ const updateTenantPlan = async (plan) => {
       tenant_id: tenantId.value,
       plan: plan
     })
-
-    console.log('Plan activado:', response.data)
-
-    // ⚠️ NO limpiar registration_data aquí - se necesita para auto-login
+    // NO limpiar registration_data aquí - se necesita para auto-login
     // Se limpiará después del auto-login exitoso
 
     // Si es trial, mostrar modal de éxito
@@ -852,33 +856,26 @@ const redirectToLogin = () => {
     }
   }
 
-  // Redirigir al login con subdomain
-  if (subdomain) {
-    // Si estamos en localhost, usar subdominio
+  // Validar subdomain antes de redirigir (prevenir open redirect)
+  if (subdomain && /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?$/.test(subdomain) && subdomain.length <= 63) {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       window.location.href = `http://${subdomain}.localhost:3000/login`
     } else {
-      // En producción
       window.location.href = `https://${subdomain}.105pos.pro/login`
     }
   } else {
-    // Fallback sin subdominio
     window.location.href = '/login'
   }
 }
 
-// 🔑 Función para hacer auto-login después de seleccionar plan
+// Función para hacer auto-login después de seleccionar plan
 const performAutoLogin = async () => {
   try {
-    console.log('🔐 Iniciando auto-login...')
-    
-    // ✅ PRIORIDAD 1: Si ya hay token guardado, redirigir directamente
+    // PRIORIDAD 1: Si ya hay token guardado, redirigir directamente
     const existingToken = localStorage.getItem('authToken')
     const existingUser = localStorage.getItem('user')
     
     if (existingToken) {
-      console.log('✅ Token existente encontrado - redirigiendo a welcome')
-      
       // Obtener subdomain
       const urlParams = new URLSearchParams(window.location.search)
       let subdomain = urlParams.get('subdomain')
@@ -903,22 +900,13 @@ const performAutoLogin = async () => {
       // Limpiar datos de registro temporales
       localStorage.removeItem('registration_data')
       
-      // 🔑 CRÍTICO: Pasar token como query param porque localStorage NO se comparte entre subdominios
+      // CRÍTICO: Pasar token como query param porque localStorage NO se comparte entre subdominios
       const tokenParam = encodeURIComponent(existingToken)
       const userParam = existingUser ? encodeURIComponent(existingUser) : ''
       
       // Redirigir al welcome del tenant CON el token
-      let targetUrl
-      if (subdomain) {
-        const baseUrl = window.location.hostname === 'localhost' 
-          ? `http://${subdomain}.localhost:3000`
-          : `https://${subdomain}.105pos.pro`
-        targetUrl = `${baseUrl}/welcome?auth_token=${tokenParam}&user_data=${userParam}`
-      } else {
-        targetUrl = `/welcome?auth_token=${tokenParam}&user_data=${userParam}`
-      }
-      
-      console.log('🚀 Redirigiendo a:', targetUrl.substring(0, 100) + '...')
+      const baseUrl = getTenantBaseUrl(subdomain)
+      const targetUrl = `${baseUrl}/welcome?auth_token=${tokenParam}&user_data=${userParam}`
       window.location.href = targetUrl
       return
     }
@@ -926,7 +914,7 @@ const performAutoLogin = async () => {
     // Obtener credenciales guardadas temporalmente
     const registrationData = localStorage.getItem('registration_data')
     if (!registrationData) {
-      console.warn('⚠️ No hay datos de registro - redirigiendo al login manual')
+      console.warn('No hay datos de registro - redirigiendo al login manual')
       redirectToLogin()
       return
     }
@@ -936,33 +924,21 @@ const performAutoLogin = async () => {
     const subdomain = data.subdomain || (data.tenant_id ? data.tenant_id.replace(/_/g, '-') : '')
     const { email, temp_password, is_google, authenticated } = data
 
-    // ✅ Si el usuario ya está autenticado desde el registro, redirigir directamente
+    // Si el usuario ya está autenticado desde el registro, redirigir directamente
     if (authenticated) {
-      console.log('✅ Usuario marcado como autenticado - redirigiendo a welcome')
-      
       // Limpiar datos de registro temporales
       localStorage.removeItem('registration_data')
       
       // Redirigir al welcome del tenant
-      const targetUrl = subdomain 
-        ? (window.location.hostname === 'localhost' 
-            ? `http://${subdomain}.localhost:3000/welcome` 
-            : `https://${subdomain}.105pos.pro/welcome`)
-        : '/welcome'
+      const targetUrl = getTenantBaseUrl(subdomain, 'welcome')
       
-      console.log('🚀 Redirigiendo a:', targetUrl)
       window.location.href = targetUrl
       return
     }
 
     // Si es registro con Google, redirigir al welcome directamente (ya tiene sesión de Google)
     if (is_google) {
-      console.log('✅ Usuario registrado con Google - redirigiendo a welcome')
-      const targetUrl = subdomain 
-        ? (window.location.hostname === 'localhost' 
-            ? `http://${subdomain}.localhost:3000/welcome` 
-            : `https://${subdomain}.105pos.pro/welcome`)
-        : '/welcome'
+      const targetUrl = getTenantBaseUrl(subdomain, 'welcome')
       
       // Limpiar credenciales temporales
       delete data.temp_password
@@ -975,28 +951,18 @@ const performAutoLogin = async () => {
 
     // Para registro con email/password, hacer login
     if (!temp_password) {
-      console.warn('⚠️ No hay password temporal - redirigiendo al login manual')
+      console.warn('No hay password temporal - redirigiendo al login manual')
       redirectToLogin()
       return
     }
 
     // Determinar API URL según el entorno
-    const apiUrl = subdomain
-      ? (window.location.hostname === 'localhost'
-          ? `http://${subdomain}.localhost:3000/api`
-          : `https://${subdomain}.105pos.pro/api`)
-      : '/api'
-
-    console.log('📤 Haciendo login automático en:', apiUrl)
-
+    const apiUrl = getTenantBaseUrl(subdomain, 'api')
     // Hacer login
     const response = await axios.post(`${apiUrl}/login`, {
       email: email,
       password: temp_password
     })
-
-    console.log('✅ Login exitoso:', response.data)
-
     // Guardar token y usuario
     if (response.data.success && response.data.data?.token) {
       const { token, user } = response.data.data
@@ -1012,20 +978,15 @@ const performAutoLogin = async () => {
       localStorage.removeItem('registration_data')
       
       // Redirigir al welcome del tenant
-      const targetUrl = subdomain 
-        ? (window.location.hostname === 'localhost' 
-            ? `http://${subdomain}.localhost:3000/welcome` 
-            : `https://${subdomain}.105pos.pro/welcome`)
-        : '/welcome'
+      const targetUrl = getTenantBaseUrl(subdomain, 'welcome')
       
-      console.log('🚀 Redirigiendo a:', targetUrl)
       window.location.href = targetUrl
     } else {
       throw new Error('No se recibió token de autenticación')
     }
 
   } catch (error) {
-    console.error('❌ Error en auto-login:', error)
+    console.error('Error en auto-login:', error)
     console.error('Detalles:', error.response?.data)
     
     // Si falla el auto-login, limpiar credenciales y redirigir al login manual

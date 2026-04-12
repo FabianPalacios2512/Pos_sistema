@@ -1,5 +1,5 @@
 /**
- * 🎵 Composable para manejar el estado global de la radio
+ * Composable para manejar el estado global de la radio
  * Permite compartir el estado de reproducción entre RadioWidget y AppHeader
  */
 

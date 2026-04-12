@@ -1,6 +1,6 @@
 <template>
   <!-- 
-    ✅ PREVIEW PROFESIONAL del ticket térmico CLASSIC
+    PREVIEW PROFESIONAL del ticket térmico CLASSIC
     Diseño tipo retail de lujo / supermercado corporativo
     Optimizado para impresión térmica 80mm
   -->

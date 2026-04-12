@@ -428,13 +428,13 @@ const updateSubscriptionDates = async () => {
     })
     
     if (res.data.success) {
-      alert('✅ Fechas actualizadas correctamente')
+      alert('Fechas actualizadas correctamente')
       emit('refresh')
     } else {
-      alert('❌ Error: ' + (res.data.message || 'No se pudo actualizar'))
+      alert('Error: ' + (res.data.message || 'No se pudo actualizar'))
     }
   } catch (error) {
-    alert('❌ Error al actualizar fechas: ' + (error.response?.data?.message || error.message))
+    alert('Error al actualizar fechas: ' + (error.response?.data?.message || error.message))
   }
   savingDates.value = false
 }
@@ -455,14 +455,14 @@ const toggleTenantStatus = async () => {
     })
     
     if (res.data.success) {
-      alert(`✅ Tienda ${newStatus === 'active' ? 'activada' : 'pausada'} correctamente`)
+      alert(`Tienda ${newStatus === 'active' ? 'activada' : 'pausada'} correctamente`)
       emit('refresh')
       emit('close')
     } else {
-      alert('❌ Error: ' + (res.data.message || 'No se pudo cambiar el estado'))
+      alert('Error: ' + (res.data.message || 'No se pudo cambiar el estado'))
     }
   } catch (error) {
-    alert('❌ Error: ' + (error.response?.data?.message || error.message))
+    alert('Error: ' + (error.response?.data?.message || error.message))
   }
   togglingStatus.value = false
 }
@@ -514,13 +514,13 @@ const confirmResetPassword = async () => {
     })
     
     if (res.data.success) {
-      alert(`✅ Contraseña actualizada!\n\nUsuario: ${selectedUser.value.email}\nNueva contraseña: ${newPassword.value}`)
+      alert(`Contraseña actualizada exitosamente.\n\nUsuario: ${selectedUser.value.email}`)
       showResetPasswordModal.value = false
       selectedUser.value = null
       newPassword.value = ''
     }
   } catch (error) {
-    alert('❌ Error al resetear contraseña: ' + (error.response?.data?.message || error.message))
+    alert('Error al resetear contraseña: ' + (error.response?.data?.message || error.message))
   }
 }
 

@@ -159,11 +159,6 @@ class ReturnsController extends Controller
     {
         try {
             // Log para debugging
-            \Log::info('Return Request Received:', [
-                'data' => $request->all(),
-                'user_id' => Auth::id(),
-                'timestamp' => now()
-            ]);
 
             $validator = Validator::make($request->all(), [
                 'original_invoice_id' => 'required|exists:invoices,id',
@@ -210,11 +205,6 @@ class ReturnsController extends Controller
                 ], 400);
             }
 
-            \Log::info('Devolución procesada en sesión de caja', [
-                'session_id' => $currentSession->id,
-                'user_id' => $userId,
-                'user_name' => Auth::user()->name ?? 'Unknown'
-            ]);
 
             DB::beginTransaction();
 
@@ -253,14 +243,6 @@ class ReturnsController extends Controller
                 $productVariantId = $originalItem->product_variant_id ?? null;
                 $variantOptions = $originalItem->variant_options ?? null;
 
-                \Log::info('📦 Capturando datos para devolución', [
-                    'product_id' => $itemData['product_id'],
-                    'product_variant_id' => $productVariantId ?? 'NULL (producto simple)',
-                    'variant_options' => $variantOptions ?? 'N/A',
-                    'invoice_item_id' => $originalItem->id,
-                    'source_warehouse_id' => $sourceWarehouseId ?? 'NULL',
-                    'current_quantity_in_invoice' => $originalItem->quantity
-                ]);
 
                 $returnItems[] = [
                     'product_id' => $itemData['product_id'],
@@ -307,11 +289,6 @@ class ReturnsController extends Controller
                 $productVariantId = $itemData['product_variant_id'] ?? null;
 
                 if ($warehouseId) {
-                    \Log::info('✅ Usando warehouse de origen capturado previamente', [
-                        'product_id' => $itemData['product_id'],
-                        'product_variant_id' => $productVariantId ?? 'NULL (producto simple)',
-                        'source_warehouse_id' => $warehouseId
-                    ]);
                 } else {
                     // ⚠️ Fallback: Si no hay source_warehouse_id (facturas antiguas), usar cash_session
                     if ($originalInvoice->cash_session_id) {
@@ -338,12 +315,6 @@ class ReturnsController extends Controller
                     // Si es un producto con variantes (fashion), filtrar por variante específica
                     if ($productVariantId) {
                         $stockQuery->where('product_variant_id', $productVariantId);
-                        \Log::info('👗 FASHION: Restaurando stock a variante específica', [
-                            'product_id' => $itemData['product_id'],
-                            'product_variant_id' => $productVariantId,
-                            'variant_options' => $itemData['variant_options'] ?? 'N/A',
-                            'warehouse_id' => $warehouseId
-                        ]);
                     }
 
                     $warehouseStock = $stockQuery->first();
@@ -364,14 +335,6 @@ class ReturnsController extends Controller
 
                         $updateQuery->update(['stock' => $newStock]);
 
-                        \Log::info('✅ Stock restaurado en bodega por devolución', [
-                            'product_id' => $itemData['product_id'],
-                            'product_variant_id' => $productVariantId ?? 'NULL (producto simple)',
-                            'warehouse_id' => $warehouseId,
-                            'stock_anterior' => $previousStock,
-                            'cantidad_devuelta' => $itemData['quantity'],
-                            'stock_nuevo' => $newStock
-                        ]);
 
                         // 👗 FASHION: También actualizar el stock en product_variants si existe
                         if ($productVariantId) {
@@ -387,12 +350,6 @@ class ReturnsController extends Controller
                                     ->where('id', $productVariantId)
                                     ->update(['stock' => $newVariantStock]);
 
-                                \Log::info('👗 FASHION: Stock de variante también actualizado', [
-                                    'product_variant_id' => $productVariantId,
-                                    'variant_sku' => $variant->sku ?? 'N/A',
-                                    'stock_anterior_variante' => $previousVariantStock,
-                                    'stock_nuevo_variante' => $newVariantStock
-                                ]);
                             }
                         }
                     } else {
@@ -486,18 +443,6 @@ class ReturnsController extends Controller
                         $customer->current_debt = $newDebt;
                         $customer->save();
 
-                        \Log::info('💳 Deuda del cliente actualizada por devolución de venta a crédito', [
-                            'customer_id' => $customer->id,
-                            'customer_name' => $customer->name,
-                            'previous_debt' => $previousDebt,
-                            'subtotal_returned' => $subtotal,
-                            'tax_returned' => $taxAmount,
-                            'surcharge_returned' => $surchargeToRefund,
-                            'total_amount_refunded' => $totalToRefund,
-                            'new_debt' => $newDebt,
-                            'return_number' => $return->number,
-                            'original_invoice' => $originalInvoice->number
-                        ]);
                     }
                 }
 
@@ -508,16 +453,12 @@ class ReturnsController extends Controller
 
                 // Si la devolución es completa (total llega a 0), marcar como devuelta
                 if ($newTotal <= 0) {
-                    \Log::info("Marcando factura #{$originalInvoice->number} como DEVUELTA - Total devuelto completamente - Referencia: {$return->number}");
 
                     try {
                         // Primero eliminar los invoice_items
-                        \Log::info("Eliminando invoice_items de la factura #{$originalInvoice->number}");
                         $deletedItems = InvoiceItem::where('invoice_id', $originalInvoice->id)->delete();
-                        \Log::info("Items eliminados: {$deletedItems}");
 
                         // Luego actualizar la factura - usar array vacío, no json_encode
-                        \Log::info("Actualizando factura a estado 'returned'");
                         $originalInvoice->update([
                             'subtotal' => 0,
                             'tax_amount' => 0,
@@ -528,14 +469,12 @@ class ReturnsController extends Controller
                             'items' => [] // Array vacío (Laravel lo convertirá a JSON automáticamente)
                         ]);
 
-                        \Log::info("Factura actualizada exitosamente a estado 'returned'");
                     } catch (\Exception $e) {
                         \Log::error("Error al actualizar factura a returned: " . $e->getMessage());
                         \Log::error("Stack trace: " . $e->getTraceAsString());
                         throw $e;
                     }
                 } else {
-                    \Log::info("Actualizando factura #{$originalInvoice->number} - Nuevo total: {$newTotal}");
 
                     // Calcular nuevo surcharge_amount proporcional si es venta a crédito
                     $newSurchargeAmount = 0;
@@ -547,11 +486,6 @@ class ReturnsController extends Controller
                             : 0;
                         $newSurchargeAmount = $newSubtotal * $surchargePercentage;
 
-                        \Log::info("Recargo proporcional calculado", [
-                            'original_surcharge' => $originalInvoice->surcharge_amount,
-                            'new_surcharge' => $newSurchargeAmount,
-                            'percentage' => $surchargePercentage * 100 . '%'
-                        ]);
                     }
 
                     // Devolución parcial: actualizar totales de la factura
@@ -572,7 +506,6 @@ class ReturnsController extends Controller
                             $newQuantity = $originalItem->quantity - $itemData['quantity'];
 
                             if ($newQuantity <= 0) {
-                                \Log::info("Eliminando item completo - Producto ID: {$itemData['product_id']}");
                                 // Si se devolvió toda la cantidad, eliminar el item
                                 $originalItem->delete();
                             } else {
@@ -580,7 +513,6 @@ class ReturnsController extends Controller
                                 $newItemSubtotal = $newQuantity * $originalItem->unit_price;
                                 $newItemTaxAmount = ($originalItem->tax_amount / $originalItem->quantity) * $newQuantity;
 
-                                \Log::info("Actualizando item - Producto ID: {$itemData['product_id']} - Nueva cantidad: {$newQuantity}");
 
                                 $originalItem->update([
                                     'quantity' => $newQuantity,

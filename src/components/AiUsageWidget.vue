@@ -24,7 +24,7 @@
 
     <!-- Widget Expandido -->
     <transition name="slide-up">
-      <div v-if="expanded" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div v-if="expanded" class="bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-700 overflow-hidden">
         <!-- Header -->
         <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4">
           <div class="flex items-center justify-between mb-2">
@@ -54,7 +54,7 @@
           <div v-for="warning in warnings" :key="warning.type"
                :class="warning.severity === 'critical' ? 'bg-red-100 border-red-500 text-red-700' : 'bg-yellow-100 border-yellow-500 text-yellow-700'"
                class="p-2 rounded-lg border-l-4 text-xs">
-            <p class="font-semibold">⚠️ {{ warning.message }}</p>
+            <p class="font-semibold">{{ warning.message }}</p>
           </div>
         </div>
 
@@ -63,12 +63,12 @@
           <!-- Barra de Progreso Última Hora -->
           <div v-if="!isUnlimited">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">Última Hora</span>
+              <span class="text-xs font-semibold text-gray-600 dark:text-zinc-400">Última Hora</span>
               <span class="text-xs font-bold text-gray-900 dark:text-white">
                 {{ usage?.usage?.last_hour?.requests || 0 }} / {{ limits?.limits?.requests_per_hour || 0 }}
               </span>
             </div>
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div class="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-2">
               <div :class="getProgressColor(usagePercentageHour)" 
                    :style="{width: usagePercentageHour + '%'}"
                    class="h-2 rounded-full transition-all duration-500"></div>
@@ -78,12 +78,12 @@
           <!-- Barra de Progreso Hoy -->
           <div v-if="!isUnlimited">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">Hoy</span>
+              <span class="text-xs font-semibold text-gray-600 dark:text-zinc-400">Hoy</span>
               <span class="text-xs font-bold text-gray-900 dark:text-white">
                 {{ usage?.usage?.today?.requests || 0 }} / {{ limits?.limits?.requests_per_day || 0 }}
               </span>
             </div>
-            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div class="w-full bg-gray-200 dark:bg-zinc-700 rounded-full h-2">
               <div :class="getProgressColor(usagePercentageDay)" 
                    :style="{width: usagePercentageDay + '%'}"
                    class="h-2 rounded-full transition-all duration-500"></div>
@@ -92,20 +92,20 @@
 
           <!-- Métricas -->
           <div class="grid grid-cols-3 gap-2">
-            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Tokens Hoy</p>
+            <div class="bg-gray-50 dark:bg-zinc-700 p-3 rounded-lg text-center">
+              <p class="text-xs text-gray-500 dark:text-zinc-400">Tokens Hoy</p>
               <p class="text-sm font-bold text-gray-900 dark:text-white">
                 {{ formatNumber(usage?.usage?.today?.tokens || 0) }}
               </p>
             </div>
-            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Costo</p>
+            <div class="bg-gray-50 dark:bg-zinc-700 p-3 rounded-lg text-center">
+              <p class="text-xs text-gray-500 dark:text-zinc-400">Costo</p>
               <p class="text-sm font-bold text-gray-900 dark:text-white">
                 ${{ (usage?.usage?.today?.cost || 0).toFixed(4) }}
               </p>
             </div>
-            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Total</p>
+            <div class="bg-gray-50 dark:bg-zinc-700 p-3 rounded-lg text-center">
+              <p class="text-xs text-gray-500 dark:text-zinc-400">Total</p>
               <p class="text-sm font-bold text-gray-900 dark:text-white">
                 {{ usage?.usage?.total?.requests || 0 }}
               </p>

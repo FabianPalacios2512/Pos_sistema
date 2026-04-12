@@ -12,6 +12,7 @@ use App\Models\InvoiceItem;
 use App\Models\Customer;
 use App\Models\Category;
 use App\Models\Supplier;
+use App\Models\ProductReturn;
 use Carbon\Carbon;
 
 class GeminiAgentService
@@ -19,7 +20,7 @@ class GeminiAgentService
     protected $apiKey;
     protected $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
     protected $sessionId;
-    protected $maxHistoryMessages = 10; // Reducido de 20 a 10 para optimizar tokens
+    protected $maxHistoryMessages = 30; // 30 mensajes para mantener buen contexto de conversación
 
     public function __construct()
     {
@@ -88,6 +89,15 @@ class GeminiAgentService
 Eres "105 IA", el asistente virtual INTELIGENTE del sistema POS 105 para "{$businessName}". 
 No eres un simple chatbot que responde - eres un ASISTENTE DE NEGOCIO que PIENSA, ANALIZA y ACTÚA.
 
+🎭 TU PERSONALIDAD:
+- Eres AMABLE, CÁLIDO y PROFESIONAL. Como un compañero de trabajo que siempre está dispuesto a ayudar.
+- NUNCA seas cortante, seco o grosero. Siempre responde con buena actitud.
+- Usa un tono cercano y positivo. Di "¡Claro!", "¡Por supuesto!", "Con gusto te ayudo".
+- NUNCA digas "No puedo", "No tengo esa capacidad", "Eso no es posible". En su lugar, busca alternativas o usa tus herramientas.
+- Si no encuentras datos, di algo como "No encontré resultados para eso, pero puedo buscar de otra forma" o "Parece que no hay registros aún".
+- Sé empático: "Entiendo lo que necesitas", "Buena pregunta", "Déjame revisar eso por ti".
+- Cuando des malas noticias (sin ventas, etc.), sé constructivo: "No hubo ventas hoy, pero puedes promocionar tus productos más populares".
+
 🏢 CONTEXTO:
 - Negocio: {$businessName}
 - Tipo de tienda: {$storeTypeInfo}
@@ -113,6 +123,13 @@ USA ESOS DATOS para responder preguntas como:
 
 ❌ NO digas "no tengo herramienta" o "no puedo consultar" si los datos YA ESTÁN en el contexto.
 ✅ Responde directamente con los números que ves en el contexto.
+
+⚠️ REGLA CRÍTICA: USA SIEMPRE LAS HERRAMIENTAS CUANDO PREGUNTEN POR DATOS
+- "¿cuántas devoluciones?" → USA consultarDevoluciones (OBLIGATORIO)
+- "¿hubo ventas hoy?" → USA consultarVentas (OBLIGATORIO)  
+- "¿devoluciones de hoy/esta semana/este mes?" → USA consultarDevoluciones con el periodo correcto
+- NUNCA digas "no tengo información de devoluciones" - TIENES la herramienta consultarDevoluciones
+- NUNCA digas "no puedo consultar ventas" - TIENES la herramienta consultarVentas
 
 ═══════════════════════════════════════════════════════════════
             🧠 TU MENTALIDAD: PIENSA → ANALIZA → ACTÚA
@@ -172,6 +189,14 @@ Tú: *Usa actualizarConfiguracion* → "¡Listo! Ya activé Creditienda. ¿Te ay
 - "Mis productos" → Lista productos (no preguntes "¿cuáles?")
 - "Ventas de hoy" → Muestra ventas (no preguntes "¿qué quieres ver?")
 - "Sí", "ok", "hazlo", "dale" → EJECUTA la última acción propuesta.
+
+📌 REGLA 1.1: DA TODA LA INFORMACIÓN DE UNA VEZ
+- Cuando muestres datos (devoluciones, ventas, facturas, etc.) SIEMPRE incluye TODOS los detalles disponibles.
+- NO des un resumen corto y esperes a que pidan más. Da la info COMPLETA desde el inicio.
+- Ejemplo devoluciones: Muestra número, cliente, total, razón, fecha, factura original, método de reembolso, quién la hizo.
+- Ejemplo ventas: Muestra número, cliente, total, método de pago, fecha.
+- Si el usuario pregunta "dame más info" sobre algo que YA consultaste → USA EL HISTORIAL de la conversación, no pidas datos de nuevo.
+- RECUERDA los datos que ya consultaste en mensajes anteriores. No olvides la conversación.
 
 ⚠️⚠️⚠️ REGLA CRÍTICA: FECHAS ESPECÍFICAS = USA HERRAMIENTAS ⚠️⚠️⚠️
 - Si el usuario pregunta por UNA FECHA ESPECÍFICA (ayer, el 27, martes, hace 2 días, semana pasada):
@@ -271,6 +296,9 @@ Cuando el usuario quiera CREAR un producto, SIEMPRE debes recopilar estos datos 
 • obtenerDetalleFactura - Ver detalle de una factura específica por ID
 • obtenerReporteVentas - Resumen de ventas con métricas
 • obtenerFacturaMasRentable - La factura con mayor margen de ganancia
+
+🔄 DEVOLUCIONES:
+• consultarDevoluciones - Ver devoluciones por período, fecha o estado. SIEMPRE úsala cuando pregunten por devoluciones.
 
 👥 CLIENTES:
 • consultarClientes - Buscar clientes
@@ -435,7 +463,6 @@ EOT;
             $deleted = ConversationHistory::where('created_at', '<', now()->subHours(48))->delete();
 
             if ($deleted > 0) {
-                Log::info("🧹 [Gemini] Historial antiguo limpiado: {$deleted} mensajes >48h eliminados");
             }
 
         } catch (\Exception $e) {
@@ -451,7 +478,6 @@ EOT;
         try {
             $sessionId = $this->getSessionId();
             $deleted = ConversationHistory::where('session_id', $sessionId)->delete();
-            Log::info("🧹 [Gemini] Sesión reiniciada: {$deleted} mensajes eliminados");
             return $deleted;
         } catch (\Exception $e) {
             Log::error('❌ [Gemini] Error limpiando sesión: ' . $e->getMessage());
@@ -506,7 +532,6 @@ EOT;
         // 🧠 Si hay contexto de pantalla, agregarlo al prompt DESPUÉS de guardar el original
         if (!empty($screenContext)) {
             $prompt = "[DATOS DEL NEGOCIO EN TIEMPO REAL - USA ESTA INFORMACIÓN PARA RESPONDER]\n" . $screenContext . "\n\n[PREGUNTA DEL USUARIO]\n" . $prompt;
-            Log::info('🧠 [Gemini] Contexto de pantalla agregado al prompt', ['context_length' => strlen($screenContext)]);
         }
 
         try {
@@ -632,10 +657,6 @@ EOT;
      */
     public function executeImportFromController($args)
     {
-        Log::info('[GeminiAgent] Ejecutando importación directa desde controlador', [
-            'has_headers' => isset($args['products_data']['headers']),
-            'rows_count' => count($args['products_data']['rows'] ?? [])
-        ]);
 
         return $this->importarProductosMasivoHandler($args);
     }
@@ -714,7 +735,6 @@ EOT;
                 $args = new \stdClass();
             }
 
-            Log::info("🤖 Gemini Agent: Ejecutando función {$functionName}", (array)$args);
 
             // Ejecutar la función
             $functionResult = $this->executeFunction($functionName, (array)$args);
@@ -1188,6 +1208,35 @@ EOT;
                         ]
                     ],
 
+                    // === DEVOLUCIONES ===
+                    [
+                        'name' => 'consultarDevoluciones',
+                        'description' => 'Consulta las devoluciones realizadas. Puede buscar por período (hoy, ayer, semana, mes) o por fecha específica (YYYY-MM-DD). Usa esto cuando pregunten por devoluciones, notas crédito, reembolsos, productos devueltos, etc.',
+                        'parameters' => [
+                            'type' => 'OBJECT',
+                            'properties' => [
+                                'periodo' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Período de tiempo: hoy, ayer, semana, mes, año, ultimos_7_dias, ultimos_30_dias',
+                                    'enum' => ['hoy', 'ayer', 'semana', 'mes', 'año', 'ultimos_7_dias', 'ultimos_30_dias']
+                                ],
+                                'fecha' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Fecha específica en formato YYYY-MM-DD'
+                                ],
+                                'estado' => [
+                                    'type' => 'STRING',
+                                    'description' => 'Estado de la devolución: completed, pending, cancelled',
+                                    'enum' => ['completed', 'pending', 'cancelled']
+                                ],
+                                'limite' => [
+                                    'type' => 'NUMBER',
+                                    'description' => 'Número máximo de devoluciones a mostrar (por defecto 10)'
+                                ]
+                            ]
+                        ]
+                    ],
+
                     // === NAVEGACIÓN Y CONTROL DEL SISTEMA ===
                     [
                         'name' => 'navegarModulo',
@@ -1262,11 +1311,6 @@ EOT;
         }
 
         // Log reducido para producción
-        Log::info('🤖 [Gemini] Enviando request', [
-            'messages_count' => count($contents),
-            'has_tools' => !empty($tools),
-            'retry' => $retryCount
-        ]);
 
         try {
             $response = Http::timeout(60)
@@ -1306,11 +1350,6 @@ EOT;
 
             if (isset($jsonResponse['usageMetadata'])) {
                 $usage = $jsonResponse['usageMetadata'];
-                Log::info('📊 [Gemini Tokens]', [
-                    'prompt' => $usage['promptTokenCount'] ?? 0,
-                    'completion' => $usage['candidatesTokenCount'] ?? 0,
-                    'total' => $usage['totalTokenCount'] ?? 0,
-                ]);
             }
 
             if (!$jsonResponse) {
@@ -1405,6 +1444,10 @@ EOT;
             case 'productosPocoVendidos':
                 return $this->productosPocoVendidosDB($args);
 
+            // === DEVOLUCIONES ===
+            case 'consultarDevoluciones':
+                return $this->consultarDevolucionesDB($args);
+
             // === NAVEGACIÓN Y CONTROL DEL SISTEMA ===
             case 'navegarModulo':
                 return $this->navegarModuloAction($args);
@@ -1490,7 +1533,6 @@ EOT;
                         'name' => ucfirst($categoriaNombre),
                         'active' => true
                     ]);
-                    Log::info("📂 [IA] Categoría creada: {$categoria->name}");
                 }
             } else {
                 // Usar categoría por defecto
@@ -1532,16 +1574,6 @@ EOT;
             ]);
 
             // Log de auditoría
-            Log::info("📦 [IA Auditoría] Producto CREADO", [
-                'product_id' => $producto->id,
-                'product_name' => $producto->name,
-                'sale_price' => $producto->sale_price,
-                'cost_price' => $producto->cost_price,
-                'stock' => $producto->current_stock,
-                'category' => $categoria->name,
-                'user_id' => auth()->id(),
-                'timestamp' => now()->toISOString()
-            ]);
 
             $precioFormateado = '$' . number_format($producto->sale_price, 0, ',', '.');
             $costoFormateado = '$' . number_format($producto->cost_price, 0, ',', '.');
@@ -1791,14 +1823,6 @@ EOT;
             $producto->save();
 
             // Log de auditoría
-            Log::info("📝 [IA Auditoría] Producto actualizado", [
-                'product_id' => $producto->id,
-                'product_name' => $producto->name,
-                'user_id' => auth()->id(),
-                'cambios' => $cambios,
-                'valores_anteriores' => $valoresAnteriores,
-                'timestamp' => now()->toISOString()
-            ]);
 
             return [
                 'status' => 'ok',
@@ -1918,8 +1942,6 @@ EOT;
             $periodo = $args['periodo'] ?? null;
             $fecha = $args['fecha'] ?? null;
             $limite = intval($args['limite'] ?? 10);
-
-            Log::info('🔧 [Gemini] consultarVentas llamado', ['periodo' => $periodo, 'fecha' => $fecha, 'limite' => $limite]);
 
             // Query para facturas PAGADAS (igual que la IA de voz)
             $query = Invoice::with('customer:id,name')
@@ -2640,7 +2662,6 @@ EOT;
                 ];
             }
 
-            Log::info('[GeminiAgent] Analizando archivo de productos', ['file' => $filePath]);
 
             // Usar los servicios de análisis existentes
             $excelParser = new \App\Services\ExcelParserService();
@@ -2649,10 +2670,6 @@ EOT;
             // Parsear el archivo
             $parseResult = $excelParser->parseFile($filePath);
 
-            Log::info('[GeminiAgent] Archivo parseado', [
-                'headers' => $parseResult['headers'],
-                'total_rows' => $parseResult['total_rows']
-            ]);
 
             // Analizar con IA
             $aiAnalysis = $columnMapper->analyzeColumnsWithAI(
@@ -2660,10 +2677,6 @@ EOT;
                 $parseResult['sample_data']
             );
 
-            Log::info('[GeminiAgent] Análisis de IA completado', [
-                'method' => $aiAnalysis['method'],
-                'confidence' => $aiAnalysis['confidence']
-            ]);
 
             // Preparar resumen para Gemini
             $mapping = $aiAnalysis['column_mapping'];
@@ -2747,10 +2760,6 @@ EOT;
                 }
             }
 
-            Log::info('[GeminiAgent] Iniciando importación masiva', [
-                'total_headers' => count($headers),
-                'total_rows' => count($rows)
-            ]);
 
             // Mapear headers a índices
             $headerMap = [];
@@ -2758,7 +2767,6 @@ EOT;
                 $headerMap[strtolower(trim($header))] = $index;
             }
 
-            Log::info('[GeminiAgent] Header map creado', ['map' => $headerMap]);
 
             $createdCount = 0;
             $errors = [];
@@ -2836,21 +2844,10 @@ EOT;
                             'product_variant_id' => null
                         ]);
 
-                        Log::info('[GeminiAgent] Stock asignado a bodega', [
-                            'product_id' => $product->id,
-                            'warehouse_id' => $targetWarehouse->id,
-                            'warehouse_name' => $targetWarehouse->name,
-                            'stock' => intval($stock ?? 0)
-                        ]);
                     }
 
                     $createdCount++;
 
-                    Log::info('[GeminiAgent] Producto creado', [
-                        'id' => $product->id,
-                        'name' => $nombre,
-                        'row' => $rowIndex + 1
-                    ]);
 
                 } catch (\Exception $e) {
                     $errors[] = "Fila " . ($rowIndex + 1) . ": " . $e->getMessage();
@@ -2876,7 +2873,6 @@ EOT;
                     "\n📦 Los productos ya están disponibles en tu inventario."
             ];
 
-            Log::info('[GeminiAgent] Importación masiva completada', $result);
 
             return $result;
 
@@ -3154,12 +3150,6 @@ EOT;
             $accion = $activar ? 'activado' : 'desactivado';
             $emoji = $activar ? '✅' : '❌';
 
-            Log::info("⚙️ [IA Config] Módulo {$modulo} {$accion}", [
-                'user_id' => auth()->id(),
-                'modulo' => $modulo,
-                'anterior' => $estadoAnterior,
-                'nuevo' => $activar
-            ]);
 
             $mensajeSeguimiento = '';
             if ($activar && $modulo === 'creditienda') {
@@ -3829,6 +3819,146 @@ EOT;
      * Controlar la radio del sistema
      * Devuelve una acción que el frontend interpretará
      */
+    // ========================================
+    // FUNCIONES DE BASE DE DATOS - DEVOLUCIONES
+    // ========================================
+
+    private function consultarDevolucionesDB($args)
+    {
+        try {
+            $periodo = $args['periodo'] ?? null;
+            $fecha = $args['fecha'] ?? null;
+            $estado = $args['estado'] ?? null;
+            $limite = intval($args['limite'] ?? 10);
+
+            $query = ProductReturn::with(['customer:id,name', 'originalInvoice:id,number', 'user:id,name']);
+
+            $periodoTexto = 'todos los tiempos';
+
+            // Filtrar por fecha específica
+            if ($fecha) {
+                try {
+                    $fechaCarbon = Carbon::parse($fecha);
+                    $query->whereDate('return_date', $fechaCarbon);
+                    $periodoTexto = $fechaCarbon->locale('es')->isoFormat('dddd D [de] MMMM [de] YYYY');
+                } catch (\Exception $e) {
+                    return ['status' => 'error', 'message' => "La fecha '{$fecha}' no es válida. Usa formato YYYY-MM-DD."];
+                }
+            }
+            // Filtrar por período
+            elseif ($periodo) {
+                switch ($periodo) {
+                    case 'hoy':
+                        $query->whereDate('return_date', Carbon::today());
+                        $periodoTexto = 'hoy (' . Carbon::today()->format('d/m/Y') . ')';
+                        break;
+                    case 'ayer':
+                        $query->whereDate('return_date', Carbon::yesterday());
+                        $periodoTexto = 'ayer (' . Carbon::yesterday()->format('d/m/Y') . ')';
+                        break;
+                    case 'semana':
+                        $query->where('return_date', '>=', Carbon::now()->startOfWeek());
+                        $periodoTexto = 'esta semana';
+                        break;
+                    case 'mes':
+                        $query->where('return_date', '>=', Carbon::now()->startOfMonth());
+                        $periodoTexto = 'este mes (' . Carbon::now()->locale('es')->isoFormat('MMMM YYYY') . ')';
+                        break;
+                    case 'año':
+                        $query->where('return_date', '>=', Carbon::now()->startOfYear());
+                        $periodoTexto = 'este año (' . Carbon::now()->format('Y') . ')';
+                        break;
+                    case 'ultimos_7_dias':
+                        $query->where('return_date', '>=', Carbon::now()->subDays(7));
+                        $periodoTexto = 'los últimos 7 días';
+                        break;
+                    case 'ultimos_30_dias':
+                        $query->where('return_date', '>=', Carbon::now()->subDays(30));
+                        $periodoTexto = 'los últimos 30 días';
+                        break;
+                }
+            }
+
+            // Filtrar por estado
+            if ($estado) {
+                $query->where('status', $estado);
+            }
+
+            $totalDevoluciones = (clone $query)->sum('total');
+            $cantidadDevoluciones = (clone $query)->count();
+
+            $devoluciones = $query->orderBy('return_date', 'desc')
+                ->limit($limite)
+                ->get()
+                ->map(function($d) {
+                    $estadoTexto = match($d->status) {
+                        'completed' => '✅ Completada',
+                        'pending' => '⏳ Pendiente',
+                        'cancelled' => '❌ Cancelada',
+                        default => $d->status
+                    };
+
+                    $metodoTexto = match($d->refund_method) {
+                        'cash' => 'Efectivo',
+                        'credit' => 'Nota crédito',
+                        'transfer' => 'Transferencia',
+                        default => $d->refund_method ?? 'No especificado'
+                    };
+
+                    return [
+                        'id' => $d->id,
+                        'numero' => $d->number,
+                        'cliente' => $d->customer?->name ?? 'Cliente General',
+                        'factura_original' => $d->originalInvoice?->number ?? 'N/A',
+                        'fecha' => Carbon::parse($d->return_date)->format('d/m/Y'),
+                        'total' => '$' . number_format($d->total, 0, ',', '.'),
+                        'total_raw' => $d->total,
+                        'estado' => $estadoTexto,
+                        'razon' => $d->reason ?? 'Sin razón especificada',
+                        'metodo_reembolso' => $metodoTexto,
+                        'realizada_por' => $d->user?->name ?? 'Sistema'
+                    ];
+                });
+
+            $totalFmt = '$' . number_format($totalDevoluciones, 0, ',', '.');
+
+            if ($cantidadDevoluciones === 0) {
+                return [
+                    'periodo' => $periodoTexto,
+                    'total_devoluciones' => 0,
+                    'total_formateado' => '$0',
+                    'cantidad' => 0,
+                    'devoluciones' => [],
+                    'hay_devoluciones' => false,
+                    'mensaje' => "📊 No encontré devoluciones para {$periodoTexto}."
+                ];
+            }
+
+            $listaDevoluciones = $devoluciones->take(5)->map(function($d) {
+                return "• {$d['numero']}: Cliente: {$d['cliente']} | Total: {$d['total']} | Estado: {$d['estado']} | Razón: {$d['razon']} | Factura original: {$d['factura_original']} | Reembolso: {$d['metodo_reembolso']} | Realizada por: {$d['realizada_por']} | Fecha: {$d['fecha']}";
+            })->join("\n");
+
+            $mensajeMas = $cantidadDevoluciones > 5 ? "\n...y " . ($cantidadDevoluciones - 5) . " devoluciones más." : "";
+
+            return [
+                'periodo' => $periodoTexto,
+                'total_devoluciones' => $totalDevoluciones,
+                'total_formateado' => $totalFmt,
+                'cantidad' => $cantidadDevoluciones,
+                'devoluciones' => $devoluciones->toArray(),
+                'hay_devoluciones' => true,
+                'mensaje' => "🔄 **Devoluciones de {$periodoTexto}**\n\n" .
+                            "• Total devuelto: {$totalFmt}\n" .
+                            "• Cantidad: {$cantidadDevoluciones}\n\n" .
+                            "📋 **Detalle:**\n{$listaDevoluciones}{$mensajeMas}"
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("Error consultarDevoluciones: " . $e->getMessage());
+            return ['status' => 'error', 'message' => 'Tuve un problema al consultar las devoluciones. Por favor intenta de nuevo.'];
+        }
+    }
+
     private function controlarRadioAction($args)
     {
         $accion = strtolower(trim($args['accion'] ?? ''));

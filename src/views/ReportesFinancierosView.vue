@@ -5,7 +5,7 @@
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Reportes Financieros</h1>
-        <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Análisis completo de ingresos, gastos y rentabilidad • {{ getPeriodLabel() }}</p>
+        <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">Análisis completo de ingresos, gastos y rentabilidad • {{ getPeriodLabel() }}</p>
       </div>
         
       <div class="flex items-center gap-3">
@@ -17,7 +17,7 @@
           <select 
             v-model="selectedPeriod" 
             @change="loadFinancialData"
-            class="pl-10 pr-5 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/30 appearance-none cursor-pointer shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-zinc-700"
+            class="pl-10 pr-5 py-2.5 text-sm rounded-xl bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent appearance-none cursor-pointer border border-gray-200 dark:border-zinc-700 shadow-sm hover:shadow-md transition-all duration-200"
           >
             <option value="today">Hoy</option>
             <option value="week">Esta semana</option>
@@ -30,7 +30,7 @@
         <!-- Export Button -->
         <button 
           @click="exportReport" 
-          class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-xl transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
+          class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -41,18 +41,18 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="bg-white dark:bg-zinc-900 rounded-2xl p-12 text-center border border-gray-200 dark:border-zinc-800">
+    <div v-if="loading" class="bg-white dark:bg-zinc-900 rounded-2xl p-12 text-center border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
       <div class="inline-flex items-center space-x-3">
         <svg class="animate-spin h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span class="text-gray-500 dark:text-gray-400 font-medium">Cargando datos financieros...</span>
+        <span class="text-gray-500 dark:text-zinc-400 font-medium">Cargando datos financieros...</span>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-gray-200 dark:border-zinc-800">
+    <div v-else-if="error" class="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
       <div class="flex items-center space-x-4">
         <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
           <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,10 +61,10 @@
         </div>
         <div>
           <h3 class="text-gray-900 dark:text-white font-semibold">Error al cargar datos financieros</h3>
-          <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{{ error }}</p>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm mt-0.5">{{ error }}</p>
         </div>
       </div>
-      <button @click="loadFinancialData" class="mt-6 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl transition-all font-medium text-sm hover:shadow-md">
+      <button @click="loadFinancialData" class="mt-6 px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl transition-all duration-300 font-bold text-sm shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50">
         Reintentar
       </button>
     </div>
@@ -160,7 +160,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <!-- Panel Ingresos -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 overflow-hidden shadow-xl dark:shadow-black/50">
           <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center">
@@ -170,7 +170,7 @@
               </div>
               <div>
                 <h3 class="text-sm font-bold text-gray-900 dark:text-white">Desglose de Ingresos</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-400">Por tipo de ingreso</p>
+                <p class="text-xs text-gray-600 dark:text-zinc-400">Por tipo de ingreso</p>
               </div>
             </div>
           </div>
@@ -236,7 +236,7 @@
         </div>
 
         <!-- Panel Gastos -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 overflow-hidden shadow-xl dark:shadow-black/50">
           <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-rose-50 dark:bg-rose-900/20 rounded-xl flex items-center justify-center">
@@ -246,7 +246,7 @@
               </div>
               <div>
                 <h3 class="text-sm font-bold text-gray-900 dark:text-white">Desglose de Gastos</h3>
-                <p class="text-xs text-gray-500 dark:text-zinc-400">Por categoría</p>
+                <p class="text-xs text-gray-600 dark:text-zinc-400">Por categoría</p>
               </div>
             </div>
           </div>
@@ -274,10 +274,10 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Flujo de Caja -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 overflow-hidden shadow-xl dark:shadow-black/50">
           <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
             <h3 class="text-sm font-bold text-gray-900 dark:text-white">Flujo de Caja</h3>
-            <p class="text-xs text-gray-500 dark:text-zinc-400">Movimiento de efectivo</p>
+            <p class="text-xs text-gray-600 dark:text-zinc-400">Movimiento de efectivo</p>
           </div>
           <div class="p-5 space-y-4">
             <div class="flex items-center justify-between">
@@ -300,10 +300,10 @@
         </div>
 
         <!-- Cuentas por Cobrar -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 overflow-hidden shadow-xl dark:shadow-black/50">
           <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
             <h3 class="text-sm font-bold text-gray-900 dark:text-white">Cuentas por Cobrar</h3>
-            <p class="text-xs text-gray-500 dark:text-zinc-400">Cartera CrediTienda</p>
+            <p class="text-xs text-gray-600 dark:text-zinc-400">Cartera CrediTienda</p>
           </div>
           <div class="p-5 space-y-4">
             <div class="flex items-center justify-between">
@@ -330,10 +330,10 @@
         </div>
 
         <!-- Valor del Inventario -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 overflow-hidden shadow-xl dark:shadow-black/50">
           <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800">
             <h3 class="text-sm font-bold text-gray-900 dark:text-white">Valor del Inventario</h3>
-            <p class="text-xs text-gray-500 dark:text-zinc-400">Activo corriente</p>
+            <p class="text-xs text-gray-600 dark:text-zinc-400">Activo corriente</p>
           </div>
           <div class="p-5 space-y-4">
             <div class="flex items-center justify-between">
@@ -363,11 +363,11 @@
       <!-- ═══════════════════════════════════════════════════════════════
            TABLA DE TRANSACCIONES RECIENTES
       ═══════════════════════════════════════════════════════════════ -->
-      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 overflow-hidden">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 overflow-hidden shadow-xl dark:shadow-black/50">
         <div class="px-5 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
           <div>
             <h3 class="text-sm font-bold text-gray-900 dark:text-white">Movimientos Financieros Recientes</h3>
-            <p class="text-xs text-gray-500 dark:text-zinc-400">Últimas transacciones de ingresos y gastos</p>
+            <p class="text-xs text-gray-600 dark:text-zinc-400">Últimas transacciones de ingresos y gastos</p>
           </div>
           <button @click="loadMoreTransactions" class="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium">
             Ver todos
@@ -556,13 +556,32 @@ const loadFinancialData = async () => {
 }
 
 const exportReport = () => {
-  // TODO: Implementar exportación PDF
-  alert('Función de exportación próximamente')
+  if (!reportData.value) {
+    alert('No hay datos para exportar')
+    return
+  }
+  const data = reportData.value
+  const lines = [
+    `Reporte Financiero - ${selectedPeriod.value}`,
+    '',
+    `Ingresos Totales,$${data.total_income || 0}`,
+    `Gastos Totales,$${data.total_expenses || 0}`,
+    `Utilidad Neta,$${data.net_profit || 0}`,
+    `Margen,%${data.profit_margin || 0}`
+  ]
+  const csv = lines.join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `reporte_financiero_${new Date().toISOString().slice(0,10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 const loadMoreTransactions = () => {
-  // TODO: Navegar a vista de transacciones
-  alert('Vista completa de transacciones próximamente')
+  // Redirigir a módulo de facturas para ver transacciones completas
+  window.dispatchEvent(new CustomEvent('navigate-module', { detail: { module: 'invoices' } }))
 }
 
 onMounted(() => {

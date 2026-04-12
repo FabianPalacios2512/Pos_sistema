@@ -1,7 +1,7 @@
 <template>
   <div class="relative bg-[#F9FAFB] dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300" style="height: 100%; display: flex; flex-direction: column; overflow: hidden;" @click="handlePosClick">
     
-    <!-- 🎯 Modal de Bienvenida Primera Vez -->
+    <!-- Modal de Bienvenida Primera Vez -->
     <Teleport to="body">
       <div v-if="showWelcomeModal" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 animate-fade-in">
         <div class="bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-2xl shadow-2xl max-w-md w-full sm:mx-4 overflow-hidden animate-scale-in border border-gray-200 dark:border-zinc-800">
@@ -84,7 +84,7 @@
       </div>
     </Teleport>
     
-    <!-- 🎯 Tour Educativo del POS -->
+    <!-- Tour Educativo del POS -->
     <ContextualTour 
       ref="posTourRef"
       module-name="pos"
@@ -101,14 +101,14 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-5">
         
         <div class="flex items-center gap-3 flex-1 w-full md:w-auto">
-          <!-- 📱 BOTÓN CAJA MÓVIL (Solo visible en móvil, al lado del buscador) -->
+          <!-- BOTÓN CAJA MÓVIL (Solo visible en móvil, al lado del buscador) -->
           <button 
             @click="hasOpenSession ? showCloseCashModal() : showOpenCashModal()"
             class="lg:hidden flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200"
             :class="hasOpenSession 
               ? 'bg-emerald-500 text-white' 
               : 'bg-[#f8f9fa] dark:bg-[#1e1f20] text-rose-500 dark:text-rose-400'"
-            :title="hasOpenSession ? 'Cerrar Caja' : '⚠️ Abrir Caja para vender'"
+            :title="hasOpenSession ? 'Cerrar Caja' : 'Abrir Caja para vender'"
           >
             <svg v-if="hasOpenSession" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
@@ -168,13 +168,13 @@
             </div>
           </div>
 
-          <!-- 🔍 DEBUG: Verificar condición del botón -->
+          <!-- DEBUG: Verificar condición del botón -->
           <!-- shouldShowMultiWarehouseFeatures: {{ shouldShowMultiWarehouseFeatures }} -->
           <!-- warehouses.length: {{ warehouses.length }} -->
           <!-- hasOpenSession: {{ hasOpenSession }} -->
           <!-- plan: {{ appStore.tenantPlan }} -->
 
-          <!-- 🌍 Toggle Búsqueda Global/Local (Siempre visible con sesión) -->
+          <!-- Toggle Búsqueda Global/Local (Siempre visible con sesión) -->
           <button
             v-if="shouldShowMultiWarehouseFeatures"
             @click="toggleGlobalSearch"
@@ -182,7 +182,7 @@
             :class="globalSearch 
               ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40' 
               : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40'"
-            :title="globalSearch ? '🌍 Buscando en TODAS las tiendas' : '🏪 Buscar SOLO en ' + (currentSession?.warehouse?.name || 'tienda actual')"
+            :title="globalSearch ? 'Buscando en TODAS las tiendas' : 'Buscar SOLO en ' + (currentSession?.warehouse?.name || 'tienda actual')"
           >
             <svg v-if="globalSearch" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -288,12 +288,12 @@
 </div>
     <!-- FIN BARRA DE HERRAMIENTAS EMPRESARIAL -->
     
-    <!-- 📱 BOTÓN FLOTANTE CARRITO MÓVIL -->
+    <!-- BOTÓN FLOTANTE CARRITO MÓVIL -->
     <button 
       @click="showMobileCart = true"
       class="lg:hidden fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3.5 rounded-2xl font-medium text-sm transition-all duration-300 active:scale-95"
       :class="cart.items.length > 0 
-        ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-xl' 
+        ? 'bg-gray-900 dark:bg-white text-white dark:text-zinc-900 shadow-xl' 
         : 'bg-white dark:bg-[#1e1f20] text-gray-600 dark:text-zinc-300 shadow-lg'"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -307,7 +307,7 @@
       </span>
     </button>
 
-    <!-- 📱 MODAL CARRITO MÓVIL (Slide from bottom) -->
+    <!-- MODAL CARRITO MÓVIL (Slide from bottom) -->
     <Teleport to="body">
       <Transition
         enter-active-class="transition ease-out duration-300"
@@ -334,7 +334,7 @@
             <div class="w-12 h-1.5 bg-gray-300 dark:bg-zinc-600 rounded-full"></div>
           </div>
           
-          <!-- ⚠️ Alerta Caja Cerrada (Solo si no hay sesión) -->
+          <!-- Alerta Caja Cerrada (Solo si no hay sesión) -->
           <div v-if="!hasOpenSession" class="mx-5 mb-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -497,7 +497,7 @@
       </Transition>
     </Teleport>
     
-    <!-- 📱 MODAL SELECTOR DE MÉTODOS DE PAGO MÓVIL -->
+    <!-- MODAL SELECTOR DE MÉTODOS DE PAGO MÓVIL -->
     <Teleport to="body">
       <Transition
         enter-active-class="transition ease-out duration-300"
@@ -572,7 +572,7 @@
       </Transition>
     </Teleport>
     
-    <!-- 📱 MODAL INPUT EFECTIVO MÓVIL -->
+    <!-- MODAL INPUT EFECTIVO MÓVIL -->
     <Teleport to="body">
       <Transition
         enter-active-class="transition ease-out duration-300"
@@ -661,9 +661,9 @@
       </Transition>
     </Teleport>
     
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 px-4 lg:px-6 py-3 pb-14 lg:pb-[56px]" style="flex: 1; min-height: 0; height: 100%; max-height: 100%; overflow: hidden;">
-  <!-- Panel Izquierdo: Catálogo de Productos - Full en móvil, 66% Fashion/FastFood (8/12) | 50% General (6/12) en desktop -->
-  <div :class="(isFashionStore || isFastFoodStore) ? 'lg:col-span-8' : 'lg:col-span-6'" class="col-span-1 lg:col-span-auto overflow-hidden" style="height: 100%; max-height: 100%;">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 px-4 lg:px-5 xl:px-6 py-3 pb-14 lg:pb-[56px]" style="flex: 1; min-height: 0; height: 100%; max-height: 100%; overflow: hidden;">
+  <!-- Panel Izquierdo: Catálogo de Productos - Full en móvil, 66% Fashion/FastFood (8/12) | 58% General (7/12) en desktop -->
+  <div :class="(isFashionStore || isFastFoodStore) ? 'lg:col-span-8' : 'lg:col-span-7 xl:col-span-6'" class="col-span-1 lg:col-span-auto overflow-hidden" style="height: 100%; max-height: 100%;">
     <div class="rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.08)] dark:shadow-2xl dark:shadow-black/50 border flex flex-col overflow-hidden" 
          :class="isFastFoodStore 
            ? 'bg-gradient-to-b from-[#FFFCF9] to-white dark:from-zinc-900 dark:to-zinc-900 border-amber-100/60 dark:border-zinc-800' 
@@ -679,7 +679,7 @@
                 :class="!selectedCategory 
                     ? (isFastFoodStore 
                         ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 font-semibold' 
-                        : 'bg-slate-900 dark:bg-white text-white dark:text-gray-900 font-semibold shadow-sm')
+                        : 'bg-slate-900 dark:bg-white text-white dark:text-zinc-900 font-semibold shadow-sm')
                     : (isFastFoodStore
                         ? 'text-gray-500 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/10 font-medium'
                         : 'text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-700 dark:hover:text-zinc-200 font-medium')"
@@ -695,7 +695,7 @@
                 :class="selectedCategory === cat.id
                     ? (isFastFoodStore 
                         ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 font-semibold' 
-                        : 'bg-slate-900 dark:bg-white text-white dark:text-gray-900 font-semibold shadow-sm')
+                        : 'bg-slate-900 dark:bg-white text-white dark:text-zinc-900 font-semibold shadow-sm')
                     : (isFastFoodStore
                         ? 'text-gray-500 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/10 font-medium'
                         : 'text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-700 dark:hover:text-zinc-200 font-medium')"
@@ -722,7 +722,7 @@
         </div>
       </div>
 
-      <!-- 🍔 RESTAURANTE - Header con estilo cálido y apetitoso -->
+      <!-- RESTAURANTE - Header con estilo cálido y apetitoso -->
       <div v-if="isFastFoodStore" class="flex-shrink-0 bg-gradient-to-r from-white to-amber-50/50 dark:from-zinc-900 dark:to-zinc-900 border-b border-amber-100/50 dark:border-zinc-800">
         <div class="px-5 py-4 flex items-center justify-between">
           <div class="flex items-center gap-4">
@@ -823,7 +823,7 @@
         </button>
       </div>
       
-      <!-- 👗 MODO FASHION - Diseño tipo Boutique/E-commerce Premium -->
+      <!-- MODO FASHION - Diseño tipo Boutique/E-commerce Premium -->
       <template v-if="isFashionStore">
         <!-- Header de Colección Fashion - Minimalista -->
         <div class="mb-5 flex items-center justify-between">
@@ -854,7 +854,7 @@
           </div>
         </div>
 
-        <!-- 🎨 GRID FASHION - Estilo Lookbook Premium -->
+        <!-- GRID FASHION - Estilo Lookbook Premium -->
         <div v-if="fashionViewMode === 'grid'" class="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 pb-20 content-start">
           <div
             v-for="(product, index) in paginatedProducts"
@@ -872,7 +872,7 @@
                 
                 <!-- Badge cantidad en carrito -->
                 <div v-if="getProductQuantityInCart(product.id) > 0" 
-                     class="absolute top-2 right-2 z-20 w-5 h-5 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-semibold flex items-center justify-center">
+                     class="absolute top-2 right-2 z-20 w-5 h-5 rounded-full bg-gray-900 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-semibold flex items-center justify-center">
                   {{ getProductQuantityInCart(product.id) }}
                 </div>
                 
@@ -919,7 +919,7 @@
           </div>
         </div>
         
-        <!-- 📋 LISTA FASHION - Vista detallada -->
+        <!-- LISTA FASHION - Vista detallada -->
         <div v-else class="space-y-3 pb-20">
           <div
             v-for="product in paginatedProducts"
@@ -963,7 +963,7 @@
                     {{ getTotalStock(product) }}
                   </span>
                   <!-- Badge si está en carrito -->
-                  <span v-if="getProductQuantityInCart(product.id) > 0" class="px-2 py-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-bold rounded-full">
+                  <span v-if="getProductQuantityInCart(product.id) > 0" class="px-2 py-1 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-bold rounded-full">
                     {{ getProductQuantityInCart(product.id) }}
                   </span>
                 </div>
@@ -973,7 +973,7 @@
         </div>
       </template>
       
-      <!-- 🍔 MODO RESTAURANTE / COMIDA RÁPIDA - Componente Externo -->
+      <!-- MODO RESTAURANTE / COMIDA RÁPIDA - Componente Externo -->
       <template v-else-if="isFastFoodStore">
         <PosFastFoodGrid 
           :products="paginatedProducts"
@@ -982,8 +982,8 @@
         />
       </template>
       
-      <!-- 📦 GRID MODO GENERAL - Compacto y funcional (DISEÑO PREMIUM) -->
-      <div v-else class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3.5 pb-20 min-h-[600px] content-start">
+      <!-- GRID MODO GENERAL - Compacto y funcional (DISEÑO PREMIUM) -->
+      <div v-else class="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3 xl:gap-3.5 pb-20 min-h-[600px] content-start">
         <div
           v-for="product in paginatedProducts"
           :key="product.id"
@@ -992,13 +992,13 @@
           @click="addToCart(product)"
         >
           
-          <!-- 🖼️ CONTENEDOR DE IMAGEN -->
+          <!-- CONTENEDOR DE IMAGEN -->
           <div class="aspect-square relative flex items-center justify-center"
                :class="(product.image_url || product.image) ? 'bg-white dark:bg-[#282a2c]' : 'bg-[#F3F4F6] dark:bg-zinc-800'"
           >
              <!-- Badge de cantidad en carrito (gris oscuro profesional - menos ruido visual) -->
              <div v-if="getProductQuantityInCart(product.id) > 0" 
-                  class="absolute top-1.5 right-1.5 z-10 w-5 h-5 rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-medium flex items-center justify-center">
+                  class="absolute top-1.5 right-1.5 z-10 w-5 h-5 rounded-full bg-gray-900 dark:bg-white text-white dark:text-zinc-900 text-[10px] font-medium flex items-center justify-center">
                {{ getProductQuantityInCart(product.id) }}
              </div>
              
@@ -1025,7 +1025,7 @@
             </div>
           </div>
 
-          <!-- 📝 INFORMACIÓN - Jerarquía tipográfica premium -->
+          <!-- INFORMACIÓN - Jerarquía tipográfica premium -->
           <div class="p-3 h-[80px] flex flex-col justify-between bg-white dark:bg-[#1e1f20] border-t border-gray-100 dark:border-zinc-800/50">
             
             <!-- Categoría pequeña y sutil -->
@@ -1051,7 +1051,7 @@
         </div>
       </div>
 
-      <!-- 📄 BOTÓN CARGAR MÁS PRODUCTOS -->
+      <!-- BOTÓN CARGAR MÁS PRODUCTOS -->
       <div v-if="remainingProductsCount > 0" class="flex justify-center pb-20 pt-4">
         <button 
           @click="loadMoreProducts"
@@ -1073,9 +1073,9 @@
 <!-- bloque de ventas - 33% Fashion/FastFood (4/12) | Panel Central General (3/12) -->
 
 <!-- Panel Derecho: Carrito/Ticket - OCULTO EN MÓVIL - 4 columnas (33%) -->
-<div :class="(isFashionStore || isFastFoodStore) ? 'lg:col-span-4' : 'lg:col-span-3'" class="hidden lg:block overflow-hidden" style="max-height: 100%;">
+<div :class="(isFashionStore || isFastFoodStore) ? 'lg:col-span-4' : 'lg:col-span-3 xl:col-span-3'" class="hidden lg:block overflow-hidden" style="max-height: 100%;">
   
-  <!-- 🍔 CARRITO FAST FOOD - Componente Externo -->
+  <!-- CARRITO FAST FOOD - Componente Externo -->
   <PosFastFoodCart 
     v-if="isFastFoodStore"
     :cart-items="cart.items"
@@ -1096,11 +1096,11 @@
     @checkout="handleCobrarClick"
   />
 
-  <!-- 👗 CARRITO FASHION + GENERAL -->
+  <!-- CARRITO FASHION + GENERAL -->
   <div v-else class="flex flex-col overflow-hidden bg-white dark:bg-[#141416] rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.08)] dark:shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-zinc-700 transition-all duration-300"
        style="height: 100%; max-height: 100%;">
     
-    <!-- 🏷️ HEADER TICKET -->
+    <!-- HEADER TICKET -->
     <div class="flex-shrink-0 px-5 pt-4 pb-3 border-b border-gray-100 dark:border-zinc-800/50">
       <!-- Header para Fashion y General -->
       <div class="flex items-center justify-between mb-3">
@@ -1115,7 +1115,7 @@
         </span>
       </div>
 
-      <!-- 👤 CLIENTE + CUPÓN - Card visible y clicable -->
+      <!-- CLIENTE + CUPÓN - Card visible y clicable -->
       <div class="flex items-stretch gap-2">
         <button
           id="tour-customer-btn-normal"
@@ -1126,20 +1126,20 @@
             : 'bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:border-gray-300'"
         >
           <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-               :class="selectedCustomer ? 'bg-white/20 dark:bg-gray-900/20' : 'bg-white dark:bg-zinc-700'">
-            <svg class="w-4 h-4" :class="selectedCustomer ? 'text-white dark:text-gray-900' : 'text-gray-500 dark:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+               :class="selectedCustomer ? 'bg-white/20 dark:bg-zinc-900/20' : 'bg-white dark:bg-zinc-700'">
+            <svg class="w-4 h-4" :class="selectedCustomer ? 'text-white dark:text-zinc-900' : 'text-gray-500 dark:text-zinc-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
           </div>
           <div class="flex-1 min-w-0 text-left">
-            <span class="text-[11px] font-bold block uppercase tracking-[0.12em] leading-none" :class="selectedCustomer ? 'text-white/75 dark:text-gray-900/75' : 'text-gray-500 dark:text-zinc-400'">
+            <span class="text-[11px] font-bold block uppercase tracking-[0.12em] leading-none" :class="selectedCustomer ? 'text-white/75 dark:text-zinc-900/75' : 'text-gray-500 dark:text-zinc-400'">
               {{ selectedCustomer ? 'Cliente' : 'Asignar Cliente' }}
             </span>
-            <span class="text-[15px] font-semibold block leading-tight truncate mt-1" :class="selectedCustomer ? 'text-white dark:text-gray-900' : 'text-gray-800 dark:text-zinc-200'">
+            <span class="text-[15px] font-semibold block leading-tight truncate mt-1" :class="selectedCustomer ? 'text-white dark:text-zinc-900' : 'text-gray-800 dark:text-zinc-200'">
               {{ selectedCustomer ? selectedCustomer.name : 'Seleccionar...' }}
             </span>
           </div>
-          <svg class="w-4 h-4 flex-shrink-0" :class="selectedCustomer ? 'text-white/50 dark:text-gray-900/50' : 'text-gray-400 dark:text-zinc-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <svg class="w-4 h-4 flex-shrink-0" :class="selectedCustomer ? 'text-white/50 dark:text-zinc-900/50' : 'text-gray-400 dark:text-zinc-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
           </svg>
         </button>
@@ -1158,8 +1158,8 @@
         </button>
       </div>
 
-      <!-- Input Cupón Expandible -->
-      <div v-if="showPromoCodeInput" class="mt-2 animate-fade-in">
+      <!-- Input Cupón Expandible (solo fashion, en general está en col 3) -->
+      <div v-if="showPromoCodeInput && isFashionStore" class="mt-2 animate-fade-in">
         <div class="flex gap-2">
           <input
             v-model="promoCode"
@@ -1171,7 +1171,7 @@
           <button
             @click="applyPromoCode"
             :disabled="!promoCode.trim()"
-            class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-medium rounded-full disabled:opacity-40 transition-all"
+            class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-medium rounded-full disabled:opacity-40 transition-all"
           >OK</button>
         </div>
       </div>
@@ -1226,7 +1226,7 @@
         </div>
       </div>
 
-      <!-- 🛒 LISTA DE ITEMS -->
+      <!-- LISTA DE ITEMS -->
       <div v-else class="px-4 py-3 space-y-1">
         <div
           v-for="item in cart.items"
@@ -1286,11 +1286,11 @@
       </div>
     </div>
     
-    <!-- 👗 SECCIÓN DE PAGO - Luxury Retail Minimal -->
+    <!-- SECCIÓN DE PAGO - Luxury Retail Minimal -->
     <div v-if="isFashionStore" class="flex-shrink-0 bg-white dark:bg-[#141416]">
       
       <div class="px-5 py-4">
-        <!-- 💰 TOTAL ENORME - Estilo Apple/Zara -->
+        <!-- TOTAL ENORME - Estilo Apple/Zara -->
         <div class="text-center mb-5">
           <p class="text-[10px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-[0.2em] mb-1">Total</p>
           <h2 class="text-5xl font-light text-gray-900 dark:text-white tracking-tight">${{ total.toLocaleString() }}</h2>
@@ -1299,7 +1299,7 @@
           </p>
         </div>
       
-        <!-- 💳 MÉTODOS DE PAGO - Iconos Cuadrados Minimalistas -->
+        <!-- MÉTODOS DE PAGO - Iconos Cuadrados Minimalistas -->
         <div class="flex gap-2 mb-4 justify-center flex-wrap">
           <button 
             v-for="method in paymentMethods" 
@@ -1307,7 +1307,7 @@
             @click="selectedPaymentMethod = method.id"
             class="w-[72px] h-16 rounded-xl flex flex-col items-center justify-center gap-1.5 transition-all duration-200"
             :class="selectedPaymentMethod === method.id 
-              ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-lg' 
+              ? 'bg-gray-900 dark:bg-white text-white dark:text-zinc-900 shadow-lg' 
               : 'bg-white dark:bg-zinc-800/50 text-gray-500 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-500'"
           >
             <svg v-if="method.id === 'efectivo'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
@@ -1333,16 +1333,16 @@
         
         <!-- Descuento aplicado -->
         <p v-if="discount > 0" class="text-xs text-emerald-600 dark:text-emerald-400 text-center mb-3 font-medium">
-          ✓ Descuento: -${{ discount.toLocaleString() }}
+          Descuento: -${{ discount.toLocaleString() }}
         </p>
       
-        <!-- 🎯 BOTÓN PAGAR - Grande y Negro -->
+        <!-- BOTÓN PAGAR - Grande y Negro -->
         <button
           @click="handleCobrarClick"
           :disabled="!canShowPaymentModal || quotationMode"
           class="w-full py-4 rounded-xl font-medium text-base transition-all duration-200"
           :class="canShowPaymentModal && !quotationMode
-            ? 'bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 active:scale-[0.99] shadow-lg'
+            ? 'bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-zinc-900 active:scale-[0.99] shadow-lg'
             : 'bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-zinc-500 cursor-not-allowed'"
         >
           Completar Compra
@@ -1371,12 +1371,12 @@
 <!-- fin bloque de ventas -->  
 
 <!-- Panel de Pagos - Solo visible en modo General (3/12) - Se oculta en Fashion y FastFood - OCULTO EN MÓVIL -->
-<div v-if="!isFashionStore && !isFastFoodStore" id="tour-pos-cart" class="hidden lg:block lg:col-span-3 h-full overflow-hidden">
+<div v-if="!isFashionStore && !isFastFoodStore" id="tour-pos-cart" class="hidden lg:block lg:col-span-2 xl:col-span-3 h-full overflow-hidden">
   
   <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-700 h-full flex flex-col justify-between shadow-[0_1px_4px_rgba(0,0,0,0.08)] dark:shadow-2xl dark:shadow-black/50 transition-all duration-300"
        :class="cart.items.length > 0 ? 'border-l-emerald-300/50 dark:border-l-emerald-800/30' : ''">
     
-    <!-- 💰 HEADER: Total Protagonista -->
+    <!-- HEADER: Total Protagonista -->
     <div class="px-4 pt-4 pb-3 flex-shrink-0 border-b border-gray-100 dark:border-zinc-800/60">
       <p class="text-xs font-extrabold uppercase tracking-[0.16em] transition-colors duration-300" :class="cart.items.length > 0 ? 'text-gray-600 dark:text-zinc-300' : 'text-gray-400 dark:text-zinc-500'">Total a Pagar</p>
       <div class="flex items-baseline justify-between mt-1">
@@ -1391,11 +1391,11 @@
           </p>
         </div>
     
-    <!-- 📦 ÁREA DE CONTENIDO CENTRAL -->
+    <!-- ÁREA DE CONTENIDO CENTRAL -->
     <div class="flex-1 overflow-y-auto px-3 py-3 pb-32 space-y-3"
          style="scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;">
 
-        <!-- 🎯 CONFIGURACIÓN DE PAGO -->
+        <!-- CONFIGURACIÓN DE PAGO -->
         <div class="space-y-2" :class="{ 'opacity-40 pointer-events-none select-none': cart.items.length === 0 }">
         
         <!-- Descuento Aplicado (Solo si existe) -->
@@ -1481,7 +1481,7 @@
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
             </div>
-            <p v-if="pointsDiscount > 0" class="text-[9px] text-emerald-600 dark:text-emerald-400 mt-1 font-bold">✓ Descuento: -${{ pointsDiscount.toLocaleString() }}</p>
+            <p v-if="pointsDiscount > 0" class="text-[9px] text-emerald-600 dark:text-emerald-400 mt-1 font-bold">Descuento: -${{ pointsDiscount.toLocaleString() }}</p>
           </div>
 
           <div v-if="showPromoCodeInput" class="mt-1.5 animate-fade-in">
@@ -1507,8 +1507,8 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
             </div>
-            <p v-if="promoError" class="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-semibold">⚠️ {{ promoError }}</p>
-            <p v-if="discount > 0 && !promoError" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 font-semibold">✓ Código aplicado: -${{ discount.toLocaleString() }}</p>
+            <p v-if="promoError" class="text-xs text-rose-600 dark:text-rose-400 mt-1.5 font-semibold">{{ promoError }}</p>
+            <p v-if="discount > 0 && !promoError" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1.5 font-semibold">Código aplicado: -${{ discount.toLocaleString() }}</p>
           </div>
         </div>
 
@@ -1840,7 +1840,7 @@
       @close="showCustomerHistory = false"
     />
 
-    <!-- 👗 Modal de Selección de Variantes (Fashion) -->
+    <!-- Modal de Selección de Variantes (Fashion) -->
     <POSVariantSelector
       :show="showVariantSelector"
       :product="selectedProductForVariants"
@@ -2021,7 +2021,7 @@
             <div class="px-6 pb-6">
               <div class="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl p-4 mb-4">
                 <p class="text-sm text-red-800 dark:text-red-400 text-center font-medium">
-                  ⚠️ No se puede usar "Cliente Final"
+                  No se puede usar "Cliente Final"
                 </p>
               </div>
               <p class="text-center text-gray-600 dark:text-zinc-400 text-sm">
@@ -2052,7 +2052,7 @@
       </Transition>
     </Teleport>
 
-    <!-- 🚫 Modal: Límite de Facturas del Plan Gratuito Alcanzado -->
+    <!-- Modal: Límite de Facturas del Plan Gratuito Alcanzado -->
     <Teleport to="body">
       <div v-if="showFreePlanLimitModal" class="fixed inset-0 bg-black/85 flex items-center justify-center z-[60] p-4">
         <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800">
@@ -2075,7 +2075,7 @@
             </p>
             
             <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
-              💡 Actualiza tu plan para seguir vendiendo sin límites
+              Actualiza tu plan para seguir vendiendo sin límites
             </p>
 
             <!-- Botones -->
@@ -2122,7 +2122,7 @@
             <div class="px-6 pb-6">
               <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl p-4 mb-4">
                 <p class="text-sm text-amber-800 dark:text-amber-400 text-center font-medium">
-                  ⚠️ Los productos en el carrito se eliminarán permanentemente
+                  Los productos en el carrito se eliminarán permanentemente
                 </p>
               </div>
             </div>
@@ -2152,7 +2152,7 @@
 
     <!-- Modal de Confirmación de Cotización -->
     <div v-if="showQuotationConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl">
+      <div class="bg-white dark:bg-zinc-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl">
         <div class="text-center">
           <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
             <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2160,7 +2160,7 @@
             </svg>
           </div>
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Confirmar Cotización</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          <p class="text-sm text-gray-500 dark:text-zinc-400 mb-6">
             ¿Está seguro que desea crear una cotización con estos datos?
           </p>
           
@@ -2184,17 +2184,17 @@
           </div>
           
           <!-- Resumen de la cotización -->
-          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6 text-left">
+          <div class="bg-gray-50 dark:bg-zinc-700 rounded-lg p-4 mb-6 text-left">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Cliente:</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">Cliente:</span>
               <span class="text-sm text-gray-900 dark:text-white">{{ selectedCustomer?.name || 'Cliente Final' }}</span>
             </div>
             <div class="flex justify-between items-center mb-2">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Productos:</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">Productos:</span>
               <span class="text-sm text-gray-900 dark:text-white">{{ cart.items.length }} artículo(s)</span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total:</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-zinc-300">Total:</span>
               <span class="text-sm font-semibold text-gray-900 dark:text-white">${{ total.toFixed(2) }}</span>
             </div>
           </div>
@@ -2202,7 +2202,7 @@
           <div class="flex space-x-3">
             <button
               @click="showQuotationConfirmModal = false"
-              class="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg font-medium hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+              class="flex-1 bg-gray-300 dark:bg-zinc-600 text-gray-700 dark:text-zinc-200 px-4 py-2 rounded-lg font-medium hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
             >
               Cancelar
             </button>
@@ -2501,7 +2501,7 @@
 
     <!-- Modal de Escáner QR -->
     <div v-if="showQRScanner" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full">
+      <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl max-w-md w-full">
         <!-- Header -->
         <div class="bg-blue-600 dark:bg-blue-700 p-4 rounded-t-xl">
           <div class="flex items-center justify-between">
@@ -2543,8 +2543,8 @@
           
           <!-- Status -->
           <div class="mt-4 text-center">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              📱 Escaneando... Muestre el código QR de la cotización
+            <p class="text-sm text-gray-600 dark:text-zinc-400">
+              Escaneando... Muestre el código QR de la cotización
             </p>
           </div>
           
@@ -2641,7 +2641,7 @@
 
   <!-- Modal de Error de Cotización -->
   <div v-if="showQuotationErrorModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100 border border-red-200 dark:border-red-800">
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100 border border-red-200 dark:border-red-800">
       <!-- Header -->
       <div class="bg-gradient-to-r from-red-600 via-red-500 to-red-700 dark:from-red-900 dark:via-red-800 dark:to-red-900 p-6 rounded-t-3xl border-b border-red-300 dark:border-red-700">
         <div class="flex items-center justify-between">
@@ -2720,7 +2720,7 @@
     @close="showConfirmCustomerModal = false"
   />
 
-  <!-- 🎫 BARRA DE MULTI-TABS INFERIOR (Footer Fijo) - SOLO DESKTOP -->
+  <!-- BARRA DE MULTI-TABS INFERIOR (Footer Fijo) - SOLO DESKTOP -->
   <div id="tour-pos-multisales" class="hidden lg:block fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121214] border-t border-gray-300/70 dark:border-zinc-700/80 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] dark:shadow-[0_-2px_12px_rgba(0,0,0,0.35)] z-50 h-[48px]">
     <div class="flex items-center h-full px-2 max-w-screen-2xl mx-auto">
       
@@ -3208,7 +3208,7 @@ const {
 // Variables locales que se sincronizan con appStore (evitar readonly del composable)
 const currentSession = ref(null)
 const hasOpenSession = ref(false)
-const warehouses = ref([]) // 🏢 Lista de todas las warehouses/sedes
+const warehouses = ref([]) // Lista de todas las warehouses/sedes
 
 // Current user info
 const currentUser = computed(() => {
@@ -3225,7 +3225,7 @@ const isAdminUser = computed(() => {
 // Loading state para WhatsApp y Email
 const isLoading = ref(false)
 
-// 🎯 Validaciones de Plan del Tenant
+// Validaciones de Plan del Tenant
 // WhatsApp solo para Premium y Enterprise
 const canUseWhatsApp = computed(() => {
   const tenantPlan = appStore.tenantPlan || 'free_trial'
@@ -3240,13 +3240,13 @@ const canUseWebOrders = computed(() => {
   return allowedPlans.includes(tenantPlan)
 })
 
-// 🎯 TOUR DEL POS - Control de bienvenida y primera visita
+// TOUR DEL POS - Control de bienvenida y primera visita
 const DEV_MODE = false // false = Tour solo primera vez | true = Tour siempre disponible
 const isFirstVisit = ref(DEV_MODE || !localStorage.getItem('pos_tour_completed'))
 const showWelcomeModal = ref(false)
 const posTourRef = ref(null)
 
-// 🎯 TOUR EDUCATIVO DEL POS - Pasos amigables y didácticos
+// TOUR EDUCATIVO DEL POS - Pasos amigables y didácticos
 const posTourSteps = ref([
   {
     selector: '#tour-pos-cash-btn',
@@ -3316,13 +3316,13 @@ const posTourSteps = ref([
   }
 ])
 
-// 🎉 Función para crear efecto de confeti ÉPICO
+// Función para crear efecto de confeti ÉPICO
 const triggerConfetti = () => {
   const duration = 3000
   const animationEnd = Date.now() + duration
   const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#ef4444']
   
-  // 🎯 Obtener factor de compensación de escalado
+  // Obtener factor de compensación de escalado
   const { appliedZoom, isCompensating } = useScreenScaling()
   const zoomFactor = isCompensating.value ? appliedZoom.value : 1
 
@@ -3381,10 +3381,10 @@ const handlePosTourComplete = () => {
     isFirstVisit.value = false
   }
   
-  // 🎉 EFECTO DE CONFETI AL COMPLETAR EL TOUR
+  // EFECTO DE CONFETI AL COMPLETAR EL TOUR
   triggerConfetti()
   
-  showSuccess('¡Felicidades! Ya dominas el POS como un profesional 🎉')
+  showSuccess('¡Felicidades! Ya dominas el POS como un profesional ')
 }
 
 const handlePosTourSkip = () => {
@@ -3453,7 +3453,7 @@ const getLocalColombiaDate = (date = new Date()) => {
   return localDate.toISOString()
 }
 
-// 🎨 Paleta de colores moderna para fallbacks (SaaS Enterprise Style)
+// Paleta de colores moderna para fallbacks (SaaS Enterprise Style)
 const fallbackColors = [
   { bg: '#EEF2FF', text: '#4F46E5' }, // Indigo
   { bg: '#F0F9FF', text: '#0EA5E9' }, // Sky
@@ -3465,7 +3465,7 @@ const fallbackColors = [
   { bg: '#FFF1F2', text: '#F43F5E' }  // Rose
 ]
 
-// 🔤 Obtener iniciales del producto
+// Obtener iniciales del producto
 const getInitials = (name) => {
   if (!name) return '??'
   return name
@@ -3476,7 +3476,7 @@ const getInitials = (name) => {
     .toUpperCase()
 }
 
-// 🎨 Obtener color determinista basado en el nombre
+// Obtener color determinista basado en el nombre
 const getColorForName = (name) => {
   if (!name) return fallbackColors[0]
   let hash = 0
@@ -3487,7 +3487,7 @@ const getColorForName = (name) => {
   return fallbackColors[index]
 }
 
-// 🖼️ Generar SVG PROFESIONAL para placeholder (con gradiente elegante)
+// Generar SVG PROFESIONAL para placeholder (con gradiente elegante)
 const generateAvatarSVG = (name) => {
   const initials = getInitials(name)
   
@@ -3552,7 +3552,7 @@ const generateAvatarSVG = (name) => {
   return `data:image/svg+xml,${encoded}`
 }
 
-// 🎨 Genera un fondo pastel suave a partir del color hex de la categoría
+// Genera un fondo pastel suave a partir del color hex de la categoría
 const getCategoryBg = (hexColor) => {
   if (!hexColor || hexColor === '#6b7280') return '#F3F4F6'
   // Parse hex → RGB, luego mezclar con blanco al 88% para un tono pastel muy suave
@@ -3566,7 +3566,7 @@ const getCategoryBg = (hexColor) => {
   return `rgb(${pr}, ${pg}, ${pb})`
 }
 
-// 🖼️ Función utilitaria para manejo inteligente de imágenes
+// Función utilitaria para manejo inteligente de imágenes
 const getProductImage = (product) => {
   // Intentar múltiples propiedades de imagen
   const imageUrl = product.image_url || product.image || product.img || product.photo
@@ -3599,7 +3599,7 @@ const getProductImage = (product) => {
   return generateAvatarSVG(product.name || 'Producto')
 }
 
-// 🔎 Validar si una imagen es REAL (no placeholder SVG)
+// Validar si una imagen es REAL (no placeholder SVG)
 const isRealProductImage = (imageUrl) => {
   if (!imageUrl || typeof imageUrl !== 'string') return false
   const url = imageUrl.trim()
@@ -3609,7 +3609,7 @@ const isRealProductImage = (imageUrl) => {
   return true
 }
 
-// 🔐 Función para generar identificador de usuario consistente para descuentos
+// Función para generar identificador de usuario consistente para descuentos
 const getUserIdentifier = () => {
   // Prioridad 1: Si hay cliente seleccionado, usar su ID + email
   if (selectedCustomer.value?.id) {
@@ -3655,12 +3655,12 @@ const loadDiscounts = async () => {
   }
 }
 
-// 🏢 Cargar todas las warehouses/sedes para validar multi-warehouse features
+// Cargar todas las warehouses/sedes para validar multi-warehouse features
 const loadWarehouses = async () => {
   try {
     const response = await warehouseService.getAll()
     
-    // ✅ CORRECCIÓN: warehouseService.getAll() ya devuelve response.data
+    // CORRECCIÓN: warehouseService.getAll() ya devuelve response.data
     // No necesitamos acceder a response.data.data
     if (response.warehouses) {
       warehouses.value = response.warehouses || []
@@ -3668,7 +3668,7 @@ const loadWarehouses = async () => {
       warehouses.value = []
     }
   } catch (error) {
-    console.error('❌ [loadWarehouses] Error:', error)
+    console.error('[loadWarehouses] Error:', error)
     warehouses.value = []
   }
 }
@@ -3701,18 +3701,18 @@ const discountsFromApi = ref([])
 const searchTerm = ref('')
 const selectedCategory = ref(null)
 const selectedCustomer = ref(null)
-const selectedPaymentMethod = ref('efectivo') // 💰 Por defecto EFECTIVO como solicitado
+const selectedPaymentMethod = ref('efectivo') // Por defecto EFECTIVO como solicitado
 const cashReceived = ref(0)
 const processing = ref(false)
 const searchingQuotation = ref(false) // Evitar múltiples búsquedas simultáneas
-const globalSearch = ref(localStorage.getItem('posGlobalSearch') === 'true') // 🌍 Toggle para búsqueda global de productos
+const globalSearch = ref(localStorage.getItem('posGlobalSearch') === 'true') // Toggle para búsqueda global de productos
 
 // Persistir el estado de búsqueda global
 watch(globalSearch, (newValue) => {
   localStorage.setItem('posGlobalSearch', newValue.toString())
 })
 
-// 🎁 Loyalty Points - Variables para redimir puntos
+// Loyalty Points - Variables para redimir puntos
 const usePoints = ref(false)
 const pointsToRedeem = ref(0)
 const pointsDiscount = ref(0)
@@ -3745,11 +3745,11 @@ const showAfterPaymentModal = ref(false)
 const showReceiptModal = ref(false)
 const showRequireCustomerModal = ref(false)
 
-// 🧾 Estados para sincronización con el modal de pago (Factus/CUFE)
+// Estados para sincronización con el modal de pago (Factus/CUFE)
 const backendProcessingPayment = ref(false)
 const backendPaymentSuccess = ref(false)
 
-// 🧾 Toggle Facturación Electrónica DIAN
+// Toggle Facturación Electrónica DIAN
 const electronicInvoicingEnabled = ref(localStorage.getItem('electronicInvoicingEnabled') !== 'false')
 
 // Función para toggle de facturación electrónica
@@ -3758,7 +3758,7 @@ const toggleElectronicInvoicing = () => {
   localStorage.setItem('electronicInvoicingEnabled', electronicInvoicingEnabled.value.toString())
 }
 
-// 🚫 Estado para modal de límite de facturas alcanzado (plan gratuito)
+// Estado para modal de límite de facturas alcanzado (plan gratuito)
 const showFreePlanLimitModal = ref(false)
 const freePlanLimitData = ref({
   invoiceCount: 0,
@@ -3881,7 +3881,7 @@ const originalQuotationProducts = ref([])
 // Variable para mostrar/ocultar input de código promocional
 const showPromoCodeInput = ref(false)
 
-// 👗 MODO FASHION - Variables para el diseño de tienda de ropa
+// MODO FASHION - Variables para el diseño de tienda de ropa
 const fashionViewMode = ref('grid') // 'grid' | 'list'
 
 // Función para detectar si un producto es nuevo (menos de 7 días)
@@ -3896,7 +3896,7 @@ const isNewProduct = (product) => {
 // Número de factura real desde el backend
 const nextInvoiceNumber = ref('FACT-000001') // Valor inicial por defecto
 
-// 🔧 FIX: Mostrar spinner de carga SOLO después de un delay para evitar flash
+// FIX: Mostrar spinner de carga SOLO después de un delay para evitar flash
 // Esto previene el parpadeo molesto cuando la carga es rápida
 const loadingDelayPassed = ref(false)
 let loadingDelayTimer = null
@@ -4052,7 +4052,7 @@ watch(showQuantityModal, (isOpen) => {
   }
 })
 
-// 👗 Modal de Selección de Variantes (Fashion/Moda)
+// Modal de Selección de Variantes (Fashion/Moda)
 const showVariantSelector = ref(false)
 const selectedProductForVariants = ref(null)
 
@@ -4172,7 +4172,7 @@ const cart = reactive({
 // Última venta
 const lastSale = ref(null)
 
-// 🎫 SISTEMA DE MULTI-TABS para ventas simultáneas
+// SISTEMA DE MULTI-TABS para ventas simultáneas
 const salesTabs = ref([
   {
     id: 'tab-main',
@@ -4208,55 +4208,55 @@ const getTabDisplayName = (tab) => {
 // Métodos de pago por defecto - ELIMINADOS para evitar doble carga
 // Ahora solo se mostrarán los métodos de pago reales de la API
 
-// 🎨 Lista de iconos de categorías (95 iconos) - sincronizada con CategoriesView
+// Lista de iconos de categorías (95 iconos) - sincronizada con CategoriesView
 const categoryIcons = [
   // General
-  { id: 'shopping-bag', emoji: '🛍️' }, { id: 'gift', emoji: '🎁' }, { id: 'package', emoji: '📦' }, { id: 'money', emoji: '💰' },
+  { id: 'shopping-bag', emoji: '' }, { id: 'gift', emoji: '' }, { id: 'package', emoji: '' }, { id: 'money', emoji: '' },
   // Comida y Bebidas
-  { id: 'food', emoji: '🍽️' }, { id: 'drink', emoji: '🥤' }, { id: 'coffee', emoji: '☕' }, { id: 'wine', emoji: '🍷' },
-  { id: 'beer', emoji: '🍺' }, { id: 'bread', emoji: '🍞' }, { id: 'meat', emoji: '🥩' }, { id: 'fruit', emoji: '🍎' },
-  { id: 'vegetable', emoji: '🥬' }, { id: 'candy', emoji: '🍬' }, { id: 'ice-cream', emoji: '🍦' }, { id: 'pizza', emoji: '🍕' },
-  { id: 'burger', emoji: '🍔' }, { id: 'chicken', emoji: '🍗' }, { id: 'fish', emoji: '🐟' }, { id: 'cheese', emoji: '🧀' },
+  { id: 'food', emoji: '' }, { id: 'drink', emoji: '' }, { id: 'coffee', emoji: '' }, { id: 'wine', emoji: '' },
+  { id: 'beer', emoji: '' }, { id: 'bread', emoji: '' }, { id: 'meat', emoji: '' }, { id: 'fruit', emoji: '' },
+  { id: 'vegetable', emoji: '' }, { id: 'candy', emoji: '' }, { id: 'ice-cream', emoji: '' }, { id: 'pizza', emoji: '' },
+  { id: 'burger', emoji: '' }, { id: 'chicken', emoji: '' }, { id: 'fish', emoji: '' }, { id: 'cheese', emoji: '' },
   // Belleza
-  { id: 'perfume', emoji: '💐' }, { id: 'cosmetics', emoji: '💄' }, { id: 'nail', emoji: '💅' }, { id: 'haircut', emoji: '💇' }, { id: 'mirror', emoji: '🪞' },
+  { id: 'perfume', emoji: '' }, { id: 'cosmetics', emoji: '' }, { id: 'nail', emoji: '' }, { id: 'haircut', emoji: '' }, { id: 'mirror', emoji: '🪞' },
   // Limpieza
-  { id: 'soap', emoji: '🧼' }, { id: 'cleaning', emoji: '🧹' }, { id: 'toilet', emoji: '🚽' },
+  { id: 'soap', emoji: '' }, { id: 'cleaning', emoji: '' }, { id: 'toilet', emoji: '' },
   // Papelería
-  { id: 'book', emoji: '📚' }, { id: 'pencil', emoji: '✏️' }, { id: 'scissors', emoji: '✂️' }, { id: 'printer', emoji: '🖨️' }, { id: 'folder', emoji: '📁' },
+  { id: 'book', emoji: '' }, { id: 'pencil', emoji: '' }, { id: 'scissors', emoji: '' }, { id: 'printer', emoji: '' }, { id: 'folder', emoji: '' },
   // Moda
-  { id: 'tshirt', emoji: '👕' }, { id: 'dress', emoji: '👗' }, { id: 'jeans', emoji: '👖' }, { id: 'shoe', emoji: '👟' },
-  { id: 'heels', emoji: '👠' }, { id: 'hat', emoji: '🎩' }, { id: 'watch', emoji: '⌚' }, { id: 'glasses', emoji: '👓' },
-  { id: 'bag', emoji: '👜' }, { id: 'jewelry', emoji: '💍' }, { id: 'necktie', emoji: '👔' },
+  { id: 'tshirt', emoji: '' }, { id: 'dress', emoji: '' }, { id: 'jeans', emoji: '' }, { id: 'shoe', emoji: '' },
+  { id: 'heels', emoji: '' }, { id: 'hat', emoji: '' }, { id: 'watch', emoji: '⌚' }, { id: 'glasses', emoji: '' },
+  { id: 'bag', emoji: '' }, { id: 'jewelry', emoji: '' }, { id: 'necktie', emoji: '' },
   // Salud
-  { id: 'pill', emoji: '💊' }, { id: 'medical', emoji: '⚕️' }, { id: 'syringe', emoji: '💉' }, { id: 'thermometer', emoji: '🌡️' },
+  { id: 'pill', emoji: '' }, { id: 'medical', emoji: '' }, { id: 'syringe', emoji: '' }, { id: 'thermometer', emoji: '' },
   // Niños
-  { id: 'toy', emoji: '🧸' }, { id: 'baby', emoji: '👶' }, { id: 'bottle', emoji: '🍼' }, { id: 'stroller', emoji: '🍼' },
+  { id: 'toy', emoji: '' }, { id: 'baby', emoji: '' }, { id: 'bottle', emoji: '' }, { id: 'stroller', emoji: '' },
   // Tecnología
-  { id: 'electronics', emoji: '📱' }, { id: 'computer', emoji: '💻' }, { id: 'camera', emoji: '📷' }, { id: 'headphones', emoji: '🎧' },
-  { id: 'keyboard', emoji: '⌨️' }, { id: 'mouse', emoji: '🖱️' }, { id: 'tv', emoji: '📺' }, { id: 'game', emoji: '🎮' },
+  { id: 'electronics', emoji: '' }, { id: 'computer', emoji: '' }, { id: 'camera', emoji: '' }, { id: 'headphones', emoji: '' },
+  { id: 'keyboard', emoji: '⌨️' }, { id: 'mouse', emoji: '' }, { id: 'tv', emoji: '' }, { id: 'game', emoji: '' },
   // Ferretería
-  { id: 'tools', emoji: '🔧' }, { id: 'hammer', emoji: '🔨' }, { id: 'saw', emoji: '🪚' }, { id: 'wrench', emoji: '🔩' }, { id: 'paint', emoji: '🎨' },
+  { id: 'tools', emoji: '' }, { id: 'hammer', emoji: '' }, { id: 'saw', emoji: '🪚' }, { id: 'wrench', emoji: '' }, { id: 'paint', emoji: '' },
   // Mascotas
-  { id: 'pet', emoji: '🐾' }, { id: 'dog', emoji: '🐕' }, { id: 'cat', emoji: '🐈' }, { id: 'fish-pet', emoji: '🐠' }, { id: 'bird', emoji: '🦜' },
+  { id: 'pet', emoji: '' }, { id: 'dog', emoji: '' }, { id: 'cat', emoji: '' }, { id: 'fish-pet', emoji: '' }, { id: 'bird', emoji: '' },
   // Jardín
-  { id: 'plant', emoji: '🌱' }, { id: 'flower', emoji: '🌸' }, { id: 'tree', emoji: '🌳' }, { id: 'garden-tools', emoji: '🌿' },
+  { id: 'plant', emoji: '' }, { id: 'flower', emoji: '' }, { id: 'tree', emoji: '' }, { id: 'garden-tools', emoji: '' },
   // Deportes
-  { id: 'sport', emoji: '⚽' }, { id: 'basketball', emoji: '🏀' }, { id: 'tennis', emoji: '🎾' }, { id: 'gym', emoji: '💪' }, { id: 'bike', emoji: '🚴' },
+  { id: 'sport', emoji: '' }, { id: 'basketball', emoji: '' }, { id: 'tennis', emoji: '' }, { id: 'gym', emoji: '' }, { id: 'bike', emoji: '' },
   // Automotriz
-  { id: 'car', emoji: '🚗' }, { id: 'motorcycle', emoji: '🏍️' }, { id: 'tire', emoji: '🛞' }, { id: 'gas', emoji: '⛽' },
+  { id: 'car', emoji: '' }, { id: 'motorcycle', emoji: '' }, { id: 'tire', emoji: '' }, { id: 'gas', emoji: '' },
   // Hogar
-  { id: 'home', emoji: '🏠' }, { id: 'furniture', emoji: '🛋️' }, { id: 'bed', emoji: '🛏️' }, { id: 'lamp', emoji: '💡' },
-  { id: 'kitchen', emoji: '🍳' }, { id: 'decoration', emoji: '🖼️' }, { id: 'door', emoji: '🚪' }, { id: 'key', emoji: '🔑' }
+  { id: 'home', emoji: '' }, { id: 'furniture', emoji: '' }, { id: 'bed', emoji: '' }, { id: 'lamp', emoji: '' },
+  { id: 'kitchen', emoji: '' }, { id: 'decoration', emoji: '' }, { id: 'door', emoji: '' }, { id: 'key', emoji: '' }
 ]
 
-// 🔍 Función helper para obtener emoji de icono de categoría
+// Función helper para obtener emoji de icono de categoría
 const getCategoryIcon = (iconId) => {
   if (!iconId) {
-    return '🛍️'
+    return ''
   }
   const icon = categoryIcons.find(i => i.id === iconId)
   if (!icon) {
-    return '🛍️'
+    return ''
   }
   return icon.emoji
 }
@@ -4301,9 +4301,9 @@ const mapPaymentIcon = (iconType, methodName) => {
 
 // Computed properties
 
-// 🏢 Computed para saber si debe mostrar features de múltiples bodegas
+// Computed para saber si debe mostrar features de múltiples bodegas
 const shouldShowMultiWarehouseFeatures = computed(() => {
-  // ✅ Solo mostrar en planes premium/enterprise
+  // Solo mostrar en planes premium/enterprise
   const plan = appStore.tenantPlan
   const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
   
@@ -4311,7 +4311,7 @@ const shouldShowMultiWarehouseFeatures = computed(() => {
     return false
   }
   
-  // ✅ CRÍTICO: Solo mostrar si hay MÁS DE UNA warehouse/sede registrada
+  // CRÍTICO: Solo mostrar si hay MÁS DE UNA warehouse/sede registrada
   if (warehouses.value.length <= 1) {
     return false
   }
@@ -4320,9 +4320,9 @@ const shouldShowMultiWarehouseFeatures = computed(() => {
   return hasOpenSession.value && currentSession.value?.warehouse_id
 })
 
-// 👗 Computed para detectar si es una tienda de MODA (Fashion Store)
+// Computed para detectar si es una tienda de MODA (Fashion Store)
 const isFashionStore = computed(() => {
-  // 🛍️ Detección de tienda de moda
+  // Detección de tienda de moda
   // PRIORIDAD 1: Configuración manual (anula todo lo demás)
   
   const storeType = systemSettings.value?.store_type
@@ -4378,9 +4378,9 @@ const isFashionStore = computed(() => {
   return false
 })
 
-// 🍔 Computed para detectar si es un RESTAURANTE o negocio de comidas
+// Computed para detectar si es un RESTAURANTE o negocio de comidas
 const isFastFoodStore = computed(() => {
-  // 🍟 Detección de restaurante/comida rápida
+  // Detección de restaurante/comida rápida
   // PRIORIDAD 1: Configuración manual (anula todo lo demás)
   
   const storeType = systemSettings.value?.store_type
@@ -4440,14 +4440,14 @@ const isFastFoodStore = computed(() => {
   return false
 })
 
-// 🎨 Computed para determinar el tipo de layout actual
+// Computed para determinar el tipo de layout actual
 const currentLayoutType = computed(() => {
   if (isFastFoodStore.value) return 'restaurant'
   if (isFashionStore.value) return 'fashion'
   return 'general'
 })
 
-// 🍔 MODO FAST FOOD - Variables para el diseño de comida rápida
+// MODO FAST FOOD - Variables para el diseño de comida rápida
 const fastFoodOrderType = ref('dine_in') // 'dine_in' | 'take_out'
 const selectedFastFoodCategory = ref(null) // Categoría seleccionada en tabs
 
@@ -4492,7 +4492,7 @@ const paymentMethods = computed(() => {
 
 const onlyStock = ref(false)
 
-// 🎯 Control de visualización - Límites para mejor rendimiento
+// Control de visualización - Límites para mejor rendimiento
 const MAX_VISIBLE_CATEGORIES = 10 // Máximo de categorías visibles inicialmente
 const PRODUCTS_PER_PAGE = 60 // Productos por página
 const showAllCategories = ref(false) // Toggle para mostrar todas las categorías
@@ -4539,7 +4539,7 @@ const categories = computed(() => {
   }
 })
 
-// 🎯 Categorías visibles (con límite)
+// Categorías visibles (con límite)
 const visibleCategories = computed(() => {
   if (showAllCategories.value) {
     return categories.value
@@ -4552,7 +4552,7 @@ const hiddenCategoriesCount = computed(() => {
   return Math.max(0, categories.value.length - MAX_VISIBLE_CATEGORIES)
 })
 
-// 🎯 Productos paginados (60 por página)
+// Productos paginados (60 por página)
 const paginatedProducts = computed(() => {
   const endIndex = currentProductPage.value * PRODUCTS_PER_PAGE
   return filteredProducts.value.slice(0, endIndex)
@@ -4619,7 +4619,7 @@ const displayTaxRate = computed(() => {
 
 const total = computed(() => {
   const baseTotal = subtotal.value - discount.value + tax.value
-  // 🎁 Aplicar descuento por puntos si están activados
+  // Aplicar descuento por puntos si están activados
   if (usePoints.value && pointsDiscount.value > 0) {
     return Math.max(0, baseTotal - pointsDiscount.value)
   }
@@ -4630,9 +4630,9 @@ const totalItems = computed(() => {
   return cart.items.reduce((total, item) => total + item.quantity, 0)
 })
 
-// 🎁 Loyalty Points - Computed properties
+// Loyalty Points - Computed properties
 const canUseLoyaltyPoints = computed(() => {
-  // 🔥 OPTIMIZACIÓN SaaS: Si loyalty está desactivado, retornar inmediatamente sin procesar
+  // OPTIMIZACIÓN SaaS: Si loyalty está desactivado, retornar inmediatamente sin procesar
   const enabled = loyaltyEnabled.value
   if (!enabled) return false
   
@@ -4686,7 +4686,7 @@ const fetchNextInvoiceNumber = async () => {
       nextInvoiceNumber.value = nextNumber
     }
   } catch (error) {
-    console.error('❌ Error al obtener próximo número de factura:', error)
+    console.error('Error al obtener próximo número de factura:', error)
   }
 }
 
@@ -4717,7 +4717,7 @@ watch(paymentMethods, (newMethods) => {
   }
 }, { immediate: true })
 
-// 🎁 Watchers para loyalty points
+// Watchers para loyalty points
 watch(pointsToRedeem, (newPoints) => {
   if (!usePoints.value || !canUseLoyaltyPoints.value) {
     pointsDiscount.value = 0
@@ -4800,7 +4800,7 @@ const applyPromoCode = async () => {
     promoApplyAttempted.value = false
     
   } catch (error) {
-    console.error('❌ Error al validar código promocional:', error)
+    console.error('Error al validar código promocional:', error)
     promoError.value = error.message || 'Error al aplicar el código promocional'
   }
 }
@@ -4867,9 +4867,9 @@ const getProductQuantityInCart = (productId) => {
   return item ? item.quantity : 0
 }
 
-// 🏢 Función helper para calcular stock total de todas las bodegas
+// Función helper para calcular stock total de todas las bodegas
 const getTotalStock = (product) => {
-  // ✅ SIEMPRE usar current_stock como fuente de verdad
+  // SIEMPRE usar current_stock como fuente de verdad
   // Este campo se actualiza automáticamente en el backend cuando se ajusta stock
   // en cualquier bodega (ver Product::updateStock y Product::updateStockInWarehouse)
   // 
@@ -4877,7 +4877,7 @@ const getTotalStock = (product) => {
   return product.current_stock || 0
 }
 
-// 🎨 Obtener colores únicos disponibles de las variantes del producto
+// Obtener colores únicos disponibles de las variantes del producto
 const getProductColors = (product) => {
   if (!product.variants || product.variants.length <= 1) return []
   
@@ -4895,7 +4895,7 @@ const getProductColors = (product) => {
   return Array.from(colors)
 }
 
-// 📏 Obtener tallas únicas disponibles de las variantes del producto
+// Obtener tallas únicas disponibles de las variantes del producto
 const getProductSizes = (product) => {
   if (!product.variants || product.variants.length <= 1) return []
   
@@ -4926,7 +4926,7 @@ const getProductSizes = (product) => {
 
 // Métodos
 const addToCart = (product) => {
-  // 👗 INTERCEPTAR: Si el producto tiene variantes REALES (no productos simples)
+  // INTERCEPTAR: Si el producto tiene variantes REALES (no productos simples)
   // Un producto simple tiene 1 variante sin options, un producto con variantes tiene múltiples variantes o options
   let hasRealVariants = false
   
@@ -4967,13 +4967,13 @@ const addToCart = (product) => {
     return
   }
   
-  // 🏢 Calcular stock disponible (ya maneja modo LOCAL vs GLOBAL)
+  // Calcular stock disponible (ya maneja modo LOCAL vs GLOBAL)
   const totalStock = getTotalStock(product)
   
   // Validar que haya stock disponible
   if (totalStock <= 0) {
     if (!globalSearch.value) {
-      showWarning(`⚠️ No hay stock de "${product.name}" en ${currentSession.value?.warehouse?.name || 'esta tienda'}. Cambia a búsqueda GLOBAL para ver productos de otras tiendas.`)
+      showWarning(`No hay stock de "${product.name}" en ${currentSession.value?.warehouse?.name || 'esta tienda'}. Cambia a búsqueda GLOBAL para ver productos de otras tiendas.`)
     } else {
       showWarning(`No hay stock disponible de ${product.name} en ninguna tienda`)
     }
@@ -5019,13 +5019,13 @@ const addToCart = (product) => {
   emit('cart-status-changed', cart.items.length > 0)
 }
 
-// 🍔 FAST FOOD - Agregar al carrito con animación rápida
+// FAST FOOD - Agregar al carrito con animación rápida
 const addToCartFastFood = (product) => {
   // Usar la misma lógica que addToCart pero con feedback visual más rápido
   addToCart(product)
 }
 
-// 🍔 FAST FOOD - Pago rápido directo
+// FAST FOOD - Pago rápido directo
 const handleQuickPayment = (paymentMethod) => {
   if (!canShowPaymentModal.value || quotationMode.value) return
   
@@ -5036,7 +5036,7 @@ const handleQuickPayment = (paymentMethod) => {
   handleCobrarClick()
 }
 
-// 🍔 FAST FOOD - Obtener emoji según categoría/nombre del producto
+// FAST FOOD - Obtener emoji según categoría/nombre del producto
 const getProductEmoji = (product) => {
   const name = (product.name || '').toLowerCase()
   const category = (product.category_name || product.category || '').toLowerCase()
@@ -5044,51 +5044,51 @@ const getProductEmoji = (product) => {
   // Mapeo de palabras clave a emojis
   const emojiMap = {
     // Fritos
-    'pollo': '🍗', 'chicken': '🍗', 'alitas': '🍗',
-    'papa': '🍟', 'papas': '🍟', 'fries': '🍟', 'patata': '🍟',
-    'empanada': '🥟', 'empanadita': '🥟',
+    'pollo': '', 'chicken': '', 'alitas': '',
+    'papa': '', 'papas': '', 'fries': '', 'patata': '',
+    'empanada': '', 'empanadita': '',
     'arepa': '🫓', 'arepita': '🫓',
-    'salchipapa': '🍟', 'salchi': '🌭',
-    'chorizo': '🌭', 'hot dog': '🌭', 'perro': '🌭',
+    'salchipapa': '', 'salchi': '',
+    'chorizo': '', 'hot dog': '', 'perro': '',
     
     // Hamburguesas
-    'hamburguesa': '🍔', 'burger': '🍔', 'hambur': '🍔',
-    'sandwich': '🥪', 'sándwich': '🥪', 'sanduche': '🥪',
+    'hamburguesa': '', 'burger': '', 'hambur': '',
+    'sandwich': '', 'sándwich': '', 'sanduche': '',
     
     // Mexicana
-    'taco': '🌮', 'tacos': '🌮',
-    'burrito': '🌯', 'wrap': '🌯',
-    'nacho': '🧀', 'nachos': '🧀',
+    'taco': '', 'tacos': '',
+    'burrito': '', 'wrap': '',
+    'nacho': '', 'nachos': '',
     'quesadilla': '🫔',
     
     // Pizza/Italiana
-    'pizza': '🍕', 'pizzeta': '🍕',
-    'pasta': '🍝', 'espagueti': '🍝', 'lasaña': '🍝',
+    'pizza': '', 'pizzeta': '',
+    'pasta': '', 'espagueti': '', 'lasaña': '',
     
     // Bebidas
-    'gaseosa': '🥤', 'soda': '🥤', 'cola': '🥤', 'refresco': '🥤',
-    'jugo': '🧃', 'juice': '🧃',
-    'agua': '💧', 'water': '💧',
-    'cerveza': '🍺', 'beer': '🍺',
-    'café': '☕', 'coffee': '☕', 'cafe': '☕',
-    'malteada': '🥛', 'milkshake': '🥛', 'batido': '🥛',
-    'limonada': '🍋', 'naranjada': '🍊',
+    'gaseosa': '', 'soda': '', 'cola': '', 'refresco': '',
+    'jugo': '', 'juice': '',
+    'agua': '', 'water': '',
+    'cerveza': '', 'beer': '',
+    'café': '', 'coffee': '', 'cafe': '',
+    'malteada': '', 'milkshake': '', 'batido': '',
+    'limonada': '', 'naranjada': '',
     
     // Postres
-    'helado': '🍦', 'ice cream': '🍦',
-    'torta': '🍰', 'cake': '🍰', 'pastel': '🍰',
-    'dona': '🍩', 'donut': '🍩',
-    'brownie': '🍫', 'chocolate': '🍫',
-    'flan': '🍮', 'pudding': '🍮',
+    'helado': '', 'ice cream': '',
+    'torta': '', 'cake': '', 'pastel': '',
+    'dona': '', 'donut': '',
+    'brownie': '', 'chocolate': '',
+    'flan': '', 'pudding': '',
     
     // Otros
-    'ensalada': '🥗', 'salad': '🥗',
-    'sopa': '🍲', 'caldo': '🍲',
-    'arroz': '🍚', 'rice': '🍚',
-    'carne': '🥩', 'steak': '🥩', 'res': '🥩',
-    'pescado': '🐟', 'fish': '🐟',
-    'sushi': '🍣',
-    'camarón': '🦐', 'camarones': '🦐',
+    'ensalada': '', 'salad': '',
+    'sopa': '', 'caldo': '',
+    'arroz': '', 'rice': '',
+    'carne': '', 'steak': '', 'res': '',
+    'pescado': '', 'fish': '',
+    'sushi': '',
+    'camarón': '', 'camarones': '',
   }
   
   // Buscar en nombre primero, luego en categoría
@@ -5099,47 +5099,47 @@ const getProductEmoji = (product) => {
   }
   
   // Emoji por defecto según categoría general
-  if (category.includes('bebida') || category.includes('drink')) return '🥤'
-  if (category.includes('postre') || category.includes('dessert')) return '🍰'
-  if (category.includes('combo') || category.includes('meal')) return '🍱'
-  if (category.includes('frito') || category.includes('fried')) return '🍗'
-  if (category.includes('entrada') || category.includes('appetizer')) return '🥗'
+  if (category.includes('bebida') || category.includes('drink')) return ''
+  if (category.includes('postre') || category.includes('dessert')) return ''
+  if (category.includes('combo') || category.includes('meal')) return ''
+  if (category.includes('frito') || category.includes('fried')) return ''
+  if (category.includes('entrada') || category.includes('appetizer')) return ''
   
-  return '🍽️' // Emoji por defecto
+  return '' // Emoji por defecto
 }
 
-// 🍔 FAST FOOD - Obtener emoji para categoría
+// FAST FOOD - Obtener emoji para categoría
 const getCategoryEmoji = (categoryName) => {
   const name = (categoryName || '').toLowerCase()
   
   const categoryEmojis = {
-    'fritos': '🍟',
-    'bebidas': '🥤',
-    'combos': '🍱',
-    'hamburguesas': '🍔',
-    'pizzas': '🍕',
-    'postres': '🍰',
-    'entradas': '🥗',
-    'pollos': '🍗',
-    'tacos': '🌮',
-    'desayunos': '🍳',
-    'almuerzos': '🍽️',
-    'cenas': '🌙',
+    'fritos': '',
+    'bebidas': '',
+    'combos': '',
+    'hamburguesas': '',
+    'pizzas': '',
+    'postres': '',
+    'entradas': '',
+    'pollos': '',
+    'tacos': '',
+    'desayunos': '',
+    'almuerzos': '',
+    'cenas': '',
     'especiales': '⭐',
-    'promociones': '🔥',
-    'adicionales': '➕',
+    'promociones': '',
+    'adicionales': '',
     'salsas': '🫙',
-    'ensaladas': '🥗',
-    'sopas': '🍲',
-    'carnes': '🥩',
-    'mariscos': '🦐',
-    'pastas': '🍝',
-    'wraps': '🌯',
-    'sandwiches': '🥪',
-    'cafés': '☕',
-    'jugos': '🧃',
-    'cervezas': '🍺',
-    'helados': '🍦',
+    'ensaladas': '',
+    'sopas': '',
+    'carnes': '',
+    'mariscos': '',
+    'pastas': '',
+    'wraps': '',
+    'sandwiches': '',
+    'cafés': '',
+    'jugos': '',
+    'cervezas': '',
+    'helados': '',
   }
   
   for (const [keyword, emoji] of Object.entries(categoryEmojis)) {
@@ -5148,10 +5148,10 @@ const getCategoryEmoji = (categoryName) => {
     }
   }
   
-  return '🍽️'
+  return ''
 }
 
-// 👗 Manejar confirmación del modal de variantes
+// Manejar confirmación del modal de variantes
 const handleVariantConfirmed = ({ variant, selectedOptions }) => {
   if (!variant || !selectedProductForVariants.value) return
   
@@ -5180,7 +5180,7 @@ const handleVariantConfirmed = ({ variant, selectedOptions }) => {
     // Agregar nueva variante al carrito
     cart.items.push({
       id: selectedProductForVariants.value.id,
-      variant_id: variant.id, // 🔑 ID único de la variante
+      variant_id: variant.id, // ID único de la variante
       name: `${selectedProductForVariants.value.name} (${optionsSummary})`,
       price: variant.price, // Precio específico de la variante
       quantity: 1,
@@ -5341,7 +5341,7 @@ const clearCart = async () => {
   emit('cart-status-changed', false)
 }
 
-// 🎯 FUNCIONES DE MULTI-TABS
+// FUNCIONES DE MULTI-TABS
 
 // Agregar nueva pestaña
 const addNewTab = () => {
@@ -5650,7 +5650,7 @@ const handleAddToCartFromHistory = (product) => {
   }
 }
 
-// 📱 Manejador de selección de método de pago móvil
+// Manejador de selección de método de pago móvil
 const handleMobilePaymentMethodSelect = (method) => {
   selectedPaymentMethod.value = method.id
   showMobilePaymentSelector.value = false
@@ -5677,7 +5677,7 @@ const handleMobilePaymentMethodSelect = (method) => {
 
 // Nuevo flujo de pago mejorado
 const handleCobrarClick = async () => {
-  // ⚠️ VALIDACIÓN CRÍTICA: Si la configuración requiere cliente, validar ANTES de cualquier cosa
+  // VALIDACIÓN CRÍTICA: Si la configuración requiere cliente, validar ANTES de cualquier cosa
   if (systemSettings.value.require_customer && (!selectedCustomer.value || selectedCustomer.value.name === 'Cliente Final')) {
     showRequireCustomerModal.value = true
     return
@@ -5755,21 +5755,21 @@ const handleCobrarClick = async () => {
   showPaymentModal.value = true
 }
 
-// 🛡️ Helper: Obtener ID del Consumidor Final dinámicamente
+// Helper: Obtener ID del Consumidor Final dinámicamente
 const getConsumidorFinalId = () => {
   const consumidorFinal = appStore.customers.find(c => c.document_number === '222222222222')
   return consumidorFinal?.id || null
 }
 
 const handlePaymentConfirmed = async (paymentData) => {
-  // ⚠️ VALIDACIÓN: Si la configuración requiere cliente, validar antes de procesar (segunda barrera de seguridad)
+  // VALIDACIÓN: Si la configuración requiere cliente, validar antes de procesar (segunda barrera de seguridad)
   if (systemSettings.value.require_customer && (!selectedCustomer.value || selectedCustomer.value.name === 'Cliente Final')) {
     showPaymentModal.value = false
     showRequireCustomerModal.value = true
     return
   }
   
-  // 🧾 Iniciar procesamiento del backend (el modal mostrará estado "processing")
+  // Iniciar procesamiento del backend (el modal mostrará estado "processing")
   backendProcessingPayment.value = true
   backendPaymentSuccess.value = false
   
@@ -5804,7 +5804,7 @@ const handlePaymentConfirmed = async (paymentData) => {
         subtotal: subtotal.value,
         tax_amount: tax.value,
         discount_amount: discount.value,
-        total: total.value  // ✅ Cambiado de total_amount a total
+        total: total.value  // Cambiado de total_amount a total
       }
       
       // Llamar al servicio para convertir la cotización
@@ -5813,7 +5813,7 @@ const handlePaymentConfirmed = async (paymentData) => {
       if (result.success) {
         
         // Preparar datos para el recibo usando la nueva factura generada
-        // 🎯 Calcular total con recargo si es crédito
+        // Calcular total con recargo si es crédito
         const surchargeForQuote = paymentData.method === 'credit' ? (paymentData.fee || 0) : 0
         const totalWithSurcharge = total.value + surchargeForQuote
         
@@ -5837,7 +5837,7 @@ const handlePaymentConfirmed = async (paymentData) => {
           subtotal: subtotal.value,
           discount: discount.value,
           tax: tax.value,
-          total: totalWithSurcharge, // 🎯 Total CON recargo incluido
+          total: totalWithSurcharge, // Total CON recargo incluido
           taxRate: displayTaxRate.value,
           payments: [{
             method: paymentData.method,
@@ -5845,7 +5845,7 @@ const handlePaymentConfirmed = async (paymentData) => {
           }],
           change: paymentData.change || 0,
           convertedFromQuote: true, // Flag para identificar que fue convertida
-          // 🎯 Recargo CrediTienda
+          // Recargo CrediTienda
           surcharge_amount: surchargeForQuote,
           payment_method: paymentData.method
         }
@@ -5860,7 +5860,7 @@ const handlePaymentConfirmed = async (paymentData) => {
       const dueDate = new Date()
       dueDate.setDate(currentDate.getDate() + 30)
       
-      // 🎯 Calcular total con recargo si es crédito
+      // Calcular total con recargo si es crédito
       const surchargeAmount = paymentData.method === 'credit' ? (paymentData.fee || 0) : 0
       const totalWithSurcharge = total.value + surchargeAmount
       
@@ -5884,14 +5884,14 @@ const handlePaymentConfirmed = async (paymentData) => {
         subtotal: subtotal.value,
         discount: discount.value,
         tax: tax.value,
-        total: totalWithSurcharge, // 🎯 Total CON recargo incluido
+        total: totalWithSurcharge, // Total CON recargo incluido
         taxRate: displayTaxRate.value,
         payments: [{
           method: paymentData.method,
           methodName: paymentData.methodName || getPaymentMethodName(paymentData.method),
           amount: paymentData.amount || totalWithSurcharge
         }],
-        // 🎯 Recargo CrediTienda (normalizado a surcharge_amount)
+        // Recargo CrediTienda (normalizado a surcharge_amount)
         surcharge: surchargeAmount,
         surcharge_amount: surchargeAmount,
         payment_method: paymentData.method,
@@ -5899,15 +5899,15 @@ const handlePaymentConfirmed = async (paymentData) => {
       }
     }
   } catch (error) {
-    console.error('❌ Error al procesar pago:', error)
-    // 🧾 Resetear estados de backend en caso de error
+    console.error('Error al procesar pago:', error)
+    // Resetear estados de backend en caso de error
     backendProcessingPayment.value = false
     backendPaymentSuccess.value = false
     showError('Error al procesar el pago: ' + error.message)
     return
   }
   
-  // 🔄 Refrescar solo productos para actualizar stock sin borrar todo
+  // Refrescar solo productos para actualizar stock sin borrar todo
   await refreshData('products')
   
   // Procesar la venta en el backend y actualizar el número de factura
@@ -5931,11 +5931,11 @@ const handlePaymentConfirmed = async (paymentData) => {
         payment_method: selectedPaymentMethod.value, // Usar directamente el código del método de pago
         surcharge_amount: selectedPaymentMethod.value === 'credit' ? paymentData.fee : 0,
         notes: `Venta POS - ${lastSale.value.cashier}`,
-        // 🧾 Skip facturación electrónica si está desactivada
+        // Skip facturación electrónica si está desactivada
         skip_electronic_invoice: !electronicInvoicingEnabled.value,
         items: lastSale.value.items.map(item => ({
           product_id: item.id,
-          variant_id: item.variant_id || null, // 👗 ID de variante si es producto fashion
+          variant_id: item.variant_id || null, // ID de variante si es producto fashion
           product_name: item.name,
           quantity: parseFloat(item.quantity), // Cambiar a parseFloat para soportar decimales
           unit_price: parseFloat(item.price)
@@ -5951,7 +5951,7 @@ const handlePaymentConfirmed = async (paymentData) => {
           customer_email: lastSale.value.customer_email || null,
           customer_phone: lastSale.value.customer_phone || null
         } : {}),
-        // 🎁 Información de puntos redimidos
+        // Información de puntos redimidos
         ...(usePoints.value && pointsToRedeem.value > 0 ? {
           loyalty_points_redeemed: pointsToRedeem.value,
           loyalty_discount_amount: pointsDiscount.value
@@ -5966,12 +5966,12 @@ const handlePaymentConfirmed = async (paymentData) => {
         lastSale.value.id = result.data.id
         lastSale.value.invoiceNumber = result.data.number || `FV-${result.data.id}`
         
-        // ✅ Actualizar vendedor con el que retornó el backend (fuente de verdad)
+        // Actualizar vendedor con el que retornó el backend (fuente de verdad)
         if (result.data.seller_name) {
           lastSale.value.cashier = result.data.seller_name
         }
         
-        // 🧾 FACTUS: Agregar datos de facturación electrónica DIAN si existen
+        // FACTUS: Agregar datos de facturación electrónica DIAN si existen
         if (result.data.cufe) {
           lastSale.value.cufe = result.data.cufe
           lastSale.value.factus_number = result.data.factus_number
@@ -5993,9 +5993,9 @@ const handlePaymentConfirmed = async (paymentData) => {
     emit('sale-completed', finalInvoiceData)
     
   } catch (error) {
-    console.error('❌ Error procesando venta en backend:', error)
+    console.error('Error procesando venta en backend:', error)
     
-    // 🧾 Resetear estados de backend en caso de error
+    // Resetear estados de backend en caso de error
     backendProcessingPayment.value = false
     backendPaymentSuccess.value = false
     
@@ -6014,7 +6014,7 @@ const handlePaymentConfirmed = async (paymentData) => {
       return // No continuar
     }
     
-    // �🚨 MOSTRAR ERROR AL USUARIO Y NO CONTINUAR
+    // �MOSTRAR ERROR AL USUARIO Y NO CONTINUAR
     showError(`No se pudo crear la factura: ${error.message || 'Error desconocido'}`)
     
     // Cerrar modal de confirmación de pago
@@ -6024,16 +6024,16 @@ const handlePaymentConfirmed = async (paymentData) => {
     return // IMPORTANTE: detener ejecución aquí
   }
   
-  // ⚡ LIMPIAR CARRITO DESPUÉS DE PROCESAR EXITOSAMENTE EN BACKEND
+  // LIMPIAR CARRITO DESPUÉS DE PROCESAR EXITOSAMENTE EN BACKEND
   // Esto garantiza que el descuento se haya enviado antes de limpiarlo
   clearCart()
   
-  // 🔄 Si fue venta a crédito, refrescar clientes para actualizar available_credit
+  // Si fue venta a crédito, refrescar clientes para actualizar available_credit
   if (selectedPaymentMethod.value === 'credit') {
     refreshData('customers')
   }
   
-  // 🧾 Señalar al modal que el backend terminó exitosamente (ahora puede mostrar estado success)
+  // Señalar al modal que el backend terminó exitosamente (ahora puede mostrar estado success)
   backendProcessingPayment.value = false
   backendPaymentSuccess.value = true
   
@@ -6041,7 +6041,7 @@ const handlePaymentConfirmed = async (paymentData) => {
   // Ya no necesitamos abrir AfterPaymentModal
 }
 
-// 🧾 Manejar cierre del modal de pago (resetear estados de sincronización)
+// Manejar cierre del modal de pago (resetear estados de sincronización)
 const handleClosePaymentModal = () => {
   showPaymentModal.value = false
   backendProcessingPayment.value = false
@@ -6052,18 +6052,18 @@ const startNewSale = async () => {
   showReceiptModal.value = false
   showAfterPaymentModal.value = false
   
-  // 🧾 Resetear estados de sincronización del modal de pago
+  // Resetear estados de sincronización del modal de pago
   backendProcessingPayment.value = false
   backendPaymentSuccess.value = false
   
-  // 🔄 Refrescar solo productos para obtener stock actualizado
+  // Refrescar solo productos para obtener stock actualizado
   await refreshData('products')
   
   // El carrito ya se limpió después del pago confirmado
   // Solo restablecer estado para nueva venta
-  // lastSale.value = null // 🔧 Mantener lastSale para referencias futuras
+  // lastSale.value = null // Mantener lastSale para referencias futuras
   
-  // 💰 Restablecer método de pago a efectivo por defecto
+  // Restablecer método de pago a efectivo por defecto
   const cashMethod = paymentMethods.value.find(method => 
     method.id === 'cash' || 
     method.id === 'efectivo' ||
@@ -6108,7 +6108,7 @@ const closePremiumModalPOS = () => {
   showPremiumModalPOS.value = false
 }
 
-// 🚫 Ir a selección de plan (desde modal de límite alcanzado)
+// Ir a selección de plan (desde modal de límite alcanzado)
 const goToSelectPlan = () => {
   showFreePlanLimitModal.value = false
   // Navegar a configuración -> sección de planes
@@ -6121,7 +6121,7 @@ const handlePrintInvoice = async () => {
     showAfterPaymentModal.value = false
     
     if (!lastSale.value) {
-      showWarning('⚠️ No hay venta para imprimir')
+      showWarning('No hay venta para imprimir')
       return
     }
     
@@ -6135,13 +6135,13 @@ const handlePrintInvoice = async () => {
       subtotal: parseFloat(lastSale.value.subtotal || 0),
       discount: parseFloat(lastSale.value.discount || 0),
       tax: parseFloat(lastSale.value.tax || 0),
-      surcharge_amount: parseFloat(lastSale.value.surcharge_amount || 0), // 🎯 Recargo por crédito
+      surcharge_amount: parseFloat(lastSale.value.surcharge_amount || 0), // Recargo por crédito
       total: parseFloat(lastSale.value.total || 0),
       payments: lastSale.value.payments || [],
       change: parseFloat(lastSale.value.change || 0),
       notes: lastSale.value.notes || '',
       payment_method: lastSale.value.payment_method || '', // Para identificar si es crédito
-      // 🧾 FACTUS: Datos de facturación electrónica DIAN
+      // FACTUS: Datos de facturación electrónica DIAN
       cufe: lastSale.value.cufe || null,
       factus_number: lastSale.value.factus_number || null,
       qr_code: lastSale.value.qr_code || null,
@@ -6166,13 +6166,13 @@ const handlePrintInvoice = async () => {
     
   } catch (error) {
     console.error('Error al imprimir factura:', error)
-    showError('❌ Error al imprimir la factura')
+    showError('Error al imprimir la factura')
   }
 }
 
 const handleSendEmail = async () => {
   try {
-    // ⚠️ PRIMERO: Verificar si tiene plan premium
+    // PRIMERO: Verificar si tiene plan premium
     if (isBasicPlan()) {
       showPremiumFeaturePOS('Envío por Email')
       return
@@ -6184,7 +6184,7 @@ const handleSendEmail = async () => {
     isLoading.value = true
     
     if (!lastSale.value) {
-      showWarning('⚠️ No hay venta para enviar')
+      showWarning('No hay venta para enviar')
       isLoading.value = false
       return
     }
@@ -6218,7 +6218,7 @@ const handleSendEmail = async () => {
       }
     }
     
-    showInfo('📧 Enviando factura por correo...')
+    showInfo('Enviando factura por correo...')
     
     // Generar PDF de la factura
     const pdfBlob = await generateInvoicePDF()
@@ -6226,11 +6226,11 @@ const handleSendEmail = async () => {
     // Enviar por email
     await sendEmailWithPDF(email, pdfBlob)
     
-    showSuccess(`✅ Factura enviada a: ${email}`)
+    showSuccess(`Factura enviada a: ${email}`)
     
   } catch (error) {
     console.error('Error enviando email:', error)
-    showError(error.message || '❌ Error enviando correo electrónico')
+    showError(error.message || 'Error enviando correo electrónico')
   } finally {
     isLoading.value = false
   }
@@ -6238,7 +6238,7 @@ const handleSendEmail = async () => {
 
 const handleSendWhatsApp = async () => {
   try {
-    // ⚠️ PRIMERO: Verificar si tiene plan premium
+    // PRIMERO: Verificar si tiene plan premium
     if (isBasicPlan()) {
       showPremiumFeaturePOS('Envío por WhatsApp')
       return
@@ -6330,7 +6330,7 @@ const handleSendWhatsApp = async () => {
     // Enviar por WhatsApp usando API
     await sendWhatsAppMessage(cleanPhone, pdfBlob)
     
-    showSuccess(`📱 Factura enviada por WhatsApp a ${cleanPhone}`)
+    showSuccess(`Factura enviada por WhatsApp a ${cleanPhone}`)
     
   } catch (error) {
     console.error('Error enviando por WhatsApp:', error)
@@ -6367,11 +6367,11 @@ const handleDownloadInvoice = async () => {
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
     
-    showSuccess('📥 Factura descargada exitosamente')
+    showSuccess('Factura descargada exitosamente')
     
   } catch (error) {
     console.error('Error descargando factura:', error)
-    showError(error.message || '❌ Error descargando la factura')
+    showError(error.message || 'Error descargando la factura')
   } finally {
     isLoading.value = false
   }
@@ -6458,7 +6458,7 @@ const generateInvoicePDF = async () => {
       invoice_number: lastSale.value.invoiceNumber || lastSale.value.invoice_number || 'SIN-NUMERO',
       created_at: lastSale.value.date || lastSale.value.created_at || new Date(),
       customer_name: lastSale.value.customer || lastSale.value.customer_name || 'Cliente Final',
-      // 🛡️ FIX: Usar el nombre del usuario autenticado si no viene en la venta
+      // FIX: Usar el nombre del usuario autenticado si no viene en la venta
       cashier: lastSale.value.cashier || lastSale.value.seller_name || currentUser.value?.name || 'Vendedor',
       items: lastSale.value.items || [],
       subtotal: parseFloat(lastSale.value.subtotal || 0),
@@ -6468,7 +6468,7 @@ const generateInvoicePDF = async () => {
       payments: lastSale.value.payments || [],
       change: parseFloat(lastSale.value.change || 0),
       notes: lastSale.value.notes || '',
-      // 🎯 Recargo CrediTienda
+      // Recargo CrediTienda
       surcharge_amount: parseFloat(lastSale.value.surcharge_amount || lastSale.value.surcharge || 0),
       payment_method: lastSale.value.payment_method || lastSale.value.paymentMethod || ''
     }
@@ -6481,7 +6481,7 @@ const generateInvoicePDF = async () => {
     return getPDFBlob(pdf)
 
   } catch (error) {
-    console.error('❌ Error generando PDF:', error)
+    console.error('Error generando PDF:', error)
     throw new Error('No se pudo generar el PDF de la factura: ' + error.message)
   }
 }
@@ -6502,21 +6502,19 @@ const sendWhatsAppMessage = async (phoneNumber, pdfBlob) => {
       day: '2-digit'
     })
 
-    const message = `🧾 *${companyName}*
+    const message = `*${companyName}*
 
 ¡Hola ${customerName}!
 
 Gracias por tu compra. Aquí tienes los detalles de tu factura:
 
-📋 *Factura:* ${invoiceNumber}
-📅 *Fecha:* ${saleDate}
-💰 *Total:* $${totalAmount}
+*Factura:* ${invoiceNumber}
+*Fecha:* ${saleDate}
+*Total:* $${totalAmount}
 
-📄 Adjunto encontrarás el comprobante de tu compra en formato PDF.
+Adjunto encontrarás el comprobante de tu compra en formato PDF.
 
-¡Esperamos verte pronto! 😊
-
-_Conserva este recibo para cualquier devolución o garantía._`
+¡Esperamos verte pronto! _Conserva este recibo para cualquier devolución o garantía._`
 
     const fileName = `factura_${lastSale.value.invoiceNumber || 'temp'}.pdf`
     
@@ -6771,7 +6769,7 @@ const confirmQuotation = async () => {
   try {
     // Validar si se requiere cliente específico para cotizaciones
     if (systemSettings.require_customer_quotations && (!selectedCustomer.value || !selectedCustomer.value.id)) {
-      alert('⚠️ La configuración del sistema requiere seleccionar un cliente específico para crear cotizaciones.\n\nNo se puede usar "Cliente Final".')
+      alert('La configuración del sistema requiere seleccionar un cliente específico para crear cotizaciones.\n\nNo se puede usar "Cliente Final".')
       showQuotationConfirmModal.value = false
       return
     }
@@ -6779,7 +6777,7 @@ const confirmQuotation = async () => {
     // Preparar items mapeados con product_name requerido
     const mappedItems = cart.items.map(item => ({
       product_id: item.id,
-      variant_id: item.variant_id || null, // 👗 ID de variante si es producto fashion
+      variant_id: item.variant_id || null, // ID de variante si es producto fashion
       product_name: item.name, // Campo requerido por el backend
       quantity: item.quantity,
       unit_price: item.price,
@@ -6811,17 +6809,17 @@ const confirmQuotation = async () => {
       const modalQuotationData = {
         id: result.data.id, // ID de la cotización para WhatsApp
         code: realQuoteCode, // Código real del backend (ej: COT-000007)
-        created_at: result.data.created_at || new Date(), // ✅ Fecha de creación del backend
+        created_at: result.data.created_at || new Date(), // Fecha de creación del backend
         customer: selectedCustomer.value || { name: 'Cliente Final' }, // Objeto completo del cliente
-        cashier: currentUser.value?.name || 'Vendedor', // ✅ Nombre del vendedor
+        cashier: currentUser.value?.name || 'Vendedor', // Nombre del vendedor
         subtotal: result.data.subtotal || subtotal.value,
         discount_amount: result.data.discount_amount || 0,
         total: result.data.total || total.value,
         items: cart.items.map(item => ({
-          product_name: item.name, // ✅ Campo requerido
+          product_name: item.name, // Campo requerido
           name: item.name,
           quantity: item.quantity,
-          unit_price: item.price, // ✅ Campo requerido
+          unit_price: item.price, // Campo requerido
           price: item.price,
           subtotal: item.price * item.quantity
         })),
@@ -6847,7 +6845,7 @@ const confirmQuotation = async () => {
     }
     
   } catch (error) {
-    console.error('❌ Error al crear cotización:', error)
+    console.error('Error al crear cotización:', error)
     alert('Error al crear la cotización. Inténtelo de nuevo.')
     showQuotationConfirmModal.value = false
   }
@@ -6932,12 +6930,12 @@ const clearFilters = () => {
   }
 }
 
-// 🌍 Toggle para búsqueda global de productos
+// Toggle para búsqueda global de productos
 const toggleGlobalSearch = async () => {
   globalSearch.value = !globalSearch.value
   
   const scope = globalSearch.value ? 'global' : 'local'
-  const icon = globalSearch.value ? '🌍' : '📍'
+  const icon = globalSearch.value ? '' : ''
   const label = globalSearch.value ? 'GLOBAL' : 'LOCAL'
   
   // Recargar productos con el nuevo scope
@@ -6945,9 +6943,9 @@ const toggleGlobalSearch = async () => {
     await appStore.loadProducts(currentSession.value.warehouse_id, scope)
     
     if (globalSearch.value) {
-      showSuccess('🌍 Búsqueda global - Todas las tiendas')
+      showSuccess('Búsqueda global - Todas las tiendas')
     } else {
-      showSuccess(`📍 Búsqueda local - ${currentSession.value.warehouse?.name || 'Tienda actual'}`)
+      showSuccess(`Búsqueda local - ${currentSession.value.warehouse?.name || 'Tienda actual'}`)
     }
   }
 }
@@ -6967,7 +6965,7 @@ const focusFirstProduct = () => {
   }
 }
 
-// 🎯 Manejar foco del input de búsqueda (prevenir escritura cuando modal de clientes está abierto)
+// Manejar foco del input de búsqueda (prevenir escritura cuando modal de clientes está abierto)
 const handleSearchInputFocus = () => {
   if (showCustomerSelector.value) {
     // Si el modal de clientes está abierto, quitar el foco del input del POS
@@ -7141,7 +7139,7 @@ const handleSearchEnter = async () => {
     } catch (error) {
       // Solo loggear errores técnicos, no cuando simplemente no se encuentra
       if (error.message !== 'Cotización no encontrada') {
-        console.error('❌ [PosView] Error técnico al buscar cotización:', error)
+        console.error('[PosView] Error técnico al buscar cotización:', error)
       }
       quotationErrorCode.value = search
       showQuotationErrorModal.value = true
@@ -7248,7 +7246,7 @@ const handleKeyboard = (event) => {
     return
   }
   
-  // 🔍 SIMULACIÓN DE LECTOR DE CÓDIGOS DE BARRAS
+  // SIMULACIÓN DE LECTOR DE CÓDIGOS DE BARRAS
   // Si el usuario NO está en un input/textarea y presiona una tecla alfanumérica,
   // automáticamente enfocar el buscador y dejar que la tecla se escriba allí
   const isTypingInInput = event.target.tagName === 'INPUT' || 
@@ -7258,7 +7256,7 @@ const handleKeyboard = (event) => {
   const isAlphanumeric = /^[a-zA-Z0-9]$/.test(event.key)
   
   // Si está escribiendo fuera de un input Y es una tecla alfanumérica
-  // 🛡️ FIX: Ignorar si se presionan teclas modificadoras (Ctrl, Alt, Meta) para evitar capturar atajos como Ctrl+C, Ctrl+V
+  // FIX: Ignorar si se presionan teclas modificadoras (Ctrl, Alt, Meta) para evitar capturar atajos como Ctrl+C, Ctrl+V
   if (!isTypingInInput && isAlphanumeric && searchInput.value && !event.ctrlKey && !event.altKey && !event.metaKey) {
     event.preventDefault()
     searchInput.value.focus()
@@ -7471,13 +7469,13 @@ const loadQuotationFromInvoices = async () => {
           }
           
         } else {
-          console.error('❌ Cotización no encontrada o no es válida')
+          console.error('Cotización no encontrada o no es válida')
         }
       } else {
-        console.error('❌ No se pudo cargar la cotización:', result.message)
+        console.error('No se pudo cargar la cotización:', result.message)
       }
     } catch (error) {
-      console.error('❌ Error al cargar cotización desde facturas:', error)
+      console.error('Error al cargar cotización desde facturas:', error)
     }
     
     // Limpiar la variable global
@@ -7515,7 +7513,7 @@ onMounted(async () => {
     // Check for forced-closed sessions FIRST (blocks POS until resolved)
     await checkForcedClosedSessions()
 
-    // 🔧 FIX: SIEMPRE forzar recarga de sesión al montar el componente
+    // FIX: SIEMPRE forzar recarga de sesión al montar el componente
     // Esto evita condiciones de carrera y asegura datos frescos
     await appStore.loadCashSession(true) // force = true
     
@@ -7523,7 +7521,7 @@ onMounted(async () => {
     hasOpenSession.value = appStore.cashSession.hasOpenSession
     currentSession.value = appStore.cashSession.current
     
-    // 🔄 AUTO-REFRESH FORZADO: Recargar productos SIEMPRE al entrar al POS
+    // AUTO-REFRESH FORZADO: Recargar productos SIEMPRE al entrar al POS
     const warehouseId = currentSession.value?.warehouse_id
     const scope = globalSearch.value ? 'global' : 'local'
     
@@ -7551,7 +7549,7 @@ onMounted(async () => {
     // Solo cargar descuentos (que aún no están en el store global)
     loadDiscounts()
     
-    // 🏢 Cargar warehouses para validar si mostrar botón Global/Local
+    // Cargar warehouses para validar si mostrar botón Global/Local
     await loadWarehouses()
     
     // Cargar configuración de loyalty points
@@ -7567,10 +7565,10 @@ onMounted(async () => {
       loadQuotationFromInvoices()
     }, 500)
     
-    // 🎯 Cargar drafts existentes de la base de datos
+    // Cargar drafts existentes de la base de datos
     await loadSalesDrafts()
     
-    // 💳 Cargar clientes con deuda para botón Abonos (no bloqueante)
+    // Cargar clientes con deuda para botón Abonos (no bloqueante)
     loadCustomersWithDebt()
     
     // Verificar productos con variantes para UI
@@ -7583,7 +7581,7 @@ onMounted(async () => {
   }
 })
 
-// 🔄 Listener para actualización de productos desde otros módulos
+// Listener para actualización de productos desde otros módulos
 const handleProductsUpdate = async (event) => {
   // Recargar productos del store global
   if (currentSession.value?.warehouse_id) {
@@ -7595,10 +7593,10 @@ const handleProductsUpdate = async (event) => {
 // Registrar listener al montar
 window.addEventListener('products-updated', handleProductsUpdate)
 
-// 🔄 AUTO-REFRESH al reactivar el componente (si se usa KeepAlive)
+// AUTO-REFRESH al reactivar el componente (si se usa KeepAlive)
 onActivated(async () => {
   try {
-    // 🔧 FIX: SIEMPRE recargar sesión al reactivar (forzar verificación)
+    // FIX: SIEMPRE recargar sesión al reactivar (forzar verificación)
     // Esto garantiza que si abriste/cerraste caja en otro módulo, se refleje aquí
     await appStore.loadCashSession(true) // force = true
     
@@ -7624,12 +7622,12 @@ onActivated(async () => {
     // 5️⃣ Actualizar número de factura
     await fetchNextInvoiceNumber()
   } catch (error) {
-    console.error('⚠️ [PosView] Error en auto-refresh:', error)
+    console.error('[PosView] Error en auto-refresh:', error)
     // No mostrar error al usuario - es refresh silencioso
   }
 })
 
-// 💰 Watcher para establecer efectivo por defecto cuando se carguen métodos de pago
+// Watcher para establecer efectivo por defecto cuando se carguen métodos de pago
 watch(() => paymentMethods.value.length, (newLength) => {
   if (newLength > 0 && selectedPaymentMethod.value === 'cash') {
     // Buscar si existe un método "efectivo" real en la API
@@ -7708,8 +7706,8 @@ const handleLoadQuotation = () => {
     emit('cart-status-changed', cart.items.length > 0)
     
   } catch (error) {
-    console.error('❌ Error al cargar cotización:', error)
-    alert('❌ Error al cargar la cotización. Inténtelo de nuevo.')
+    console.error('Error al cargar cotización:', error)
+    alert('Error al cargar la cotización. Inténtelo de nuevo.')
   }
 }
 
@@ -7770,13 +7768,13 @@ const handleAddPartialStock = (item) => {
     // Buscar el producto en el catálogo para obtener sus datos completos
     const product = appStore.products.find(p => p.name === item.name)
     if (!product) {
-      alert('❌ Producto no encontrado en el catálogo')
+      alert('Producto no encontrado en el catálogo')
       return
     }
     
     // Verificar que realmente hay stock disponible
     if (product.current_stock < 1) {
-      alert('❌ No hay stock disponible para este producto')
+      alert('No hay stock disponible para este producto')
       return
     }
     
@@ -7803,7 +7801,7 @@ const handleAddPartialStock = (item) => {
       if (currentQuantity < maxQuantity) {
         cart.items[existingItemIndex].quantity = maxQuantity
       } else {
-        alert(`⚠️ Ya tienes la cantidad máxima disponible de ${product.name} en el carrito`)
+        alert(`Ya tienes la cantidad máxima disponible de ${product.name} en el carrito`)
         return
       }
     } else {
@@ -7811,11 +7809,11 @@ const handleAddPartialStock = (item) => {
       cart.items.push(cartItem)
     }
     
-    alert(`✅ Se agregó ${cartItem.quantity} unidad(es) de ${product.name} al carrito`)
+    alert(`Se agregó ${cartItem.quantity} unidad(es) de ${product.name} al carrito`)
     
   } catch (error) {
     console.error('Error al agregar producto con stock parcial:', error)
-    alert('❌ Error al agregar el producto. Inténtelo de nuevo.')
+    alert('Error al agregar el producto. Inténtelo de nuevo.')
   }
 }
 
@@ -7919,12 +7917,12 @@ const handleSendQuotationWhatsApp = async () => {
     }
 
     // Preparar mensaje personalizado para WhatsApp
-    const message = `📋 *Cotización ${quotationData.code}*\n\n` +
-                   `📅 Fecha: ${new Date().toLocaleDateString('es-CO')}\n` +
-                   `👤 Cliente: ${customerName}\n` +
-                   `💰 Total: $${parseFloat(quotationData.total || 0).toLocaleString()}\n\n` +
+    const message = `*Cotización ${quotationData.code}*\n\n` +
+                   `Fecha: ${new Date().toLocaleDateString('es-CO')}\n` +
+                   `Cliente: ${customerName}\n` +
+                   `Total: $${parseFloat(quotationData.total || 0).toLocaleString()}\n\n` +
                    `Puede usar este código para realizar su compra posteriormente.\n\n` +
-                   `¡Gracias por elegirnos! 😊`
+                   `¡Gracias por elegirnos! `
 
     const fileName = `cotizacion_${quotationData.code}_${Date.now()}.pdf`
 
@@ -7940,7 +7938,7 @@ const handleSendQuotationWhatsApp = async () => {
     if (result.success) {
       
       // Toast profesional en lugar de alerta
-      showSuccess(`📱 Cotización ${quotationData.code} enviada a ${customerName} (${formattedPhone})`)
+      showSuccess(`Cotización ${quotationData.code} enviada a ${customerName} (${formattedPhone})`)
       
       // Cerrar modal después del envío exitoso
       showQuotationModal.value = false
@@ -7949,8 +7947,8 @@ const handleSendQuotationWhatsApp = async () => {
     }
 
   } catch (error) {
-    console.error('❌ Error enviando cotización por WhatsApp:', error)
-    alert(`❌ Error al enviar cotización por WhatsApp\n\n${error.message}`)
+    console.error('Error enviando cotización por WhatsApp:', error)
+    alert(`Error al enviar cotización por WhatsApp\n\n${error.message}`)
   }
 }
 
@@ -8005,7 +8003,7 @@ const handleSendQuotationEmail = async () => {
       throw new Error('Email requerido')
     }
 
-    showToast('📧 Generando y enviando cotización por email...', 'info')
+    showToast('Generando y enviando cotización por email...', 'info')
 
     // Generar el mismo PDF que se usa para imprimir
     const pdfBlob = await generateQuotationPDFBlob(quotationData)
@@ -8023,14 +8021,14 @@ const handleSendQuotationEmail = async () => {
       quotationData.code
     )
 
-    showSuccess(`✅ Cotización ${quotationData.code} enviada a ${customerEmail}`)
+    showSuccess(`Cotización ${quotationData.code} enviada a ${customerEmail}`)
     
     // Cerrar modal después del envío exitoso
     showQuotationModal.value = false
 
   } catch (error) {
-    console.error('❌ Error enviando cotización por email:', error)
-    showError(`❌ Error al enviar cotización por email: ${error.message}`)
+    console.error('Error enviando cotización por email:', error)
+    showError(`Error al enviar cotización por email: ${error.message}`)
   }
 }
 
@@ -8074,7 +8072,7 @@ const printQuotationTicket = async () => {
     }
     
   } catch (error) {
-    console.error('❌ Error al imprimir cotización:', error)
+    console.error('Error al imprimir cotización:', error)
     showError('Error al generar PDF de cotización')
   }
 }
@@ -8116,7 +8114,7 @@ const generateQuotationPDFBlob = async (quotationData) => {
     return getPDFBlob(pdf)
     
   } catch (error) {
-    console.error('❌ Error al generar PDF Blob:', error)
+    console.error('Error al generar PDF Blob:', error)
     throw error
   }
 }
@@ -8144,7 +8142,7 @@ const startQRScanner = async () => {
     await nextTick()
     
     if (!qrVideo.value) {
-      console.error('❌ Elemento de video no encontrado')
+      console.error('Elemento de video no encontrado')
       return
     }
     
@@ -8165,7 +8163,7 @@ const startQRScanner = async () => {
     await qrScanner.value.start()
     
   } catch (error) {
-    console.error('❌ Error al iniciar scanner QR:', error)
+    console.error('Error al iniciar scanner QR:', error)
     alert('Error al acceder a la cámara. Por favor, verifique los permisos.')
     showQRScanner.value = false
   }
@@ -8194,7 +8192,7 @@ const handleQRResult = (data) => {
     handleSearchEnter()
     
   } else {
-    alert('❌ Código QR no válido. Se esperaba un código de cotización (COT-XXXXXX)')
+    alert('Código QR no válido. Se esperaba un código de cotización (COT-XXXXXX)')
   }
 }
 
@@ -8211,7 +8209,7 @@ const handleOpenCashSession = async (sessionData) => {
       showSuccess('¡Caja abierta correctamente! Ya puedes procesar ventas.')
       showCashOpenModal.value = false
       
-      // 🔧 ARREGLO: Desactivar modo cotización cuando se abre una caja
+      // ARREGLO: Desactivar modo cotización cuando se abre una caja
       if (quotationMode.value) {
         quotationMode.value = false
         showSuccess('Modo cotización desactivado. Ahora puedes procesar ventas normalmente.')
@@ -8224,10 +8222,10 @@ const handleOpenCashSession = async (sessionData) => {
       currentSession.value = composableCurrentSession.value
       hasOpenSession.value = composableHasOpenSession.value
       
-      // ✅ SINCRONIZAR CON APPSTORE (evitar verificaciones futuras)
+      // SINCRONIZAR CON APPSTORE (evitar verificaciones futuras)
       appStore.updateCashSession(currentSession.value, hasOpenSession.value)
       
-      // 🏪 RECARGAR PRODUCTOS DE LA BODEGA SELECCIONADA
+      // RECARGAR PRODUCTOS DE LA BODEGA SELECCIONADA
       if (currentSession.value?.warehouse_id) {
         await appStore.loadProducts(currentSession.value.warehouse_id)
       }
@@ -8258,7 +8256,7 @@ const handleCloseCashSession = async (closeData) => {
       currentSession.value = composableCurrentSession.value
       hasOpenSession.value = composableHasOpenSession.value
       
-      // ✅ SINCRONIZAR CON APPSTORE (evitar verificaciones futuras)
+      // SINCRONIZAR CON APPSTORE (evitar verificaciones futuras)
       appStore.updateCashSession(currentSession.value, hasOpenSession.value)
       
     }
@@ -8311,7 +8309,7 @@ const showCloseCashModal = async () => {
   try {
     await loadCurrentSession()
   } catch (error) {
-    console.error('🎯 Error cargando sesión:', error)
+    console.error('Error cargando sesión:', error)
   }
   
   // Verificar nuevamente después de cargar
@@ -8607,21 +8605,21 @@ const generateAbonoReceiptText = () => {
   const methodLabel = { cash: 'Efectivo', card: 'Tarjeta', transfer: 'Transferencia' }[d.method] || d.method
   const fecha = new Date(d.date).toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 
-  let text = `📄 *${companyName}*\n`
+  let text = `*${companyName}*\n`
   text += `Comprobante de Abono a Crédito\n`
   text += `─────────────────────\n`
-  text += `👤 Cliente: ${d.customer?.name || 'Cliente'}\n`
-  if (d.customer?.document_number) text += `📋 Documento: ${d.customer.document_number}\n`
-  text += `📅 Fecha: ${fecha}\n`
+  text += `Cliente: ${d.customer?.name || 'Cliente'}\n`
+  if (d.customer?.document_number) text += `Documento: ${d.customer.document_number}\n`
+  text += `Fecha: ${fecha}\n`
   text += `─────────────────────\n`
-  text += `💰 *Monto abonado: $${Number(d.amount).toLocaleString('es-CO')}*\n`
-  text += `💳 Método: ${methodLabel}\n`
-  if (d.reference) text += `🔖 Referencia: ${d.reference}\n`
-  if (d.notes) text += `📝 Notas: ${d.notes}\n`
+  text += `*Monto abonado: $${Number(d.amount).toLocaleString('es-CO')}*\n`
+  text += `Método: ${methodLabel}\n`
+  if (d.reference) text += `Referencia: ${d.reference}\n`
+  if (d.notes) text += `Notas: ${d.notes}\n`
   text += `─────────────────────\n`
-  text += `📊 Saldo pendiente: $${d.remaining_debt > 0 ? Number(d.remaining_debt).toLocaleString('es-CO') : '0 (Pagado)'}\n`
+  text += `Saldo pendiente: $${d.remaining_debt > 0 ? Number(d.remaining_debt).toLocaleString('es-CO') : '0 (Pagado)'}\n`
   if (d.id) text += `\n#${d.id}\n`
-  text += `\n¡Gracias por tu pago! 🙏`
+  text += `\n¡Gracias por tu pago! `
   return text
 }
 
@@ -8780,7 +8778,7 @@ const handleWebOrderLoaded = async (order) => {
     }
     
   } catch (error) {
-    console.error('❌ Error cargando pedido web:', error)
+    console.error('Error cargando pedido web:', error)
     showError('Error al cargar el pedido web')
   }
 }
@@ -8848,7 +8846,7 @@ const handleConfirmNewCustomer = async () => {
     pendingWebOrder.value = null
     
   } catch (error) {
-    console.error('❌ Error creando cliente:', error)
+    console.error('Error creando cliente:', error)
     showError('Error al crear el cliente')
   }
 }
@@ -8973,7 +8971,7 @@ defineExpose({
   animation: scaleIn 0.4s ease-out;
 }
 
-/* 🚀 Animación de pulso sutil para botón COBRAR listo */
+/* Animación de pulso sutil para botón COBRAR listo */
 @keyframes pulse-subtle {
   0%, 100% {
     box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
@@ -8987,7 +8985,7 @@ defineExpose({
   animation: pulse-subtle 2s ease-in-out infinite;
 }
 
-/* 💚 Clase para botón COBRAR listo - Pulso suave profesional */
+/* Clase para botón COBRAR listo - Pulso suave profesional */
 .cobrar-ready-pulse {
   animation: cobrar-glow 2s ease-in-out infinite;
 }
@@ -9001,7 +8999,7 @@ defineExpose({
   }
 }
 
-/* ✨ Efecto de brillo que recorre el botón */
+/* Efecto de brillo que recorre el botón */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -9051,7 +9049,7 @@ defineExpose({
   display: none;
 }
 
-/* 🎨 Animación de entrada para productos */
+/* Animación de entrada para productos */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -9068,7 +9066,7 @@ defineExpose({
   opacity: 0;
 }
 
-/* 🖼️ Animación de carga de imagen */
+/* Animación de carga de imagen */
 @keyframes image-load {
   from {
     opacity: 0;

@@ -1,10 +1,10 @@
 <template>
   <div class="fixed inset-0 bg-black/50  flex items-center justify-center z-50 p-4">
     <!-- Contenedor optimizado para factura POS 58mm -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-sm w-full max-h-[90vh] overflow-y-auto animate-scale-in" style="width: 350px;">
+    <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-2xl max-w-sm w-full max-h-[90vh] overflow-y-auto animate-scale-in" style="width: 350px;">
       
       <!-- Header Simple -->
-      <div class="p-4 border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+      <div class="p-4 border-b border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-700">
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
             <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,51 +21,51 @@
       </div>
 
       <!-- FACTURA PARA VISUALIZACIÓN -->
-      <div class="p-4 dark:bg-gray-800" id="receipt-content">
+      <div class="p-4 dark:bg-zinc-800" id="receipt-content">
         
         <!-- Información del Negocio (Formato POS 58mm) -->
-        <div class="text-center border-b border-gray-300 dark:border-gray-600 pb-3 mb-3">
+        <div class="text-center border-b border-gray-300 dark:border-zinc-600 pb-3 mb-3">
           <h2 class="text-lg font-bold text-gray-900 dark:text-white">{{ companyInfo.name }}</h2>
-          <p v-if="companyInfo.address" class="text-xs text-gray-600 dark:text-gray-300">{{ companyInfo.address }}</p>
-          <p v-if="companyInfo.phone" class="text-xs text-gray-600 dark:text-gray-300">Tel: {{ companyInfo.phone }}</p>
-          <p v-if="companyInfo.taxId" class="text-xs text-gray-600 dark:text-gray-300">{{ companyInfo.taxLabel }}: {{ companyInfo.taxId }}</p>
+          <p v-if="companyInfo.address" class="text-xs text-gray-600 dark:text-zinc-300">{{ companyInfo.address }}</p>
+          <p v-if="companyInfo.phone" class="text-xs text-gray-600 dark:text-zinc-300">Tel: {{ companyInfo.phone }}</p>
+          <p v-if="companyInfo.taxId" class="text-xs text-gray-600 dark:text-zinc-300">{{ companyInfo.taxLabel }}: {{ companyInfo.taxId }}</p>
         </div>
 
         <!-- Información de la Venta (Formato POS Compacto) -->
         <div class="text-xs mb-3 space-y-1">
           <div class="flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">Factura #:</span>
+            <span class="text-gray-600 dark:text-zinc-400">Factura #:</span>
             <span class="font-semibold text-gray-900 dark:text-white">{{ sale.invoiceNumber }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">Fecha:</span>
+            <span class="text-gray-600 dark:text-zinc-400">Fecha:</span>
             <span class="text-gray-900 dark:text-white">{{ formatDate(sale.date) }}</span>
           </div>
           <div v-if="sale.due_date" class="flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">Vence:</span>
+            <span class="text-gray-600 dark:text-zinc-400">Vence:</span>
             <span class="text-gray-900 dark:text-white">{{ formatDate(sale.due_date) }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">Vendedor:</span>
+            <span class="text-gray-600 dark:text-zinc-400">Vendedor:</span>
             <span class="text-gray-900 dark:text-white">{{ sale.cashier || 'Vendedor' }}</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">Cliente:</span>
+            <span class="text-gray-600 dark:text-zinc-400">Cliente:</span>
             <span class="text-gray-900 dark:text-white">{{ sale.customer || 'Cliente General' }}</span>
           </div>
         </div>
 
         <!-- Items de la Venta (Formato POS) -->
-        <div class="border-t-2 border-gray-300 dark:border-gray-600 pt-3 mb-4">
-          <div class="text-xs font-bold text-gray-800 dark:text-gray-200 mb-3 border-b border-dashed border-gray-400 dark:border-gray-600 pb-2">
+        <div class="border-t-2 border-gray-300 dark:border-zinc-600 pt-3 mb-4">
+          <div class="text-xs font-bold text-gray-800 dark:text-zinc-200 mb-3 border-b border-dashed border-gray-400 dark:border-zinc-600 pb-2">
             PRODUCTOS
           </div>
           
-          <div v-for="item in normalizedSale.items" :key="item.id" class="mb-3 bg-gray-50 dark:bg-gray-800 p-2 rounded">
+          <div v-for="item in normalizedSale.items" :key="item.id" class="mb-3 bg-gray-50 dark:bg-zinc-800 p-2 rounded">
             <div class="text-xs">
               <div class="font-medium text-gray-900 dark:text-white mb-1">{{ item.name }}</div>
               <div class="flex justify-between items-center">
-                <span class="text-gray-600 dark:text-gray-400">{{ item.quantity }} x ${{ item.price.toLocaleString() }}</span>
+                <span class="text-gray-600 dark:text-zinc-400">{{ item.quantity }} x ${{ item.price.toLocaleString() }}</span>
                 <span class="font-bold text-gray-900 dark:text-white">${{ (item.quantity * item.price).toLocaleString() }}</span>
               </div>
             </div>
@@ -73,35 +73,35 @@
         </div>
 
         <!-- Descuentos aplicados -->
-        <div v-if="sale.appliedDiscount" class="border-t-2 border-dashed border-gray-400 dark:border-gray-600 pt-3 mb-4">
-          <div class="text-xs font-bold text-gray-800 dark:text-gray-200 mb-2">DESCUENTO APLICADO</div>
+        <div v-if="sale.appliedDiscount" class="border-t-2 border-dashed border-gray-400 dark:border-zinc-600 pt-3 mb-4">
+          <div class="text-xs font-bold text-gray-800 dark:text-zinc-200 mb-2">DESCUENTO APLICADO</div>
           <div class="flex justify-between text-xs bg-green-50 dark:bg-green-900 p-2 rounded">
-            <span class="text-gray-600 dark:text-gray-400">{{ sale.appliedDiscount.name }}</span>
+            <span class="text-gray-600 dark:text-zinc-400">{{ sale.appliedDiscount.name }}</span>
             <span class="text-green-600 dark:text-green-400 font-bold">-${{ normalizedSale.discount.toLocaleString() }}</span>
           </div>
         </div>
 
         <!-- Totales (Formato POS) -->
-        <div class="border-t-2 border-dashed border-gray-400 dark:border-gray-600 pt-3 mb-4">
+        <div class="border-t-2 border-dashed border-gray-400 dark:border-zinc-600 pt-3 mb-4">
           <div class="space-y-2 text-xs">
             <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">Subtotal:</span>
+              <span class="text-gray-600 dark:text-zinc-400">Subtotal:</span>
               <span class="text-gray-900 dark:text-white">${{ normalizedSale.subtotal.toLocaleString() }}</span>
             </div>
             <div v-if="normalizedSale.discount > 0" class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">Descuento:</span>
+              <span class="text-gray-600 dark:text-zinc-400">Descuento:</span>
               <span class="text-red-600 dark:text-red-400">-${{ normalizedSale.discount.toLocaleString() }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">IVA ({{ sale.taxRate }}%):</span>
+              <span class="text-gray-600 dark:text-zinc-400">IVA ({{ sale.taxRate }}%):</span>
               <span class="text-gray-900 dark:text-white">${{ normalizedSale.tax.toLocaleString() }}</span>
             </div>
             <!-- Mostrar comisión si aplica -->
             <div v-if="hasPaymentFees" class="flex justify-between">
-              <span class="text-gray-600 dark:text-gray-400">Comisión:</span>
+              <span class="text-gray-600 dark:text-zinc-400">Comisión:</span>
               <span class="text-orange-600 dark:text-orange-400">+${{ paymentFeesTotal.toLocaleString() }}</span>
             </div>
-            <div class="flex justify-between text-sm font-bold border-t-2 border-gray-400 dark:border-gray-600 pt-2 mt-3 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+            <div class="flex justify-between text-sm font-bold border-t-2 border-gray-400 dark:border-zinc-600 pt-2 mt-3 bg-gray-100 dark:bg-zinc-700 px-2 py-1 rounded">
               <span class="text-gray-900 dark:text-white">TOTAL:</span>
               <span class="text-gray-900 dark:text-white">${{ (normalizedSale.totalWithFees || normalizedSale.total).toLocaleString() }}</span>
             </div>
@@ -109,34 +109,34 @@
         </div>
 
         <!-- Información de Pago (Formato POS) -->
-        <div class="border-t-2 border-dashed border-gray-400 dark:border-gray-600 pt-3 mb-4">
-          <div class="text-xs font-bold text-gray-800 dark:text-gray-200 mb-2">MÉTODO DE PAGO</div>
-          <div v-for="payment in normalizedSale.payments" :key="payment.method" class="flex justify-between text-xs mb-2 bg-gray-50 dark:bg-gray-800 p-2 rounded">
-            <span class="text-gray-600 dark:text-gray-400">{{ payment.methodName || getPaymentMethodName(payment.method) }}:</span>
+        <div class="border-t-2 border-dashed border-gray-400 dark:border-zinc-600 pt-3 mb-4">
+          <div class="text-xs font-bold text-gray-800 dark:text-zinc-200 mb-2">MÉTODO DE PAGO</div>
+          <div v-for="payment in normalizedSale.payments" :key="payment.method" class="flex justify-between text-xs mb-2 bg-gray-50 dark:bg-zinc-800 p-2 rounded">
+            <span class="text-gray-600 dark:text-zinc-400">{{ payment.methodName || getPaymentMethodName(payment.method) }}:</span>
             <span class="text-gray-900 dark:text-white font-medium">${{ payment.amount.toLocaleString() }}</span>
           </div>
-          <div v-if="normalizedSale.change > 0" class="flex justify-between text-xs font-bold border-t border-gray-300 dark:border-gray-600 pt-2 mt-2 bg-green-50 dark:bg-green-900 p-2 rounded">
+          <div v-if="normalizedSale.change > 0" class="flex justify-between text-xs font-bold border-t border-gray-300 dark:border-zinc-600 pt-2 mt-2 bg-green-50 dark:bg-green-900 p-2 rounded">
             <span class="text-gray-900 dark:text-white">Cambio:</span>
             <span class="text-green-600 dark:text-green-400">${{ normalizedSale.change.toLocaleString() }}</span>
           </div>
         </div>
 
         <!-- Mensaje de Agradecimiento (Formato POS) -->
-        <div class="text-center border-t-2 border-dashed border-gray-400 dark:border-gray-600 pt-4">
+        <div class="text-center border-t-2 border-dashed border-gray-400 dark:border-zinc-600 pt-4">
           <p class="text-sm font-bold text-gray-900 dark:text-white mb-2">¡GRACIAS POR SU COMPRA!</p>
-          <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Conserve este recibo</p>
-          <p v-if="companyInfo.returnPolicy" class="text-xs text-gray-600 dark:text-gray-400 mb-4">{{ companyInfo.returnPolicy }}</p>
+          <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1">Conserve este recibo</p>
+          <p v-if="companyInfo.returnPolicy" class="text-xs text-gray-600 dark:text-zinc-400 mb-4">{{ companyInfo.returnPolicy }}</p>
           
           <!-- QR Code con número de factura -->
           <div class="flex flex-col items-center mt-4 mb-4">
             <div class="w-20 h-20 bg-white border-2 border-gray-300 p-2 rounded shadow-sm">
               <img v-if="qrCodeDataURL" :src="qrCodeDataURL" alt="QR Factura" class="w-full h-full">
             </div>
-            <p class="text-xs text-gray-600 dark:text-gray-400 mt-2 font-medium">{{ sale.invoiceNumber }}</p>
+            <p class="text-xs text-gray-600 dark:text-zinc-400 mt-2 font-medium">{{ sale.invoiceNumber }}</p>
           </div>
           
           <!-- Información Legal - DESPUÉS del QR -->
-          <div class="text-xs text-gray-500 dark:text-gray-400 mt-4 space-y-1 border-t border-gray-200 dark:border-gray-700 pt-3">
+          <div class="text-xs text-gray-500 dark:text-zinc-400 mt-4 space-y-1 border-t border-gray-200 dark:border-zinc-700 pt-3">
             <p class="font-medium">Información Legal</p>
             <p>Régimen Común - No responsable de IVA</p>
             <p>Factura de venta Art. 617 del E.T.</p>
@@ -146,7 +146,7 @@
           </div>
           
           <!-- Nombre de la empresa/software -->
-          <div class="text-xs text-gray-500 dark:text-gray-400 mt-4 pt-3 border-t border-gray-300 dark:border-gray-600">
+          <div class="text-xs text-gray-500 dark:text-zinc-400 mt-4 pt-3 border-t border-gray-300 dark:border-zinc-600">
             <p class="font-medium">{{ companyInfo.name || '105 POS' }}</p>
             <p>Sistema de facturación</p>
           </div>
@@ -219,7 +219,7 @@
       </div>
 
       <!-- Footer con Acciones - 4 opciones: Imprimir, Descargar PDF, WhatsApp y Email -->
-      <div class="p-4 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+      <div class="p-4 border-t border-gray-200 dark:border-zinc-600 bg-gray-50 dark:bg-zinc-700">
         <div class="grid grid-cols-2 gap-3 mb-3">
           <button
             @click="printReceipt"
@@ -291,7 +291,7 @@
             </p>
             
             <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
-              💡 Desbloquea todas las funciones premium para potenciar tu negocio
+              Desbloquea todas las funciones premium para potenciar tu negocio
             </p>
 
             <!-- Botones -->
@@ -525,8 +525,6 @@ const downloadPDF = async () => {
 
 const printReceipt = async () => {
   try {
-    console.log('🖨️ ReceiptModal: Iniciando impresión...')
-    
     // Preparar datos de la factura (igual que downloadPDF)
     const invoiceData = {
       invoice_number: props.sale.invoiceNumber || 'SIN-NUMERO',
@@ -558,11 +556,9 @@ const printReceipt = async () => {
       }
     }
     
-    console.log('✅ ReceiptModal: PDF generado y ventana abierta')
-    
   } catch (error) {
-    console.error('❌ Error al imprimir factura:', error)
-    alert('❌ Error al imprimir la factura')
+    console.error('Error al imprimir factura:', error)
+    alert('Error al imprimir la factura')
   }
 }
 
@@ -582,7 +578,6 @@ const sendWhatsApp = () => {
     return
   }
   
-  console.log('� ReceiptModal sendWhatsApp ejecutado - Emitiendo evento al padre')
   emit('send-whatsapp')
 }
 </script>

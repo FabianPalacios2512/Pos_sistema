@@ -286,12 +286,6 @@ class LoyaltyController extends Controller
                 Auth::id()
             );
 
-            Log::info('🔧 Ajuste manual de puntos', [
-                'customer_id' => $customer->id,
-                'points' => $request->points,
-                'description' => $request->description,
-                'admin_id' => Auth::id()
-            ]);
 
             return response()->json([
                 'success' => true,

@@ -62,7 +62,7 @@
           />
         </svg>
 
-        <!-- 🎯 Tooltip Flotante Estilo Intercom/Driver.js - DISEÑO LIMPIO -->
+        <!-- Tooltip Flotante Estilo Intercom/Driver.js - DISEÑO LIMPIO -->
         <Transition name="tooltip-slide">
           <div 
             v-if="highlightRect && currentTooltipPosition"
@@ -178,7 +178,7 @@ const props = defineProps({
 
 const emit = defineEmits(['complete', 'skip', 'step-change'])
 
-// 🎯 Importar lógica de compensación de escalado
+// Importar lógica de compensación de escalado
 const { appliedZoom, isCompensating } = useScreenScaling()
 
 const isActive = ref(false)
@@ -188,7 +188,7 @@ const currentTooltipPosition = ref(null)
 
 const currentStep = computed(() => props.steps[currentStepIndex.value] || {})
 
-// 🔧 DEV MODE - desactivado para evitar scroll automático
+// DEV MODE - desactivado para evitar scroll automático
 const DEV_MODE = false
 
 // Calcular posición del elemento resaltado
@@ -206,16 +206,13 @@ const updateHighlight = async () => {
     console.warn(`Elemento no encontrado: ${currentStep.value.selector}`)
     highlightRect.value = null
     
-    // 🔥 AUTO-SKIP: Si el elemento no existe, pasar automáticamente al siguiente paso
-    // Esto evita que el tour se quede bloqueado
+    // AUTO-SKIP: Si el elemento no existe, pasar automáticamente al siguiente paso
     if (currentStepIndex.value < props.steps.length - 1) {
-      console.log('⏭️ Saltando paso automáticamente porque el elemento no existe')
       setTimeout(() => {
         nextStep()
       }, 500) // Pequeño delay para que el usuario vea el mensaje
     } else {
       // Si es el último paso y no existe, completar el tour
-      console.log('✅ Completando tour porque el último elemento no existe')
       setTimeout(() => {
         completeTour()
       }, 500)
@@ -223,7 +220,7 @@ const updateHighlight = async () => {
     return
   }
 
-  // 🎯 SCROLL AUTOMÁTICO SUAVE - Solo si el elemento no está visible
+  // SCROLL AUTOMÁTICO SUAVE - Solo si el elemento no está visible
   const rect = element.getBoundingClientRect()
   const isVisible = (
     rect.top >= 0 &&
@@ -245,7 +242,7 @@ const updateHighlight = async () => {
   // Recalcular posición después del scroll
   const finalRect = element.getBoundingClientRect()
   
-  // 🎯 COMPENSAR ESCALADO DE PANTALLA
+  // COMPENSAR ESCALADO DE PANTALLA
   // Si el sistema detectó escalado (125%, 150%), necesitamos compensar las coordenadas
   // porque getBoundingClientRect() devuelve valores en el espacio visual escalado
   const zoomCompensation = isCompensating.value ? (1 / appliedZoom.value) : 1
@@ -371,7 +368,7 @@ const skipTour = () => {
   highlightRect.value = null
   currentTooltipPosition.value = null
   
-  // 🔓 Restaurar scroll del body
+  // Restaurar scroll del body
   document.body.style.overflow = ''
   document.body.style.pointerEvents = ''
   
@@ -385,7 +382,7 @@ const completeTour = () => {
   highlightRect.value = null
   currentTooltipPosition.value = null
   
-  // 🔓 Restaurar scroll del body
+  // Restaurar scroll del body
   document.body.style.overflow = ''
   document.body.style.pointerEvents = ''
   
@@ -404,7 +401,7 @@ const startTourConfirmed = async () => {
   currentStepIndex.value = 0
   isActive.value = true
   
-  // 🔒 Bloquear scroll del body
+  // Bloquear scroll del body
   document.body.style.overflow = 'hidden'
   
   await updateHighlight()
@@ -414,7 +411,7 @@ const startTourConfirmed = async () => {
 let resizeObserver
 onMounted(() => {
   window.addEventListener('resize', updateHighlight)
-  // ❌ NO escuchar scroll - está bloqueado durante el tour
+  // NO escuchar scroll - está bloqueado durante el tour
   
   if (props.autoStart || DEV_MODE) {
     setTimeout(startTour, 500) // Pequeño delay para que el DOM esté listo
@@ -424,7 +421,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', updateHighlight)
   
-  // 🔓 Asegurar que el scroll se restaure al desmontar
+  // Asegurar que el scroll se restaure al desmontar
   document.body.style.overflow = ''
 })
 

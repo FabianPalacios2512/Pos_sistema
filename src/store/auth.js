@@ -59,7 +59,7 @@ const actions = {
       }
     } catch (error) {
       console.error('Error al inicializar autenticación:', error)
-      // ⚠️ NO hacer logout si solo falló la inicialización
+      // NO hacer logout si solo falló la inicialización
       // Solo limpiar estado
       state.user = null
       state.token = null
@@ -81,8 +81,7 @@ const actions = {
       state.user = response.user
       state.isAuthenticated = true
       
-      // ✅ INICIALIZAR APPSTORE DESPUÉS DEL LOGIN EXITOSO (incluye sesión de caja)
-      console.log('🚀 Login exitoso, inicializando appStore con sesión de caja...')
+      // INICIALIZAR APPSTORE DESPUÉS DEL LOGIN EXITOSO (incluye sesión de caja)
       await appStore.initialize()
       
       return response
@@ -109,7 +108,7 @@ const actions = {
       state.error = null
       state.loading = false
       
-      // ✅ LIMPIAR APPSTORE AL HACER LOGOUT
+      // LIMPIAR APPSTORE AL HACER LOGOUT
       appStore.initialized = false
       appStore.cashSession.initialized = false
     }
@@ -185,7 +184,6 @@ const actions = {
     } catch (error) {
       if (error.response?.status === 401) {
         // Token expirado, limpiar sesión
-        console.log('🔒 Token expirado, limpiando sesión automáticamente')
         await this.logout()
         return false
       }
@@ -206,11 +204,10 @@ const actions = {
     localStorage.removeItem('authToken')
     localStorage.removeItem('user')
     
-    // ✅ LIMPIAR APPSTORE AL FORZAR LOGOUT
+    // LIMPIAR APPSTORE AL FORZAR LOGOUT
     appStore.initialized = false
     appStore.cashSession.initialized = false
     
-    console.log('🚪 Sesión forzada a cerrar')
   }
 }
 

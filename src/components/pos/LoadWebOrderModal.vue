@@ -193,7 +193,7 @@
                       </svg>
                     </div>
                     <div class="flex-1">
-                      <p class="text-base font-bold text-amber-900 dark:text-amber-300 mb-3">⚠️ Advertencia de Stock</p>
+                      <p class="text-base font-bold text-amber-900 dark:text-amber-300 mb-3">Advertencia de Stock</p>
                       <div class="space-y-2">
                         <div v-for="issue in stockIssues" :key="issue.product" class="text-sm text-amber-800 dark:text-amber-400 bg-white dark:bg-zinc-800 px-3 py-2.5 rounded-xl font-semibold border border-amber-200 dark:border-amber-700">
                           <span class="font-bold">{{ issue.product }}:</span> 

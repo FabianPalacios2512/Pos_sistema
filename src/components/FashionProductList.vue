@@ -12,9 +12,9 @@
   <!-- Contenido principal -->
   <div v-else class="min-h-screen font-sans bg-gradient-to-br from-gray-50 via-white to-slate-100 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
     
-    <!-- 🔥 INDICADOR VISUAL - ESTE ARCHIVO SE ESTÁ CARGANDO -->
+    <!-- INDICADOR VISUAL - ESTE ARCHIVO SE ESTÁ CARGANDO -->
     <div class="bg-black text-white p-8 text-center text-2xl font-bold mb-4">
-      ✅ FASHION PRODUCT LIST CARGADO CORRECTAMENTE
+      FASHION PRODUCT LIST CARGADO CORRECTAMENTE
     </div>
     
     <div class="p-4 lg:p-6 space-y-8 pb-8 animate-fade-in">
@@ -495,17 +495,14 @@ const refreshProducts = async () => {
 
 const openCreateModal = () => {
   // Implementar apertura de modal
-  console.log('Abrir modal de creación')
 }
 
 const viewProduct = (product) => {
   // Implementar vista de detalle
-  console.log('Ver producto:', product)
 }
 
 const editProduct = (product) => {
   // Implementar edición
-  console.log('Editar producto:', product)
 }
 
 const showNotification = (title, message = '', type = 'info', duration = 5000) => {
@@ -537,8 +534,6 @@ watch([searchTerm, categoryFilter, statusFilter], () => {
 
 // Lifecycle
 onMounted(async () => {
-  console.log('Fashion Product List inicializado')
-  
   await loadCategories()
   await loadProducts()
   

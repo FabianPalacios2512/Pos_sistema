@@ -123,7 +123,7 @@
     <main class="flex-1 overflow-y-auto bg-[#f8f9fa] dark:bg-transparent">
       <div class="p-8 space-y-6 max-w-5xl mx-auto">
         
-        <!-- ⚠️ Barra de Advertencia - Configuración Incompleta - Gemini -->
+        <!-- Barra de Advertencia - Configuración Incompleta - Gemini -->
         <div v-if="showWarningMessage" 
              class="bg-[#fef7e0] dark:bg-[#ea8600]/15 border-l-4 border-[#ea8600] rounded-2xl p-4 flex items-start gap-3 animate-fade-in">
           <svg class="w-5 h-5 text-[#ea8600] dark:text-[#fdd663] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -150,7 +150,7 @@
           <!-- SECCIÓN: DISEÑO - Estilo Gemini -->
           <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
             
-            <!-- 🎨 TARJETA 1: Logo y Color Primario - Gemini -->
+            <!-- TARJETA 1: Logo y Color Primario - Gemini -->
             <div class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
               <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                 <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Identidad Visual</h3>
@@ -220,7 +220,7 @@
               </div>
             </div>
             
-            <!-- 🎨 TARJETA 2: Selección de Plantilla - Gemini -->
+            <!-- TARJETA 2: Selección de Plantilla - Gemini -->
             <div class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
               <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                 <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Plantilla de Diseño</h3>
@@ -319,7 +319,7 @@
               </div>
             </div>
             
-            <!-- 🎨 TARJETA 3: Banner Promocional (Solo Fashion) - Gemini -->
+            <!-- TARJETA 3: Banner Promocional (Solo Fashion) - Gemini -->
             <div v-if="isFashionStore" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
               <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
                 <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Banner Promocional</h3>
@@ -371,7 +371,7 @@
                 <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-1">Controla qué categorías y productos se muestran en tu tienda online.</p>
               </div>
               
-              <!-- ⚠️ Advertencia si no hay categorías cargadas -->
+              <!-- Advertencia si no hay categorías cargadas -->
               <div v-if="availableCategories.length === 0" 
                    class="bg-[#e8f0fe] dark:bg-[#1a73e8]/15 border-l-4 border-[#1a73e8] dark:border-[#8ab4f8] rounded-xl p-4 flex items-start gap-3">
                 <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8] flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -749,7 +749,7 @@ const getValidTemplate = (template) => {
   }
   // Si NO es fashion, NUNCA puede ser visual-story
   if (template === 'visual-story') {
-    console.warn('⚠️ Plantilla "visual-story" no disponible para tiendas no-fashion. Usando "speed-market"')
+    console.warn('Plantilla "visual-story" no disponible para tiendas no-fashion. Usando "speed-market"')
     return 'speed-market'
   }
   return template || 'speed-market'
@@ -786,9 +786,8 @@ const availableCategories = ref([])
 onMounted(async () => {
   isLoading.value = true
   
-  // 🔄 Cargar categorías desde la API con autenticación
+  // Cargar categorías desde la API con autenticación
   try {
-    console.log('📦 Cargando categorías desde la API...')
     const response = await apiClient.get('/categories-pos')
     
     // La API devuelve {success: true, data: Array, message: '...'}
@@ -799,16 +798,14 @@ onMounted(async () => {
         id: cat.id,
         name: cat.name
       }))
-      console.log('✅ Categorías cargadas:', availableCategories.value.length, 'categorías')
     } else {
-      console.warn('⚠️ No se encontraron categorías en la respuesta')
+      console.warn('No se encontraron categorías en la respuesta')
       availableCategories.value = []
     }
   } catch (error) {
-    console.error('❌ Error cargando categorías:', error)
+    console.error('Error cargando categorías:', error)
     // Fallback: usar categorías del appStore si falló la API
     if (appStore.categories && appStore.categories.length > 0) {
-      console.log('🔄 Usando categorías del appStore como fallback')
       availableCategories.value = appStore.categories
     } else {
       availableCategories.value = []
@@ -818,18 +815,18 @@ onMounted(async () => {
   // Load existing configuration from backend
   await loadConfiguration()
   
-  // 🛡️ Validación final: Asegurar que la plantilla sea válida
+  // Validación final: Asegurar que la plantilla sea válida
   config.brandIdentity.template = getValidTemplate(config.brandIdentity.template)
   
   isLoading.value = false
 })
 
-// ⚠️ Validación: Desactivar catálogo automáticamente si no hay categorías O número WhatsApp
+// Validación: Desactivar catálogo automáticamente si no hay categorías O número WhatsApp
 watch(() => config.storeActive, async (newValue) => {
   if (newValue) {
     // Verificar categorías
     if (config.inventoryVisibility.visibleCategories.length === 0) {
-      console.warn('⚠️ Intento de activar catálogo sin categorías seleccionadas')
+      console.warn('Intento de activar catálogo sin categorías seleccionadas')
       
       // Desactivar INMEDIATAMENTE el toggle
       config.storeActive = false
@@ -837,24 +834,20 @@ watch(() => config.storeActive, async (newValue) => {
       // Esperar a que se actualice el DOM
       await nextTick()
       
-      // 💾 Guardar automáticamente el cambio en el backend
-      console.log('💾 Guardando estado inactivo automáticamente...')
+      // Guardar automáticamente el cambio en el backend
       await saveConfiguration()
-      console.log('✅ Estado guardado en backend')
-      
       // Mostrar mensaje de alerta por 40 segundos
       warningType.value = 'categories'
       showWarningMessage.value = true
       setTimeout(() => {
         showWarningMessage.value = false
-        console.log('🔄 Mensaje de alerta ocultado después de 40 segundos')
       }, 40000)
       return
     }
     
     // Verificar número de WhatsApp
     if (!isValidWhatsappNumber(config.ordersConfig.whatsappNumber)) {
-      console.warn('⚠️ Intento de activar catálogo sin número de WhatsApp válido')
+      console.warn('Intento de activar catálogo sin número de WhatsApp válido')
       
       // Desactivar INMEDIATAMENTE el toggle
       config.storeActive = false
@@ -862,48 +855,37 @@ watch(() => config.storeActive, async (newValue) => {
       // Esperar a que se actualice el DOM
       await nextTick()
       
-      // 💾 Guardar automáticamente el cambio en el backend
-      console.log('💾 Guardando estado inactivo automáticamente...')
+      // Guardar automáticamente el cambio en el backend
       await saveConfiguration()
-      console.log('✅ Estado guardado en backend')
-      
       // Mostrar mensaje de alerta por 40 segundos
       warningType.value = 'whatsapp'
       showWarningMessage.value = true
       setTimeout(() => {
         showWarningMessage.value = false
-        console.log('🔄 Mensaje de alerta ocultado después de 40 segundos')
       }, 40000)
       return
     }
     
-    // ✅ Si llegó aquí, el cambio es válido - Guardar automáticamente
+    // Si llegó aquí, el cambio es válido - Guardar automáticamente
     await nextTick()
-    console.log('💾 Toggle cambiado - Guardando configuración automáticamente...')
     await saveConfiguration()
-    console.log('✅ Configuración guardada automáticamente')
   } else if (!newValue) {
-    // 🔴 Usuario desactivó la tienda manualmente - Guardar automáticamente
+    // Usuario desactivó la tienda manualmente - Guardar automáticamente
     await nextTick()
-    console.log('💾 Tienda desactivada - Guardando configuración automáticamente...')
     await saveConfiguration()
-    console.log('✅ Configuración guardada automáticamente')
   }
 })
 
-// 🛡️ Validación inteligente al cambiar categorías
+// Validación inteligente al cambiar categorías
 watch(() => config.inventoryVisibility.visibleCategories.length, async (newLength, oldLength) => {
-  console.log('📊 Cambio en categorías detectado:', { newLength, oldLength, storeActive: config.storeActive })
-  
   // 1️⃣ Si se selecciona al menos una categoría, cerrar mensaje de alerta inmediatamente
   if (newLength > 0 && showWarningMessage.value) {
     showWarningMessage.value = false
-    console.log('✅ Categoría seleccionada - Mensaje de alerta cerrado')
   }
   
   // 2️⃣ Si se quitan TODAS las categorías y el catálogo está activo, desactivarlo automáticamente
   if (config.storeActive && newLength === 0 && oldLength > 0) {
-    console.warn('⚠️ Se quitaron todas las categorías - Desactivando catálogo automáticamente')
+    console.warn('Se quitaron todas las categorías - Desactivando catálogo automáticamente')
     
     // Desactivar el toggle
     config.storeActive = false
@@ -911,27 +893,22 @@ watch(() => config.inventoryVisibility.visibleCategories.length, async (newLengt
     // Esperar a que se actualice el DOM
     await nextTick()
     
-    // 💾 Guardar automáticamente el cambio en el backend
-    console.log('💾 Guardando estado inactivo automáticamente...')
+    // Guardar automáticamente el cambio en el backend
     await saveConfiguration()
-    console.log('✅ Estado guardado en backend')
-    
     // Mostrar mensaje de alerta por 40 segundos
     warningType.value = 'categories'
     showWarningMessage.value = true
     setTimeout(() => {
       showWarningMessage.value = false
-      console.log('🔄 Mensaje de alerta ocultado después de 40 segundos')
     }, 40000)
   }
 })
 
-// 🛡️ Validación del número de WhatsApp
+// Validación del número de WhatsApp
 watch(() => config.ordersConfig.whatsappNumber, (newValue) => {
   // Si se ingresa un número válido, cerrar mensaje de alerta si era de WhatsApp
   if (isValidWhatsappNumber(newValue) && showWarningMessage.value && warningType.value === 'whatsapp') {
     showWarningMessage.value = false
-    console.log('✅ Número de WhatsApp válido - Mensaje de alerta cerrado')
   }
 })
 
@@ -967,9 +944,8 @@ const copyStoreLink = async () => {
       showSuccessToast.value = false
     }, 3000)
     
-    console.log('✅ Enlace copiado al portapapeles:', catalogUrl)
   } catch (error) {
-    console.error('❌ Error al copiar enlace:', error)
+    console.error('Error al copiar enlace:', error)
     // Fallback para navegadores antiguos
     const textArea = document.createElement('textarea')
     textArea.value = catalogUrl
@@ -986,7 +962,7 @@ const copyStoreLink = async () => {
         showSuccessToast.value = false
       }, 3000)
     } catch (err) {
-      console.error('❌ Error en fallback de copia:', err)
+      console.error('Error en fallback de copia:', err)
       alert('No se pudo copiar el enlace. Por favor, cópialo manualmente.')
     }
     document.body.removeChild(textArea)
@@ -1017,11 +993,6 @@ const handleFileUpload = (event, type) => {
   const file = event.target.files[0]
   if (!file) return
 
-  console.log('📁 Archivo seleccionado:', {
-    name: file.name,
-    size: file.size,
-    type: file.type
-  })
 
   if (file.size > 2 * 1024 * 1024) {
     alert('El archivo es muy grande. Máximo 2MB.')
@@ -1031,18 +1002,11 @@ const handleFileUpload = (event, type) => {
   const reader = new FileReader()
   reader.onload = (e) => {
     const base64String = e.target.result
-    console.log('✅ Archivo convertido a base64:', {
-      type,
-      length: base64String.length,
-      preview: base64String.substring(0, 50) + '...'
-    })
     
     if (type === 'logo') {
       config.brandIdentity.logo = base64String
-      console.log('🖼️ Logo asignado a config.brandIdentity.logo')
     } else if (type === 'banner') {
       config.brandIdentity.banner = base64String
-      console.log('🖼️ Banner asignado a config.brandIdentity.banner')
     }
   }
   reader.readAsDataURL(file)
@@ -1056,18 +1020,12 @@ const loadConfiguration = async () => {
     if (response.data.success) {
       const data = response.data.data
       
-      console.log('📥 Configuración cargada desde BD:', {
-        logo_url: data.logo_url ? `${data.logo_url.substring(0, 50)}...` : 'null',
-        logo_length: data.logo_url ? data.logo_url.length : 0,
-        banner_url: data.banner_url ? `${data.banner_url.substring(0, 50)}...` : 'null'
-      })
-      
       // Por defecto inactivo si no está explícitamente configurado
       config.storeActive = data.store_active ?? false
       config.brandIdentity.logo = data.logo_url || ''
       config.brandIdentity.banner = data.banner_url || ''
       config.brandIdentity.primaryColor = data.primary_color || '#10B981'
-      // 🛡️ Validar plantilla usando helper
+      // Validar plantilla usando helper
       const loadedTemplate = data.template || 'speed-market'
       config.brandIdentity.template = getValidTemplate(loadedTemplate)
       
@@ -1076,9 +1034,9 @@ const loadConfiguration = async () => {
       // Respetar la configuración guardada, incluso si está vacía
       config.inventoryVisibility.visibleCategories = visibleCats
       
-      // 🛡️ REGLA: Si no hay categorías seleccionadas, FORZAR catálogo inactivo
+      // REGLA: Si no hay categorías seleccionadas, FORZAR catálogo inactivo
       if (visibleCats.length === 0) {
-        console.warn('⚠️ No hay categorías seleccionadas - Forzando catálogo inactivo')
+        console.warn('No hay categorías seleccionadas - Forzando catálogo inactivo')
         config.storeActive = false
       }
       
@@ -1101,7 +1059,7 @@ const saveConfiguration = async () => {
   isSaving.value = true
   
   try {
-    // 🛡️ Validar plantilla antes de guardar
+    // Validar plantilla antes de guardar
     const validTemplate = getValidTemplate(config.brandIdentity.template)
     if (validTemplate !== config.brandIdentity.template) {
       config.brandIdentity.template = validTemplate
@@ -1133,16 +1091,8 @@ const saveConfiguration = async () => {
       }
     }
     
-    console.log('💾 Guardando configuración:', {
-      storeActive: payload.storeActive,
-      visibleCategories: payload.products.visibleCategories,
-      logo_length: payload.brandIdentity.logo ? payload.brandIdentity.logo.length : 0,
-      banner_length: payload.brandIdentity.banner ? payload.brandIdentity.banner.length : 0
-    })
     
     const response = await apiClient.post('/web-catalog/config', payload)
-    
-    console.log('📤 Respuesta del servidor:', response.data)
     
     if (response.data.success) {
       toastMessage.title = '¡Guardado!'
@@ -1156,7 +1106,7 @@ const saveConfiguration = async () => {
       refreshPreview()
     }
   } catch (error) {
-    console.error('❌ Error saving configuration:', error)
+    console.error('Error saving configuration:', error)
     alert('Error al guardar la configuración.')
   } finally {
     isSaving.value = false

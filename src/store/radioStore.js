@@ -15,7 +15,7 @@ export const useRadioStore = defineStore('radio', {
         newsStations: [],
         musicStations: [],
         searchResults: [],
-        favorites: [], // 🎯 Lista de favoritos
+        favorites: [], // Lista de favoritos
 
         // Cache for city filters
         cityStations: {
@@ -50,7 +50,7 @@ export const useRadioStore = defineStore('radio', {
             this.loadFavorites()
         },
 
-        // 🎯 Sistema de Favoritos
+        // Sistema de Favoritos
         loadFavorites() {
             try {
                 const saved = localStorage.getItem('radio-favorites')
@@ -98,7 +98,7 @@ export const useRadioStore = defineStore('radio', {
             return this.favorites.some(f => f.id === stationId)
         },
 
-        // 🎯 Navegación entre emisoras
+        // Navegación entre emisoras
         getAllStations() {
             // Combinar todas las emisoras disponibles según la vista actual
             let stations = []

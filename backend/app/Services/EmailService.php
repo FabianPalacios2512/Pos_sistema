@@ -54,10 +54,6 @@ class EmailService
                 );
             });
 
-            Log::info('📧 Email de bienvenida enviado', [
-                'email' => $data['email'],
-                'subdomain' => $data['subdomain']
-            ]);
 
             return true;
         } catch (\Exception $e) {
@@ -101,9 +97,6 @@ class EmailService
                 );
             });
 
-            Log::info('📧 Email de recuperación de contraseña enviado', [
-                'email' => $data['email']
-            ]);
 
             return true;
         } catch (\Exception $e) {
@@ -146,9 +139,6 @@ class EmailService
                 );
             });
 
-            Log::info('📧 Email de confirmación de cambio de contraseña enviado', [
-                'email' => $data['email']
-            ]);
 
             return true;
         } catch (\Exception $e) {
@@ -196,10 +186,6 @@ class EmailService
                 );
             });
 
-            Log::info('📧 Email de notificación enviado', [
-                'email' => $data['email'],
-                'subject' => $data['subject']
-            ]);
 
             return true;
         } catch (\Exception $e) {

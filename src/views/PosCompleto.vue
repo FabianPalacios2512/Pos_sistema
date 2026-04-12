@@ -2,7 +2,7 @@
   <!-- Sistema POS Empresarial Completo -->
   <div :class="{ 'dark': isDarkMode }" class="bg-[#F9FAFB] dark:bg-gradient-to-b dark:from-zinc-900 dark:via-zinc-950 dark:to-black transition-colors duration-300 overflow-x-hidden" style="height: 100%; display: flex; flex-direction: column;">
     
-    <!-- 🔥 Modal de Suscripción Expirada (NO se puede cerrar) -->
+    <!-- Modal de Suscripción Expirada (NO se puede cerrar) -->
     <SubscriptionExpiredModal />
     
     <!-- Sidebar Component -->
@@ -172,7 +172,7 @@
       @close="radioWidgetOpen = false"
     />
 
-    <!-- 🤖 Botón Flotante IA 105 - Solo visible fuera del POS -->
+    <!-- Botón Flotante IA 105 - Solo visible fuera del POS -->
     <Transition
       enter-active-class="transition-all duration-300 ease-out"
       enter-from-class="opacity-0 scale-90 translate-y-2"
@@ -247,7 +247,7 @@ import AppHeader from '../components/AppHeader.vue'
 // Importar RadioPlayerModal
 import RadioPlayerModal from '../components/RadioPlayerModal.vue'
 
-// 🔥 Importar Modal de Suscripción Expirada
+// Importar Modal de Suscripción Expirada
 import SubscriptionExpiredModal from '../components/SubscriptionExpiredModal.vue'
 
 // Router
@@ -257,13 +257,13 @@ const route = useRoute()
 // Navegación global de módulos (para chat AI y otros componentes)
 const { onModuleChange } = useModuleNavigation()
 
-// 🔄 Sistema de persistencia de ruta/módulo
+// Sistema de persistencia de ruta/módulo
 const { saveCurrentModule, restoreLastModule, markRefresh, wasRecentlyRefreshed } = useRouteState()
 
 // Sistema de timeout de sesión
 const sessionTimeout = useSessionTimeout()
 
-// 🎯 Store de contexto UI para IA de voz
+// Store de contexto UI para IA de voz
 const uiContext = useUIContextStore()
 
 // Importar componentes de módulos
@@ -341,7 +341,7 @@ const cartHasItems = ref(false) // Estado del carrito
 // Referencias a componentes
 const posViewRef = ref(null)
 const pendingPosAction = ref(null) // Acción pendiente para ejecutar cuando PosView se monte
-const posRefreshKey = ref(Date.now()) // 🔄 Key para forzar recreación del POS
+const posRefreshKey = ref(Date.now()) // Key para forzar recreación del POS
 
 // Notificaciones del sistema
 const notifications = ref([
@@ -530,7 +530,7 @@ const loadInvoices = async () => {
         customer: document.customer?.name || document.customer_name || 'Cliente General',
         customer_name: document.customer_name,
         customer_id: document.customer_id,
-        seller_name: document.seller_name, // ✅ Pass seller_name explicitly
+        seller_name: document.seller_name, // Pass seller_name explicitly
         cashier: document.seller_name || document.cashier_name || 'Vendedor',
         items: document.items || document.sale_items || [],
         subtotal: parseFloat(document.subtotal || 0),
@@ -551,7 +551,7 @@ const loadInvoices = async () => {
       invoicesList.value = []
     }
   } catch (error) {
-    console.error('❌ Error cargando facturas desde BD:', error)
+    console.error('Error cargando facturas desde BD:', error)
     // Si falla, inicializar como array vacío
     invoicesList.value = []
   }
@@ -602,7 +602,7 @@ const ensureDefaultCustomer = async () => {
   }
 }
 
-// 🏭 Actualizar stock de productos vendidos
+// Actualizar stock de productos vendidos
 const updateSoldProductsStock = async (soldItems) => {
   
   try {
@@ -619,13 +619,13 @@ const updateSoldProductsStock = async (soldItems) => {
       try {
         const response = await inventoryService.updateProductStock(item.id, stockData)
       } catch (productError) {
-        console.error(`❌ Error actualizando stock del producto ${item.name} (ID: ${item.id}):`, productError)
+        console.error(`Error actualizando stock del producto ${item.name} (ID: ${item.id}):`, productError)
         // Continuar con los demás productos aunque uno falle
       }
     }
     
   } catch (error) {
-    console.error('❌ Error general actualizando stock de productos vendidos:', error)
+    console.error('Error general actualizando stock de productos vendidos:', error)
     // No lanzamos el error para que no interrumpa la venta
   }
 }
@@ -670,7 +670,7 @@ const handleSaleCompleted = async (saleData) => {
     }, 1000)
     
   } catch (error) {
-    console.error('❌ Error procesando venta completada:', error)
+    console.error('Error procesando venta completada:', error)
   }
   
   // Agregar también a ventas recientes
@@ -728,7 +728,7 @@ const handleCreateQuote = async (quoteData) => {
         
         // Mostrar el modal directamente aquí (no necesitamos emit)
         // Simulamos el showQuotationModal del PosView
-        alert(`✅ Cotización creada exitosamente\n\nCódigo: ${modalQuotationData.code}\nCliente: ${modalQuotationData.customer}\nTotal: $${modalQuotationData.total.toLocaleString()}`)
+        alert(`Cotización creada exitosamente\n\nCódigo: ${modalQuotationData.code}\nCliente: ${modalQuotationData.customer}\nTotal: $${modalQuotationData.total.toLocaleString()}`)
       }
       
       return { success: true, data: result.data }
@@ -736,7 +736,7 @@ const handleCreateQuote = async (quoteData) => {
       throw new Error(result.message || 'Error al crear cotización')
     }
   } catch (error) {
-    console.error('❌ Error al crear cotización:', error)
+    console.error('Error al crear cotización:', error)
     return { success: false, error: error.message }
   }
 }
@@ -771,7 +771,7 @@ const handleSearchQuote = async (quoteCode) => {
       return { success: false, message: 'Cotización no encontrada' }
     }
   } catch (error) {
-    console.error('❌ [handleSearchQuote] Error al buscar cotización:', error)
+    console.error('[handleSearchQuote] Error al buscar cotización:', error)
     return { success: false, error: error.message }
   }
 }
@@ -1220,7 +1220,7 @@ const salesData = ref({
 
 // ===== COMPUTED PROPERTIES =====
 
-// 🍔 Fast Food Mode Detection (para sidebar y UI)
+// Fast Food Mode Detection (para sidebar y UI)
 const isFastFoodMode = computed(() => {
   const settings = appStore.systemSettings || {}
   const storeType = settings.store_type
@@ -1320,15 +1320,13 @@ const setCurrentModule = (module, options = {}) => {
     }
     const moduleFriendlyName = moduleNames[module] || module
     
-    // 🔒 Notificar al contexto UI del error de permisos (para que la IA pueda responder)
+    // Notificar al contexto UI del error de permisos (para que la IA pueda responder)
     uiContext.setLastNavigationError({
       module: module,
       moduleName: moduleFriendlyName,
       roleName: roleName,
       message: `No tienes permiso para acceder a ${moduleFriendlyName}. Tu rol de "${roleName}" no incluye este módulo.`
     })
-    
-    console.log(`🚫 [PosCompleto] Navegación denegada a ${module}. Rol: ${roleName}`)
     
     // Solo mostrar alert si NO viene de navegación por IA (options.fromAI)
     if (!options.fromAI) {
@@ -1349,7 +1347,7 @@ const setCurrentModule = (module, options = {}) => {
 
   currentModule.value = module
   
-  // 🎯 Notificar al contexto UI para la IA de voz
+  // Notificar al contexto UI para la IA de voz
   uiContext.setCurrentModule(module)
   
   // � Si volvemos al POS, forzar recreación del componente para refrescar datos
@@ -1357,10 +1355,10 @@ const setCurrentModule = (module, options = {}) => {
     posRefreshKey.value = Date.now()
   }
   
-  // �📱 Cerrar sidebar en móvil al cambiar de módulo
+  // �Cerrar sidebar en móvil al cambiar de módulo
   sidebarOpen.value = false
   
-  // 🔄 PERSISTIR el módulo actual en localStorage
+  // PERSISTIR el módulo actual en localStorage
   saveCurrentModule(module)
   
   // Manejar acciones especiales después del cambio de módulo
@@ -1489,7 +1487,7 @@ const getMenuItemClass = (module) => {
   if (isActive) {
     classes += ' bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-[1.02] ring-2 ring-blue-200';
   } else {
-    classes += ' text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:text-blue-700 dark:hover:text-blue-300 hover:shadow-md hover:scale-[1.01]';
+    classes += ' text-gray-700 dark:text-zinc-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 dark:hover:from-gray-700 dark:hover:to-gray-600 hover:text-blue-700 dark:hover:text-blue-300 hover:shadow-md hover:scale-[1.01]';
   }
   
   return classes;
@@ -1607,7 +1605,7 @@ const getModuleDescription = () => {
     'attendance': 'Punteo de Jornada • Control biométrico de asistencia',
     'my-attendance': 'Mi Jornada • Control de asistencia personal'
   }
-  return descriptions[currentModule.value] || '✨ Sistema de gestión empresarial avanzado'
+  return descriptions[currentModule.value] || 'Sistema de gestión empresarial avanzado'
 }
 
 // Obtener props para el módulo actual
@@ -1641,7 +1639,6 @@ const loadSettings = () => {
       isDarkMode.value = savedDarkMode === 'true'
     }
   } catch (error) {
-    console.log('Error loading settings:', error)
   }
 }
 
@@ -1678,9 +1675,9 @@ watch(posViewRef, async (newRef) => {
   }
 })
 
-// 🔄 Watcher para AUTO-REFRESH cuando entras al módulo POS
+// Watcher para AUTO-REFRESH cuando entras al módulo POS
 watch(() => currentModule.value, async (newModule, oldModule) => {
-  // 🧠 ACTUALIZAR UI CONTEXT STORE PARA IA (sincronizar módulo actual)
+  // ACTUALIZAR UI CONTEXT STORE PARA IA (sincronizar módulo actual)
   uiContext.setCurrentModule(newModule)
   
   if (newModule === 'pos' && oldModule !== 'pos') {
@@ -1694,7 +1691,7 @@ watch(() => currentModule.value, async (newModule, oldModule) => {
         await appStore.loadPaymentMethods(true)
       }
     } catch (error) {
-      console.error('⚠️ Error en auto-refresh al entrar al POS:', error)
+      console.error('Error en auto-refresh al entrar al POS:', error)
     }
   }
 }, { immediate: true })
@@ -1716,7 +1713,7 @@ onMounted(() => {
     return
   }
   
-  // 🔄 RESTAURAR el último módulo si se hizo refresh
+  // RESTAURAR el último módulo si se hizo refresh
   const lastModule = restoreLastModule()
   if (lastModule && lastModule !== 'pos') {
     currentModule.value = lastModule
@@ -1734,11 +1731,6 @@ onMounted(() => {
       moduleQueryParams.value = {}
     }
   })
-  
-  // Configurar token de autenticación temporal para desarrollo (si no existe uno real)
-  if (!localStorage.getItem('auth_token')) {
-    localStorage.setItem('auth_token', '2|9bqn3alwfSdQZVAYFp10z4RqcFHUcS6X8IiFMIJDb632dab8')
-  }
   
   // Cargar configuración
   loadSettings()
@@ -1898,7 +1890,7 @@ main > div {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   🎨 ANIMACIÓN GLOW PULSANTE PARA BOTÓN IA FLOTANTE
+   ANIMACIÓN GLOW PULSANTE PARA BOTÓN IA FLOTANTE
    Efecto de "vida" - La IA está esperando
 ════════════════════════════════════════════════════════════════════════════ */
 @keyframes ai-glow {

@@ -61,8 +61,6 @@ class StockTransferController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info('=== INICIO STORE TRANSFER ===');
-        \Log::info('Request data:', $request->all());
 
         $validated = $request->validate([
             'source_warehouse_id' => 'required|exists:warehouses,id',
@@ -73,23 +71,15 @@ class StockTransferController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
-        \Log::info('Validation passed:', $validated);
 
         DB::beginTransaction();
-        \Log::info('Transaction started');
 
         try {
             $sourceWarehouse = Warehouse::findOrFail($validated['source_warehouse_id']);
-            \Log::info('Source warehouse found:', ['id' => $sourceWarehouse->id, 'name' => $sourceWarehouse->name]);
 
             // Validar que haya suficiente stock en origen
             foreach ($validated['items'] as $item) {
                 $availableStock = $sourceWarehouse->getProductStock($item['product_id']);
-                \Log::info('Stock validation:', [
-                    'product_id' => $item['product_id'],
-                    'available' => $availableStock,
-                    'requested' => $item['quantity']
-                ]);
 
                 if ($availableStock < $item['quantity']) {
                     $product = Product::find($item['product_id']);
@@ -102,7 +92,6 @@ class StockTransferController extends Controller
                 }
             }
 
-            \Log::info('Stock validation passed, creating transfer...');
 
             // Crear el traslado
             $transfer = StockTransfer::create([
@@ -114,11 +103,6 @@ class StockTransferController extends Controller
                 'status' => 'pending',
             ]);
 
-            \Log::info('Transfer created:', [
-                'id' => $transfer->id,
-                'reference' => $transfer->reference_number,
-                'status' => $transfer->status
-            ]);
 
             // Agregar los items
             foreach ($validated['items'] as $item) {
@@ -128,22 +112,11 @@ class StockTransferController extends Controller
                     'quantity' => $item['quantity'],
                 ]);
 
-                \Log::info('Transfer item created:', [
-                    'id' => $transferItem->id,
-                    'product_id' => $transferItem->product_id,
-                    'quantity' => $transferItem->quantity
-                ]);
             }
 
-            \Log::info('All items created, committing transaction...');
             DB::commit();
-            \Log::info('Transaction committed successfully');
 
             $transferWithRelations = $transfer->load(['sourceWarehouse', 'destinationWarehouse', 'items.product']);
-            \Log::info('Transfer loaded with relations:', [
-                'transfer_id' => $transferWithRelations->id,
-                'items_count' => $transferWithRelations->items->count()
-            ]);
 
             return response()->json([
                 'message' => 'Traslado creado exitosamente',
@@ -155,7 +128,6 @@ class StockTransferController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             DB::rollBack();
-            \Log::info('Transaction rolled back');
 
             return response()->json([
                 'message' => 'Error al crear el traslado',
@@ -169,17 +141,10 @@ class StockTransferController extends Controller
      */
     public function complete($id)
     {
-        \Log::info('=== COMPLETE TRANSFER ===');
-        \Log::info('Transfer ID:', ['id' => $id]);
 
         DB::beginTransaction();
         try {
             $transfer = StockTransfer::with('items')->findOrFail($id);
-            \Log::info('Transfer found:', [
-                'id' => $transfer->id,
-                'status' => $transfer->status,
-                'items_count' => $transfer->items->count()
-            ]);
 
             if ($transfer->status !== 'pending') {
                 \Log::warning('Transfer is not pending:', ['status' => $transfer->status]);
@@ -188,25 +153,16 @@ class StockTransferController extends Controller
                 ], 422);
             }
 
-            \Log::info('Calling transfer->complete()...');
             $transfer->complete();
-            \Log::info('Transfer completed successfully');
 
             // Actualizar el current_stock de cada producto afectado
-            \Log::info('Updating current_stock for products...');
             foreach ($transfer->items as $item) {
                 $product = Product::find($item->product_id);
                 $totalStock = $product->warehouses()->sum('product_warehouse.stock');
-                \Log::info('Updating product stock:', [
-                    'product_id' => $product->id,
-                    'old_stock' => $product->current_stock,
-                    'new_stock' => $totalStock
-                ]);
                 $product->update(['current_stock' => $totalStock]);
             }
 
             DB::commit();
-            \Log::info('Transaction committed');
 
             return response()->json([
                 'message' => 'Traslado completado exitosamente',

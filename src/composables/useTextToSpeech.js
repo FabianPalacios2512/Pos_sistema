@@ -1,5 +1,5 @@
 /**
- * 🔊 useTextToSpeech - Composable para síntesis de voz con Gemini TTS
+ * useTextToSpeech - Composable para síntesis de voz con Gemini TTS
  * 
  * Genera audio de alta calidad usando gemini-2.5-flash-tts
  * Con fallback a Web Speech API nativa si falla.

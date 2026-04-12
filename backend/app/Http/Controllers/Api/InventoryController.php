@@ -262,12 +262,6 @@ class InventoryController extends Controller
                     $product->total_sold = (int)($salesData->total_sold ?? 0);
                     $product->total_revenue = (float)($salesData->total_revenue ?? 0);
 
-                    \Log::info('💰 VENTAS CALCULADAS', [
-                        'product_id' => $product->id,
-                        'product_name' => $product->name,
-                        'total_sold' => $product->total_sold,
-                        'total_revenue' => $product->total_revenue
-                    ]);
 
                     return $product;
                 });

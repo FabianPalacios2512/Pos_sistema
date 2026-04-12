@@ -11,7 +11,7 @@
         <p class="text-gray-400 mb-1">Esta acción eliminará permanentemente:</p>
         <p class="text-white font-bold">{{ tenant.business_name }}</p>
         <p class="text-sm text-gray-500 mt-2">ID: {{ tenant.id }}</p>
-        <p class="text-sm text-red-400 mt-4 font-semibold">⚠️ Esta acción NO se puede deshacer</p>
+        <p class="text-sm text-red-400 mt-4 font-semibold">Esta acción NO se puede deshacer</p>
       </div>
       <div class="flex space-x-3">
         <button @click="$emit('close')" class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition-colors">

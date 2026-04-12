@@ -121,7 +121,7 @@
                         <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M12 12h.01M12 12v4.01"></path>
                         </svg>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Esperando código QR...</p>
+                        <p class="text-sm text-gray-500 dark:text-zinc-400">Esperando código QR...</p>
                       </div>
                       <div v-else class="text-center">
                         <svg class="w-12 h-12 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +130,7 @@
                         <p class="text-sm text-gray-900 dark:text-white font-medium">{{ qrResult }}</p>
                       </div>
                     </div>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 mb-4">
                       Apunte la cámara hacia el código QR de la factura
                     </p>
                     <button
@@ -686,8 +686,6 @@ const processReturn = async () => {
     
     const result = await returnsService.createReturn(returnData)
     
-    console.log('Resultado de devolución:', result.data)
-    
     // Procesar la respuesta para parsear items JSON (igual que en ReturnsManagementView)
     let returnResponse = result.data
     if (returnResponse.items && typeof returnResponse.items === 'string') {
@@ -708,7 +706,6 @@ const processReturn = async () => {
     
     // Esperar un tick para asegurar que los datos se actualicen
     await nextTick()
-    console.log('processedReturn después de asignar:', processedReturn.value)
     showSuccessModal.value = true
     
     // NO emitir success aquí, lo haremos desde el modal de éxito

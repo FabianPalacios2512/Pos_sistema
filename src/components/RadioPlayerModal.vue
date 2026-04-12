@@ -26,7 +26,7 @@
             </svg>
           </button>
 
-          <!-- 📱 MOBILE HEADER (sm:hidden) -->
+          <!-- MOBILE HEADER (sm:hidden) -->
           <div
             class="sm:hidden flex items-center justify-between px-4 py-3 flex-shrink-0 border-b"
             :class="isDarkMode ? 'bg-[#09090b] border-zinc-800' : 'bg-white border-slate-100'"
@@ -184,7 +184,7 @@
               :class="isDarkMode ? 'bg-[#09090b]' : 'bg-white'"
             >
               
-              <!-- 📱 MOBILE: Search + Filter Chips (sm:hidden) -->
+              <!-- MOBILE: Search + Filter Chips (sm:hidden) -->
               <div
                 class="sm:hidden sticky top-0 z-30 px-4 pt-3 pb-2 border-b space-y-2"
                 :class="isDarkMode ? 'bg-[#09090b] border-zinc-800/80' : 'bg-white border-slate-100'"
@@ -721,7 +721,7 @@ const emit = defineEmits(['close'])
 const radioStore = useRadioStore()
 const searchQuery = ref('')
 
-// 🎯 Usar el modo oscuro del POS (localStorage: 'pos-dark-mode')
+// Usar el modo oscuro del POS (localStorage: 'pos-dark-mode')
 const isDarkMode = ref(true)
 
 // Sincronizar con el tema del POS
@@ -889,7 +889,7 @@ const handleImageError = (e) => {
     
     parent.classList.add('flex', 'items-center', 'justify-center', 'bg-gradient-to-br', ...colors[colorIndex].split(' '))
     parent.innerHTML = `
-      <span class="text-white font-bold text-lg drop-shadow-lg">${initials || '📻'}</span>
+      <span class="text-white font-bold text-lg drop-shadow-lg">${initials || ''}</span>
     `
   }
 }
@@ -900,7 +900,7 @@ onMounted(() => {
   syncThemeWithPOS()
   window.addEventListener('storage', handleStorageChange)
   
-  // 🎯 IMPORTANTE: Cargar favoritos ANTES de fetchHomeData
+  // IMPORTANTE: Cargar favoritos ANTES de fetchHomeData
   radioStore.loadFavorites()
   radioStore.fetchHomeData()
   

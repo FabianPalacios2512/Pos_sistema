@@ -118,9 +118,6 @@ class CreditPaymentController extends Controller
                 $customer->current_debt = 0;
                 $customer->subtotal_debt = 0;
                 $customer->debt_since = null;
-                Log::info('✅ Cliente liquidó deuda completa, limpiando debt_since', [
-                    'customer_id' => $customer->id
-                ]);
             }
 
             // Asegurar que subtotal_debt no sea negativo
@@ -133,12 +130,6 @@ class CreditPaymentController extends Controller
             // Reload with relationships for complete response
             $payment->load('customer:id,name,document_number', 'user:id,name');
 
-            Log::info('Credit payment registered', [
-                'payment_id' => $payment->id,
-                'customer_id' => $customer->id,
-                'amount' => $request->amount,
-                'new_debt' => $customer->current_debt
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -292,11 +283,6 @@ class CreditPaymentController extends Controller
                         $responseData = $response->json();
                         if (isset($responseData['success']) && $responseData['success']) {
                             $sentChannels[] = 'WhatsApp';
-                            Log::info('✅ Recordatorio WhatsApp enviado', [
-                                'customer_id' => $customer->id,
-                                'phone' => $phone,
-                                'tenant_id' => $tenantId
-                            ]);
                         } else {
                             $errors[] = 'WhatsApp: ' . ($responseData['error'] ?? 'Error desconocido');
                             Log::warning('⚠️ Error enviando WhatsApp', [
@@ -352,10 +338,6 @@ class CreditPaymentController extends Controller
                     });
 
                     $sentChannels[] = 'Email';
-                    Log::info('✅ Recordatorio Email enviado', [
-                        'customer_id' => $customer->id,
-                        'email' => $customer->email
-                    ]);
                 } catch (\Exception $e) {
                     $errors[] = 'Email: ' . $e->getMessage();
                     Log::error('❌ Excepción enviando Email', [
@@ -479,11 +461,6 @@ class CreditPaymentController extends Controller
 
             $settings->save();
 
-            Log::info('✅ Reminder settings saved', [
-                'frequency' => $request->frequency,
-                'send_hour' => $settings->reminder_send_hour,
-                'min_days_overdue' => $settings->reminder_min_days_overdue
-            ]);
 
             return response()->json([
                 'success' => true,

@@ -114,7 +114,7 @@
           </p>
           
           <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
-            💡 Desbloquea todas las funciones premium para potenciar tu negocio
+            Desbloquea todas las funciones premium para potenciar tu negocio
           </p>
 
           <!-- Botones -->

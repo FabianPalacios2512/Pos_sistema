@@ -14,7 +14,7 @@
           <select 
             v-model="selectedPeriod" 
             @change="handlePeriodChange"
-            class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-700 dark:text-gray-300 font-medium"
+            class="px-4 py-2.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-700 dark:text-zinc-300 font-medium"
           >
             <option value="today">Hoy</option>
             <option value="week">Esta semana</option>
@@ -26,7 +26,7 @@
             type="date"
             v-model="customDate"
             @change="loadCashReportsData"
-            class="px-4 py-2.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-700 dark:text-gray-200"
+            class="px-4 py-2.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-700 dark:text-zinc-200"
           />
           
           <input 
@@ -34,7 +34,7 @@
             v-model="customEndDate"
             @change="loadCashReportsData"
             :min="customDate"
-            class="px-4 py-2.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-700 dark:text-gray-200"
+            class="px-4 py-2.5 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm text-gray-700 dark:text-zinc-200"
             placeholder="Hasta"
           />
 
@@ -62,18 +62,18 @@
       </div>
     
     <!-- Indicador de carga -->
-    <div v-if="loading" class="bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center border border-gray-200 dark:border-zinc-800">
+    <div v-if="loading" class="bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
       <div class="inline-flex items-center space-x-3">
         <svg class="animate-spin h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <span class="text-gray-500 dark:text-gray-400 font-medium">Cargando reportes de caja...</span>
+        <span class="text-gray-500 dark:text-zinc-400 font-medium">Cargando reportes de caja...</span>
       </div>
     </div>
 
     <!-- Mensaje de error -->
-    <div v-else-if="error" class="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-gray-200 dark:border-zinc-800">
+    <div v-else-if="error" class="bg-white dark:bg-zinc-900 rounded-2xl p-8 border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
       <div class="flex items-center space-x-4">
         <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center">
           <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,10 +82,10 @@
         </div>
         <div>
           <h3 class="text-gray-900 dark:text-white font-semibold">Error al cargar reportes de caja</h3>
-          <p class="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{{ error }}</p>
+          <p class="text-gray-500 dark:text-zinc-400 text-sm mt-0.5">{{ error }}</p>
         </div>
       </div>
-      <button @click="loadCashReportsData" class="mt-6 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl transition-all font-medium text-sm hover:shadow-md">
+      <button @click="loadCashReportsData" class="mt-6 px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white rounded-xl transition-all duration-300 font-bold text-sm shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50">
         Reintentar
       </button>
     </div>
@@ -240,16 +240,16 @@
       </div>
 
       <!-- Tabla comparativa detallada -->
-      <div class="bg-white dark:bg-[#212124] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-        <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+        <div class="px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800">
           <div>
             <h2 class="text-base font-semibold text-gray-900 dark:text-white">Análisis Comparativo Detallado</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Métricas completas por cajero y sesión</p>
+            <p class="text-sm text-gray-600 dark:text-zinc-400 mt-0.5">Métricas completas por cajero y sesión</p>
           </div>
           <div class="flex gap-3">
             <button 
               @click="exportCashierComparison" 
-              class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-full transition-colors flex items-center gap-2"
+              class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 flex items-center gap-2"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -262,32 +262,32 @@
         <!-- Tabla responsive -->
         <div class="overflow-x-auto">
           <table class="min-w-full">
-            <thead class="bg-[#f8f9fa] dark:bg-[#1a1a1d]">
+            <thead class="bg-gray-50 dark:bg-zinc-900">
               <tr>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Cajero</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Sesiones</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Ventas</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Transacciones</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Promedio/Venta</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Eficiencia</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Horas Trabajadas</th>
-                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ventas/Hora</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Cajero</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Sesiones</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Total Ventas</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Transacciones</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Promedio/Venta</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Eficiencia</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Horas Trabajadas</th>
+                <th class="px-6 py-4 text-left text-xs font-medium text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Ventas/Hora</th>
               </tr>
             </thead>
-            <tbody class="bg-white dark:bg-[#212124] divide-y divide-gray-100 dark:divide-gray-800">
-              <tr v-for="cashier in cashierComparison" :key="cashier.id" class="hover:bg-gray-50 dark:hover:bg-[#282a2c] transition-colors">
+            <tbody class="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800">
+              <tr v-for="cashier in cashierComparison" :key="cashier.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <div class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mr-4">
-                      <span class="text-gray-600 dark:text-gray-300 font-medium text-sm">{{ getInitials(cashier.name) }}</span>
+                    <div class="w-10 h-10 bg-gray-200 dark:bg-zinc-700 rounded-full flex items-center justify-center mr-4">
+                      <span class="text-gray-600 dark:text-zinc-300 font-medium text-sm">{{ getInitials(cashier.name) }}</span>
                     </div>
                     <div>
                       <div class="text-sm font-medium text-gray-900 dark:text-white">{{ cashier.name }}</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">{{ cashier.role }}</div>
+                      <div class="text-xs text-gray-500 dark:text-zinc-400">{{ cashier.role }}</div>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-zinc-200">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
                     {{ cashier.sessions || 1 }}
                   </span>
@@ -295,32 +295,32 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-600 dark:text-emerald-400">
                   ${{ parseFloat(cashier.total_sales || 0).toLocaleString() }}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ cashier.transactions }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">${{ parseFloat(cashier.average_sale || 0).toFixed(2) }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-zinc-200">{{ cashier.transactions }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-zinc-200">${{ parseFloat(cashier.average_sale || 0).toFixed(2) }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
+                    <div class="w-16 bg-gray-200 dark:bg-zinc-700 rounded-full h-2 mr-2">
                       <div class="bg-emerald-500 h-2 rounded-full" :style="`width: ${parseFloat(cashier.efficiency || 0)}%`"></div>
                     </div>
-                    <span class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ parseFloat(cashier.efficiency || 0).toFixed(1) }}%</span>
+                    <span class="text-sm font-medium text-gray-900 dark:text-zinc-200">{{ parseFloat(cashier.efficiency || 0).toFixed(1) }}%</span>
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{{ cashier.hoursWorked || 8 }}h</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-zinc-200">{{ cashier.hoursWorked || 8 }}h</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-zinc-200">
                   ${{ (parseFloat(cashier.total_sales || 0) / (cashier.hoursWorked || 8)).toFixed(0) }}
                 </td>
               </tr>
               
               <!-- Estado vacío -->
-              <tr v-if="!cashierComparison || cashierComparison.length === 0" class="hover:bg-gray-50 dark:hover:bg-[#282a2c]">
+              <tr v-if="!cashierComparison || cashierComparison.length === 0" class="hover:bg-gray-50 dark:hover:bg-zinc-800/50">
                 <td colspan="8" class="px-6 py-12 text-center">
                   <div class="flex flex-col items-center">
-                    <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-16 h-16 text-gray-300 dark:text-zinc-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
-                    <h3 class="text-base font-medium text-gray-700 dark:text-gray-300 mb-1">No hay datos de cajeros</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-500">No se encontraron datos para el período seleccionado</p>
-                    <button @click="loadCashReportsData" class="mt-3 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full hover:bg-black dark:hover:bg-gray-100 transition-colors text-sm font-medium">
+                    <h3 class="text-base font-medium text-gray-700 dark:text-zinc-300 mb-1">No hay datos de cajeros</h3>
+                    <p class="text-sm text-gray-500 dark:text-zinc-500">No se encontraron datos para el período seleccionado</p>
+                    <button @click="loadCashReportsData" class="mt-3 px-4 py-2.5 bg-slate-900 dark:bg-slate-700 text-white rounded-xl hover:bg-black dark:hover:bg-slate-600 transition-all duration-300 text-sm font-bold shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50">
                       Actualizar datos
                     </button>
                   </div>
@@ -335,35 +335,35 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Top 5 mejores sesiones -->
-        <div class="bg-white dark:bg-[#212124] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-          <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+          <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
             <div class="flex items-center gap-3">
               <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
               <h3 class="text-base font-semibold text-gray-900 dark:text-white">Top 5 Mejores Sesiones</h3>
             </div>
           </div>
           <div class="p-6 space-y-4">
-            <div v-for="(session, index) in topSessions" :key="session.id" class="flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+            <div v-for="(session, index) in topSessions" :key="session.id" class="flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-100 dark:border-amber-800/50">
               <div class="flex items-center">
                 <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center mr-3">
                   <span class="text-white font-medium text-sm">{{ index + 1 }}</span>
                 </div>
                 <div>
                   <div class="font-medium text-gray-900 dark:text-white">{{ session.cashier }}</div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">{{ session.date }}</div>
+                  <div class="text-sm text-gray-500 dark:text-zinc-400">{{ session.date }}</div>
                 </div>
               </div>
               <div class="text-right">
                 <div class="font-medium text-emerald-600 dark:text-emerald-400">${{ parseFloat(session.sales || 0).toLocaleString() }}</div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">{{ Math.abs(session.duration || 0) }}h</div>
+                <div class="text-sm text-gray-500 dark:text-zinc-400">{{ Math.abs(session.duration || 0) }}h</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Métodos de pago más usados -->
-        <div class="bg-white dark:bg-[#212124] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-          <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+          <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
             <div class="flex items-center gap-3">
               <div class="w-3 h-3 bg-indigo-500 rounded-full"></div>
               <h3 class="text-base font-semibold text-gray-900 dark:text-white">Métodos de Pago</h3>
@@ -377,8 +377,8 @@
         </div>
 
         <!-- Alertas y recomendaciones -->
-        <div class="bg-white dark:bg-[#212124] rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-          <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
+          <div class="px-6 py-5 border-b border-gray-100 dark:border-zinc-800">
             <div class="flex items-center gap-3">
               <div class="w-3 h-3 bg-rose-500 rounded-full"></div>
               <h3 class="text-base font-semibold text-gray-900 dark:text-white">Alertas y Recomendaciones</h3>
@@ -435,7 +435,6 @@ const getColombiaDate = () => {
   const month = String(now.getMonth() + 1).padStart(2, '0')
   const day = String(now.getDate()).padStart(2, '0')
   const result = `${year}-${month}-${day}`
-  console.log('🗓️ Fecha Colombia calculada:', result)
   return result
 }
 const customDate = ref(getColombiaDate())
@@ -838,20 +837,20 @@ const getTransactionGrowth = () => {
 
 const getAlertClass = (type) => {
   const classes = {
-    warning: 'bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200',
-    success: 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200',
-    info: 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200',
-    error: 'bg-gradient-to-r from-red-50 to-pink-50 border border-red-200'
+    warning: 'bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50',
+    success: 'bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50',
+    info: 'bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50',
+    error: 'bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50'
   }
   return classes[type] || classes.info
 }
 
 const getAlertIconClass = (type) => {
   const classes = {
-    warning: 'text-yellow-600',
-    success: 'text-green-600',
-    info: 'text-blue-600',
-    error: 'text-red-600'
+    warning: 'text-amber-600 dark:text-amber-400',
+    success: 'text-emerald-600 dark:text-emerald-400',
+    info: 'text-blue-600 dark:text-blue-400',
+    error: 'text-rose-600 dark:text-rose-400'
   }
   return classes[type] || classes.info
 }
@@ -869,8 +868,6 @@ const getAlertIcon = (type) => {
 // Funciones de exportación
 const exportCashReport = async () => {
   try {
-    console.log('Exportando reporte completo de caja...')
-    
     const result = await exportService.exportCashierReport(
       cashierComparison.value,
       getPeriodLabel()
@@ -889,8 +886,6 @@ const exportCashReport = async () => {
 
 const exportCashierComparison = async () => {
   try {
-    console.log('Exportando comparativa de cajeros...')
-    
     const result = await exportService.exportCashierComparison(
       cashierComparison.value,
       topSessions.value,
@@ -982,18 +977,7 @@ const loadCashReportsData = async () => {
       } else {
         averageSalesPerHour.value = 0
       }
-      
-      console.log('✅ Datos de eficiencia por hora cargados correctamente:', {
-        totalHours: hourlyResponse.data.hourly_data.length,
-        hoursWithSales: hoursWithSales.length,
-        averageSalesPerHour: averageSalesPerHour.value,
-        timezone: hourlyResponse.data.timezone,
-        totalSales: hourlyResponse.data.total_sales,
-        peakHour: hourlyResponse.data.peak_hour,
-        sampleData: hourlyResponse.data.hourly_data.slice(0, 3)
-      })
     } else {
-      console.warn('⚠️ No se encontraron datos de eficiencia por hora válidos:', hourlyResponse)
       hourlyEfficiencyData.value = []
       averageSalesPerHour.value = 0
     }
@@ -1043,7 +1027,7 @@ watch(selectedPeriod, () => {
 })
 
 // ═══════════════════════════════════════════════════════════════
-// 🤖 CONTEXTO IA - Reportes de Caja
+// CONTEXTO IA - Reportes de Caja
 // ═══════════════════════════════════════════════════════════════
 const uiContextStore = useUIContextStore()
 
@@ -1107,18 +1091,18 @@ const registrarAccionesIA = () => {
       let mensaje = ''
       switch (tipoConsulta) {
         case 'mejor_cajero':
-          mensaje = `🏆 Mejor cajero del ${getPeriodLabel()}: ${bestCashierData.value.name} con ${formatMoney(bestCashierData.value.sales)} en ventas`
+          mensaje = `Mejor cajero del ${getPeriodLabel()}: ${bestCashierData.value.name} con ${formatMoney(bestCashierData.value.sales)} en ventas`
           break
           
         case 'comparativa_cajeros':
           const cajeros = cashierComparison.value.slice(0, 5)
-          mensaje = `👥 Comparativa de cajeros (${getPeriodLabel()}):\n` + 
+          mensaje = `Comparativa de cajeros (${getPeriodLabel()}):\n` + 
             cajeros.map((c, i) => `${i+1}. ${c.name}: ${formatMoney(parseFloat(c.total_sales) || 0)} (${c.transactions || 0} trans.)`).join('\n')
           break
           
         case 'top_sesiones':
           const sesiones = topSessions.value.slice(0, 5)
-          mensaje = `🌟 Mejores sesiones del ${getPeriodLabel()}:\n` + 
+          mensaje = `Mejores sesiones del ${getPeriodLabel()}:\n` + 
             sesiones.map((s, i) => `${i+1}. ${s.cashier_name}: ${formatMoney(parseFloat(s.total_sales) || 0)}`).join('\n')
           break
           
@@ -1127,7 +1111,7 @@ const registrarAccionesIA = () => {
           break
           
         default:
-          mensaje = `📊 REPORTE DE CAJAS (${getPeriodLabel()}):
+          mensaje = `REPORTE DE CAJAS (${getPeriodLabel()}):
 • Sesiones activas: ${activeSessions.value?.length || 0}
 • Total ventas: ${formatMoney(totalSalesAmount.value)}
 • Transacciones: ${totalTransactions.value}

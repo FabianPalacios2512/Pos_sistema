@@ -65,7 +65,6 @@ export function useSessionTimeout() {
    * Mostrar advertencia de sesión próxima a expirar
    */
   function showSessionWarning() {
-    console.log('⚠️ Mostrando advertencia de inactividad')
     showWarning.value = true
     warningCountdown.value = Math.ceil(WARNING_TIME / 1000) // segundos
     
@@ -84,7 +83,6 @@ export function useSessionTimeout() {
    * Extender la sesión (cancelar logout)
    */
   function extendSession() {
-    console.log('✅ Sesión extendida por el usuario')
     resetInactivityTimer()
   }
   
@@ -92,8 +90,6 @@ export function useSessionTimeout() {
    * Realizar logout automático
    */
   async function performAutoLogout() {
-    console.log('🚪 Realizando logout automático por inactividad')
-    
     try {
       // Limpiar todos los timers
       cleanup()

@@ -28,13 +28,6 @@ class AIController extends Controller
         set_time_limit(120);
 
         // 🔍 LOG DE DEBUG: Ver qué llega
-        Log::info('🤖 [AI Chat] Request recibido', [
-            'message' => $request->input('message'),
-            'provider' => $request->input('provider', 'groq'),
-            'has_auth' => auth()->check(),
-            'user_id' => auth()->id(),
-            'ip' => $request->ip()
-        ]);
 
         $request->validate([
             'message' => 'required|string',
@@ -45,20 +38,14 @@ class AIController extends Controller
         // 🧠 SELECTOR DE CEREBROS (AI Provider)
         $provider = $request->input('provider', 'groq');
 
-        Log::info('🔄 [AI Chat] Proveedor seleccionado', ['provider' => $provider]);
 
         if ($provider === 'gemini') {
             try {
                 // 🧠 Obtener contexto de pantalla del frontend
                 $screenContext = $request->input('screen_context', null);
                 
-                Log::info('🚀 [Gemini] Iniciando agente Gemini', [
-                    'message' => $userMessage,
-                    'has_context' => !empty($screenContext)
-                ]);
                 $geminiService = new \App\Services\GeminiAgentService();
                 $response = $geminiService->runAgent($userMessage, $screenContext);
-                Log::info('✅ [Gemini] Respuesta generada', ['reply_length' => strlen(json_encode($response))]);
                 return response()->json($response);
             } catch (\Exception $e) {
                 Log::error("❌ [Gemini] Error: " . $e->getMessage(), [
@@ -242,7 +229,6 @@ class AIController extends Controller
                 }
 
                 cache([$executionKey => time()], 5);
-                Log::info("[DEV CODE] Usuario usó código: {$userMessage}");
 
                 $devResponse = $devCodes[$userMessage];
 
@@ -351,10 +337,6 @@ class AIController extends Controller
      */
     public function chatWithFile(Request $request)
     {
-        Log::info("📂 [AI] Iniciando carga de archivo", [
-            'has_file' => $request->hasFile('file'),
-            'message' => $request->input('message')
-        ]);
 
         set_time_limit(180); // Más tiempo para procesar archivos grandes
 
@@ -398,21 +380,13 @@ class AIController extends Controller
      */
     private function processExcelFile($file, $userMessage, $provider)
     {
-        Log::info("📂 [processExcelFile] Iniciando procesamiento", [
-            'provider' => $provider,
-            'extension' => $file->getClientOriginalExtension(),
-            'size' => $file->getSize(),
-            'message' => $userMessage
-        ]);
 
         // ✅ SI EL PROVIDER ES GEMINI, USAR GEMINI AGENT
         if ($provider === 'gemini') {
-            Log::info("🤖 [processExcelFile] Usando Gemini Agent para procesar archivo");
             return $this->processExcelFileWithGemini($file, $userMessage);
         }
 
         // ❌ SI NO, USAR PROCESAMIENTO DIRECTO (ANTIGUO)
-        Log::info("📊 [processExcelFile] Usando procesamiento directo (sin IA)");
 
         // Usar PhpSpreadsheet si está disponible, sino SimpleXLSX
         $extension = strtolower($file->getClientOriginalExtension());
@@ -1025,7 +999,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
         while ($iterations < $maxIterations) {
             $iterations++;
 
-            Log::info("[Agent Loop] Iteration {$iterations}/{$maxIterations}");
 
             // Call Groq API with tools
             $response = $this->callGroqAPIWithTools($messages);
@@ -1038,26 +1011,22 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             $message = $response['choices'][0]['message'];
             $finishReason = $response['choices'][0]['finish_reason'];
 
-            Log::info("[Agent Loop] Finish reason: {$finishReason}");
 
             // Add assistant message to conversation
             $messages[] = $message;
 
             // Check if AI wants to call a tool
             if ($finishReason === 'tool_calls' && isset($message['tool_calls'])) {
-                Log::info("[Agent Loop] AI requested " . count($message['tool_calls']) . " tool call(s)");
 
                 // Execute each tool call
                 foreach ($message['tool_calls'] as $toolCall) {
                     $toolName = $toolCall['function']['name'];
                     $toolArgs = json_decode($toolCall['function']['arguments'], true);
 
-                    Log::info("[Tool Call] {$toolName}", $toolArgs ?? []);
 
                     // Execute the tool
                     $toolResult = $this->executeToolCall($toolName, $toolArgs ?? []);
 
-                    Log::info("[Tool Result] {$toolName}", ['result' => $toolResult]);
 
                     // Add tool result to messages
                     $messages[] = [
@@ -1076,7 +1045,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             if ($finishReason === 'stop') {
                 $finalContent = $message['content'] ?? '';
 
-                Log::info("[Agent Loop] Final response received");
 
                 if (!$finalContent) {
                     return json_encode([
@@ -1142,7 +1110,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             $keyIndex = $index + 1;
             $keyLast4 = substr($apiKey, -4);
 
-            Log::info("[Groq API] Trying API Key #{$keyIndex}");
 
             try {
                 $response = Http::timeout(30)->withHeaders([
@@ -1160,7 +1127,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 $responseTime = (int)((microtime(true) - $startTime) * 1000);
 
                 if ($response->successful()) {
-                    Log::info("[Groq API] ✅ Success with API Key #{$keyIndex}");
 
                     $responseData = $response->json();
 
@@ -1170,7 +1136,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                     $completionTokens = $usage['completion_tokens'] ?? 0;
                     $totalTokens = $usage['total_tokens'] ?? 0;
 
-                    Log::info("[Token Usage] Prompt: {$promptTokens}, Completion: {$completionTokens}, Total: {$totalTokens}");
 
                     // Log usage
                     try {
@@ -1293,14 +1258,12 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 return $this->toolSearchCategories($args);
 
                 case 'get_sales_report':
-                    \Log::info('🔧 [AI] get_sales_report llamado con args:', $args);
                     return $this->toolGetSalesReport($args);
 
                 case 'get_low_stock_products':
                     return $this->toolGetLowStockProducts($args);
 
                 case 'search_invoices':
-                    \Log::info('🔧 [AI] search_invoices llamado con args:', $args);
                     return $this->toolSearchInvoices($args);
 
                 case 'get_invoice_details':
@@ -1845,7 +1808,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             $deleted = ConversationHistory::where('session_id', $sessionId)->delete();
 
             if ($deleted > 0) {
-                Log::info("🧹 [AI] Historial limpiado: {$deleted} mensajes eliminados (session: {$sessionId})");
             }
 
         } catch (\Exception $e) {
@@ -2012,7 +1974,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
      */
     private function processExcelFileWithGemini($file, $userMessage)
     {
-        Log::info("🤖 [Gemini Excel] Iniciando análisis con Gemini");
 
         $fullPath = null;
         try {
@@ -2020,7 +1981,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             $filePath = $file->store('temp_excel', 'local');
             $fullPath = storage_path('app/' . $filePath);
 
-            Log::info("📁 [Gemini Excel] Archivo guardado en: {$fullPath}");
 
             // 2. Parsear el archivo CSV/Excel INMEDIATAMENTE
             $excelService = app(\App\Services\ExcelParserService::class);
@@ -2032,7 +1992,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             // ✅ ELIMINAR ARCHIVO INMEDIATAMENTE DESPUÉS DE PARSEAR
             if (file_exists($fullPath)) {
                 unlink($fullPath);
-                Log::info("🗑️ [Gemini Excel] Archivo temporal eliminado inmediatamente");
             }
 
             if (empty($headers) || empty($rows)) {
@@ -2042,10 +2001,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 ], 400);
             }
 
-            Log::info("📊 [Gemini Excel] Archivo parseado", [
-                'headers' => $headers,
-                'total_rows' => count($rows)
-            ]);
 
             // 🚀 NUEVO ENFOQUE: Importar directamente sin pasar por Gemini Agent
             // Esto evita el error MALFORMED_FUNCTION_CALL con archivos grandes
@@ -2059,10 +2014,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 ]
             ]);
 
-            Log::info("✅ [Gemini Excel] Importación completada", [
-                'success' => $importResult['status'] === 'success',
-                'created' => $importResult['productos_creados'] ?? 0
-            ]);
 
             // Retornar resultado de la importación (usar 'mensaje' que es el campo correcto)
             $replyText = $importResult['mensaje'] ?? $importResult['message'] ?? 'Importación procesada';
@@ -2078,7 +2029,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             // Limpiar archivo si aún existe
             if ($fullPath && file_exists($fullPath)) {
                 @unlink($fullPath);
-                Log::info("🗑️ [Gemini Excel] Archivo temporal eliminado (error)");
             }
 
             return response()->json([
@@ -2104,12 +2054,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
         $voice = $request->input('voice', 'Kore'); // Voz natural en español
         $model = $request->input('model', 'gemini-2.5-flash-preview-tts');
 
-        Log::info('🔊 [TTS] Solicitud de síntesis de voz', [
-            'text_length' => strlen($text),
-            'voice' => $voice,
-            'model' => $model,
-            'user_id' => auth()->id()
-        ]);
 
         try {
             $apiKey = config('services.gemini.api_key') ?: env('GEMINI_API_KEY');
@@ -2162,10 +2106,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             // Decodificar base64 a binario
             $audioBlob = base64_decode($audioData);
 
-            Log::info('✅ [TTS] Audio generado exitosamente', [
-                'audio_size' => strlen($audioBlob),
-                'mime_type' => $mimeType
-            ]);
 
             // Retornar audio como stream
             return response($audioBlob, 200)
@@ -2285,10 +2225,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
 
         $model = $request->input('model', 'gemini-2.5-flash-native-audio-dialog');
 
-        Log::info('📞 [Live] Solicitud de token efímero', [
-            'model' => $model,
-            'user_id' => auth()->id()
-        ]);
 
         try {
             $apiKey = config('services.gemini.api_key') ?: env('GEMINI_API_KEY');
@@ -2310,9 +2246,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
             if ($response->successful()) {
                 $data = $response->json();
                 
-                Log::info('✅ [Live] Token efímero generado', [
-                    'expires_in' => '120s'
-                ]);
 
                 return response()->json([
                     'success' => true,
@@ -2433,7 +2366,6 @@ private function callGroqAPI($systemPrompt, $userMessage, $conversationHistory =
                 \Log::warning("No se pudo registrar en central: " . $e->getMessage());
             }
 
-            \Log::info("[AI Voice Log] Llamada registrada: {$durationSeconds}s, costo: \${$costUsd} USD");
 
             return response()->json([
                 'success' => true,

@@ -153,12 +153,12 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
       rightYPos += 5
     }
 
-    // ✅ Bodega Destino removida - información interna del sistema
+    // Bodega Destino removida - información interna del sistema
 
     yPos = Math.max(yPos, rightYPos) + 10
 
     // ==================== TABLA DE PRODUCTOS ====================
-    // ✅ Solo producto y cantidad - NO mostrar precios (información interna)
+    // Solo producto y cantidad - NO mostrar precios (información interna)
     const tableHeaders = [['PRODUCTO', 'CANTIDAD']]
     const tableData = items.map(item => [
       item.product_name || item.name || '',
@@ -194,7 +194,7 @@ export const createPurchaseOrderTemplate = (orderData, systemSettings = {}) => {
     yPos = pdf.lastAutoTable.finalY + 10
 
     // ==================== SIN TOTALES ====================
-    // ✅ Precios y totales removidos - son información interna del sistema
+    // Precios y totales removidos - son información interna del sistema
     // El proveedor solo necesita ver qué productos y cantidades solicitar
 
     // ==================== NOTAS ====================

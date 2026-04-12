@@ -158,9 +158,6 @@ class FactusService
             Cache::put($cacheKey . '_refresh', $data['refresh_token'], 86400); // 24 horas
         }
         
-        Log::info('✅ Factus: Token obtenido correctamente', [
-            'expires_in' => $expiresIn
-        ]);
         
         return $token;
     }
@@ -267,16 +264,9 @@ class FactusService
     {
         $factusData = $this->transformToFactusFormat($invoiceData);
         
-        Log::info('📤 Factus: Enviando factura para validación', [
-            'reference_code' => $factusData['reference_code'] ?? 'N/A'
-        ]);
         
         $response = $this->apiRequest('POST', '/v1/bills/validate', $factusData);
         
-        Log::info('✅ Factus: Factura validada', [
-            'number' => $response['data']['bill']['number'] ?? 'N/A',
-            'cufe' => $response['data']['bill']['cufe'] ?? 'N/A'
-        ]);
         
         return $response;
     }

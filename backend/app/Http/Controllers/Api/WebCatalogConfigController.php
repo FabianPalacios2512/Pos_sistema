@@ -16,11 +16,6 @@ class WebCatalogConfigController extends Controller
      */
     public function getConfig(Request $request)
     {
-        Log::info('WebCatalogConfigController: getConfig called', [
-            'user_id' => Auth::id(),
-            'tenant_id_from_user' => Auth::user() ? Auth::user()->tenant_id : 'null',
-            'tenant_id_from_helper' => tenant('id')
-        ]);
 
         try {
             // Usar el helper tenant() para obtener el ID del tenant actual
@@ -42,11 +37,6 @@ class WebCatalogConfigController extends Controller
             // Decodificar JSONs
             $config->visible_categories = json_decode($config->visible_categories);
 
-            Log::info('Configuración cargada:', [
-                'logo_url_length' => $config->logo_url ? strlen($config->logo_url) : 0,
-                'logo_url_preview' => $config->logo_url ? substr($config->logo_url, 0, 50) . '...' : 'null',
-                'banner_url_length' => $config->banner_url ? strlen($config->banner_url) : 0
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -66,13 +56,6 @@ class WebCatalogConfigController extends Controller
      */
     public function saveConfig(Request $request)
     {
-        Log::info('WebCatalogConfigController: saveConfig called', [
-            'user_id' => Auth::id(),
-            'logo_length' => $request->input('brandIdentity.logo') ? strlen($request->input('brandIdentity.logo')) : 0,
-            'banner_length' => $request->input('brandIdentity.banner') ? strlen($request->input('brandIdentity.banner')) : 0,
-            'visible_categories_input' => $request->input('products.visibleCategories'),
-            'all_request_data' => $request->except(['brandIdentity.logo', 'brandIdentity.banner'])
-        ]);
 
         try {
             $tenantId = tenant('id');
@@ -80,11 +63,6 @@ class WebCatalogConfigController extends Controller
             $logoUrl = $request->input('brandIdentity.logo');
             $bannerUrl = $request->input('brandIdentity.banner');
 
-            Log::info('Datos de imágenes recibidos:', [
-                'logo_is_base64' => $logoUrl ? (strpos($logoUrl, 'data:image') === 0) : false,
-                'logo_preview' => $logoUrl ? substr($logoUrl, 0, 50) . '...' : 'null',
-                'banner_is_base64' => $bannerUrl ? (strpos($bannerUrl, 'data:image') === 0) : false
-            ]);
 
             // BACKWARD COMPATIBILITY: Aceptar datos en formato NUEVO (products) o VIEJO (inventoryVisibility)
             $visibleCategories = $request->input('products.visibleCategories')
@@ -131,10 +109,6 @@ class WebCatalogConfigController extends Controller
             // Limpiar caché de configuración para que se recargue
             Cache::forget("web_catalog_config_{$tenantId}");
 
-            Log::info('✅ Configuración guardada exitosamente', [
-                'tenant_id' => $tenantId,
-                'visible_categories' => $visibleCategories
-            ]);
 
             return response()->json([
                 'success' => true,

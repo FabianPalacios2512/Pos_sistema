@@ -105,12 +105,6 @@ class InventoryTestController extends Controller
                 ->get();
 
             // Debug
-            \Log::info('🔍 Top Products Debug', [
-                'period' => $period,
-                'startDate' => $startDate->format('Y-m-d H:i:s'),
-                'endDate' => $endDate->format('Y-m-d H:i:s'),
-                'invoices_count' => $invoicesThisPeriod->count()
-            ]);
 
             $productSales = [];
             foreach ($invoicesThisPeriod as $invoice) {

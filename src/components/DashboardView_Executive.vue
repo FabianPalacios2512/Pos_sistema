@@ -311,13 +311,13 @@ const auth = useAuth()
 const isVendedor = computed(() => auth.hasRole('Vendedor'))
 const vendedorUserId = computed(() => isVendedor.value ? auth.user.value?.id : null)
 
-// 🧠 Composable para contexto de pantalla (IA Chat de texto)
+// Composable para contexto de pantalla (IA Chat de texto)
 const { setContext, updateData } = useScreenContext()
 
-// 🧠 Store para contexto de IA de voz
+// Store para contexto de IA de voz
 const uiContextStore = useUIContextStore()
 
-// 🧠 Navegación de módulos (para escuchar cambios de filtro)
+// Navegación de módulos (para escuchar cambios de filtro)
 const { onModuleChange } = useModuleNavigation()
 
 // Props
@@ -666,7 +666,7 @@ const loadDashboardData = async (period = '24H') => {
   try {
     loading.value = true
     
-    // 🧹 Limpiar datos previos al inicio (evitar cache)
+    // Limpiar datos previos al inicio (evitar cache)
     dashboardData.value.summary.low_stock_products = 0
     dashboardData.value.charts.low_stock_products = []
     
@@ -779,7 +779,7 @@ const loadDashboardData = async (period = '24H') => {
       dashboardData.value.recent_sales = recentTransactions.data
     }
     
-    // 🌐 ACTUALIZAR DATOS GLOBALES DEL NEGOCIO
+    // ACTUALIZAR DATOS GLOBALES DEL NEGOCIO
     // Estos datos estarán disponibles para la IA desde CUALQUIER módulo
     uiContextStore.updateGlobalBusinessSection('ventas', {
       ventasHoy: dashboardData.value.summary.today_sales.amount,
@@ -809,7 +809,7 @@ const loadDashboardData = async (period = '24H') => {
     })
     
   } catch (err) {
-    console.error('❌ Error cargando datos del dashboard:', err)
+    console.error('Error cargando datos del dashboard:', err)
   } finally {
     loading.value = false
   }
@@ -847,7 +847,7 @@ const handleGoToInventory = () => {
   emit('change-module', 'stock')
 }
 
-// 🧠 Función para actualizar el contexto de pantalla para la IA
+// Función para actualizar el contexto de pantalla para la IA
 const updateScreenContextForAI = () => {
   // Analizar tendencia de la gráfica
   const chartData = weeklyDataComputed.value
@@ -898,7 +898,7 @@ const updateScreenContextForAI = () => {
     data: contextData
   })
   
-  // 🧠 Actualizar también el store de UI para IA de voz
+  // Actualizar también el store de UI para IA de voz
   uiContextStore.setCurrentModule('dashboard')
   uiContextStore.setScreenData(contextData)
 }
@@ -908,7 +908,7 @@ watch(selectedPeriod, async (newPeriod) => {
   await loadDashboardData(newPeriod)
 })
 
-// 🧠 Watcher para responder a comandos de la IA (queryParams)
+// Watcher para responder a comandos de la IA (queryParams)
 watch(
   () => props.queryParams,
   (newParams) => {
@@ -987,7 +987,6 @@ const applyPeriodFilter = (filter) => {
   const mappedPeriod = filterMap[normalizedFilter]
   
   if (mappedPeriod) {
-    console.log(`📊 [Dashboard] Aplicando filtro de período: ${filter} → ${mappedPeriod}`)
     selectedPeriod.value = mappedPeriod
     // Forzar recarga de datos
     loadDashboardData(mappedPeriod)
@@ -999,10 +998,10 @@ onMounted(async () => {
   await loadCurrentSession()
   await loadDashboardData(selectedPeriod.value)
   
-  // 🧠 Establecer contexto inicial para la IA después de cargar datos
+  // Establecer contexto inicial para la IA después de cargar datos
   updateScreenContextForAI()
   
-  // 🧠 Escuchar cambios de módulo/filtro desde la IA de voz
+  // Escuchar cambios de módulo/filtro desde la IA de voz
   onModuleChange((moduleName, queryParams) => {
     if (moduleName === 'dashboard' && queryParams?.filter) {
       applyPeriodFilter(queryParams.filter)

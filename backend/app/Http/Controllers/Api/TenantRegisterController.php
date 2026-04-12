@@ -126,7 +126,6 @@ class TenantRegisterController extends Controller
         if (!empty($orphanDbExists)) {
             \Log::warning("🧹 Base de datos huérfana detectada: {$tenantDbName}. Eliminando...");
             \DB::statement("DROP DATABASE IF EXISTS `{$tenantDbName}`");
-            \Log::info("✅ Base de datos huérfana eliminada: {$tenantDbName}");
         }
 
         // Check if tenant ID exists (to prevent 500 error on duplicate primary key)
@@ -194,7 +193,6 @@ class TenantRegisterController extends Controller
                 $tenant->domains()->create([
                     'domain' => $underscoreDomain
                 ]);
-                \Log::info('✅ Dominio alternativo creado', ['domain' => $underscoreDomain]);
             }
 
             // 🎯 PASO 3: Marcar el token como usado si existe
@@ -213,10 +211,8 @@ class TenantRegisterController extends Controller
             // Así que lo ejecutamos manualmente aquí para garantizar que los datos iniciales existan
             $tenant->run(function () {
                 try {
-                    \Log::info('🌱 Ejecutando DatabaseSeeder manualmente...');
                     $seeder = new \Database\Seeders\DatabaseSeeder();
                     $seeder->run();
-                    \Log::info('✅ DatabaseSeeder ejecutado correctamente');
                 } catch (\Exception $e) {
                     \Log::error('❌ Error ejecutando DatabaseSeeder: ' . $e->getMessage());
                     // No relanzamos para no abortar el registro
@@ -251,11 +247,6 @@ class TenantRegisterController extends Controller
                             $updateData['google_id'] = $request->google_id;
                             $updateData['password'] = bcrypt(Str::random(32)); // Password aleatorio
 
-                            \Log::info('🔐 Registro con Google OAuth detectado', [
-                                'google_id' => $request->google_id,
-                                'email' => $request->email,
-                                'name' => $ownerName
-                            ]);
                         } else {
                             // Registro normal con email/password
                             $updateData['password'] = bcrypt($request->password);
@@ -281,12 +272,6 @@ class TenantRegisterController extends Controller
                             'is_super_admin' => $adminUser->is_super_admin ?? false
                         ];
 
-                        \Log::info('✅ Usuario admin actualizado con datos del registro', [
-                            'name' => $request->owner_name,
-                            'email' => $request->email,
-                            'cc' => $request->cedula,
-                            'token_generated' => true
-                        ]);
                     }
 
                     // Actualizar system_settings con datos del registro
@@ -298,11 +283,6 @@ class TenantRegisterController extends Controller
                         'updated_at' => now(),
                     ]);
 
-                    \Log::info('✅ Tenant inicializado correctamente - Datos del negocio guardados', [
-                        'company_name' => $request->company_name,
-                        'company_email' => $request->email,
-                        'company_document' => $request->cedula
-                    ]);
 
                 } catch (\Exception $e) {
                     \Log::error('❌ Error al actualizar datos del tenant', [
@@ -330,19 +310,9 @@ class TenantRegisterController extends Controller
                 $redirectUrl = $protocol . $domainToCreate . '/welcome';
             }
 
-            \Log::info('✅ Tenant registrado exitosamente', [
-                'tenant_id' => $tenant->id,
-                'domain' => $domainToCreate,
-                'redirect_url' => $redirectUrl,
-                'token_generated' => $authToken ? true : false
-            ]);
 
             // 📧 NO ENVIAR EMAIL AQUÍ - Se enviará después de seleccionar plan
             // El email se enviará desde el frontend después de que el usuario seleccione su plan
-            \Log::info('⏳ Email de bienvenida pendiente - se enviará al seleccionar plan', [
-                'email' => $request->email,
-                'tenant_id' => $tenant->id
-            ]);
 
             // 🔑 Preparar respuesta con token de autenticación
             $response = [
@@ -359,7 +329,6 @@ class TenantRegisterController extends Controller
                     'user' => $adminUserData,
                     'token' => $authToken
                 ];
-                \Log::info('✅ Token incluido en respuesta de registro - Usuario autenticado automáticamente');
             }
 
             return response()->json($response, 201);
@@ -374,7 +343,6 @@ class TenantRegisterController extends Controller
                     // 1. Eliminar la base de datos del tenant si existe
                     $databaseName = 'tenant' . $tenantId;
                     \DB::statement("DROP DATABASE IF EXISTS `{$databaseName}`");
-                    \Log::info("✅ BD eliminada: {$databaseName}");
 
                     // 2. Eliminar el tenant de la tabla central
                     $deletedTenant = Tenant::where('id', $tenantId)->first();
@@ -383,17 +351,14 @@ class TenantRegisterController extends Controller
                         $deletedTenant->domains()->delete();
                         // Eliminar tenant
                         $deletedTenant->forceDelete();
-                        \Log::info("✅ Tenant eliminado de tabla central: {$tenantId}");
                     }
 
-                    \Log::info('✅ Tenant fallido limpiado completamente');
                 } elseif (isset($tenant)) {
                     // Fallback por si $tenantId no está disponible
                     $databaseName = 'tenant' . $tenant->id;
                     \DB::statement("DROP DATABASE IF EXISTS `{$databaseName}`");
                     $tenant->domains()->delete();
                     $tenant->forceDelete();
-                    \Log::info('✅ Tenant fallido limpiado (usando objeto $tenant)');
                 }
             } catch (\Exception $cleanupError) {
                 \Log::error('⚠️ Error en limpieza de tenant fallido', [
@@ -491,10 +456,6 @@ class TenantRegisterController extends Controller
                 'plan' => $validated['plan']
             ]);
 
-            \Log::info('📧 Email de bienvenida enviado después de seleccionar plan', [
-                'email' => $validated['email'],
-                'plan' => $validated['plan']
-            ]);
 
             return response()->json([
                 'success' => true,

@@ -2,7 +2,7 @@
   <div class="bg-gray-50 dark:bg-[#131314] font-sans transition-colors duration-300 px-8" style="height: 100%; display: flex; flex-direction: column;">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
       
-      <!-- 🎨 Header Gemini -->
+      <!-- Header Gemini -->
       <div class="flex items-center justify-between pb-4">
         <div class="flex items-center space-x-4">
           <div>
@@ -24,7 +24,7 @@
           
           <!-- Botón Principal -->
           <button @click="showNewSessionModal = true"
-                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md transition-all duration-300 flex items-center space-x-2">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-medium rounded-md transition-all duration-300 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -84,8 +84,8 @@
             class="px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
           >
             <option value="">Todos los estados</option>
-            <option value="open">🟢 Sesiones Activas</option>
-            <option value="closed">🔴 Sesiones Cerradas</option>
+            <option value="open">Sesiones Activas</option>
+            <option value="closed">Sesiones Cerradas</option>
           </select>
           
           <!-- Filtro Fecha -->
@@ -386,8 +386,8 @@
 
         <!-- Empty State -->
         <div v-if="filteredSessions.length === 0" class="text-center py-12">
-          <div class="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-4">
-            <svg class="w-8 h-8 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-16 h-16 mx-auto bg-gray-100 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-gray-300 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
             </svg>
           </div>
@@ -395,7 +395,7 @@
           <p class="text-gray-500 dark:text-zinc-400 mb-4">Ajusta los filtros o crea una nueva sesión</p>
           <button
             @click="clearFilters"
-            class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full hover:bg-black dark:hover:bg-gray-100 transition-all duration-300 text-sm font-medium"
+            class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 rounded-full hover:bg-black dark:hover:bg-gray-100 transition-all duration-300 text-sm font-medium"
           >
             Limpiar filtros
           </button>
@@ -789,7 +789,7 @@
                   <div v-if="event.type === 'expense' && event.details.supplier" class="text-sm text-gray-500 dark:text-zinc-500">
                     Proveedor: {{ event.details.supplier }}
                   </div>
-                  <div v-if="event.type === 'expense' && event.details.payment_method" class="text-xs text-gray-400 dark:text-gray-600">
+                  <div v-if="event.type === 'expense' && event.details.payment_method" class="text-xs text-gray-400 dark:text-zinc-600">
                     Método: {{ event.details.payment_method }}
                   </div>
                   <div v-if="(event.type === 'cash-income' || event.type === 'cash-expense') && event.details.reference" class="text-sm text-gray-500 dark:text-zinc-500">
@@ -817,7 +817,7 @@
           <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-zinc-800">
             <button
               @click="showAuditModal = false"
-              class="px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full hover:bg-black dark:hover:bg-gray-100 font-medium text-sm transition-all duration-300"
+              class="px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-zinc-900 rounded-full hover:bg-black dark:hover:bg-gray-100 font-medium text-sm transition-all duration-300"
             >
               Cerrar
             </button>
@@ -827,7 +827,7 @@
     </div>
   </div>
 
-  <!-- 🎯 Modal de Confirmación Profesional (reemplaza confirm() nativo) -->
+  <!-- Modal de Confirmación Profesional (reemplaza confirm() nativo) -->
   <div v-if="showConfirmModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-[200]" @click.self="showConfirmModal = false">
     <div class="bg-white dark:bg-[#131314] rounded-md shadow-sm w-full max-w-md mx-4 overflow-hidden border border-gray-200 dark:border-zinc-800 animate-fade-in">
       <!-- Header con icono -->
@@ -879,7 +879,7 @@ import { useUIContextStore } from '../store/uiContextStore.js'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 
-// 🎯 Props y Emits para evitar warnings de Vue
+// Props y Emits para evitar warnings de Vue
 defineProps({
   moduleName: { type: String, default: '' },
   queryParams: { type: Object, default: () => ({}) }
@@ -890,7 +890,7 @@ defineEmits(['navigate', 'changeModule', 'openQuotationInPos', 'openReturnInPos'
 // Toast system
 const { showSuccess, showError, showInfo, showWarning } = useToast()
 
-// 🧠 IA Context Store
+// IA Context Store
 const uiContext = useUIContextStore()
 
 // Data
@@ -1003,7 +1003,7 @@ const refreshSessions = async () => {
       throw new Error(response.message || 'Error en la respuesta del servidor')
     }
   } catch (error) {
-    showError('❌ No se pudieron cargar las sesiones')
+    showError('No se pudieron cargar las sesiones')
   } finally {
     loading.value = false
   }
@@ -1017,8 +1017,32 @@ const clearFilters = () => {
 }
 
 const exportData = () => {
-  // TODO: Implementar exportación real
-  showInfo('📥 Exportación en desarrollo - Esta función estará disponible pronto')
+  const data = filteredSessions.value
+  if (!data.length) {
+    showInfo('No hay sesiones para exportar')
+    return
+  }
+  const headers = ['ID','Cajero','Apertura','Cierre','Monto Inicial','Ventas Efectivo','Ventas Total','Diferencia','Estado']
+  const rows = data.map(s => [
+    s.id,
+    s.user?.name || 'N/A',
+    s.opened_at || '',
+    s.closed_at || 'Abierta',
+    s.opening_amount || 0,
+    s.cash_sales || 0,
+    s.total_sales || 0,
+    s.difference || 0,
+    s.status || ''
+  ])
+  const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `sesiones_caja_${new Date().toISOString().slice(0,10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+  showSuccess('Archivo exportado correctamente')
 }
 
 // Pagination methods
@@ -1052,7 +1076,7 @@ const getUserInitials = (name) => {
 const getStatusBadgeClass = (status) => {
   return status === 'open' 
     ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' 
-    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
+    : 'bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
 }
 
 const formatDate = (dateString) => {
@@ -1151,7 +1175,7 @@ const confirmCloseSession = async () => {
   
   // Validar que sea un número válido y mayor a 0
   if (!closeForm.value.actual_amount || closeForm.value.actual_amount.trim() === '' || isNaN(actualAmount) || actualAmount <= 0) {
-    showError('⚠️ Monto inválido - Por favor ingresa un monto mayor a $0.00')
+    showError('Monto inválido - Por favor ingresa un monto mayor a $0.00')
     return
   }
 
@@ -1159,7 +1183,7 @@ const confirmCloseSession = async () => {
   showConfirmModal.value = true
 }
 
-// 🎯 Función que hace el cierre real después de confirmar en el modal bonito
+// Función que hace el cierre real después de confirmar en el modal bonito
 const confirmCloseSessionFinal = async () => {
   showConfirmModal.value = false
   const actualAmount = parseFloat(closeForm.value.actual_amount)
@@ -1179,11 +1203,11 @@ const confirmCloseSessionFinal = async () => {
     })
     
     if (data.success) {
-      showSuccess('✅ Caja cerrada correctamente')
+      showSuccess('Caja cerrada correctamente')
       showCloseSessionModal.value = false
       sessionToClose.value = null
       
-      // 🔄 Actualizar appStore para que el POS detecte el cambio
+      // Actualizar appStore para que el POS detecte el cambio
       await appStore.loadCashSession(true) // force = true
       
       refreshSessions()
@@ -1191,7 +1215,7 @@ const confirmCloseSessionFinal = async () => {
       throw new Error(data.message || 'Error al cerrar la sesión')
     }
   } catch (error) {
-    showError('❌ No se pudo cerrar la sesión. Intenta nuevamente.')
+    showError('No se pudo cerrar la sesión. Intenta nuevamente.')
   } finally {
     closingSession.value = false
   }
@@ -1209,7 +1233,7 @@ const viewSessionAudit = async (session) => {
       throw new Error(data.message || 'Error al cargar auditoría')
     }
   } catch (error) {
-    showError('❌ No se pudo cargar la auditoría')
+    showError('No se pudo cargar la auditoría')
   }
 }
 
@@ -1245,15 +1269,15 @@ const getClosingStatusClass = (status) => {
     deficit: 'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800',
     with_expenses: 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
   }
-  return classes[status] || 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
+  return classes[status] || 'bg-gray-50 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-700'
 }
 
 const getClosingStatusText = (status) => {
   const texts = {
-    exact: '✅ Exacto',
-    surplus: '📈 Sobrante', 
-    deficit: '📉 Faltante',
-    with_expenses: '💸 Con gastos'
+    exact: 'Exacto',
+    surplus: 'Sobrante', 
+    deficit: 'Faltante',
+    with_expenses: 'Con gastos'
   }
   return texts[status] || 'Desconocido'
 }
@@ -1292,7 +1316,7 @@ const closeSessionWithDetails = async () => {
   
   closingSession.value = true
   try {
-    showInfo('🔄 Cerrando sesión... - Procesando cierre de caja con detalles')
+    showInfo('Cerrando sesión... - Procesando cierre de caja con detalles')
     
     const response = await apiCall(`/cash-sessions/${sessionToClose.value.id}/close`, {
       method: 'POST',
@@ -1300,11 +1324,11 @@ const closeSessionWithDetails = async () => {
     })
     
     if (response.success) {
-      showSuccess('✅ Sesión cerrada - La sesión se cerró correctamente')
+      showSuccess('Sesión cerrada - La sesión se cerró correctamente')
       showCloseSessionModal.value = false
       sessionToClose.value = null
       
-      // 🔄 Actualizar appStore para que el POS detecte el cambio
+      // Actualizar appStore para que el POS detecte el cambio
       await appStore.loadCashSession(true) // force = true
       
       refreshSessions()
@@ -1313,7 +1337,7 @@ const closeSessionWithDetails = async () => {
     }
   } catch (error) {
     console.error('Error closing session:', error)
-    showError('❌ Error al cerrar - No se pudo cerrar la sesión. Intenta nuevamente.')
+    showError('Error al cerrar - No se pudo cerrar la sesión. Intenta nuevamente.')
   } finally {
     closingSession.value = false
   }
@@ -1321,7 +1345,7 @@ const closeSessionWithDetails = async () => {
 
 const generateReport = async (session) => {
   try {
-    showInfo(`📊 Generando reporte de sesión #${session.id}...`)
+    showInfo(`Generando reporte de sesión #${session.id}...`)
     
     const doc = new jsPDF()
     
@@ -1471,7 +1495,7 @@ const generateReport = async (session) => {
     
     // Descargar
     doc.save(`Sesion_Caja_${session.id}_${new Date().toISOString().split('T')[0]}.pdf`)
-    showSuccess('✅ Reporte generado exitosamente')
+    showSuccess('Reporte generado exitosamente')
     
   } catch (error) {
     console.error('Error generando reporte:', error)
@@ -1479,7 +1503,7 @@ const generateReport = async (session) => {
   }
 }
 
-// 🧠 ================================
+// ================================
 // IA CONTEXT - Control de Cajas
 // ================================
 
@@ -1624,7 +1648,7 @@ const obtenerRendimientoEmpleado = async (busqueda) => {
   }
 }
 
-// 🏦 Función para distinguir "mi caja" vs "cajas de empleados"
+// Función para distinguir "mi caja" vs "cajas de empleados"
 const obtenerMiCajaVsEmpleados = () => {
   const currentUser = appStore.user
   const currentUserId = currentUser?.id
@@ -1845,7 +1869,7 @@ const registrarAccionesIA = () => {
     }
   })
   
-  // 🏦 Mi caja vs cajas de empleados (GLOBAL)
+  // Mi caja vs cajas de empleados (GLOBAL)
   uiContext.registerAction('obtenerMiCajaVsEmpleados', async () => {
     const info = obtenerMiCajaVsEmpleados()
     
@@ -1968,7 +1992,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 🎨 Animaciones Empresariales */
+/* Animaciones Empresariales */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -1999,13 +2023,13 @@ onUnmounted(() => {
   animation: slide-in 0.5s ease-out;
 }
 
-/* 💫 Efectos Hover Empresariales */
+/* Efectos Hover Empresariales */
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* 📊 Scrollbar Empresarial */
+/* Scrollbar Empresarial */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -2025,24 +2049,24 @@ onUnmounted(() => {
   background: #94a3b8;
 }
 
-/* 🎯 Estados de Focus Empresariales */
+/* Estados de Focus Empresariales */
 input:focus, select:focus, textarea:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* ⚡ Transiciones Optimizadas */
+/* Transiciones Optimizadas */
 button, .transition-all, .transition-colors {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 🎨 Badge Hover Empresarial */
+/* Badge Hover Empresarial */
 .badge-hover:hover {
   transform: scale(1.05);
   transition: transform 0.2s ease;
 }
 
-/* 💼 Modal y Overlay Empresarial */
+/* Modal y Overlay Empresarial */
 .modal-overlay {
   backdrop-filter: blur(8px);
   background: rgba(15, 23, 42, 0.6);

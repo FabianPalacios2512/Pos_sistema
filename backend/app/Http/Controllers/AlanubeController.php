@@ -108,10 +108,6 @@ class AlanubeController extends Controller
                     'tax_regime' => $request->tax_regime ?? 'R-99-PN'
                 ]);
 
-            Log::info('✅ Datos fiscales guardados', [
-                'nit' => $request->company_document,
-                'tenant' => tenant('id')
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -172,10 +168,6 @@ class AlanubeController extends Controller
                     'alanube_status' => 'testing'
                 ]);
 
-                Log::info('✅ Empresa registrada en Alanube', [
-                    'company_id' => $companyId,
-                    'tenant' => tenant('id')
-                ]);
 
                 return response()->json([
                     'success' => true,
@@ -233,10 +225,6 @@ class AlanubeController extends Controller
                     'alanube_status' => $status === 'ACCEPTED' ? 'active' : 'testing'
                 ]);
 
-                Log::info('✅ Set de pruebas completado', [
-                    'status' => $status,
-                    'tenant' => tenant('id')
-                ]);
 
                 return response()->json([
                     'success' => true,
@@ -310,10 +298,6 @@ class AlanubeController extends Controller
                 'electronic_invoice_provider' => $provider
             ]);
 
-            Log::info('✅ Proveedor de facturación electrónica actualizado', [
-                'provider' => $provider,
-                'tenant' => tenant('id')
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -369,11 +353,6 @@ class AlanubeController extends Controller
                 'dian_technical_key' => $request->technical_key
             ]);
 
-            Log::info('✅ Resolución DIAN guardada', [
-                'resolution' => $request->resolution_number,
-                'prefix' => $request->prefix,
-                'tenant' => tenant('id')
-            ]);
 
             return response()->json([
                 'success' => true,

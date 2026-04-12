@@ -1,5 +1,5 @@
 <template>
-  <!-- 🍔 MODO RESTAURANTE / COMIDA RÁPIDA - Diseño Premium Profesional -->
+  <!-- MODO RESTAURANTE / COMIDA RÁPIDA - Diseño Premium Profesional -->
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 pb-20 content-start">
     <div
       v-for="product in products"
@@ -10,7 +10,7 @@
       <!-- Card con diseño profesional -->
       <div class="relative bg-white dark:bg-zinc-800/90 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg dark:shadow-black/20 dark:hover:shadow-black/40 border border-gray-100 dark:border-zinc-700/60 transition-all duration-200 hover:-translate-y-0.5">
         
-        <!-- 🖼️ Contenedor de imagen -->
+        <!-- Contenedor de imagen -->
         <div class="aspect-[4/3] relative flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-zinc-800">
            
            <!-- Badge de cantidad en carrito -->
@@ -47,7 +47,7 @@
             </div>
           </div>
           
-          <!-- 🔘 BOTÓN AGREGAR - Profesional con micro-interacción -->
+          <!-- BOTÓN AGREGAR - Profesional con micro-interacción -->
           <button 
             class="absolute bottom-2.5 right-2.5 w-10 h-10 rounded-xl bg-white dark:bg-zinc-700 text-orange-500 dark:text-orange-400 shadow-md shadow-black/10 dark:shadow-black/30 flex items-center justify-center transition-all duration-150 hover:bg-orange-500 hover:text-white hover:shadow-lg hover:shadow-orange-500/25 hover:scale-105 active:scale-95 z-10 border border-gray-100 dark:border-zinc-600"
             @click.stop="$emit('add-to-cart', product)"
@@ -58,7 +58,7 @@
           </button>
         </div>
 
-        <!-- 📝 Info del producto -->
+        <!-- Info del producto -->
         <div class="p-3">
           
           <!-- Categoria sutil -->
@@ -71,7 +71,7 @@
             {{ product.name }}
           </h3>
           
-          <!-- 💰 Precio - Grande y claro -->
+          <!-- Precio - Grande y claro -->
           <div class="flex items-end justify-between">
             <span class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
               ${{ product.price.toLocaleString() }}

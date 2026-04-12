@@ -141,7 +141,7 @@ export const invoicesService = {
     } catch (error) {
       // Solo loggeamos errores técnicos, no cuando simplemente no se encuentra la cotización
       if (error.message !== 'Cotización no encontrada') {
-        console.error('❌ Error técnico al buscar cotización:', error)
+        console.error('Error técnico al buscar cotización:', error)
       }
       return { success: false, data: [], message: error.message || 'Cotización no encontrada' }
     }
@@ -156,8 +156,6 @@ export const invoicesService = {
       
       if (searchResult.success && searchResult.data && searchResult.data.length > 0) {
         const quotation = searchResult.data[0]
-        console.log('📄 Cotización encontrada para conversión:', quotation)
-        
         // Asegurar que los items tengan el formato correcto
         const formattedItems = (conversionData.items || quotation.invoice_items || quotation.items || []).map(item => ({
           product_id: item.product_id || item.id || 0,
@@ -184,14 +182,10 @@ export const invoicesService = {
           customer_phone: conversionData.customer_phone || quotation.customer_phone || ''
         }
         
-        console.log('📝 Datos de factura a crear:', newInvoiceData)
-        
         // Crear nueva factura usando el método correcto
         const newInvoiceResponse = await this.createPosInvoice(newInvoiceData)
         
         if (newInvoiceResponse.success) {
-          console.log('✅ Nueva factura creada:', newInvoiceResponse.data)
-          
           // Cancelar la cotización original cambiando su status
           try {
             await apiCall(`/invoices/${quotation.id}`, {
@@ -200,9 +194,8 @@ export const invoicesService = {
                 status: 'cancelled'
               })
             })
-            console.log('✅ Cotización cancelada automáticamente')
           } catch (updateError) {
-            console.warn('⚠️ No se pudo cancelar la cotización, pero la factura fue creada:', updateError)
+            console.warn('No se pudo cancelar la cotización, pero la factura fue creada:', updateError)
           }
           
           return {
@@ -256,7 +249,7 @@ export const invoicesService = {
         customer: quote.customer || { name: 'Cliente General' },
         total: quote.total_amount,
         items: quote.sale_items || [],
-        seller_name: quote.seller_name || quote.cashier_name || 'Vendedor' // ✅ Ensure seller_name is passed
+        seller_name: quote.seller_name || quote.cashier_name || 'Vendedor' // Ensure seller_name is passed
       }))
 
       // Combinar todos los documentos

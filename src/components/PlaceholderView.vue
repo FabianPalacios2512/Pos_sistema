@@ -41,13 +41,13 @@
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Funcionalidades Planificadas</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div v-for="feature in plannedFeatures" :key="feature.id" 
-               class="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+               class="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-zinc-900 rounded-lg">
             <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0">
               <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <span class="text-gray-700 dark:text-gray-300">{{ feature.name }}</span>
+            <span class="text-gray-700 dark:text-zinc-300">{{ feature.name }}</span>
           </div>
         </div>
       </div>
@@ -55,11 +55,11 @@
       <!-- Progreso del desarrollo -->
       <div class="mb-8">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Progreso del Desarrollo</h2>
-        <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-2">
+        <div class="bg-gray-200 dark:bg-zinc-700 rounded-full h-3 mb-2">
           <div class="bg-gradient-to-r from-primary-600 to-accent-600 h-3 rounded-full transition-all duration-500" 
                :style="{ width: developmentProgress + '%' }"></div>
         </div>
-        <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+        <div class="flex justify-between text-sm text-gray-600 dark:text-zinc-400">
           <span>{{ developmentProgress }}% completado</span>
           <span>Estimado: {{ estimatedCompletion }}</span>
         </div>
@@ -89,8 +89,8 @@
       </div>
 
       <!-- Información adicional -->
-      <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+      <div class="mt-8 pt-6 border-t border-gray-200 dark:border-zinc-700">
+        <div class="text-center text-sm text-gray-500 dark:text-zinc-400">
           <p>Para funcionalidades inmediatas, utiliza el módulo de <strong>Dashboard</strong> o <strong>POS</strong></p>
           <p class="mt-1">Sistema POS 105 - Versión empresarial completa</p>
         </div>

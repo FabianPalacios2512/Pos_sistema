@@ -145,7 +145,7 @@
                   {{ index + 1 }}
                 </div>
                 
-                <span v-if="index === 0" class="absolute bottom-0 left-0 right-0 bg-blue-600/90 text-white text-[9px] font-bold text-center py-0.5 uppercase tracking-wider">★ Principal</span>
+                <span v-if="index === 0" class="absolute bottom-0 left-0 right-0 bg-blue-600/90 text-white text-[9px] font-bold text-center py-0.5 uppercase tracking-wider">Principal</span>
               </div>
               <!-- Slot para agregar más -->
               <div v-if="form.images.length < 5" 
@@ -538,7 +538,7 @@ const form = reactive({
   images: []
 })
 
-// 🔄 Cargar datos cuando se edita un producto
+// Cargar datos cuando se edita un producto
 watch(() => props.editingProduct, (product) => {
   if (product) {
     form.id = product.id || null
@@ -551,7 +551,7 @@ watch(() => props.editingProduct, (product) => {
     // Cargar opciones
     if (product.options && Array.isArray(product.options)) {
       form.options = product.options.map(opt => {
-        // 🛡️ Asegurar que values sea un array de strings, no objetos
+        // Asegurar que values sea un array de strings, no objetos
         let cleanValues = []
         if (opt.values && Array.isArray(opt.values)) {
           cleanValues = opt.values
@@ -584,7 +584,7 @@ watch(() => props.editingProduct, (product) => {
     // Cargar variantes
     if (product.variants && Array.isArray(product.variants)) {
       form.variants = product.variants.map(variant => {
-        // 🔧 Procesar options correctamente
+        // Procesar options correctamente
         let processedOptions = []
         
         if (variant.options) {
@@ -599,7 +599,7 @@ watch(() => props.editingProduct, (product) => {
               if (opt && typeof opt.value === 'string') {
                 return { name: opt.name || '', value: opt.value }
               }
-              // 🛡️ FIX: Si value es un objeto (viene del backend mal parseado), extraer solo el value interno
+              // FIX: Si value es un objeto (viene del backend mal parseado), extraer solo el value interno
               if (opt && typeof opt.value === 'object' && opt.value !== null) {
                 const innerValue = opt.value.value || ''
                 return { name: opt.name || '', value: typeof innerValue === 'string' ? innerValue : '' }
@@ -784,7 +784,7 @@ const removeValue = (optionIndex, valueIndex) => {
   form.options[optionIndex].values.splice(valueIndex, 1)
 }
 
-// 🎨 Funciones para colores personalizados (solo hex)
+// Funciones para colores personalizados (solo hex)
 const isColorOption = (optionName) => {
   return optionName && (
     optionName.toLowerCase().includes('color') || 
@@ -845,7 +845,7 @@ const generateVariants = () => {
   const validOptions = form.options.filter(opt => opt.values.length > 0 && opt.name.trim() !== '')
   
   if (validOptions.length === 0) {
-    showWarning('⚠️ Debes agregar al menos un atributo con valores (ej: Talla: S, M, L)', 4000)
+    showWarning('Debes agregar al menos un atributo con valores (ej: Talla: S, M, L)', 4000)
     return
   }
 
@@ -893,7 +893,7 @@ const generateVariants = () => {
   })
 }
 
-// 🚀 Generar variantes CON scroll automático
+// Generar variantes CON scroll automático
 const generateVariantsWithScroll = () => {
   generateVariants()
   
@@ -908,7 +908,7 @@ const generateVariantsWithScroll = () => {
   }, 100)
 }
 
-// 🎯 Manejar click en el botón dinámico
+// Manejar click en el botón dinámico
 const handleContinueOrGenerate = () => {
   if (!hasValidOptions.value) {
     // No hay atributos, mostrar formulario simple
@@ -1045,7 +1045,7 @@ const removeImage = async (index) => {
       if (data.success) {
         // Eliminar del array local
         form.images.splice(index, 1)
-        showSuccess('✅ Imagen eliminada correctamente')
+        showSuccess('Imagen eliminada correctamente')
       } else {
         showError(data.message || 'Error al eliminar la imagen')
       }
@@ -1066,25 +1066,25 @@ const removeImage = async (index) => {
 const handleSubmit = () => {
   // Validaciones básicas
   if (!form.name) {
-    showWarning('⚠️ El nombre del producto es requerido', 3000)
+    showWarning('El nombre del producto es requerido', 3000)
     return
   }
   
   if (!form.category_id) {
-    showWarning('⚠️ Debes seleccionar una categoría', 3000)
+    showWarning('Debes seleccionar una categoría', 3000)
     return
   }
   
-  // ✅ Manejar productos simples (sin variantes o con 1 variante sin opciones)
+  // Manejar productos simples (sin variantes o con 1 variante sin opciones)
   if (showSimpleForm.value) {
     // Validar campos del producto simple
     if (simpleProduct.price <= 0) {
-      showWarning('⚠️ El precio de venta debe ser mayor a 0', 3000)
+      showWarning('El precio de venta debe ser mayor a 0', 3000)
       return
     }
     
     if (simpleProduct.stock < 0) {
-      showWarning('⚠️ El stock no puede ser negativo', 3000)
+      showWarning('El stock no puede ser negativo', 3000)
       return
     }
     
@@ -1119,7 +1119,7 @@ const handleSubmit = () => {
   const payload = {
     ...form,
     type: isSimpleProduct ? 'simple' : 'variable', // CRÍTICO: distinguir tipo
-    store_type: 'fashion', // ✅ SIEMPRE marcar como producto de moda
+    store_type: 'fashion', // SIEMPRE marcar como producto de moda
     // Limpiar campos temporales y solo enviar opciones que tengan valores
     options: form.options
       .filter(o => o.values && o.values.length > 0) // Solo opciones con valores

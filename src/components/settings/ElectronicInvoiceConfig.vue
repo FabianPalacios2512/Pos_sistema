@@ -1,6 +1,6 @@
 <template>
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 🧾 CONFIGURACIÓN DE FACTURACIÓN ELECTRÓNICA DIAN                   -->
+  <!-- CONFIGURACIÓN DE FACTURACIÓN ELECTRÓNICA DIAN                   -->
   <!-- Permite a cada comercio registrarse con sus datos fiscales          -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <div class="space-y-6">
@@ -26,8 +26,8 @@
           ]"
         >
           {{ 
-            status.alanube.status === 'active' ? '✅ Habilitado DIAN' 
-            : status.alanube.status === 'testing' ? '🔄 En Proceso'
+            status.alanube.status === 'active' ? 'Habilitado DIAN' 
+            : status.alanube.status === 'testing' ? 'En Proceso'
             : '⏸️ Sin Configurar'
           }}
         </span>
@@ -422,7 +422,7 @@
 
         <!-- Resumen -->
         <div v-if="status?.provider === 'alanube'" class="bg-emerald-50 dark:bg-emerald-950/50 rounded-xl p-6 border border-emerald-100 dark:border-emerald-900">
-          <h4 class="font-semibold text-emerald-700 dark:text-emerald-400 mb-3">✅ Configuración Completa</h4>
+          <h4 class="font-semibold text-emerald-700 dark:text-emerald-400 mb-3">Configuración Completa</h4>
           <ul class="space-y-2 text-sm text-emerald-600 dark:text-emerald-400">
             <li class="flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -136,7 +136,7 @@
       <!-- Additional Info -->
       <div class="mt-8 text-center">
         <p class="text-sm text-gray-500 dark:text-zinc-500">
-          💡 <span class="font-semibold">Tip:</span> Con Premium también desbloqueas Multi-sede, IA integrada y más funciones avanzadas
+          <span class="font-semibold">Tip:</span> Con Premium también desbloqueas Multi-sede, IA integrada y más funciones avanzadas
         </p>
       </div>
 

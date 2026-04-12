@@ -16,19 +16,6 @@ class LogPaymentRequests
     {
         // Solo loguear si contiene "payment" en la URL
         if (str_contains($request->path(), 'payment')) {
-            Log::info('=== PAYMENT REQUEST DETECTED ===', [
-                'path' => $request->path(),
-                'full_url' => $request->fullUrl(),
-                'method' => $request->method(),
-                'query_string' => $request->query(),
-                'all_params' => $request->all(),
-                'headers' => [
-                    'user_agent' => $request->header('User-Agent'),
-                    'referer' => $request->header('Referer'),
-                    'origin' => $request->header('Origin'),
-                ],
-                'timestamp' => now()->toIso8601String(),
-            ]);
         }
 
         return $next($request);

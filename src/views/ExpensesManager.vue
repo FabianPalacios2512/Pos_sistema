@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 px-8">
+  <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300 px-8">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in">
       
       <!-- Header sin icono -->
@@ -29,7 +29,7 @@
 
           <!-- Botón Registrar Gasto -->
           <button @click="openCreateModal" 
-                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md transition-all duration-300">
+                  class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-medium rounded-xl transition-all duration-300 shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50">
             <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -82,7 +82,7 @@
       <!-- Tabs: Egresos / Ingresos de Caja -->
       <div class="flex items-center gap-1 bg-white dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 p-1 w-fit">
         <button @click="activeTab = 'expenses'" 
-                :class="activeTab === 'expenses' ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'"
+                :class="activeTab === 'expenses' ? 'bg-slate-900 dark:bg-slate-700 text-white shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'"
                 class="px-4 py-2 text-sm font-semibold rounded transition-all duration-200">
           Egresos
           <span v-if="expenses.total" class="ml-1.5 text-xs opacity-70">({{ expenses.total }})</span>
@@ -183,7 +183,7 @@
               <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">Comienza registrando tu primer gasto</p>
             </div>
             <button @click="openCreateModal" 
-                    class="px-4 py-2 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md">
+                    class="px-4 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-medium rounded-xl">
               Registrar Gasto
             </button>
           </div>
@@ -760,7 +760,7 @@
               </button>
               <button type="submit"
                       :disabled="saving"
-                      class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-md shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                      class="px-5 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-medium rounded-xl shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                 <svg v-if="!saving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
@@ -936,7 +936,7 @@ export default {
   },
   methods: {
     // ========================================
-    // 🤖 CONTEXTO DE IA - Gastos Operativos
+    // CONTEXTO DE IA - Gastos Operativos
     // ========================================
     actualizarContextoIA() {
       if (!this.uiContext) return;
@@ -1081,7 +1081,7 @@ export default {
             const categoriaName = this.categories.find(c => c.id === categoriaId)?.name || 'Sin categoría';
             return {
               success: true,
-              message: `✅ Listo! Registré el gasto: $${monto.toLocaleString()} en "${categoriaName}" por "${descripcion}".`
+              message: `Listo! Registré el gasto: $${monto.toLocaleString()} en "${categoriaName}" por "${descripcion}".`
             };
           } else {
             return { success: false, message: response.data.message || 'Error al registrar el gasto' };
@@ -1108,16 +1108,16 @@ export default {
         
         switch(consulta) {
           case 'total_mes':
-            mensaje = `📊 Total de gastos este mes: $${this.formatNumber(this.statistics.current_month || 0)}`;
+            mensaje = `Total de gastos este mes: $${this.formatNumber(this.statistics.current_month || 0)}`;
             if (this.statistics.percentage_change !== undefined) {
-              const trend = this.statistics.percentage_change > 0 ? '📈 +' : '📉 ';
+              const trend = this.statistics.percentage_change > 0 ? '+' : '';
               mensaje += ` (${trend}${this.statistics.percentage_change}% vs mes anterior)`;
             }
             break;
             
           case 'por_categoria':
             if (this.statistics.by_category && this.statistics.by_category.length > 0) {
-              mensaje = '📊 Gastos por categoría este mes:\n';
+              mensaje = 'Gastos por categoría este mes:\n';
               this.statistics.by_category.forEach(cat => {
                 mensaje += `• ${cat.category}: $${this.formatNumber(cat.total)}\n`;
               });
@@ -1128,7 +1128,7 @@ export default {
             
           case 'ultimos':
             if (this.expenses.data && this.expenses.data.length > 0) {
-              mensaje = '📋 Últimos gastos registrados:\n';
+              mensaje = 'Últimos gastos registrados:\n';
               this.expenses.data.slice(0, 5).forEach(g => {
                 mensaje += `• ${g.description}: $${this.formatNumber(g.amount)} (${g.category?.name})\n`;
               });
@@ -1139,7 +1139,7 @@ export default {
             
           case 'resumen':
           default:
-            mensaje = `📊 Resumen de gastos:\n`;
+            mensaje = `Resumen de gastos:\n`;
             mensaje += `• Total mes: $${this.formatNumber(this.statistics.current_month || 0)}\n`;
             mensaje += `• Cantidad: ${this.expenses.total || 0} gastos registrados\n`;
             

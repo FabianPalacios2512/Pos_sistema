@@ -363,7 +363,6 @@ const loadData = async () => {
     recentRequests.value = response.data.recent_requests
     topUsers.value = response.data.top_users
     
-    console.log('📊 Dashboard data loaded:', response.data)
   } catch (error) {
     console.error('Error loading dashboard:', error)
   } finally {
@@ -372,7 +371,6 @@ const loadData = async () => {
 }
 
 const viewKeyDetails = (keyIndex) => {
-  console.log('Ver detalles de key:', keyIndex)
   // TODO: Abrir modal con detalles de la key
 }
 

@@ -82,7 +82,7 @@
                         :class="[
                           'relative px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-150 touch-manipulation',
                           selectedOptions[optionGroup.name] === value
-                            ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-2 border-gray-900 dark:border-white'
+                            ? 'bg-gray-900 dark:bg-white text-white dark:text-zinc-900 border-2 border-gray-900 dark:border-white'
                             : isOptionAvailable(optionGroup.name, value)
                             ? 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 hover:border-gray-400 dark:hover:border-zinc-600'
                             : 'bg-gray-50 dark:bg-zinc-900/50 text-gray-300 dark:text-zinc-700 border border-gray-200 dark:border-zinc-800 cursor-not-allowed line-through'

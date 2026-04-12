@@ -1,7 +1,7 @@
 <template>
   <div class="group relative bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
     
-    <!-- 📸 Image Container -->
+    <!-- Image Container -->
     <div class="relative aspect-square overflow-hidden bg-gray-100 dark:bg-zinc-800">
       <img 
         v-if="product.image" 
@@ -20,7 +20,7 @@
         <span v-if="product.stock <= 5 && product.stock > 0" class="px-2 py-0.5 bg-orange-500 text-white text-[10px] font-bold uppercase rounded-md shadow-sm">
           ¡Quedan {{ product.stock }}!
         </span>
-        <span v-if="product.category" class="px-2 py-0.5 bg-white/90 dark:bg-zinc-800/90  text-gray-700 dark:text-gray-300 text-[10px] font-bold uppercase rounded-md border border-gray-200 dark:border-zinc-700">
+        <span v-if="product.category" class="px-2 py-0.5 bg-white/90 dark:bg-zinc-800/90  text-gray-700 dark:text-zinc-300 text-[10px] font-bold uppercase rounded-md border border-gray-200 dark:border-zinc-700">
           {{ product.category }}
         </span>
       </div>
@@ -38,13 +38,13 @@
       </div>
     </div>
 
-    <!-- 📝 Content (Compact) -->
+    <!-- Content (Compact) -->
     <div class="p-3 md:p-4 flex flex-col flex-1">
       <div class="mb-2 flex-1">
-        <h3 class="text-sm md:text-base font-bold text-gray-900 dark:text-gray-100 mb-1 leading-tight line-clamp-2">
+        <h3 class="text-sm md:text-base font-bold text-gray-900 dark:text-zinc-100 mb-1 leading-tight line-clamp-2">
           {{ product.name }}
         </h3>
-        <p class="hidden md:block text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+        <p class="hidden md:block text-xs text-gray-500 dark:text-zinc-400 line-clamp-2">
           {{ product.description || 'Calidad garantizada.' }}
         </p>
       </div>
@@ -72,7 +72,7 @@
           <div v-else-if="quantity > 0" class="flex items-center bg-gray-100 dark:bg-zinc-800 rounded-lg p-0.5">
             <button 
               @click="decreaseQuantity"
-              class="w-7 h-7 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-md text-gray-600 dark:text-gray-300 shadow-sm"
+              class="w-7 h-7 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-md text-gray-600 dark:text-zinc-300 shadow-sm"
             >
               -
             </button>
@@ -80,7 +80,7 @@
             <button 
               @click="increaseQuantity"
               :disabled="quantity >= product.stock"
-              class="w-7 h-7 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-md text-gray-600 dark:text-gray-300 shadow-sm disabled:opacity-50"
+              class="w-7 h-7 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-md text-gray-600 dark:text-zinc-300 shadow-sm disabled:opacity-50"
             >
               +
             </button>

@@ -55,15 +55,10 @@ class ExcelImportController extends Controller
             $path = $file->storeAs('temp/imports', $filename);
             $fullPath = storage_path('app/' . $path);
 
-            Log::info('[ExcelImport] File uploaded: ' . $filename);
 
             // Parsear archivo
             $parseResult = $this->excelParser->parseFile($fullPath);
 
-            Log::info('[ExcelImport] Parsed file', [
-                'headers' => $parseResult['headers'],
-                'total_rows' => $parseResult['total_rows']
-            ]);
 
             // Analizar con IA
             $aiAnalysis = $this->columnMapper->analyzeColumnsWithAI(
@@ -71,10 +66,6 @@ class ExcelImportController extends Controller
                 $parseResult['sample_data']
             );
 
-            Log::info('[ExcelImport] AI Analysis completed', [
-                'method' => $aiAnalysis['method'] ?? 'unknown',
-                'confidence' => $aiAnalysis['confidence']
-            ]);
 
             // Guardar datos en sesión/cache para el siguiente paso
             $importId = Str::random(32);
@@ -356,13 +347,6 @@ class ExcelImportController extends Controller
                 @unlink($importData['file_path']);
             }
 
-            Log::info('[ExcelImport] Import completed', [
-                'imported' => $imported,
-                'updated' => $updated,
-                'skipped' => $skipped,
-                'errors' => count($errors),
-                'warehouse_id' => $warehouseId
-            ]);
 
             return response()->json([
                 'success' => true,

@@ -58,11 +58,11 @@ const authService = {
         // Configurar token en el cliente API
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
         
-        // 🚀 INICIALIZAR STORE GLOBAL DESPUÉS DEL LOGIN
+        // INICIALIZAR STORE GLOBAL DESPUÉS DEL LOGIN
         try {
           await appStore.initialize()
         } catch (error) {
-          console.warn('⚠️ Error inicializando store:', error)
+          console.warn('Error inicializando store:', error)
         }
       }
       
@@ -88,25 +88,24 @@ const authService = {
         if (user?.role !== 'superadmin' && !user?.is_super_admin) {
           await apiClient.post('/logout');
         } else {
-          console.log('👑 [AuthService] Superadmin logout - Skip API call')
         }
       }
     } catch (error) {
       console.error('Error al hacer logout:', error);
     } finally {
-      // 🔒 PRESERVAR configuraciones de UI que NO deben perderse entre sesiones
+      // PRESERVAR configuraciones de UI que NO deben perderse entre sesiones
       const tourCompleted = localStorage.getItem('pos_tour_completed')
       const tourSkipped = localStorage.getItem('pos_tour_skipped')
       
       // Limpiar datos locales
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
-      localStorage.removeItem('google_login'); // 🔥 Limpiar flag de login con Google
-      localStorage.removeItem('onboarding_completed'); // 🔥 Limpiar flag de onboarding
-      localStorage.removeItem('welcome_seen'); // 🔥 Limpiar flag de welcome
+      localStorage.removeItem('google_login'); // Limpiar flag de login con Google
+      localStorage.removeItem('onboarding_completed'); // Limpiar flag de onboarding
+      localStorage.removeItem('welcome_seen'); // Limpiar flag de welcome
       delete apiClient.defaults.headers.common['Authorization'];
       
-      // 🔒 RESTAURAR configuraciones de UI preservadas
+      // RESTAURAR configuraciones de UI preservadas
       if (tourCompleted) localStorage.setItem('pos_tour_completed', tourCompleted)
       if (tourSkipped) localStorage.setItem('pos_tour_skipped', tourSkipped)
     }
@@ -117,10 +116,9 @@ const authService = {
     try {
       let response;
       
-      // 👑 Si es super admin, retornar datos de localStorage sin llamar API
+      // Si es super admin, retornar datos de localStorage sin llamar API
       const localUser = this.getUser()
       if (localUser?.role === 'superadmin' || localUser?.is_super_admin) {
-        console.log('👑 [AuthService] Superadmin detectado - NO llamando a /api/me')
         return {
           success: true,
           data: { user: localUser }
@@ -137,9 +135,8 @@ const authService = {
       return response.data;
     } catch (error) {
       // Si falla, limpiar datos locales
-      // ⛔ FIX: No hacer logout si es error 403 (Suscripción expirada) o 401 en rutas de renovación
+      // FIX: No hacer logout si es error 403 (Suscripción expirada) o 401 en rutas de renovación
       if (error.response?.status === 403) {
-        console.log('⛔ [AuthService] Error 403 en getCurrentUser - Posible suscripción expirada. NO haciendo logout.')
         throw error
       }
       
@@ -148,15 +145,14 @@ const authService = {
         const currentPath = window.location.pathname
         const allowedExpiredRoutes = ['/subscription-expired', '/select-plan', '/payment/success', '/payment/failure', '/admin/god-mode']
         if (allowedExpiredRoutes.includes(currentPath)) {
-          console.log('⛔ [AuthService] Error 401 en ruta protegida - NO haciendo logout.')
           throw error
         }
       }
       
-      // 👑 PROTECCIÓN: No hacer logout si es superadmin y solo falló una llamada API
+      // PROTECCIÓN: No hacer logout si es superadmin y solo falló una llamada API
       const localUser = this.getUser()
       if (localUser?.role === 'superadmin' || localUser?.is_super_admin) {
-        console.warn('⚠️ [AuthService] Error en superadmin - NO haciendo logout')
+        console.warn('[AuthService] Error en superadmin - NO haciendo logout')
         throw error
       }
 

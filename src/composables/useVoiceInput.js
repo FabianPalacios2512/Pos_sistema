@@ -1,5 +1,5 @@
 /**
- * 🎤 useVoiceInput - Composable para entrada de voz con Web Speech API
+ * useVoiceInput - Composable para entrada de voz con Web Speech API
  * 
  * Captura audio del micrófono y lo convierte a texto usando la API nativa del navegador.
  * Optimizado para velocidad en la interacción inicial.

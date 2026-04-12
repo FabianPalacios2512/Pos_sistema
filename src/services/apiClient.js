@@ -20,16 +20,14 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
     
-    // 🔧 FIX: Si es FormData, ELIMINAR Content-Type para que el navegador lo establezca con boundary
+    // FIX: Si es FormData, ELIMINAR Content-Type para que el navegador lo establezca con boundary
     if (config.data instanceof FormData) {
       delete config.headers['Content-Type']
-      console.log('🔧 FormData detectado - Content-Type eliminado para boundary automático')
     }
     
     // Log para debugging (solo en desarrollo) - DESACTIVADO
     /*
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🌐 API Request [${config.method?.toUpperCase()}] ${config.url}`, {
         hasToken: !!token,
         tokenSent: config.headers.Authorization ? 'YES' : 'NO',
         tokenPreview: token ? token.substring(0, 10) + '...' : 'NONE'
@@ -51,11 +49,6 @@ apiClient.interceptors.response.use(
     // Log para debugging (solo en desarrollo)
     if (process.env.NODE_ENV === 'development') {
   /*
-  console.log('API Response:', {
-    status: response.status,
-    url: response.config.url,
-    data: response.data
-  })
   */
     }
     
@@ -82,37 +75,33 @@ apiClient.interceptors.response.use(
       switch (status) {
         case 401:
           // Token expirado o inválido
-          console.log('🔒 Error 401 detectado')
-          
           const currentPath = window.location.pathname
           
-          // 🔥 CRÍTICO: NO hacer logout si estamos en /login (proceso de login en curso)
+          // CRÍTICO: NO hacer logout si estamos en /login (proceso de login en curso)
           if (currentPath === '/login') {
-            console.log('⚠️ Error 401 durante login - NO eliminar token (puede ser error de multitenancy en local)')
             break
           }
 
-          // ✅ CHECK PRIORITARIO: Si el backend dice explícitamente "Unauthenticated", el token es inválido.
+          // CHECK PRIORITARIO: Si el backend dice explícitamente "Unauthenticated", el token es inválido.
           // Debemos limpiar y redirigir, SIN IMPORTAR en qué ruta estemos.
           if (data?.message === 'Unauthenticated.' || data?.message?.includes('Unauthenticated') || data?.message?.includes('Token')) {
-            // 🛡️ PROTECCIÓN ANTI-BUCLE: Si acabamos de loguearnos (< 10 segundos), NO hacer logout
+            // PROTECCIÓN ANTI-BUCLE: Si acabamos de loguearnos (< 10 segundos), NO hacer logout
             const loginTimestamp = localStorage.getItem('loginTimestamp')
             const now = Date.now()
             
             if (loginTimestamp && (now - parseInt(loginTimestamp)) < 10000) {
-                console.warn('🛡️ 401 recibido inmediatamente después de login (<10s) - Ignorando logout forzado para evitar bucle.')
-                console.warn('⚠️ Posible problema de configuración backend o latencia de replicación DB.')
+                console.warn('401 recibido inmediatamente después de login (<10s) - Ignorando logout forzado para evitar bucle.')
+                console.warn('Posible problema de configuración backend o latencia de replicación DB.')
                 break
             }
 
-            console.log('🚪 Token inválido (Unauthenticated) - Forzando logout')
             localStorage.removeItem('authToken')
             localStorage.removeItem('user')
             window.location.href = '/login?reason=expired&message=Tu sesión ha expirado'
             return Promise.reject(error)
           }
           
-          // 🔥 NO hacer logout si estamos en rutas especiales de pago
+          // NO hacer logout si estamos en rutas especiales de pago
           const allowedExpiredRoutes = [
             '/subscription-expired', 
             '/select-plan', 
@@ -122,11 +111,10 @@ apiClient.interceptors.response.use(
             '/admin/god-mode',
             '/welcome', // Onboarding
             '/onboarding' // Configuración inicial
-            // ❌ REMOVIDO: '/pos', '/dashboard' - Si el token es inválido, DEBE redirigir a login
+            // REMOVIDO: '/pos', '/dashboard' - Si el token es inválido, DEBE redirigir a login
           ]
           
           if (allowedExpiredRoutes.includes(currentPath) || currentPath.startsWith('/payment/')) {
-            console.log('⚠️ Error 401 en ruta protegida - NO haciendo logout automático')
             break
           }
           break
@@ -142,10 +130,8 @@ apiClient.interceptors.response.use(
               data.message.includes('plan ha expirado') ||
               data.message.includes('renueva tu plan')
           ))) {
-            console.log('⛔ Suscripción expirada detectada en apiClient')
             // YA NO REDIRIGIR - El modal aparecerá automáticamente en el POS
             // Solo registrar el evento
-            console.log('⛔ Modal de renovación se mostrará automáticamente')
           }
           break
           
@@ -161,7 +147,7 @@ apiClient.interceptors.response.use(
         
         case 404:
           // Recurso no encontrado
-          // 🛡️ EXCEPCIÓN: NO procesar errores de operaciones CRUD normales
+          // EXCEPCIÓN: NO procesar errores de operaciones CRUD normales
           const isCrudOperation = error.config?.url?.includes('/customers/') && error.config?.method === 'delete'
           
           // Detectar si es error de tenant/tienda no encontrada (SOLO en recursos críticos)
@@ -170,13 +156,13 @@ apiClient.interceptors.response.use(
             data.message.toLowerCase().includes('tienda') ||
             data.message.toLowerCase().includes('warehouse')
           )) {
-            console.error('🔥 Error: Recurso del tenant no encontrado')
+            console.error('Error: Recurso del tenant no encontrado')
             console.error('Detalles:', data.message)
             
             // Si es el health-check o recursos críticos, cerrar sesión
             if (error.config?.url?.includes('health-check') || 
                 error.config?.url?.includes('warehouses')) {
-              // 🔐 Preservar configuraciones de UI antes de limpiar
+              // Preservar configuraciones de UI antes de limpiar
               const tourCompleted = localStorage.getItem('pos_tour_completed')
               const tourSkipped = localStorage.getItem('pos_tour_skipped')
               
@@ -203,10 +189,10 @@ apiClient.interceptors.response.use(
             data.message.includes('Unknown database') ||
             data.message.includes('tenant') && data.message.includes('not found')
           )) {
-            console.error('🔥 Error crítico: Base de datos o tenant no existe')
+            console.error('Error crítico: Base de datos o tenant no existe')
             console.error('Detalles:', data.message)
             
-            // 🔐 Preservar configuraciones de UI antes de limpiar
+            // Preservar configuraciones de UI antes de limpiar
             const tourCompleted = localStorage.getItem('pos_tour_completed')
             const tourSkipped = localStorage.getItem('pos_tour_skipped')
             

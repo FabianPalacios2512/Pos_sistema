@@ -22,10 +22,7 @@ export const inventoryService = {
         reference: movementData.reason
       }
 
-      console.log('Datos enviados a la API:', apiData)
       const response = await inventoryService.updateProductStock(movementData.product_id, apiData)
-      console.log('Respuesta de la API:', response)
-
       return response
     } catch (error) {
       console.error('Error en createMovement:', error)
@@ -36,7 +33,7 @@ export const inventoryService = {
   // Ajustar stock directamente (para la función ajustar)
   adjustStock: async (productId, newStock, reason = 'Ajuste manual', warehouseId = null, variantId = null) => {
     try {
-      // 👗 Si es un producto con variante, obtenemos el stock de la variante específica
+      // Si es un producto con variante, obtenemos el stock de la variante específica
       let currentStock = 0
       
       if (variantId) {
@@ -44,7 +41,6 @@ export const inventoryService = {
         const productsResponse = await api.get(`/products/${productId}`)
         const variant = productsResponse.data.variants?.find(v => v.id === variantId)
         currentStock = variant ? (variant.stock || 0) : 0
-        console.log('👗 Stock actual de variante:', { variantId, currentStock })
       } else {
         // Para productos normales
         const productsResponse = await api.get(`/products/${productId}`)
@@ -59,17 +55,8 @@ export const inventoryService = {
         type: 'adjustment',
         reference: reason,
         warehouse_id: warehouseId, // incluir warehouse_id si se proporciona
-        variant_id: variantId // 👗 NUEVO: incluir variant_id para productos fashion
+        variant_id: variantId // NUEVO: incluir variant_id para productos fashion
       }
-
-      console.log('Ajustando stock:', {
-        productId,
-        variantId,
-        currentStock,
-        newStock: parseInt(newStock),
-        difference,
-        apiData
-      })
 
       const response = await api.post(`/products/${productId}/update-stock`, apiData)
       return response

@@ -191,12 +191,6 @@ class FactusController extends Controller
                 'factus_response' => $response
             ]);
             
-            Log::info('✅ Factura validada ante DIAN', [
-                'invoice_id' => $invoice->id,
-                'number' => $invoice->number,
-                'cufe' => $billData['cufe'] ?? 'N/A',
-                'factus_number' => $billData['number'] ?? 'N/A'
-            ]);
             
             return response()->json([
                 'success' => true,

@@ -169,7 +169,7 @@ const setActiveReport = (report) => {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 🤖 CONTEXTO IA - Menú de Reportes
+// CONTEXTO IA - Menú de Reportes
 // ═══════════════════════════════════════════════════════════════
 
 // Actualizar contexto para la IA

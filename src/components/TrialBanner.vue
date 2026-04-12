@@ -62,7 +62,7 @@
           @click="goToUpgrade"
           class="flex-shrink-0 px-6 py-2.5 bg-white text-rose-600 text-sm font-black rounded-xl hover:bg-gray-100 hover:scale-105 transition-all duration-200 shadow-xl hover:shadow-2xl"
         >
-          🚀 Actualizar Ahora
+          Actualizar Ahora
         </button>
 
         <!-- Botón Cerrar (opcional) -->

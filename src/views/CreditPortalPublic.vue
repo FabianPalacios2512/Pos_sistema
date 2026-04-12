@@ -1,5 +1,5 @@
 <template>
-  <!-- 🎯 CREDIT PORTAL - Clean Premium Design -->
+  <!-- CREDIT PORTAL - Clean Premium Design -->
   <div class="credit-portal min-h-screen font-['Inter',system-ui,sans-serif] antialiased">
     
     <!-- ==================== LOGIN SCREEN ==================== -->
@@ -143,7 +143,7 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <!-- 🛒 Ver Catálogo (solo si está activo) -->
+            <!-- Ver Catálogo (solo si está activo) -->
             <button 
               v-if="creditData.catalog_active"
               @click="goToCatalog"
@@ -328,7 +328,7 @@
           <div v-if="paidInvoices.length > 0">
             <div class="flex items-center justify-between mb-3 px-1">
               <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                <span class="text-emerald-600 dark:text-emerald-400">✓</span> Historial · {{ paidInvoices.length }} pagadas
+                <span class="text-emerald-600 dark:text-emerald-400"></span> Historial · {{ paidInvoices.length }} pagadas
               </p>
               <button 
                 @click="showHistory = !showHistory" 

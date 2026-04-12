@@ -118,7 +118,7 @@ const props = defineProps({
 
 defineEmits(['view', 'edit'])
 
-// 🎨 Helper: Detectar si tiene variantes REALES (no productos simples)
+// Helper: Detectar si tiene variantes REALES (no productos simples)
 const hasVariants = computed(() => {
   const variants = props.product.variants || []
   if (variants.length === 0) return false
@@ -130,7 +130,7 @@ const hasVariants = computed(() => {
   return true
 })
 
-// 📊 Helper: Calcular rango de precios
+// Helper: Calcular rango de precios
 const priceRange = computed(() => {
   const variants = props.product.variants || []
   
@@ -164,7 +164,7 @@ const priceRange = computed(() => {
   }
 })
 
-// 🎨 Helper: Extraer colores de variantes
+// Helper: Extraer colores de variantes
 const variantColors = computed(() => {
   const variants = props.product.variants || []
   const colors = []
@@ -186,7 +186,7 @@ const variantColors = computed(() => {
   return colors
 })
 
-// 📏 Helper: Extraer tallas de variantes
+// Helper: Extraer tallas de variantes
 const variantSizes = computed(() => {
   const variants = props.product.variants || []
   const sizes = []
@@ -215,7 +215,7 @@ const variantSizes = computed(() => {
   })
 })
 
-// ⚠️ Helper: Stock bajo
+// Helper: Stock bajo
 const isLowStock = computed(() => {
   const currentStock = props.product.current_stock || 0
   const minStock = props.product.min_stock || 0
@@ -231,7 +231,7 @@ const isNewProduct = computed(() => {
   return diffDays <= 7
 })
 
-// 🎨 Helper: Detecta si es HEX o nombre de color y devuelve HEX
+// Helper: Detecta si es HEX o nombre de color y devuelve HEX
 const getColorDisplay = (value) => {
   // Si ya es un código HEX, devolverlo directamente
   if (value.startsWith('#')) {
@@ -242,7 +242,7 @@ const getColorDisplay = (value) => {
   return getColorHex(value) || value
 }
 
-// 🎨 Helper: Mapeo de nombres de colores a hex (expandido)
+// Helper: Mapeo de nombres de colores a hex (expandido)
 const getColorHex = (colorName) => {
   const colorMap = {
     // ROJOS
@@ -303,7 +303,7 @@ const getColorHex = (colorName) => {
   return colorMap[colorName.toLowerCase()] || '#94A3B8'
 }
 
-// 🖼️ Helper: Obtener imagen del producto
+// Helper: Obtener imagen del producto
 const getProductImage = (product) => {
   // 1. Primero verificar si hay imágenes en la galería (relación images)
   if (product.images && Array.isArray(product.images) && product.images.length > 0) {
@@ -323,7 +323,7 @@ const getProductImage = (product) => {
   return null
 }
 
-// 📸 Helper: Procesar URL de imagen para el backend
+// Helper: Procesar URL de imagen para el backend
 const processImageUrl = (url) => {
   if (!url || typeof url !== 'string') return null
   
@@ -361,7 +361,7 @@ const handleImageError = (e) => {
   e.target.style.display = 'none'
 }
 
-// 💰 Helper: Formatear moneda
+// Helper: Formatear moneda
 const formatCurrency = (value) => {
   const num = parseFloat(value || 0)
   return num.toLocaleString('es-CL', { minimumFractionDigits: 0, maximumFractionDigits: 0 })

@@ -81,7 +81,7 @@ const router = useRouter()
 const route = useRoute()
 const { user, updateUser } = useAuth()
 
-// 🔧 MODO DESARROLLO: Cambia esto a false cuando estés en producción
+// MODO DESARROLLO: Cambia esto a false cuando estés en producción
 const DEV_MODE = false // true = siempre muestra el tour para testing
 
 const isActive = ref(false)
@@ -90,9 +90,8 @@ const totalSteps = 4
 
 // Check if tour should start
 const checkTourStatus = () => {
-  // 🔧 En modo desarrollo, SIEMPRE mostrar el tour (ignorar BD)
+  // En modo desarrollo, SIEMPRE mostrar el tour (ignorar BD)
   if (DEV_MODE) {
-    console.log('🔧 DEV_MODE activo - Mostrando tour siempre')
     const savedStep = localStorage.getItem('tour_step')
     if (savedStep) {
       currentStep.value = parseInt(savedStep)
@@ -139,10 +138,10 @@ const currentStepDescription = computed(() => {
 
 const currentStepIcon = computed(() => {
   switch (currentStep.value) {
-    case 1: return '👋'
-    case 2: return '📊'
-    case 3: return '📦'
-    case 4: return '🚀'
+    case 1: return ''
+    case 2: return ''
+    case 3: return ''
+    case 4: return ''
     default: return ''
   }
 })
@@ -183,7 +182,6 @@ const completeTour = async () => {
   
   // En DEV_MODE, no actualizar la BD (para poder probar fácilmente)
   if (DEV_MODE) {
-    console.log('🔧 DEV_MODE: Tour completado pero NO se guardó en BD')
     return
   }
   
@@ -205,7 +203,7 @@ const handleBackdropClick = () => {
   // Optional: Close on backdrop click? No, better to force interaction or skip.
 }
 
-// 🔧 DESARROLLO: Función para resetear el tour manualmente
+// DESARROLLO: Función para resetear el tour manualmente
 const resetTour = () => {
   localStorage.removeItem('tour_step')
   currentStep.value = 1
@@ -214,10 +212,9 @@ const resetTour = () => {
   setTimeout(() => {
     checkTourStatus()
   }, 100)
-  console.log('🔧 Tour reseteado')
 }
 
-// 🔧 DESARROLLO: Atajo de teclado Ctrl+Shift+T para resetear tour
+// DESARROLLO: Atajo de teclado Ctrl+Shift+T para resetear tour
 const handleKeyPress = (event) => {
   if (DEV_MODE && event.ctrlKey && event.shiftKey && event.key === 'T') {
     resetTour()
@@ -228,7 +225,6 @@ const handleKeyPress = (event) => {
 onMounted(() => {
   if (DEV_MODE) {
     window.addEventListener('keydown', handleKeyPress)
-    console.log('🔧 DEV_MODE: Presiona Ctrl+Shift+T para resetear el tour')
   }
 })
 

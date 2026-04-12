@@ -42,10 +42,6 @@ class PaymentHistoryController extends Controller
                 ->limit(50)  // Últimos 50 pagos
                 ->get();
 
-            Log::info('PaymentHistoryController::getPaymentHistory - Historial obtenido', [
-                'tenant_id' => $tenantId,
-                'count' => $payments->count(),
-            ]);
 
             return response()->json([
                 'success' => true,

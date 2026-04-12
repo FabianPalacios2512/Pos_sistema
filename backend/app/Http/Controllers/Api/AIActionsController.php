@@ -85,13 +85,6 @@ class AIActionsController extends Controller
                 'allow_multiple_uses_per_user' => false,
             ]);
 
-            Log::info('🎁 IA creó descuento:', [
-                'id' => $discount->id,
-                'code' => $discount->code,
-                'value' => $discount->value,
-                'type' => $discount->type,
-                'expires_at' => $discount->expires_at?->format('Y-m-d H:i:s'),
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -142,11 +135,6 @@ class AIActionsController extends Controller
     public function sendBulkWhatsApp(Request $request)
     {
         try {
-            Log::info('📨 [sendBulkWhatsApp] Request recibido:', [
-                'all_data' => $request->all(),
-                'target' => $request->input('target'),
-                'customer_ids' => $request->input('customer_ids'),
-            ]);
 
             $validated = $request->validate([
                 'message' => 'required|string|max:1000',
@@ -155,10 +143,6 @@ class AIActionsController extends Controller
                 'customer_ids.*' => 'integer|exists:customers,id',
             ]);
 
-            Log::info('✅ [sendBulkWhatsApp] Datos validados:', [
-                'validated' => $validated,
-                'customer_ids_count' => count($validated['customer_ids'] ?? []),
-            ]);
 
             // Obtener clientes según target
             $customers = $this->getTargetCustomers($validated['target'], $validated['customer_ids'] ?? []);
@@ -175,12 +159,6 @@ class AIActionsController extends Controller
                 $normalized = preg_replace('/[^0-9]/', '', $customer->phone); // Eliminar +, -, espacios
                 $customer->normalized_phone = $normalized;
 
-                Log::info("🔧 [NORMALIZACIÓN]", [
-                    'customer_id' => $customer->id,
-                    'customer_name' => $customer->name,
-                    'phone_original' => $customer->phone,
-                    'phone_normalized' => $normalized
-                ]);
 
                 return $customer;
             });
@@ -200,20 +178,8 @@ class AIActionsController extends Controller
 
             $duplicatesRemoved = $customers->count() - $uniqueCustomers->count();
 
-            Log::info("📊 [FILTRADO DUPLICADOS]", [
-                'total_customers' => $customers->count(),
-                'unique_customers' => $uniqueCustomers->count(),
-                'duplicates_removed' => $duplicatesRemoved,
-                'unique_ids' => $uniqueCustomers->pluck('id')->toArray(),
-                'unique_phones' => $uniqueCustomers->pluck('normalized_phone')->toArray()
-            ]);
 
             if ($duplicatesRemoved > 0) {
-                Log::info("📱 Se removieron {$duplicatesRemoved} números duplicados", [
-                    'total' => $customers->count(),
-                    'unique' => $uniqueCustomers->count(),
-                    'removed' => $duplicatesRemoved
-                ]);
             }
 
             // Verificar que WhatsApp esté conectado
@@ -264,14 +230,6 @@ class AIActionsController extends Controller
                 usleep(500000); // 500ms
             }
 
-            Log::info('📱 IA envió mensajes WhatsApp masivos:', [
-                'total_clientes' => $customers->count(),
-                'numeros_unicos' => $uniqueCustomers->count(),
-                'duplicados_removidos' => $duplicatesRemoved,
-                'enviados' => $sent,
-                'fallidos' => $failed,
-                'omitidos' => $skipped,
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -356,10 +314,6 @@ class AIActionsController extends Controller
                 $whatsappResult = $whatsappResponse->getData(true);
             }
 
-            Log::info('🚀 IA creó campaña completa:', [
-                'discount_code' => $discount['code'],
-                'whatsapp_sent' => $whatsappResult['stats']['sent'] ?? 0,
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -453,13 +407,6 @@ class AIActionsController extends Controller
             // Formatear número (agregar código de país si no existe)
             $formattedPhone = $this->formatPhoneNumber($phone);
 
-            Log::info("📤 [INICIO ENVÍO] ID: {$messageId}", [
-                'message_id' => $messageId,
-                'phone_original' => $phone,
-                'phone_formatted' => $formattedPhone,
-                'customer' => $customerName,
-                'timestamp' => now()->format('Y-m-d H:i:s.u')
-            ]);
 
             // ✅ Timeout aumentado a 15 segundos para evitar falsos timeouts
             $response = Http::timeout(15)->post('http://localhost:3002/send', [
@@ -467,20 +414,12 @@ class AIActionsController extends Controller
                 'message' => $message,
             ]);
 
-            Log::info("📥 [RESPUESTA] ID: {$messageId}", [
-                'message_id' => $messageId,
-                'status' => $response->status(),
-                'body' => $response->body(),
-                'successful' => $response->successful(),
-                'timestamp' => now()->format('Y-m-d H:i:s.u')
-            ]);
 
             if ($response->successful()) {
                 $data = $response->json();
 
                 // Verificar si el envío fue exitoso
                 if (isset($data['success']) && $data['success']) {
-                    Log::info("✅ WhatsApp enviado correctamente a {$formattedPhone}");
                     return [
                         'success' => true,
                         'customer' => $customerName,
@@ -600,14 +539,6 @@ class AIActionsController extends Controller
             // Crear producto
             $product = Product::create($productData);
 
-            Log::info('📦 IA creó producto:', [
-                'id' => $product->id,
-                'name' => $product->name,
-                'sku' => $product->sku,
-                'category_id' => $product->category_id,
-                'sale_price' => $product->sale_price,
-                'stock' => $product->current_stock,
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -665,10 +596,6 @@ class AIActionsController extends Controller
                 'active' => true,
             ]);
 
-            Log::info('🏷️ IA creó categoría:', [
-                'id' => $category->id,
-                'name' => $category->name,
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -695,4 +622,3 @@ class AIActionsController extends Controller
         }
     }
 }
-

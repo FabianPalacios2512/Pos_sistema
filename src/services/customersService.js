@@ -99,7 +99,7 @@ export const customersService = {
       const response = await apiCall(`/customers/${customerId}/invoices`)
       return response
     } catch (error) {
-      console.error('❌ Error getting customer invoices:', error)
+      console.error('Error getting customer invoices:', error)
       // Si hay error, lanzar la excepción para que el caller la maneje
       throw error
     }

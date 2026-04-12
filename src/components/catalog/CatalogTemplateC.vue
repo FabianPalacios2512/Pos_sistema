@@ -593,7 +593,7 @@
       </Transition>
     </Teleport>
 
-    <!-- ⚖️ Modal de Cantidad (Productos por peso/medida) -->
+    <!-- Modal de Cantidad (Productos por peso/medida) -->
     <QuantityModal
       :show="showQuantityModal"
       :product="selectedProductForQuantity"
@@ -721,27 +721,18 @@ const getProductQuantity = (productId) => {
 const addToCart = (product) => {
   if (product.stock === 0) return
   
-  console.log('🛒 Producto clickeado:', product.name)
-  console.log('⚖️ measurement_unit:', product.measurement_unit)
-  console.log('📊 unit:', product.unit)
-  console.log('📦 Variantes:', product.variants)
-  
-  // 🚨 DETECCIÓN IGUAL QUE EL POS
+  // DETECCIÓN IGUAL QUE EL POS
   // Si el producto usa measurement_unit diferente de 'unit', requiere modal de cantidad
   const requiresQuantityInput = product.measurement_unit && product.measurement_unit !== 'unit'
   
-  console.log('✅ Requiere input de cantidad:', requiresQuantityInput)
-  
   if (requiresQuantityInput) {
     // Mostrar modal de cantidad
-    console.log('🚨 Abriendo modal de cantidad')
     selectedProductForQuantity.value = product
     showQuantityModal.value = true
     return
   }
   
   // Si no requiere cantidad especial, agregar directamente
-  console.log('➡️ Agregando directamente al carrito')
   cartItems.value.push({ ...product })
 }
 
@@ -769,8 +760,6 @@ const clearFilters = () => {
 }
 
 const handleQuantityConfirmed = ({ product, quantity }) => {
-  console.log(`⚖️ Agregando ${quantity} ${product.measurement_unit || product.unit} de ${product.name}`)
-  
   // Crear producto con cantidad específica para el carrito
   const productWithQuantity = {
     ...product,
@@ -806,12 +795,10 @@ const searchCustomerByDocument = async () => {
       formData.value.customer_email = response.data.customer.email || ''
       formData.value.customer_address = response.data.customer.address || ''
       
-      console.log('✅ Cliente encontrado:', response.data.customer.name)
     } else {
-      console.log('ℹ️ Cliente no encontrado, permitir llenado manual')
     }
   } catch (error) {
-    console.error('⚠️ Error buscando cliente:', error)
+    console.error('Error buscando cliente:', error)
   } finally {
     searchingCustomer.value = false
   }
@@ -862,17 +849,17 @@ const handleCheckoutSubmit = async () => {
       // Crear mensaje usando configuración personalizada
       const greeting = props.storeConfig.custom_message || 'Hola, quiero hacer el siguiente pedido:'
       let message = `${greeting}\n\n`
-      message += `📋 *Código: ${order.order_number}*\n\n`
-      message += `👤 ${customerData.customer_name}\n`
-      message += `📱 ${customerData.customer_phone}\n\n`
+      message += `*Código: ${order.order_number}*\n\n`
+      message += `${customerData.customer_name}\n`
+      message += `${customerData.customer_phone}\n\n`
       
       if (customerData.delivery_type === 'delivery') {
-        message += `🚚 Envío a: ${customerData.customer_address}\n\n`
+        message += `Envío a: ${customerData.customer_address}\n\n`
       } else {
-        message += `🏪 Recoger en tienda\n\n`
+        message += `Recoger en tienda\n\n`
       }
       
-      message += `📦 *Productos:*\n`
+      message += `*Productos:*\n`
       orderItems.forEach((item, index) => {
         message += `${index + 1}. ${item.name} x${item.quantity}\n`
       })
@@ -880,10 +867,10 @@ const handleCheckoutSubmit = async () => {
       const deliveryCost = customerData.delivery_type === 'delivery' ? parseFloat(props.storeConfig.delivery_cost || 0) : 0
       const finalTotal = parseFloat(order.total) + deliveryCost
       
-      message += `\n💰 Total: ${props.storeConfig.currency_symbol}${formatPrice(finalTotal)}`
+      message += `\nTotal: ${props.storeConfig.currency_symbol}${formatPrice(finalTotal)}`
 
       if (customerData.note) {
-        message += `\n\n📝 ${customerData.note}`
+        message += `\n\n${customerData.note}`
       }
 
       const whatsappUrl = `https://wa.me/${props.storeConfig.whatsapp_number}?text=${encodeURIComponent(message)}`
@@ -891,7 +878,7 @@ const handleCheckoutSubmit = async () => {
     }
   } catch (error) {
     console.error('Error al crear pedido:', error)
-    alert('❌ Error al crear el pedido. Por favor intenta nuevamente.')
+    alert('Error al crear el pedido. Por favor intenta nuevamente.')
   } finally {
     submittingOrder.value = false
   }

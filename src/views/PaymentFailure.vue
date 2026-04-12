@@ -25,14 +25,14 @@
           @click="retryPayment"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
         >
-          🔄 Intentar Nuevamente
+          Intentar Nuevamente
         </button>
 
         <button 
           @click="activateTrial"
           class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
         >
-          ⚡ Activar Trial de 3 Días Gratis
+          Activar Trial de 3 Días Gratis
         </button>
 
         <button 
@@ -48,7 +48,7 @@
         target="_blank"
         class="block mt-6 text-sm text-blue-600 hover:text-blue-700 hover:underline font-medium"
       >
-        💬 ¿Necesitas ayuda? Contáctanos por WhatsApp
+        ¿Necesitas ayuda? Contáctanos por WhatsApp
       </a>
 
       <p class="mt-4 text-xs text-gray-400" v-if="paymentId">

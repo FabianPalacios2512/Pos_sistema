@@ -26,7 +26,7 @@
           <button
             v-if="!isVendedor"
             @click="navigateToPos"
-            class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
+            class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -280,7 +280,7 @@
                   <button
                     v-if="!isVendedor && (selectedInvoice.type === 'Cotización' || selectedInvoice.type === 'quote')"
                     @click="openInPos(selectedInvoice)"
-                    class="px-5 py-2 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2"
+                    class="px-5 py-2 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-[13px] font-semibold rounded-md  transition-all duration-300 flex items-center gap-2"
                     title="Convertir a factura">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -646,7 +646,7 @@
                 
                 <button
                   @click="handleReturnFromModal"
-                  class="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white dark:text-gray-900 text-sm font-semibold rounded-md shadow-lg shadow-emerald-600/30 transition-all duration-200 flex items-center justify-center gap-2"
+                  class="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white dark:text-zinc-900 text-sm font-semibold rounded-md shadow-lg shadow-emerald-600/30 transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
@@ -696,7 +696,7 @@
           </p>
           
           <p class="text-sm text-gray-500 dark:text-zinc-500 mb-8">
-            💡 Desbloquea todas las funciones premium para potenciar tu negocio
+            Desbloquea todas las funciones premium para potenciar tu negocio
           </p>
 
           <!-- Botones -->
@@ -808,7 +808,6 @@ const premiumFeatureName = ref('')
 const isBasicPlan = () => {
   const plan = (appStore.tenantPlan || 'free_trial').toLowerCase()
   const isBasic = plan === 'free_trial' || plan === 'free' || plan === 'basic'
-  console.log('📊 [InvoicesView] Plan detectado:', plan, '| Es plan básico:', isBasic)
   return isBasic
 }
 
@@ -945,7 +944,6 @@ const posCompatibleSale = computed(() => {
 // Métodos
 const loadMoreInvoices = () => {
   displayLimit.value += 20
-  console.log(`📄 Cargando más facturas. Mostrando: ${displayLimit.value}`)
 }
 
 const selectInvoice = async (invoice) => {
@@ -1212,7 +1210,7 @@ const downloadPDF = async (invoice) => {
       discount: parseFloat(invoice.discount_amount || 0),
       tax: parseFloat(invoice.tax || invoice.tax_amount || 0),
       tax_amount: parseFloat(invoice.tax || invoice.tax_amount || 0),
-      surcharge_amount: parseFloat(invoice.surcharge_amount || 0), // 🎯 Recargo por crédito
+      surcharge_amount: parseFloat(invoice.surcharge_amount || 0), // Recargo por crédito
       total: parseFloat(invoice.total || 0),
       payments: invoice.payments || [{
         method: invoice.payment_method || 'efectivo',
@@ -1296,7 +1294,7 @@ const sendByEmail = async (invoice) => {
       discount: parseFloat(invoice.discount_amount || 0),
       tax: parseFloat(invoice.tax || invoice.tax_amount || 0),
       tax_amount: parseFloat(invoice.tax || invoice.tax_amount || 0),
-      surcharge_amount: parseFloat(invoice.surcharge_amount || 0), // 🎯 Recargo por crédito
+      surcharge_amount: parseFloat(invoice.surcharge_amount || 0), // Recargo por crédito
       total: parseFloat(invoice.total || 0),
       payments: invoice.payments || [{
         method: invoice.payment_method || 'efectivo',
@@ -1325,7 +1323,7 @@ const sendByEmail = async (invoice) => {
       invoice.number || invoice.invoiceNumber || `DOC-${invoice.id}`
     )
     
-    showToast(`✅ ${docTypeCapitalized} enviada exitosamente a ${email}`, 'success')
+    showToast(`${docTypeCapitalized} enviada exitosamente a ${email}`, 'success')
   } catch (error) {
     console.error('Error enviando email:', error)
     showToast(`Error al enviar la ${docType}`, 'error')
@@ -1409,7 +1407,7 @@ const sendByWhatsApp = async (invoice) => {
       documentData.customer_name || 'Cliente'
     )
     
-    showToast(`✅ ${docType} enviada por WhatsApp exitosamente`, 'success')
+    showToast(`${docType} enviada por WhatsApp exitosamente`, 'success')
   } catch (error) {
     console.error('Error enviando por WhatsApp:', error)
     showToast('Error al enviar por WhatsApp', 'error')
@@ -1545,7 +1543,7 @@ const handleSendWhatsApp = async () => {
       discount: parseFloat(selectedInvoice.value.discount_amount || 0),
       tax: parseFloat(selectedInvoice.value.tax_amount || selectedInvoice.value.tax || 0),
       total: parseFloat(selectedInvoice.value.total || 0),
-      // 🎯 Recargo CrediTienda
+      // Recargo CrediTienda
       surcharge_amount: parseFloat(selectedInvoice.value.surcharge_amount || 0),
       payment_method: selectedInvoice.value.payment_method || 'efectivo',
       payments: selectedInvoice.value.payments || [{
@@ -1562,7 +1560,7 @@ const handleSendWhatsApp = async () => {
 
     // Enviar por WhatsApp
     const companyName = appStore.systemSettings.company_name || 'Nuestra Empresa'
-    const message = `¡Hola! ${companyName} le envía su factura No. ${invoiceData.invoice_number}. Total: $${invoiceData.total.toLocaleString()}. ¡Gracias por su compra! 🙏`
+    const message = `¡Hola! ${companyName} le envía su factura No. ${invoiceData.invoice_number}. Total: $${invoiceData.total.toLocaleString()}. ¡Gracias por su compra! `
 
     await whatsappService.sendInvoiceWithPDF(phone, pdfBlob, message, invoiceData.invoice_number)
     
@@ -1580,7 +1578,7 @@ const handleCloseQuotationModal = () => {
 const handlePrintQuotation = async () => {
   try {
     if (!selectedInvoice.value) {
-      showToast('⚠️ No hay cotización seleccionada', 'warning')
+      showToast('No hay cotización seleccionada', 'warning')
       return
     }
 
@@ -1732,7 +1730,7 @@ const handlePrintQuotation = async () => {
           <img src="${qrDataURL}" alt="QR Code" style="width: 120px; height: 120px;">
         </div>
         <div class="qr-instructions">
-          📱 Escanee para cargar automáticamente
+          Escanee para cargar automáticamente
         </div>
       </div>
 
@@ -1776,7 +1774,7 @@ const handlePrintQuotation = async () => {
 
       <div class="print-button no-print">
         <button class="print-btn" onclick="window.print();">
-          🖨️ Imprimir Ticket
+          Imprimir Ticket
         </button>
       </div>
     </body>
@@ -1797,8 +1795,8 @@ const handlePrintQuotation = async () => {
     }
 
   } catch (error) {
-    console.error('❌ Error al imprimir cotización:', error)
-    showToast('❌ Error al imprimir cotización', 'error')
+    console.error('Error al imprimir cotización:', error)
+    showToast('Error al imprimir cotización', 'error')
   }
 }
 
@@ -1827,7 +1825,7 @@ watch([searchTerm, statusFilter, typeFilter], () => {
   displayLimit.value = 20 // Resetear a 20 cuando cambien los filtros
 })
 
-// 🎯 Watcher para actualizar contexto cuando cambie la factura seleccionada
+// Watcher para actualizar contexto cuando cambie la factura seleccionada
 watch(selectedInvoice, (newInvoice) => {
   if (newInvoice) {
     // Notificar al contexto UI para la IA de voz
@@ -1843,11 +1841,9 @@ watch(selectedInvoice, (newInvoice) => {
   }
 })
 
-// 🎯 Watcher para query params de navegación AI (búsqueda y filtros automáticos)
+// Watcher para query params de navegación AI (búsqueda y filtros automáticos)
 watch(() => props.queryParams, async (newParams) => {
   if (!newParams || Object.keys(newParams).length === 0) return
-  
-  console.log('🔍 [InvoicesView] Query params detectados:', newParams)
   
   // Seleccionar factura por ID (para mostrar detalle)
   if (newParams.selectId) {
@@ -1872,7 +1868,6 @@ watch(() => props.queryParams, async (newParams) => {
     if (factura) {
       // Usar selectInvoice para que notifique al contexto UI
       await selectInvoice(factura)
-      console.log('✅ [InvoicesView] Factura seleccionada por AI:', factura.invoice_number || factura.id)
       showToast(`Mostrando factura ${factura.invoice_number || 'seleccionada'}`, 'success', 3000)
     }
   }
@@ -1880,7 +1875,6 @@ watch(() => props.queryParams, async (newParams) => {
   // Aplicar búsqueda si hay query.search
   if (newParams.search) {
     searchTerm.value = newParams.search
-    console.log('✅ [InvoicesView] Búsqueda aplicada:', newParams.search)
     showToast(`Buscando: "${newParams.search}"`, 'info', 3000)
   }
   
@@ -1892,11 +1886,9 @@ watch(() => props.queryParams, async (newParams) => {
     switch(newParams.date) {
       case 'today':
         // Filtrar facturas de hoy (esto requeriría un filtro de fecha)
-        console.log('✅ [InvoicesView] Filtro de fecha: HOY', today)
         showToast('Mostrando facturas de hoy', 'info', 3000)
         break
       case 'yesterday':
-        console.log('✅ [InvoicesView] Filtro de fecha: AYER', yesterday)
         showToast('Mostrando facturas de ayer', 'info', 3000)
         break
     }
@@ -1910,7 +1902,7 @@ const handleKeyDown = (event) => {
   }
 }
 
-// 🧠 Actualizar contexto de pantalla para IA de voz
+// Actualizar contexto de pantalla para IA de voz
 const updateScreenContextForAI = () => {
   const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
   
@@ -2024,7 +2016,7 @@ const updateScreenContextForAI = () => {
       vendedor: selectedInvoice.value.seller_name || 'N/A',
       metodoPago: selectedInvoice.value.payment_method || 'Efectivo',
       items: (selectedInvoice.value.items || []).length,
-      // 🔥 Validación de datos de contacto para envíos
+      // Validación de datos de contacto para envíos
       tieneEmail: !!(selectedInvoice.value.customer_email || selectedInvoice.value.email),
       tieneTelefono: !!(selectedInvoice.value.customer_phone || selectedInvoice.value.phone),
       email: selectedInvoice.value.customer_email || selectedInvoice.value.email || null,
@@ -2035,12 +2027,12 @@ const updateScreenContextForAI = () => {
       enviarWhatsApp: selectedInvoice.value 
         ? (selectedInvoice.value.customer_phone || selectedInvoice.value.phone 
             ? 'Puedes enviar por WhatsApp - el cliente tiene teléfono registrado'
-            : '⚠️ El cliente NO tiene teléfono registrado. Pídele al usuario que ingrese el número manualmente o que actualice los datos del cliente primero')
+            : 'El cliente NO tiene teléfono registrado. Pídele al usuario que ingrese el número manualmente o que actualice los datos del cliente primero')
         : 'Primero debes seleccionar una factura',
       enviarEmail: selectedInvoice.value 
         ? (selectedInvoice.value.customer_email || selectedInvoice.value.email 
             ? 'Puedes enviar por Email - el cliente tiene email registrado'
-            : '⚠️ El cliente NO tiene email registrado. Pídele al usuario que ingrese el email manualmente o que actualice los datos del cliente primero')
+            : 'El cliente NO tiene email registrado. Pídele al usuario que ingrese el email manualmente o que actualice los datos del cliente primero')
         : 'Primero debes seleccionar una factura'
     }
   }
@@ -2054,13 +2046,13 @@ onMounted(() => {
   document.addEventListener('click', closeActionsMenu)
   document.addEventListener('keydown', handleKeyDown)
   
-  // 🧠 Establecer módulo actual para la IA
+  // Establecer módulo actual para la IA
   uiContext.setCurrentModule('invoices')
   
-  // 🧠 Inicializar contexto de pantalla para IA
+  // Inicializar contexto de pantalla para IA
   updateScreenContextForAI()
   
-  // 🎯 Registrar callbacks de acciones para la IA de voz (mejorados con validación)
+  // Registrar callbacks de acciones para la IA de voz (mejorados con validación)
   uiContext.registerAction('sendEmail', async () => {
     if (!selectedInvoice.value) {
       return { success: false, message: 'No hay factura seleccionada. Primero selecciona una factura de la lista.' }
@@ -2109,7 +2101,7 @@ onMounted(() => {
     return { success: true, message: 'Documento listo para imprimir' }
   })
   
-  // 🧾 Seleccionar factura por número o posición
+  // Seleccionar factura por número o posición
   uiContext.registerAction('seleccionarFactura', async ({ numero, posicion }) => {
     const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
     
@@ -2166,7 +2158,7 @@ onMounted(() => {
     return { success: false, message: 'No encontré esa factura. ¿Podrías darme el número exacto o el nombre del cliente?' }
   })
   
-  // 🧾 Consultar facturas de hoy
+  // Consultar facturas de hoy
   uiContext.registerAction('consultarFacturasHoy', async () => {
     const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
     // Usar fecha local, no UTC
@@ -2183,7 +2175,7 @@ onMounted(() => {
     }
     
     const total = facturasHoy.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
-    let mensaje = `📋 Hoy tienes ${facturasHoy.length} factura${facturasHoy.length > 1 ? 's' : ''} por ${formatMoney(total)}:\n\n`
+    let mensaje = `Hoy tienes ${facturasHoy.length} factura${facturasHoy.length > 1 ? 's' : ''} por ${formatMoney(total)}:\n\n`
     
     facturasHoy.slice(0, 5).forEach((f, i) => {
       const num = f.invoice_number || f.number || `FV-${f.id}`
@@ -2197,7 +2189,7 @@ onMounted(() => {
     return { success: true, message: mensaje }
   })
   
-  // 🧾 Ver primera o última factura
+  // Ver primera o última factura
   uiContext.registerAction('consultarFacturaEspecial', async ({ tipo, periodo }) => {
     const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
     
@@ -2251,14 +2243,14 @@ onMounted(() => {
       
       return { 
         success: true, 
-        message: `📄 La factura ${descripcion} es la ${num}:\n• Cliente: ${factura.customer_name || 'Cliente General'}\n• Total: ${formatMoney(factura.total)}\n• Fecha: ${fecha}\n• Estado: ${factura.status}\n• Vendedor: ${factura.seller_name || 'N/A'}\n\nYa la seleccioné por si quieres hacer algo con ella.`
+        message: `La factura ${descripcion} es la ${num}:\n• Cliente: ${factura.customer_name || 'Cliente General'}\n• Total: ${formatMoney(factura.total)}\n• Fecha: ${fecha}\n• Estado: ${factura.status}\n• Vendedor: ${factura.seller_name || 'N/A'}\n\nYa la seleccioné por si quieres hacer algo con ella.`
       }
     }
     
     return { success: false, message: 'No encontré facturas.' }
   })
   
-  // 🧾 Buscar facturas por cliente
+  // Buscar facturas por cliente
   uiContext.registerAction('buscarFacturasPorCliente', async ({ cliente }) => {
     const formatMoney = (n) => `$${(parseFloat(n) || 0).toLocaleString('es-CO', { maximumFractionDigits: 0 })}`
     
@@ -2277,7 +2269,7 @@ onMounted(() => {
     }
     
     const total = facturasCliente.reduce((sum, f) => sum + parseFloat(f.total || 0), 0)
-    let mensaje = `📋 Encontré ${facturasCliente.length} factura${facturasCliente.length > 1 ? 's' : ''} de "${cliente}" por ${formatMoney(total)} total:\n\n`
+    let mensaje = `Encontré ${facturasCliente.length} factura${facturasCliente.length > 1 ? 's' : ''} de "${cliente}" por ${formatMoney(total)} total:\n\n`
     
     facturasCliente.slice(0, 5).forEach((f, i) => {
       const num = f.invoice_number || f.number || `FV-${f.id}`
@@ -2299,12 +2291,12 @@ onMounted(() => {
   // NO seleccionar automáticamente - dejar en blanco para que el usuario elija
 })
 
-// 🧠 Watcher para actualizar contexto cuando cambien las facturas
+// Watcher para actualizar contexto cuando cambien las facturas
 watch(() => props.invoices.length, () => {
   updateScreenContextForAI()
 })
 
-// 🧠 Watcher para actualizar contexto cuando cambie la factura seleccionada
+// Watcher para actualizar contexto cuando cambie la factura seleccionada
 watch(selectedInvoice, () => {
   updateScreenContextForAI()
 })

@@ -30,13 +30,13 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       discount = 0,
       tax = 0,
       tax_amount = tax,
-      surcharge_amount = 0, // 🎯 Recargo por crédito
+      surcharge_amount = 0, // Recargo por crédito
       total = 0,
       payments = [],
       change = 0,
       notes = '',
       payment_method = '', // Para saber si es crédito
-      // 🎫 FACTURACIÓN ELECTRÓNICA DIAN
+      // FACTURACIÓN ELECTRÓNICA DIAN
       cufe = '',
       factus_number = '',
       qr_code = '', // URL del QR de la DIAN
@@ -58,28 +58,15 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     const taxLabel = systemSettings.iva_display_name || 'IVA'
     const taxRate = systemSettings.iva_percentage || 19
 
-    // 🎨 TEMPLATE SELECCIONADO (classic, modern, minimal)
+    // TEMPLATE SELECCIONADO (classic, modern, minimal)
     const selectedTemplate = systemSettings.invoice_template || 'classic'
     const style = getTemplateStyle(selectedTemplate)
 
-    console.log(`📄 Generando factura con template: ${selectedTemplate.toUpperCase()}`)
-    console.log('📋 System Settings recibidos:', {
-      invoice_template: systemSettings.invoice_template,
-      qr_style: systemSettings.qr_style,
-      company_logo: systemSettings.company_logo ? 'SI' : 'NO',
-      invoice_footer_message: systemSettings.invoice_footer_message
-    })
 
-    // 🎫 Generar QR Code - Prioridad: DIAN (qr_code) > Número de factura
+    // Generar QR Code - Prioridad: DIAN (qr_code) > Número de factura
     // Si hay qr_code de la DIAN (Alanube/Factus), usarlo para el QR real
     const qrContent = qr_code || invoiceCode
     const isDianQR = !!qr_code // Indica si es QR validado por DIAN
-    
-    console.log('🔍 QR Info:', {
-      hasQrCode: !!qr_code,
-      qrContentPreview: qrContent.substring(0, 50) + '...',
-      isDianQR
-    })
     
     const qrDataURL = await QRCode.toDataURL(qrContent, {
       width: 120, // Mayor resolución para QR de DIAN (más datos)
@@ -163,7 +150,6 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
           img.src = companyLogo
         })
       } catch (err) {
-        console.log('No se pudo cargar el logo', err)
       }
     }
 
@@ -548,7 +534,7 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
       yPos += 4
     }
 
-    // 🎯 RECARGO POR CRÉDITO (si aplica) - Destacado en ámbar
+    // RECARGO POR CRÉDITO (si aplica) - Destacado en ámbar
     if (surcharge_amount > 0) {
       // Calcular porcentaje de recargo
       const surchargePercent = subtotal > 0 ? Math.round((surcharge_amount / subtotal) * 100) : 13
@@ -697,7 +683,7 @@ export const createInvoiceTemplate = async (invoiceData, systemSettings = {}) =>
     const qrSize = 22 // Más compacto
     const qrX = (pageWidth - qrSize) / 2
 
-    // 🎫 Determinar si es CUFE real de DIAN o CUFE local
+    // Determinar si es CUFE real de DIAN o CUFE local
     // Alanube: envía qr_code (contenido texto) - ya está codificado en qrDataURL
     // Factus: envía qr_image (base64 de imagen)
     const hasRealDianQrContent = qr_code && qr_code.includes('NumFac:') // Formato DIAN estándar

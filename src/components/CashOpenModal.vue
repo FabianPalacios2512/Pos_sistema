@@ -428,7 +428,7 @@ const loadWarehouses = async () => {
     
     // Si no hay bodegas, intentar crear una por defecto o mostrar error
     if (warehouses.value.length === 0) {
-      console.error('⚠️ No hay bodegas disponibles')
+      console.error('No hay bodegas disponibles')
       showToast('No hay tiendas/bodegas configuradas', 'error')
       return
     }

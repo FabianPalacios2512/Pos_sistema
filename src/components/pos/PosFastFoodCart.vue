@@ -1,12 +1,12 @@
 <template>
-  <!-- 🍔 PANEL DE PEDIDO - Diseño Profesional Premium -->
+  <!-- PANEL DE PEDIDO - Diseño Profesional Premium -->
   <div class="flex flex-col overflow-hidden rounded-2xl border shadow-lg dark:shadow-xl dark:shadow-black/40 transition-all duration-300"
        :class="cartItems.length > 0 
          ? 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-700' 
          : 'bg-gray-50 dark:bg-zinc-900/80 border-gray-100 dark:border-zinc-800'"
        style="height: 100%; max-height: 100%;">
     
-    <!-- 🏷️ HEADER -->
+    <!-- HEADER -->
     <div class="flex-shrink-0 px-4 pt-4 pb-3 border-b"
          :class="cartItems.length > 0 
            ? 'bg-white dark:bg-zinc-900 border-gray-100 dark:border-zinc-800' 
@@ -167,7 +167,7 @@
       </div>
     </div>
     
-    <!-- 💳 SECCION DE PAGO -->
+    <!-- SECCION DE PAGO -->
     <div class="flex-shrink-0 border-t"
          :class="cartItems.length > 0 
            ? 'bg-white dark:bg-zinc-900 border-gray-100 dark:border-zinc-800' 

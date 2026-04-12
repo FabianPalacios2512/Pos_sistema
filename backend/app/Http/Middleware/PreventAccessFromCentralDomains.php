@@ -22,11 +22,9 @@ class PreventAccessFromCentralDomains extends BasePreventAccessFromCentralDomain
     {
         // Si la ruta está marcada como exempt, saltar validación
         if ($request->attributes->get('tenancy_exempt')) {
-            \Log::info('PreventAccessFromCentralDomains: Skipping validation for exempt route', ['path' => $request->path()]);
             return $next($request);
         }
 
-        \Log::info('PreventAccessFromCentralDomains: Validating', ['path' => $request->path()]);
         // Caso contrario, ejecutar validación normalmente
         return parent::handle($request, $next);
     }

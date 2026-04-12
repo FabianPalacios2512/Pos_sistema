@@ -345,7 +345,7 @@ const message = ref({ text: '', type: '' })
 const imageLoaded = ref(false)
 const radioOpen = ref(false)
 
-// 📧 Paso 1: Solicitar código
+// Paso 1: Solicitar código
 const requestReset = async () => {
   loading.value = true
   message.value = { text: '', type: '' }
@@ -375,7 +375,7 @@ const requestReset = async () => {
   }
 }
 
-// ✅ Paso 2: Validar código
+// Paso 2: Validar código
 const validateCode = async () => {
   loading.value = true
   message.value = { text: '', type: '' }
@@ -406,7 +406,7 @@ const validateCode = async () => {
   }
 }
 
-// 🔄 Paso 3: Cambiar contraseña
+// Paso 3: Cambiar contraseña
 const resetPassword = async () => {
   if (password.value !== passwordConfirmation.value) {
     message.value = {

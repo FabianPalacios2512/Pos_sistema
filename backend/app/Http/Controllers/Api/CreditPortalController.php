@@ -324,12 +324,6 @@ class CreditPortalController extends Controller
             $catalogActive = $catalogConfig ? (bool) $catalogConfig->store_active : false;
             
             // 🐛 DEBUG temporal
-            Log::info('🛒 CATALOG CHECK', [
-                'tenant_id' => tenant('id'),
-                'config_found' => $catalogConfig ? 'YES' : 'NO',
-                'store_active_value' => $catalogConfig ? $catalogConfig->store_active : null,
-                'catalog_active_result' => $catalogActive
-            ]);
         } catch (\Exception $e) {
             // Si no existe la tabla o hay error, dejar en false
             Log::error('Error checking catalog: ' . $e->getMessage());

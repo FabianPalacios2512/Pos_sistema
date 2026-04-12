@@ -45,7 +45,7 @@
           <!-- Botón Principal -->
           <button @click="openCreateUserModal()"
                   :disabled="!canCreateMoreUsers"
-                  class="px-4 py-2 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-semibold transition-colors duration-150 flex items-center gap-2">
+                  class="px-4 py-2 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-sm font-semibold transition-colors duration-150 flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -64,7 +64,7 @@
             @click="selectDatePreset(preset.key)"
             class="px-3 py-1.5 text-xs font-semibold border transition-colors duration-150 uppercase tracking-wide"
             :class="activeDatePreset === preset.key
-              ? 'bg-gray-900 dark:bg-zinc-200 text-white dark:text-gray-900 border-gray-900 dark:border-zinc-200'
+              ? 'bg-gray-900 dark:bg-zinc-200 text-white dark:text-zinc-900 border-gray-900 dark:border-zinc-200'
               : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700'">
             {{ preset.label }}
           </button>
@@ -1455,13 +1455,13 @@ const loadWarehouses = async () => {
 
 // Usuarios
 const openCreateUserModal = () => {
-  // 🔒 VALIDACIÓN DE PLAN: Verificar si puede crear más usuarios
+  // VALIDACIÓN DE PLAN: Verificar si puede crear más usuarios
   if (!canCreateMoreUsers.value) {
     const planName = currentPlan.value === 'free_trial' ? 'Prueba Gratuita' : 
                      currentPlan.value === 'basic' ? 'Básico' :
                      currentPlan.value === 'pro' || currentPlan.value === 'premium' ? 'Premium' : 
                      'Enterprise'
-    alert(`⚠️ Has alcanzado el límite de ${maxUsersAllowed.value} usuarios para el plan ${planName}.\n\n💎 Actualiza tu plan para agregar más usuarios.`)
+    alert(`Has alcanzado el límite de ${maxUsersAllowed.value} usuarios para el plan ${planName}.\n\nActualiza tu plan para agregar más usuarios.`)
     return
   }
   
@@ -1470,9 +1470,9 @@ const openCreateUserModal = () => {
 }
 
 const openEditUserModal = (user) => {
-  // 🔒 PROTECCIÓN: No permitir editar el usuario administrador inicial
+  // PROTECCIÓN: No permitir editar el usuario administrador inicial
   if (user.role_id === 1) {
-    alert('⚠️ El usuario Administrador principal no puede ser editado por seguridad del sistema')
+    alert('El usuario Administrador principal no puede ser editado por seguridad del sistema')
     return
   }
   
@@ -1492,27 +1492,27 @@ const saveUser = async (userData) => {
     if (selectedUser.value) {
       // Editar usuario existente
       await usersService.updateUser(selectedUser.value.id, userData)
-      alert('✅ Usuario actualizado exitosamente')
+      alert('Usuario actualizado exitosamente')
     } else {
       // Crear nuevo usuario
       await usersService.createUser(userData)
-      alert('✅ Usuario creado exitosamente')
+      alert('Usuario creado exitosamente')
     }
     
     await loadUsers()
     closeUserModal()
   } catch (error) {
     console.error('Error guardando usuario:', error)
-    alert('❌ Error al guardar el usuario')
+    alert('Error al guardar el usuario')
   } finally {
     loading.value = false
   }
 }
 
 const deleteUser = async (user) => {
-  // 🔒 PROTECCIÓN: No permitir eliminar el usuario administrador inicial
+  // PROTECCIÓN: No permitir eliminar el usuario administrador inicial
   if (user.role_id === 1) {
-    alert('⚠️ El usuario Administrador principal no puede ser eliminado por seguridad del sistema')
+    alert('El usuario Administrador principal no puede ser eliminado por seguridad del sistema')
     return
   }
   
@@ -1523,31 +1523,31 @@ const deleteUser = async (user) => {
   try {
     loading.value = true
     await usersService.deleteUser(user.id)
-    alert('✅ Usuario eliminado exitosamente')
+    alert('Usuario eliminado exitosamente')
     await loadUsers()
   } catch (error) {
     console.error('Error eliminando usuario:', error)
-    alert('❌ Error al eliminar el usuario')
+    alert('Error al eliminar el usuario')
   } finally {
     loading.value = false
   }
 }
 
 const toggleUserStatus = async (user) => {
-  // 🔒 PROTECCIÓN: No permitir desactivar el usuario administrador inicial
+  // PROTECCIÓN: No permitir desactivar el usuario administrador inicial
   if (user.role_id === 1) {
-    alert('⚠️ El usuario Administrador principal no puede ser desactivado por seguridad del sistema')
+    alert('El usuario Administrador principal no puede ser desactivado por seguridad del sistema')
     return
   }
   
   try {
     loading.value = true
     await usersService.toggleStatus(user.id)
-    alert(`✅ Usuario ${user.active ? 'desactivado' : 'activado'} exitosamente`)
+    alert(`Usuario ${user.active ? 'desactivado' : 'activado'} exitosamente`)
     await loadUsers()
   } catch (error) {
     console.error('Error cambiando estado del usuario:', error)
-    alert('❌ Error al cambiar el estado')
+    alert('Error al cambiar el estado')
   } finally {
     loading.value = false
   }
@@ -1569,11 +1569,11 @@ const savePassword = async (passwordData) => {
   try {
     loading.value = true
     await usersService.changePassword(selectedUser.value.id, passwordData)
-    alert('✅ Contraseña actualizada exitosamente')
+    alert('Contraseña actualizada exitosamente')
     closePasswordModal()
   } catch (error) {
     console.error('Error cambiando contraseña:', error)
-    alert('❌ Error al cambiar la contraseña')
+    alert('Error al cambiar la contraseña')
   } finally {
     loading.value = false
   }

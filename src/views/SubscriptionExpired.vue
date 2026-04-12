@@ -94,33 +94,28 @@ onMounted(async () => {
     delete window.__redirecting_to_expired
   }
   
-  // 🔥 CRÍTICO: Obtener tenant_id REAL desde el backend
+  // CRÍTICO: Obtener tenant_id REAL desde el backend
   try {
-    console.log('🔍 Obteniendo tenant_id desde /tenant-info...')
     const response = await apiClient.get('/tenant-info')
     
     if (response.data.success && response.data.tenant_id) {
       localStorage.setItem('expiredTenantId', response.data.tenant_id)
-      console.log('💾 TenantId guardado desde backend:', response.data.tenant_id)
-      
       // También guardar el nombre del negocio si está disponible
       if (response.data.business_name) {
         localStorage.setItem('business_name', response.data.business_name)
       }
     } else {
-      console.error('❌ No se pudo obtener tenant_id del backend')
+      console.error('No se pudo obtener tenant_id del backend')
       // Fallback: intentar desde appStore
       if (appStore.tenant?.id && appStore.tenant.id !== 'unknown') {
         localStorage.setItem('expiredTenantId', appStore.tenant.id)
-        console.log('💾 TenantId guardado desde appStore (fallback):', appStore.tenant.id)
       }
     }
   } catch (error) {
-    console.error('❌ Error obteniendo tenant_id:', error)
+    console.error('Error obteniendo tenant_id:', error)
     // Último recurso: intentar desde appStore
     if (appStore.tenant?.id && appStore.tenant.id !== 'unknown') {
       localStorage.setItem('expiredTenantId', appStore.tenant.id)
-      console.log('💾 TenantId guardado desde appStore (error fallback):', appStore.tenant.id)
     }
   }
 })

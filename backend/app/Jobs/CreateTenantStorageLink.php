@@ -55,19 +55,13 @@ class CreateTenantStorageLink implements ShouldQueue
     {
         $tenantId = $this->tenant->getTenantKey();
         
-        Log::info("🔗 [Tenant Storage] Creando symlink para tenant: {$tenantId}");
-        
         try {
-            // Ruta del storage del tenant (donde se guardan realmente los archivos)
             $tenantStoragePath = storage_path("tenant{$tenantId}/app/public");
             
-            // Asegurar que el directorio del tenant exista
             if (!is_dir($tenantStoragePath)) {
                 File::makeDirectory($tenantStoragePath, 0755, true);
-                Log::info("📁 [Tenant Storage] Directorio creado: {$tenantStoragePath}");
             }
             
-            // Crear subdirectorios necesarios
             $subdirs = ['products', 'logos', 'temp'];
             foreach ($subdirs as $subdir) {
                 $subdirPath = "{$tenantStoragePath}/{$subdir}";
@@ -76,10 +70,6 @@ class CreateTenantStorageLink implements ShouldQueue
                 }
             }
             
-            // ========================================
-            // SYMLINK: storage/app/public/tenants/{tenant_id}
-            // Apunta a: storage/tenant{tenant_id}/app/public
-            // ========================================
             $storageTenantsDir = storage_path('app/public/tenants');
             if (!is_dir($storageTenantsDir)) {
                 File::makeDirectory($storageTenantsDir, 0755, true);
@@ -87,43 +77,27 @@ class CreateTenantStorageLink implements ShouldQueue
             
             $symlinkPath = "{$storageTenantsDir}/{$tenantId}";
             
-            // Si ya existe como directorio, eliminarlo primero
             if (is_dir($symlinkPath) && !is_link($symlinkPath)) {
-                Log::warning("⚠️ [Tenant Storage] Eliminando directorio existente: {$symlinkPath}");
                 File::deleteDirectory($symlinkPath);
             }
             
-            // Si ya existe como symlink roto, eliminarlo
             if (is_link($symlinkPath) && !file_exists($symlinkPath)) {
-                Log::warning("⚠️ [Tenant Storage] Eliminando symlink roto: {$symlinkPath}");
                 unlink($symlinkPath);
             }
             
-            // Crear el symlink si no existe
             if (!is_link($symlinkPath)) {
-                if (@symlink($tenantStoragePath, $symlinkPath)) {
-                    Log::info("✅ [Tenant Storage] Symlink creado: {$symlinkPath} -> {$tenantStoragePath}");
-                } else {
-                    Log::warning("⚠️ [Tenant Storage] No se pudo crear symlink: {$symlinkPath}");
+                if (!@symlink($tenantStoragePath, $symlinkPath)) {
+                    Log::warning("[Tenant Storage] No se pudo crear symlink: {$symlinkPath}");
                 }
-            } else {
-                Log::info("ℹ️ [Tenant Storage] Symlink ya existe: {$symlinkPath}");
             }
             
-            // ========================================
-            // VERIFICAR symlink principal public/storage
-            // ========================================
             $publicStoragePath = public_path('storage');
-            
             if (!is_link($publicStoragePath)) {
-                Log::warning("⚠️ [Tenant Storage] public/storage no es un symlink. Ejecutar: php artisan storage:link");
+                Log::warning("[Tenant Storage] public/storage no es un symlink. Ejecutar: php artisan storage:link");
             }
-            
-            Log::info("🎉 [Tenant Storage] Symlinks configurados exitosamente para: {$tenantId}");
             
         } catch (\Exception $e) {
-            Log::error("❌ [Tenant Storage] Error creando symlinks para tenant {$tenantId}: {$e->getMessage()}");
-            // No lanzar excepción para no detener la creación del tenant
+            Log::error("[Tenant Storage] Error creando symlinks para tenant {$tenantId}: {$e->getMessage()}");
         }
     }
 }

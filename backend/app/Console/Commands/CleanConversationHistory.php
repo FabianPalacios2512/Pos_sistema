@@ -55,7 +55,6 @@ class CleanConversationHistory extends Command
                         $totalDeleted += $deleted;
                         $tenantsProcessed++;
                         $this->line("  ✅ Tenant {$tenant->id}: {$deleted} registros eliminados");
-                        Log::info("[CleanConversationHistory] Tenant {$tenant->id}: {$deleted} conversaciones eliminadas");
                     }
 
                 } catch (\Exception $e) {

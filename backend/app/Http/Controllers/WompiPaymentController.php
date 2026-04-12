@@ -66,7 +66,6 @@ class WompiPaymentController extends Controller
                 $paymentData['customer_data'] = $validated['customer_data'];
             }
 
-            Log::info('Wompi: Creando transacción', $paymentData);
 
             return response()->json([
                 'success' => true,
@@ -105,14 +104,6 @@ class WompiPaymentController extends Controller
             $redirectUrl = $validated['redirect_url'] ?? config('app.url') . '/payment/success';
 
             // 🔍 Log para debug
-            Log::info('Wompi: Creando link de pago', [
-                'redirect_url' => $redirectUrl,
-                'amount_in_cents' => $validated['amount_in_cents'],
-                'reference' => $validated['reference'],
-                'payment_frequency' => $validated['payment_frequency'],
-                'plan' => $validated['plan'],
-                'tenant_id' => $validated['tenant_id'],
-            ]);
 
             // Crear transacción
             $response = Http::withHeaders([
@@ -130,7 +121,6 @@ class WompiPaymentController extends Controller
 
             if ($response->successful()) {
                 $data = $response->json();
-                Log::info('Wompi: Link de pago creado', $data);
 
                 // Wompi devuelve el ID del payment link, construimos la URL
                 $paymentLinkId = $data['data']['id'];
@@ -148,11 +138,6 @@ class WompiPaymentController extends Controller
                     'status' => 'pending',
                 ]);
 
-                Log::info('Wompi: Pending payment guardado', [
-                    'reference' => $validated['reference'],
-                    'payment_frequency' => $validated['payment_frequency'],
-                    'plan' => $validated['plan'],
-                ]);
 
                 return response()->json([
                     'success' => true,
@@ -193,11 +178,6 @@ class WompiPaymentController extends Controller
             $event = $request->input('event');
             $data = $request->input('data');
 
-            Log::info('Wompi Webhook recibido', [
-                'event' => $event,
-                'transaction_id' => $data['transaction']['id'] ?? null,
-                'status' => $data['transaction']['status'] ?? null,
-            ]);
 
             // Procesar según el tipo de evento
             switch ($event) {
@@ -206,7 +186,6 @@ class WompiPaymentController extends Controller
                     break;
 
                 default:
-                    Log::info('Evento Wompi no manejado: ' . $event);
             }
 
             return response()->json(['success' => true]);
@@ -226,11 +205,6 @@ class WompiPaymentController extends Controller
         $reference = $transaction['reference'];
         $status = $transaction['status'];
 
-        Log::info('Transacción actualizada', [
-            'reference' => $reference,
-            'status' => $status,
-            'payment_method_type' => $transaction['payment_method_type'] ?? null,
-        ]);
 
         // 🔥 BUSCAR datos del pago pendiente para obtener payment_frequency y plan
         $pendingPayment = \App\Models\PendingPayment::where('reference', $reference)->first();
@@ -240,11 +214,6 @@ class WompiPaymentController extends Controller
             return;
         }
 
-        Log::info('Wompi: Pending payment encontrado', [
-            'tenant_id' => $pendingPayment->tenant_id,
-            'plan' => $pendingPayment->plan,
-            'payment_frequency' => $pendingPayment->payment_frequency,
-        ]);
 
         if ($status === 'APPROVED') {
             // 🔥 Activar plan con la duración correcta según payment_frequency
@@ -287,13 +256,6 @@ class WompiPaymentController extends Controller
             $tenant->subscription_ends_at = $subscriptionEndsAt;
             $tenant->save();
 
-            Log::info('✅ Plan activado correctamente', [
-                'tenant_id' => $pendingPayment->tenant_id,
-                'plan' => $pendingPayment->plan,
-                'payment_frequency' => $pendingPayment->payment_frequency,
-                'subscription_ends_at' => $subscriptionEndsAt->toDateTimeString(),
-                'transaction_id' => $transaction['id'] ?? null,
-            ]);
 
         } catch (\Exception $e) {
             Log::error('Error activando plan: ' . $e->getMessage(), [
@@ -323,7 +285,6 @@ class WompiPaymentController extends Controller
 
             // Si falla, podría ser una referencia, intentar buscar por referencia
             if ($response->status() === 404) {
-                Log::info('Transacción no encontrada por ID, buscando por referencia: ' . $transactionId);
 
                 return response()->json([
                     'success' => false,

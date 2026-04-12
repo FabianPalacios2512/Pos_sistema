@@ -293,7 +293,7 @@ const handleSubmit = async () => {
   }
 }
 
-// 🤖 Exponer form y métodos para que la IA pueda llenar campos
+// Exponer form y métodos para que la IA pueda llenar campos
 const setFieldValue = (campo, valor) => {
   const campoMap = {
     'name': 'name',

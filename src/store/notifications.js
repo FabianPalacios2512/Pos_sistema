@@ -111,27 +111,24 @@ export const notificationStore = {
     await this.loadCounts()
   },
 
-  // 🔥 NUEVO: Polling automático cada 30 segundos para detectar cambios
+  // NUEVO: Polling automático cada 30 segundos para detectar cambios
   startPolling(intervalMs = 30000) {
     this.stopPolling() // Detener cualquier polling anterior
     
     pollingInterval = setInterval(async () => {
       try {
         await this.loadCounts()
-        console.log('📡 Notificaciones actualizadas automáticamente')
       } catch (error) {
         console.error('Error en polling de notificaciones:', error)
       }
     }, intervalMs)
     
-    console.log(`🔄 Polling de notificaciones iniciado cada ${intervalMs/1000}s`)
   },
 
   stopPolling() {
     if (pollingInterval) {
       clearInterval(pollingInterval)
       pollingInterval = null
-      console.log('⏹️ Polling de notificaciones detenido')
     }
   }
 }

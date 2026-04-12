@@ -28,7 +28,7 @@
             
             <button
               @click="openCreateModal"
-              class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
+              class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
               </svg>
@@ -49,7 +49,7 @@
             
             <button
               @click="openTransferModal"
-              class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
+              class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
               </svg>
@@ -527,7 +527,7 @@
             </button>
             <button 
               @click="goToPlans"
-              class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center space-x-2">
+              class="px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center space-x-2">
               <span>Ver Planes</span>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -687,7 +687,7 @@ const viewInventory = async (warehouse) => {
     const data = await warehouseService.getInventory(warehouse.id)
     const totalProducts = data.summary?.total_products || 0
     const totalStock = data.summary?.total_stock || 0
-    alert(`📦 Inventario de ${warehouse.name}\n\n` +
+    alert(`Inventario de ${warehouse.name}\n\n` +
           `Total de productos: ${totalProducts}\n` +
           `Stock total: ${totalStock} unidades\n\n` +
           `(Vista detallada en desarrollo)`)

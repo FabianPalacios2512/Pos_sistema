@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-lg w-full animate-scale-in border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div class="bg-white dark:bg-zinc-800 rounded-3xl shadow-2xl max-w-lg w-full animate-scale-in border border-gray-100 dark:border-zinc-700 overflow-hidden">
       
       <!-- Header Mejorado -->
       <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white">
@@ -45,7 +45,7 @@
               'flex flex-col items-center p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1',
               selectedMethod === method.id 
                 ? 'border-green-500 bg-green-50 dark:bg-green-900/20 shadow-lg scale-105' 
-                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                : 'border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-gray-600'
             ]"
           >
             <div :class="[
@@ -57,7 +57,7 @@
             </div>
             <div class="text-center">
               <h5 class="font-semibold text-gray-900 dark:text-white">{{ method.name }}</h5>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ method.description }}</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">{{ method.description }}</p>
             </div>
             <div v-if="selectedMethod === method.id" class="mt-2">
               <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
@@ -71,7 +71,7 @@
 
         <!-- Campo de Monto Mejorado (para efectivo) -->
         <div v-if="selectedMethod === 'cash'" class="mb-6 animate-slide-down">
-          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+          <label class="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3 flex items-center">
             <svg class="w-4 h-4 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
             </svg>
@@ -79,7 +79,7 @@
           </label>
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <span class="text-gray-500 dark:text-gray-400 text-xl font-bold">$</span>
+              <span class="text-gray-500 dark:text-zinc-400 text-xl font-bold">$</span>
             </div>
             <input
               v-model.number="amountReceived"
@@ -87,7 +87,7 @@
               step="0.01"
               min="0"
               placeholder="0.00"
-              class="block w-full pl-10 pr-4 py-4 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-xl font-semibold shadow-sm transition-all duration-200"
+              class="block w-full pl-10 pr-4 py-4 border border-gray-300 dark:border-zinc-600 rounded-2xl bg-white dark:bg-zinc-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-xl font-semibold shadow-sm transition-all duration-200"
               @focus="$event.target.select()"
             />
           </div>
@@ -112,7 +112,7 @@
 
           <!-- Botones de Monto Rápido Mejorados -->
           <div class="mt-6">
-            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+            <p class="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3 flex items-center">
               <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
               </svg>
@@ -173,7 +173,7 @@
         </div>
 
         <!-- Resumen Mejorado -->
-        <div class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 mb-6 border border-gray-200 dark:border-gray-700">
+        <div class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 mb-6 border border-gray-200 dark:border-zinc-700">
           <h5 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
             <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -182,14 +182,14 @@
           </h5>
           <div class="space-y-3">
             <div class="flex justify-between items-center text-base">
-              <span class="text-gray-600 dark:text-gray-400">Subtotal:</span>
+              <span class="text-gray-600 dark:text-zinc-400">Subtotal:</span>
               <span class="font-semibold text-gray-900 dark:text-white">${{ (total / 1.19).toFixed(2) }}</span>
             </div>
             <div class="flex justify-between items-center text-base">
-              <span class="text-gray-600 dark:text-gray-400">IVA (19%):</span>
+              <span class="text-gray-600 dark:text-zinc-400">IVA (19%):</span>
               <span class="font-semibold text-gray-900 dark:text-white">${{ (total - (total / 1.19)).toFixed(2) }}</span>
             </div>
-            <div class="border-t border-gray-300 dark:border-gray-600 pt-3">
+            <div class="border-t border-gray-300 dark:border-zinc-600 pt-3">
               <div class="flex justify-between items-center text-xl font-bold">
                 <span class="text-gray-900 dark:text-white">Total a pagar:</span>
                 <span class="text-green-600 dark:text-green-400">${{ total.toFixed(2) }}</span>
@@ -200,7 +200,7 @@
       </div>
 
       <!-- Footer Mejorado -->
-      <div class="p-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <div class="p-6 bg-gray-50 dark:bg-zinc-800 border-t border-gray-200 dark:border-zinc-700">
         <div class="flex space-x-4">
           <button
             @click="$emit('close')"
@@ -218,7 +218,7 @@
               'flex-1 px-6 py-4 font-semibold rounded-2xl transition-all duration-200 shadow-md hover:shadow-lg transform flex items-center justify-center',
               canProcessPayment && !processing
                 ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white hover:-translate-y-0.5'
-                : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                : 'bg-gray-300 dark:bg-zinc-700 text-gray-500 dark:text-zinc-400 cursor-not-allowed'
             ]"
           >
             <svg v-if="processing" class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">

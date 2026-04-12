@@ -2,7 +2,7 @@
   <div class="space-y-6">
 
     <!-- Encabezado -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-700 p-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <div>
           <h2 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
@@ -11,7 +11,7 @@
             </svg>
             Gestión de Roles y Permisos
           </h2>
-          <p class="text-gray-600 dark:text-gray-400 mt-1">
+          <p class="text-gray-600 dark:text-zinc-400 mt-1">
             Crear roles personalizados y asignar permisos específicos para cada módulo del sistema
           </p>
         </div>
@@ -100,36 +100,36 @@
     </div>
 
     <!-- Lista de Roles -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-700 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-700">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Roles del Sistema</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <p class="text-sm text-gray-600 dark:text-zinc-400 mt-1">
           Gestiona los roles y sus permisos de acceso a los módulos
         </p>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-900">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-zinc-700">
+          <thead class="bg-gray-50 dark:bg-zinc-900">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                 Rol
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                 Usuarios Asignados
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                 Permisos
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                 Estado
               </th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody class="bg-white dark:bg-zinc-800 divide-y divide-gray-200 dark:divide-zinc-700">
             <tr
               v-for="role in roles"
               :key="role.id"
@@ -146,7 +146,7 @@
                     <div class="text-sm font-medium text-gray-900 dark:text-white">
                       {{ role.name }}
                     </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                    <div class="text-sm text-gray-500 dark:text-zinc-400">
                       {{ role.description }}
                     </div>
                   </div>
@@ -159,7 +159,7 @@
                   <span class="text-sm font-medium text-gray-900 dark:text-white">
                     {{ role.users_count }}
                   </span>
-                  <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                  <span class="ml-2 text-xs text-gray-500 dark:text-zinc-400">
                     {{ role.users_count === 1 ? 'usuario' : 'usuarios' }}
                   </span>
                 </div>
@@ -183,7 +183,7 @@
                     </span>
                     <span
                       v-if="role.permissions.length > 3"
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400"
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-zinc-900/30 dark:text-zinc-400"
                     >
                       +{{ role.permissions.length - 3 }} más
                     </span>
@@ -272,12 +272,12 @@
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
       @click.self="closeRoleModal"
     >
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-4 border-b border-gray-200 dark:border-zinc-700">
           <h3 class="text-base font-semibold text-gray-900 dark:text-white">
             {{ editingRole ? 'Editar Rol' : 'Crear Nuevo Rol' }}
           </h3>
-          <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+          <p class="text-xs text-gray-600 dark:text-zinc-400 mt-1">
             Define el nombre, descripción y permisos del rol
           </p>
         </div>
@@ -286,23 +286,23 @@
           <!-- Información Básica -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
                 Nombre del Rol
               </label>
               <input
                 v-model="roleForm.name"
                 type="text"
                 placeholder="Ej: Cajero, Supervisor, etc."
-                class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                class="block w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
                 Estado
               </label>
               <select
                 v-model="roleForm.active"
-                class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                class="block w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               >
                 <option :value="true">Activo</option>
                 <option :value="false">Inactivo</option>
@@ -311,14 +311,14 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1">
               Descripción
             </label>
             <textarea
               v-model="roleForm.description"
               rows="2"
               placeholder="Describe las responsabilidades y alcance de este rol..."
-              class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              class="block w-full px-3 py-2 border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
             ></textarea>
           </div>
 
@@ -330,7 +330,7 @@
 
             <div class="space-y-4">
               <!-- Acceso Total -->
-              <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-purple-50 dark:bg-purple-900/20">
+              <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4 bg-purple-50 dark:bg-purple-900/20">
                 <label class="flex items-center cursor-pointer">
                   <input
                     v-model="hasFullAccess"
@@ -339,10 +339,10 @@
                     class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                   />
                   <span class="ml-3 text-sm font-medium text-gray-900 dark:text-white">
-                    🔓 Acceso Total al Sistema
+                    Acceso Total al Sistema
                   </span>
                 </label>
-                <p class="ml-7 text-xs text-gray-600 dark:text-gray-400 mt-1">
+                <p class="ml-7 text-xs text-gray-600 dark:text-zinc-400 mt-1">
                   Este rol tendrá todos los permisos disponibles
                 </p>
               </div>
@@ -351,9 +351,9 @@
               <template v-if="!hasFullAccess">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <!-- Módulo Dashboard -->
-                  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4">
                     <h5 class="font-medium text-gray-900 dark:text-white mb-3 text-sm flex items-center">
-                      📊 Dashboard
+                      Dashboard
                     </h5>
                     <div class="space-y-2">
                       <label class="flex items-center cursor-pointer">
@@ -363,7 +363,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Dashboard</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Dashboard</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -372,15 +372,15 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Analíticas</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Analíticas</span>
                       </label>
                     </div>
                   </div>
 
                   <!-- Módulo Productos -->
-                  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4">
                     <h5 class="font-medium text-gray-900 dark:text-white mb-3 text-sm flex items-center">
-                      📦 Productos
+                      Productos
                     </h5>
                     <div class="space-y-2">
                       <label class="flex items-center cursor-pointer">
@@ -390,7 +390,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Productos</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Productos</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -399,7 +399,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Crear Productos</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Crear Productos</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -408,7 +408,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Editar Productos</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Editar Productos</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -417,15 +417,15 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Eliminar Productos</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Eliminar Productos</span>
                       </label>
                     </div>
                   </div>
 
                   <!-- Módulo Ventas -->
-                  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4">
                     <h5 class="font-medium text-gray-900 dark:text-white mb-3 text-sm flex items-center">
-                      💰 Ventas
+                      Ventas
                     </h5>
                     <div class="space-y-2">
                       <label class="flex items-center cursor-pointer">
@@ -435,7 +435,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Ventas</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Ventas</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -444,7 +444,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Realizar Ventas</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Realizar Ventas</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -453,15 +453,15 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Procesar Devoluciones</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Procesar Devoluciones</span>
                       </label>
                     </div>
                   </div>
 
                   <!-- Módulo Clientes -->
-                  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4">
                     <h5 class="font-medium text-gray-900 dark:text-white mb-3 text-sm flex items-center">
-                      👥 Clientes
+                      Clientes
                     </h5>
                     <div class="space-y-2">
                       <label class="flex items-center cursor-pointer">
@@ -471,7 +471,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Clientes</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Clientes</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -480,7 +480,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Crear Clientes</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Crear Clientes</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -489,15 +489,15 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Editar Clientes</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Editar Clientes</span>
                       </label>
                     </div>
                   </div>
 
                   <!-- Módulo Inventario -->
-                  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4">
                     <h5 class="font-medium text-gray-900 dark:text-white mb-3 text-sm flex items-center">
-                      📋 Inventario
+                      Inventario
                     </h5>
                     <div class="space-y-2">
                       <label class="flex items-center cursor-pointer">
@@ -507,7 +507,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Inventario</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Inventario</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -516,15 +516,15 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ajustar Inventario</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ajustar Inventario</span>
                       </label>
                     </div>
                   </div>
 
                   <!-- Módulo Reportes -->
-                  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4">
                     <h5 class="font-medium text-gray-900 dark:text-white mb-3 text-sm flex items-center">
-                      📈 Reportes
+                      Reportes
                     </h5>
                     <div class="space-y-2">
                       <label class="flex items-center cursor-pointer">
@@ -534,7 +534,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Reportes</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Reportes</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -543,15 +543,15 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Reportes de Ventas</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Reportes de Ventas</span>
                       </label>
                     </div>
                   </div>
 
                   <!-- Módulo Administración -->
-                  <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="border border-gray-200 dark:border-zinc-700 rounded-lg p-4">
                     <h5 class="font-medium text-gray-900 dark:text-white mb-3 text-sm flex items-center">
-                      ⚙️ Administración
+                      Administración
                     </h5>
                     <div class="space-y-2">
                       <label class="flex items-center cursor-pointer">
@@ -561,7 +561,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Usuarios</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Usuarios</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -570,7 +570,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Crear Usuarios</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Crear Usuarios</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -579,7 +579,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Ver Roles</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Ver Roles</span>
                       </label>
                       <label class="flex items-center cursor-pointer">
                         <input
@@ -588,7 +588,7 @@
                           type="checkbox"
                           class="h-3 w-3 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                         />
-                        <span class="ml-2 text-xs text-gray-700 dark:text-gray-300">Crear Roles</span>
+                        <span class="ml-2 text-xs text-gray-700 dark:text-zinc-300">Crear Roles</span>
                       </label>
                     </div>
                   </div>
@@ -599,10 +599,10 @@
         </div>
 
         <!-- Botones del Modal -->
-        <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+        <div class="px-4 py-3 border-t border-gray-200 dark:border-zinc-700 flex justify-end space-x-3">
           <button
             @click="closeRoleModal"
-            class="px-3 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors text-sm"
+            class="px-3 py-2 text-gray-700 dark:text-zinc-300 bg-gray-100 dark:bg-zinc-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors text-sm"
           >
             Cancelar
           </button>
@@ -622,8 +622,8 @@
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
       @click.self="showDetailsModal = false"
     >
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full">
-        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div class="bg-white dark:bg-zinc-800 rounded-xl shadow-xl max-w-2xl w-full">
+        <div class="p-6 border-b border-gray-200 dark:border-zinc-700">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
             Detalles del Rol: {{ selectedRole.name }}
           </h3>
@@ -632,7 +632,7 @@
         <div class="p-6 space-y-4">
           <div>
             <h4 class="font-medium text-gray-900 dark:text-white mb-2">Descripción</h4>
-            <p class="text-gray-600 dark:text-gray-400">{{ selectedRole.description }}</p>
+            <p class="text-gray-600 dark:text-zinc-400">{{ selectedRole.description }}</p>
           </div>
 
           <div>
@@ -643,7 +643,7 @@
               <template v-if="selectedRole.permissions.includes('all')">
                 <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg">
                   <span class="text-purple-700 dark:text-purple-300 font-medium">
-                    🔓 Acceso Total al Sistema
+                    Acceso Total al Sistema
                   </span>
                   <p class="text-xs text-purple-600 dark:text-purple-400 mt-1">
                     Este rol tiene permisos completos para todos los módulos
@@ -654,7 +654,7 @@
                 <div
                   v-for="category in moduleCategories"
                   :key="category"
-                  class="border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+                  class="border border-gray-200 dark:border-zinc-700 rounded-lg p-3"
                 >
                   <h5 class="font-medium text-gray-900 dark:text-white mb-2">{{ category }}</h5>
                   <div class="grid grid-cols-2 gap-2">
@@ -668,7 +668,7 @@
                           'w-2 h-2 rounded-full',
                           selectedRole.permissions.includes(module.id) 
                             ? 'bg-green-500' 
-                            : 'bg-gray-300 dark:bg-gray-600'
+                            : 'bg-gray-300 dark:bg-zinc-600'
                         ]"
                       ></div>
                       <span
@@ -676,7 +676,7 @@
                           'text-xs',
                           selectedRole.permissions.includes(module.id)
                             ? 'text-gray-900 dark:text-white'
-                            : 'text-gray-400 dark:text-gray-500'
+                            : 'text-gray-400 dark:text-zinc-500'
                         ]"
                       >
                         {{ module.name }}
@@ -689,10 +689,10 @@
           </div>
         </div>
 
-        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-700 flex justify-end">
           <button
             @click="showDetailsModal = false"
-            class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+            class="px-4 py-2 bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
           >
             Cerrar
           </button>

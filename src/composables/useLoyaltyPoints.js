@@ -18,7 +18,7 @@ export function useLoyaltyPoints() {
    */
   const loadSettings = async () => {
     try {
-      // 🔥 OPTIMIZACIÓN: Verificar primero en appStore si loyalty está habilitado
+      // OPTIMIZACIÓN: Verificar primero en appStore si loyalty está habilitado
       const systemSettings = appStore.systemSettings
       if (!systemSettings.enable_loyalty_system) {
         loyaltySettings.value.enabled = false
@@ -33,10 +33,10 @@ export function useLoyaltyPoints() {
       if (response.success && response.data) {
         loyaltySettings.value = response.data
       } else {
-        console.warn('⚠️ [Loyalty] Respuesta sin estructura esperada:', response)
+        console.warn('[Loyalty] Respuesta sin estructura esperada:', response)
       }
     } catch (err) {
-      console.error('❌ [Loyalty] Error loading loyalty settings:', err)
+      console.error('[Loyalty] Error loading loyalty settings:', err)
       error.value = err.message
     } finally {
       loading.value = false

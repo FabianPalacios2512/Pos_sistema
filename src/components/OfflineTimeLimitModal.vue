@@ -30,10 +30,10 @@
           <div class="p-8 space-y-6">
             <!-- Mensaje principal - limpio -->
             <div class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-xl p-4">
-              <p class="text-sm text-gray-700 dark:text-gray-300 text-center leading-relaxed">
+              <p class="text-sm text-gray-700 dark:text-zinc-300 text-center leading-relaxed">
                 Has estado trabajando <strong class="text-red-600 dark:text-red-400">{{ formatOfflineTime }}</strong> sin conexión a internet.
               </p>
-              <p class="text-sm text-gray-700 dark:text-gray-300 text-center mt-2 leading-relaxed">
+              <p class="text-sm text-gray-700 dark:text-zinc-300 text-center mt-2 leading-relaxed">
                 Por seguridad, necesitas <strong>reconectar a internet</strong> para continuar usando el sistema.
               </p>
             </div>
@@ -81,7 +81,7 @@
                 </svg>
                 Instrucciones
               </p>
-              <ol class="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-decimal list-inside">
+              <ol class="text-sm text-gray-700 dark:text-zinc-300 space-y-2 list-decimal list-inside">
                 <li>Activa tu conexión WiFi o datos móviles</li>
                 <li>Espera a que se restablezca la conexión</li>
                 <li>Haz clic en "Verificar Conexión"</li>
@@ -186,12 +186,11 @@ async function checkConnection() {
       })
       
       if (response.ok) {
-        console.log('✅ Conexión verificada exitosamente')
         showModal.value = false
         // El validador ya limpiará el tiempo offline
       }
     } catch (error) {
-      console.error('❌ Sin conexión real al servidor:', error)
+      console.error('Sin conexión real al servidor:', error)
       isOnline.value = false
       alert('No se pudo conectar al servidor. Verifica tu conexión a internet.')
     }
@@ -224,10 +223,9 @@ function handleOnlineStatus() {
 
 function handleValidatorEvent(data) {
   if (data.type === 'time_limit_exceeded') {
-    console.warn('⚠️ Límite de tiempo offline excedido - Mostrando modal')
+    console.warn('Límite de tiempo offline excedido - Mostrando modal')
     updateStatus()
   } else if (data.type === 'online_restored') {
-    console.log('✅ Conexión restaurada - Ocultando modal')
     showModal.value = false
   }
 }

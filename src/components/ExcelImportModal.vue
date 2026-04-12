@@ -708,8 +708,6 @@ const processFile = async (file) => {
     const formData = new FormData()
     formData.append('file', file)
 
-    console.log('Enviando archivo al servidor...')
-    
     // Usar fetch directamente para FormData (api.post convierte a JSON)
     const token = localStorage.getItem('authToken')
     const fetchHeaders = {
@@ -726,9 +724,6 @@ const processFile = async (file) => {
     })
     
     const response = { data: await fetchResponse.json() }
-
-    console.log('Respuesta del servidor:', response)
-    console.log('Respuesta data:', response.data)
 
     // Verificar que la respuesta tenga la estructura esperada
     if (!response.data) {
@@ -860,8 +855,6 @@ const generatePreview = async () => {
     })
     
     const response = await fetchResponse.json()
-    console.log('Preview response:', response)
-
     if (response.success) {
       previewData.value = response.preview_data
       previewStats.value = response.stats
@@ -936,13 +929,9 @@ const importProducts = async () => {
     })
     
     const response = await fetchResponse.json()
-    console.log('Import response:', response)
-    
     // Debug: Mostrar errores detallados si existen
     if (response.errors && response.errors.length > 0) {
-      console.log('ERRORES DE IMPORTACIÓN:', response.errors)
       response.errors.forEach((err, idx) => {
-        console.log(`Error fila ${idx + 1}:`, err)
       })
     }
 

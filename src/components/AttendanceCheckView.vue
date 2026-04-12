@@ -474,7 +474,7 @@
                         <div v-if="!selectedEvent" class="space-y-2 flex-1">
                           <!-- Primary suggested action -->
                           <button @click="selectedEvent = allowedEvents[0].type"
-                                  class="w-full py-2.5 px-4 rounded bg-gray-800 dark:bg-zinc-200 text-white dark:text-gray-900 font-semibold text-sm transition-colors hover:bg-gray-900 dark:hover:bg-white text-left flex items-center justify-between">
+                                  class="w-full py-2.5 px-4 rounded bg-gray-800 dark:bg-zinc-200 text-white dark:text-zinc-900 font-semibold text-sm transition-colors hover:bg-gray-900 dark:hover:bg-white text-left flex items-center justify-between">
                             <span>{{ allowedEvents[0].label }}</span>
                             <span class="text-[10px] uppercase tracking-wider font-medium opacity-50">Sugerido</span>
                           </button>
@@ -506,7 +506,7 @@
                             <!-- Confirm button -->
                             <button @click="registerEvent(selectedEvent)"
                                     :disabled="recording"
-                                    class="w-full py-2.5 rounded bg-gray-800 dark:bg-zinc-200 text-white dark:text-gray-900 font-semibold text-sm transition-colors hover:bg-gray-900 dark:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                    class="w-full py-2.5 rounded bg-gray-800 dark:bg-zinc-200 text-white dark:text-zinc-900 font-semibold text-sm transition-colors hover:bg-gray-900 dark:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                               <svg v-if="recording" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                               <span>{{ recording ? 'Registrando...' : 'Confirmar registro' }}</span>
                             </button>
@@ -987,7 +987,7 @@ const getEventDotClass = (type) => {
     break_start: 'border-amber-500 bg-amber-50 dark:bg-amber-950',
     break_end:   'border-indigo-500 bg-indigo-50 dark:bg-indigo-950',
   }
-  return map[type] || 'border-gray-500 bg-gray-50 dark:bg-gray-950'
+  return map[type] || 'border-gray-500 bg-gray-50 dark:bg-zinc-950'
 }
 
 const getEventAvatarClass = (type) => {
@@ -997,7 +997,7 @@ const getEventAvatarClass = (type) => {
     break_start: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400',
     break_end:   'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400',
   }
-  return map[type] || 'bg-gray-50 dark:bg-gray-950 text-gray-700 dark:text-gray-400'
+  return map[type] || 'bg-gray-50 dark:bg-zinc-950 text-gray-700 dark:text-zinc-400'
 }
 
 const getEventBadgeClass = (type) => {
@@ -1007,7 +1007,7 @@ const getEventBadgeClass = (type) => {
     break_start: 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800',
     break_end:   'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
   }
-  return map[type] || 'bg-gray-50 dark:bg-gray-950 text-gray-700 dark:text-gray-400 border-gray-100 dark:border-gray-800'
+  return map[type] || 'bg-gray-50 dark:bg-zinc-950 text-gray-700 dark:text-zinc-400 border-gray-100 dark:border-zinc-800'
 }
 
 const formatTime = (dateString) => {

@@ -23,7 +23,7 @@
           
           <!-- Botón Principal - Negro/Slate como el resto del sistema -->
           <button @click="openMovementModal"
-                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center space-x-2">
+                  class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-md  transition-all duration-300 flex items-center space-x-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
@@ -371,7 +371,7 @@
                 
                 <!-- Botón de acción - Gemini Style -->
                 <button @click="adjustStock(alert)" 
-                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-400 dark:hover:bg-blue-300 text-white dark:text-gray-900 text-xs font-medium rounded-xl transition-all duration-200 flex items-center gap-1.5 flex-shrink-0">
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-400 dark:hover:bg-blue-300 text-white dark:text-zinc-900 text-xs font-medium rounded-xl transition-all duration-200 flex items-center gap-1.5 flex-shrink-0">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                   </svg>
@@ -522,8 +522,8 @@
               <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Tipo de Movimiento</label>
               <select v-model="newMovementForm.type" 
                       class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
-                <option value="entrada">📦 Entrada</option>
-                <option value="salida">📤 Salida</option>
+                <option value="entrada">Entrada</option>
+                <option value="salida">Salida</option>
               </select>
             </div>
             <div>
@@ -573,7 +573,7 @@
           </button>
           <button @click="createMovement" 
                   :disabled="!selectedProduct || !newMovementForm.quantity || !newMovementForm.reason"
-                  class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 dark:disabled:text-gray-600 text-white dark:text-gray-900 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
+                  class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 dark:disabled:text-gray-600 text-white dark:text-zinc-900 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
             Registrar Movimiento
           </button>
         </div>
@@ -624,7 +624,7 @@
                 <div class="flex items-center gap-3 mt-1">
                   <span class="text-xs text-gray-600 dark:text-zinc-400">{{ selectedProductForAdjust.category }}</span>
                   <span v-if="productVariants.length > 0" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
-                    👗 MODA/VARIANTES
+                    MODA/VARIANTES
                   </span>
                   <div v-else class="flex items-center gap-3">
                     <span class="text-xs text-gray-600 dark:text-zinc-400">Stock:</span>
@@ -805,7 +805,7 @@
                     <div class="text-right">
                       <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
                             :class="stockDifference >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'">
-                        {{ stockDifference >= 0 ? '📦 Entrada' : '📤 Salida' }}
+                        {{ stockDifference >= 0 ? 'Entrada' : 'Salida' }}
                       </span>
                     </div>
                   </div>
@@ -822,7 +822,7 @@
             </button>
             <button @click="processStockAdjustment" 
                     :disabled="!isFormValid"
-                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 dark:disabled:text-gray-600 text-white dark:text-gray-900 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
+                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 dark:disabled:text-gray-600 text-white dark:text-zinc-900 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
               {{ adjustmentLoading ? 'Procesando...' : 'Confirmar Ajuste' }}
             </button>
           </div>
@@ -912,7 +912,7 @@
           <div class="flex items-end">
             <button @click="loadProductHistory" 
                     :disabled="historyLoading"
-                    class="px-5 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 text-white dark:text-gray-900 rounded-full font-medium flex items-center gap-2 transition-colors text-sm">
+                    class="px-5 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 text-white dark:text-zinc-900 rounded-full font-medium flex items-center gap-2 transition-colors text-sm">
               <svg class="w-4 h-4" :class="{'animate-spin': historyLoading}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
               </svg>
@@ -1011,7 +1011,7 @@ import { notificationStore } from '../store/notifications.js'
 import { useToast } from '../composables/useToast.js'
 import { appStore } from '../store/appStore.js' // NUEVO: para obtener el plan
 import { useAutoRefresh } from '../composables/useRouteState.js'
-import { useUIContextStore } from '../store/uiContextStore.js' // 🧠 IA
+import { useUIContextStore } from '../store/uiContextStore.js' // IA
 import MovementsSection from './inventory/sections/MovementsSection.vue'
 import TablePaginator from './TablePaginator.vue'
 
@@ -1029,7 +1029,7 @@ const emit = defineEmits(['navigate', 'changeModule', 'change-module', 'openQuot
 // Sistema de toasts
 const { showSuccess, showError, showWarning } = useToast()
 
-// 🏢 NUEVO: Estado para multi-sede
+// NUEVO: Estado para multi-sede
 const warehouses = ref([])
 const selectedWarehouse = ref(null)
 const showWarehouseFilter = ref(false)
@@ -1074,7 +1074,7 @@ const modalProductInput = ref(null)
 const showAdjustModal = ref(false)
 const adjustForm = ref({
   product_id: '',
-  variant_id: null, // 👗 NUEVO: Para productos fashion
+  variant_id: null, // NUEVO: Para productos fashion
   new_stock: '',
   reason: '',
   customReason: '',
@@ -1082,12 +1082,12 @@ const adjustForm = ref({
   errors: {
     new_stock: '',
     reason: '',
-    variant: '' // 👗 Error de variante
+    variant: '' // Error de variante
   }
 })
 const selectedProductForAdjust = ref(null)
-const productVariants = ref([]) // 👗 NUEVO: Lista de variantes
-const selectedVariant = ref(null) // 👗 NUEVO: Variante seleccionada
+const productVariants = ref([]) // NUEVO: Lista de variantes
+const selectedVariant = ref(null) // NUEVO: Variante seleccionada
 const adjustmentLoading = ref(false)
 
 // Variables para el modal de historial
@@ -1341,7 +1341,7 @@ const loadProducts = async () => {
   try {
     loading.value = true
 
-    // 🏢 Construir parámetros con filtro de warehouse si está activo
+    // Construir parámetros con filtro de warehouse si está activo
     const params = { 
       per_page: 1000,
       status: 'all', // Obtener todos los productos (activos e inactivos)
@@ -1350,32 +1350,19 @@ const loadProducts = async () => {
     
     if (showWarehouseFilter.value && selectedWarehouse.value) {
       params.warehouse_id = selectedWarehouse.value
-      console.log(`📦 Filtrando productos por warehouse ID: ${selectedWarehouse.value}`)
     }
 
-    // 🖼️ USAR EL MISMO ENDPOINT QUE PRODUCTSVIEW para obtener imágenes
+    // USAR EL MISMO ENDPOINT QUE PRODUCTSVIEW para obtener imágenes
     const response = await productsService.getAll(params)
-    console.log('📦 [InventoryView] Respuesta completa del endpoint:', response)
-
     // Los productos pueden venir en response.data.data (paginación) o directamente en response.data
     const productsList = response.data?.data || response.data || []
-    console.log('📦 [InventoryView] Lista de productos extraída:', productsList.length)
-    
     // Verificar el primer producto para ver estructura de imágenes
     if (productsList.length > 0) {
-      console.log('📦 [InventoryView] Primer producto (estructura completa):', productsList[0])
-      console.log('📦 [InventoryView] Campos de imagen del primer producto:', {
-        image_url: productsList[0].image_url,
-        image: productsList[0].image,
-        images: productsList[0].images,
-        img: productsList[0].img
-      })
-      console.log('💰 [DEBUG VENTAS] total_sold:', productsList[0].total_sold, 'total_revenue:', productsList[0].total_revenue)
     }
 
     products.value = productsList.map(product => ({
       ...product,
-      type: product.type || 'simple', // 👗 IMPORTANTE: Incluir tipo de producto
+      type: product.type || 'simple', // IMPORTANTE: Incluir tipo de producto
       category: product.category ? product.category.name : 'Sin categoría',
       current_stock: product.current_stock || 0, // campo real de la BD
       stock: product.current_stock || 0, // alias para compatibilidad
@@ -1383,13 +1370,12 @@ const loadProducts = async () => {
       barcode: product.barcode || `BAR${product.id}${Date.now().toString().slice(-4)}`,
       price: parseFloat(product.sale_price || product.price || 0),
       image_url: product.image_url || product.image || null,
-      images: product.images || [], // 🖼️ Incluir array de imágenes para getProductImage()
-      total_sold: parseInt(product.total_sold || 0), // 📊 Ventas totales (backend las calcula)
-      total_revenue: parseFloat(product.total_revenue || 0) // 💰 Ingresos totales (backend los calcula)
+      images: product.images || [], // Incluir array de imágenes para getProductImage()
+      total_sold: parseInt(product.total_sold || 0), // Ventas totales (backend las calcula)
+      total_revenue: parseFloat(product.total_revenue || 0) // Ingresos totales (backend los calcula)
     }))
 
     const warehouseInfo = showWarehouseFilter.value ? ` (Sede: ${selectedWarehouse.value})` : ' (Todas las sedes)'
-    console.log(`Productos cargados${warehouseInfo}:`, products.value.length)
   } catch (error) {
     console.error('Error cargando productos:', error)
   } finally {
@@ -1410,8 +1396,6 @@ const loadCategories = async () => {
 const loadMovementsData = async (filters = null) => {
   try {
     movementsLoading.value = true
-    console.log('🔄 Cargando movimientos para Control de Inventario...')
-    
     // Usar filtros pasados o los filtros actuales
     const currentFilters = filters || movementsFilters.value
     
@@ -1427,8 +1411,6 @@ const loadMovementsData = async (filters = null) => {
     
     // Llamada a la API de movimientos (usando endpoint de prueba con parámetros)
     const data = await api.get(`/inventory/test/movements?${params}`)
-    console.log('✅ Movimientos cargados:', data)
-    
     // El endpoint de prueba devuelve: { success: true, data: { movements: [...], summary: {...} } }
     if (data.success && data.data) {
       const movements = data.data.movements || []
@@ -1447,13 +1429,12 @@ const loadMovementsData = async (filters = null) => {
         pagination: data.data.pagination || {}
       }
       
-      console.log('📊 Datos estructurados para MovementsSection:', movementsData.value)
     } else {
       throw new Error('Formato de respuesta inesperado')
     }
     
   } catch (error) {
-    console.error('❌ Error cargando movimientos:', error)
+    console.error('Error cargando movimientos:', error)
     showError('Error al cargar movimientos: ' + error.message)
     
     // Datos de fallback si hay error
@@ -1688,13 +1669,12 @@ const adjustStock = async (product) => {
     }
   }
   
-  // 👗 Si el producto es tipo "variable" (fashion), cargar variantes
+  // Si el producto es tipo "variable" (fashion), cargar variantes
   if (product.type === 'variable') {
     try {
       const response = await api.get(`/products/${product.id}`)
       if (response.data && response.data.variants) {
         productVariants.value = response.data.variants
-        console.log('👗 Variantes cargadas:', productVariants.value)
       }
     } catch (error) {
       console.error('Error cargando variantes:', error)
@@ -1705,19 +1685,18 @@ const adjustStock = async (product) => {
   showAdjustModal.value = true
 }
 
-// 👗 Función para seleccionar una variante
+// Función para seleccionar una variante
 const selectVariant = (variant) => {
   selectedVariant.value = variant
   adjustForm.value.variant_id = variant.id
   adjustForm.value.new_stock = '' // Resetear el input cuando se cambia de variante
   adjustForm.value.errors.variant = ''
-  console.log('👗 Variante seleccionada:', variant)
 }
 
 // Nueva función para procesar el ajuste con la API
 const processStockAdjustment = async () => {
   try {
-    // 👗 Validar que se haya seleccionado variante si es producto fashion
+    // Validar que se haya seleccionado variante si es producto fashion
     if (productVariants.value.length > 0 && !selectedVariant.value) {
       adjustForm.value.errors.variant = 'Debes seleccionar una variante para ajustar'
       showWarning('Por favor selecciona una variante')
@@ -1736,7 +1715,7 @@ const processStockAdjustment = async () => {
     adjustmentLoading.value = true
     
     const newStock = parseInt(adjustForm.value.new_stock)
-    // 👗 Si es producto con variantes, usar el stock de la variante seleccionada
+    // Si es producto con variantes, usar el stock de la variante seleccionada
     const currentStock = selectedVariant.value 
       ? (selectedVariant.value.stock || 0)
       : (selectedProductForAdjust.value.current_stock || 0)
@@ -1753,41 +1732,26 @@ const processStockAdjustment = async () => {
       ? adjustForm.value.customReason.trim() 
       : adjustForm.value.reason
     
-    console.log('Enviando ajuste a la API:', { 
-      product: selectedProductForAdjust.value.name,
-      variant_id: adjustForm.value.variant_id, // 👗 Incluir variant_id
-      variant: selectedVariant.value ? (typeof selectedVariant.value.options_summary === 'string' ? JSON.parse(selectedVariant.value.options_summary) : selectedVariant.value.options_summary) : null,
-      from: currentStock,
-      to: newStock,
-      difference,
-      reason: finalReason,
-      warehouse_id: selectedWarehouse.value
-    })
-    
-    // 🏢 Incluir warehouse_id y variant_id si está disponible
+    // Incluir warehouse_id y variant_id si está disponible
     const response = await inventoryService.adjustStock(
       adjustForm.value.product_id, 
       newStock, 
       finalReason,
       selectedWarehouse.value,
-      adjustForm.value.variant_id // 👗 NUEVO: pasar variant_id
+      adjustForm.value.variant_id // NUEVO: pasar variant_id
     )
     
     if (response && response.success) {
-      console.log('✅ Ajuste de stock registrado exitosamente en la BD')
-      
       // ⏱️ Pequeño delay para asegurar que el backend termine de actualizar
       await new Promise(resolve => setTimeout(resolve, 100))
       
-      // ✅ RECARGAR PRODUCTOS PARA ACTUALIZAR LA VISTA LOCAL
+      // RECARGAR PRODUCTOS PARA ACTUALIZAR LA VISTA LOCAL
       await loadProducts()
       
-      // 🔥 FORZAR ACTUALIZACIÓN EN EL STORE GLOBAL (para POS)
-      console.log('🔄 Actualizando store global después del ajuste...')
+      // FORZAR ACTUALIZACIÓN EN EL STORE GLOBAL (para POS)
       await appStore.loadProducts(selectedWarehouse.value, 'general', true)
       
-      // 🔥 EMITIR EVENTO GLOBAL para que ProductsView recargue
-      console.log('📢 Emitiendo evento global para recargar productos en todos los módulos...')
+      // EMITIR EVENTO GLOBAL para que ProductsView recargue
       window.dispatchEvent(new CustomEvent('products-updated', { 
         detail: { 
           source: 'inventory-adjustment',
@@ -1796,8 +1760,7 @@ const processStockAdjustment = async () => {
         } 
       }))
       
-      // 🔥 ACTUALIZAR NOTIFICACIONES AUTOMÁTICAMENTE
-      console.log('📬 Actualizando notificaciones después del ajuste...')
+      // ACTUALIZAR NOTIFICACIONES AUTOMÁTICAMENTE
       await notificationStore.loadNotifications()
       
       // Agregar movimiento a la vista local
@@ -1833,7 +1796,6 @@ const processStockAdjustment = async () => {
 
 // Funciones para el modal de historial
 const viewMovements = async (product) => {
-  console.log('Ver movimientos de:', product.name)
   selectedProductForHistory.value = product
   historyDateFilter.value = 'all'
   historyTypeFilter.value = 'all'
@@ -1880,8 +1842,6 @@ const loadProductHistory = async () => {
       filters.type = historyTypeFilter.value
     }
     
-    console.log('Cargando historial con filtros:', filters)
-    
     // Llamar a la API real usando el inventoryStore
     const response = await inventoryStore.getMovements(filters)
     
@@ -1889,8 +1849,6 @@ const loadProductHistory = async () => {
       // La API retorna datos paginados, extraemos los items
       const movements = response.data.data || response.data
       productMovements.value = movements
-      console.log('Historial cargado exitosamente:', productMovements.value.length, 'movimientos')
-      console.log('Datos recibidos:', response.data)
     } else {
       productMovements.value = []
       console.warn('Respuesta vacía de la API')
@@ -1907,7 +1865,6 @@ const loadProductHistory = async () => {
 
 const filterMovements = () => {
   // Los filtros se aplican automáticamente a través de la computed property filteredMovements
-  console.log('Aplicando filtros:', historyDateFilter.value, historyTypeFilter.value)
 }
 
 const createMovement = async () => {
@@ -1939,19 +1896,13 @@ const createMovement = async () => {
       reason: newMovementForm.value.reason
     }
     
-    console.log('Enviando movimiento a la API:', movementData)
     const response = await inventoryService.createMovement(movementData)
     
-    console.log('Respuesta completa de la API:', response)
-    
     if (response && response.success) {
-      console.log('Movimiento registrado exitosamente en la BD')
-      
       // Recargar productos para obtener datos actualizados
       await loadProducts()
       
-      // 🔥 ACTUALIZAR NOTIFICACIONES AUTOMÁTICAMENTE
-      console.log('Actualizando notificaciones después del movimiento...')
+      // ACTUALIZAR NOTIFICACIONES AUTOMÁTICAMENTE
       await notificationStore.loadNotifications()
       
       // Agregar movimiento a la vista local
@@ -1968,23 +1919,22 @@ const createMovement = async () => {
       closeMovementModal()
       
       // Mostrar mensaje de éxito
-      alert('✅ Movimiento registrado exitosamente')
+      alert('Movimiento registrado exitosamente')
     } else {
       const errorMessage = response?.message || 'Error desconocido al registrar el movimiento'
-      alert('❌ Error: ' + errorMessage)
+      alert('Error: ' + errorMessage)
     }
     
   } catch (error) {
     console.error('Error registrando movimiento:', error)
     const errorMessage = error?.response?.data?.message || error?.message || 'Error de conexión con el servidor'
-    alert('❌ Error al conectar con el servidor: ' + errorMessage)
+    alert('Error al conectar con el servidor: ' + errorMessage)
   } finally {
     loading.value = false
   }
 }
 
 const generateReport = () => {
-  console.log('Navegando a reportes de inventario...')
   emit('navigate', 'reports')
   emit('changeModule', 'reports')
 }
@@ -2037,7 +1987,7 @@ const closeMovementModal = () => {
   }
 }
 
-// 🏢 NUEVO: Cargar warehouses según plan del tenant
+// NUEVO: Cargar warehouses según plan del tenant
 const loadWarehousesIfAvailable = async () => {
   try {
     const tenantPlan = appStore.tenantPlan
@@ -2061,11 +2011,6 @@ const loadWarehousesIfAvailable = async () => {
       const defaultWh = warehouses.value.find(w => w.is_default)
       selectedWarehouse.value = defaultWh?.id || warehouses.value[0]?.id
       
-      console.log('🏢 Multi-sede habilitado:', {
-        plan: tenantPlan,
-        warehouses: warehouses.value.length,
-        selected: selectedWarehouse.value
-      })
     }
   } catch (error) {
     console.error('Error cargando warehouses:', error)
@@ -2077,10 +2022,8 @@ const loadWarehousesIfAvailable = async () => {
 const refreshInventoryData = async () => {
   try {
     loading.value = true
-    console.log('Refrescando datos de inventario...')
     await loadProducts()
     await loadCategories()
-    console.log('Datos de inventario actualizados')
   } catch (error) {
     console.error('Error refrescando datos:', error)
     alert('Error al actualizar los datos')
@@ -2089,7 +2032,7 @@ const refreshInventoryData = async () => {
   }
 }
 
-// 🖼️ Función utilitaria para manejo inteligente de imágenes (copiada de ProductsView)
+// Función utilitaria para manejo inteligente de imágenes (copiada de ProductsView)
 const getProductImage = (product) => {
   // Usar el origen actual (mismo puerto que el frontend/proxy)
   const baseUrl = window.location.origin
@@ -2143,7 +2086,7 @@ const getProductImage = (product) => {
   return null
 }
 
-// 🎨 Generar avatar dinámico SVG con iniciales del producto (copiado de ProductsView)
+// Generar avatar dinámico SVG con iniciales del producto (copiado de ProductsView)
 const generateDynamicAvatar = (name) => {
   // Obtener las primeras 2 letras del nombre
   const initials = (name || 'P')
@@ -2176,7 +2119,7 @@ const generateDynamicAvatar = (name) => {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
 
-// 🚨 Manejar errores de carga de imagen (copiado de ProductsView)
+// Manejar errores de carga de imagen (copiado de ProductsView)
 const handleImageError = (event, product) => {
   // Evitar bucle infinito
   if (event.target.dataset.errorHandled) return
@@ -2192,7 +2135,7 @@ onMounted(async () => {
   try {
     loading.value = true
     
-    // 🚀 OPTIMIZACIÓN: Cargar datos en paralelo en lugar de secuencial
+    // OPTIMIZACIÓN: Cargar datos en paralelo en lugar de secuencial
     // Esto reduce el tiempo de carga de ~4s a ~1-2s
     await Promise.all([
       loadWarehousesIfAvailable(),
@@ -2206,7 +2149,7 @@ onMounted(async () => {
     await notificationStore.loadNotifications()
     notificationStore.startPolling(15000)
     
-    // 🧠 Inicializar contexto para IA
+    // Inicializar contexto para IA
     setTimeout(() => {
       updateScreenContextForAI()
     }, 500)
@@ -2217,10 +2160,9 @@ onMounted(async () => {
   }
 })
 
-// 🔄 AUTO-REFRESH al reactivar el componente
+// AUTO-REFRESH al reactivar el componente
 onActivated(async () => {
-  console.log('🔄 [InventoryView] Component activated - Refreshing data...')
-  // 🚀 Recarga en paralelo de datos críticos
+  // Recarga en paralelo de datos críticos
   try {
     await Promise.all([
       loadProducts(),
@@ -2231,7 +2173,7 @@ onActivated(async () => {
   }
 })
 
-// 🔥 LIMPIAR POLLING AL DESMONTAR COMPONENTE
+// LIMPIAR POLLING AL DESMONTAR COMPONENTE
 onUnmounted(() => {
   notificationStore.stopPolling()
 })
@@ -2248,7 +2190,7 @@ watch(activeTab, async (newTab) => {
   updateScreenContextForAI()
 })
 
-// 🧠 CONCIENCIA DE PANTALLA PARA IA
+// CONCIENCIA DE PANTALLA PARA IA
 const updateScreenContextForAI = () => {
   const uiContext = useUIContextStore()
   
@@ -2379,7 +2321,7 @@ const updateScreenContextForAI = () => {
     return { success: true, message: 'Modal de nuevo movimiento abierto' }
   })
   
-  // 🧠 ACCIÓN: Editar campo de producto (principalmente stock) desde inventario
+  // ACCIÓN: Editar campo de producto (principalmente stock) desde inventario
   uiContext.registerAction('editarCampoProducto', async (params) => {
     const { nombreProducto, campo, nuevoValor } = params
     

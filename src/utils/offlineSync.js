@@ -1,5 +1,5 @@
 /**
- * 🔄 Sistema de Sincronización Offline
+ * Sistema de Sincronización Offline
  * Gestiona operaciones cuando no hay conexión y las sincroniza cuando vuelve
  */
 
@@ -54,14 +54,12 @@ class OfflineSyncManager {
    */
   setupEventListeners() {
     window.addEventListener('online', () => {
-      console.log('🟢 Conexión restaurada - iniciando sincronización')
       this.isOnline = true
       this.notifyListeners('online')
       this.syncPendingOperations()
     })
 
     window.addEventListener('offline', () => {
-      console.log('🔴 Sin conexión - modo offline activado')
       this.isOnline = false
       this.notifyListeners('offline')
     })
@@ -102,7 +100,6 @@ class OfflineSyncManager {
       const request = store.add(operationData)
 
       request.onsuccess = () => {
-        console.log('💾 Operación guardada offline:', operation.type)
         resolve(request.result)
       }
       request.onerror = () => reject(request.error)
@@ -191,23 +188,17 @@ class OfflineSyncManager {
    */
   async syncPendingOperations() {
     if (this.syncInProgress || !this.isOnline) {
-      console.log('⏸️ Sincronización ya en progreso o sin conexión')
       return
     }
 
     this.syncInProgress = true
-    console.log('🔄 Iniciando sincronización de operaciones pendientes...')
-
     try {
       const operations = await this.getPendingOperations()
       
       if (operations.length === 0) {
-        console.log('✅ No hay operaciones pendientes')
         this.syncInProgress = false
         return
       }
-
-      console.log(`📦 Sincronizando ${operations.length} operaciones...`)
 
       // Ordenar por timestamp (más antiguas primero)
       operations.sort((a, b) => a.timestamp - b.timestamp)
@@ -220,9 +211,8 @@ class OfflineSyncManager {
           await this.syncOperation(operation)
           await this.deleteOperation(operation.id)
           successful++
-          console.log(`✅ Operación ${operation.type} sincronizada`)
         } catch (error) {
-          console.error(`❌ Error sincronizando ${operation.type}:`, error)
+          console.error(`Error sincronizando ${operation.type}:`, error)
           
           // Incrementar reintentos
           operation.retries = (operation.retries || 0) + 1
@@ -232,13 +222,10 @@ class OfflineSyncManager {
             failed++
           } else {
             // Mantener como pendiente para reintentar
-            console.log(`🔄 Reintentando operación (${operation.retries}/${operation.maxRetries})`)
           }
         }
       }
 
-      console.log(`🎉 Sincronización completada: ${successful} exitosas, ${failed} fallidas`)
-      
       // Notificar resultado
       this.notifyListeners('synced', {
         successful,
@@ -247,7 +234,7 @@ class OfflineSyncManager {
       })
 
     } catch (error) {
-      console.error('❌ Error en sincronización:', error)
+      console.error('Error en sincronización:', error)
     } finally {
       this.syncInProgress = false
     }
@@ -258,8 +245,6 @@ class OfflineSyncManager {
    */
   async syncOperation(operation) {
     const { type, endpoint, method, data, params } = operation
-
-    console.log(`🔄 Sincronizando: ${type}`)
 
     // Realizar la petición al servidor
     const response = await axios({
@@ -309,7 +294,6 @@ class OfflineSyncManager {
           }
           cursor.continue()
         } else {
-          console.log(`🗑️ ${deleted} operaciones antiguas eliminadas`)
           resolve(deleted)
         }
       }

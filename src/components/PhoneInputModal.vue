@@ -5,7 +5,7 @@
         <!-- Header -->
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-800">
-            📱 Número de WhatsApp
+            Número de WhatsApp
           </h3>
           <button 
             @click="cancel" 

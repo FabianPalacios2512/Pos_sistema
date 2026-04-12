@@ -1,5 +1,5 @@
 <template>
-  <!-- 🔒 POLÍTICA DE PRIVACIDAD - 105 POS PRO -->
+  <!-- POLÍTICA DE PRIVACIDAD - 105 POS PRO -->
   <div class="min-h-screen bg-slate-50 py-12 px-4">
     <div class="max-w-4xl mx-auto">
       
@@ -68,7 +68,7 @@
               <li>Cumplir con obligaciones legales (ej: facturación DIAN)</li>
             </ul>
             <p class="mt-3 font-semibold text-blue-700">
-              ⚠️ NO vendemos ni compartimos sus datos con terceros para marketing.
+              NO vendemos ni compartimos sus datos con terceros para marketing.
             </p>
           </div>
         </section>

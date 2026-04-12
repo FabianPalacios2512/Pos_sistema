@@ -71,11 +71,6 @@ class EPaycoPaymentController extends Controller
                 throw new \Exception('No se pudo crear la sesión de checkout');
             }
 
-            Log::info('ePayco Checkout 2.0: Sesión creada', [
-                'reference' => $validated['reference'],
-                'sessionId' => $sessionData['sessionId'],
-                'plan' => $validated['plan'],
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -195,10 +190,6 @@ class EPaycoPaymentController extends Controller
             }
 
             // Log del payload para debugging
-            Log::info('ePayco Apify session payload', [
-                'payload' => $sessionPayload,
-                'tokenLength' => strlen($authToken)
-            ]);
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, 'https://apify.epayco.co/payment/session/create');
@@ -215,10 +206,6 @@ class EPaycoPaymentController extends Controller
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
-            Log::info('ePayco Apify session response', [
-                'httpCode' => $httpCode,
-                'response' => substr($response, 0, 500)
-            ]);
 
             if ($httpCode === 200 && $response) {
                 $responseData = json_decode($response, true);
@@ -273,12 +260,6 @@ class EPaycoPaymentController extends Controller
                 'verification_token' => $verificationToken
             ]);
 
-            Log::info('ePayco: Pending payment guardado', [
-                'reference' => $validated['reference'],
-                'payment_frequency' => $validated['payment_frequency'],
-                'plan' => $validated['plan'],
-                'verification_token' => substr($verificationToken, 0, 16) . '...'
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -303,7 +284,6 @@ class EPaycoPaymentController extends Controller
         try {
             $data = $request->all();
 
-            Log::info('ePayco Webhook recibido', $data);
 
             // Validar firma
             $p_cust_id_cliente = $data['x_cust_id_cliente'] ?? null;
@@ -355,16 +335,13 @@ class EPaycoPaymentController extends Controller
                 $pendingPayment->payment_link_id = $x_ref_payco; // Guardamos ref de ePayco
                 $pendingPayment->save();
 
-                Log::info('ePayco: Pago aprobado y procesado');
 
             } elseif ($x_cod_response == 2 || $x_cod_response == 4) {
                 // Rechazada o Fallida
                 $pendingPayment->status = 'rejected';
                 $pendingPayment->save();
-                Log::info('ePayco: Pago rechazado o fallido');
             } else {
                 // Pendiente
-                Log::info('ePayco: Pago pendiente');
             }
 
             return response()->json(['success' => true]);
@@ -471,7 +448,6 @@ class EPaycoPaymentController extends Controller
             if ($httpCode === 200 && $response) {
                 $data = json_decode($response, true);
 
-                Log::info('ePayco API Response for reference: ' . $pendingPayment->reference, $data);
 
                 // Estructura puede ser: { success: true, data: { ... } } o directamente los datos
                 $transactionData = $data['data'] ?? $data;
@@ -488,11 +464,6 @@ class EPaycoPaymentController extends Controller
                     $estado = strtolower($transaction['x_response'] ?? $transaction['estado'] ?? '');
                     $cod_response = $transaction['x_cod_response'] ?? $transaction['cod_response'] ?? null;
 
-                    Log::info('ePayco Transaction Status', [
-                        'estado' => $estado,
-                        'cod_response' => $cod_response,
-                        'reference' => $pendingPayment->reference
-                    ]);
 
                     if ($cod_response == 1 || $estado === 'aceptada' || $estado === 'aprobada') {
                         // Pago aprobado
@@ -502,13 +473,11 @@ class EPaycoPaymentController extends Controller
                         $pendingPayment->payment_link_id = $transaction['x_ref_payco'] ?? $transaction['ref_payco'] ?? null;
                         $pendingPayment->save();
 
-                        Log::info('✅ ePayco: Pago aprobado (sincronizado vía API)');
                     } elseif ($cod_response == 2 || $cod_response == 4 || $estado === 'rechazada' || $estado === 'fallida') {
                         // Pago rechazado
                         $pendingPayment->status = 'rejected';
                         $pendingPayment->save();
 
-                        Log::info('❌ ePayco: Pago rechazado (sincronizado vía API)');
                     }
                 }
             }
@@ -544,12 +513,6 @@ class EPaycoPaymentController extends Controller
             $tenant->subscription_ends_at = $subscriptionEndsAt;
             $tenant->save();
 
-            Log::info('✅ Plan activado correctamente (ePayco)', [
-                'tenant_id' => $pendingPayment->tenant_id,
-                'plan' => $pendingPayment->plan,
-                'payment_frequency' => $pendingPayment->payment_frequency,
-                'subscription_ends_at' => $subscriptionEndsAt->toDateTimeString(),
-            ]);
 
         } catch (\Exception $e) {
             Log::error('Error activando plan: ' . $e->getMessage());
@@ -597,11 +560,6 @@ class EPaycoPaymentController extends Controller
                 $pendingPayment->refresh();
             }
 
-            Log::info('✅ Verificación de pago solicitada', [
-                'reference' => $validated['reference'],
-                'status' => $pendingPayment->status,
-                'tenant_id' => $pendingPayment->tenant_id
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -658,10 +616,6 @@ class EPaycoPaymentController extends Controller
             $pendingPayment->status = 'approved';
             $pendingPayment->save();
 
-            Log::info('✅ Pago aprobado manualmente', [
-                'reference' => $reference,
-                'plan' => $pendingPayment->plan
-            ]);
 
             return response()->json([
                 'success' => true,

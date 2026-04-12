@@ -1,5 +1,5 @@
 <template>
-  <!-- 🎨 Vista de Selección de Tipo de Negocio - Onboarding -->
+  <!-- Vista de Selección de Tipo de Negocio - Onboarding -->
   <div class="min-h-screen font-sans bg-gradient-to-b from-gray-50 via-gray-100 to-gray-200 dark:bg-gradient-to-b dark:from-[#141417] dark:via-slate-900 dark:to-[#0a0a0c] transition-colors duration-300">
     
     <div class="flex flex-col items-center justify-center min-h-screen px-4 py-12">
@@ -24,7 +24,7 @@
       <!-- Grid de Opciones de Negocio -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full mb-10">
         
-        <!-- 🛒 Comercio General -->
+        <!-- Comercio General -->
         <button
           @click="selectBusinessType('general')"
           class="group relative bg-white dark:bg-zinc-900 rounded-3xl p-6 lg:p-8 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
@@ -52,7 +52,7 @@
           <!-- Contenido -->
           <div class="text-center">
             <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              🛒 Comercio General
+              Comercio General
             </h3>
             <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed mb-4">
               Ferreterías, minimarkets, repuestos, papelerías y tiendas variadas.
@@ -73,7 +73,7 @@
           </div>
         </button>
 
-        <!-- 👗 Moda y Boutique -->
+        <!-- Moda y Boutique -->
         <button
           @click="selectBusinessType('fashion')"
           class="group relative bg-white dark:bg-zinc-900 rounded-3xl p-6 lg:p-8 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
@@ -101,7 +101,7 @@
           <!-- Contenido -->
           <div class="text-center">
             <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              👗 Moda y Boutique
+              Moda y Boutique
             </h3>
             <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed mb-4">
               Tiendas de ropa, calzado, accesorios, joyería y productos de moda.
@@ -122,7 +122,7 @@
           </div>
         </button>
 
-        <!-- 🍔 Comida Rápida -->
+        <!-- Comida Rápida -->
         <button
           @click="selectBusinessType('fast_food')"
           class="group relative bg-white dark:bg-zinc-900 rounded-3xl p-6 lg:p-8 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
@@ -142,7 +142,7 @@
 
           <!-- Badge Popular -->
           <div class="absolute -top-3 left-4 px-3 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full shadow-lg">
-            🔥 Popular
+            Popular
           </div>
 
           <!-- Icono Grande -->
@@ -155,7 +155,7 @@
           <!-- Contenido -->
           <div class="text-center">
             <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              🍔 Comida Rápida
+              Comida Rápida
             </h3>
             <p class="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed mb-4">
               Restaurantes, fritos, cafeterías, pizzerías, taquerías y comida rápida.
@@ -241,20 +241,20 @@
             <div v-else-if="selectedType === 'fast_food'" class="flex gap-3 h-full">
               <div class="flex-1 bg-gray-50 dark:bg-zinc-800 rounded-xl p-3">
                 <div class="flex gap-2 mb-3">
-                  <div class="px-3 py-1.5 bg-orange-500 text-white text-xs font-bold rounded-full">🍟 Fritos</div>
-                  <div class="px-3 py-1.5 bg-gray-200 dark:bg-zinc-700 text-xs font-medium rounded-full">🥤 Bebidas</div>
-                  <div class="px-3 py-1.5 bg-gray-200 dark:bg-zinc-700 text-xs font-medium rounded-full">🍔 Combos</div>
+                  <div class="px-3 py-1.5 bg-orange-500 text-white text-xs font-bold rounded-full">Fritos</div>
+                  <div class="px-3 py-1.5 bg-gray-200 dark:bg-zinc-700 text-xs font-medium rounded-full">Bebidas</div>
+                  <div class="px-3 py-1.5 bg-gray-200 dark:bg-zinc-700 text-xs font-medium rounded-full">Combos</div>
                 </div>
                 <div class="grid grid-cols-4 gap-2">
                   <div v-for="i in 4" :key="i" class="aspect-square bg-gradient-to-b from-orange-100 to-orange-200 dark:from-orange-900/50 dark:to-orange-800/50 rounded-xl flex items-center justify-center">
-                    <span class="text-2xl">🍗</span>
+                    <span class="text-2xl"></span>
                   </div>
                 </div>
               </div>
               <div class="w-64 bg-gray-50 dark:bg-zinc-800 rounded-xl p-3">
                 <div class="flex gap-1 mb-3">
-                  <div class="flex-1 py-1.5 bg-emerald-500 text-white text-[10px] font-bold rounded-lg text-center">🍽️ AQUÍ</div>
-                  <div class="flex-1 py-1.5 bg-gray-200 dark:bg-zinc-700 text-[10px] font-medium rounded-lg text-center">🥡 LLEVAR</div>
+                  <div class="flex-1 py-1.5 bg-emerald-500 text-white text-[10px] font-bold rounded-lg text-center">AQUÍ</div>
+                  <div class="flex-1 py-1.5 bg-gray-200 dark:bg-zinc-700 text-[10px] font-medium rounded-lg text-center">LLEVAR</div>
                 </div>
                 <div class="space-y-1.5">
                   <div class="h-4 bg-gray-200 dark:bg-zinc-700 rounded animate-pulse"></div>

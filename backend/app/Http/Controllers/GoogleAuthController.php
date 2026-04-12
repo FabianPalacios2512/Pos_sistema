@@ -51,7 +51,7 @@ class GoogleAuthController extends Controller
                 }
 
                 // Redirigir al registro con error
-                $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+                $frontendUrl = config('app.frontend_url', 'https://105pos.pro');
                 return redirect($frontendUrl . '/register?error=no_code');
             }
 
@@ -105,7 +105,6 @@ class GoogleAuthController extends Controller
                 }
             }
 
-            \Log::info('📦 Datos de registro recibidos:', $registrationData);
 
             // 🎯 PRIMERO: Verificar si el usuario YA EXISTE (buscar en todos los tenants)
             $userTenant = null;
@@ -139,11 +138,6 @@ class GoogleAuthController extends Controller
 
             if ($existingUser && $userTenant) {
                 // 🔥 USUARIO EXISTENTE - Hacer login automático
-                \Log::info('✅ Usuario existente encontrado - Iniciando sesión automática', [
-                    'user_id' => $existingUser->id,
-                    'email' => $existingUser->email,
-                    'tenant_id' => $userTenant->id
-                ]);
 
                 // Generar token de sesión
                 $token = \Str::random(60);
@@ -173,11 +167,6 @@ class GoogleAuthController extends Controller
                     $redirectUrl = 'https://' . $tenantDomain->domain . '/login?google_login_token=' . $token;
                 }
 
-                \Log::info('✅ Usuario existente autenticado con Google - Redirigiendo', [
-                    'user_id' => $existingUser->id,
-                    'tenant_id' => $userTenant->id,
-                    'redirect_url' => $redirectUrl
-                ]);
 
                 return redirect()->away($redirectUrl);
             }
@@ -186,7 +175,6 @@ class GoogleAuthController extends Controller
             $hasCompanyData = !empty($registrationData['company_name']) && !empty($registrationData['subdomain']);
 
             if (!$hasCompanyData) {
-                \Log::info('⏩ Usuario nuevo sin datos de tienda - Redirigiendo al registro');
 
                 // Generar token temporal único
                 $tempToken = Str::random(64);
@@ -201,15 +189,9 @@ class GoogleAuthController extends Controller
                 ], now()->addMinutes(5));
 
                 // 🔥 Usar URL fija en producción para evitar problemas de proxy
-                $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+                $frontendUrl = config('app.frontend_url', 'https://105pos.pro');
                 $redirectUrl = $frontendUrl . '/register?google_token=' . $tempToken;
 
-                \Log::info('🔀 Redirigiendo a registro con Google token', [
-                    'frontend_url' => $frontendUrl,
-                    'redirect_url' => $redirectUrl,
-                    'token' => $tempToken,
-                    'google_email' => $googleUser['email']
-                ]);
 
                 return redirect()->away($redirectUrl);
             }
@@ -286,10 +268,6 @@ class GoogleAuthController extends Controller
                                 'google_id' => $googleUser['id'], // Guardar Google ID
                             ]);
 
-                            \Log::info('✅ Usuario admin actualizado con datos de Google', [
-                                'google_id' => $googleUser['id'],
-                                'email' => $googleUser['email']
-                            ]);
                         }
 
                         // Actualizar system_settings con datos del registro
@@ -330,12 +308,6 @@ class GoogleAuthController extends Controller
                     $redirectUrl = 'https://' . $domainToCreate . '/login?google_token=' . $loginToken;
                 }
 
-                \Log::info('✅ Tenant creado con Google OAuth - Redirigiendo', [
-                    'tenant_id' => $tenantId,
-                    'domain' => $domainToCreate,
-                    'redirect_url' => $redirectUrl,
-                    'token' => $loginToken
-                ]);
 
                 return redirect()->away($redirectUrl);
 
@@ -504,12 +476,6 @@ class GoogleAuthController extends Controller
                 }
             }
 
-            \Log::info('✅ Token Sanctum generado para usuario de Google', [
-                'user_id' => $sessionData['user_id'],
-                'tenant_id' => $sessionData['tenant_id'],
-                'email' => $sessionData['email'],
-                'needs_plan_selection' => $needsPlanSelection
-            ]);
 
             return response()->json([
                 'success' => true,

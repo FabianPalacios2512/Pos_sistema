@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -58,13 +59,19 @@ class UserController extends Controller
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
+            $warehouseId = $request->warehouse_id;
+            if (empty($warehouseId)) {
+                $defaultWarehouse = Warehouse::orderBy('id')->first();
+                $warehouseId = $defaultWarehouse ? $defaultWarehouse->id : null;
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'cc' => $request->cc,
                 'password' => Hash::make($request->password),
                 'role_id' => $request->role_id,
-                'warehouse_id' => $request->warehouse_id,
+                'warehouse_id' => $warehouseId,
                 'phone' => $request->phone,
                 'active' => $request->active ?? true
             ]);

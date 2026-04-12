@@ -127,6 +127,7 @@
         </div>
 
         <div
+          v-if="canAccessUsersModule"
           @click="$emit('change-module', 'my-attendance')"
           class="menu-item group"
           :class="[currentModule === 'my-attendance' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"

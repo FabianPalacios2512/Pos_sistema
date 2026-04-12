@@ -322,7 +322,7 @@ const quickCustomer = ref({
 
 // Computed
 const filteredCustomers = computed(() => {
-  // 🛡️ Filtrar el Consumidor Final (cliente del sistema) - No debe mostrarse en selectores
+  // Filtrar el Consumidor Final (cliente del sistema) - No debe mostrarse en selectores
   const systemCustomers = (customers.value || []).filter(c => c.document_number !== '222222222222' && c.document_number !== '00000000000' && c.email !== 'general@sistema.local')
   
   if (!searchTerm.value) return systemCustomers
@@ -427,7 +427,7 @@ onMounted(async () => {
     appStore.loadCustomers()
   }
 
-  // 🎯 AUTOFOCUS: Enfocar el input de búsqueda cuando se abre el modal
+  // AUTOFOCUS: Enfocar el input de búsqueda cuando se abre el modal
   await nextTick()
   if (searchInputRef.value && !props.startCreating) {
     searchInputRef.value.focus()

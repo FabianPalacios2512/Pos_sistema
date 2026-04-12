@@ -26,7 +26,7 @@
           <!-- Botón Nuevo Crédito -->
           <button 
             @click="openCreateCreditModal"
-            class="px-4 py-2 text-sm font-semibold text-white dark:text-gray-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-md transition-colors flex items-center gap-2">
+            class="px-4 py-2 text-sm font-semibold text-white dark:text-zinc-900 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 rounded-md transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -84,7 +84,7 @@
           <div class="p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900">
             <!-- Búsqueda -->
             <div class="relative mb-3">
-              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
               <input
@@ -116,13 +116,13 @@
             
             <!-- Empty state -->
             <div v-else-if="filteredCustomers.length === 0" class="flex flex-col items-center justify-center py-12 text-center px-4">
-              <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800/50 flex items-center justify-center mb-3">
-                <svg class="w-7 h-7 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-zinc-800/50 flex items-center justify-center mb-3">
+                <svg class="w-7 h-7 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                 </svg>
               </div>
               <p class="text-sm font-medium text-gray-900 dark:text-white">Sin clientes</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">No hay clientes con crédito activo</p>
+              <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">No hay clientes con crédito activo</p>
             </div>
             
             <!-- Lista de clientes con tarjetas -->
@@ -167,7 +167,7 @@
                     </span>
                   </div>
                   <div class="flex items-center gap-2 mt-1">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">
                       {{ customer.document_type }}: {{ customer.document_number }}
                     </p>
                   </div>
@@ -178,7 +178,7 @@
                   <span class="text-sm font-bold" :class="customer.current_debt > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'">
                     ${{ formatCurrency(customer.current_debt || 0) }}
                   </span>
-                  <p class="text-[10px] text-gray-400 dark:text-gray-500">Deuda</p>
+                  <p class="text-[10px] text-gray-400 dark:text-zinc-500">Deuda</p>
                 </div>
                 
                 <!-- Indicador de selección -->
@@ -207,7 +207,7 @@
                 <div class="relative">
                   <!-- Círculo principal con avatar -->
                   <div class="w-20 h-20 rounded-md bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center shadow-inner">
-                    <svg class="w-10 h-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-10 h-10 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
                   </div>
@@ -228,15 +228,15 @@
               <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">
                 Portal de Créditos
               </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-2">
+              <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed mb-2">
                 Selecciona un cliente del panel izquierdo para visualizar su información completa, historial de crédito y registrar abonos.
               </p>
-              <p class="text-xs text-gray-400 dark:text-gray-500">
+              <p class="text-xs text-gray-400 dark:text-zinc-500">
                 Gestión segura de créditos para tu negocio.
               </p>
               
               <!-- Indicador visual -->
-              <div class="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+              <div class="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -245,7 +245,7 @@
             </div>
             
             <!-- Footer de seguridad -->
-            <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+            <div class="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
               </svg>
@@ -372,7 +372,7 @@
                   <p class="text-2xl font-bold text-amber-700 dark:text-amber-300 mt-1">
                     ${{ formatNumber(selectedCustomer.balance || 0) }}
                   </p>
-                  <!-- 📊 Desglose de deuda: Productos + Recargo (usa porcentaje dinámico del sistema) -->
+                  <!-- Desglose de deuda: Productos + Recargo (usa porcentaje dinámico del sistema) -->
                   <div v-if="selectedCustomer.balance > 0" class="mt-3 pt-3 border-t border-amber-200 dark:border-amber-800/50 space-y-1">
                     <div class="flex justify-between items-center text-xs">
                       <span class="text-amber-600 dark:text-amber-400">Productos</span>
@@ -767,7 +767,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                   </div>
-                  <p v-if="customerExists" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">✓ Cliente existente encontrado</p>
+                  <p v-if="customerExists" class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">Cliente existente encontrado</p>
                 </div>
               </div>
 
@@ -862,7 +862,7 @@
               <button 
                 @click="saveCustomerCredit"
                 :disabled="!customerForm.document_number || !customerForm.name || !customerForm.credit_limit || processing"
-                class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white dark:text-gray-900 text-sm font-semibold rounded-md shadow-sm transition-all duration-300 flex items-center gap-2"
+                class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-sm font-semibold rounded-md shadow-sm transition-all duration-300 flex items-center gap-2"
               >
                 <svg v-if="processing" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -1189,7 +1189,7 @@
                 <button @click="showEditCustomerModal = false" type="button" class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300 text-sm font-bold rounded-md border border-gray-300 dark:border-zinc-700 transition-all duration-200">
                   Cancelar
                 </button>
-                <button @click="submitEditCustomer" :disabled="processingEdit || !editForm.name" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white dark:text-gray-900 text-sm font-semibold rounded-md shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                <button @click="submitEditCustomer" :disabled="processingEdit || !editForm.name" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white dark:text-zinc-900 text-sm font-semibold rounded-md shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                   <svg v-if="processingEdit" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -1257,7 +1257,7 @@
       </Transition>
     </Teleport>
 
-    <!-- 🗑️ MODAL: Confirmar Eliminación de Crédito -->
+    <!-- MODAL: Confirmar Eliminación de Crédito -->
     <Teleport to="body">
       <Transition
         enter-active-class="transition-opacity duration-200 ease-out"
@@ -1371,7 +1371,7 @@ import axios from 'axios'
 const { showSuccess, showError } = useToast()
 const uiContextStore = useUIContextStore()
 
-// 🎯 Escape Key Handler - Limpiar filtros
+// Escape Key Handler - Limpiar filtros
 const handleEscape = (e) => {
   if (e.key === 'Escape') {
     // Cerrar modales primero (por prioridad)
@@ -1425,7 +1425,7 @@ const paymentForm = ref({
   notes: ''
 })
 
-// 🎯 CreditiTenda: Modal de creación de cliente con crédito
+// CreditiTenda: Modal de creación de cliente con crédito
 const showCreateCreditModal = ref(false)
 const checkingDocument = ref(false)
 const customerExists = ref(false)
@@ -1433,7 +1433,7 @@ const uploadingPhoto = ref(false)
 const photoPreview = ref(null)
 let documentCheckTimeout = null // Para debounce de búsqueda
 
-// 🗑️ Modal de confirmación para eliminar crédito
+// Modal de confirmación para eliminar crédito
 const showDeleteModal = ref(false)
 const customerToDelete = ref(null)
 const deletingCredit = ref(false)
@@ -1451,13 +1451,13 @@ const customerForm = ref({
   active: true
 })
 
-// 🎯 Modal de edición de cliente
+// Modal de edición de cliente
 const showEditCustomerModal = ref(false)
 const editForm = ref({})
 const editPhotoPreview = ref(null)
 const uploadingEditPhoto = ref(false)
 
-// 🔔 Modal de configuración de recordatorios
+// Modal de configuración de recordatorios
 const showReminderSettingsModal = ref(false)
 const savingSettings = ref(false)
 const showWhatsAppModal = ref(false)
@@ -1477,7 +1477,7 @@ const openWhatsAppConfig = () => {
 
 const processingEdit = ref(false)
 
-// 🎯 Modal de preview de foto
+// Modal de preview de foto
 const showPhotoPreviewModal = ref(false)
 const previewPhotoUrl = ref('')
 const previewPhotoName = ref('')
@@ -1526,7 +1526,7 @@ const averageDaysOverdue = computed(() => {
   return 0
 })
 
-// 🔧 System settings para obtener el porcentaje de recargo dinámicamente
+// System settings para obtener el porcentaje de recargo dinámicamente
 const systemSettings = ref({
   credit_surcharge_percentage: 10,
   company_name: ''
@@ -1580,7 +1580,7 @@ const getStatusColor = (customer) => {
   const limit = customer.credit_limit || 0
   
   if (debt === 0) return 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'
-  if (debt > limit) return 'bg-gray-900 dark:bg-gray-950 text-white dark:text-gray-100 border-gray-800 dark:border-gray-900'
+  if (debt > limit) return 'bg-gray-900 dark:bg-zinc-950 text-white dark:text-zinc-100 border-gray-800 dark:border-zinc-900'
   
   if (!customer.debt_since) {
     return 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800'
@@ -1618,7 +1618,7 @@ const getStatusText = (customer) => {
 }
 
 const getAvailableCredit = (customer) => {
-  // 🎯 El disponible se calcula contra el SUBTOTAL_DEBT (productos sin recargo)
+  // El disponible se calcula contra el SUBTOTAL_DEBT (productos sin recargo)
   // El recargo es ganancia del negocio, NO cuenta contra el cupo del cliente
   // Usamos subtotal_debt que viene directamente de la BD
   const subtotalDebt = customer.subtotal_debt || 0
@@ -1627,7 +1627,7 @@ const getAvailableCredit = (customer) => {
 
 // Función helper para obtener el subtotal de productos pendientes (sin recargo)
 const getSubtotalPendiente = (customer) => {
-  // 🎯 USAR subtotal_debt del cliente (calculado correctamente en el backend)
+  // USAR subtotal_debt del cliente (calculado correctamente en el backend)
   // NO calcular desde las facturas porque su status='paid' (la venta se hizo)
   // El crédito es independiente del status de la factura
   if (customer.subtotal_debt !== undefined && customer.subtotal_debt !== null) {
@@ -1643,7 +1643,7 @@ const getSubtotalPendiente = (customer) => {
 
 // Función para calcular el crédito disponible (puede ser negativo para mostrar cuánto sobrepasó)
 const getAvailableCreditAmount = (customer) => {
-  // 🎯 El disponible es: Límite - subtotal_debt (sin recargo)
+  // El disponible es: Límite - subtotal_debt (sin recargo)
   // El recargo NO cuenta contra el cupo (es ganancia del negocio)
   const limit = customer.credit_limit || 0
   const subtotalDebt = customer.subtotal_debt || getSubtotalPendiente(customer)
@@ -1851,7 +1851,7 @@ const sendReminder = async (customer) => {
       // Mensaje de error amigable
       const message = response.data.message || 'No se pudo enviar el recordatorio'
       if (response.data.requires_whatsapp) {
-        showError('WhatsApp no está conectado. Conéctalo desde el botón de configuración ⚙️')
+        showError('WhatsApp no está conectado. Conéctalo desde el botón de configuración ')
       } else {
         showError(message)
       }
@@ -1865,7 +1865,7 @@ const sendReminder = async (customer) => {
   }
 }
 
-// 🎯 CreditiTenda: Funciones para creación de cliente con validación de cédula
+// CreditiTenda: Funciones para creación de cliente con validación de cédula
 const openCreateCreditModal = () => {
   customerForm.value = {
     document_type: 'CC',
@@ -1925,8 +1925,8 @@ const removePhoto = () => {
   photoPreview.value = null
 }
 
-// 🗑️ Función para confirmar y eliminar crédito
-// 🗑️ Función para abrir modal de confirmación de eliminación
+// Función para confirmar y eliminar crédito
+// Función para abrir modal de confirmación de eliminación
 const confirmDeleteCredit = (customer) => {
   // Verificar que el cliente esté al día (sin deuda)
   if (customer.balance > 0 || customer.current_debt > 0) {
@@ -1939,7 +1939,7 @@ const confirmDeleteCredit = (customer) => {
   showDeleteModal.value = true
 }
 
-// 🗑️ Función para ejecutar la eliminación del crédito
+// Función para ejecutar la eliminación del crédito
 const executeDeleteCredit = async () => {
   if (!customerToDelete.value) return
   
@@ -2115,14 +2115,11 @@ const checkDocumentExists = async () => {
           photoPreview.value = existingCustomer.credit_photo
         }
         
-        console.log('✅ Cliente encontrado y campos auto-llenados:', existingCustomer.name)
       } else {
         customerExists.value = false
-        console.log('📝 Cliente no encontrado, listo para crear nuevo')
       }
     } catch (error) {
       // Búsqueda opcional: No mostrar error si no encuentra el cliente
-      console.log('📝 No se encontró cliente con ese documento')
       customerExists.value = false
     } finally {
       checkingDocument.value = false
@@ -2160,60 +2157,60 @@ const saveCustomerCredit = async () => {
 
     if (response.data.success) {
       const isNewCustomer = !customerExists.value
-      const createdCustomer = response.data.data // 📦 Cliente con credit_id y token generados
+      const createdCustomer = response.data.data // Cliente con credit_id y token generados
       
       showSuccess(customerExists.value ? 'Crédito actualizado exitosamente' : 'Crédito creado exitosamente')
       showCreateCreditModal.value = false
       await loadCustomers()
       
-      // 🎉 Enviar mensajes de bienvenida para CUALQUIER nuevo crédito
+      // Enviar mensajes de bienvenida para CUALQUIER nuevo crédito
       // (tanto clientes nuevos como clientes existentes que reciben crédito por primera vez o de nuevo)
       if (customerForm.value.email || customerForm.value.phone) {
         await sendWelcomeMessages(createdCustomer)
       }
     }
   } catch (error) {
-    console.error('❌ Error al crear/actualizar cliente:', error)
-    console.error('📊 Respuesta del servidor:', error.response?.data)
-    console.error('📝 Datos enviados:', customerForm.value)
+    console.error('Error al crear/actualizar cliente:', error)
+    console.error('Respuesta del servidor:', error.response?.data)
+    console.error('Datos enviados:', customerForm.value)
     
     if (error.response?.data?.errors) {
       const errors = error.response.data.errors
       const firstError = Object.values(errors)[0]
       
       if (errors.document_number) {
-        showError('❌ Este número de documento ya está registrado')
+        showError('Este número de documento ya está registrado')
       } else if (errors.email) {
-        showError('❌ Este correo electrónico ya está registrado')
+        showError('Este correo electrónico ya está registrado')
       } else if (errors.name) {
-        showError('❌ El nombre del cliente es requerido')
+        showError('El nombre del cliente es requerido')
       } else {
-        showError(`❌ Error de validación: ${Array.isArray(firstError) ? firstError[0] : firstError}`)
+        showError(`Error de validación: ${Array.isArray(firstError) ? firstError[0] : firstError}`)
       }
     } else if (error.response?.data?.message) {
-      showError(`❌ Error: ${error.response.data.message}`)
+      showError(`Error: ${error.response.data.message}`)
     } else if (error.response?.data?.error) {
-      showError(`❌ Error del servidor: ${error.response.data.error}`)
+      showError(`Error del servidor: ${error.response.data.error}`)
     } else if (error.message) {
-      showError(`❌ Error al crear cliente: ${error.message}`)
+      showError(`Error al crear cliente: ${error.message}`)
     } else {
-      showError('❌ Error desconocido al crear el cliente. Verifica la consola para más detalles.')
+      showError('Error desconocido al crear el cliente. Verifica la consola para más detalles.')
     }
   } finally {
     processing.value = false
   }
 }
 
-// 🎉 FUNCIÓN CRM: Enviar mensajes de bienvenida a nuevo cliente con crédito
+// FUNCIÓN CRM: Enviar mensajes de bienvenida a nuevo cliente con crédito
 const sendWelcomeMessages = async (createdCustomer = null) => {
   try {
     const customerData = createdCustomer || customerForm.value
-    // 🔧 Usar nombre de empresa de systemSettings o fallback
+    // Usar nombre de empresa de systemSettings o fallback
     const companyName = systemSettings.value.company_name || 'MATIMAA'
-    // 🔧 Obtener porcentaje de recargo del sistema (dinámico)
+    // Obtener porcentaje de recargo del sistema (dinámico)
     const surchargePercent = parseFloat(systemSettings.value.credit_surcharge_percentage) || 10
     
-    // 🔗 Construir URL del portal de crédito
+    // Construir URL del portal de crédito
     const baseUrl = window.location.origin
     const portalUrl = customerData.credit_access_token 
       ? `${baseUrl}/mi-credito?token=${customerData.credit_access_token}`
@@ -2233,7 +2230,7 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
     const ejemploRecargo = Math.round(ejemploProductos * surchargePercent / 100)
     const ejemploTotal = ejemploProductos + ejemploRecargo
 
-    // 📧 Enviar email de bienvenida si tiene correo
+    // Enviar email de bienvenida si tiene correo
     if (customerData.email && customerData.email.includes('@')) {
       try {
         const currentDate = new Date().toLocaleDateString('es-CO', { 
@@ -2260,7 +2257,7 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
                 <!-- Saludo con icono visual -->
                 <div style="text-align: center; margin-bottom: 30px;">
                   <div style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 60px; height: 60px; border-radius: 50%; line-height: 60px; margin-bottom: 15px;">
-                    <span style="color: white; font-size: 28px;">✓</span>
+                    <span style="color: white; font-size: 28px;"></span>
                   </div>
                   <h2 style="color: #0f766e; margin: 0; font-size: 22px; font-weight: 600;">Crédito Aprobado</h2>
                 </div>
@@ -2313,10 +2310,10 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
                   </p>
                 </div>
                 
-                <!-- 📊 Información sobre recargo financiero (transparencia) -->
+                <!-- Información sobre recargo financiero (transparencia) -->
                 <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 18px 20px; margin: 20px 0; border-radius: 8px;">
                   <p style="color: #0c4a6e; margin: 0 0 10px 0; font-size: 13px; font-weight: 600;">
-                    📊 Información de su Crédito
+                    Información de su Crédito
                   </p>
                   <p style="color: #0369a1; margin: 0; font-size: 13px; line-height: 1.7;">
                     Las compras realizadas a crédito incluyen un <strong>recargo financiero del ${surchargePercent}%</strong> 
@@ -2341,14 +2338,14 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
                   </div>
                 </div>
                 
-                <!-- 🔗 Botón de acceso al portal de crédito -->
+                <!-- Botón de acceso al portal de crédito -->
                 <div style="text-align: center; margin: 30px 0;">
                   <p style="color: #374151; font-size: 14px; margin: 0 0 15px 0;">
                     Consulte su crédito en línea en cualquier momento:
                   </p>
                   <a href="${portalUrl}" 
                      style="display: inline-block; background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); color: #ffffff; padding: 14px 32px; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px; letter-spacing: 0.5px;">
-                    📊 Ver Mi Crédito
+                    Ver Mi Crédito
                   </a>
                   <p style="color: #9ca3af; font-size: 11px; margin: 12px 0 0 0;">
                     Su ID de Crédito: <strong style="color: #0f766e;">${creditInfo.creditId}</strong>
@@ -2381,13 +2378,12 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
             </div>
           `
         })
-        console.log('✅ Email de bienvenida enviado correctamente')
       } catch (emailError) {
-        console.warn('⚠️ No se pudo enviar el email de bienvenida:', emailError.message)
+        console.warn('No se pudo enviar el email de bienvenida:', emailError.message)
       }
     }
 
-    // 📱 Enviar mensaje de WhatsApp si tiene teléfono
+    // Enviar mensaje de WhatsApp si tiene teléfono
     if (customerData.phone && customerData.phone.length >= 10) {
       try {
         // Formatear número de teléfono
@@ -2400,26 +2396,24 @@ const sendWelcomeMessages = async (createdCustomer = null) => {
           }
         }
         
-        const welcomeMessage = `🎉 *¡Bienvenido a ${companyName}!*
+        const welcomeMessage = `*¡Bienvenido a ${companyName}!*
 
 Hola *${customerData.name}*,
 
 Tu crédito ha sido *activado exitosamente*. 
 
-💳 *Tu Cupo:* ${creditInfo.creditLimit}
+*Tu Cupo:* ${creditInfo.creditLimit}
 
-📋 *Tu cuenta:*
+*Tu cuenta:*
 • ID: *${creditInfo.creditId}*
 • Documento: ${customerData.document_type} ${customerData.document_number}
 
-📊 *Nota:* Las compras a crédito incluyen un recargo del ${surchargePercent}%.
+*Nota:* Las compras a crédito incluyen un recargo del ${surchargePercent}%.
 
-💡 Paga a tiempo para mantener tu crédito activo.
+Paga a tiempo para mantener tu crédito activo.
 
-¡Gracias por confiar en nosotros! 🙌
-
----
-🔗 *Consulta tu crédito aquí:*
+¡Gracias por confiar en nosotros! ---
+*Consulta tu crédito aquí:*
 ${portalUrl}
 
 _${companyName}_`
@@ -2444,24 +2438,23 @@ _${companyName}_`
           }
         })
         
-        console.log('✅ WhatsApp de bienvenida enviado correctamente')
       } catch (whatsappError) {
-        console.warn('⚠️ No se pudo enviar el WhatsApp de bienvenida:', whatsappError.message)
+        console.warn('No se pudo enviar el WhatsApp de bienvenida:', whatsappError.message)
       }
     }
 
     // Mostrar notificación de que se enviaron los mensajes
     if (customerData.email || customerData.phone) {
-      showSuccess('🎉 Mensajes de bienvenida enviados al cliente')
+      showSuccess('Mensajes de bienvenida enviados al cliente')
     }
 
   } catch (error) {
-    console.error('❌ Error al enviar mensajes de bienvenida:', error)
+    console.error('Error al enviar mensajes de bienvenida:', error)
     // No mostrar error al usuario, ya que el crédito sí se creó correctamente
   }
 }
 
-// 🔔 Funciones de configuración de recordatorios
+// Funciones de configuración de recordatorios
 const loadReminderSettings = async () => {
   try {
     const response = await axiosInstance.get('/credit-reminder-settings')

@@ -21,13 +21,6 @@ class PlanUpgradeController extends Controller
     public function processUpgrade(Request $request)
     {
         // 🔥 LOG AGRESIVO PARA DEBUG
-        \Log::info('='.str_repeat('=', 50));
-        \Log::info('PlanUpgradeController::processUpgrade - INICIADO', [
-            'request_data' => $request->all(),
-            'request_url' => $request->fullUrl(),
-            'request_method' => $request->method(),
-        ]);
-        \Log::info('='.str_repeat('=', 50));
 
         // ✅ VALIDAR DATOS REQUERIDOS
         $validator = Validator::make($request->all(), [
@@ -115,10 +108,6 @@ class PlanUpgradeController extends Controller
 
             // Si el plan ya es el nuevo plan (actualizado por webhook), retornar éxito
             if ($oldPlan === $newPlan) {
-                Log::info('PlanUpgradeController::processUpgrade - Plan ya fue actualizado por webhook', [
-                    'tenant_id' => $tenantId,
-                    'plan' => $newPlan,
-                ]);
                 return response()->json([
                     'success' => true,
                     'message' => 'Plan ya está actualizado',
@@ -150,11 +139,6 @@ class PlanUpgradeController extends Controller
                 default => now()->addMonth(),  // monthly
             };
 
-            Log::info('PlanUpgradeController::processUpgrade - Calculando nueva suscripción', [
-                'tenant_id' => $tenantId,
-                'payment_frequency' => $paymentFrequency,
-                'subscription_ends_at' => $subscriptionEndsAt,
-            ]);
 
             // ✅ ACTUALIZAR TENANT
             $data = json_decode($tenant->data, true) ?? [];
@@ -175,18 +159,9 @@ class PlanUpgradeController extends Controller
                     'status' => 'completed',
                     'completed_at' => now(),
                 ]);
-                Log::info('PlanUpgradeController::processUpgrade - Marcado como completado');
             } else {
-                Log::info('PlanUpgradeController::processUpgrade - Ya estaba completado por webhook');
             }
 
-            Log::info('PlanUpgradeController::processUpgrade - UPGRADE EXITOSO', [
-                'tenant_id' => $tenantId,
-                'old_plan' => $oldPlan,
-                'new_plan' => $newPlan,
-                'reference' => $reference,
-                'subscription_ends_at' => $subscriptionEndsAt,
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -220,10 +195,6 @@ class PlanUpgradeController extends Controller
      */
     public function upgrade(Request $request)
     {
-        Log::info('PlanUpgradeController::upgrade - Solicitud de upgrade recibida', [
-            'user_id' => $request->user()?->id,
-            'request_data' => $request->all(),
-        ]);
 
         // ✅ VALIDAR AUTENTICACIÓN
         if (!$request->user()) {
@@ -331,12 +302,6 @@ class PlanUpgradeController extends Controller
                 default => now()->addMonth(),  // monthly
             };
 
-            Log::info('PlanUpgradeController::upgrade - Cálculo de fecha de expiración', [
-                'tenant_id' => $tenantId,
-                'payment_frequency' => $paymentFrequency,
-                'old_subscription_ends_at' => $tenant->subscription_ends_at,
-                'new_subscription_ends_at' => $subscriptionEndsAt,
-            ]);
 
             // ✅ ACTUALIZAR TENANT
             $data = json_decode($tenant->data, true) ?? [];
@@ -357,14 +322,6 @@ class PlanUpgradeController extends Controller
                 'completed_at' => now(),
             ]);
 
-            Log::info('PlanUpgradeController::upgrade - UPGRADE COMPLETADO EXITOSAMENTE', [
-                'tenant_id' => $tenantId,
-                'old_plan' => $oldPlan,
-                'new_plan' => $newPlan,
-                'payment_frequency' => $paymentFrequency,
-                'subscription_ends_at' => $subscriptionEndsAt,
-                'user_id' => $request->user()->id,
-            ]);
 
             return response()->json([
                 'success' => true,

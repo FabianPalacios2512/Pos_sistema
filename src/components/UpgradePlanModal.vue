@@ -859,7 +859,7 @@ const processPayment = async () => {
       number_doc_billing: '1234567890'
     }
 
-    // 🔥 CERRAR EL MODAL ANTES de abrir ePayco para que el iframe se vea correctamente
+    // CERRAR EL MODAL ANTES de abrir ePayco para que el iframe se vea correctamente
     emit('close')
     
     // Pequeño delay para que el modal se cierre completamente
@@ -869,7 +869,7 @@ const processPayment = async () => {
     
   } catch (error) {
     console.error('Error processing payment:', error)
-    alert('❌ Error al procesar el pago\n\n' + (error.response?.data?.error || error.message || 'Por favor, intenta nuevamente.'))
+    alert('Error al procesar el pago\n\n' + (error.response?.data?.error || error.message || 'Por favor, intenta nuevamente.'))
   } finally {
     isProcessing.value = false
   }

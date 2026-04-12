@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <!-- 🏪 HEADER PREMIUM: Retail Fashion Store Style (KHARIS-inspired) -->
+    <!-- HEADER PREMIUM: Retail Fashion Store Style (KHARIS-inspired) -->
     <header 
       ref="stickyHeader"
       class="fixed top-9 left-0 right-0 z-50 bg-white transition-all duration-300"
@@ -126,7 +126,7 @@
       </Transition>
     </header>
 
-    <!-- 🖼️ HERO BANNER: Compacto y Elegante -->
+    <!-- HERO BANNER: Compacto y Elegante -->
     <section 
       class="relative w-full overflow-hidden mt-[94px] lg:mt-[154px]" 
       :class="isMobilePreview ? 'h-[280px]' : 'h-[300px] md:h-[450px]'"
@@ -179,7 +179,7 @@
       </div>
     </section>
 
-    <!-- 🔧 BARRA STICKY: Filtrar + Ordenar (Móvil) - Línea fina inferior -->
+    <!-- BARRA STICKY: Filtrar + Ordenar (Móvil) - Línea fina inferior -->
     <div 
       class="lg:hidden sticky top-[93px] z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200"
     >
@@ -379,7 +379,7 @@
         </div>
       </div>
 
-      <!-- 🛍️ GRID DE PRODUCTOS: E-commerce Premium con Hover Effects -->
+      <!-- GRID DE PRODUCTOS: E-commerce Premium con Hover Effects -->
       <div :class="gridClassesPremium">
         <TransitionGroup name="list">
           <div 
@@ -392,7 +392,7 @@
               @click="openProductDetails(product)"
             >
               
-              <!-- 📸 Product Image - Aspect 3:4 Uniforme -->
+              <!-- Product Image - Aspect 3:4 Uniforme -->
               <div class="relative aspect-[3/4] overflow-hidden bg-gray-50">
                 
                 <!-- Imagen del Producto -->
@@ -412,7 +412,7 @@
                   </svg>
                 </div>
                 
-                <!-- 🛒 Botón Agregar - Minimal -->
+                <!-- Botón Agregar - Minimal -->
                 <button
                   @click.stop="addToCart(product)"
                   :disabled="product.stock === 0"
@@ -426,7 +426,7 @@
                   </svg>
                 </button>
 
-                <!-- 🏷️ Badges (Esquina Superior Izquierda) - Discretos -->
+                <!-- Badges (Esquina Superior Izquierda) - Discretos -->
                 <div class="absolute top-0 left-0 flex flex-col">
                   <span v-if="product.stock <= 5 && product.stock > 0" class="px-2 py-1 bg-gray-900/85 text-white text-[8px] font-semibold uppercase tracking-wider">
                     Solo {{ product.stock }}
@@ -440,7 +440,7 @@
                 </div>
               </div>
 
-              <!-- 📝 Product Info - Compacto y Alineado -->
+              <!-- Product Info - Compacto y Alineado -->
               <div class="pt-3 pb-4 px-0.5">
                 <h3 class="text-[13px] font-normal text-gray-700 truncate leading-snug mb-1">
                   {{ product.name }}
@@ -463,7 +463,7 @@
       </div>
     </section>
 
-    <!-- ⚖️ FOOTER: Powered by 105 POS -->
+    <!-- FOOTER: Powered by 105 POS -->
     <footer class="bg-white border-t border-gray-100 py-8 text-center" :class="{ 'mb-16': cartCount > 0 }">
       <p class="text-xs text-gray-400 tracking-wide">
         Tecnología por
@@ -476,7 +476,7 @@
       </p>
     </footer>
 
-    <!-- 📱 WHATSAPP BUTTON - En móvil sube con carrito, en PC fijo -->
+    <!-- WHATSAPP BUTTON - En móvil sube con carrito, en PC fijo -->
     <a 
       v-if="storeConfig.whatsapp_number"
       :href="`https://wa.me/${storeConfig.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hola, me interesa hacer un pedido`"
@@ -491,7 +491,7 @@
       </svg>
     </a>
 
-    <!-- 🛒 STICKY BOTTOM ACTION BAR - Solo Móvil (Desktop usa Mini-Cart en Header) -->
+    <!-- STICKY BOTTOM ACTION BAR - Solo Móvil (Desktop usa Mini-Cart en Header) -->
     <Transition name="slide-up">
       <div 
         v-if="cartCount > 0"
@@ -517,7 +517,7 @@
       </div>
     </Transition>
 
-    <!-- 📱 OFF-CANVAS DRAWER MENU (Menú Lateral de Categorías) -->
+    <!-- OFF-CANVAS DRAWER MENU (Menú Lateral de Categorías) -->
     <Transition name="fade">
       <div v-if="showMobileMenu" class="fixed inset-0 bg-black/50 z-[160]" @click="showMobileMenu = false"></div>
     </Transition>
@@ -577,7 +577,7 @@
       </div>
     </Transition>
 
-    <!-- 📱 MOBILE FILTERS DRAWER (Solo Móvil) -->
+    <!-- MOBILE FILTERS DRAWER (Solo Móvil) -->
     <Transition name="fade">
       <div v-if="showMobileFilters" class="lg:hidden fixed inset-0 bg-black/50 z-[150]" @click="showMobileFilters = false"></div>
     </Transition>
@@ -673,7 +673,7 @@
       </div>
     </Transition>
 
-    <!-- 📱 MOBILE SORT MODAL (Solo Móvil) -->
+    <!-- MOBILE SORT MODAL (Solo Móvil) -->
     <Transition name="fade">
       <div v-if="showSortModal" class="lg:hidden fixed inset-0 bg-black/50 z-[150]" @click="showSortModal = false"></div>
     </Transition>
@@ -746,7 +746,7 @@
       </div>
     </Transition>
 
-    <!-- ⚖️ Modal de Cantidad (Productos por peso/medida) -->
+    <!-- Modal de Cantidad (Productos por peso/medida) -->
     <QuantityModal
       :show="showQuantityModal"
       :product="selectedProductForQuantity"
@@ -754,7 +754,7 @@
       @confirm="handleQuantityConfirmed"
     />
 
-    <!-- 👗 Modal de Selección de Variantes (Fashion) -->
+    <!-- Modal de Selección de Variantes (Fashion) -->
     <POSVariantSelector
       :show="showVariantModal"
       :product="selectedProductForVariants"
@@ -975,7 +975,7 @@ const gridClasses = computed(() => {
   return 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 lg:gap-5'
 })
 
-// 🛍️ Grid Premium para Moda (2 columnas en móvil, máximo 4 en desktop)
+// Grid Premium para Moda (2 columnas en móvil, máximo 4 en desktop)
 const gridClassesPremium = computed(() => {
   if (props.isMobilePreview) {
     return 'grid grid-cols-2 gap-3 px-0'
@@ -1153,7 +1153,7 @@ onUnmounted(() => {
   transform: translateX(-100%);
 }
 
-/* 📢 Animación Carrusel de Anuncios */
+/* Animación Carrusel de Anuncios */
 @keyframes scroll-left {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -1323,7 +1323,7 @@ onUnmounted(() => {
   }
 }
 
-/* 🚂 Ticker Tren - Animación horizontal: entra desde derecha, se detiene, sale por izquierda */
+/* Ticker Tren - Animación horizontal: entra desde derecha, se detiene, sale por izquierda */
 .ticker-train-enter-active {
   transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1341,7 +1341,7 @@ onUnmounted(() => {
   transform: translateX(-100%);
 }
 
-/* 🎚️ Dual Range Slider - Estilos Premium */
+/* Dual Range Slider - Estilos Premium */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;

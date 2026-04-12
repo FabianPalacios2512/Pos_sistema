@@ -227,10 +227,10 @@
                 v-model="form.plan" 
                 class="w-full px-2 sm:px-4 py-2.5 sm:py-3 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl border-2 border-gray-200 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all text-sm sm:text-base"
               >
-                <option value="free">🎁 Trial</option>
-                <option value="basic">💼 Basic</option>
+                <option value="free">Trial</option>
+                <option value="basic">Basic</option>
                 <option value="premium">⭐ Premium</option>
-                <option value="enterprise">🏢 Enterprise</option>
+                <option value="enterprise">Enterprise</option>
               </select>
             </div>
 

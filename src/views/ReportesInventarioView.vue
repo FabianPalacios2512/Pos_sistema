@@ -1,5 +1,5 @@
 <template>
-  <!-- 📊 REPORTES DE INVENTARIO - NIVEL ENTERPRISE SaaS -->
+  <!-- REPORTES DE INVENTARIO - NIVEL ENTERPRISE SaaS -->
   <!-- Análisis profesional de inventario: KPIs, Rotación ABC, Distribución por Categoría, Stock Crítico -->
   <div class="space-y-6 animate-fade-in">
     
@@ -969,7 +969,7 @@ const exportReport = () => {
 // Lifecycle
 // ═══════════════════════════════════════════════════════════════
 
-// 🤖 Store de contexto para IA de voz
+// Store de contexto para IA de voz
 const uiContextStore = useUIContextStore()
 
 // Actualizar contexto para la IA
@@ -1047,33 +1047,33 @@ const registrarAccionesIA = () => {
       let mensaje = ''
       switch (tipoConsulta) {
         case 'valor_total':
-          mensaje = `💰 Valor total del inventario: ${formatMoney(metrics.value.totalInventoryValue)} (costo)\nValor potencial de venta: ${formatMoney(metrics.value.totalSaleValue)}\nMargen potencial: ${formatMoney(metrics.value.potentialMargin)} (${metrics.value.marginPercent.toFixed(1)}%)`
+          mensaje = `Valor total del inventario: ${formatMoney(metrics.value.totalInventoryValue)} (costo)\nValor potencial de venta: ${formatMoney(metrics.value.totalSaleValue)}\nMargen potencial: ${formatMoney(metrics.value.potentialMargin)} (${metrics.value.marginPercent.toFixed(1)}%)`
           break
           
         case 'stock_bajo':
           const stockBajo = lowStockProducts.value.slice(0, 5)
-          mensaje = `⚠️ Productos con stock bajo (${stockBajo.length}):\n` + 
+          mensaje = `Productos con stock bajo (${stockBajo.length}):\n` + 
             stockBajo.map((p, i) => `${i+1}. ${p.name}: ${p.current_stock} unidades (mín: ${p.min_stock})`).join('\n')
           break
           
         case 'top_vendidos':
           const topVendidos = topSellingProducts.value.slice(0, 5)
-          mensaje = `🏆 Top productos más vendidos:\n` + 
+          mensaje = `Top productos más vendidos:\n` + 
             topVendidos.map((p, i) => `${i+1}. ${p.name}: ${p.total_quantity_sold || 0} vendidos (${formatMoney(p.total_revenue || 0)})`).join('\n')
           break
           
         case 'sin_movimiento':
           const sinMov = deadStockProducts.value.slice(0, 5)
-          mensaje = `📦 Productos sin movimiento (capital inmovilizado):\n` + 
+          mensaje = `Productos sin movimiento (capital inmovilizado):\n` + 
             sinMov.map((p, i) => `${i+1}. ${p.name}: ${p.current_stock} unidades (${formatMoney((p.current_stock || 0) * (parseFloat(p.cost_price) || 0))} inmovilizado)`).join('\n')
           break
           
         case 'abc':
-          mensaje = `📊 Análisis ABC de rotación:\n• Clase A (alta rotación): ${abcAnalysis.value.A} productos\n• Clase B (media rotación): ${abcAnalysis.value.B} productos\n• Clase C (baja rotación): ${abcAnalysis.value.C} productos`
+          mensaje = `Análisis ABC de rotación:\n• Clase A (alta rotación): ${abcAnalysis.value.A} productos\n• Clase B (media rotación): ${abcAnalysis.value.B} productos\n• Clase C (baja rotación): ${abcAnalysis.value.C} productos`
           break
           
         default:
-          mensaje = `📦 RESUMEN DE INVENTARIO:
+          mensaje = `RESUMEN DE INVENTARIO:
 • Total productos: ${metrics.value.totalProducts} (${metrics.value.activeProducts} activos)
 • Valor inventario: ${formatMoney(metrics.value.totalInventoryValue)}
 • Valor venta potencial: ${formatMoney(metrics.value.totalSaleValue)}

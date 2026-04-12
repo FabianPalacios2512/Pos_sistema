@@ -156,7 +156,7 @@
             </button>
           </li>
           
-          <!-- 🧾 Facturación Electrónica DIAN (TEMPORALMENTE DESHABILITADO) -->
+          <!-- Facturación Electrónica DIAN (TEMPORALMENTE DESHABILITADO) -->
           <!-- TODO: Reactivar cuando esté listo el módulo de facturación electrónica
           <li>
             <button @click="activeSection = 'electronic-invoice'"
@@ -372,9 +372,9 @@
                 <label class="block text-xs font-semibold text-gray-700 dark:text-zinc-300 mb-2">Tipo de Negocio</label>
                 <select v-model="systemSettings.store_type" 
                         class="w-full px-3 py-2.5 text-sm border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                  <option value="general">🏪 General (Mini Market, Ferretería, Papelería)</option>
-                  <option value="fashion">👗 Moda (Ropa, Zapatos, Accesorios)</option>
-                  <option value="food">🍔 Restaurante / Comidas Rápidas</option>
+                  <option value="general">General (Mini Market, Ferretería, Papelería)</option>
+                  <option value="fashion">Moda (Ropa, Zapatos, Accesorios)</option>
+                  <option value="food">Restaurante / Comidas Rápidas</option>
                 </select>
                 <p class="text-[10px] text-gray-500 dark:text-zinc-400 mt-1">Cambia el diseño del punto de venta según tu tipo de negocio.</p>
               </div>
@@ -1032,7 +1032,7 @@
 
       </div>
 
-      <!-- 🗑️ Sección: Papelera de Productos -->
+      <!-- Sección: Papelera de Productos -->
       <div v-if="activeSection === 'trash'" class="space-y-6">
         
         <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-300 dark:border-zinc-800 shadow-xl dark:shadow-black/50 overflow-hidden">
@@ -1151,7 +1151,7 @@
         </div>
       </div>
 
-      <!-- 🧾 Sección: Facturación Electrónica DIAN -->
+      <!-- Sección: Facturación Electrónica DIAN -->
       <div v-if="activeSection === 'electronic-invoice'">
         <ElectronicInvoiceConfig />
       </div>
@@ -1488,7 +1488,6 @@ const errorMessage = ref('')
 const showErrorToast = ref(false)
 
 const showNotification = (message, type = 'success') => {
-  console.log(`[${type.toUpperCase()}] ${message}`)
   if (type === 'success') {
     successMessage.value = message
     showSuccessModal.value = true
@@ -1523,11 +1522,11 @@ const editingPaymentMethod = ref(null)
 // Secciones de configuración
 const sections = ref([
   { id: 'plan', name: 'Mi Plan', icon: '⭐' },
-  { id: 'general', name: 'General', icon: '🏢' },
-  { id: 'pos', name: 'POS', icon: '🛒' },
-  { id: 'discounts', name: 'Descuentos', icon: '🎯' },
-  { id: 'payments', name: 'Pagos', icon: '💳' },
-  { id: 'expenses', name: 'Gastos', icon: '💰' }
+  { id: 'general', name: 'General', icon: '' },
+  { id: 'pos', name: 'POS', icon: '' },
+  { id: 'discounts', name: 'Descuentos', icon: '' },
+  { id: 'payments', name: 'Pagos', icon: '' },
+  { id: 'expenses', name: 'Gastos', icon: '' }
 ])
 
 // =====================================================
@@ -1636,7 +1635,7 @@ const planLimits = computed(() => {
 // Configuraciones del sistema desde API
 const systemSettings = ref({
   company_name: 'Mi Empresa',
-  store_type: 'general', // 🏪 Default
+  store_type: 'general', // Default
   company_document: '',
   company_phone: '',
   company_email: '',
@@ -1685,7 +1684,7 @@ const discountForm = ref({
   allow_multiple_uses_per_user: false
 })
 
-// 🖼️ Funciones para manejar el logo de la empresa
+// Funciones para manejar el logo de la empresa
 const handleCompanyLogoUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
@@ -1805,22 +1804,18 @@ const saveAllSettings = async () => {
       auto_apply_discounts: systemSettings.value.auto_apply_discounts ? 1 : 0,
     }
     
-    console.log('🏪 [Settings] Guardando configuraciones:', { store_type: settingsToSave.store_type })
-    
     const response = await axiosInstance.put('/system-settings', settingsToSave)
-    
-    console.log('✅ [Settings] Respuesta del servidor:', response.data)
     
     if (response.data.success) {
       showNotification('Configuraciones guardadas exitosamente', 'success')
       // Recargar settings para confirmar que se guardaron
       await loadSystemSettings()
-      // 🔄 IMPORTANTE: Recargar appStore para que POS vea los cambios (force=true)
+      // IMPORTANTE: Recargar appStore para que POS vea los cambios (force=true)
       await appStore.loadSystemSettings(true)
     }
   } catch (error) {
-    console.error('❌ [Settings] Error al guardar configuración:', error)
-    console.error('❌ [Settings] Response:', error.response?.data)
+    console.error('[Settings] Error al guardar configuración:', error)
+    console.error('[Settings] Response:', error.response?.data)
     showNotification('Error al guardar configuración', 'error')
   } finally {
     loading.value = false
@@ -1833,7 +1828,7 @@ const resetToDefaults = async () => {
       const response = await axiosInstance.post('/system-settings/reset')
       if (response.data.success) {
         await loadSystemSettings()
-        showNotification('🔄 Configuraciones restauradas', 'success')
+        showNotification('Configuraciones restauradas', 'success')
       }
     } catch (error) {
       console.error('Error al restaurar configuración:', error)
@@ -1912,11 +1907,11 @@ const saveDiscount = async () => {
     if (response.data.success) {
       await loadDiscounts()
       closeDiscountModal()
-      showNotification(editingDiscount.value ? '✅ Descuento actualizado' : '✅ Descuento creado', 'success')
+      showNotification(editingDiscount.value ? 'Descuento actualizado' : 'Descuento creado', 'success')
     }
   } catch (error) {
     console.error('Error al guardar descuento:', error)
-    showNotification('❌ Error al guardar descuento', 'error')
+    showNotification('Error al guardar descuento', 'error')
   } finally {
     loading.value = false
   }
@@ -1946,7 +1941,7 @@ const deleteDiscount = async (id) => {
       const response = await axiosInstance.delete(`/discounts/${id}`)
       if (response.data.success) {
         await loadDiscounts()
-        showNotification('✅ Descuento eliminado', 'success')
+        showNotification('Descuento eliminado', 'success')
       }
     } catch (error) {
       console.error('Error al eliminar descuento:', error)
@@ -1982,7 +1977,7 @@ const togglePaymentMethodStatus = async (method) => {
     const response = await axiosInstance.patch(`/payment-methods/${method.id}/toggle-status`)
     if (response.data.success) {
       await loadPaymentMethods()
-      showNotification('✅ Estado actualizado', 'success')
+      showNotification('Estado actualizado', 'success')
     }
   } catch (error) {
     console.error('Error al cambiar estado:', error)
@@ -2000,7 +1995,7 @@ const deletePaymentMethod = async (id) => {
       const response = await axiosInstance.delete(`/payment-methods/${id}`)
       if (response.data.success) {
         await loadPaymentMethods()
-        showNotification('✅ Método de pago eliminado', 'success')
+        showNotification('Método de pago eliminado', 'success')
       }
     } catch (error) {
       console.error('Error al eliminar método de pago:', error)
@@ -2085,10 +2080,10 @@ const saveExpenseCategory = async () => {
     
     await loadExpenseCategories()
     closeCategoryModal()
-    showNotification(editingCategory.value ? '✅ Categoría actualizada' : '✅ Categoría creada', 'success')
+    showNotification(editingCategory.value ? 'Categoría actualizada' : 'Categoría creada', 'success')
   } catch (error) {
     console.error('Error al guardar categoría:', error)
-    showNotification('❌ Error al guardar categoría', 'error')
+    showNotification('Error al guardar categoría', 'error')
   } finally {
     savingCategory.value = false
   }
@@ -2099,10 +2094,10 @@ const deleteExpenseCategory = async (id) => {
     try {
       await axiosInstance.delete(`/expense-categories/${id}`)
       await loadExpenseCategories()
-      showNotification('✅ Categoría eliminada', 'success')
+      showNotification('Categoría eliminada', 'success')
     } catch (error) {
       console.error('Error al eliminar categoría:', error)
-      showNotification('❌ Error al eliminar categoría', 'error')
+      showNotification('Error al eliminar categoría', 'error')
     }
   }
 }
@@ -2178,7 +2173,6 @@ watch(activeSection, (newVal) => {
 // Watch para cambiar sección desde query params
 watch(() => props.queryParams, (newParams) => {
   if (newParams && newParams.section) {
-    console.log('🔄 Cambiando sección desde query params:', newParams.section)
     activeSection.value = newParams.section
   }
 }, { immediate: true, deep: true })
@@ -2193,7 +2187,7 @@ const handleUpgradeSuccess = async (upgradeData) => {
   await loadSystemSettings()
   
   // Mostrar mensaje de éxito
-  showNotification('✅ Plan actualizado exitosamente. Redirigiéndote al POS...', 'success')
+  showNotification('Plan actualizado exitosamente. Redirigiéndote al POS...', 'success')
   
   // Redirigir al POS después de 2 segundos
   setTimeout(() => {
@@ -2207,7 +2201,7 @@ onMounted(async () => {
   await loadDiscounts()
   await loadPaymentMethods()
   
-  // 🔥 Verificar si viene un error de pago en la URL (desde PaymentSuccess)
+  // Verificar si viene un error de pago en la URL (desde PaymentSuccess)
   const urlParams = new URLSearchParams(window.location.search)
   const paymentError = urlParams.get('payment_error')
   if (paymentError) {

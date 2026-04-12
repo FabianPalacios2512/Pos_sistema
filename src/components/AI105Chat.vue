@@ -8,7 +8,7 @@
         :style="{ top: dynamicHeaderHeight + 'px', height: `calc(100% - ${dynamicHeaderHeight}px)` }"
       >
         <!-- ═══════════════════════════════════════════════════════════════
-             🔴 LIVE CALL OVERLAY - Vista de llamada en vivo estilo Futurista Light Mode
+             LIVE CALL OVERLAY - Vista de llamada en vivo estilo Futurista Light Mode
              Diseño: Google Gemini / Apple Intelligence / Siri
         ═══════════════════════════════════════════════════════════════ -->
         <transition name="fade">
@@ -370,7 +370,7 @@
         </div>
 
         <!-- ═══════════════════════════════════════════════════════════════
-             🎵 Mini Controles de Radio (flotante)
+             Mini Controles de Radio (flotante)
         ═══════════════════════════════════════════════════════════════ -->
         <transition name="slide-down">
           <div 
@@ -414,7 +414,7 @@
           <div ref="messagesContainer" class="flex-1 overflow-y-auto">
             
             <!-- ══════════════════════════════════════════════════════════
-                 🔒 BLOQUEO POR PLAN - Free Trial y Básico sin IA
+                 BLOQUEO POR PLAN - Free Trial y Básico sin IA
             ══════════════════════════════════════════════════════════ -->
             <div v-if="!hasAIAccess" class="h-full flex flex-col items-center justify-center px-6 text-center">
               <div class="w-20 h-20 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full flex items-center justify-center mb-6">
@@ -432,7 +432,7 @@
                 @click="$emit('navigate', 'upgrade')"
                 class="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-medium rounded-full hover:shadow-lg hover:shadow-purple-500/25 transition-all"
               >
-                ✨ Actualizar Plan
+                Actualizar Plan
               </button>
               <p class="text-xs text-gray-400 dark:text-zinc-500 mt-4">
                 Plan actual: {{ tenantPlan.replace('_', ' ').toUpperCase() }}
@@ -521,13 +521,13 @@
                         <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
                         </svg>
-                        <p class="text-blue-700 dark:text-blue-400 text-sm">{{ message.text.replace(/^ℹ️\s*/, '') }}</p>
+                        <p class="text-blue-700 dark:text-blue-400 text-sm">{{ message.text.replace(/^ℹ*/, '') }}</p>
                       </div>
                       <div v-else-if="message.isWarning" class="flex items-center gap-2">
                         <svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
                         </svg>
-                        <p class="text-amber-700 dark:text-amber-400 text-sm">{{ message.text.replace(/^⚠️\s*/, '') }}</p>
+                        <p class="text-amber-700 dark:text-amber-400 text-sm">{{ message.text }}</p>
                       </div>
                       <p v-else class="whitespace-pre-line">{{ message.text }}</p>
                       
@@ -640,7 +640,7 @@
                   
                   <!-- Derecha: Mic + Enviar -->
                   <div class="flex items-center gap-1">
-                    <!-- 📞 Botón Live Call (solo para Premium y Enterprise) -->
+                    <!-- Botón Live Call (solo para Premium y Enterprise) -->
                     <button
                       v-if="hasVoiceAccess"
                       type="button"
@@ -797,17 +797,17 @@ export default {
     const radioStore = useRadioStore()
     // appStore ya está importado directamente
     
-    // 🧠 Store de contexto de pantalla para la IA
+    // Store de contexto de pantalla para la IA
     const aiContextStore = useAIContextStore()
     
-    // 📞 Composable para llamada en vivo con Gemini Live API
+    // Composable para llamada en vivo con Gemini Live API
     const liveCall = useLiveCall()
     
-    // 🔒 Control de acceso a IA por plan - ESCALERA DE BENEFICIOS
+    // Control de acceso a IA por plan - ESCALERA DE BENEFICIOS
     // Todos tienen IA, pero con límites diferentes según el plan
     const tenantPlan = computed(() => appStore.tenantPlan || 'free_trial')
     
-    // ⚠️ MODO DESARROLLO - Cambiar a false en producción
+    // MODO DESARROLLO - Cambiar a false en producción
     const DEV_MODE_UNLIMITED = false
     
     // Límites de mensajes de chat por día según plan
@@ -821,7 +821,7 @@ export default {
     
     // Límites de voz en segundos por día según plan
     // Presupuesto máximo diario: Premium ~$1,425 COP, Enterprise ~$2,850 COP
-    // ⚠️ En producción: premium=900 (15min), enterprise=1800 (30min)
+    // En producción: premium=900 (15min), enterprise=1800 (30min)
     const VOICE_LIMITS = {
       'free_trial': DEV_MODE_UNLIMITED ? 0 : 0,      // Sin voz (0 = sin límite si DEV_MODE)
       'basico': DEV_MODE_UNLIMITED ? 0 : 0,          // Sin voz
@@ -833,7 +833,7 @@ export default {
     const hasAIAccess = computed(() => true)
     
     // Solo Premium y Enterprise tienen voz (en dev mode, todos tienen)
-    // 🚫 Planes BLOQUEADOS: free_trial y starter
+    // Planes BLOQUEADOS: free_trial y starter
     const hasVoiceAccess = computed(() => {
       if (DEV_MODE_UNLIMITED) return true
       const plan = tenantPlan.value.toLowerCase()
@@ -1049,13 +1049,13 @@ export default {
       }
     ]
 
-    // 🎨 Chips estilo Gemini con emojis
+    // Chips de sugerencias rápidas
     const geminiChips = computed(() => [
-      { icon: '📊', text: '¿Cuánto vendí hoy?', category: 'ventas' },
-      { icon: '📦', text: 'Productos con stock bajo', category: 'inventario' },
-      { icon: '➕', text: 'Crear un nuevo producto', category: 'inventario' },
-      { icon: '📄', text: 'Facturas pendientes', category: 'facturas' },
-      { icon: '🎵', text: 'Pon música', category: 'radio' }
+      { icon: '', text: '¿Cuánto vendí hoy?', category: 'ventas' },
+      { icon: '', text: 'Productos con stock bajo', category: 'inventario' },
+      { icon: '', text: 'Crear un nuevo producto', category: 'inventario' },
+      { icon: '', text: 'Facturas pendientes', category: 'facturas' },
+      { icon: '', text: 'Pon música', category: 'radio' }
     ])
 
     // Sugerencias que cambian según la categoría seleccionada
@@ -1164,7 +1164,7 @@ export default {
           recordVoiceUsage(secondsUsed)
         }
         
-        // 🔒 Mostrar mensaje si la llamada fue terminada automáticamente por límite
+        // Mostrar mensaje si la llamada fue terminada automáticamente por límite
         if (liveCall.wasAutoTerminated.value) {
           messages.value.push({
             type: 'ai',
@@ -1271,7 +1271,7 @@ export default {
 
       messages.value.push({
         type: 'user',
-        text: file ? `${userMessage}\n📎 ${file.name}` : userMessage,
+        text: file ? `${userMessage}\n${file.name}` : userMessage,
         timestamp: getCurrentTime()
       })
 
@@ -1280,7 +1280,7 @@ export default {
 
       isTyping.value = true
       
-      // 🧠 OPTIMIZACIÓN: Detectar si el mensaje necesita contexto de negocio
+      // OPTIMIZACIÓN: Detectar si el mensaje necesita contexto de negocio
       // Mensajes simples como "hola", "gracias", "ok" NO necesitan todos los datos
       const needsBusinessContext = (() => {
         const msg = userMessage.toLowerCase().trim()
@@ -1331,7 +1331,7 @@ export default {
         return businessKeywords.some(keyword => msg.includes(keyword))
       })()
       
-      // 🧠 Solo obtener contexto si el mensaje lo necesita
+      // Solo obtener contexto si el mensaje lo necesita
       const screenContext = needsBusinessContext ? aiContextStore.getSystemPrompt() : null
       
       try {
@@ -1353,7 +1353,7 @@ export default {
             message: userMessage,
             provider: selectedProvider.value,
             session_id: sessionId.value,
-            // 🧠 Enviar contexto de pantalla al backend
+            // Enviar contexto de pantalla al backend
             screen_context: screenContext || null
           })
         }
@@ -1419,7 +1419,7 @@ export default {
           if (targetModule) navigateToModule(targetModule, queryParams)
         }
 
-        // 🎵 Procesar acciones de radio
+        // Procesar acciones de radio
         if (aiAction && aiAction.type === 'radio' && aiAction.payload) {
           const radioAction = aiAction.payload.action
           const volume = aiAction.payload.volume
@@ -1554,7 +1554,7 @@ export default {
       }
     }
 
-    // 📞 Iniciar llamada en vivo
+    // Iniciar llamada en vivo
     const startLiveCall = async () => {
       // Verificar acceso por plan
       if (!hasVoiceAccess.value) {
@@ -1582,7 +1582,7 @@ export default {
         // Guardar tiempo de inicio para calcular duración
         const startTime = Date.now()
         
-        // 🔒 Establecer límite máximo de duración para corte automático
+        // Establecer límite máximo de duración para corte automático
         const remainingSeconds = voiceSecondsRemaining.value
         liveCall.setMaxDuration(remainingSeconds)
         
@@ -1593,14 +1593,14 @@ export default {
       } catch (err) {
         messages.value.push({
           type: 'ai',
-          text: `📞 No se pudo iniciar la llamada: ${err.message || 'Error desconocido'}`,
+          text: `No se pudo iniciar la llamada: ${err.message || 'Error desconocido'}`,
           timestamp: getCurrentTime(),
           isWarning: true
         })
       }
     }
     
-    // 📞 Terminar llamada en vivo
+    // Terminar llamada en vivo
     const endLiveCall = () => {
       liveCall.endCall()
     }
@@ -1646,11 +1646,11 @@ export default {
       radioControlPlayPause,
       radioControlNext,
       closeRadioControls,
-      // 📞 Llamada en vivo
+      // Llamada en vivo
       liveCall,
       startLiveCall,
       endLiveCall,
-      // 🔒 Control de acceso por plan
+      // Control de acceso por plan
       tenantPlan,
       hasAIAccess,
       hasVoiceAccess,
@@ -1658,7 +1658,7 @@ export default {
       canUseVoice,
       voiceSecondsRemaining,
       voiceLimitSeconds,
-      // 💬 Límites de chat por plan
+      // Límites de chat por plan
       chatMessageLimit,
       chatMessagesUsedToday,
       chatMessagesRemaining,
@@ -1772,7 +1772,7 @@ export default {
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
-   🎨 ANIMACIONES FUTURISTAS PARA VOICE AI - Estilo Gemini/Siri/Apple Intelligence
+   ANIMACIONES FUTURISTAS PARA VOICE AI - Estilo Gemini/Siri/Apple Intelligence
 ════════════════════════════════════════════════════════════════════════════ */
 
 /* Ambient Glow Pulse - Para los fondos de luz difusa */

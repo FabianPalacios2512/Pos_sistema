@@ -1,5 +1,5 @@
 /**
- * 🖥️ useScreenScaling v5 - ULTRA LIGERO
+ * useScreenScaling v5 - ULTRA LIGERO
  * 
  * Solo actúa cuando Windows tiene escalado 125%+ (devicePixelRatio > 1.2)
  * Completamente transparente cuando no hay escalado.
@@ -16,6 +16,8 @@ import { ref, onMounted, computed } from 'vue'
 const deviceScale = ref(1)
 const appliedZoom = ref(1)
 const isCompensating = ref(false)
+// Zoom base de compensación (sin zoom del usuario)
+const baseZoom = ref(1)
 
 // Flag para evitar múltiples inicializaciones
 let isInitialized = false
@@ -73,23 +75,27 @@ function applyCompensation() {
   // Si NO necesita compensación, asegurar que todo esté limpio y salir
   if (!needsCompensation()) {
     appliedZoom.value = 1
+    baseZoom.value = 1
     isCompensating.value = false
     
     // Limpiar cualquier estilo residual
     html.style.zoom = ''
     html.style.removeProperty('--inv-scale')
+    html.style.removeProperty('--base-zoom')
     body.classList.remove('screen-compensated')
     return
   }
   
   // Sí necesita compensación (Windows 125%+)
   const zoom = getZoomValue(ratio)
+  baseZoom.value = zoom
   appliedZoom.value = zoom
   isCompensating.value = true
   
   // Aplicar solo el zoom CSS - el navegador maneja el resto
   html.style.zoom = String(zoom)
   html.style.setProperty('--inv-scale', String(1 / zoom))
+  html.style.setProperty('--base-zoom', String(zoom))
   body.classList.add('screen-compensated')
 }
 
@@ -109,9 +115,32 @@ export function useScreenScaling() {
   return {
     deviceScale,
     appliedZoom,
+    baseZoom,
     isCompensating,
     isScaled
   }
+}
+
+/**
+ * Aplicar zoom del usuario SOBRE el zoom base de compensación.
+ * @param {number} userZoomPercent - Zoom del usuario en porcentaje (e.g. 100, 90, 110)
+ */
+export function applyUserZoom(userZoomPercent) {
+  const userFactor = userZoomPercent / 100
+  const finalZoom = baseZoom.value * userFactor
+  
+  appliedZoom.value = finalZoom
+  
+  const html = document.documentElement
+  html.style.zoom = String(finalZoom)
+  html.style.setProperty('--inv-scale', String(1 / finalZoom))
+}
+
+/**
+ * Obtener el zoom base de compensación actual (para lectura externa)
+ */
+export function getBaseZoom() {
+  return baseZoom.value
 }
 
 /**
@@ -120,13 +149,24 @@ export function useScreenScaling() {
 export function initScreenScaling() {
   if (isInitialized) return
   
-  // Aplicar inmediatamente
+  // Aplicar compensación base inmediatamente
   applyCompensation()
   isInitialized = true
   
+  // Aplicar zoom del usuario guardado sobre la compensación base
+  const savedZoom = parseFloat(localStorage.getItem('pos_zoom') || '100')
+  if (savedZoom !== 100) {
+    applyUserZoom(savedZoom)
+  }
+  
   // Solo re-aplicar si el documento aún está cargando
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyCompensation, { once: true })
+    document.addEventListener('DOMContentLoaded', () => {
+      applyCompensation()
+      if (savedZoom !== 100) {
+        applyUserZoom(savedZoom)
+      }
+    }, { once: true })
   }
 }
 

@@ -53,7 +53,7 @@
           <button 
             @click="activeTab = 'explore'"
             class="flex-1 py-3 text-sm font-bold transition-colors relative"
-            :class="activeTab === 'explore' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+            :class="activeTab === 'explore' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700'"
           >
             Explorar
             <div v-if="activeTab === 'explore'" class="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500"></div>
@@ -61,9 +61,9 @@
           <button 
             @click="activeTab = 'favorites'"
             class="flex-1 py-3 text-sm font-bold transition-colors relative"
-            :class="activeTab === 'favorites' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'"
+            :class="activeTab === 'favorites' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-700'"
           >
-            ❤️ Mis Favoritas
+            Mis Favoritas
             <div v-if="activeTab === 'favorites'" class="absolute bottom-0 left-0 w-full h-0.5 bg-emerald-500"></div>
           </button>
         </div>
@@ -107,11 +107,11 @@
             <div class="ml-3 flex-1 min-w-0 cursor-pointer" @click="selectRadio(radio)">
               <h4 
                 class="font-bold text-sm truncate"
-                :class="currentRadio?.id === radio.id ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-800 dark:text-gray-200'"
+                :class="currentRadio?.id === radio.id ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-800 dark:text-zinc-200'"
               >
                 {{ radio.name }}
               </h4>
-              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+              <p class="text-xs text-gray-500 dark:text-zinc-400 truncate">
                 {{ currentRadio?.id === radio.id && isPlaying ? 'Reproduciendo...' : 'Frecuencia FM' }}
               </p>
             </div>
@@ -159,7 +159,7 @@
             </div>
 
             <div v-else class="bg-white dark:bg-zinc-800 p-3 rounded-xl border border-gray-100 dark:border-zinc-700 shadow-sm animate-fade-in">
-              <p class="text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Solicitar Emisora</p>
+              <p class="text-xs font-bold text-gray-700 dark:text-zinc-300 mb-2">Solicitar Emisora</p>
               <div class="flex gap-2">
                 <input 
                   v-model="requestStationName"
@@ -351,7 +351,7 @@ const isFavorite = (id) => favorites.value.has(id)
 // Request Logic
 const submitRequest = () => {
   if (!requestStationName.value) return
-  alert('¡Gracias! Hemos recibido tu solicitud. 🎵')
+  alert('¡Gracias! Hemos recibido tu solicitud. ')
   requestStationName.value = ''
   showRequestForm.value = false
 }

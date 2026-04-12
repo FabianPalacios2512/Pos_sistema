@@ -75,7 +75,6 @@ class AlanubeService
      */
     public function createCompany(array $companyData): array
     {
-        Log::info('🏢 Alanube: Creando empresa', ['data' => $companyData]);
 
         $payload = [
             'name' => $companyData['name'],
@@ -95,9 +94,6 @@ class AlanubeService
         $result = $response->json();
 
         if ($response->successful()) {
-            Log::info('✅ Alanube: Empresa creada exitosamente', [
-                'company_id' => $result['company']['id'] ?? null
-            ]);
         } else {
             Log::error('❌ Alanube: Error creando empresa', [
                 'status' => $response->status(),
@@ -119,10 +115,6 @@ class AlanubeService
      */
     public function runTestSet(string $companyId, string $type = 'invoices'): array
     {
-        Log::info('🧪 Alanube: Ejecutando set de pruebas DIAN', [
-            'company_id' => $companyId,
-            'type' => $type
-        ]);
 
         // Government ID para sandbox DIAN
         $governmentId = env('ALANUBE_ENVIRONMENT', 'sandbox') === 'production'
@@ -148,9 +140,6 @@ class AlanubeService
         $result = $response->json();
 
         if ($response->successful()) {
-            Log::info('✅ Alanube: Set de pruebas completado', [
-                'status' => $result['testSet']['status'] ?? 'unknown'
-            ]);
         } else {
             Log::error('❌ Alanube: Error en set de pruebas', [
                 'status' => $response->status(),
@@ -174,9 +163,6 @@ class AlanubeService
     {
         $startTime = microtime(true);
         
-        Log::info('🧾 Alanube: Creando factura electrónica', [
-            'invoice_number' => $invoiceData['number'] ?? 'N/A'
-        ]);
 
         // Obtener datos del tenant
         $settings = DB::table('system_settings')->first();
@@ -205,20 +191,7 @@ class AlanubeService
 
         if ($response->successful()) {
             // Log completo de la respuesta para debug
-            Log::info('🔍 Alanube: Respuesta completa', [
-                'invoice_keys' => array_keys($result['invoice'] ?? []),
-                'has_qrCodeUrl' => isset($result['invoice']['qrCodeUrl']),
-                'has_qrCode' => isset($result['invoice']['qrCode']),
-                'has_qrCodeContent' => isset($result['invoice']['qrCodeContent']),
-                'legalStatus' => $result['invoice']['legalStatus'] ?? 'N/A',
-                'governmentResponse' => $result['invoice']['governmentResponse'] ?? null
-            ]);
             
-            Log::info('✅ Alanube: Factura creada', [
-                'cufe' => $result['invoice']['cufe'] ?? 'N/A',
-                'number' => $result['invoice']['fullNumber'] ?? 'N/A',
-                'time_ms' => $elapsed
-            ]);
             
             // Buscar URL de QR de DIAN si existe
             $qrUrl = $result['invoice']['qrCodeUrl'] 
