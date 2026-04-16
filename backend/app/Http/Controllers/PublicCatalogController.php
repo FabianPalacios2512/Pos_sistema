@@ -240,6 +240,14 @@ class PublicCatalogController extends Controller
                         'currency_symbol' => '$',
                         'delivery_cost' => 0,
                         'minimum_order' => 0,
+                        'ai_color_palette' => null,
+                        'ai_fonts' => null,
+                        'ai_banner_texts' => null,
+                        'ai_about_us' => null,
+                        'ai_value_messages' => null,
+                        'ai_announcements' => null,
+                        'ai_cross_sell_messages' => null,
+                        'ai_layout_config' => null,
                         'store_name' => DB::table('system_settings')->value('company_name')
                             ?? \Stancl\Tenancy\Facades\Tenancy::tenant()?->business_name
                             ?? tenant('name')
@@ -264,6 +272,14 @@ class PublicCatalogController extends Controller
                     'delivery_cost' => $config->delivery_cost,
                     'minimum_order' => $config->minimum_order,
                     'custom_message' => $config->custom_message ?? 'Hola, quiero hacer el siguiente pedido:',
+                    'ai_color_palette' => json_decode($config->ai_color_palette ?? 'null', true),
+                    'ai_fonts' => json_decode($config->ai_fonts ?? 'null', true),
+                    'ai_banner_texts' => json_decode($config->ai_banner_texts ?? 'null', true),
+                    'ai_about_us' => $config->ai_about_us ?? null,
+                    'ai_value_messages' => json_decode($config->ai_value_messages ?? 'null', true),
+                    'ai_announcements' => json_decode($config->ai_announcements ?? 'null', true),
+                    'ai_cross_sell_messages' => json_decode($config->ai_cross_sell_messages ?? 'null', true),
+                    'ai_layout_config' => json_decode($config->ai_layout_config ?? 'null', true),
                     'store_name' => DB::table('system_settings')->value('company_name')
                         ?? \Stancl\Tenancy\Facades\Tenancy::tenant()?->business_name
                         ?? tenant('name')

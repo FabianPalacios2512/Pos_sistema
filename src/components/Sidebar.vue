@@ -141,7 +141,7 @@
       </div>
 
       <!-- INVENTARIO -->
-      <div v-if="hasModuleAccess('products') || hasModuleAccess('categories') || (hasModuleAccess('stock') && !isFashionStore) || hasModuleAccess('intelligent_inventory')">
+      <div v-if="hasModuleAccess('products') || hasModuleAccess('categories') || hasModuleAccess('stock') || hasModuleAccess('intelligent_inventory')">
         <div v-if="sidebarCollapsed" class="section-divider"></div>
         <h3 v-else class="text-[11px] font-black text-gray-400 dark:text-zinc-600 uppercase tracking-[0.2em] mt-8 mb-3 px-4">Inventario</h3>
         
@@ -172,7 +172,7 @@
         </div>
 
         <div
-          v-if="hasModuleAccess('stock') && !isFashionStore"
+          v-if="hasModuleAccess('stock')"
           @click="$emit('change-module', 'stock')"
           class="menu-item group"
           :class="[currentModule === 'stock' ? 'active' : '', sidebarCollapsed ? 'collapsed' : '']"

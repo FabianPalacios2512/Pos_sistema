@@ -46,7 +46,16 @@ const storeConfigForTemplate = computed(() => ({
   min_order_value: catalogConfig.value.min_order_value,
   custom_message: catalogConfig.value.custom_message,
   store_name: catalogConfig.value.store_name,
-  catalog_products: products.value
+  catalog_products: products.value,
+  // AI-Generated Brand Identity
+  ai_color_palette: catalogConfig.value.ai_color_palette,
+  ai_fonts: catalogConfig.value.ai_fonts,
+  ai_banner_texts: catalogConfig.value.ai_banner_texts,
+  ai_about_us: catalogConfig.value.ai_about_us,
+  ai_value_messages: catalogConfig.value.ai_value_messages,
+  ai_announcements: catalogConfig.value.ai_announcements,
+  ai_cross_sell_messages: catalogConfig.value.ai_cross_sell_messages,
+  ai_layout_config: catalogConfig.value.ai_layout_config
 }))
 
 // Cargar configuración del catálogo
@@ -66,7 +75,16 @@ const loadCatalogConfig = async () => {
         delivery_cost: parseFloat(data.delivery_cost || 0),
         min_order_value: parseFloat(data.minimum_order || 0),
         custom_message: data.custom_message || 'Hola, quiero hacer el siguiente pedido:',
-        store_name: data.store_name || 'Mi Tienda'
+        store_name: data.store_name || 'Mi Tienda',
+        // AI-Generated Brand Identity
+        ai_color_palette: data.ai_color_palette || null,
+        ai_fonts: data.ai_fonts || null,
+        ai_banner_texts: data.ai_banner_texts || null,
+        ai_about_us: data.ai_about_us || null,
+        ai_value_messages: data.ai_value_messages || null,
+        ai_announcements: data.ai_announcements || null,
+        ai_cross_sell_messages: data.ai_cross_sell_messages || null,
+        ai_layout_config: data.ai_layout_config || null
       }
     }
   } catch (error) {

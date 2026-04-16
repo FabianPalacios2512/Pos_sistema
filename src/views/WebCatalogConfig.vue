@@ -55,7 +55,12 @@
             : 'text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#f0f4f9] dark:hover:bg-[#282a2c]'"
         >
           <div class="w-4 h-4 flex items-center justify-center flex-shrink-0">
-            <svg v-if="tab.icon === 'palette'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" 
+            <svg v-if="tab.icon === 'sparkles'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" 
+                 :class="activeTab === tab.id ? 'text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-[#5f6368] dark:text-[#9aa0a6]'" 
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+            </svg>
+            <svg v-else-if="tab.icon === 'palette'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" 
                  :class="activeTab === tab.id ? 'text-[#1a73e8] dark:text-[#8ab4f8]' : 'text-[#5f6368] dark:text-[#9aa0a6]'" 
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -147,6 +152,256 @@
           </button>
         </div>
           
+          <!-- SECCIÓN: IA MARCA - Motor de Diseño Adaptativo -->
+          <div v-if="activeTab === 'ai-brand'" class="space-y-6 animate-fade-in">
+
+            <!-- TARJETA 1: Describe tu Negocio -->
+            <div class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+              <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+                <div class="flex items-center gap-2">
+                  <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+                  </svg>
+                  <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Describe tu Negocio</h3>
+                </div>
+                <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-1">Cuéntanos sobre tu tienda y la IA creará una identidad de marca completa</p>
+              </div>
+              
+              <div class="p-6 space-y-4">
+                <div class="relative">
+                  <textarea 
+                    v-model="aiBrandDescription"
+                    rows="5"
+                    placeholder="Ej: Vendo ropa casual para mujer, mi estilo es boho chic y minimalista. Me enfoco en telas naturales y colores tierra. Mi público son mujeres de 25-40 años que buscan comodidad con estilo..."
+                    class="w-full px-4 py-3 rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] bg-[#f8f9fa] dark:bg-[#282a2c] text-sm text-[#1e1f20] dark:text-[#e3e3e3] placeholder-[#5f6368] dark:placeholder-[#9aa0a6] focus:outline-none focus:ring-2 focus:ring-[#1a73e8] dark:focus:ring-[#8ab4f8] focus:border-transparent resize-none"
+                    :disabled="isGeneratingBrand"
+                  ></textarea>
+                  <span class="absolute bottom-3 right-3 text-[10px] text-[#9aa0a6]">{{ aiBrandDescription.length }}/2000</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <!-- Botón Generar -->
+                  <button 
+                    @click="generateAiBrand"
+                    :disabled="isGeneratingBrand || aiBrandDescription.trim().length < 10"
+                    class="flex-1 px-6 py-3 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-sm font-medium rounded-full transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg v-if="!isGeneratingBrand" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                    <svg v-else class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ isGeneratingBrand ? aiGenerationProgress || 'Generando...' : 'Generar Identidad con IA' }}
+                  </button>
+
+                  <!-- Botón Micrófono -->
+                  <button 
+                    @click="isRecordingVoice ? stopVoiceRecording() : startVoiceRecording()"
+                    class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0"
+                    :class="isRecordingVoice 
+                      ? 'bg-[#ea4335] text-white animate-pulse shadow-lg shadow-[#ea4335]/30' 
+                      : 'bg-[#f8f9fa] dark:bg-[#282a2c] text-[#5f6368] dark:text-[#9aa0a6] hover:bg-[#e8eaed] dark:hover:bg-[#3a3a3f] border border-[#e8eaed] dark:border-[#3a3a3f]'"
+                    :title="isRecordingVoice ? 'Detener grabación' : 'Dictar descripción'"
+                  >
+                    <svg v-if="!isRecordingVoice" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                    </svg>
+                    <svg v-else class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" />
+                    </svg>
+                  </button>
+                </div>
+
+                <p v-if="isRecordingVoice" class="text-xs text-[#ea4335] dark:text-[#f28b82] flex items-center gap-1.5">
+                  <span class="w-2 h-2 bg-[#ea4335] rounded-full animate-pulse"></span>
+                  Grabando... Habla sobre tu negocio y presiona el botón rojo para terminar.
+                </p>
+              </div>
+            </div>
+
+            <!-- RESULTADOS DE IA (Solo si hay datos generados) -->
+            <template v-if="aiBrandData">
+              
+              <!-- TARJETA 2: Paleta de Colores Generada -->
+              <div v-if="aiBrandData.color_palette" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between">
+                  <div>
+                    <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Paleta de Colores</h3>
+                    <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Generada por IA para tu identidad de marca</p>
+                  </div>
+                  <button 
+                    @click="applyAiColors"
+                    class="px-4 py-2 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-medium rounded-full transition-all"
+                  >
+                    Aplicar Color
+                  </button>
+                </div>
+                <div class="p-6">
+                  <div class="grid grid-cols-6 gap-3">
+                    <div v-for="(color, key) in aiBrandData.color_palette" :key="key" class="text-center">
+                      <div 
+                        class="w-full aspect-square rounded-2xl border-2 border-[#e8eaed] dark:border-[#3a3a3f] mb-2 cursor-pointer hover:scale-105 transition-transform"
+                        :style="{ backgroundColor: color }"
+                        :title="color"
+                        @click="navigator.clipboard.writeText(color)"
+                      ></div>
+                      <p class="text-[9px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">{{ key.replace('_', ' ') }}</p>
+                      <p class="text-[10px] font-mono text-[#1e1f20] dark:text-[#e3e3e3]">{{ color }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TARJETA 3: Tipografías -->
+              <div v-if="aiBrandData.fonts" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+                  <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Tipografías Recomendadas</h3>
+                  <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Par de fuentes seleccionado para tu marca</p>
+                </div>
+                <div class="p-6">
+                  <div class="grid grid-cols-2 gap-6">
+                    <div class="p-4 rounded-2xl bg-[#f8f9fa] dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f]">
+                      <p class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-2">Títulos</p>
+                      <p class="text-2xl text-[#1e1f20] dark:text-[#e3e3e3]" :style="{ fontFamily: aiBrandData.fonts.heading + ', serif' }">
+                        {{ aiBrandData.fonts.heading }}
+                      </p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-[#f8f9fa] dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f]">
+                      <p class="text-[10px] font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide mb-2">Cuerpo de texto</p>
+                      <p class="text-base text-[#1e1f20] dark:text-[#e3e3e3]" :style="{ fontFamily: aiBrandData.fonts.body + ', sans-serif' }">
+                        {{ aiBrandData.fonts.body }}
+                      </p>
+                    </div>
+                  </div>
+                  <p v-if="aiBrandData.fonts.style_rationale" class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mt-4 italic">
+                    {{ aiBrandData.fonts.style_rationale }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- TARJETA 4: Plantilla Recomendada -->
+              <div v-if="aiBrandData.recommended_template" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f] flex items-center justify-between">
+                  <div>
+                    <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Plantilla Recomendada</h3>
+                    <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">
+                      La IA recomienda: <span class="font-medium text-[#1a73e8] dark:text-[#8ab4f8]">
+                        {{ aiBrandData.recommended_template === 'visual-story' ? 'Historia Visual' : aiBrandData.recommended_template === 'speed-market' ? 'Mercado Rápido' : 'Cuadrícula Moderna' }}
+                      </span>
+                    </p>
+                  </div>
+                  <button 
+                    @click="applyAiTemplate"
+                    class="px-4 py-2 bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-medium rounded-full transition-all"
+                  >
+                    Aplicar Plantilla
+                  </button>
+                </div>
+              </div>
+
+              <!-- TARJETA 5: Textos del Banner -->
+              <div v-if="aiBrandData.banner_texts" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+                  <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Textos del Banner</h3>
+                  <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Copy profesional generado para tu banner principal</p>
+                </div>
+                <div class="p-6 space-y-4">
+                  <div class="relative rounded-2xl overflow-hidden" :style="{ backgroundColor: aiBrandData.color_palette?.primary || '#1a1a1a' }">
+                    <div class="p-8 text-center">
+                      <h2 class="text-2xl font-light text-white mb-2" style="text-shadow: 0 2px 12px rgba(0,0,0,0.3);">
+                        {{ aiBrandData.banner_texts.headline }}
+                      </h2>
+                      <p class="text-sm text-white/80 tracking-wider uppercase">
+                        {{ aiBrandData.banner_texts.subheadline }}
+                      </p>
+                      <span v-if="aiBrandData.banner_texts.cta_text" class="inline-block mt-4 px-6 py-2 bg-white text-gray-900 text-xs font-semibold uppercase tracking-wide rounded-full">
+                        {{ aiBrandData.banner_texts.cta_text }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TARJETA 6: Sobre Nosotros -->
+              <div v-if="aiBrandData.about_us" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+                  <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Nuestra Historia</h3>
+                  <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Sección "Sobre Nosotros" generada por IA</p>
+                </div>
+                <div class="p-6">
+                  <p class="text-sm text-[#1e1f20] dark:text-[#e3e3e3] leading-relaxed whitespace-pre-line">
+                    {{ aiBrandData.about_us }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- TARJETA 7: Mensajes de Valor + Anuncios -->
+              <div class="grid grid-cols-2 gap-4">
+                <div v-if="aiBrandData.value_messages" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                  <div class="px-5 py-3 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+                    <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Mensajes de Valor</h4>
+                  </div>
+                  <div class="p-5 space-y-2">
+                    <div v-for="(msg, i) in aiBrandData.value_messages" :key="'val-'+i" class="flex items-start gap-2">
+                      <span class="w-5 h-5 rounded-full bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg class="w-3 h-3 text-[#1e8e3e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                      </span>
+                      <span class="text-xs text-[#1e1f20] dark:text-[#e3e3e3]">{{ msg }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="aiBrandData.announcements" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                  <div class="px-5 py-3 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+                    <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Barra de Anuncios</h4>
+                  </div>
+                  <div class="p-5 space-y-2">
+                    <div v-for="(ann, i) in aiBrandData.announcements" :key="'ann-'+i" class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#1a73e8] dark:bg-[#8ab4f8] flex-shrink-0"></span>
+                      <span class="text-xs text-[#1e1f20] dark:text-[#e3e3e3]">{{ ann }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TARJETA 8: Mensajes de Venta Cruzada -->
+              <div v-if="aiBrandData.cross_sell_messages" class="bg-white dark:bg-[#1e1f20] rounded-2xl border border-[#e8eaed] dark:border-[#3a3a3f] overflow-hidden">
+                <div class="px-6 py-4 border-b border-[#e8eaed] dark:border-[#3a3a3f]">
+                  <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Mensajes de Recomendación</h3>
+                  <p class="text-sm text-[#5f6368] dark:text-[#9aa0a6] mt-0.5">Venta cruzada profesional para tu catálogo</p>
+                </div>
+                <div class="p-6 space-y-3">
+                  <div v-for="(msg, i) in aiBrandData.cross_sell_messages" :key="'cross-'+i" 
+                       class="px-4 py-3 rounded-xl bg-[#f8f9fa] dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f]">
+                    <p class="text-sm text-[#1e1f20] dark:text-[#e3e3e3]">{{ msg }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón Aplicar Todo + Timestamp -->
+              <div class="flex items-center justify-between">
+                <p v-if="aiBrandData.generated_at" class="text-[10px] text-[#9aa0a6]">
+                  Generado: {{ new Date(aiBrandData.generated_at).toLocaleString('es-CO') }}
+                </p>
+                <button 
+                  @click="applyAllAiSettings"
+                  class="px-6 py-3 bg-[#1e8e3e] hover:bg-[#168936] text-white text-sm font-medium rounded-full transition-all duration-200 flex items-center gap-2"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Aplicar Todo y Guardar
+                </button>
+              </div>
+
+            </template>
+
+          </div>
+
           <!-- SECCIÓN: DISEÑO - Estilo Gemini -->
           <div v-if="activeTab === 'identity'" class="space-y-6 animate-fade-in">
             
@@ -677,9 +932,17 @@ const toastMessage = reactive({
   description: 'Vista previa actualizada.'
 })
 const isLoading = ref(true)
-const activeTab = ref('identity')
+const activeTab = ref('ai-brand')
 const showWarningMessage = ref(false) // Control independiente del mensaje de alerta
 const warningType = ref('categories') // 'categories' | 'whatsapp' - tipo de advertencia
+
+// AI Brand State
+const aiBrandDescription = ref('')
+const isGeneratingBrand = ref(false)
+const aiBrandData = ref(null)
+const isRecordingVoice = ref(false)
+const voiceRecognition = ref(null)
+const aiGenerationProgress = ref('')
 
 // Helper: Verificar si el número de WhatsApp es válido (más de solo el código de país)
 const isValidWhatsappNumber = (number) => {
@@ -693,6 +956,12 @@ const isValidWhatsappNumber = (number) => {
 
 // Tabs Configuration
 const tabs = [
+  { 
+    id: 'ai-brand', 
+    label: 'IA Marca', 
+    icon: 'sparkles',
+    description: 'Genera tu identidad de marca con Inteligencia Artificial'
+  },
   { 
     id: 'identity', 
     label: 'Diseño', 
@@ -814,6 +1083,9 @@ onMounted(async () => {
 
   // Load existing configuration from backend
   await loadConfiguration()
+  
+  // Load AI brand data
+  await loadAiBrandData()
   
   // Validación final: Asegurar que la plantilla sea válida
   config.brandIdentity.template = getValidTemplate(config.brandIdentity.template)
@@ -1110,6 +1382,176 @@ const saveConfiguration = async () => {
     alert('Error al guardar la configuración.')
   } finally {
     isSaving.value = false
+  }
+}
+
+// ==================== AI BRAND METHODS ====================
+
+// Load existing AI brand data
+const loadAiBrandData = async () => {
+  try {
+    const response = await apiClient.get('/web-catalog/ai-brand/data')
+    if (response.data.success && response.data.data) {
+      aiBrandData.value = response.data.data
+      if (response.data.data.business_description) {
+        aiBrandDescription.value = response.data.data.business_description
+      }
+    }
+  } catch (error) {
+    // Silent fail - AI data is optional
+  }
+}
+
+// Generate brand identity with Groq AI
+const generateAiBrand = async () => {
+  if (!aiBrandDescription.value || aiBrandDescription.value.trim().length < 10) {
+    toastMessage.title = 'Descripción muy corta'
+    toastMessage.description = 'Escribe al menos 10 caracteres describiendo tu negocio.'
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 4000)
+    return
+  }
+
+  isGeneratingBrand.value = true
+  aiGenerationProgress.value = 'Analizando tu negocio...'
+
+  try {
+    // Progress updates
+    setTimeout(() => { if (isGeneratingBrand.value) aiGenerationProgress.value = 'Generando paleta de colores...' }, 2000)
+    setTimeout(() => { if (isGeneratingBrand.value) aiGenerationProgress.value = 'Seleccionando tipografías...' }, 4000)
+    setTimeout(() => { if (isGeneratingBrand.value) aiGenerationProgress.value = 'Redactando textos persuasivos...' }, 6000)
+    setTimeout(() => { if (isGeneratingBrand.value) aiGenerationProgress.value = 'Creando identidad de marca...' }, 8000)
+
+    const response = await apiClient.post('/web-catalog/ai-brand/generate', {
+      business_description: aiBrandDescription.value.trim()
+    })
+
+    if (response.data.success) {
+      aiBrandData.value = {
+        ...response.data.data,
+        business_description: aiBrandDescription.value,
+        generated_at: new Date().toISOString()
+      }
+
+      // Aplicar automáticamente color + plantilla recomendada en backend
+      await apiClient.post('/web-catalog/ai-brand/apply', {
+        apply_colors: true,
+        apply_template: true
+      })
+
+      // Reflejar en estado local para vista previa inmediata
+      if (response.data.data?.color_palette?.primary) {
+        config.brandIdentity.primaryColor = response.data.data.color_palette.primary
+      }
+      if (response.data.data?.recommended_template) {
+        config.brandIdentity.template = getValidTemplate(response.data.data.recommended_template)
+      }
+
+      // Recargar configuración y preview para ver cambios de IA en tiempo real
+      await loadConfiguration()
+      refreshPreview()
+
+      toastMessage.title = 'Identidad generada'
+      toastMessage.description = 'IA aplicada: plantilla, color, fuentes y textos actualizados.'
+      showSuccessToast.value = true
+      setTimeout(() => showSuccessToast.value = false, 4000)
+
+      aiGenerationProgress.value = ''
+    } else {
+      toastMessage.title = 'Error'
+      toastMessage.description = response.data.message || 'No se pudo generar la identidad.'
+      showSuccessToast.value = true
+      setTimeout(() => showSuccessToast.value = false, 5000)
+    }
+  } catch (error) {
+    toastMessage.title = 'Error de conexión'
+    toastMessage.description = 'No se pudo conectar con el servicio de IA.'
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 5000)
+  } finally {
+    isGeneratingBrand.value = false
+    aiGenerationProgress.value = ''
+  }
+}
+
+// Apply AI colors to catalog config
+const applyAiColors = () => {
+  if (aiBrandData.value?.color_palette?.primary) {
+    config.brandIdentity.primaryColor = aiBrandData.value.color_palette.primary
+    toastMessage.title = 'Color aplicado'
+    toastMessage.description = 'El color primario de IA se aplicó a tu tienda.'
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 3000)
+  }
+}
+
+// Apply AI recommended template
+const applyAiTemplate = () => {
+  if (aiBrandData.value?.recommended_template) {
+    const template = aiBrandData.value.recommended_template
+    const validTemplate = getValidTemplate(template)
+    config.brandIdentity.template = validTemplate
+    toastMessage.title = 'Plantilla aplicada'
+    toastMessage.description = `Se seleccionó "${validTemplate === 'visual-story' ? 'Historia Visual' : validTemplate === 'speed-market' ? 'Mercado Rápido' : 'Cuadrícula Moderna'}".`
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 3000)
+  }
+}
+
+// Apply ALL AI settings at once
+const applyAllAiSettings = async () => {
+  if (!aiBrandData.value) return
+
+  applyAiColors()
+  applyAiTemplate()
+
+  // Save config after applying
+  await saveConfiguration()
+}
+
+// Voice-to-Text (Web Speech API)
+const startVoiceRecording = () => {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    toastMessage.title = 'No soportado'
+    toastMessage.description = 'Tu navegador no soporta reconocimiento de voz. Usa Chrome.'
+    showSuccessToast.value = true
+    setTimeout(() => showSuccessToast.value = false, 4000)
+    return
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  voiceRecognition.value = new SpeechRecognition()
+  voiceRecognition.value.lang = 'es-CO'
+  voiceRecognition.value.continuous = true
+  voiceRecognition.value.interimResults = true
+
+  voiceRecognition.value.onstart = () => {
+    isRecordingVoice.value = true
+  }
+
+  voiceRecognition.value.onresult = (event) => {
+    let transcript = ''
+    for (let i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript
+    }
+    aiBrandDescription.value = transcript
+  }
+
+  voiceRecognition.value.onerror = () => {
+    isRecordingVoice.value = false
+  }
+
+  voiceRecognition.value.onend = () => {
+    isRecordingVoice.value = false
+  }
+
+  voiceRecognition.value.start()
+}
+
+const stopVoiceRecording = () => {
+  if (voiceRecognition.value) {
+    voiceRecognition.value.stop()
+    isRecordingVoice.value = false
   }
 }
 </script>

@@ -40,8 +40,14 @@ class InventoryTestController extends Controller
 
             $totalProducts = Product::count();
             $activeProducts = Product::where('active', true)->count();
-            $lowStockProducts = Product::whereColumn('current_stock', '<=', 'min_stock')->count();
-            $outOfStockProducts = Product::where('current_stock', '<=', 0)->count();
+            
+            $simpleLowStockCount = Product::where('active', 1)->where(function($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })->whereColumn('current_stock', '<=', 'min_stock')->count();
+            $variantLowStockCount = \App\Models\ProductVariant::join('products', 'products.id', '=', 'product_variants.product_id')->where('products.active', 1)->where('product_variants.active', 1)->whereColumn('product_variants.stock', '<=', 'products.min_stock')->count();
+            $lowStockProducts = $simpleLowStockCount + $variantLowStockCount;
+
+            $simpleOutOfStockCount = Product::where('active', 1)->where(function($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })->where('current_stock', '<=', 0)->count();
+            $variantOutOfStockCount = \App\Models\ProductVariant::join('products', 'products.id', '=', 'product_variants.product_id')->where('products.active', 1)->where('product_variants.active', 1)->where('product_variants.stock', '<=', 0)->count();
+            $outOfStockProducts = $simpleOutOfStockCount + $variantOutOfStockCount;
 
             // Valor de COSTO (inventario)
             $totalInventoryValue = DB::selectOne('SELECT SUM(current_stock * cost_price) as total FROM products WHERE active = 1 AND current_stock > 0')->total ?? 0;
@@ -167,10 +173,12 @@ class InventoryTestController extends Controller
             }
 
             // Productos con stock bajo (hasta 10)
-            $lowStockProductsList = Product::with(['category:id,name'])
+            $simpleLowStock = Product::with(['category:id,name'])
+                ->where('active', 1)
+                ->where(function($q) {
+                    $q->whereNull('product_type')->orWhere('product_type', 'simple');
+                })
                 ->whereColumn('current_stock', '<=', 'min_stock')
-                ->orderBy('current_stock', 'asc')
-                ->limit(10)
                 ->get()
                 ->map(function($product) {
                     return [
@@ -186,6 +194,46 @@ class InventoryTestController extends Controller
                         ] : null
                     ];
                 });
+
+            $variantLowStock = \App\Models\ProductVariant::with(['product.category:id,name'])
+                ->join('products', 'products.id', '=', 'product_variants.product_id')
+                ->where('products.active', 1)
+                ->where('product_variants.active', 1)
+                ->whereColumn('product_variants.stock', '<=', 'products.min_stock')
+                ->select('product_variants.*', 'products.name as parent_name', 'products.image_url as parent_image', 'products.min_stock as parent_min', 'products.category_id as parent_category')
+                ->get()
+                ->map(function($variant) {
+                    $variantName = $variant->parent_name;
+                    $summary = is_string($variant->options_summary) ? json_decode($variant->options_summary, true) : $variant->options_summary;
+                    
+                    if (is_array($summary) && count($summary) > 0) {
+                        $optsStr = collect($summary)->map(function($o) { return $o['value'] ?? ''; })->filter()->join(', ');
+                        $variantName .= ' (' . $optsStr . ')';
+                    } elseif ($variant->sku) {
+                        $variantName .= ' (' . $variant->sku . ')';
+                    } else {
+                        $variantName .= ' (Variante)';
+                    }
+
+                    return [
+                        'id' => 'v-' . $variant->id,
+                        'name' => $variantName,
+                        'sku' => $variant->sku,
+                        'image_url' => $variant->parent_image,
+                        'current_stock' => $variant->stock,
+                        'min_stock' => $variant->parent_min,
+                        'category' => $variant->product && $variant->product->category ? [
+                            'id' => $variant->product->category->id,
+                            'name' => $variant->product->category->name
+                        ] : null
+                    ];
+                });
+
+            $lowStockProductsList = $simpleLowStock->concat($variantLowStock)
+                ->sortBy('current_stock')
+                ->take(10)
+                ->values()
+                ->toArray();
 
             return response()->json([
                 'success' => true,

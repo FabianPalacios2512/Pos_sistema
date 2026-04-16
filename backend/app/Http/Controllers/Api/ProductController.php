@@ -1046,10 +1046,47 @@ class ProductController extends Controller
 
     public function lowStock()
     {
-        $products = Product::lowStock()
-                          ->with(['category', 'supplier'])
-                          ->orderBy('current_stock')
-                          ->get();
+        $simpleProducts = Product::lowStock()
+            ->where(function($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+            ->with(['category', 'supplier'])
+            ->get();
+
+        $variables = \App\Models\ProductVariant::with(['product.category', 'product.supplier'])
+            ->join('products', 'products.id', '=', 'product_variants.product_id')
+            ->where('products.manage_stock', true)
+            ->where('products.active', true)
+            ->where('product_variants.active', true)
+            ->whereColumn('product_variants.stock', '<=', 'products.min_stock')
+            ->select('product_variants.*', 'products.name as parent_name', 'products.image_url as parent_image', 'products.min_stock as parent_min', 'products.category_id as parent_category')
+            ->get()
+            ->map(function($variant) {
+                $variantName = $variant->parent_name;
+                $summary = is_string($variant->options_summary) ? json_decode($variant->options_summary, true) : $variant->options_summary;
+                
+                if (is_array($summary) && count($summary) > 0) {
+                    $optsStr = collect($summary)->map(function($o) { return $o['value'] ?? ''; })->filter()->join(', ');
+                    $variantName .= ' (' . $optsStr . ')';
+                } elseif ($variant->sku) {
+                    $variantName .= ' (' . $variant->sku . ')';
+                } else {
+                    $variantName .= ' (Variante)';
+                }
+                
+                return [
+                    'id' => 'v-' . $variant->id,
+                    'name' => $variantName,
+                    'sku' => $variant->sku,
+                    'image_url' => $variant->parent_image,
+                    'current_stock' => $variant->stock,
+                    'min_stock' => $variant->parent_min,
+                    'category' => $variant->product ? $variant->product->category : null,
+                    'supplier' => $variant->product ? $variant->product->supplier : null,
+                    'product_type' => 'variant',
+                    'original_product_id' => $variant->product_id
+                ];
+            });
+
+        $products = collect($simpleProducts)->concat($variables)->sortBy('current_stock')->values();
 
         return response()->json([
             'success' => true,

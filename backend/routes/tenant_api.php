@@ -652,6 +652,12 @@ Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigCo
 //     Route::get('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'getConfig']);
 //     Route::post('/web-catalog/config', [\App\Http\Controllers\Api\WebCatalogConfigController::class, 'saveConfig']);
 // });
+// ==================== AI BRAND GENERATION (Groq) ====================
+Route::post('/web-catalog/ai-brand/generate', [\App\Http\Controllers\Api\AiBrandController::class, 'generate']);
+Route::post('/web-catalog/ai-brand/apply', [\App\Http\Controllers\Api\AiBrandController::class, 'apply']);
+Route::get('/web-catalog/ai-brand/data', [\App\Http\Controllers\Api\AiBrandController::class, 'getAiBrandData']);
+// ==================== FIN AI BRAND ====================
+
 // ==================== FIN WEB CATALOG CONFIGURATION ====================
 
 // ==================== AI MONITORING (Sin Tenancy - Para Super Admin) ====================

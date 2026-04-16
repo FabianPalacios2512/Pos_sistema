@@ -1,16 +1,21 @@
 ﻿<template>
   <!-- PLANTILLA A: "MODA PREMIUM" - Estilo Vélez/Zara -->
-  <div class="catalog-visual-story bg-white relative overflow-x-hidden min-h-screen">
+  <div class="catalog-visual-story relative overflow-x-hidden min-h-screen" :style="themeVars">
     
-    <!-- � TOP BAR: Ticker tipo Tren - Entra, se detiene, sale -->
-    <div class="fixed top-0 left-0 right-0 z-[60] bg-[#1a1a1a] h-9 flex items-center justify-center overflow-hidden">
+    <!-- TOP BAR: Ticker sólido y elegante -->
+    <div
+      class="fixed top-0 left-0 right-0 z-[60] h-8 flex items-center justify-center overflow-hidden border-b"
+      :style="tickerBarStyle"
+    >
       <div class="relative w-full h-full flex items-center justify-center">
         <TransitionGroup name="ticker-train" tag="div" class="relative w-full h-full">
           <span 
             :key="currentAnnouncement"
-            class="absolute inset-0 flex items-center justify-center text-[11px] text-white font-medium tracking-[0.15em] uppercase whitespace-nowrap px-4"
+            class="absolute inset-0 flex items-center justify-center gap-2 text-[10px] font-medium tracking-[0.08em] whitespace-nowrap px-4"
+            :style="{ color: tickerTextColor }"
           >
-            {{ announcements[currentAnnouncement] }}
+            <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :style="{ backgroundColor: aiPalette.primary }"></span>
+            <span class="truncate max-w-[92vw]">{{ currentAnnouncementText }}</span>
           </span>
         </TransitionGroup>
       </div>
@@ -19,8 +24,9 @@
     <!-- HEADER PREMIUM: Retail Fashion Store Style (KHARIS-inspired) -->
     <header 
       ref="stickyHeader"
-      class="fixed top-9 left-0 right-0 z-50 bg-white transition-all duration-300"
-      style="box-shadow: 0 1px 0 rgba(0,0,0,0.06);"
+      class="fixed top-8 left-0 right-0 z-50 transition-all duration-300"
+      :style="{ backgroundColor: aiPalette.background || '#ffffff' }"
+      style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
     >
       <!-- Línea decorativa superior sutil -->
       <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
@@ -33,7 +39,7 @@
             @click="showMobileMenu = !showMobileMenu"
             class="lg:hidden w-10 h-10 flex items-center justify-center -ml-1"
           >
-            <svg class="w-[22px] h-[22px] text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
+            <svg class="w-[22px] h-[22px]" :style="{ color: aiPalette.text_dark }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
               <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
             </svg>
           </button>
@@ -42,18 +48,11 @@
         <!-- CENTER: Nombre del Comercio - Tipografía Serif Elegante -->
         <div class="flex-1 flex flex-col items-center justify-center lg:justify-start lg:flex-none lg:absolute lg:left-1/2 lg:-translate-x-1/2">
           <h1 
-            class="text-[22px] lg:text-[28px] text-gray-900 tracking-[0.08em] uppercase leading-none"
-            style="font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif; font-weight: 600;"
+            class="text-[22px] lg:text-[30px] text-gray-900 leading-none"
+            :style="{ fontFamily: aiFonts.heading + ', Georgia, Times New Roman, serif', fontWeight: 600, letterSpacing: layoutConfig.editorial_mood === 'luxury' ? '0.08em' : '0.02em' }"
           >
-            {{ storeNameFirst }}
+            {{ storeName }}
           </h1>
-          <span 
-            v-if="storeNameSecond"
-            class="text-[9px] lg:text-[11px] text-gray-500 tracking-[0.25em] uppercase mt-0.5 font-medium"
-            style="font-family: 'Inter', 'Helvetica Neue', sans-serif;"
-          >
-            {{ storeNameSecond }}
-          </span>
         </div>
 
         <!-- Right: Lupa + Bolsa (Elegantes, negro) -->
@@ -63,7 +62,7 @@
             @click="showMobileSearch = !showMobileSearch"
             class="lg:hidden w-10 h-10 flex items-center justify-center"
           >
-            <svg class="w-[20px] h-[20px] text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
+            <svg class="w-[20px] h-[20px]" :style="{ color: aiPalette.text_dark }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
           </button>
@@ -73,12 +72,13 @@
             @click="router.push('/catalog/bolsa')"
             class="relative w-10 h-10 flex items-center justify-center"
           >
-            <svg class="w-[20px] h-[20px] text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
+            <svg class="w-[20px] h-[20px]" :style="{ color: aiPalette.text_dark }" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
             <span 
               v-if="cartCount > 0"
-              class="absolute -top-0.5 -right-0.5 bg-gray-900 text-white text-[8px] font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center tracking-tight"
+              class="absolute -top-0.5 -right-0.5 text-white text-[8px] font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center tracking-tight"
+              :style="{ backgroundColor: aiPalette.primary }"
             >
               {{ cartCount }}
             </span>
@@ -93,7 +93,8 @@
             v-model="searchQuery"
             type="text" 
             placeholder="Buscar productos..."
-            class="w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-400 focus:ring-1 focus:ring-gray-200 transition-all outline-none"
+            class="w-full h-10 pl-10 pr-4 border rounded-lg text-sm placeholder-gray-400 transition-all outline-none"
+            :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary, color: aiPalette.text_dark }"
           />
           <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -112,7 +113,8 @@
               v-model="searchQuery"
               type="text" 
               placeholder="¿Qué estás buscando?"
-              class="w-full h-11 pl-10 pr-10 bg-gray-50 border border-gray-200 rounded-full text-sm text-gray-900 placeholder-gray-500 focus:bg-white focus:border-gray-300 transition-all outline-none"
+              class="w-full h-11 pl-10 pr-10 border rounded-full text-sm placeholder-gray-500 transition-all outline-none"
+              :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary, color: aiPalette.text_dark }"
               autofocus
             />
             <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,12 +128,12 @@
       </Transition>
     </header>
 
-    <!-- HERO BANNER: Compacto y Elegante -->
+    <!-- HERO BANNER: Full-Impact Fashion -->
     <section 
-      class="relative w-full overflow-hidden mt-[94px] lg:mt-[154px]" 
-      :class="isMobilePreview ? 'h-[280px]' : 'h-[300px] md:h-[450px]'"
+      class="relative w-full overflow-hidden mt-[92px] lg:mt-[152px]" 
+      :class="heroSectionHeightClass"
     >
-      <!-- Carrusel de Imágenes -->
+      <!-- Carousel with Ken Burns zoom -->
       <div class="absolute inset-0">
         <TransitionGroup name="fade-slide">
           <div 
@@ -143,45 +145,288 @@
             <img 
               :src="image"
               alt="Banner"
-              class="w-full h-full object-cover"
+              class="w-full h-full object-cover will-change-transform transition-transform duration-[12000ms] ease-out"
+              :class="currentSlide === index ? 'scale-110' : 'scale-100'"
             />
-            <!-- Gradiente fuerte inferior para legibilidad -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
+            <div class="absolute inset-0" :class="heroOverlayClass"></div>
           </div>
         </TransitionGroup>
       </div>
 
-      <!-- Contenido sobre el Banner -->
-      <div class="absolute inset-0 flex flex-col items-center justify-end z-10 px-6 pb-10 text-center">
+      <!-- Hero Content -->
+      <div class="absolute inset-0 z-10 px-5 md:px-10 pb-10 md:pb-16" :class="heroContentPositionClass">
+        <p class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[9px] uppercase tracking-[0.14em] mb-3" :style="heroBadgeStyle">
+          Curado por IA
+        </p>
         <h2 
-          class="text-white text-2xl md:text-5xl font-light mb-2 tracking-wide"
-          style="font-family: 'Montserrat', 'Inter', sans-serif; font-weight: 300; text-shadow: 0 2px 12px rgba(0,0,0,0.3);"
+          class="text-white text-[35px] md:text-5xl lg:text-6xl mb-2 leading-[1.05] max-w-[14ch] md:max-w-[16ch]"
+          :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, textShadow: '0 3px 22px rgba(0,0,0,0.36)' }"
         >
-          Nueva Colección
+          {{ heroHeadlineDisplay }}
         </h2>
         <p 
-          class="text-white/90 text-xs md:text-lg font-medium tracking-[0.2em] uppercase"
-          style="font-family: 'Montserrat', 'Inter', sans-serif; text-shadow: 0 1px 8px rgba(0,0,0,0.25);"
+          class="text-white/90 text-[10px] md:text-sm font-medium tracking-[0.15em] uppercase mb-5 max-w-[320px]"
+          :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
         >
-          Descubre lo nuevo
+          {{ heroSubheadlineDisplay }}
         </p>
+        <!-- CTA: double-solid (Kharis-style) -->
+        <div v-if="layoutConfig.hero_cta_style === 'double-solid'" class="flex gap-2.5 md:gap-3">
+          <button
+            @click="scrollToProducts"
+            class="px-5 md:px-6 py-3 md:py-3.5 bg-white text-gray-900 text-[11px] md:text-xs font-bold uppercase tracking-[0.16em] rounded-lg transition-all duration-300 hover:bg-gray-100"
+            :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
+          >
+            {{ bannerCtaText || 'VER CATÁLOGO' }}
+          </button>
+          <button
+            v-if="bannerCtaSecondary"
+            @click="scrollToProducts"
+            class="px-5 md:px-6 py-3 md:py-3.5 border border-white text-white text-[11px] md:text-xs font-bold uppercase tracking-[0.16em] rounded-lg transition-all duration-300 hover:bg-white/10"
+            :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
+          >
+            {{ bannerCtaSecondary }}
+          </button>
+        </div>
+        <!-- CTA: bold-filled -->
+        <button
+          v-else-if="layoutConfig.hero_cta_style === 'bold-filled'"
+          @click="scrollToProducts"
+          class="px-9 py-3 md:py-4 text-white text-[11px] md:text-xs font-bold uppercase tracking-[0.2em] rounded-lg transition-all duration-300 hover:opacity-90"
+          :style="{ fontFamily: aiFonts.body + ', sans-serif', backgroundColor: aiPalette.primary }"
+        >
+          {{ bannerCtaText || 'COMPRAR AHORA' }}
+        </button>
+        <!-- CTA: single-outline (default) -->
+        <button
+          v-else
+          @click="scrollToProducts"
+          class="group px-9 py-3 md:py-3.5 border border-white/75 hover:bg-white hover:text-gray-900 text-white text-[11px] md:text-xs font-semibold uppercase tracking-[0.22em] rounded-lg transition-all duration-500 hover:tracking-[0.28em]"
+          :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
+        >
+          {{ bannerCtaText || 'EXPLORAR COLECCIÓN' }}
+        </button>
       </div>
 
-      <!-- Indicadores Minimalistas -->
-      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+      <!-- Slide Indicators -->
+      <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         <button 
           v-for="(img, index) in carouselImages.length || 3" 
           :key="index"
           @click="currentSlide = index"
-          class="w-1.5 h-1.5 rounded-full transition-all duration-300"
-          :class="currentSlide === index ? 'bg-white w-6' : 'bg-white/50'"
+          class="h-[2px] rounded-full transition-all duration-500"
+          :class="currentSlide === index ? 'bg-white w-8' : 'bg-white/40 w-4'"
         ></button>
       </div>
     </section>
 
-    <!-- BARRA STICKY: Filtrar + Ordenar (Móvil) - Línea fina inferior -->
+    <!-- HERO PRODUCT SPOTLIGHT: Productos visibles desde el primer scroll -->
+    <section v-if="heroProducts.length > 0" class="relative z-20 -mt-6 sm:-mt-10 md:-mt-14 lg:ml-64 px-3 lg:px-8">
+      <div class="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+        <article
+          v-for="product in heroProducts"
+          :key="'hero-product-' + product.id"
+          @click="openProductDetails(product)"
+          class="group cursor-pointer rounded-xl sm:rounded-2xl overflow-hidden border shadow-lg shadow-black/15"
+          :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary + '66' }"
+        >
+          <div class="relative h-[80px] sm:h-28 md:h-32 overflow-hidden">
+            <img
+              v-if="getProductImage(product)"
+              :src="getProductImage(product)"
+              :alt="product.name"
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div v-else class="w-full h-full bg-gray-100 flex items-center justify-center">
+              <svg class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" /></svg>
+            </div>
+          </div>
+          <div class="px-2 sm:px-3 py-2 sm:py-2.5">
+            <p class="text-[8px] sm:text-[10px] uppercase tracking-[0.08em] mb-0.5 truncate" :style="{ color: aiPalette.primary + '99' }">{{ product.category || 'Colección' }}</p>
+            <h3 class="text-[11px] sm:text-sm leading-snug truncate" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500, color: aiPalette.text_dark }">{{ product.name }}</h3>
+            <p class="text-[11px] sm:text-sm font-bold mt-0.5" :style="{ color: aiPalette.text_dark }">{{ storeConfig.currency_symbol }}{{ formatPrice(product.price) }}</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- VALUE PROPOSITIONS: Trust Strip -->
+    <div class="border-b border-gray-100" :style="{ backgroundColor: aiPalette.background }">
+      <div class="flex items-center justify-center gap-6 md:gap-12 px-4 py-3.5 overflow-x-auto scrollbar-hide">
+        <template v-if="storeConfig.ai_value_messages && storeConfig.ai_value_messages.length > 0">
+          <div v-for="(msg, i) in storeConfig.ai_value_messages.slice(0, 3)" :key="'vp-'+i" class="flex items-center gap-2 flex-shrink-0">
+            <svg class="w-4 h-4 flex-shrink-0" :style="{ color: aiPalette.primary }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path v-if="i === 0" stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path v-else-if="i === 1" stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+              <path v-else stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+            </svg>
+            <span class="text-[11px] md:text-xs text-gray-600 font-medium whitespace-nowrap" :style="{ fontFamily: aiFonts.body + ', sans-serif' }">{{ msg }}</span>
+          </div>
+        </template>
+        <template v-else>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+            <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Envío a todo el país</span>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Calidad garantizada</span>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+            <span class="text-[11px] text-gray-500 font-medium whitespace-nowrap">Pago seguro</span>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- EDITORIAL STRIP: Historia + colecciones + anuncios cerca del hero -->
+    <section class="lg:ml-64 px-4 lg:px-8 pt-8 pb-4 space-y-5">
+      <div class="rounded-3xl border border-gray-200/80 overflow-hidden" :style="{ backgroundColor: aiPalette.background }">
+        <div class="grid lg:grid-cols-[1.2fr,1fr] gap-0">
+          <div class="p-5 md:p-7 lg:p-8">
+            <p class="text-[10px] uppercase tracking-[0.25em] font-semibold" :style="{ color: aiPalette.primary }">Brand Story</p>
+            <h3
+              class="mt-2 text-2xl md:text-3xl leading-tight text-gray-900"
+              :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500 }"
+            >
+              {{ bannerHeadline }}
+            </h3>
+            <p class="mt-3 text-sm md:text-base leading-relaxed text-gray-600 whitespace-pre-line" :style="{ fontFamily: aiFonts.body + ', sans-serif' }">
+              {{ storySnippet }}
+            </p>
+
+            <button
+              @click="scrollToProducts"
+              class="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] transition-all duration-300 hover:gap-3"
+              :style="{ color: aiPalette.primary }"
+            >
+              Ver colección
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" /></svg>
+            </button>
+          </div>
+
+          <div class="relative overflow-hidden lg:min-h-full">
+            <!-- Imagen principal de fondo -->
+            <img v-if="storyImageSlots[0]" :src="storyImageSlots[0]" alt="Historia de marca" class="w-full h-52 sm:h-64 lg:h-full object-cover" />
+            <div v-else class="w-full h-52 sm:h-64 lg:h-full bg-gray-100"></div>
+            <!-- Gradient overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
+            <!-- Thumbnails flotantes -->
+            <div class="absolute bottom-3 right-3 flex flex-col gap-2">
+              <div class="w-16 h-16 rounded-xl overflow-hidden border-2 border-white/80 shadow-lg">
+                <img v-if="storyImageSlots[1]" :src="storyImageSlots[1]" alt="" class="w-full h-full object-cover" />
+                <div v-else class="w-full h-full bg-gray-200"></div>
+              </div>
+              <div class="w-16 rounded-xl px-2 py-1.5 flex flex-col items-center justify-center text-center" :style="{ backgroundColor: aiPalette.primary }">
+                <p class="text-white text-base font-bold leading-tight">{{ filteredProducts.length }}</p>
+                <p class="text-white/80 text-[8px] uppercase tracking-wider leading-tight">items</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROMOS: Retail Impact Design -->
+      <div v-if="announcementCards.length > 0" class="space-y-2.5">
+
+        <!-- Promo Destacada: Banner premium estilo retail -->
+        <article
+          v-if="announcementCards[0]"
+          @click="scrollToProducts"
+          class="relative rounded-2xl overflow-hidden cursor-pointer group"
+        >
+          <!-- Fondo degradado: primary → dark -->
+          <div class="absolute inset-0" :style="{ background: `linear-gradient(130deg, ${aiPalette.primary} 0%, ${aiPalette.text_dark} 115%)` }"></div>
+          <!-- Círculos decorativos flotantes -->
+          <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/[0.06] pointer-events-none"></div>
+          <div class="absolute -bottom-8 right-8 w-28 h-28 rounded-full bg-white/[0.04] pointer-events-none"></div>
+
+          <div class="relative flex items-center gap-4 px-5 py-5">
+            <!-- Contenido principal -->
+            <div class="flex-1 min-w-0">
+              <!-- Label oferta -->
+              <div class="flex items-center gap-1.5 mb-2.5">
+                <svg class="w-3 h-3 text-white/70 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-white/75 text-[9px] font-bold uppercase tracking-[0.2em]">Oferta especial</span>
+              </div>
+              <!-- Mensaje grande -->
+              <p
+                class="text-white text-[16px] font-bold leading-snug mb-3.5"
+                style="max-width: 210px;"
+                :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
+              >{{ announcementCards[0] }}</p>
+              <!-- CTA subtle -->
+              <span class="inline-flex items-center gap-1.5 text-white/75 text-[10px] font-bold uppercase tracking-[0.18em] group-hover:text-white group-hover:gap-2.5 transition-all duration-300">
+                Ver colección
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                </svg>
+              </span>
+            </div>
+            <!-- Badge circular decorativo -->
+            <div
+              class="w-[60px] h-[60px] flex-shrink-0 rounded-full border-2 border-white/20 flex items-center justify-center bg-white/10"
+            >
+              <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+              </svg>
+            </div>
+          </div>
+        </article>
+
+        <!-- Promos Secundarias: horizontal lista retail elegante -->
+        <div v-if="announcementCards.length > 1" class="space-y-2">
+          <article
+            v-for="(message, idx) in announcementCards.slice(1)"
+            :key="'promo-s-' + idx"
+            @click="scrollToProducts"
+            class="flex items-stretch rounded-xl overflow-hidden cursor-pointer group transition-all duration-200 hover:shadow-md border"
+            :style="{ backgroundColor: aiPalette.background || '#ffffff', borderColor: `${aiPalette.secondary}55` }"
+          >
+            <!-- Stripe lateral de color -->
+            <div
+              class="w-[4px] flex-shrink-0"
+              :style="{ backgroundColor: idx === 0 ? aiPalette.primary : (aiPalette.accent || aiPalette.text_dark) }"
+            ></div>
+            <!-- Icono -->
+            <div
+              class="w-12 h-12 my-auto ml-3.5 rounded-xl flex-shrink-0 flex items-center justify-center"
+              :style="{ backgroundColor: `${idx === 0 ? aiPalette.primary : (aiPalette.accent || aiPalette.text_dark)}14` }"
+            >
+              <svg v-if="idx === 0" class="w-5 h-5" :style="{ color: aiPalette.primary }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+              </svg>
+              <svg v-else class="w-5 h-5" :style="{ color: aiPalette.accent || aiPalette.text_dark }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+              </svg>
+            </div>
+            <!-- Texto -->
+            <div class="flex-1 py-3.5 px-3 min-w-0">
+              <p
+                class="text-[9px] uppercase tracking-[0.16em] font-bold mb-0.5"
+                :style="{ color: idx === 0 ? aiPalette.primary : (aiPalette.accent || aiPalette.text_dark) }"
+              >{{ idx === 0 ? 'Descuento exclusivo' : 'Beneficio' }}</p>
+              <p
+                class="text-[13px] font-semibold leading-tight"
+                :style="{ color: aiPalette.text_dark, fontFamily: aiFonts.body + ', sans-serif' }"
+              >{{ message }}</p>
+            </div>
+            <!-- Flecha -->
+            <svg class="w-4 h-4 self-center mr-3.5 flex-shrink-0 text-gray-300 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARRA STICKY: Filtrar + Ordenar (Móvil) - Sólida -->
     <div 
-      class="lg:hidden sticky top-[93px] z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200"
+      class="lg:hidden sticky top-[90px] z-40 border-t border-b border-gray-200"
+      :style="{ backgroundColor: aiPalette.background || '#ffffff', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }"
     >
       <div class="flex">
         <!-- Botón FILTRAR (50%) -->
@@ -219,11 +464,13 @@
             @click="selectedCategory = null"
             class="w-full text-left py-2.5 text-sm transition-all duration-200 flex items-center gap-3 relative"
             :class="selectedCategory === null 
-              ? 'text-gray-900 font-semibold' 
+                ? 'font-semibold' 
               : 'text-gray-500 hover:text-gray-900'"
+              :style="selectedCategory === null ? { color: aiPalette.text_dark } : {}"
           >
             <span 
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-gray-900 transition-opacity duration-200"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 transition-opacity duration-200"
+              :style="{ backgroundColor: aiPalette.primary }"
               :class="selectedCategory === null ? 'opacity-100' : 'opacity-0'"
             ></span>
             <span class="pl-4">Todas</span>
@@ -234,11 +481,13 @@
             @click="selectedCategory = cat.id"
             class="w-full text-left py-2.5 text-sm transition-all duration-200 flex items-center gap-3 relative"
             :class="selectedCategory === cat.id 
-              ? 'text-gray-900 font-semibold' 
+                ? 'font-semibold' 
               : 'text-gray-500 hover:text-gray-900'"
+              :style="selectedCategory === cat.id ? { color: aiPalette.text_dark } : {}"
           >
             <span 
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-gray-900 transition-opacity duration-200"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 transition-opacity duration-200"
+              :style="{ backgroundColor: aiPalette.primary }"
               :class="selectedCategory === cat.id ? 'opacity-100' : 'opacity-0'"
             ></span>
             <span class="pl-4">{{ cat.name }}</span>
@@ -253,8 +502,8 @@
           <!-- Single Range Slider -->
           <div class="relative h-1.5 bg-gray-200 rounded-full">
             <div 
-              class="absolute left-0 h-full bg-gray-900 rounded-full transition-all"
-              :style="{ width: ((priceRange.max - minProductPrice) / (maxProductPrice - minProductPrice)) * 100 + '%' }"
+              class="absolute left-0 h-full rounded-full transition-all"
+              :style="{ backgroundColor: aiPalette.primary, width: ((priceRange.max - minProductPrice) / (maxProductPrice - minProductPrice)) * 100 + '%' }"
             ></div>
             <input 
               type="range" 
@@ -268,7 +517,7 @@
           <!-- Valor del rango -->
           <div class="flex items-center justify-between text-sm">
             <span class="text-gray-400">{{ storeConfig.currency_symbol }}0</span>
-            <span class="font-semibold text-gray-900">Hasta {{ storeConfig.currency_symbol }}{{ formatPrice(priceRange.max) }}</span>
+            <span class="font-semibold" :style="{ color: aiPalette.text_dark }">Hasta {{ storeConfig.currency_symbol }}{{ formatPrice(priceRange.max) }}</span>
           </div>
         </div>
       </div>
@@ -367,16 +616,31 @@
     </aside>
 
     <!-- ÁREA PRINCIPAL: Productos -->
-    <section class="lg:ml-64 pt-4 px-4 lg:px-8">
+    <section ref="productsSection" class="lg:ml-64 pt-3 px-4 lg:px-8 pb-8">
       
-      <!-- Barra Superior: Contador (Solo Desktop) -->
-      <div class="hidden lg:flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-        <div class="text-sm text-gray-600 font-medium">
-          {{ filteredProducts.length }} productos
-          <span v-if="selectedCategory || showOnlyAvailable || sortOrder" class="font-semibold" :style="{ color: primaryColor }">
-            (filtrados)
-          </span>
+      <!-- Header de Catálogo -->
+      <div class="mb-5 pb-4 border-b border-gray-200 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.22em] font-semibold" :style="{ color: aiPalette.primary }">Catálogo Curado</p>
+          <h3 class="mt-1 text-2xl md:text-3xl text-gray-900" :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500 }">
+            {{ selectedCategory !== null ? activeCategoryName : (bannerCtaText || 'Compra por estilo') }}
+          </h3>
+          <p class="mt-1 text-sm text-gray-500">
+            {{ filteredProducts.length }} productos
+            <span v-if="selectedCategory !== null || showOnlyAvailable || sortOrder" class="font-semibold" :style="{ color: aiPalette.primary }">
+              · filtrados
+            </span>
+          </p>
         </div>
+
+        <button
+          v-if="selectedCategory !== null || showOnlyAvailable || sortOrder || searchQuery"
+          @click="clearFilters"
+          class="px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-[0.14em] border transition-colors"
+          :style="{ borderColor: aiPalette.secondary, color: aiPalette.text_dark }"
+        >
+          Reiniciar vista
+        </button>
       </div>
 
       <!-- GRID DE PRODUCTOS: E-commerce Premium con Hover Effects -->
@@ -388,7 +652,7 @@
             class="group"
           >
             <div 
-              class="bg-white overflow-hidden h-full flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl" 
+              class="bg-white rounded-2xl border border-gray-100 overflow-hidden h-full flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10" 
               @click="openProductDetails(product)"
             >
               
@@ -418,13 +682,20 @@
                   :disabled="product.stock === 0"
                   class="absolute bottom-2.5 right-2.5 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 z-10"
                   :class="product.stock > 0 
-                    ? 'bg-white text-gray-600 hover:bg-gray-900 hover:text-white shadow-sm hover:shadow-md hover:scale-110' 
+                    ? 'bg-white text-gray-600 hover:text-white shadow-sm hover:shadow-md hover:scale-110' 
                     : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
+                  :style="product.stock > 0 ? { '--tw-bg-opacity': '1', backgroundColor: 'white' } : {}"
+                  @mouseenter="product.stock > 0 ? $event.currentTarget.style.backgroundColor = aiPalette.primary : null"
+                  @mouseleave="product.stock > 0 ? $event.currentTarget.style.backgroundColor = 'white' : null"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </button>
+
+                <span class="absolute top-2.5 right-2.5 text-[9px] uppercase tracking-[0.12em] bg-white/90 text-gray-800 px-2 py-1 rounded-full font-semibold">
+                  Ver
+                </span>
 
                 <!-- Badges (Esquina Superior Izquierda) - Discretos -->
                 <div class="absolute top-0 left-0 flex flex-col">
@@ -441,13 +712,17 @@
               </div>
 
               <!-- Product Info - Compacto y Alineado -->
-              <div class="pt-3 pb-4 px-0.5">
-                <h3 class="text-[13px] font-normal text-gray-700 truncate leading-snug mb-1">
+              <div class="pt-3 pb-4 px-3">
+                <p class="text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-1 truncate">{{ product.category || 'Colección' }}</p>
+                <h3 class="text-[13px] font-normal text-gray-700 truncate leading-snug mb-1" :style="{ fontFamily: aiFonts.heading + ', serif' }">
                   {{ product.name }}
                 </h3>
-                <p class="text-sm font-bold text-gray-900">
+                <div class="flex items-center justify-between gap-2">
+                  <p class="text-sm font-bold text-gray-900">
                   {{ storeConfig.currency_symbol }}{{ formatPrice(product.price) }}
-                </p>
+                  </p>
+                  <span class="text-[11px] font-medium" :style="{ color: aiPalette.primary }">Comprar</span>
+                </div>
               </div>
             </div>
           </div>
@@ -463,8 +738,50 @@
       </div>
     </section>
 
+    <!-- ABOUT US SECTION (AI Generated) -->
+    <section v-if="storeConfig.ai_about_us" class="border-t py-12" :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary }">
+      <div class="lg:ml-64 px-4 lg:px-8">
+        <div class="rounded-3xl border border-gray-200 overflow-hidden" :style="{ backgroundColor: '#ffffff' }">
+          <div class="grid md:grid-cols-[1.2fr,1fr] gap-0">
+            <div class="p-6 md:p-8">
+              <p class="text-[10px] uppercase tracking-[0.24em] font-semibold" :style="{ color: aiPalette.primary }">Nuestra esencia</p>
+              <h3 
+                class="text-2xl md:text-3xl text-gray-900 mt-2 mb-4"
+                :style="{ fontFamily: aiFonts.heading + ', serif', fontWeight: 500 }"
+              >
+                Nuestra Historia
+              </h3>
+              <p 
+                class="text-sm md:text-base text-gray-600 leading-relaxed whitespace-pre-line"
+                :style="{ fontFamily: aiFonts.body + ', sans-serif' }"
+              >
+                {{ storeConfig.ai_about_us }}
+              </p>
+
+              <div v-if="storeConfig.ai_value_messages && storeConfig.ai_value_messages.length > 0" class="mt-6 space-y-2.5">
+                <div
+                  v-for="(msg, i) in storeConfig.ai_value_messages"
+                  :key="'history-value-' + i"
+                  class="flex items-start gap-2.5 text-sm text-gray-700"
+                >
+                  <span class="mt-1 w-1.5 h-1.5 rounded-full" :style="{ backgroundColor: aiPalette.primary }"></span>
+                  <span :style="{ fontFamily: aiFonts.body + ', sans-serif' }">{{ msg }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="relative min-h-[260px] md:min-h-full">
+              <img v-if="storyImageSlots[0]" :src="storyImageSlots[0]" alt="Colección principal" class="w-full h-full object-cover" />
+              <div v-else class="w-full h-full bg-gray-100"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- FOOTER: Powered by 105 POS -->
-    <footer class="bg-white border-t border-gray-100 py-8 text-center" :class="{ 'mb-16': cartCount > 0 }">
+    <footer class="border-t py-8 text-center" :class="{ 'mb-16': cartCount > 0 }" :style="{ backgroundColor: aiPalette.background, borderColor: aiPalette.secondary }">
       <p class="text-xs text-gray-400 tracking-wide">
         Tecnología por
         <a 
@@ -495,7 +812,8 @@
     <Transition name="slide-up">
       <div 
         v-if="cartCount > 0"
-        class="fixed bottom-0 left-0 right-0 z-[55] bg-white px-4 py-3 flex items-center justify-between lg:hidden"
+        class="fixed bottom-0 left-0 right-0 z-[55] px-4 py-3 flex items-center justify-between lg:hidden"
+        :style="{ backgroundColor: aiPalette.background }"
         style="box-shadow: 0 -4px 16px rgba(0,0,0,0.08);"
       >
         <!-- Izquierda: Total -->
@@ -507,7 +825,8 @@
         <!-- Derecha: Botón VER BOLSA -->
         <button 
           @click="router.push('/catalog/bolsa')"
-          class="bg-gray-900 hover:bg-black text-white px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors flex items-center gap-2"
+          class="text-white px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-colors flex items-center gap-2"
+          :style="{ backgroundColor: aiPalette.primary }"
         >
           <span class="bg-white text-gray-900 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
             {{ cartCount }}
@@ -834,13 +1153,20 @@ const searchQuery = ref('')
 const sortOrder = ref('') // Filtro de ordenamiento
 const showOnlyAvailable = ref(false) // Filtro de disponibilidad
 
-// Ticker de anuncios vertical
-const announcements = ref([
+// Ticker de anuncios vertical - Use AI-generated or defaults
+const defaultAnnouncements = [
   'Envío Gratis en compras mayores a $150.000',
   'Nuevas Colecciones Disponibles',
   'Hasta 3 cuotas sin interés',
   'Devoluciones gratis en 30 días'
-])
+]
+const announcements = computed(() => {
+  const aiAnnouncements = props.storeConfig.ai_announcements
+  if (aiAnnouncements && Array.isArray(aiAnnouncements) && aiAnnouncements.length > 0) {
+    return aiAnnouncements
+  }
+  return defaultAnnouncements
+})
 const currentAnnouncement = ref(0)
 
 // Rango de precios para filtro
@@ -865,6 +1191,161 @@ const showSortModal = ref(false)
 // Color primario dinámico del storeConfig
 const primaryColor = computed(() => props.storeConfig.primary_color || '#10B981')
 
+// AI color palette with resilient fallbacks
+const aiPalette = computed(() => {
+  const palette = props.storeConfig.ai_color_palette || {}
+  return {
+    primary: palette.primary || primaryColor.value || '#10B981',
+    secondary: palette.secondary || '#d1d5db',
+    accent: palette.accent || '#111827',
+    background: palette.background || '#ffffff',
+    text_dark: palette.text_dark || '#111827',
+    text_light: palette.text_light || '#f9fafb'
+  }
+})
+
+// Global theme variables for mobile + desktop layout
+const themeVars = computed(() => ({
+  '--ai-primary': aiPalette.value.primary,
+  '--ai-secondary': aiPalette.value.secondary,
+  '--ai-accent': aiPalette.value.accent,
+  '--ai-background': aiPalette.value.background,
+  '--ai-text-dark': aiPalette.value.text_dark,
+  '--ai-text-light': aiPalette.value.text_light,
+  '--ai-font-heading': aiFonts.value.heading,
+  '--ai-font-body': aiFonts.value.body,
+}))
+
+// AI-generated fonts with fallbacks
+const aiFonts = computed(() => {
+  const fonts = props.storeConfig.ai_fonts
+  return {
+    heading: fonts?.heading || 'Playfair Display',
+    body: fonts?.body || 'Montserrat'
+  }
+})
+
+// AI layout config - controls hero style, CTA variant, category layout
+const layoutConfig = computed(() => {
+  const cfg = props.storeConfig.ai_layout_config || {}
+  return {
+    hero_style: cfg.hero_style || 'full-bleed',
+    hero_cta_style: cfg.hero_cta_style || 'single-outline',
+    hero_text_position: cfg.hero_text_position || 'bottom-left',
+    category_style: cfg.category_style || 'horizontal-pills',
+    editorial_mood: cfg.editorial_mood || 'luxury',
+    ticker_style: cfg.ticker_style || 'muted-light',
+    hero_content_density: cfg.hero_content_density || 'balanced'
+  }
+})
+
+const tickerBarStyle = computed(() => {
+  const style = layoutConfig.value.ticker_style
+  if (style === 'contrast-dark') {
+    return {
+      backgroundColor: aiPalette.value.text_dark,
+      borderColor: aiPalette.value.text_dark
+    }
+  }
+  if (style === 'soft-primary') {
+    // Opaque: use store background with primary border hint
+    return {
+      backgroundColor: aiPalette.value.background || '#ffffff',
+      borderColor: `${aiPalette.value.primary}55`
+    }
+  }
+  // muted-light: always opaque off-white (no transparency)
+  return {
+    backgroundColor: '#f6f5f3',
+    borderColor: '#e6e3de'
+  }
+})
+
+const tickerTextColor = computed(() => {
+  return layoutConfig.value.ticker_style === 'contrast-dark'
+    ? aiPalette.value.text_light
+    : aiPalette.value.text_dark
+})
+
+const currentAnnouncementText = computed(() => {
+  const text = announcements.value[currentAnnouncement.value] || ''
+  const maxLength = 64
+  return text.length > maxLength ? `${text.slice(0, maxLength - 3).trim()}...` : text
+})
+
+const heroSectionHeightClass = computed(() => {
+  if (layoutConfig.value.hero_style === 'centered-minimal') {
+    return props.isMobilePreview
+      ? 'h-[58vh] min-h-[320px]'
+      : 'h-[60vh] min-h-[360px] md:h-[64vh] md:min-h-[460px]'
+  }
+  if (layoutConfig.value.hero_style === 'split-portrait') {
+    return props.isMobilePreview
+      ? 'h-[62vh] min-h-[350px]'
+      : 'h-[64vh] min-h-[390px] md:h-[68vh] md:min-h-[500px]'
+  }
+  return props.isMobilePreview
+    ? 'h-[65vh] min-h-[360px]'
+    : 'h-[65vh] min-h-[400px] md:h-[70vh] md:min-h-[520px]'
+})
+
+const heroOverlayClass = computed(() => {
+  if (layoutConfig.value.hero_style === 'centered-minimal') {
+    return 'bg-gradient-to-t from-black/35 via-black/20 to-black/10'
+  }
+  if (layoutConfig.value.hero_style === 'split-portrait') {
+    return 'bg-gradient-to-r from-black/55 via-black/20 to-transparent'
+  }
+  return 'bg-gradient-to-t from-black/55 via-black/20 to-transparent'
+})
+
+const heroContentPositionClass = computed(() => {
+  const position = layoutConfig.value.hero_text_position
+  if (position === 'center') {
+    return 'flex flex-col items-center justify-center text-center'
+  }
+  if (position === 'bottom-center') {
+    return 'flex flex-col items-center justify-end text-center'
+  }
+  return 'flex flex-col items-start justify-end text-left'
+})
+
+const heroBadgeStyle = computed(() => ({
+  backgroundColor: `${aiPalette.value.background}2E`,
+  border: `1px solid ${aiPalette.value.text_light}33`,
+  color: aiPalette.value.text_light,
+  backdropFilter: 'blur(4px)'
+}))
+
+const bannerCtaSecondary = computed(() => {
+  return props.storeConfig.ai_banner_texts?.cta_secondary || ''
+})
+
+// AI-generated banner texts with fallbacks
+const bannerHeadline = computed(() => {
+  return props.storeConfig.ai_banner_texts?.headline || 'Nueva Colección'
+})
+
+const bannerSubheadline = computed(() => {
+  return props.storeConfig.ai_banner_texts?.subheadline || 'Descubre lo nuevo'
+})
+
+const bannerCtaText = computed(() => {
+  return props.storeConfig.ai_banner_texts?.cta_text || ''
+})
+
+const heroHeadlineDisplay = computed(() => {
+  const text = bannerHeadline.value || 'Nueva Colección'
+  const maxChars = layoutConfig.value.hero_content_density === 'compact' ? 58 : 76
+  return text.length > maxChars ? `${text.slice(0, maxChars - 3).trim()}...` : text
+})
+
+const heroSubheadlineDisplay = computed(() => {
+  const text = bannerSubheadline.value || ''
+  const maxChars = layoutConfig.value.hero_content_density === 'compact' ? 62 : 88
+  return text.length > maxChars ? `${text.slice(0, maxChars - 3).trim()}...` : text
+})
+
 // Imágenes del carrusel - usar banner y logo si están disponibles
 const carouselImages = computed(() => {
   const images = []
@@ -881,37 +1362,84 @@ const carouselImages = computed(() => {
   return images.slice(0, 3)
 })
 
+const catalogProducts = computed(() => props.storeConfig.catalog_products || [])
+
+const getProductImage = (product) => {
+  if (!product) return ''
+  if (product.images && product.images.length > 0) return product.images[0]
+  return product.image_url || ''
+}
+
+const heroProducts = computed(() => {
+  const inStock = catalogProducts.value.filter(product => Number(product.stock || 0) > 0)
+  const source = inStock.length > 0 ? inStock : catalogProducts.value
+  return source.slice(0, 3)
+})
+
+const storyImageSlots = computed(() => {
+  const productImages = catalogProducts.value
+    .map(product => getProductImage(product))
+    .filter(Boolean)
+
+  const fallback = [...carouselImages.value]
+  const combined = [...productImages, ...fallback]
+
+  return [combined[0] || '', combined[1] || '', combined[2] || '']
+})
+
+const storySnippet = computed(() => {
+  const about = (props.storeConfig.ai_about_us || '').trim()
+  if (!about) {
+    return 'Curamos piezas con diseño, calidad y carácter para que tu compra se sienta especial desde el primer vistazo.'
+  }
+  return about.length > 260 ? `${about.slice(0, 260).trim()}...` : about
+})
+
+const announcementCards = computed(() => announcements.value.slice(0, 3))
+
+const categoryHighlights = computed(() => {
+  const countMap = new Map()
+
+  catalogProducts.value.forEach((product) => {
+    const rawId = product.category_id ?? product.category ?? 'sin-categoria'
+    const id = String(rawId)
+    const name = product.category || product.category_name || 'Sin categoría'
+
+    if (!countMap.has(id)) {
+      countMap.set(id, { id: rawId, name, count: 0 })
+    }
+    countMap.get(id).count += 1
+  })
+
+  return Array.from(countMap.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8)
+})
+
+const activeCategoryName = computed(() => {
+  if (selectedCategory.value === null) return 'Toda la colección'
+  const match = categoryHighlights.value.find(category => String(category.id) === String(selectedCategory.value))
+  return match?.name || 'Colección seleccionada'
+})
+
 // Computed
 const storeName = computed(() => props.storeConfig.store_name || 'Mi Tienda')
 
-// Split store name: first word = main title (serif), rest = subtitle
-const storeNameFirst = computed(() => {
-  const name = storeName.value.trim()
-  const parts = name.split(/\s+/)
-  return parts[0] || name
-})
-
-const storeNameSecond = computed(() => {
-  const name = storeName.value.trim()
-  const parts = name.split(/\s+/)
-  return parts.length > 1 ? parts.slice(1).join(' ') : ''
-})
-
 // Precios mínimo y máximo de productos
 const minProductPrice = computed(() => {
-  const products = props.storeConfig.catalog_products || []
+  const products = catalogProducts.value
   if (products.length === 0) return 0
   return Math.floor(Math.min(...products.map(p => parseFloat(p.price || 0))))
 })
 
 const maxProductPrice = computed(() => {
-  const products = props.storeConfig.catalog_products || []
+  const products = catalogProducts.value
   if (products.length === 0) return 1000000
   return Math.ceil(Math.max(...products.map(p => parseFloat(p.price || 0))))
 })
 
 const filteredProducts = computed(() => {
-  let products = props.storeConfig.catalog_products || []
+  let products = catalogProducts.value
   
   // Filtro por búsqueda
   if (searchQuery.value.trim()) {
@@ -991,8 +1519,19 @@ const formatPrice = (price) => {
 
 const clearFilters = () => {
   selectedCategory.value = null
+  searchQuery.value = ''
   sortOrder.value = ''
   showOnlyAvailable.value = false
+  priceRange.value.max = maxProductPrice.value
+}
+
+const applyCategoryFilter = (categoryId) => {
+  selectedCategory.value = categoryId
+  showMobileMenu.value = false
+  showMobileFilters.value = false
+  nextTick(() => {
+    scrollToProducts()
+  })
 }
 
 const handleImageError = (productId) => {
@@ -1070,7 +1609,9 @@ const handleScroll = () => {
 }
 
 const scrollToProducts = () => {
-  productsSection.value?.scrollIntoView({ behavior: 'smooth' })
+  if (!productsSection.value) return
+  const top = productsSection.value.getBoundingClientRect().top + window.scrollY - 140
+  window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' })
 }
 
 const openProductDetails = (product) => {
@@ -1081,7 +1622,8 @@ const openProductDetails = (product) => {
 let carouselInterval = null
 const startCarousel = () => {
   carouselInterval = setInterval(() => {
-    currentSlide.value = (currentSlide.value + 1) % 3 // 3 slides
+    const totalSlides = Math.max(carouselImages.value.length, 1)
+    currentSlide.value = (currentSlide.value + 1) % totalSlides
   }, 5000) // Cambia cada 5 segundos
 }
 
@@ -1105,6 +1647,34 @@ const stopAnnouncementTicker = () => {
   }
 }
 
+// Load Google Fonts dynamically for AI-generated font pairs
+const loadAiFonts = () => {
+  const fonts = props.storeConfig.ai_fonts
+  if (!fonts) return
+  
+  const fontsToLoad = new Set()
+  if (fonts.heading) fontsToLoad.add(fonts.heading)
+  if (fonts.body) fontsToLoad.add(fonts.body)
+  
+  // Always load defaults too
+  fontsToLoad.add('Playfair Display')
+  fontsToLoad.add('Montserrat')
+  
+  const familyParam = Array.from(fontsToLoad)
+    .map(f => 'family=' + f.replace(/\s+/g, '+') + ':wght@300;400;500;600;700')
+    .join('&')
+  
+  // Check if link already exists
+  const existingLink = document.querySelector('link[data-ai-fonts]')
+  if (existingLink) existingLink.remove()
+  
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = `https://fonts.googleapis.com/css2?${familyParam}&display=swap`
+  link.setAttribute('data-ai-fonts', 'true')
+  document.head.appendChild(link)
+}
+
 // Inicializar rango de precios cuando se cargan los productos
 const initPriceRange = () => {
   priceRange.value.min = minProductPrice.value
@@ -1121,7 +1691,17 @@ onMounted(() => {
   props.storeConfig.catalog_products?.forEach(p => {
     imageErrors.value[p.id] = false
   })
+  // Load AI-generated Google Fonts dynamically
+  loadAiFonts()
 })
+
+watch(() => props.storeConfig.ai_fonts, () => {
+  loadAiFonts()
+}, { deep: true })
+
+watch(() => props.storeConfig.catalog_products, () => {
+  initPriceRange()
+}, { deep: true })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
@@ -1133,6 +1713,16 @@ onUnmounted(() => {
 <style scoped>
 .catalog-visual-story {
   --brand-color: v-bind('storeConfig.primary_color');
+  background-color: var(--ai-background, #ffffff);
+  color: var(--ai-text-dark, #111827);
+  font-family: var(--ai-font-body), 'Inter', 'Helvetica Neue', sans-serif;
+}
+
+.catalog-visual-story h1,
+.catalog-visual-story h2,
+.catalog-visual-story h3,
+.catalog-visual-story h4 {
+  font-family: var(--ai-font-heading), 'Playfair Display', 'Georgia', serif;
 }
 
 .bg-brand {

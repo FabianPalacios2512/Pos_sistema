@@ -59,11 +59,20 @@ class DashboardController extends Controller
             $monthSalesCount = (clone $monthSalesQuery)->count();
 
             // Productos con stock bajo
-            $lowStockProducts = Product::whereRaw('current_stock <= min_stock')
-                ->where('manage_stock', true)
-                ->where('active', true)
-                ->count();
+              $simpleLowStockProducts = Product::whereRaw('current_stock <= min_stock')
+                  ->where('manage_stock', true)
+                  ->where(function($q) { $q->whereNull('product_type')->orWhere('product_type', 'simple'); })
+                  ->where('active', true)
+                  ->count();
 
+              $variantLowStockProducts = \App\Models\ProductVariant::join('products', 'products.id', '=', 'product_variants.product_id')
+                  ->where('products.manage_stock', true)
+                  ->where('products.active', true)
+                  ->where('product_variants.active', true)
+                  ->whereColumn('product_variants.stock', '<=', 'products.min_stock')
+                  ->count();
+
+              $lowStockProducts = $simpleLowStockProducts + $variantLowStockProducts;
             // Total de productos activos
             $totalProducts = Product::where('active', true)->count();
 

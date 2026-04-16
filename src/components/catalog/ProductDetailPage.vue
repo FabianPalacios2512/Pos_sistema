@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white relative">
+  <div class="min-h-screen bg-white relative pdp-immersive" :style="themeVars">
     
     <!-- Loading State -->
     <div v-if="loading" class="min-h-screen flex items-center justify-center">
@@ -21,17 +21,30 @@
     <template v-else-if="product">
       
       <!-- STICKY HEADER: Volver + Compartir + Carrito -->
-      <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm" style="box-shadow: 0 1px 0 rgba(0,0,0,0.06);">
-        <div class="flex items-center justify-between px-4 h-12">
+      <header class="sticky top-0 z-50 backdrop-blur-sm" :style="{ backgroundColor: aiPalette.background, boxShadow: '0 1px 0 rgba(0,0,0,0.06)' }">
+        <div class="flex items-center px-3 h-12 gap-2">
+          <!-- Back -->
           <button 
             @click="goBack"
-            class="flex items-center gap-1 text-gray-700 active:text-gray-900 transition-colors -ml-1"
+            class="w-9 h-9 flex items-center justify-center text-gray-700 active:text-gray-900 transition-colors flex-shrink-0 -ml-1"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button>
-          <div class="flex items-center gap-1">
+
+          <!-- Store name — centered -->
+          <div class="flex-1 flex flex-col items-center justify-center min-w-0 px-1">
+            <span
+              class="text-[14px] leading-tight text-gray-900 truncate max-w-full"
+              :style="{ fontFamily: aiFonts.heading + ', Georgia, serif', fontWeight: 600, letterSpacing: '0.02em' }"
+            >
+              {{ storeConfig.store_name || '' }}
+            </span>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center flex-shrink-0">
             <!-- Share -->
             <button 
               @click="shareProduct" 
@@ -61,9 +74,26 @@
       </header>
 
       <!-- HERO GALLERY: Smart-Cropped Container -->
-      <div class="relative w-full bg-gray-50">
+      <!-- PRODUCT TRANSITION OVERLAY -->
+      <Transition name="product-swap">
+        <div
+          v-if="isTransitioning"
+          class="fixed inset-0 z-[55] flex flex-col items-center justify-center gap-4 pointer-events-none"
+          :style="{ backgroundColor: aiPalette.background }"
+        >
+          <div class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center" :style="{ borderTopColor: aiPalette.primary }">
+            <svg class="w-5 h-5 animate-spin" :style="{ color: aiPalette.primary }" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+              <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </div>
+          <p class="text-xs text-gray-400 font-medium tracking-wide" :style="{ fontFamily: aiFonts.body + ', sans-serif' }">Cargando producto...</p>
+        </div>
+      </Transition>
+
+      <div class="relative w-full" :style="{ backgroundColor: aiPalette.background }">
         <div 
-          class="relative w-full max-h-[52vh] aspect-[4/5] overflow-hidden touch-pan-y"
+          class="relative w-full max-h-[52vh] aspect-[4/5] overflow-hidden touch-pan-y border-b border-gray-100"
           @touchstart="onGalleryTouchStart"
           @touchmove="onGalleryTouchMove"
           @touchend="onGalleryTouchEnd"
@@ -114,13 +144,16 @@
       <div class="bg-white">
         
         <!-- Category + Title + Price -->
-        <div class="px-5 pt-4 pb-3">
+        <div class="px-5 pt-5 pb-4">
           <p class="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-medium mb-1">
             {{ product.category_name || product.category || 'Producto' }}
           </p>
-          <h1 class="text-xl font-normal text-gray-900 leading-snug mb-2" style="font-family: 'Inter', sans-serif;">
+          <h1 class="text-[26px] font-normal text-gray-900 leading-tight mb-2" :style="{ fontFamily: aiFonts.heading + ', serif' }">
             {{ product.name }}
           </h1>
+          <p class="text-sm text-gray-600 mb-3" :style="{ fontFamily: aiFonts.body + ', sans-serif' }">
+            {{ productHook }}
+          </p>
           <div class="flex items-baseline gap-3">
             <span class="text-2xl font-bold text-gray-900 tracking-tight">
               {{ currencySymbol }}{{ formatPrice(currentPrice) }}
@@ -130,6 +163,20 @@
             </span>
             <span v-else-if="currentStock === 0" class="text-[11px] text-red-500 font-semibold uppercase tracking-wide bg-red-50 px-2 py-0.5">
               Agotado
+            </span>
+          </div>
+
+          <div v-if="storeConfig.ai_value_messages && storeConfig.ai_value_messages.length > 0" class="mt-3 flex flex-wrap gap-2">
+            <span
+              v-for="(message, idx) in storeConfig.ai_value_messages.slice(0, 2)"
+              :key="'pdp-chip-' + idx"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-[0.1em] border"
+              :style="{ borderColor: `${aiPalette.primary}33`, color: aiPalette.primary, backgroundColor: `${aiPalette.primary}08` }"
+            >
+              <svg class="w-2.5 h-2.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              {{ message }}
             </span>
           </div>
         </div>
@@ -181,10 +228,10 @@
         <div class="h-px bg-gray-100"></div>
 
         <!-- �️ TRUST ZONE: Logística + Pagos + Seguridad -->
-        <div class="px-5 py-4 flex flex-col gap-3 border-t border-b border-gray-100">
+        <div class="px-5 py-4 flex flex-col gap-3 border-t border-b border-gray-100" :style="{ backgroundColor: '#fbfbfb' }">
 
           <!-- Logística: Envío + Retiro -->
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-4 flex-wrap">
             <div class="flex items-center gap-1.5">
               <svg class="w-[15px] h-[15px] text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
@@ -259,28 +306,71 @@
 
         <div class="h-px bg-gray-100"></div>
 
+        <div v-if="productStorySnippet" class="mx-5 mt-4 mb-1 p-4 rounded-2xl border" :style="{ borderColor: aiPalette.secondary, backgroundColor: aiPalette.background }">
+          <p class="text-[10px] uppercase tracking-[0.18em] font-semibold mb-2" :style="{ color: aiPalette.primary }">Inspiración de marca</p>
+          <p class="text-sm leading-relaxed text-gray-600" :style="{ fontFamily: aiFonts.body + ', sans-serif' }">{{ productStorySnippet }}</p>
+        </div>
+
         <!-- CROSS-SELLING: "También te podría interesar" -->
-        <div v-if="relatedProducts.length > 0" class="py-5">
-          <h3 class="px-5 text-xs font-bold text-gray-900 uppercase tracking-[0.12em] mb-4">
-            También te podría interesar
-          </h3>
-          <div class="flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide snap-x snap-mandatory">
+        <!-- CROSS-SELLING: También te podría interesar -->
+        <div v-if="relatedProducts.length > 0" class="pt-5 pb-3">
+          <div class="px-5 flex items-center justify-between mb-4">
+            <h3 class="text-xs font-bold uppercase tracking-[0.14em]" :style="{ color: aiPalette.text_dark }">
+              {{ crossSellHeading }}
+            </h3>
+            <span class="text-[10px] text-gray-400">{{ relatedProducts.length }} productos</span>
+          </div>
+          <div class="flex gap-3 overflow-x-auto px-5 pb-3 scrollbar-hide snap-x snap-mandatory">
             <div 
               v-for="related in relatedProducts" 
               :key="'cross-'+related.id"
               @click="navigateToProduct(related)"
-              class="flex-shrink-0 w-[140px] snap-start cursor-pointer group"
+              class="flex-shrink-0 w-[140px] snap-start cursor-pointer group relative"
+              :class="{ 'pointer-events-none': isTransitioning }"
             >
-              <div class="aspect-[3/4] bg-gray-50 overflow-hidden mb-2">
+              <!-- Card image -->
+              <div
+                class="relative aspect-[3/4] overflow-hidden mb-2.5 rounded-2xl border transition-all duration-200"
+                :class="transitioningToId === related.id ? 'border-transparent shadow-lg' : 'border-gray-100 group-active:scale-[0.97]'"
+                :style="transitioningToId === related.id ? { borderColor: aiPalette.primary, boxShadow: `0 4px 20px ${aiPalette.primary}33` } : {}"
+              >
                 <img 
                   :src="related.images && related.images.length > 0 ? related.images[0] : related.image_url"
                   :alt="related.name"
-                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   @error="(e) => e.target.style.display = 'none'"
                 />
+                <!-- Loading spinner overlay on the card being navigated to -->
+                <div
+                  v-if="transitioningToId === related.id"
+                  class="absolute inset-0 flex items-center justify-center rounded-2xl"
+                  :style="{ backgroundColor: `${aiPalette.background}CC` }"
+                >
+                  <div class="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center justify-center" :style="{ borderTopColor: aiPalette.primary }">
+                    <svg class="w-4 h-4 animate-spin" :style="{ color: aiPalette.primary }" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                      <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                  </div>
+                </div>
+                <!-- Category badge -->
+                <div class="absolute top-2 left-2">
+                  <span
+                    v-if="related.category_name || related.category"
+                    class="px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wide bg-white/90 text-gray-600 backdrop-blur-sm"
+                  >
+                    {{ (related.category_name || related.category || '').slice(0, 12) }}
+                  </span>
+                </div>
               </div>
-              <p class="text-[12px] text-gray-600 truncate leading-snug">{{ related.name }}</p>
-              <p class="text-[13px] font-bold text-gray-900 mt-0.5">{{ currencySymbol }}{{ formatPrice(related.price) }}</p>
+              <!-- Info -->
+              <p
+                class="text-[12px] leading-snug font-semibold truncate mb-0.5 transition-colors duration-200"
+                :style="{ color: transitioningToId === related.id ? aiPalette.primary : aiPalette.text_dark, fontFamily: aiFonts.heading + ', serif' }"
+              >{{ related.name }}</p>
+              <p class="text-[12px] font-bold" :style="{ color: aiPalette.text_dark }">
+                {{ currencySymbol }}{{ formatPrice(related.price) }}
+              </p>
             </div>
           </div>
         </div>
@@ -302,7 +392,8 @@
           <button 
             @click="handleAddToCart"
             :disabled="currentStock === 0 || !isVariantSelected || addingToCart"
-            class="flex-1 h-[48px] bg-slate-900 hover:bg-slate-800 text-white text-[13px] font-bold uppercase tracking-[0.12em] rounded-lg transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
+            class="flex-1 h-[48px] text-white text-[13px] font-bold uppercase tracking-[0.12em] rounded-lg transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.98]"
+            :style="{ backgroundColor: aiPalette.primary }"
           >
             <!-- Spinner state -->
             <svg v-if="addingToCart" class="animate-spin w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24">
@@ -365,6 +456,8 @@ const imageIndex = ref(0)
 const swipeOffset = ref(0)
 const showDescription = ref(false)
 const addingToCart = ref(false)
+const isTransitioning = ref(false)
+const transitioningToId = ref(null)
 
 // Swipe tracking
 let touchStartX = 0
@@ -372,6 +465,59 @@ let touchStartY = 0
 let isSwiping = false
 
 const currencySymbol = computed(() => storeConfig.value.currency_symbol || '$')
+
+const aiPalette = computed(() => {
+  const palette = storeConfig.value.ai_color_palette || {}
+  return {
+    primary: palette.primary || '#0f172a',
+    secondary: palette.secondary || '#d1d5db',
+    accent: palette.accent || '#111827',
+    background: palette.background || '#ffffff',
+    text_dark: palette.text_dark || '#111827',
+    text_light: palette.text_light || '#f8fafc'
+  }
+})
+
+const aiFonts = computed(() => {
+  const fonts = storeConfig.value.ai_fonts || {}
+  return {
+    heading: fonts.heading || 'Playfair Display',
+    body: fonts.body || 'Montserrat'
+  }
+})
+
+const themeVars = computed(() => ({
+  '--pdp-primary': aiPalette.value.primary,
+  '--pdp-secondary': aiPalette.value.secondary,
+  '--pdp-background': aiPalette.value.background,
+  '--pdp-text-dark': aiPalette.value.text_dark,
+  '--pdp-text-light': aiPalette.value.text_light,
+  '--pdp-font-heading': aiFonts.value.heading,
+  '--pdp-font-body': aiFonts.value.body
+}))
+
+const productHook = computed(() => {
+  const values = storeConfig.value.ai_value_messages
+  if (values && Array.isArray(values) && values.length > 0) {
+    return values[0]
+  }
+  return storeConfig.value.ai_banner_texts?.subheadline || 'Pieza elegida para tu estilo diario'
+})
+
+const productStorySnippet = computed(() => {
+  const about = (storeConfig.value.ai_about_us || '').trim()
+  if (!about) return ''
+  return about.length > 180 ? `${about.slice(0, 180).trim()}...` : about
+})
+
+// AI-generated cross-sell heading
+const crossSellHeading = computed(() => {
+  const messages = storeConfig.value.ai_cross_sell_messages
+  if (messages && Array.isArray(messages) && messages.length > 0) {
+    return messages[Math.floor(Math.random() * messages.length)]
+  }
+  return 'También te podría interesar'
+})
 
 // Images
 const productImages = computed(() => {
@@ -447,7 +593,13 @@ const loadData = async () => {
         min_order_value: parseFloat(d.minimum_order || 0),
         whatsapp_number: d.whatsapp_number || '',
         store_name: d.store_name || 'Mi Tienda',
-        custom_message: d.custom_message || ''
+        custom_message: d.custom_message || '',
+        ai_cross_sell_messages: d.ai_cross_sell_messages || null,
+        ai_fonts: d.ai_fonts || null,
+        ai_color_palette: d.ai_color_palette || null,
+        ai_banner_texts: d.ai_banner_texts || null,
+        ai_about_us: d.ai_about_us || '',
+        ai_value_messages: d.ai_value_messages || null
       }
     }
 
@@ -532,6 +684,8 @@ const goBack = () => {
 }
 
 const navigateToProduct = (related) => {
+  transitioningToId.value = related.id
+  isTransitioning.value = true
   router.push(productUrl(related))
 }
 
@@ -585,7 +739,11 @@ const onGalleryTouchEnd = () => {
 
 // Watch route changes (for cross-selling navigation)
 watch(() => route.params.slug, (newSlug) => {
-  if (newSlug) {
+  if (!newSlug) return
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+  isTransitioning.value = true
+  // Short delay so user sees the loading state before content swaps
+  setTimeout(() => {
     const found = findProductBySlug(newSlug, allProducts.value)
     if (found) {
       product.value = found
@@ -593,11 +751,15 @@ watch(() => route.params.slug, (newSlug) => {
       imageIndex.value = 0
       swipeOffset.value = 0
       showDescription.value = false
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
       loadData()
     }
-  }
+    // Allow content to settle before removing overlay
+    setTimeout(() => {
+      isTransitioning.value = false
+      transitioningToId.value = null
+    }, 250)
+  }, 350)
 })
 
 onMounted(() => {
@@ -606,6 +768,16 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.pdp-immersive {
+  font-family: var(--pdp-font-body), 'Inter', 'Helvetica Neue', sans-serif;
+}
+
+.pdp-immersive h1,
+.pdp-immersive h2,
+.pdp-immersive h3 {
+  font-family: var(--pdp-font-heading), 'Playfair Display', 'Georgia', serif;
+}
+
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -627,5 +799,16 @@ onMounted(() => {
 }
 .toast-leave-to {
   opacity: 0; transform: translateY(-10px);
+}
+
+.product-swap-enter-active {
+  transition: opacity 0.18s ease;
+}
+.product-swap-leave-active {
+  transition: opacity 0.25s ease;
+}
+.product-swap-enter-from,
+.product-swap-leave-to {
+  opacity: 0;
 }
 </style>

@@ -2334,7 +2334,7 @@ const updateScreenContextForAI = () => {
       }
     }
     
-    // Buscar el producto
+    // Buscar el producto 
     let productoEncontrado = null
     
     if (nombreProducto) {

@@ -180,7 +180,17 @@ class WebCatalogConfigController extends Controller
                 'custom_message' => $config->custom_message,
                 'delivery_cost' => (float) $config->delivery_cost,
                 'minimum_order' => (float) $config->minimum_order,
-                'sync_with_cash_register' => (bool) $config->sync_with_cash_register
+                'sync_with_cash_register' => (bool) $config->sync_with_cash_register,
+
+                // AI-Generated Brand Identity
+                'ai_color_palette' => json_decode($config->ai_color_palette ?? 'null', true),
+                'ai_fonts' => json_decode($config->ai_fonts ?? 'null', true),
+                'ai_banner_texts' => json_decode($config->ai_banner_texts ?? 'null', true),
+                'ai_about_us' => $config->ai_about_us ?? null,
+                'ai_value_messages' => json_decode($config->ai_value_messages ?? 'null', true),
+                'ai_announcements' => json_decode($config->ai_announcements ?? 'null', true),
+                'ai_cross_sell_messages' => json_decode($config->ai_cross_sell_messages ?? 'null', true),
+                'ai_layout_config' => json_decode($config->ai_layout_config ?? 'null', true),
             ];
 
             return response()->json([

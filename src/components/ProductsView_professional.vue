@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <!-- Loading State durante inicialización (evita parpadeo) -->
   <div v-if="isInitializing" class="min-h-screen font-sans bg-gray-50 dark:bg-[#131314] transition-colors duration-300 px-8">
     <div class="flex items-center justify-center min-h-screen">
@@ -517,14 +517,27 @@
           </tr>
 
           <!-- Product Rows -->
-          <tr v-for="(product, index) in paginatedProducts" 
-              :key="product.id"
-              @click="viewProduct(product)"
-              :class="[index % 2 === 1 ? 'bg-[#FAFAFA] dark:bg-zinc-900/60' : 'bg-white dark:bg-zinc-900']"
-              class="hover:bg-[#F1F5F9] dark:hover:bg-zinc-800/50 transition-colors duration-150 group cursor-pointer">
-            <!-- Columna Producto (La Estrella) -->
+          <template v-for="(product, index) in paginatedProducts" :key="product.id">
+            <tr @click="viewProduct(product)"
+                :class="[index % 2 === 1 ? 'bg-[#FAFAFA] dark:bg-zinc-900/60' : 'bg-white dark:bg-zinc-900', expandedProducts.has(product.id) ? 'border-b-0' : 'border-b border-[#E5E7EB] dark:border-zinc-800']"
+                class="hover:bg-[#F1F5F9] dark:hover:bg-zinc-800/50 transition-colors duration-150 group cursor-pointer">
+              <!-- Columna Producto (La Estrella) -->
             <td class="px-6 py-[16px]">
               <div class="flex items-center gap-4">
+                <!-- Botón de expandir variantes -->
+                <button v-if="hasVariants(product)"
+                        @click.stop="toggleProduct(product.id)"
+                        class="p-1 rounded-md text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:text-zinc-500 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all focus:outline-none"
+                        title="Ver variantes">
+                  <svg v-if="expandedProducts.has(product.id)" class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                  <svg v-else class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                <div v-else class="w-7"></div> <!-- Espaciador si no hay botón -->
+
                 <div class="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800/60" 
                      :class="!getProductImage(product) ? 'flex items-center justify-center' : ''">
                   <img v-if="getProductImage(product)"
@@ -578,19 +591,35 @@
             <template v-if="showMultipleStockColumns">
               <td v-for="warehouse in availableWarehouses" :key="warehouse.id"
                   class="px-4 py-[16px] text-center">
-                <div v-if="getWarehouseStock(product, warehouse.id) !== null" class="flex flex-col items-center">
+                <div v-if="getWarehouseStock(product, warehouse.id) !== null" class="flex flex-col items-center relative group/stock-wh" :title="hasVariants(product) ? getVariantWarehouseStockAnalysis(product, warehouse.id)?.tooltipText : null">
                   <!-- �S& Producto EXISTE en esta sede -->
                   <span :class="[
-                    'text-[15px] font-mono font-semibold tabular-nums',
-                    getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0) ? 'text-amber-500 dark:text-amber-400' : 'text-green-600 dark:text-green-400'
+                    'text-[14px] font-mono font-bold tabular-nums text-gray-900 dark:text-gray-200'
                   ]">
                     {{ getWarehouseStock(product, warehouse.id) }}
                   </span>
                   <!-- Alerta de stock bajo para esta bodega -->
-                  <span v-if="getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0)" 
-                        class="text-[13px] font-semibold text-amber-500 dark:text-amber-400 mt-0.5">
-                    Bajo
-                  </span>
+                  <template v-if="hasVariants(product)">
+                    <div v-if="getVariantWarehouseStockAnalysis(product, warehouse.id)?.status === 'critical'" class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80">
+                      <span class="text-[11px] leading-none mb-0.5">✖</span>
+                      <span>{{ getVariantWarehouseStockAnalysis(product, warehouse.id).message }}</span>
+                    </div>
+                    <div v-else-if="getVariantWarehouseStockAnalysis(product, warehouse.id)?.status === 'low'" class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80">
+                      <span class="text-[11px] leading-none mb-0.5">⚠</span>
+                      <span>{{ getVariantWarehouseStockAnalysis(product, warehouse.id).message }}</span>
+                    </div>
+                    <div v-else class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-500 opacity-70">
+                      <span>Todas OK</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                     <span v-if="getWarehouseStock(product, warehouse.id) === 0" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80 mt-1">
+                       ✖ Sin stock
+                     </span>
+                     <span v-else-if="getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0)" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80 mt-1">
+                       ⚠ Bajo
+                     </span>
+                  </template>
                 </div>
                 <div v-else class="flex flex-col items-center">
                   <!-- �R Producto NO existe en esta sede -->
@@ -604,31 +633,59 @@
               </td>
             </template>
             <template v-else>
-              <!-- Columna Stock (Con Resumen para Variantes) -->
-              <td class="px-6 py-[16px] text-center">
-                <div class="flex flex-col items-center relative group/stock">
-                  <span :class="[
-                    'inline-flex items-center justify-center min-w-[2.5rem] px-2 py-0.5 rounded-md text-[15px] font-mono font-semibold tabular-nums',
-                    getTotalStock(product) === 0 ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400' :
-                    getTotalStock(product) <= (product.min_stock || 0) ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-500 dark:text-amber-400' : 
-                    'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400'
-                  ]">
-                    {{ hasVariants(product) ? getStockSummary(product).total : getTotalStock(product) }}
-                  </span>
-                  <!-- Resumen si tiene variantes -->
-                  <span v-if="hasVariants(product)" class="text-[13px] text-gray-500 dark:text-zinc-400 mt-0.5">
-                    ({{ getStockSummary(product).variants }} variantes)
-                  </span>
+              <!-- Columna Stock (Con Análisis de Variantes) -->
+                <td class="px-6 py-[16px] text-center">
+                  <div class="flex flex-col items-center relative group/stock" :title="hasVariants(product) ? getVariantStockAnalysis(product)?.tooltipText : null"> 
+                    <span :class="[
+                        'inline-flex items-center justify-center gap-1 min-w-[2.5rem] px-2 py-0.5 rounded-md text-[14px] font-mono font-bold tabular-nums cursor-default transition-colors',
+                        getTotalStock(product) === 0 ? 'text-gray-900 dark:text-gray-200' : 
+                        (hasVariants(product) && hasVariantWithLowStock(product)) || (!hasVariants(product) && getTotalStock(product) <= (product.min_stock || 0)) ? 'text-gray-900 dark:text-gray-200' : 
+                        'text-gray-900 dark:text-gray-200'
+                      ]">
+                        {{ hasVariants(product) ? getStockSummary(product).total : getTotalStock(product) }}
+                      </span>
+
+                      <!-- State below the main total -->
+                      <template v-if="hasVariants(product)">
+                        <div v-if="getVariantStockAnalysis(product)?.status === 'critical'" class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80">
+                          <span class="text-[11px] leading-none mb-0.5">✖</span>
+                          <span>{{ getVariantStockAnalysis(product).message }}</span>
+                        </div>
+                        <div v-else-if="getVariantStockAnalysis(product)?.status === 'low'" class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80">
+                          <span class="text-[11px] leading-none mb-0.5">⚠</span>
+                          <span>{{ getVariantStockAnalysis(product).message }}</span>
+                        </div>
+                        <div v-else class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-500 opacity-70">
+                          <span>Todas OK</span>
+                        </div>
+                      </template>
+                      <template v-else>
+                         <span v-if="getTotalStock(product) === 0" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80 mt-1">
+                           ✖ Sin stock
+                         </span>
+                         <span v-else-if="getTotalStock(product) <= (product.min_stock || 0)" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80 mt-1">
+                           ⚠ Bajo
+                         </span>
+                      </template>
                   
-                  <!-- Tooltip con desglose -->
-                  <div v-if="hasVariants(product) && getStockBreakdown(product)" 
-                       class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover/stock:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap">
-                    <div class="bg-gray-900 dark:bg-zinc-800 text-white text-[15px] px-3 py-2 rounded-lg shadow-xl border border-gray-700 dark:border-zinc-600">
-                      {{ getStockBreakdown(product) }}
-                      <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                        <div class="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-zinc-800"></div>
-                      </div>
-                    </div>
+                  <!-- Tooltip / Popover Multi-sede (Glassmorphism) -->
+                  <div v-if="product.warehouses && product.warehouses.length > 0" 
+                       class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover/stock:opacity-100 transition-all duration-200 pointer-events-none z-10 w-48 bg-white dark:bg-zinc-900/95 backdrop-blur-md shadow-xl dark:shadow-black/50 border border-gray-200 dark:border-white/10 rounded-xl p-3">
+                    <p class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wide mb-2 text-left">Stock por Sede</p>
+                    <ul class="space-y-1.5 text-sm text-left">
+                      <li v-for="wh in product.warehouses" :key="wh.warehouse_id" class="flex justify-between items-center text-gray-700 dark:text-zinc-300">
+                         <span class="flex items-center gap-1.5 truncate max-w-[120px]">
+                           <svg class="w-3.5 h-3.5 text-gray-400 dark:text-zinc-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                           </svg> 
+                           <span class="truncate text-[13px]">{{ wh.warehouse_name || 'Desconocida' }}</span>
+                         </span>
+                         <span class="font-mono font-semibold text-[13px]" :class="wh.stock_quantity > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'">
+                           {{ wh.stock_quantity }}
+                         </span>
+                      </li>
+                    </ul>
+                    <div class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-white dark:bg-zinc-900/95 border-b border-r border-gray-200 dark:border-white/10 rotate-45"></div>
                   </div>
                 </div>
               </td>
@@ -683,6 +740,75 @@
               </div>
             </td>
           </tr>
+
+          <!-- Sub-tabla Variantes (Nested Table) -->
+          <tr v-if="expandedProducts.has(product.id) && hasVariants(product)" class="bg-gray-50/50 dark:bg-zinc-800/30 border-b border-[#E5E7EB] dark:border-zinc-800 relative">
+            <td :colspan="showMultipleStockColumns ? 5 + availableWarehouses.length : 6" class="py-4 px-6 pl-14">
+              <!-- Indicador visual de jerarquía -->
+              <div class="absolute left-6 top-0 bottom-0 w-px bg-gray-200 dark:bg-zinc-700/50"></div>
+              <div class="absolute left-6 top-6 w-5 h-px bg-gray-200 dark:bg-zinc-700/50"></div>
+
+              <div class="transition-all bg-slate-50 dark:bg-zinc-800/20 border-t border-b border-gray-200 dark:border-zinc-800">
+                  <table class="w-full text-left text-[13px]">
+                    <thead class="text-gray-500 dark:text-zinc-500 border-b border-gray-200 dark:border-zinc-800">
+                      <tr>
+                        <th class="py-2.5 px-6 pl-12 font-medium tracking-wide uppercase text-[11px]">Variante</th>
+                        <th class="py-2.5 px-6 font-medium tracking-wide uppercase text-[11px]">SKU</th>
+                        <th class="py-2.5 px-6 w-32 font-medium tracking-wide uppercase text-[11px] text-right">Precio</th>
+                        <th class="py-2.5 px-6 pr-12 w-32 font-medium tracking-wide uppercase text-[11px] text-right">Stock</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-zinc-800/60">
+                      <tr v-for="variant in product.variants" :key="variant.id" class="text-gray-700 dark:text-zinc-300">
+                        <td class="py-2.5 px-6 pl-12">
+                          <div class="flex items-center gap-2">
+                            <div v-if="getVariantColor(variant)" 
+                                 class="w-3 h-3 rounded-full border border-gray-300 dark:border-zinc-600 shrink-0"
+                                 :style="{ backgroundColor: getVariantColor(variant) }"
+                                 title="Color de la Variante">
+                            </div>
+                            <div class="flex items-center gap-1 flex-wrap">
+                              <template v-if="getVariantOptionsArray(variant).length">
+                                <template v-for="(opt, i) in getVariantOptionsArray(variant)" :key="i">
+                                  <span class="text-gray-500 dark:text-zinc-400 font-medium">{{ opt.name }}:</span>
+                                  <span class="font-medium" v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')">
+                                    {{ opt.text && opt.text !== opt.value ? opt.text : 'Color' }}
+                                  </span>
+                                  <span class="font-medium" v-else>{{ opt.text || opt.value }}</span>
+                                  <span v-if="i < getVariantOptionsArray(variant).length - 1" class="text-gray-300 dark:text-zinc-600 mx-0.5">•</span>
+                                </template>
+                              </template>
+                              <span v-else class="font-medium">
+                                {{ variant.name || 'Variante Base' }}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="py-2.5 px-6">
+                          <span class="font-mono text-[12px] opacity-80">{{ variant.sku || 'N/A' }}</span>
+                        </td>
+                        <td class="py-2.5 px-6 text-right tabular-nums">
+                          ${{ formatCurrency(variant.price || product.price) }}
+                        </td>
+                        <td class="py-2.5 px-6 pr-12 text-right">
+                          <span :class="[
+                            'inline-flex items-center justify-end gap-1 font-mono text-[13px] tabular-nums',
+                            (variant.stock || 0) === 0 ? 'text-rose-500/80 dark:text-rose-400/80 font-medium' : 
+                            (variant.stock || 0) <= (product.min_stock || 0) ? 'text-amber-500/80 dark:text-amber-400/80 font-medium' :
+                            'text-gray-600 dark:text-zinc-400 font-medium'
+                          ]">
+                            {{ variant.stock || 0 }}
+                            <span v-if="(variant.stock || 0) === 0" class="text-[11px] leading-none ml-0.5 opacity-80" title="Sin stock">⚠</span>
+                            <span v-else-if="(variant.stock || 0) <= (product.min_stock || 0)" class="text-[11px] leading-none ml-0.5 opacity-80" title="Bajo stock">⚠</span>
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+          </tr>
+          </template>
         </tbody>
       </table>
       </div>
@@ -992,7 +1118,7 @@
 
             <form v-else @submit.prevent="saveProduct" class="space-y-6">
               
-              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"� -->
               <!-- SECCI�N 1: INFORMACI�N BÁSICA (Compacta) -->
               <!-- SECCIÓN 1: INFORMACIÓN BÁSICA (Compacta) -->
               <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-[#E5E7EB] dark:border-zinc-800">
@@ -1115,9 +1241,9 @@
                 </div>
               </div>
 
-              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"� -->
               <!-- SECCI�N 3: PRECIOS + STOCK (Todo en uno) -->
-              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"� -->
               <div class="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-[#E5E7EB] dark:border-zinc-800">
                 <h4 class="text-[14px] font-semibold text-[#111827] dark:text-white mb-4 flex items-center gap-2">
                   <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1197,9 +1323,9 @@
                 </div>
               </div>
 
-              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"� -->
               <!-- SECCI�N 4: STOCK MULTI-BODEGA (Solo si hay 2+ bodegas) -->
-              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"� -->
               <div v-if="availableWarehouses.length >= 2" class="bg-white dark:bg-zinc-900 rounded-xl p-6 border border-[#E5E7EB] dark:border-zinc-800">
                 <div class="flex items-center justify-between mb-4">
                   <h4 class="text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -1256,9 +1382,9 @@
                 </div>
               </div>
 
-              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"� -->
               <!-- SECCI�N 5: ESTADO (Inline compacto) -->
-              <!-- �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"� -->
+              <!-- �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"� -->
               <div class="flex items-center justify-between bg-white dark:bg-zinc-900 rounded-xl p-5 border border-[#E5E7EB] dark:border-zinc-800">
                 <div class="flex items-center gap-3">
                   <svg class="w-5 h-5" :class="productForm.active ? 'text-emerald-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1564,22 +1690,17 @@
            class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-5xl shadow-2xl max-h-[90vh] overflow-hidden border border-gray-200 dark:border-zinc-800 flex flex-col">
         
         <!-- Header -->
-        <div class="bg-gray-50 dark:bg-zinc-900 px-6 py-4 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
+        <div class="bg-gray-50 dark:bg-zinc-900 px-6 py-5 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-              <div class="w-11 h-11 bg-purple-100 dark:bg-purple-950/80 rounded-xl flex items-center justify-center ring-1 ring-purple-200 dark:ring-purple-800/50">
-                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                </svg>
-              </div>
               <div>
-                <div class="flex items-center gap-3">
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedProduct.name }}</h3>
-                  <span class="px-2.5 py-1 bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50 rounded-lg text-[12px] font-bold uppercase tracking-wide">
-                    Moda/Variantes
+                <div class="flex items-center gap-3 mb-1">
+                  <h3 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{{ selectedProduct.name }}</h3>
+                  <span class="px-2 py-0.5 bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border border-gray-300 dark:border-zinc-700 rounded text-[11px] font-bold uppercase tracking-wider">
+                    Gestión de Variantes
                   </span>
                 </div>
-                <p class="text-[13px] text-gray-500 dark:text-zinc-500 mt-0.5">Gestión de Inventario por Variante</p>
+                <p class="text-[13px] text-gray-600 dark:text-zinc-500">Administración de inventario y valores por SKU</p>
               </div>
             </div>
             <button @click="showViewModal = false" 
@@ -1740,12 +1861,28 @@
                             {{ (selectedProduct.name || 'P').substring(0, 2).toUpperCase() }}
                           </span>
                         </div>
-                        <p class="text-[15px] font-medium text-gray-900 dark:text-white">
-                          <span v-if="variant.options_summary">
-                            {{ formatVariantOptions(variant.options_summary) }}
+                        <div class="flex items-center gap-2">
+                          <div v-if="getVariantColor(variant)"
+                               class="w-3.5 h-3.5 rounded-full shadow-sm border border-gray-300 dark:border-zinc-600 shrink-0"
+                               title="Color de la Variante"
+                               :style="{ backgroundColor: getVariantColor(variant) }">
+                          </div>
+                          <span class="text-[14px] font-medium text-gray-900 dark:text-gray-100">
+                            <template v-if="getVariantOptionsArray(variant).length">
+                              <template v-for="(opt, i) in getVariantOptionsArray(variant)" :key="i">
+                                <span class="text-gray-500 dark:text-zinc-400 capitalize">{{ opt.name }}:</span>
+                                <span class="font-semibold ml-0.5" v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')">
+                                  {{ opt.text && opt.text !== opt.value ? opt.text : '' }}
+                                </span>
+                                <span class="font-semibold ml-0.5" v-else>{{ opt.text || opt.value }}</span>
+                                <span v-if="i < getVariantOptionsArray(variant).length - 1" class="mx-1.5 text-gray-300 dark:text-zinc-600">•</span>
+                              </template>
+                            </template>
+                            <template v-else>
+                              {{ variant.name || selectedProduct.name }}
+                            </template>
                           </span>
-                          <span v-else>{{ selectedProduct.name }}</span>
-                        </p>
+                        </div>>
                       </div>
                     </td>
                     
@@ -1756,36 +1893,36 @@
                     
                     <!-- Costo Unitario (Input Editable) -->
                     <td class="px-4 py-3">
-                      <div class="flex items-center justify-center gap-1">
-                        <span class="text-[15px] text-gray-400 dark:text-zinc-500 font-medium">$</span>
-                        <input type="text" 
-                               :value="formatInputNumber(variant.editableCost)"
+                      <div class="flex items-center justify-center gap-0 group">      
+                        <span class="text-[14px] text-gray-400 dark:text-zinc-500 font-medium px-1.5">$</span>
+                        <input type="text"
+                               :value="formatInputNumber(variant.editableCost)" 
                                @input="handleCostInput($event, variant)"
                                @focus="$event.target.select()"
-                               class="w-28 px-3 py-2 text-center text-[15px] font-semibold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all tabular-nums"
-                               :class="variantChanges[variant.id]?.cost ? 'ring-2 ring-amber-500 border-amber-500' : ''">
+                               class="w-28 px-2 py-1.5 text-right text-[14px] font-semibold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700/80 rounded block text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all tabular-nums"
+                               :class="variantChanges[variant.id]?.cost ? 'ring-2 ring-amber-500/20 border-amber-500' : ''">
                       </div>
                     </td>
-                    
+
                     <!-- Precio Venta (Input Editable) -->
                     <td class="px-4 py-3">
-                      <div class="flex items-center justify-center gap-1">
-                        <span class="text-[15px] text-gray-400 dark:text-zinc-500 font-medium">$</span>
-                        <input type="text" 
+                      <div class="flex items-center justify-center gap-0 group">      
+                        <span class="text-[14px] text-gray-400 dark:text-zinc-500 font-medium px-1.5">$</span>
+                        <input type="text"
                                :value="formatInputNumber(variant.editablePrice)"
-                               @input="handlePriceInput($event, variant)"
+                               @input="handlePriceInput($event, variant)"       
                                @focus="$event.target.select()"
-                               class="w-28 px-3 py-2 text-center text-[15px] font-bold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-emerald-600 dark:text-emerald-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all tabular-nums"
-                               :class="variantChanges[variant.id]?.price ? 'ring-2 ring-amber-500 border-amber-500' : ''">
+                               class="w-28 px-2 py-1.5 text-right text-[14px] font-bold bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700/80 rounded block text-[#1a1a20] dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all tabular-nums"
+                               :class="variantChanges[variant.id]?.price ? 'ring-2 ring-amber-500/20 border-amber-500' : ''">
                       </div>
                     </td>
-                    
+
                     <!-- Stock (Input Numérico + Botones [-]/[+]) -->
                     <td class="px-4 py-3">
                       <div class="flex items-center justify-center gap-1">
                         <button @click="decrementStock(variant)" 
                                 class="w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded text-gray-700 dark:text-zinc-300 font-bold text-[15px] transition-colors">
-                          ��
+                          <span class="mb-[2px] leading-none">-</span>
                         </button>
                         <input type="number" 
                                v-model.number="variant.editableStock"
@@ -1795,8 +1932,8 @@
                                  variantChanges[variant.id]?.stock ? 'ring-2 ring-amber-400 dark:ring-amber-500 border-amber-400 dark:border-amber-500' : '',
                                  variant.editableStock <= 5 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
                                ]">
-                        <button @click="incrementStock(variant)" 
-                                class="w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-300 dark:border-zinc-600 rounded text-gray-700 dark:text-zinc-300 font-bold text-[15px] transition-colors">
+                        <button @click="incrementStock(variant)"
+                                class="w-7 h-7 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 border border-gray-200 dark:border-zinc-700/80 rounded text-gray-500 dark:text-zinc-400 font-bold text-[16px] leading-none transition-colors">
                           +
                         </button>
                       </div>
@@ -2082,7 +2219,7 @@
     </div>
   </div>
 
-  <!-- �x�� Tooltip: Stock por Bodega -->
+  <!-- �x<span class="mb-[2px] leading-none">-</span> Tooltip: Stock por Bodega -->
   <Teleport to="body">
     <div v-if="stockTooltip.visible" 
          class="fixed z-[9999] bg-white dark:bg-zinc-900 shadow-xl rounded-xl border border-gray-300 dark:border-zinc-700 p-3 min-w-[200px]"
@@ -2237,7 +2374,7 @@ import apiClient from '../services/apiClient'
 import { productsService } from '../services/productsService.js'
 import { categoriesService } from '../services/categoriesService.js'
 import { warehouseService } from '../services/warehouseService.js'
-import { apiCall } from '../services/api.js' // �x�� Para cargar proveedores
+import { apiCall } from '../services/api.js' // �x<span class="mb-[2px] leading-none">-</span> Para cargar proveedores
 import { appStore } from '../store/appStore.js'
 import { useUIContextStore } from '../store/uiContextStore.js'
 import { useAutoRefresh } from '../composables/useRouteState.js'
@@ -2247,6 +2384,17 @@ import ContextualTour from './ContextualTour.vue'
 import ExcelImportModal from './ExcelImportModal.vue'
 import FashionProductForm from './FashionProductForm.vue'
 import FashionProductCard from './FashionProductCard.vue'
+
+// --- ESTADOS PARA TABLA ANIDADA (Variantes) ---
+const expandedProducts = ref(new Set());
+const toggleProduct = (productId) => {
+  if (expandedProducts.value.has(productId)) {
+    expandedProducts.value.delete(productId);
+  } else {
+    expandedProducts.value.add(productId);
+  }
+};
+// ----------------------------------------------
 
 // �x� Store de contexto para IA
 const uiContext = useUIContextStore()
@@ -2391,7 +2539,7 @@ const handleImageError = (event, product) => {
 const loading = ref(true) // Iniciar en true para evitar parpadeo al cargar
 const products = ref([])
 const categories = ref([])
-const suppliers = ref([]) // �x�� Lista de proveedores
+const suppliers = ref([]) // �x<span class="mb-[2px] leading-none">-</span> Lista de proveedores
 const searchTerm = ref('')
 const categoryFilter = ref('')
 const statusFilter = ref('')
@@ -2477,7 +2625,7 @@ const variantChanges = ref({}) // Objeto: { variantId: { stock: true, price: tru
 const hasUnsavedChanges = computed(() => Object.keys(variantChanges.value).length > 0)
 const changesCount = computed(() => Object.keys(variantChanges.value).length)
 
-// �x�� Computed: Detectar si la tienda es de tipo Fashion (para vista de tarjetas)
+// �x<span class="mb-[2px] leading-none">-</span> Computed: Detectar si la tienda es de tipo Fashion (para vista de tarjetas)
 const isFashionStore = computed(() => {
   const storeType = appStore.systemSettings?.store_type
   return storeType === 'fashion' || storeType === 'moda'
@@ -2508,22 +2656,22 @@ const availableIcons = [
   { id: 'package', emoji: '�x�', name: 'Paquetería', category: 'general' },
   { id: 'money', emoji: '�x�', name: 'Finanzas', category: 'general' },
   // Comida y Bebidas
-  { id: 'food', emoji: '�x��️', name: 'Comida', category: 'food' },
-  { id: 'drink', emoji: '�x��', name: 'Bebidas', category: 'food' },
-  { id: 'coffee', emoji: '��"', name: 'Café', category: 'food' },
-  { id: 'wine', emoji: '�x��', name: 'Vino/Licor', category: 'food' },
-  { id: 'beer', emoji: '�x��', name: 'Cerveza', category: 'food' },
+  { id: 'food', emoji: '�x<span class="mb-[2px] leading-none">-</span>️', name: 'Comida', category: 'food' },
+  { id: 'drink', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Bebidas', category: 'food' },
+  { id: 'coffee', emoji: '<span class="mb-[2px] leading-none">-</span>"', name: 'Café', category: 'food' },
+  { id: 'wine', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Vino/Licor', category: 'food' },
+  { id: 'beer', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Cerveza', category: 'food' },
   { id: 'bread', emoji: '�x�~', name: 'Panadería', category: 'food' },
-  { id: 'meat', emoji: '�x��', name: 'Carnes', category: 'food' },
+  { id: 'meat', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Carnes', category: 'food' },
   { id: 'fruit', emoji: '�x�}', name: 'Frutas', category: 'food' },
-  { id: 'vegetable', emoji: '�x��', name: 'Verduras', category: 'food' },
-  { id: 'candy', emoji: '�x��', name: 'Dulces', category: 'food' },
-  { id: 'ice-cream', emoji: '�x��', name: 'Helados', category: 'food' },
+  { id: 'vegetable', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Verduras', category: 'food' },
+  { id: 'candy', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Dulces', category: 'food' },
+  { id: 'ice-cream', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Helados', category: 'food' },
   { id: 'pizza', emoji: '�x�"', name: 'Pizza', category: 'food' },
   { id: 'burger', emoji: '�x�', name: 'Hamburguesas', category: 'food' },
   { id: 'chicken', emoji: '�x�', name: 'Pollo', category: 'food' },
   { id: 'fish', emoji: '�x�x', name: 'Pescado', category: 'food' },
-  { id: 'cheese', emoji: '�x��', name: 'Lácteos', category: 'food' },
+  { id: 'cheese', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Lácteos', category: 'food' },
   // Belleza y Cuidado Personal
   { id: 'perfume', emoji: '�x�', name: 'Perfumes', category: 'beauty' },
   { id: 'cosmetics', emoji: '�x', name: 'Cosméticos', category: 'beauty' },
@@ -2531,8 +2679,8 @@ const availableIcons = [
   { id: 'haircut', emoji: '�x!', name: 'Peluquería', category: 'beauty' },
   { id: 'mirror', emoji: '�x�~', name: 'Espejos', category: 'beauty' },
   // Limpieza
-  { id: 'soap', emoji: '�x��', name: 'Jabones', category: 'cleaning' },
-  { id: 'cleaning', emoji: '�x��', name: 'Limpieza', category: 'cleaning' },
+  { id: 'soap', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Jabones', category: 'cleaning' },
+  { id: 'cleaning', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Limpieza', category: 'cleaning' },
   { id: 'toilet', emoji: '�xa�', name: 'Baño', category: 'cleaning' },
   // Papelería y Oficina
   { id: 'book', emoji: '�xa', name: 'Libros', category: 'office' },
@@ -2558,10 +2706,10 @@ const availableIcons = [
   { id: 'syringe', emoji: '�x0', name: 'Inyectables', category: 'health' },
   { id: 'thermometer', emoji: '�xR�️', name: 'Instrumentos', category: 'health' },
   // Niños y Bebés
-  { id: 'toy', emoji: '�x��', name: 'Juguetes', category: 'kids' },
+  { id: 'toy', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Juguetes', category: 'kids' },
   { id: 'baby', emoji: '�x�', name: 'Bebés', category: 'kids' },
-  { id: 'bottle', emoji: '�x��', name: 'Biberones', category: 'kids' },
-  { id: 'stroller', emoji: '�x��', name: 'Carriolas', category: 'kids' },
+  { id: 'bottle', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Biberones', category: 'kids' },
+  { id: 'stroller', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Carriolas', category: 'kids' },
   // Tecnología y Electrónica
   { id: 'electronics', emoji: '�x�', name: 'Electrónica', category: 'tech' },
   { id: 'computer', emoji: '�x�', name: 'Computadoras', category: 'tech' },
@@ -2578,10 +2726,10 @@ const availableIcons = [
   { id: 'wrench', emoji: '�x�', name: 'Tornillería', category: 'hardware' },
   { id: 'paint', emoji: '�x}�', name: 'Pintura', category: 'hardware' },
   // Mascotas
-  { id: 'pet', emoji: '�x��', name: 'Mascotas', category: 'pets' },
+  { id: 'pet', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Mascotas', category: 'pets' },
   { id: 'dog', emoji: '�x�"', name: 'Perros', category: 'pets' },
-  { id: 'cat', emoji: '�x��', name: 'Gatos', category: 'pets' },
-  { id: 'fish-pet', emoji: '�x��', name: 'Peces', category: 'pets' },
+  { id: 'cat', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Gatos', category: 'pets' },
+  { id: 'fish-pet', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Peces', category: 'pets' },
   { id: 'bird', emoji: '�x�S', name: 'Aves', category: 'pets' },
   // Jardín y Plantas
   { id: 'plant', emoji: '�xR�', name: 'Plantas', category: 'garden' },
@@ -2590,21 +2738,21 @@ const availableIcons = [
   { id: 'garden-tools', emoji: '�xR�', name: 'Jardinería', category: 'garden' },
   // Deportes
   { id: 'sport', emoji: '�a�', name: 'Deportes', category: 'sports' },
-  { id: 'basketball', emoji: '�x��', name: 'Basketball', category: 'sports' },
+  { id: 'basketball', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Basketball', category: 'sports' },
   { id: 'tennis', emoji: '�x}�', name: 'Tenis', category: 'sports' },
   { id: 'gym', emoji: '�x�', name: 'Gimnasio', category: 'sports' },
   { id: 'bike', emoji: '�xa�', name: 'Ciclismo', category: 'sports' },
   // Automotriz
   { id: 'car', emoji: '�xa', name: 'Automotriz', category: 'automotive' },
-  { id: 'motorcycle', emoji: '�x��️', name: 'Motocicletas', category: 'automotive' },
+  { id: 'motorcycle', emoji: '�x<span class="mb-[2px] leading-none">-</span>️', name: 'Motocicletas', category: 'automotive' },
   { id: 'tire', emoji: '�x:~', name: 'Llantas', category: 'automotive' },
   { id: 'gas', emoji: '�:�', name: 'Combustible', category: 'automotive' },
   // Hogar y Muebles
-  { id: 'home', emoji: '�x��', name: 'Hogar', category: 'home' },
+  { id: 'home', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Hogar', category: 'home' },
   { id: 'furniture', emoji: '�x:9️', name: 'Muebles', category: 'home' },
   { id: 'bed', emoji: '�x:�️', name: 'Colchones', category: 'home' },
   { id: 'lamp', emoji: '�x�', name: 'Iluminación', category: 'home' },
-  { id: 'kitchen', emoji: '�x��', name: 'Cocina', category: 'home' },
+  { id: 'kitchen', emoji: '�x<span class="mb-[2px] leading-none">-</span>', name: 'Cocina', category: 'home' },
   { id: 'decoration', emoji: '�x�️', name: 'Decoración', category: 'home' },
   { id: 'door', emoji: '�xa�', name: 'Puertas', category: 'home' },
   { id: 'key', emoji: '�x', name: 'Cerrajería', category: 'home' }
@@ -2637,9 +2785,9 @@ const productForm = ref({
   min_stock: 5,
   max_stock: 100,
   category_id: '',
-  supplier_id: null, // �x�� Proveedor principal (opcional)
-  warehouse_id: null, // �x�� Bodega donde se guardará el producto
-  warehouseStock: {}, // �x�� Stock por cada tienda { warehouse_id: cantidad }
+  supplier_id: null, // �x<span class="mb-[2px] leading-none">-</span> Proveedor principal (opcional)
+  warehouse_id: null, // �x<span class="mb-[2px] leading-none">-</span> Bodega donde se guardará el producto
+  warehouseStock: {}, // �x<span class="mb-[2px] leading-none">-</span> Stock por cada tienda { warehouse_id: cantidad }
   warehouseEnabled: {}, // �S& Control de qué sedes tendrán el producto { warehouse_id: boolean }
   image: '',
   imageFile: null, // �x� Archivo de imagen para subir
@@ -2648,11 +2796,11 @@ const productForm = ref({
   allow_decimal: false // �x� Permite cantidades decimales (0.5, 1.25, etc)
 })
 
-// �x�� Lista de bodegas disponibles
+// �x<span class="mb-[2px] leading-none">-</span> Lista de bodegas disponibles
 const warehouses = ref([])
 const loadingWarehouses = ref(false)
 
-// �x�� Tooltip de stock por bodega
+// �x<span class="mb-[2px] leading-none">-</span> Tooltip de stock por bodega
 const stockTooltip = ref({
   visible: false,
   productId: null,
@@ -2737,9 +2885,9 @@ const uniqueCategories = computed(() => {
   return new Set(categoryIds).size
 })
 
-// �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
+// �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"�
 // �x� CONTEXTO PARA IA - Información visible en pantalla
-// �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
+// �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"�
 const updateScreenContextForAI = () => {
   // Obtener productos con stock bajo para alertas
   const productosStockBajo = products.value
@@ -2752,7 +2900,7 @@ const updateScreenContextForAI = () => {
       categoria: p.category_name || 'Sin categoría'
     }))
 
-  // �x�� IMPORTANTE: Obtener productos VISIBLES en pantalla (filtrados)
+  // �x<span class="mb-[2px] leading-none">-</span> IMPORTANTE: Obtener productos VISIBLES en pantalla (filtrados)
   // Si hay pocos productos filtrados, incluirlos para que la IA sepa cuáles ve el usuario
   // Helper para obtener nombre del proveedor
   const getSupplierName = (supplierId) => {
@@ -2776,7 +2924,7 @@ const updateScreenContextForAI = () => {
       }))
     : null // Si hay muchos, no los incluimos para no sobrecargar
 
-  // �x�� Si hay exactamente 1 producto filtrado, automáticamente es el "producto en contexto"
+  // �x<span class="mb-[2px] leading-none">-</span> Si hay exactamente 1 producto filtrado, automáticamente es el "producto en contexto"
   const productoEnContexto = filteredProducts.value.length === 1 
     ? filteredProducts.value[0] 
     : selectedProduct.value
@@ -2802,10 +2950,10 @@ const updateScreenContextForAI = () => {
       ordenarPor: sortBy.value
     },
     vistaActual: viewMode.value, // 'table' o 'grid'
-    productosVisibles: productosVisibles, // �x�� Lista de productos en pantalla (si son pocos)
-    cantidadFiltrada: filteredProducts.value.length, // �x�� Cuántos productos ve el usuario
+    productosVisibles: productosVisibles, // �x<span class="mb-[2px] leading-none">-</span> Lista de productos en pantalla (si son pocos)
+    cantidadFiltrada: filteredProducts.value.length, // �x<span class="mb-[2px] leading-none">-</span> Cuántos productos ve el usuario
     alertasStockBajo: productosStockBajo,
-    // �x�� Usar productoEnContexto (automático si hay 1 filtrado, o el seleccionado)
+    // �x<span class="mb-[2px] leading-none">-</span> Usar productoEnContexto (automático si hay 1 filtrado, o el seleccionado)
     productoSeleccionado: productoEnContexto ? {
       id: productoEnContexto.id,
       nombre: productoEnContexto.name,
@@ -2819,7 +2967,7 @@ const updateScreenContextForAI = () => {
       activo: getProductStatus(productoEnContexto)
     } : null,
     
-    // �x�� Lista de proveedores disponibles (para que la IA pueda sugerir)
+    // �x<span class="mb-[2px] leading-none">-</span> Lista de proveedores disponibles (para que la IA pueda sugerir)
     proveedoresDisponibles: suppliers.value.slice(0, 15).map(s => ({ id: s.id, nombre: s.name })),
     modalAbierto: showProductModal.value ? (isEditing.value ? 'editar' : 'crear') : null,
     sedesDisponibles: availableWarehouses.value.map(w => ({ id: w.id, nombre: w.name })),
@@ -2861,7 +3009,7 @@ const updateScreenContextForAI = () => {
     }
   }
 
-  // �x�� Función para normalizar términos de búsqueda (un litro �  1L, medio �  500, etc.)
+  // �x<span class="mb-[2px] leading-none">-</span> Función para normalizar términos de búsqueda (un litro �  1L, medio �  500, etc.)
   const normalizarBusqueda = (texto) => {
     let normalizado = texto.toLowerCase()
     
@@ -2896,7 +3044,7 @@ const updateScreenContextForAI = () => {
     return normalizado
   }
 
-  // �x�� Función para buscar con coincidencia flexible
+  // �x<span class="mb-[2px] leading-none">-</span> Función para buscar con coincidencia flexible
   const buscarProductoFlexible = (texto) => {
     const textoNormalizado = normalizarBusqueda(texto)
     const palabras = textoNormalizado.split(/\s+/).filter(p => p.length > 1)
@@ -2978,7 +3126,7 @@ const updateScreenContextForAI = () => {
     return { success: false, message: 'Estado no reconocido. Usa: activos, inactivos, stock_bajo' }
   })
 
-  // �x�� NUEVA ACCI�N: Buscar proveedor de un producto
+  // �x<span class="mb-[2px] leading-none">-</span> NUEVA ACCI�N: Buscar proveedor de un producto
   uiContext.registerAction('buscarProveedorDeProducto', ({ nombreProducto }) => {
     if (!nombreProducto) {
       return { success: false, message: 'Dime el nombre del producto para buscar su proveedor' }
@@ -3104,7 +3252,7 @@ const updateScreenContextForAI = () => {
       return { success: false, message: 'Necesito saber qué campo cambiar y el nuevo valor' }
     }
     
-    // �x�� INTELIGENCIA: Si no se especifica producto, usar el que está en contexto (filtrado único)
+    // �x<span class="mb-[2px] leading-none">-</span> INTELIGENCIA: Si no se especifica producto, usar el que está en contexto (filtrado único)
     let producto = null
     
     if (nombreProducto) {
@@ -3205,9 +3353,9 @@ const updateScreenContextForAI = () => {
   // Actualizar el store de contexto
   uiContext.setScreenData(contextData)
 
-  // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
-  // �x�� ACCIONES PARA CREAR PRODUCTOS - CONCIENCIA DE PANTALLA
-  // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
+  // �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"�
+  // �x<span class="mb-[2px] leading-none">-</span> ACCIONES PARA CREAR PRODUCTOS - CONCIENCIA DE PANTALLA
+  // �"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"<span class="mb-[2px] leading-none">-</span>"�
   
   // Acción para llenar campos del formulario visualmente
   uiContext.registerAction('llenarCampoProducto', ({ campo, valor }) => {
@@ -3613,7 +3761,24 @@ const handlePriceInput = (event, variant) => {
   markVariantChanged(variant.id)
 }
 
-// �x��️ Formatear opciones de variante para mostrar
+// �x<span class="mb-[2px] leading-none">-</span>️ Formatear opciones de variante para mostrar
+const getVariantOptionsArray = (variant) => {
+  try {
+    const summary = variant.options_summary || variant.options;
+    if (!summary) return [];
+    const options = typeof summary === 'string' ? JSON.parse(summary) : summary;
+    return Array.isArray(options) ? options : [];
+  } catch (e) { return []; }
+};
+
+const getVariantColor = (variant) => {
+  if (variant.sku_fields?.Color?.value) return variant.sku_fields.Color.value;
+  if (variant.colorCode) return variant.colorCode;
+  const opts = getVariantOptionsArray(variant);
+  const colorOpt = opts.find(o => (o.name || '').toLowerCase() === 'color' || (o.value && String(o.value).startsWith('#')));
+  return colorOpt ? colorOpt.value : null;
+};
+
 const formatVariantOptions = (optionsSummary) => {
   try {
     const options = typeof optionsSummary === 'string' 
@@ -3750,6 +3915,103 @@ const getPriceRange = (product) => {
   return `$${formatCurrency(minPrice)} - $${formatCurrency(maxPrice)}`
 }
 
+const hasVariantWithLowStock = (product) => {
+  if (!product.variants || !Array.isArray(product.variants)) return false;
+  return product.variants.some(v => (v.stock || 0) <= (product.min_stock || 0));
+};
+
+const getVariantStockAnalysis = (product) => {
+  if (!hasVariants(product)) return null;
+
+  let criticalCount = 0;
+  let lowCount = 0;
+  let tooltipLines = [];
+
+  product.variants.forEach(v => {
+    const stock = v.stock || 0;
+    const minStock = product.min_stock || 0;
+    
+    let variantName = v.name || 'Variante';
+    const opts = getVariantOptionsArray(v);
+    if (opts && opts.length) {
+        variantName = opts.map(o => `${o.name}: ${o.text || o.value}`).join(', ');
+    }
+    tooltipLines.push(`${variantName} \u2192 ${stock} unidades`);
+
+    if (stock === 0) {
+      criticalCount++;
+    } else if (stock <= minStock) {
+      lowCount++;
+    }
+  });
+
+  let status = 'ok';
+  let message = '';
+  if (criticalCount > 0) {
+      status = 'critical';
+      message = `${criticalCount} sin stock`;
+  } else if (lowCount > 0) {
+      status = 'low';
+      message = `${lowCount} variante baja`;
+  }
+
+  return {
+    status,
+    criticalCount,
+    lowCount,
+    message,
+    tooltipText: tooltipLines.join('\n')
+  };
+};
+
+const getVariantWarehouseStockAnalysis = (product, warehouseId) => {
+  if (!hasVariants(product)) return null;
+
+  let criticalCount = 0;
+  let lowCount = 0;
+  let tooltipLines = [];
+
+  product.variants.forEach(v => {
+    let stock = 0;
+    if (v.warehouses) {
+      const whStockObj = v.warehouses.find(w => w.warehouse_id === warehouseId || w.id === warehouseId);
+      if (whStockObj) stock = parseFloat(whStockObj.pivot?.stock ?? whStockObj.stock) || 0;
+    }
+    const minStock = product.min_stock || 0;
+    
+    let variantName = v.name || 'Variante';
+    const opts = getVariantOptionsArray(v);
+    if (opts && opts.length) {
+        variantName = opts.map(o => `${o.name}: ${o.text || o.value}`).join(', ');
+    }
+    tooltipLines.push(`${variantName} \u2192 ${stock} unidades`);
+
+    if (stock === 0) {
+      criticalCount++;
+    } else if (stock <= minStock) {
+      lowCount++;
+    }
+  });
+
+  let status = 'ok';
+  let message = '';
+  if (criticalCount > 0) {
+      status = 'critical';
+      message = `${criticalCount} sin stock`;
+  } else if (lowCount > 0) {
+      status = 'low';
+      message = `${lowCount} variante baja`;
+  }
+
+  return {
+    status,
+    criticalCount,
+    lowCount,
+    message,
+    tooltipText: tooltipLines.join('\n')
+  };
+};
+
 const getStockSummary = (product) => {
   if (!hasVariants(product)) {
     return {
@@ -3862,7 +4124,7 @@ const loadCategories = async () => {
   }
 }
 
-// �x�� Cargar proveedores activos (optimizado - endpoint ligero sin analytics)
+// �x<span class="mb-[2px] leading-none">-</span> Cargar proveedores activos (optimizado - endpoint ligero sin analytics)
 const loadSuppliers = async () => {
   try {
     // �S& OPTIMIZADO: Usar /suppliers (simple) en lugar de /suppliers/analytics (pesado)
@@ -3877,7 +4139,7 @@ const loadSuppliers = async () => {
   }
 }
 
-// �x�� Computed: Filtrar bodegas según plan del tenant
+// �x<span class="mb-[2px] leading-none">-</span> Computed: Filtrar bodegas según plan del tenant
 const availableWarehouses = computed(() => {
   const plan = appStore.tenantPlan
   const isPremiumOrEnterprise = plan === 'premium' || plan === 'enterprise'
@@ -3898,12 +4160,12 @@ const availableWarehouses = computed(() => {
   return defaultWarehouse ? [defaultWarehouse] : warehouses.value.filter(w => w.active).slice(0, 1)
 })
 
-// �x�� Computed: Determinar si mostrar múltiples columnas de stock
+// �x<span class="mb-[2px] leading-none">-</span> Computed: Determinar si mostrar múltiples columnas de stock
 const showMultipleStockColumns = computed(() => {
   return availableWarehouses.value.length > 1
 })
 
-// �x�� Helper: Obtener stock de un producto en una bodega específica
+// �x<span class="mb-[2px] leading-none">-</span> Helper: Obtener stock de un producto en una bodega específica
 // Devuelve null si el producto NO existe en esa sede (para mostrar "N/A")
 const getWarehouseStock = (product, warehouseId) => {
   // Si el producto tiene relación con bodegas Y tiene datos, usar esa data
@@ -3938,7 +4200,7 @@ const getWarehouseStock = (product, warehouseId) => {
   return null  // �R Producto NO existe en esta sede
 }
 
-// �x�� Helper: Obtener stock total de un producto
+// �x<span class="mb-[2px] leading-none">-</span> Helper: Obtener stock total de un producto
 const getTotalStock = (product) => {
   // �S& SIEMPRE usar current_stock como fuente de verdad
   // Este campo se actualiza automáticamente en el backend cuando se ajusta stock
@@ -3946,7 +4208,7 @@ const getTotalStock = (product) => {
   return product.current_stock || 0
 }
 
-// �x�� Cargar bodegas disponibles
+// �x<span class="mb-[2px] leading-none">-</span> Cargar bodegas disponibles
 const loadWarehouses = async () => {
   try {
     loadingWarehouses.value = true
@@ -3977,7 +4239,7 @@ const loadWarehouses = async () => {
   }
 }
 
-// �x�� Mostrar tooltip de stock por bodega
+// �x<span class="mb-[2px] leading-none">-</span> Mostrar tooltip de stock por bodega
 const showStockTooltip = (event, product) => {
   if (product.warehouses && product.warehouses.length > 0) {
     stockTooltip.value.visible = true
@@ -3990,7 +4252,7 @@ const showStockTooltip = (event, product) => {
   }
 }
 
-// �x�� Ocultar tooltip de stock por bodega
+// �x<span class="mb-[2px] leading-none">-</span> Ocultar tooltip de stock por bodega
 const hideStockTooltip = () => {
   stockTooltip.value.visible = false
   stockTooltip.value.productId = null
@@ -4070,7 +4332,7 @@ const openCreateModal = async () => {
   
   isEditing.value = false
   
-  // �x�� El modo fashion ya fue detectado en onMounted, no necesitamos volver a detectarlo
+  // �x<span class="mb-[2px] leading-none">-</span> El modo fashion ya fue detectado en onMounted, no necesitamos volver a detectarlo
   
   // Cargar bodegas antes de abrir el modal
   await loadWarehouses()
@@ -4216,7 +4478,7 @@ const editProduct = async (product) => {
   
   isEditing.value = true
   
-  // �x�� Si hay solo 1 bodega, obtener el stock de esa bodega para el campo "Stock Inicial"
+  // �x<span class="mb-[2px] leading-none">-</span> Si hay solo 1 bodega, obtener el stock de esa bodega para el campo "Stock Inicial"
   let singleWarehouseStock = parseInt(product.current_stock || product.stock || 0)
   if (warehouses.value.length === 1 && warehouses.value[0]) {
     const warehouseId = warehouses.value[0].id
@@ -4238,7 +4500,7 @@ const editProduct = async (product) => {
     min_stock: parseInt(product.min_stock || 5),
     max_stock: parseInt(product.max_stock || 100),
     category_id: product.category_id,
-    supplier_id: product.supplier_id || null, // �x�� Cargar proveedor
+    supplier_id: product.supplier_id || null, // �x<span class="mb-[2px] leading-none">-</span> Cargar proveedor
     warehouseStock: warehouseStock,
     warehouseEnabled: warehouseEnabled,
     image: '', // Dejar vacío inicialmente
@@ -5205,7 +5467,7 @@ const saveProduct = async (skipValidation = false) => {
       // �x� Agregar la imagen como archivo
       formData.append('images[]', productForm.value.imageFile)
       
-      // �x�� Stock por bodegas
+      // �x<span class="mb-[2px] leading-none">-</span> Stock por bodegas
       Object.keys(productForm.value.warehouseStock || {}).forEach(warehouseId => {
         if (productForm.value.warehouseEnabled[warehouseId]) {
           formData.append(`warehouse_stocks[${warehouseId}]`, productForm.value.warehouseStock[warehouseId])
@@ -5296,7 +5558,7 @@ watch([searchTerm, categoryFilter, statusFilter, sortBy], () => {
   currentPage.value = 1
 })
 
-// �x�� Sincronizar stock con bodega única cuando hay solo 1 bodega disponible
+// �x<span class="mb-[2px] leading-none">-</span> Sincronizar stock con bodega única cuando hay solo 1 bodega disponible
 watch(() => productForm.value.stock, (newStock) => {
   // Usar availableWarehouses que ya filtra según el plan
   if (availableWarehouses.value.length === 1 && availableWarehouses.value[0]) {
@@ -5515,3 +5777,14 @@ onUnmounted(() => {
   transition: all 0.2s ease-in-out;
 }
 </style>
+
+
+
+
+
+
+
+
+
+
+
