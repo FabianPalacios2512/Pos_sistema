@@ -217,7 +217,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 dark:divide-zinc-700 bg-white dark:bg-zinc-900">
-                <tr v-for="product in paginatedProducts" :key="product.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors duration-150 group">
+                <tr v-for="product in paginatedProducts" :key="product._rowKey || product.id" class="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors duration-150 group">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <!-- Imagen del producto -->
@@ -232,8 +232,19 @@
                         </svg>
                       </div>
                       <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ product.name }}</p>
-                        <p class="text-xs text-gray-600 dark:text-zinc-400">{{ product.barcode || 'Sin código' }}</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white leading-tight">{{ product.name }}</p>
+                        <div v-if="product._isVariantRow && product._variantOptions" class="flex items-center gap-2 mt-1.5">
+                          <template v-for="(opt, idx) in product._variantOptions" :key="idx">
+                            <span v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')" class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700">
+                              <span class="inline-block w-5 h-5 rounded-full border-2 border-gray-300 dark:border-zinc-500 shadow-sm" :style="{ backgroundColor: opt.value }"></span>
+                            </span>
+                            <span v-else class="inline-flex items-center px-2.5 py-1 rounded-lg bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm font-bold text-gray-800 dark:text-zinc-100 uppercase tracking-wide">
+                              {{ opt.value }}
+                            </span>
+                            <span v-if="idx < product._variantOptions.length - 1" class="text-gray-400 dark:text-zinc-500 text-xs">/</span>
+                          </template>
+                        </div>
+                        <p class="text-xs text-gray-400 dark:text-zinc-500 mt-1 font-mono">{{ product.barcode || 'Sin código' }}</p>
                       </div>
                     </div>
                   </td>
@@ -244,8 +255,13 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
                     <div class="flex flex-col items-center">
-                      <span class="text-sm font-bold text-gray-900 dark:text-white">{{ product.current_stock || 0 }}</span>
-                      <span class="text-[10px] text-gray-600 dark:text-zinc-400">Min: {{ product.min_stock || 10 }}</span>
+                      <span :class="[
+                        'text-base font-bold',
+                        product.current_stock <= (product.min_stock || 10)
+                          ? 'text-rose-600 dark:text-rose-400'
+                          : 'text-gray-900 dark:text-white'
+                      ]">{{ product.current_stock || 0 }}</span>
+                      <span class="text-[10px] text-gray-500 dark:text-zinc-500">Min: {{ product.min_stock || 10 }}</span>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -274,7 +290,7 @@
                     <div class="flex items-center justify-center gap-1">
                       <button @click="adjustStock(product)" 
                               class="p-2 text-gray-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all duration-200"
-                              title="Ajustar Stock">
+                              :title="product._isVariantRow ? 'Ajustar stock de esta variante' : 'Ajustar Stock'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -586,24 +602,16 @@
          @click.self="showAdjustModal = false">
       <div class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-5xl flex flex-col max-h-[90vh] animate-scale-in">
         
-        <!-- Header - Gemini Style -->
-        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 px-8 py-5 flex-shrink-0 rounded-t-2xl">
+        <!-- Header compacto -->
+        <div class="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-700 px-6 py-3 flex-shrink-0 rounded-t-2xl">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="text-xl font-black text-gray-900 dark:text-white">Ajustar Stock</h3>
-                <p class="text-xs text-gray-600 dark:text-zinc-400 mt-0.5">Modifica la cantidad en inventario</p>
-              </div>
+            <div>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white">Ajustar Stock</h3>
+              <p class="text-xs text-gray-500 dark:text-zinc-500">Modifica la cantidad en inventario</p>
             </div>
             <button @click="showAdjustModal = false" 
-                    class="p-2 hover:bg-gray-50 dark:hover:bg-zinc-800 rounded-md transition-all">
-              <svg class="w-5 h-5 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    class="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-all">
+              <svg class="w-5 h-5 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
             </button>
@@ -614,26 +622,18 @@
         <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-zinc-950 p-6" v-if="selectedProductForAdjust">
           
           <!-- Información del Producto -->
-          <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5 mb-5">
-            <div class="flex items-center space-x-4">
-              <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center flex-shrink-0">
-                <span class="text-base font-medium text-blue-600 dark:text-blue-400">{{ selectedProductForAdjust.name.charAt(0) }}</span>
-              </div>
-              <div class="flex-1">
-                <h4 class="text-base font-medium text-gray-900 dark:text-white">{{ selectedProductForAdjust.name }}</h4>
-                <div class="flex items-center gap-3 mt-1">
-                  <span class="text-xs text-gray-600 dark:text-zinc-400">{{ selectedProductForAdjust.category }}</span>
-                  <span v-if="productVariants.length > 0" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
-                    MODA/VARIANTES
-                  </span>
-                  <div v-else class="flex items-center gap-3">
-                    <span class="text-xs text-gray-600 dark:text-zinc-400">Stock:</span>
-                    <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">{{ selectedProductForAdjust.current_stock || 0 }} uds</span>
-                    <span class="text-xs text-gray-600 dark:text-zinc-400">|</span>
-                    <span class="text-xs text-gray-600 dark:text-zinc-400">Mínimo:</span>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ selectedProductForAdjust.min_stock || 10 }} uds</span>
-                  </div>
+          <div class="bg-white dark:bg-zinc-900 rounded-xl px-5 py-3 mb-4 border border-gray-200 dark:border-zinc-800">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="text-sm font-semibold text-gray-900 dark:text-white">{{ selectedProductForAdjust.name }}</h4>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-xs text-gray-500 dark:text-zinc-500">{{ selectedProductForAdjust.category }}</span>
+                  <span v-if="productVariants.length > 0" class="text-xs text-gray-400 dark:text-zinc-500">· {{ productVariants.length }} variantes</span>
                 </div>
+              </div>
+              <div v-if="productVariants.length === 0" class="text-right">
+                <span class="text-sm font-bold text-gray-900 dark:text-white">{{ selectedProductForAdjust.current_stock || 0 }}</span>
+                <span class="text-xs text-gray-500 dark:text-zinc-500 ml-1">/ mín {{ selectedProductForAdjust.min_stock || 10 }}</span>
               </div>
             </div>
           </div>
@@ -644,35 +644,34 @@
             <!-- Columna Izquierda: Variantes (si existen) -->
             <div v-if="productVariants.length > 0" class="col-span-5 space-y-5">
               <div class="bg-white dark:bg-zinc-900 rounded-2xl p-5">
-                <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Selecciona la Variante</h4>
-                <div class="space-y-2 max-h-[320px] overflow-y-auto">
+                <h4 class="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Selecciona la Variante</h4>
+                <div class="space-y-1 max-h-[320px] overflow-y-auto">
                   <button
                     v-for="variant in productVariants"
                     :key="variant.id"
                     @click="selectVariant(variant)"
                     type="button"
                     :class="[
-                      'w-full p-3 rounded-xl transition-all text-left',
+                      'w-full px-3 py-2.5 rounded-lg transition-all text-left border',
                       selectedVariant?.id === variant.id
-                        ? 'bg-purple-50 dark:bg-purple-900/20 ring-2 ring-purple-600 dark:ring-purple-400'
-                        : 'bg-gray-50 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                        ? 'bg-slate-50 dark:bg-slate-800/40 border-l-[3px] border-l-slate-700 dark:border-l-slate-400 border-t-gray-200 border-r-gray-200 border-b-gray-200 dark:border-t-zinc-700 dark:border-r-zinc-700 dark:border-b-zinc-700'
+                        : 'bg-white dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700/50 hover:bg-gray-50 dark:hover:bg-zinc-700/50'
                     ]"
                   >
-                    <div class="flex items-start gap-2">
-                      <svg v-if="selectedVariant?.id === variant.id" class="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                      </svg>
+                    <div class="flex items-center justify-between">
                       <div class="flex-1 min-w-0">
-                        <p class="font-medium text-gray-900 dark:text-white text-sm mb-1">
-                          {{ (typeof variant.options_summary === 'string' ? JSON.parse(variant.options_summary) : variant.options_summary).map(opt => `${opt.name}: ${opt.value}`).join(' | ') }}
+                        <p class="font-medium text-gray-900 dark:text-white text-sm">
+                          {{ formatVariantLabel(variant) }}
                         </p>
-                        <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-zinc-400">
-                          <span>{{ variant.sku }}</span>
-                          <span class="text-gray-200 dark:text-zinc-700">|</span>
-                          <span class="font-medium text-blue-600 dark:text-blue-400">{{ variant.stock || 0 }} uds</span>
-                          <span class="text-gray-200 dark:text-zinc-700">|</span>
+                        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+                          <span class="font-mono">{{ variant.sku }}</span>
+                          <span class="text-gray-300 dark:text-zinc-600">·</span>
                           <span>${{ Number(variant.price || 0).toLocaleString('es-CO') }}</span>
                         </div>
+                      </div>
+                      <div class="text-right pl-3">
+                        <span class="text-sm font-bold" :class="(variant.stock || 0) <= (selectedProductForAdjust?.min_stock || 10) ? 'text-rose-600 dark:text-rose-400' : 'text-gray-900 dark:text-white'">{{ variant.stock || 0 }}</span>
+                        <span class="text-xs text-gray-400 dark:text-zinc-500 ml-0.5">uds</span>
                       </div>
                     </div>
                   </button>
@@ -692,30 +691,30 @@
                 
                 <!-- Tipo de Ajuste -->
                 <div>
-                  <label class="block text-xs font-medium text-gray-900 dark:text-white mb-2">Tipo de Ajuste</label>
-                  <div class="grid grid-cols-2 gap-3">
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Tipo de Ajuste</label>
+                  <div class="grid grid-cols-2 gap-2">
                     <button type="button" @click="setQuickAdjustment('restock')"
-                            :class="['p-3 rounded-xl transition-all', 
+                            :class="['px-3 py-2.5 rounded-lg transition-all border text-sm font-medium', 
                                      adjustForm.adjustmentType === 'restock' 
-                                       ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 ring-2 ring-[#1e8e3e] dark:ring-[#81c995]' 
-                                       : 'bg-gray-50 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-400']">
+                                       ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white' 
+                                       : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700']">
                       <div class="flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        <span class="font-medium text-sm">Restock</span>
+                        <span>Restock</span>
                       </div>
                     </button>
                     <button type="button" @click="setQuickAdjustment('correction')"
-                            :class="['p-3 rounded-xl transition-all', 
+                            :class="['px-3 py-2.5 rounded-lg transition-all border text-sm font-medium', 
                                      adjustForm.adjustmentType === 'correction' 
-                                       ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-500 dark:text-amber-300 ring-2 ring-amber-500 dark:ring-amber-300' 
-                                       : 'bg-gray-50 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-400']">
+                                       ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white' 
+                                       : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-700']">
                       <div class="flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
-                        <span class="font-medium text-sm">Corrección</span>
+                        <span>Corrección</span>
                       </div>
                     </button>
                   </div>
@@ -723,16 +722,16 @@
 
                 <!-- Nuevo Stock -->
                 <div>
-                  <label class="block text-xs font-medium text-gray-900 dark:text-white mb-2">Nuevo Stock</label>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Nuevo Stock</label>
                   <div class="relative">
                     <input v-model="adjustForm.new_stock" 
                            type="number" 
                            min="0"
                            step="1"
-                           :class="['w-full px-4 py-3 pr-12 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm',
+                           :class="['w-full px-4 py-3 pr-12 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border',
                                     adjustForm.errors.new_stock 
-                                      ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' 
-                                      : 'bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white']"
+                                      ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-700' 
+                                      : 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white border-gray-300 dark:border-zinc-600']"
                            placeholder="Ingresa la cantidad nueva"
                            @blur="validateNewStock">
                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-600 dark:text-zinc-400 font-medium">uds</span>
@@ -747,12 +746,12 @@
                 
                 <!-- Motivo -->
                 <div>
-                  <label class="block text-xs font-medium text-gray-900 dark:text-white mb-2">Motivo del Ajuste</label>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Motivo del Ajuste</label>
                   <select v-model="adjustForm.reason" 
-                          :class="['w-full px-4 py-3 rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm cursor-pointer',
+                          :class="['w-full px-4 py-3 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm cursor-pointer border',
                                    adjustForm.errors.reason 
-                                     ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400' 
-                                     : 'bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white']"
+                                     ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-700' 
+                                     : 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white border-gray-300 dark:border-zinc-600']"
                           @change="validateReason">
                     <option value="">Selecciona un motivo...</option>
                     <option value="Reposición de inventario">Reposición de inventario</option>
@@ -815,14 +814,14 @@
           </div>
           
           <!-- Footer: Botones de Acción - Gemini Style -->
-          <div class="flex justify-end gap-3 pt-6 mt-6 border-t border-gray-200 dark:border-zinc-700">
+          <div class="flex justify-end gap-3 pt-4 mt-4 border-t border-gray-200 dark:border-zinc-700">
             <button @click="showAdjustModal = false" 
-                    class="px-5 py-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-sm font-medium rounded-xl transition-all duration-200">
+                    class="px-5 py-2.5 text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 text-sm font-medium rounded-lg border border-gray-300 dark:border-zinc-700 transition-all duration-200">
               Cancelar
             </button>
             <button @click="processStockAdjustment" 
                     :disabled="!isFormValid"
-                    class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 dark:bg-blue-400 dark:hover:bg-blue-300 dark:disabled:bg-zinc-700 dark:disabled:text-gray-600 text-white dark:text-zinc-900 rounded-full text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed">
+                    class="px-6 py-2.5 bg-gray-900 hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 dark:bg-white dark:hover:bg-gray-100 dark:disabled:bg-zinc-700 dark:disabled:text-zinc-500 text-white dark:text-gray-900 rounded-lg text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed">
               {{ adjustmentLoading ? 'Procesando...' : 'Confirmar Ajuste' }}
             </button>
           </div>
@@ -1111,7 +1110,8 @@ const filteredProducts = computed(() => {
     const term = searchTerm.value.toLowerCase()
     filtered = filtered.filter(product => 
       product.name.toLowerCase().includes(term) ||
-      product.barcode.includes(term)
+      (product.barcode && product.barcode.toLowerCase().includes(term)) ||
+      (product._variantDetailLabel && product._variantDetailLabel.toLowerCase().includes(term))
     )
   }
 
@@ -1121,9 +1121,11 @@ const filteredProducts = computed(() => {
 
   if (stockFilter.value) {
     filtered = filtered.filter(product => {
-      if (stockFilter.value === 'low') return product.stock <= product.min_stock
-      if (stockFilter.value === 'normal') return product.stock > product.min_stock && product.stock <= product.min_stock * 2
-      if (stockFilter.value === 'high') return product.stock > product.min_stock * 2
+      const stock = product.current_stock || 0
+      const minStock = product.min_stock || 10
+      if (stockFilter.value === 'low') return stock <= minStock
+      if (stockFilter.value === 'normal') return stock > minStock && stock <= minStock * 2
+      if (stockFilter.value === 'high') return stock > minStock * 2
       return true
     })
   }
@@ -1136,13 +1138,13 @@ const unreadMovementsCount = computed(() => {
   return notificationStore.unreadMovementsCount.value
 })
 
-const unreadAlertsCount = computed(() => {
-  return notificationStore.unreadAlertsCount.value
-})
+const alertsHaveBeenViewed = ref(false)
+const lastSeenAlertsCount = ref(0)
 
-// Computed para total de productos
+// Computed para total de productos (contar productos únicos, no filas de variantes)
 const totalProducts = computed(() => {
-  return products.value.length
+  const uniqueParentIds = new Set(products.value.map(p => p._parentProductId))
+  return uniqueParentIds.size
 })
 
 // Computed properties para paginación
@@ -1167,9 +1169,20 @@ const resetPagination = () => {
 
 const totalProductsInStock = computed(() => products.value.reduce((sum, p) => sum + (p.current_stock || 0), 0))
 const lowStockProducts = computed(() => products.value.filter(p => (p.current_stock || 0) <= (p.min_stock || 10)).length)
-const totalInventoryValue = computed(() => products.value.reduce((sum, p) => sum + ((p.current_stock || 0) * parseFloat(p.sale_price || 0)), 0))
+const totalInventoryValue = computed(() => products.value.reduce((sum, p) => sum + ((p.current_stock || 0) * parseFloat(p.sale_price || p.price || 0)), 0))
 const todayMovements = computed(() => recentMovements.value.length)
-const stockAlerts = computed(() => products.value.filter(p => (p.current_stock || 0) <= (p.min_stock || 10)))
+const stockAlerts = computed(() => products.value.filter(p => (p.current_stock || 0) <= (p.min_stock || 10)).map(p => ({
+  ...p,
+  stock: p.current_stock || 0,
+  name: p._isVariantRow ? `${p._parentName} (${p._variantLabel})` : p.name
+})))
+
+const unreadAlertsCount = computed(() => {
+  const currentCount = stockAlerts.value?.length || 0
+  if (alertsHaveBeenViewed.value && currentCount <= lastSeenAlertsCount.value) return 0
+  if (currentCount === 0) return 0
+  return alertsHaveBeenViewed.value ? currentCount - lastSeenAlertsCount.value : currentCount
+})
 
 // Computed properties para el modal de ajuste mejorado
 const stockDifference = computed(() => {
@@ -1345,6 +1358,7 @@ const loadProducts = async () => {
     const params = { 
       per_page: 1000,
       status: 'all', // Obtener todos los productos (activos e inactivos)
+      with_sales: true, // Incluir datos de ventas e ingresos
       _t: Date.now() // Cache busting
     }
     
@@ -1360,22 +1374,80 @@ const loadProducts = async () => {
     if (productsList.length > 0) {
     }
 
-    products.value = productsList.map(product => ({
-      ...product,
-      type: product.type || 'simple', // IMPORTANTE: Incluir tipo de producto
-      category: product.category ? product.category.name : 'Sin categoría',
-      current_stock: product.current_stock || 0, // campo real de la BD
-      stock: product.current_stock || 0, // alias para compatibilidad
-      min_stock: product.min_stock || 10,
-      barcode: product.barcode || `BAR${product.id}${Date.now().toString().slice(-4)}`,
-      price: parseFloat(product.sale_price || product.price || 0),
-      image_url: product.image_url || product.image || null,
-      images: product.images || [], // Incluir array de imágenes para getProductImage()
-      total_sold: parseInt(product.total_sold || 0), // Ventas totales (backend las calcula)
-      total_revenue: parseFloat(product.total_revenue || 0) // Ingresos totales (backend los calcula)
-    }))
+    // Mapear y expandir productos: variantes se muestran como filas separadas
+    const expandedProducts = []
+    for (const product of productsList) {
+      const baseProduct = {
+        ...product,
+        type: product.type || product.product_type || 'simple',
+        category: product.category ? product.category.name : 'Sin categoría',
+        current_stock: product.current_stock || 0,
+        stock: product.current_stock || 0,
+        min_stock: product.min_stock || 10,
+        barcode: product.barcode || `BAR${product.id}${Date.now().toString().slice(-4)}`,
+        price: parseFloat(product.sale_price || product.price || 0),
+        sale_price: product.sale_price || product.price || 0,
+        image_url: product.image_url || product.image || null,
+        images: product.images || [],
+        total_sold: parseInt(product.total_sold || 0),
+        total_revenue: parseFloat(product.total_revenue || 0)
+      }
 
-    const warehouseInfo = showWarehouseFilter.value ? ` (Sede: ${selectedWarehouse.value})` : ' (Todas las sedes)'
+      const isVariable = baseProduct.type === 'variable'
+      const variants = product.variants || []
+
+      if (isVariable && variants.length > 0) {
+        // Expandir cada variante como fila independiente
+        for (const variant of variants) {
+          const optsSummary = typeof variant.options_summary === 'string'
+            ? JSON.parse(variant.options_summary)
+            : (variant.options_summary || [])
+          // Limpiar opciones: si nombre == valor, solo mostrar valor
+          const cleanedOptions = optsSummary.map(o => ({
+            name: o.name,
+            value: (o.name.toLowerCase() === o.value.toLowerCase()) ? o.value : o.value
+          }))
+          const variantLabel = cleanedOptions.map(o => o.value).join(' / ')
+          const variantDetailLabel = cleanedOptions.map(o => `${o.name}: ${o.value}`).join(' · ')
+
+          expandedProducts.push({
+            ...baseProduct,
+            _rowKey: `${product.id}-v${variant.id}`,
+            _isVariantRow: true,
+            _parentProductId: product.id,
+            _variantId: variant.id,
+            _variantData: variant,
+            _variantLabel: variantLabel,
+            _variantDetailLabel: variantDetailLabel,
+            _variantOptions: cleanedOptions,
+            _parentName: baseProduct.name,
+            name: baseProduct.name,
+            current_stock: variant.stock || 0,
+            stock: variant.stock || 0,
+            sale_price: variant.price || baseProduct.sale_price,
+            price: parseFloat(variant.price || baseProduct.sale_price || 0),
+            barcode: variant.sku || variant.barcode || baseProduct.barcode,
+            total_sold: parseInt(variant.total_sold || 0),
+            total_revenue: parseFloat(variant.total_revenue || 0)
+          })
+        }
+      } else {
+        // Producto simple: mostrar tal cual
+        expandedProducts.push({
+          ...baseProduct,
+          _rowKey: `p${product.id}`,
+          _isVariantRow: false,
+          _parentProductId: product.id,
+          _variantId: null,
+          _variantData: null,
+          _variantLabel: null,
+          _variantDetailLabel: null,
+          _variantOptions: null,
+          _parentName: baseProduct.name
+        })
+      }
+    }
+    products.value = expandedProducts
   } catch (error) {
     console.error('Error cargando productos:', error)
   } finally {
@@ -1650,15 +1722,26 @@ const setQuickAdjustment = (type) => {
 }
 
 const adjustStock = async (product) => {
-  // Abrir modal de ajuste en lugar de prompt
-  selectedProductForAdjust.value = product
+  // Determinar si estamos trabajando con una fila de variante expandida
+  const isVariantRow = product._isVariantRow
+  const parentProductId = product._parentProductId || product.id
+  
+  // Crear un objeto "padre" para el modal
+  const parentForModal = {
+    ...product,
+    id: parentProductId,
+    name: product._parentName || product.name,
+    current_stock: product.current_stock || 0
+  }
+  
+  selectedProductForAdjust.value = parentForModal
   productVariants.value = []
   selectedVariant.value = null
   
   adjustForm.value = {
-    product_id: product.id,
+    product_id: parentProductId,
     variant_id: null,
-    new_stock: '', // Dejar vacío para que el usuario ingrese la cantidad que desee
+    new_stock: '',
     reason: '',
     customReason: '',
     adjustmentType: '',
@@ -1670,11 +1753,20 @@ const adjustStock = async (product) => {
   }
   
   // Si el producto es tipo "variable" (fashion), cargar variantes
-  if (product.type === 'variable') {
+  const isVariable = product.type === 'variable' || product.product_type === 'variable'
+  if (isVariable) {
     try {
-      const response = await api.get(`/products/${product.id}`)
+      const response = await api.get(`/products/${parentProductId}`)
       if (response.data && response.data.variants) {
         productVariants.value = response.data.variants
+        
+        // Si venimos de una fila de variante, pre-seleccionar esa variante
+        if (isVariantRow && product._variantId) {
+          const targetVariant = response.data.variants.find(v => v.id === product._variantId)
+          if (targetVariant) {
+            selectVariant(targetVariant)
+          }
+        }
       }
     } catch (error) {
       console.error('Error cargando variantes:', error)
@@ -1683,6 +1775,20 @@ const adjustStock = async (product) => {
   }
   
   showAdjustModal.value = true
+}
+
+// Función para formatear label de variante sin hex codes
+const formatVariantLabel = (variant) => {
+  try {
+    const opts = typeof variant.options_summary === 'string' ? JSON.parse(variant.options_summary) : variant.options_summary
+    if (!Array.isArray(opts)) return variant.name || 'Variante'
+    return opts.map(opt => {
+      if (opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')) {
+        return `${opt.name}: ${opt.text && opt.text !== opt.value ? opt.text : '●'}`
+      }
+      return `${opt.name}: ${opt.value}`
+    }).join(' / ')
+  } catch { return variant.name || 'Variante' }
 }
 
 // Función para seleccionar una variante
@@ -1796,7 +1902,15 @@ const processStockAdjustment = async () => {
 
 // Funciones para el modal de historial
 const viewMovements = async (product) => {
-  selectedProductForHistory.value = product
+  // Mantener datos del producto, incluyendo info de variante
+  const productForHistory = {
+    ...product,
+    id: product._parentProductId || product.id,
+    name: product._isVariantRow 
+      ? `${product._parentName} — ${product._variantLabel}` 
+      : product.name
+  }
+  selectedProductForHistory.value = productForHistory
   historyDateFilter.value = 'all'
   historyTypeFilter.value = 'all'
   showHistoryModal.value = true
@@ -2184,6 +2298,8 @@ watch(activeTab, async (newTab) => {
     await loadMovementsData()
     await notificationStore.markMovementsAsViewed()
   } else if (newTab === 'alerts') {
+    alertsHaveBeenViewed.value = true
+    lastSeenAlertsCount.value = stockAlerts.value?.length || 0
     await notificationStore.markAlertsAsViewed()
   }
   // Actualizar contexto para IA cuando cambia el tab

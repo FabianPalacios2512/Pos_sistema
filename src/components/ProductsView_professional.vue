@@ -600,23 +600,23 @@
                   </span>
                   <!-- Alerta de stock bajo para esta bodega -->
                   <template v-if="hasVariants(product)">
-                    <div v-if="getVariantWarehouseStockAnalysis(product, warehouse.id)?.status === 'critical'" class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80">
-                      <span class="text-[11px] leading-none mb-0.5">✖</span>
+                    <div v-if="getVariantWarehouseStockAnalysis(product, warehouse.id)?.status === 'critical'" class="mt-1.5 flex items-center gap-1 text-xs font-bold text-rose-600 dark:text-rose-400">
+                      <span class="text-xs leading-none">✖</span>
                       <span>{{ getVariantWarehouseStockAnalysis(product, warehouse.id).message }}</span>
                     </div>
-                    <div v-else-if="getVariantWarehouseStockAnalysis(product, warehouse.id)?.status === 'low'" class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80">
-                      <span class="text-[11px] leading-none mb-0.5">⚠</span>
+                    <div v-else-if="getVariantWarehouseStockAnalysis(product, warehouse.id)?.status === 'low'" class="mt-1.5 flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400">
+                      <span class="text-xs leading-none">⚠</span>
                       <span>{{ getVariantWarehouseStockAnalysis(product, warehouse.id).message }}</span>
                     </div>
-                    <div v-else class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-500 opacity-70">
-                      <span>Todas OK</span>
+                    <div v-else class="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-500">
+                      <span>✓ Todas OK</span>
                     </div>
                   </template>
                   <template v-else>
-                     <span v-if="getWarehouseStock(product, warehouse.id) === 0" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80 mt-1">
+                     <span v-if="getWarehouseStock(product, warehouse.id) === 0" class="text-xs font-bold text-rose-600 dark:text-rose-400 mt-1.5">
                        ✖ Sin stock
                      </span>
-                     <span v-else-if="getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0)" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80 mt-1">
+                     <span v-else-if="getWarehouseStock(product, warehouse.id) <= (product.min_stock || 0)" class="text-xs font-bold text-amber-600 dark:text-amber-400 mt-1.5">
                        ⚠ Bajo
                      </span>
                   </template>
@@ -647,23 +647,23 @@
 
                       <!-- State below the main total -->
                       <template v-if="hasVariants(product)">
-                        <div v-if="getVariantStockAnalysis(product)?.status === 'critical'" class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80">
-                          <span class="text-[11px] leading-none mb-0.5">✖</span>
+                        <div v-if="getVariantStockAnalysis(product)?.status === 'critical'" class="mt-1.5 flex items-center gap-1 text-xs font-bold text-rose-600 dark:text-rose-400">
+                          <span class="text-xs leading-none">✖</span>
                           <span>{{ getVariantStockAnalysis(product).message }}</span>
                         </div>
-                        <div v-else-if="getVariantStockAnalysis(product)?.status === 'low'" class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80">
-                          <span class="text-[11px] leading-none mb-0.5">⚠</span>
+                        <div v-else-if="getVariantStockAnalysis(product)?.status === 'low'" class="mt-1.5 flex items-center gap-1 text-xs font-bold text-amber-600 dark:text-amber-400">
+                          <span class="text-xs leading-none">⚠</span>
                           <span>{{ getVariantStockAnalysis(product).message }}</span>
                         </div>
-                        <div v-else class="mt-1 flex items-center gap-1 text-[11px] font-medium text-gray-500 dark:text-zinc-500 opacity-70">
-                          <span>Todas OK</span>
+                        <div v-else class="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-500">
+                          <span>✓ Todas OK</span>
                         </div>
                       </template>
                       <template v-else>
-                         <span v-if="getTotalStock(product) === 0" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80 mt-1">
+                         <span v-if="getTotalStock(product) === 0" class="text-xs font-bold text-rose-600 dark:text-rose-400 mt-1.5">
                            ✖ Sin stock
                          </span>
-                         <span v-else-if="getTotalStock(product) <= (product.min_stock || 0)" class="text-[11px] font-medium text-gray-500 dark:text-zinc-400 opacity-80 mt-1">
+                         <span v-else-if="getTotalStock(product) <= (product.min_stock || 0)" class="text-xs font-bold text-amber-600 dark:text-amber-400 mt-1.5">
                            ⚠ Bajo
                          </span>
                       </template>
@@ -748,58 +748,64 @@
               <div class="absolute left-6 top-0 bottom-0 w-px bg-gray-200 dark:bg-zinc-700/50"></div>
               <div class="absolute left-6 top-6 w-5 h-px bg-gray-200 dark:bg-zinc-700/50"></div>
 
-              <div class="transition-all bg-slate-50 dark:bg-zinc-800/20 border-t border-b border-gray-200 dark:border-zinc-800">
-                  <table class="w-full text-left text-[13px]">
-                    <thead class="text-gray-500 dark:text-zinc-500 border-b border-gray-200 dark:border-zinc-800">
+              <div class="transition-all bg-slate-50 dark:bg-zinc-800/20 border-t border-b border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+                  <table class="w-full text-left text-sm">
+                    <thead class="text-gray-500 dark:text-zinc-400 border-b border-gray-200 dark:border-zinc-800">
                       <tr>
-                        <th class="py-2.5 px-6 pl-12 font-medium tracking-wide uppercase text-[11px]">Variante</th>
-                        <th class="py-2.5 px-6 font-medium tracking-wide uppercase text-[11px]">SKU</th>
-                        <th class="py-2.5 px-6 w-32 font-medium tracking-wide uppercase text-[11px] text-right">Precio</th>
-                        <th class="py-2.5 px-6 pr-12 w-32 font-medium tracking-wide uppercase text-[11px] text-right">Stock</th>
+                        <th class="py-3 px-6 pl-12 font-semibold tracking-wide uppercase text-xs">Variante</th>
+                        <th class="py-3 px-6 font-semibold tracking-wide uppercase text-xs">SKU</th>
+                        <th class="py-3 px-6 w-32 font-semibold tracking-wide uppercase text-xs text-right">Precio</th>
+                        <th class="py-3 px-6 pr-12 w-32 font-semibold tracking-wide uppercase text-xs text-right">Stock</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-zinc-800/60">
-                      <tr v-for="variant in product.variants" :key="variant.id" class="text-gray-700 dark:text-zinc-300">
-                        <td class="py-2.5 px-6 pl-12">
-                          <div class="flex items-center gap-2">
+                      <tr v-for="variant in product.variants" :key="variant.id" class="text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800/40 transition-colors">
+                        <td class="py-3 px-6 pl-12">
+                          <div class="flex items-center gap-2.5">
                             <div v-if="getVariantColor(variant)" 
-                                 class="w-3 h-3 rounded-full border border-gray-300 dark:border-zinc-600 shrink-0"
+                                 class="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-zinc-500 shrink-0 shadow-sm"
                                  :style="{ backgroundColor: getVariantColor(variant) }"
-                                 title="Color de la Variante">
+                                 :title="'Color: ' + getVariantColor(variant)">
                             </div>
-                            <div class="flex items-center gap-1 flex-wrap">
+                            <div class="flex items-center gap-1.5 flex-wrap">
                               <template v-if="getVariantOptionsArray(variant).length">
                                 <template v-for="(opt, i) in getVariantOptionsArray(variant)" :key="i">
-                                  <span class="text-gray-500 dark:text-zinc-400 font-medium">{{ opt.name }}:</span>
-                                  <span class="font-medium" v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')">
-                                    {{ opt.text && opt.text !== opt.value ? opt.text : 'Color' }}
-                                  </span>
-                                  <span class="font-medium" v-else>{{ opt.text || opt.value }}</span>
-                                  <span v-if="i < getVariantOptionsArray(variant).length - 1" class="text-gray-300 dark:text-zinc-600 mx-0.5">•</span>
+                                  <!-- Si es color con valor hex, solo mostrar el swatch (ya visible arriba) -->
+                                  <template v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')">
+                                    <span class="text-gray-500 dark:text-zinc-400 text-sm">{{ opt.name }}:</span>
+                                    <span v-if="opt.text && opt.text !== opt.value" class="font-semibold text-sm text-gray-800 dark:text-zinc-200">{{ opt.text }}</span>
+                                    <span v-else class="inline-block w-4 h-4 rounded-full border-2 border-gray-300 dark:border-zinc-500 align-middle shadow-sm" :style="{ backgroundColor: opt.value }"></span>
+                                  </template>
+                                  <!-- Opciones normales -->
+                                  <template v-else>
+                                    <span class="text-gray-500 dark:text-zinc-400 text-sm">{{ opt.name }}:</span>
+                                    <span class="font-semibold text-sm text-gray-800 dark:text-zinc-200">{{ opt.text || opt.value }}</span>
+                                  </template>
+                                  <span v-if="i < getVariantOptionsArray(variant).length - 1" class="text-gray-300 dark:text-zinc-600 mx-1">•</span>
                                 </template>
                               </template>
-                              <span v-else class="font-medium">
+                              <span v-else class="font-semibold text-sm">
                                 {{ variant.name || 'Variante Base' }}
                               </span>
                             </div>
                           </div>
                         </td>
-                        <td class="py-2.5 px-6">
-                          <span class="font-mono text-[12px] opacity-80">{{ variant.sku || 'N/A' }}</span>
+                        <td class="py-3 px-6">
+                          <span class="font-mono text-[13px] text-gray-600 dark:text-zinc-400">{{ variant.sku || 'N/A' }}</span>
                         </td>
-                        <td class="py-2.5 px-6 text-right tabular-nums">
+                        <td class="py-3 px-6 text-right tabular-nums font-semibold text-gray-900 dark:text-white">
                           ${{ formatCurrency(variant.price || product.price) }}
                         </td>
-                        <td class="py-2.5 px-6 pr-12 text-right">
+                        <td class="py-3 px-6 pr-12 text-right">
                           <span :class="[
-                            'inline-flex items-center justify-end gap-1 font-mono text-[13px] tabular-nums',
-                            (variant.stock || 0) === 0 ? 'text-rose-500/80 dark:text-rose-400/80 font-medium' : 
-                            (variant.stock || 0) <= (product.min_stock || 0) ? 'text-amber-500/80 dark:text-amber-400/80 font-medium' :
-                            'text-gray-600 dark:text-zinc-400 font-medium'
+                            'inline-flex items-center justify-end gap-1 font-mono text-sm tabular-nums font-bold',
+                            (variant.stock || 0) === 0 ? 'text-rose-600 dark:text-rose-400' : 
+                            (variant.stock || 0) <= (product.min_stock || 0) ? 'text-amber-600 dark:text-amber-400' :
+                            'text-gray-900 dark:text-white'
                           ]">
                             {{ variant.stock || 0 }}
-                            <span v-if="(variant.stock || 0) === 0" class="text-[11px] leading-none ml-0.5 opacity-80" title="Sin stock">⚠</span>
-                            <span v-else-if="(variant.stock || 0) <= (product.min_stock || 0)" class="text-[11px] leading-none ml-0.5 opacity-80" title="Bajo stock">⚠</span>
+                            <span v-if="(variant.stock || 0) === 0" class="text-xs leading-none ml-0.5" title="Sin stock">⚠</span>
+                            <span v-else-if="(variant.stock || 0) <= (product.min_stock || 0)" class="text-xs leading-none ml-0.5" title="Bajo stock">⚠</span>
                           </span>
                         </td>
                       </tr>
@@ -1687,7 +1693,7 @@
            @click.self="showViewModal = false">
       <!-- Modal Full Width para productos FASHION (con o sin variantes) -->
       <div v-if="selectedProduct && isFashionProduct(selectedProduct)" 
-           class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-5xl shadow-2xl max-h-[90vh] overflow-hidden border border-gray-200 dark:border-zinc-800 flex flex-col">
+           class="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-6xl shadow-2xl max-h-[90vh] overflow-hidden border border-gray-200 dark:border-zinc-800 flex flex-col">
         
         <!-- Header -->
         <div class="bg-gray-50 dark:bg-zinc-900 px-6 py-5 border-b border-gray-200 dark:border-zinc-800 flex-shrink-0">
@@ -1767,49 +1773,36 @@
             
             <!-- Resumen Global (Estadísticas) -->
             <div class="lg:col-span-2 flex flex-col">
-              <div class="flex-1 bg-white dark:bg-zinc-900/60  rounded-2xl p-5 border border-gray-200 dark:border-zinc-800 shadow-sm">
-                <h4 class="text-[15px] font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                  </svg>
-                  Estadísticas Globales
-                </h4>
-                
-                <div class="grid grid-cols-3 gap-3">
+              <div class="flex-1 bg-white dark:bg-zinc-900/60 rounded-md border border-gray-200 dark:border-zinc-800">
+                <div class="grid grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
                   <!-- Stock Total Global -->
-                  <div class="bg-gray-50 dark:bg-zinc-800/80 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50 text-center hover:border-emerald-300 dark:hover:border-emerald-800/50 transition-colors">
-                    <div class="w-9 h-9 bg-emerald-100 dark:bg-emerald-950/80 rounded-lg flex items-center justify-center mx-auto mb-2.5">
-                      <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                      </svg>
+                  <div class="flex flex-col gap-1 px-5 py-4">
+                    <div class="flex items-center justify-between">
+                      <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Stock Total</p>
+                      <svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                     </div>
-                    <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Stock Total</p>
                     <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ formatNumber(getStockSummary(selectedProduct).total) }}</p>
-                    <p class="text-[12px] text-gray-500 dark:text-zinc-500 mt-0.5">unidades</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500">unidades</p>
                   </div>
                   
                   <!-- Valor Total Inventario -->
-                  <div class="bg-gray-50 dark:bg-zinc-800/80 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50 text-center hover:border-blue-300 dark:hover:border-blue-800/50 transition-colors">
-                    <div class="w-9 h-9 bg-blue-100 dark:bg-blue-950/80 rounded-lg flex items-center justify-center mx-auto mb-2.5">
-                      <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                      </svg>
+                  <div class="flex flex-col gap-1 px-5 py-4">
+                    <div class="flex items-center justify-between">
+                      <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Valor Total</p>
+                      <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Valor Total</p>
-                    <p class="text-xl font-black text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(getTotalInventoryValue(selectedProduct)) }}</p>
-                    <p class="text-[12px] text-gray-500 dark:text-zinc-500 mt-0.5">inventario</p>
+                    <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">${{ formatCurrency(getTotalInventoryValue(selectedProduct)) }}</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500">inventario</p>
                   </div>
                   
                   <!-- Total Variantes -->
-                  <div class="bg-gray-50 dark:bg-zinc-800/80 rounded-xl p-4 border border-gray-200 dark:border-zinc-700/50 text-center hover:border-purple-300 dark:hover:border-purple-800/50 transition-colors">
-                    <div class="w-9 h-9 bg-purple-100 dark:bg-purple-950/80 rounded-lg flex items-center justify-center mx-auto mb-2.5">
-                      <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                      </svg>
+                  <div class="flex flex-col gap-1 px-5 py-4">
+                    <div class="flex items-center justify-between">
+                      <p class="text-xs text-gray-400 dark:text-zinc-500 uppercase tracking-wider font-medium">Variantes</p>
+                      <svg class="w-4 h-4 text-violet-500 dark:text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                     </div>
-                    <p class="text-[11px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider mb-1.5">Variantes</p>
                     <p class="text-2xl font-black text-gray-900 dark:text-white tabular-nums">{{ getVariantsCount(selectedProduct) }}</p>
-                    <p class="text-[12px] text-gray-500 dark:text-zinc-500 mt-0.5">combinaciones</p>
+                    <p class="text-xs text-gray-400 dark:text-zinc-500">combinaciones</p>
                   </div>
                 </div>
               </div>
@@ -1819,11 +1812,8 @@
           <!-- TABLA EXCEL-STYLE: Edición en Línea -->
           <div class="bg-white dark:bg-zinc-900/60  rounded-md border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm dark:shadow-none">
             <div class="bg-gray-50 dark:bg-zinc-800/50 px-5 py-3 border-b border-gray-200 dark:border-zinc-700/50">
-              <h4 class="text-[15px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                </svg>
-                {{ hasVariants(selectedProduct) ? 'Gestión de Stock por Variante - Edición Rápida' : 'Información del Producto' }}
+              <h4 class="text-[15px] font-bold text-gray-900 dark:text-white">
+                {{ hasVariants(selectedProduct) ? 'Gestión de Stock por Variante' : 'Información del Producto' }}
               </h4>
             </div>
             
@@ -1863,18 +1853,22 @@
                         </div>
                         <div class="flex items-center gap-2">
                           <div v-if="getVariantColor(variant)"
-                               class="w-3.5 h-3.5 rounded-full shadow-sm border border-gray-300 dark:border-zinc-600 shrink-0"
-                               title="Color de la Variante"
+                               class="w-4 h-4 rounded-full shadow-sm border border-gray-300 dark:border-zinc-600 shrink-0"
+                               :title="getVariantColor(variant)"
                                :style="{ backgroundColor: getVariantColor(variant) }">
                           </div>
                           <span class="text-[14px] font-medium text-gray-900 dark:text-gray-100">
                             <template v-if="getVariantOptionsArray(variant).length">
                               <template v-for="(opt, i) in getVariantOptionsArray(variant)" :key="i">
-                                <span class="text-gray-500 dark:text-zinc-400 capitalize">{{ opt.name }}:</span>
-                                <span class="font-semibold ml-0.5" v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')">
-                                  {{ opt.text && opt.text !== opt.value ? opt.text : '' }}
-                                </span>
-                                <span class="font-semibold ml-0.5" v-else>{{ opt.text || opt.value }}</span>
+                                <template v-if="opt.name.toLowerCase() === 'color' && String(opt.value).startsWith('#')">
+                                  <span class="text-gray-500 dark:text-zinc-400 capitalize">{{ opt.name }}:</span>
+                                  <span v-if="opt.text && opt.text !== opt.value" class="font-semibold ml-0.5">{{ opt.text }}</span>
+                                  <span v-else class="inline-block w-4 h-4 rounded-full border border-gray-300 dark:border-zinc-600 align-middle ml-0.5" :style="{ backgroundColor: opt.value }"></span>
+                                </template>
+                                <template v-else>
+                                  <span class="text-gray-500 dark:text-zinc-400 capitalize">{{ opt.name }}:</span>
+                                  <span class="font-semibold ml-0.5">{{ opt.text || opt.value }}</span>
+                                </template>
                                 <span v-if="i < getVariantOptionsArray(variant).length - 1" class="mx-1.5 text-gray-300 dark:text-zinc-600">•</span>
                               </template>
                             </template>
@@ -1882,7 +1876,7 @@
                               {{ variant.name || selectedProduct.name }}
                             </template>
                           </span>
-                        </div>>
+                        </div>
                       </div>
                     </td>
                     
@@ -2876,7 +2870,20 @@ const paginatedProducts = computed(() => {
 })
 
 const activeProducts = computed(() => products.value.filter(p => getProductStatus(p) !== false).length)
-const lowStockProducts = computed(() => products.value.filter(p => (p.current_stock || 0) <= (p.min_stock || 0)).length)
+const lowStockProducts = computed(() => {
+  let count = 0
+  products.value.forEach(p => {
+    if (p.variants && p.variants.length > 0) {
+      // Contar variantes individuales con stock bajo
+      p.variants.forEach(v => {
+        if ((v.stock || 0) <= (p.min_stock || 0)) count++
+      })
+    } else {
+      if ((p.current_stock || 0) <= (p.min_stock || 0)) count++
+    }
+  })
+  return count
+})
 const totalValue = computed(() => 
   products.value.reduce((sum, p) => sum + (parseFloat(p.sale_price || 0) * (p.current_stock || 0)), 0)
 )

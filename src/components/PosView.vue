@@ -5935,9 +5935,10 @@ const handlePaymentConfirmed = async (paymentData) => {
         skip_electronic_invoice: !electronicInvoicingEnabled.value,
         items: lastSale.value.items.map(item => ({
           product_id: item.id,
-          variant_id: item.variant_id || null, // ID de variante si es producto fashion
+          variant_id: item.variant_id || null,
+          variant_options: item.variant_options || null,
           product_name: item.name,
-          quantity: parseFloat(item.quantity), // Cambiar a parseFloat para soportar decimales
+          quantity: parseFloat(item.quantity),
           unit_price: parseFloat(item.price)
         })),
         // Información del descuento aplicado
@@ -6777,8 +6778,9 @@ const confirmQuotation = async () => {
     // Preparar items mapeados con product_name requerido
     const mappedItems = cart.items.map(item => ({
       product_id: item.id,
-      variant_id: item.variant_id || null, // ID de variante si es producto fashion
-      product_name: item.name, // Campo requerido por el backend
+      variant_id: item.variant_id || null,
+      variant_options: item.variant_options || null,
+      product_name: item.name,
       quantity: item.quantity,
       unit_price: item.price,
       total_price: item.price * item.quantity

@@ -140,13 +140,16 @@ class ProductController extends Controller
                 });
             }
 
-            // 🏢 Si hay filtro de warehouse, ajustar el stock
+            // 🏢 Ajustar stock según tipo de producto y warehouse
+            $isVariable = $product->product_type === 'variable' || $product->type === 'variable';
+
             if ($warehouseId) {
-                // 🛠️ FIX: Para productos variables, sumar stock de TODAS sus variantes en el warehouse
-                if ($product->product_type === 'variable') {
+                if ($isVariable) {
+                    // Para productos variables, sumar stock de TODAS sus variantes en el warehouse
                     $totalVariantStock = DB::table('product_warehouse')
                         ->where('warehouse_id', $warehouseId)
                         ->where('product_id', $product->id)
+                        ->whereNotNull('product_variant_id')
                         ->sum('stock');
 
                     $product->current_stock = (int)$totalVariantStock;
@@ -158,6 +161,13 @@ class ProductController extends Controller
                         $product->current_stock = (int)$warehouseStock;
                         $product->stock = (int)$warehouseStock;
                     }
+                }
+            } else {
+                // Sin filtro de warehouse: recalcular current_stock para productos variables
+                if ($isVariable && $product->variants && $product->variants->count() > 0) {
+                    $totalVariantStock = $product->variants->sum('stock');
+                    $product->current_stock = (int)$totalVariantStock;
+                    $product->stock = (int)$totalVariantStock;
                 }
             }
 
@@ -175,6 +185,65 @@ class ProductController extends Controller
 
                 $product->total_sold = (int)($salesData->total_sold ?? 0);
                 $product->total_revenue = (float)($salesData->total_revenue ?? 0);
+
+                // Ventas por variante: combinar ventas con variant_id + históricas sin variant_id
+                if ($isVariable && $product->variants && $product->variants->count() > 0) {
+                    // 1) Ventas exactas por product_variant_id (nuevas)
+                    $variantSales = DB::table('invoice_items')
+                        ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                        ->where('invoice_items.product_id', $product->id)
+                        ->whereNotNull('invoice_items.product_variant_id')
+                        ->where('invoices.status', 'paid')
+                        ->groupBy('invoice_items.product_variant_id')
+                        ->selectRaw('
+                            invoice_items.product_variant_id,
+                            COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
+                            COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
+                        ')
+                        ->get()
+                        ->keyBy('product_variant_id');
+
+                    // 2) Ventas históricas SIN variant_id, agrupar por precio
+                    $salesByPrice = DB::table('invoice_items')
+                        ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
+                        ->where('invoice_items.product_id', $product->id)
+                        ->whereNull('invoice_items.product_variant_id')
+                        ->where('invoices.status', 'paid')
+                        ->groupBy('invoice_items.unit_price')
+                        ->selectRaw('
+                            invoice_items.unit_price,
+                            COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
+                            COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
+                        ')
+                        ->get()
+                        ->keyBy(function($item) {
+                            return number_format((float)$item->unit_price, 2, '.', '');
+                        });
+
+                    // 3) Combinar ambas fuentes para cada variante
+                    $product->variants->each(function($variant) use ($variantSales, $salesByPrice) {
+                        $sold = 0;
+                        $revenue = 0.0;
+
+                        // Sumar ventas exactas por variant_id
+                        $exact = $variantSales->get($variant->id);
+                        if ($exact) {
+                            $sold += (int)$exact->total_sold;
+                            $revenue += (float)$exact->total_revenue;
+                        }
+
+                        // Sumar ventas históricas por precio
+                        $variantPrice = number_format((float)($variant->price ?? 0), 2, '.', '');
+                        $byPrice = $salesByPrice->get($variantPrice);
+                        if ($byPrice) {
+                            $sold += (int)$byPrice->total_sold;
+                            $revenue += (float)$byPrice->total_revenue;
+                        }
+
+                        $variant->total_sold = $sold;
+                        $variant->total_revenue = $revenue;
+                    });
+                }
             } else {
                 // Valores por defecto para no romper el frontend
                 $product->total_sold = 0;

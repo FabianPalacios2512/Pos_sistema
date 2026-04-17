@@ -1266,10 +1266,12 @@ class InvoiceController extends Controller
                 }
                 // Para cotizaciones, NO crear movimiento de inventario ya que no afectan stock
 
-                // ✅ Crear invoice_item CON source_warehouse_id (DESPUÉS de descontar stock)
+                // ✅ Crear invoice_item CON source_warehouse_id Y product_variant_id (DESPUÉS de descontar stock)
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
+                    'product_variant_id' => $variantId ?? null,
+                    'variant_options' => $item['variant_options'] ?? $item['options_summary'] ?? null,
                     'source_warehouse_id' => $sourceWarehouseId, // ✅ NUEVO: Guardar de dónde se descontó
                     'product_name' => $item['product_name'],
                     'product_sku' => $item['product_sku'] ?? null,
