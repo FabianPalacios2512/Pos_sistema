@@ -81,7 +81,7 @@
             </svg>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Valor Inventario</p>
+            <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Capital Invertido</p>
             <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
               <span v-if="loading" class="inline-block w-24 h-7 bg-gray-200 dark:bg-zinc-700 rounded animate-pulse"></span>
               <span v-else>{{ formatCurrency(metrics.totalInventoryValue) }}</span>

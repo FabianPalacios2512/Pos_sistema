@@ -71,7 +71,7 @@
 
         <!-- Valor Total -->
         <div class="bg-white/70 dark:bg-zinc-900/40  rounded-xl px-5 py-4 border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all duration-200">
-          <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Valor Inventario</p>
+          <p class="text-xs font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Valor Potencial</p>
           <p class="text-3xl font-light text-gray-900 dark:text-white">${{ formatCurrency(totalValue) }}</p>
         </div>
       </div>
@@ -305,6 +305,9 @@ const lowStockProducts = computed(() => {
 
 const totalValue = computed(() => {
   return products.value.reduce((sum, p) => {
+    if (p.variants && p.variants.length > 0) {
+      return sum + p.variants.reduce((vs, v) => vs + ((v.stock || 0) * (v.price || p.sale_price || 0)), 0)
+    }
     const stock = p.current_stock || 0
     const price = p.sale_price || p.price || 0
     return sum + (stock * price)

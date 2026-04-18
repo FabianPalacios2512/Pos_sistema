@@ -42,7 +42,7 @@
           :alert="data.metrics.outOfStockProducts > 0"
         />
         <MetricCard
-          title="Valor Total"
+          title="Capital Invertido"
           :value="formatCurrency(data.metrics.totalInventoryValue)"
           icon="fas fa-dollar-sign"
           color="purple"

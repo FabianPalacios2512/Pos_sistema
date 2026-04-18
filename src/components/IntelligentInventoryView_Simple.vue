@@ -471,9 +471,9 @@
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">VALOR TOTAL</p>
+                <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">VALOR POTENCIAL</p>
                 <p class="text-2xl font-semibold text-[#1e1f20] dark:text-[#e3e3e3] mt-0.5">{{ formatCurrency(productsMetrics.totalValueSale) }}</p>
-                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Costo: {{ formatCurrency(productsMetrics.totalValueCost) }}</p>
+                <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Invertido: {{ formatCurrency(productsMetrics.totalValueCost) }}</p>
               </div>
             </div>
           </div>
