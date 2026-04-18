@@ -33,17 +33,18 @@ export const inventoryService = {
   // Ajustar stock directamente (para la función ajustar)
   adjustStock: async (productId, newStock, reason = 'Ajuste manual', warehouseId = null, variantId = null) => {
     try {
-      // Si es un producto con variante, obtenemos el stock de la variante específica
+      // Construir URL con warehouse_id para obtener stock per-warehouse correcto
+      const warehouseParam = warehouseId ? `?warehouse_id=${warehouseId}` : ''
       let currentStock = 0
       
       if (variantId) {
-        // Para variantes, obtener stock de la variante específica
-        const productsResponse = await api.get(`/products/${productId}`)
+        // Para variantes, obtener stock de la variante específica (filtrado por warehouse)
+        const productsResponse = await api.get(`/products/${productId}${warehouseParam}`)
         const variant = productsResponse.data.variants?.find(v => v.id === variantId)
         currentStock = variant ? (variant.stock || 0) : 0
       } else {
         // Para productos normales
-        const productsResponse = await api.get(`/products/${productId}`)
+        const productsResponse = await api.get(`/products/${productId}${warehouseParam}`)
         currentStock = productsResponse.data.current_stock || 0
       }
 
@@ -51,11 +52,11 @@ export const inventoryService = {
       const difference = parseInt(newStock) - currentStock
 
       const apiData = {
-        quantity: difference, // Enviamos la diferencia, no el valor absoluto
+        quantity: difference,
         type: 'adjustment',
         reference: reason,
-        warehouse_id: warehouseId, // incluir warehouse_id si se proporciona
-        variant_id: variantId // NUEVO: incluir variant_id para productos fashion
+        warehouse_id: warehouseId,
+        variant_id: variantId
       }
 
       const response = await api.post(`/products/${productId}/update-stock`, apiData)

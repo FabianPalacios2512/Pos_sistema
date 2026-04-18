@@ -20,7 +20,8 @@ class StockTransferController extends Controller
             'sourceWarehouse',
             'destinationWarehouse',
             'user',
-            'items.product'
+            'items.product',
+            'items.variant'
         ]);
 
         // Filtros
@@ -50,7 +51,8 @@ class StockTransferController extends Controller
             'sourceWarehouse',
             'destinationWarehouse',
             'user',
-            'items.product'
+            'items.product',
+            'items.variant'
         ])->findOrFail($id);
 
         return response()->json($transfer);
@@ -68,6 +70,7 @@ class StockTransferController extends Controller
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
+            'items.*.product_variant_id' => 'nullable|exists:product_variants,id',
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
@@ -79,16 +82,19 @@ class StockTransferController extends Controller
 
             // Validar que haya suficiente stock en origen
             foreach ($validated['items'] as $item) {
-                $availableStock = $sourceWarehouse->getProductStock($item['product_id']);
+                $variantId = $item['product_variant_id'] ?? null;
+                $availableStock = $sourceWarehouse->getProductStock($item['product_id'], $variantId);
 
                 if ($availableStock < $item['quantity']) {
                     $product = Product::find($item['product_id']);
-                    \Log::error('Insufficient stock:', [
-                        'product' => $product->name,
-                        'available' => $availableStock,
-                        'requested' => $item['quantity']
-                    ]);
-                    throw new \Exception("Stock insuficiente para {$product->name}. Disponible: {$availableStock}, Solicitado: {$item['quantity']}");
+                    $label = $product->name;
+                    if ($variantId) {
+                        $variant = \App\Models\ProductVariant::find($variantId);
+                        if ($variant && is_array($variant->options_summary)) {
+                            $label .= ' (' . collect($variant->options_summary)->map(fn($o) => ($o['name'] ?? '') . ': ' . ($o['value'] ?? ''))->implode(', ') . ')';
+                        }
+                    }
+                    throw new \Exception("Stock insuficiente para {$label}. Disponible: {$availableStock}, Solicitado: {$item['quantity']}");
                 }
             }
 
@@ -109,6 +115,7 @@ class StockTransferController extends Controller
                 $transferItem = StockTransferItem::create([
                     'stock_transfer_id' => $transfer->id,
                     'product_id' => $item['product_id'],
+                    'product_variant_id' => $item['product_variant_id'] ?? null,
                     'quantity' => $item['quantity'],
                 ]);
 
@@ -116,7 +123,7 @@ class StockTransferController extends Controller
 
             DB::commit();
 
-            $transferWithRelations = $transfer->load(['sourceWarehouse', 'destinationWarehouse', 'items.product']);
+            $transferWithRelations = $transfer->load(['sourceWarehouse', 'destinationWarehouse', 'items.product', 'items.variant']);
 
             return response()->json([
                 'message' => 'Traslado creado exitosamente',
@@ -144,7 +151,7 @@ class StockTransferController extends Controller
 
         DB::beginTransaction();
         try {
-            $transfer = StockTransfer::with('items')->findOrFail($id);
+            $transfer = StockTransfer::with('items.variant')->findOrFail($id);
 
             if ($transfer->status !== 'pending') {
                 \Log::warning('Transfer is not pending:', ['status' => $transfer->status]);
@@ -166,7 +173,7 @@ class StockTransferController extends Controller
 
             return response()->json([
                 'message' => 'Traslado completado exitosamente',
-                'transfer' => $transfer->fresh(['sourceWarehouse', 'destinationWarehouse', 'items.product'])
+                'transfer' => $transfer->fresh(['sourceWarehouse', 'destinationWarehouse', 'items.product', 'items.variant'])
             ]);
         } catch (\Exception $e) {
             \Log::error('Exception in complete transfer:', [

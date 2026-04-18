@@ -19,8 +19,21 @@ class CashSessionController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = CashSession::with('user')
+            $query = CashSession::with(['user', 'warehouse'])
                 ->orderBy('created_at', 'desc');
+
+            // Restricción por sede para usuarios no-admin
+            $currentUser = Auth::user();
+            $totalWarehouses = Warehouse::where('active', true)->count();
+            if ($totalWarehouses > 1 && $currentUser) {
+                $currentUser->loadMissing('role');
+                $roleName = strtolower($currentUser->role->name ?? '');
+                $isAdmin = in_array($roleName, ['administrador', 'admin', 'superadmin']);
+
+                if (!$isAdmin && $currentUser->warehouse_id) {
+                    $query->where('warehouse_id', $currentUser->warehouse_id);
+                }
+            }
 
             // Filtros opcionales
             if ($request->filled('status')) {
@@ -957,5 +970,37 @@ class CashSessionController extends Controller
                 'message' => 'Error al resolver cierre forzado: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Devuelve info de acceso del usuario actual para la vista de cajas.
+     * El frontend usa esto para mostrar el empty state correcto.
+     */
+    public function warehouseAccess()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'No autenticado'], 401);
+        }
+
+        $user->loadMissing('role');
+        $roleName = strtolower($user->role->name ?? '');
+        $isAdmin = in_array($roleName, ['administrador', 'admin', 'superadmin']);
+        $totalWarehouses = Warehouse::where('active', true)->count();
+        $needsRestriction = $totalWarehouses > 1 && !$isAdmin;
+
+        $userWarehouse = $user->warehouse_id ? Warehouse::find($user->warehouse_id) : null;
+
+        return response()->json([
+            'success' => true,
+            'is_admin' => $isAdmin,
+            'needs_restriction' => $needsRestriction,
+            'has_warehouse' => $user->warehouse_id !== null,
+            'warehouse' => $userWarehouse ? [
+                'id' => $userWarehouse->id,
+                'name' => $userWarehouse->name,
+            ] : null,
+            'total_warehouses' => $totalWarehouses,
+        ]);
     }
 }

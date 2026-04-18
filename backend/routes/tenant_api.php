@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\ExpenseCategoryController;
 use App\Http\Controllers\Api\ExcelImportController;
+use App\Http\Controllers\Api\StaffTransferController;
 use App\Http\Controllers\Api\WebCatalogConfigController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\CreditPortalController;
@@ -217,6 +218,9 @@ Route::get('/optimized/recent-transactions', [\App\Http\Controllers\Api\Optimize
 Route::get('/optimized/metrics', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'getMainMetrics']);
 Route::get('/optimized/financial', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'getFinancialData']);
 Route::post('/optimized/clear-cache', [\App\Http\Controllers\Api\OptimizedDashboardController::class, 'clearCache']);
+
+// BI Dashboard (all-in-one endpoint)
+Route::get('/bi/dashboard', [\App\Http\Controllers\Api\BIDashboardController::class, 'index']);
 
 // Dashboard ventas hoy en hora Colombia (sin auth para pruebas)
 Route::get('/dashboard/ventas-hoy', [\App\Http\Controllers\DashboardController::class, 'ventasHoy']);
@@ -447,6 +451,7 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     // ==================== BODEGAS/SEDES MULTITIENDA ====================
     Route::get('/warehouses', [App\Http\Controllers\WarehouseController::class, 'index']);
     Route::get('/warehouses/default', [App\Http\Controllers\WarehouseController::class, 'getDefault']);
+    Route::get('/warehouses/stock-matrix', [App\Http\Controllers\WarehouseController::class, 'stockMatrix']);
     Route::get('/warehouses/{id}', [App\Http\Controllers\WarehouseController::class, 'show']);
     Route::post('/warehouses', [App\Http\Controllers\WarehouseController::class, 'store']);
     Route::put('/warehouses/{id}', [App\Http\Controllers\WarehouseController::class, 'update']);
@@ -491,6 +496,12 @@ Route::middleware(['auth:sanctum', 'trial'])->group(function () {
     Route::get('/cash-sessions/history', [CashSessionController::class, 'getHistory']);
     Route::get('/cash-sessions/check-forced-closed', [CashSessionController::class, 'checkForcedClosed']);
     Route::post('/cash-sessions/resolve-forced-close', [CashSessionController::class, 'resolveForcedClose']);
+    Route::get('/cash-sessions/warehouse-access', [CashSessionController::class, 'warehouseAccess']);
+
+    // ==================== TRASLADO DE PERSONAL ====================
+    Route::get('/staff-transfers', [StaffTransferController::class, 'index']);
+    Route::get('/staff-transfers/users', [StaffTransferController::class, 'transferableUsers']);
+    Route::post('/staff-transfers', [StaffTransferController::class, 'transfer']);
 
     // ==================== INVENTARIO INTELIGENTE ====================
     // 1. Vista General del Inventario

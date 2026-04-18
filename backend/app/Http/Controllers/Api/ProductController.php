@@ -84,7 +84,9 @@ class ProductController extends Controller
             },
             'variants' => function($q) {
                 $q->select('product_variants.*')
-                  ->with(['optionValues.option']);
+                  ->with(['optionValues.option', 'warehouses' => function($wq) {
+                      $wq->select('warehouses.id', 'warehouses.name')->withPivot('stock');
+                  }]);
             }
         ]);
 
@@ -145,15 +147,27 @@ class ProductController extends Controller
 
             if ($warehouseId) {
                 if ($isVariable) {
-                    // Para productos variables, sumar stock de TODAS sus variantes en el warehouse
-                    $totalVariantStock = DB::table('product_warehouse')
+                    // Obtener stock PER-VARIANT para este warehouse desde product_warehouse
+                    $warehouseVariantStock = DB::table('product_warehouse')
                         ->where('warehouse_id', $warehouseId)
                         ->where('product_id', $product->id)
                         ->whereNotNull('product_variant_id')
-                        ->sum('stock');
+                        ->pluck('stock', 'product_variant_id'); // [variant_id => stock]
 
+                    $totalVariantStock = $warehouseVariantStock->sum();
                     $product->current_stock = (int)$totalVariantStock;
                     $product->stock = (int)$totalVariantStock;
+
+                    // Filtrar variantes: solo las que existen en este warehouse
+                    // y sobreescribir el stock global con el stock del warehouse
+                    if ($product->variants) {
+                        $filtered = $product->variants->filter(function($variant) use ($warehouseVariantStock) {
+                            return $warehouseVariantStock->has($variant->id);
+                        })->each(function($variant) use ($warehouseVariantStock) {
+                            $variant->stock = (int)$warehouseVariantStock->get($variant->id, 0);
+                        })->values();
+                        $product->setRelation('variants', $filtered);
+                    }
                 } else {
                     // Para productos simples, usar el stock directo del warehouse
                     if ($product->warehouses && $product->warehouses->isNotEmpty()) {
@@ -173,11 +187,18 @@ class ProductController extends Controller
 
             // 💰 CALCULAR ventas e ingresos SOLO si se solicitan (evita N+1 queries)
             if ($includeSales) {
-                $salesData = DB::table('invoice_items')
+                $salesQuery = DB::table('invoice_items')
                     ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
                     ->where('invoice_items.product_id', $product->id)
-                    ->where('invoices.status', 'paid')
-                    ->selectRaw('
+                    ->where('invoices.status', 'paid');
+                
+                // Filtrar ventas por warehouse (a través de cash_sessions)
+                if ($warehouseId) {
+                    $salesQuery->join('cash_sessions', 'invoices.cash_session_id', '=', 'cash_sessions.id')
+                        ->where('cash_sessions.warehouse_id', $warehouseId);
+                }
+                
+                $salesData = $salesQuery->selectRaw('
                         COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
                         COALESCE(SUM(invoice_items.quantity * invoice_items.unit_price), 0) as total_revenue
                     ')
@@ -189,12 +210,18 @@ class ProductController extends Controller
                 // Ventas por variante: combinar ventas con variant_id + históricas sin variant_id
                 if ($isVariable && $product->variants && $product->variants->count() > 0) {
                     // 1) Ventas exactas por product_variant_id (nuevas)
-                    $variantSales = DB::table('invoice_items')
+                    $variantSalesQuery = DB::table('invoice_items')
                         ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
                         ->where('invoice_items.product_id', $product->id)
                         ->whereNotNull('invoice_items.product_variant_id')
-                        ->where('invoices.status', 'paid')
-                        ->groupBy('invoice_items.product_variant_id')
+                        ->where('invoices.status', 'paid');
+                    
+                    if ($warehouseId) {
+                        $variantSalesQuery->join('cash_sessions', 'invoices.cash_session_id', '=', 'cash_sessions.id')
+                            ->where('cash_sessions.warehouse_id', $warehouseId);
+                    }
+                    
+                    $variantSales = $variantSalesQuery->groupBy('invoice_items.product_variant_id')
                         ->selectRaw('
                             invoice_items.product_variant_id,
                             COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
@@ -204,12 +231,18 @@ class ProductController extends Controller
                         ->keyBy('product_variant_id');
 
                     // 2) Ventas históricas SIN variant_id, agrupar por precio
-                    $salesByPrice = DB::table('invoice_items')
+                    $salesByPriceQuery = DB::table('invoice_items')
                         ->join('invoices', 'invoice_items.invoice_id', '=', 'invoices.id')
                         ->where('invoice_items.product_id', $product->id)
                         ->whereNull('invoice_items.product_variant_id')
-                        ->where('invoices.status', 'paid')
-                        ->groupBy('invoice_items.unit_price')
+                        ->where('invoices.status', 'paid');
+                    
+                    if ($warehouseId) {
+                        $salesByPriceQuery->join('cash_sessions', 'invoices.cash_session_id', '=', 'cash_sessions.id')
+                            ->where('cash_sessions.warehouse_id', $warehouseId);
+                    }
+                    
+                    $salesByPrice = $salesByPriceQuery->groupBy('invoice_items.unit_price')
                         ->selectRaw('
                             invoice_items.unit_price,
                             COALESCE(SUM(invoice_items.quantity), 0) as total_sold,
@@ -349,10 +382,20 @@ class ProductController extends Controller
                     $localStock = (int) $product->current_stock;
                 } else if ($warehouseId && $product->warehouses) {
                     // 🏢 MODO MULTI-TIENDA: Usar stock de bodega específica
-                    $currentWarehouse = $product->warehouses->firstWhere('id', $warehouseId);
+                    $isVariable = $product->product_type === 'variable';
 
-                    if ($currentWarehouse) {
-                        $localStock = (int) $currentWarehouse->pivot->stock;
+                    if ($isVariable) {
+                        // Para productos variables: sumar stock de variantes en este warehouse
+                        $localStock = (int) \Illuminate\Support\Facades\DB::table('product_warehouse')
+                            ->where('warehouse_id', $warehouseId)
+                            ->where('product_id', $product->id)
+                            ->whereNotNull('product_variant_id')
+                            ->sum('stock');
+                    } else {
+                        $currentWarehouse = $product->warehouses->firstWhere('id', $warehouseId);
+                        if ($currentWarehouse) {
+                            $localStock = (int) $currentWarehouse->pivot->stock;
+                        }
                     }
 
                     // Si es búsqueda global, encontrar bodegas alternativas
@@ -390,6 +433,22 @@ class ProductController extends Controller
                         });
                         $variant->options_summary = $optionsSummary;
                     });
+
+                    // 🏢 Si hay warehouse, filtrar variantes y ajustar stock per-warehouse
+                    if ($warehouseId && $searchScope !== 'global') {
+                        $warehouseVariantStock = \Illuminate\Support\Facades\DB::table('product_warehouse')
+                            ->where('warehouse_id', $warehouseId)
+                            ->where('product_id', $product->id)
+                            ->whereNotNull('product_variant_id')
+                            ->pluck('stock', 'product_variant_id');
+
+                        $filtered = $product->variants->filter(function($variant) use ($warehouseVariantStock) {
+                            return $warehouseVariantStock->has($variant->id);
+                        })->each(function($variant) use ($warehouseVariantStock) {
+                            $variant->stock = (int)$warehouseVariantStock->get($variant->id, 0);
+                        })->values();
+                        $product->setRelation('variants', $filtered);
+                    }
                 }
 
                 // Agregar campo auxiliar para el frontend
@@ -680,6 +739,9 @@ class ProductController extends Controller
             'images'
         ]);
 
+        // 🏢 Si se pasa warehouse_id, filtrar variantes y ajustar stock per-warehouse
+        $warehouseId = request()->query('warehouse_id');
+
         // Formatear las variantes para incluir options como array simple
         if ($product->variants) {
             $product->variants->each(function($variant) {
@@ -692,6 +754,25 @@ class ProductController extends Controller
                     $variant->options = [];
                 }
             });
+
+            // Filtrar y ajustar stock per-warehouse si se solicita
+            if ($warehouseId) {
+                $warehouseVariantStock = DB::table('product_warehouse')
+                    ->where('warehouse_id', $warehouseId)
+                    ->where('product_id', $product->id)
+                    ->whereNotNull('product_variant_id')
+                    ->pluck('stock', 'product_variant_id');
+
+                $filtered = $product->variants->filter(function($variant) use ($warehouseVariantStock) {
+                    return $warehouseVariantStock->has($variant->id);
+                })->each(function($variant) use ($warehouseVariantStock) {
+                    $variant->stock = (int)$warehouseVariantStock->get($variant->id, 0);
+                })->values();
+                $product->setRelation('variants', $filtered);
+
+                // Ajustar stock total del producto al warehouse
+                $product->current_stock = $warehouseVariantStock->sum();
+            }
         }
 
         // Formatear las opciones del producto
@@ -1187,14 +1268,18 @@ class ProductController extends Controller
                 ], 404);
             }
 
-            // Actualizar stock en product_variants
-            $currentVariantStock = $variant->stock ?? 0;
-            $newVariantStock = $currentVariantStock + $request->quantity;
-            $variant->stock = max(0, $newVariantStock);
-            $variant->save();
-
-            // Actualizar stock en product_warehouse
             $warehouseId = $warehouseId ?? 1; // Warehouse por defecto
+
+            // Obtener stock ACTUAL en el warehouse específico (no global)
+            $currentWarehouseStock = (int) DB::table('product_warehouse')
+                ->where('product_id', $product->id)
+                ->where('product_variant_id', $variantId)
+                ->where('warehouse_id', $warehouseId)
+                ->value('stock') ?? 0;
+
+            $quantity = $request->quantity; // Diferencia enviada por el frontend
+
+            // Actualizar stock en product_warehouse para este warehouse
             $pivotExists = DB::table('product_warehouse')
                 ->where('product_id', $product->id)
                 ->where('product_variant_id', $variantId)
@@ -1202,23 +1287,34 @@ class ProductController extends Controller
                 ->exists();
 
             if ($pivotExists) {
+                $newWarehouseStock = max(0, $currentWarehouseStock + $quantity);
                 DB::table('product_warehouse')
                     ->where('product_id', $product->id)
                     ->where('product_variant_id', $variantId)
                     ->where('warehouse_id', $warehouseId)
-                    ->increment('stock', $request->quantity);
+                    ->update(['stock' => $newWarehouseStock, 'updated_at' => now()]);
             } else {
+                $newWarehouseStock = max(0, $quantity);
                 DB::table('product_warehouse')->insert([
                     'product_id' => $product->id,
                     'product_variant_id' => $variantId,
                     'warehouse_id' => $warehouseId,
-                    'stock' => max(0, $request->quantity),
+                    'stock' => $newWarehouseStock,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
             }
 
-            // Recalcular stock total del producto (suma de todas las variantes)
+            // Recalcular stock GLOBAL de la variante (suma de TODOS los warehouses)
+            $globalVariantStock = (int) DB::table('product_warehouse')
+                ->where('product_id', $product->id)
+                ->where('product_variant_id', $variantId)
+                ->sum('stock');
+
+            $variant->stock = $globalVariantStock;
+            $variant->save();
+
+            // Recalcular stock total del producto (suma de todas las variantes en TODOS los warehouses)
             $totalStock = DB::table('product_warehouse')
                 ->where('product_id', $product->id)
                 ->whereNotNull('product_variant_id')
@@ -1230,14 +1326,15 @@ class ProductController extends Controller
             // Crear movimiento de inventario
             \App\Models\InventoryMovement::create([
                 'product_id' => $product->id,
-                'type' => $request->type === 'purchase' || $request->type === 'adjustment' ? 'in' : 'out',
-                'quantity' => $request->quantity,
-                'previous_stock' => $currentVariantStock,
-                'new_stock' => $variant->stock,
+                'type' => $quantity >= 0 ? 'in' : 'out',
+                'quantity' => $quantity,
+                'previous_stock' => $currentWarehouseStock,
+                'new_stock' => $newWarehouseStock ?? max(0, $quantity),
                 'unit_cost' => $product->cost_price ?? 0,
                 'reference' => $request->reference ?? 'Ajuste de variante',
-                'notes' => "Variante ID: {$variantId}",
+                'notes' => "Variante ID: {$variantId}, Bodega ID: {$warehouseId}",
                 'user_id' => auth()->id() ?? 1,
+                'warehouse_id' => $warehouseId,
                 'movement_date' => now()
             ]);
 

@@ -79,17 +79,28 @@ class StockTransfer extends Model
         \DB::beginTransaction();
         try {
             foreach ($this->items as $item) {
+                $variantId = $item->product_variant_id;
+
                 // Obtener stocks antes de las operaciones
-                $previousStockSource = $this->sourceWarehouse->getProductStock($item->product_id);
-                $previousStockDestination = $this->destinationWarehouse->getProductStock($item->product_id);
+                $previousStockSource = $this->sourceWarehouse->getProductStock($item->product_id, $variantId);
+                $previousStockDestination = $this->destinationWarehouse->getProductStock($item->product_id, $variantId);
 
                 // Descontar de bodega origen
-                $this->sourceWarehouse->decrementProductStock($item->product_id, $item->quantity);
+                $this->sourceWarehouse->decrementProductStock($item->product_id, $item->quantity, $variantId);
                 $newStockSource = $previousStockSource - $item->quantity;
 
                 // Sumar a bodega destino
-                $this->destinationWarehouse->incrementProductStock($item->product_id, $item->quantity);
+                $this->destinationWarehouse->incrementProductStock($item->product_id, $item->quantity, $variantId);
                 $newStockDestination = $previousStockDestination + $item->quantity;
+
+                // Nota descriptiva con variante si aplica
+                $variantLabel = '';
+                if ($variantId && $item->variant) {
+                    $opts = $item->variant->options_summary;
+                    if (is_array($opts)) {
+                        $variantLabel = ' (' . collect($opts)->map(fn($o) => ($o['name'] ?? '') . ': ' . ($o['value'] ?? ''))->implode(', ') . ')';
+                    }
+                }
 
                 // Registrar movimiento de inventario en ambas bodegas
                 InventoryMovement::create([
@@ -100,7 +111,7 @@ class StockTransfer extends Model
                     'quantity' => -$item->quantity,
                     'previous_stock' => $previousStockSource,
                     'new_stock' => $newStockSource,
-                    'notes' => "Traslado {$this->reference_number} a {$this->destinationWarehouse->name}",
+                    'notes' => "Traslado {$this->reference_number} a {$this->destinationWarehouse->name}{$variantLabel}",
                     'user_id' => $this->user_id,
                     'movement_date' => now(),
                 ]);
@@ -113,7 +124,7 @@ class StockTransfer extends Model
                     'quantity' => $item->quantity,
                     'previous_stock' => $previousStockDestination,
                     'new_stock' => $newStockDestination,
-                    'notes' => "Traslado {$this->reference_number} desde {$this->sourceWarehouse->name}",
+                    'notes' => "Traslado {$this->reference_number} desde {$this->sourceWarehouse->name}{$variantLabel}",
                     'user_id' => $this->user_id,
                     'movement_date' => now(),
                 ]);

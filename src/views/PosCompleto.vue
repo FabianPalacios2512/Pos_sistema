@@ -17,14 +17,14 @@
     />
 
     <!-- Contenedor Principal con Chat IA Lateral -->
-    <div class="flex flex-1 min-h-0 transition-all duration-300"
+    <div class="flex flex-1 min-h-0 min-w-0 transition-all duration-300"
          :class="{
            'lg:ml-[264px]': !sidebarCollapsed,
            'lg:ml-[68px]': sidebarCollapsed
          }">
       
       <!-- Área Principal de Contenido -->
-      <div class="flex-1 flex flex-col min-h-0">
+      <div class="flex-1 flex flex-col min-h-0 min-w-0 overflow-x-hidden">
         
         <!-- Header Corporativo Profesional - Siempre ancho completo -->
         <AppHeader
@@ -49,7 +49,7 @@
 
 
         <!-- Contenido Principal - En POS el chat flota, en otras vistas hace espacio -->
-        <main class="flex-1 min-h-0 transition-all duration-300"
+        <main class="flex-1 min-h-0 min-w-0 overflow-y-auto transition-all duration-300"
               :class="{ 'ai-chat-content-spacing': aiChatStore.isOpen.value && currentModule !== 'pos' }">
         
         <!-- Dashboard -->
@@ -79,7 +79,7 @@
         </div>
 
         <!-- Módulos restantes se cargan dinámicamente -->
-        <div v-if="currentModule !== 'dashboard' && currentModule !== 'pos'" style="height: 100%;">
+        <div v-if="currentModule !== 'dashboard' && currentModule !== 'pos'" style="height: 100%; overflow: hidden;">
           <component
             :is="currentModuleComponent"
             v-bind="getModuleProps()"
@@ -267,7 +267,7 @@ const sessionTimeout = useSessionTimeout()
 const uiContext = useUIContextStore()
 
 // Importar componentes de módulos
-const DashboardView = defineAsyncComponent(() => import('../components/DashboardView_Executive.vue'))
+const DashboardView = defineAsyncComponent(() => import('../components/DashboardView_BI.vue'))
 const PosView = defineAsyncComponent(() => import('../components/PosView.vue'))
 const ProductsViewStandard = defineAsyncComponent(() => import('../components/ProductsView_professional.vue'))
 const FashionProductList = defineAsyncComponent(() => import('../components/FashionProductList.vue'))

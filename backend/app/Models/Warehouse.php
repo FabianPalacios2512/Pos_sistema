@@ -41,6 +41,14 @@ class Warehouse extends Model
     }
 
     /**
+     * Usuarios asignados a esta sede
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    /**
      * Movimientos de inventario de esta bodega
      */
     public function inventoryMovements()
@@ -67,8 +75,16 @@ class Warehouse extends Model
     /**
      * Obtener stock total de un producto en esta bodega
      */
-    public function getProductStock($productId)
+    public function getProductStock($productId, $variantId = null)
     {
+        if ($variantId) {
+            $row = \DB::table('product_warehouse')
+                ->where('warehouse_id', $this->id)
+                ->where('product_id', $productId)
+                ->where('product_variant_id', $variantId)
+                ->first();
+            return $row ? (int)$row->stock : 0;
+        }
         $pivot = $this->products()->where('product_id', $productId)->first();
         return $pivot ? $pivot->pivot->stock : 0;
     }
@@ -76,8 +92,18 @@ class Warehouse extends Model
     /**
      * Actualizar stock de un producto en esta bodega
      */
-    public function updateProductStock($productId, $quantity)
+    public function updateProductStock($productId, $quantity, $variantId = null)
     {
+        if ($variantId) {
+            return \DB::table('product_warehouse')
+                ->where('warehouse_id', $this->id)
+                ->where('product_id', $productId)
+                ->where('product_variant_id', $variantId)
+                ->update([
+                    'stock' => $quantity,
+                    'updated_at' => now(),
+                ]);
+        }
         return $this->products()->updateExistingPivot($productId, [
             'stock' => $quantity,
             'updated_at' => now(),
@@ -87,17 +113,41 @@ class Warehouse extends Model
     /**
      * Incrementar stock de un producto
      */
-    public function incrementProductStock($productId, $quantity)
+    public function incrementProductStock($productId, $quantity, $variantId = null)
     {
-        // Verificar si el producto ya existe en esta bodega
+        if ($variantId) {
+            $row = \DB::table('product_warehouse')
+                ->where('warehouse_id', $this->id)
+                ->where('product_id', $productId)
+                ->where('product_variant_id', $variantId)
+                ->first();
+
+            if ($row) {
+                return \DB::table('product_warehouse')
+                    ->where('id', $row->id)
+                    ->update([
+                        'stock' => $row->stock + $quantity,
+                        'updated_at' => now(),
+                    ]);
+            } else {
+                return \DB::table('product_warehouse')->insert([
+                    'warehouse_id' => $this->id,
+                    'product_id' => $productId,
+                    'product_variant_id' => $variantId,
+                    'stock' => $quantity,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        // Original logic for non-variant products
         $pivot = $this->products()->where('product_id', $productId)->first();
 
         if ($pivot) {
-            // Si existe, incrementar el stock actual
             $currentStock = $pivot->pivot->stock;
             return $this->updateProductStock($productId, $currentStock + $quantity);
         } else {
-            // Si NO existe, crear el registro con el stock inicial
             return $this->products()->attach($productId, [
                 'stock' => $quantity,
                 'created_at' => now(),
@@ -109,9 +159,9 @@ class Warehouse extends Model
     /**
      * Decrementar stock de un producto
      */
-    public function decrementProductStock($productId, $quantity)
+    public function decrementProductStock($productId, $quantity, $variantId = null)
     {
-        $currentStock = $this->getProductStock($productId);
-        return $this->updateProductStock($productId, $currentStock - $quantity);
+        $currentStock = $this->getProductStock($productId, $variantId);
+        return $this->updateProductStock($productId, $currentStock - $quantity, $variantId);
     }
 }

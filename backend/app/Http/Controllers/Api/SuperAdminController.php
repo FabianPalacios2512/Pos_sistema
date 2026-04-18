@@ -217,6 +217,8 @@ class SuperAdminController extends Controller
                     'cedula' => $tenant->cedula ?? null,
                     'admin_email' => $adminUser->email ?? null,
                     'admin_phone' => $adminUser->phone ?? null,
+                    'max_users' => $tenant->max_users ?? null,
+                    'max_warehouses' => $tenant->max_warehouses ?? null,
                     'stats' => $stats
                 ]
             ]);
@@ -555,6 +557,8 @@ class SuperAdminController extends Controller
             'business_name' => 'nullable|string|max:255',
             'plan' => 'nullable|string|in:free_trial,basic,premium,enterprise',
             'status' => 'nullable|string|in:active,paused,suspended',
+            'max_users' => 'nullable|integer|min:1|max:999',
+            'max_warehouses' => 'nullable|integer|min:1|max:99',
         ]);
 
         try {
@@ -577,6 +581,14 @@ class SuperAdminController extends Controller
                 $tenant->data = $data;
             }
 
+            // Actualizar límites de usuarios y sedes
+            if (isset($validated['max_users'])) {
+                $tenant->max_users = $validated['max_users'];
+            }
+            if (isset($validated['max_warehouses'])) {
+                $tenant->max_warehouses = $validated['max_warehouses'];
+            }
+
             $tenant->save();
 
 
@@ -588,6 +600,8 @@ class SuperAdminController extends Controller
                     'business_name' => $tenant->data['business_name'] ?? 'Sin Nombre',
                     'plan' => $tenant->plan,
                     'status' => $tenant->data['status'] ?? 'active',
+                    'max_users' => $tenant->max_users ?? null,
+                    'max_warehouses' => $tenant->max_warehouses ?? null,
                 ]
             ]);
 

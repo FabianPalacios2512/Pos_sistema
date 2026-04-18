@@ -49,7 +49,6 @@ class SystemSettingsController extends Controller
                 }
 
                 // Calcular max_users según el plan
-                // Free/Trial: 1 usuario, Basic: 1 usuario, Premium: 3 usuarios, Enterprise: ilimitado
                 $maxUsers = [
                     'free' => 1,
                     'basic' => 1,
@@ -65,6 +64,19 @@ class SystemSettingsController extends Controller
                     'enterprise' => null // null = ilimitado
                 ];
 
+                // Override con valores configurados por el admin
+                $resolvedMaxUsers = $maxUsers[$tenantPlanRaw] ?? 1;
+                $adminMaxUsers = $tenantData->max_users ?? null;
+                if ($adminMaxUsers !== null && (int)$adminMaxUsers > 0) {
+                    $resolvedMaxUsers = (int)$adminMaxUsers;
+                }
+
+                $resolvedMaxWarehouses = $maxWarehouses[$tenantPlanRaw] ?? 1;
+                $adminMaxWarehouses = $tenantData->max_warehouses ?? null;
+                if ($adminMaxWarehouses !== null && (int)$adminMaxWarehouses > 0) {
+                    $resolvedMaxWarehouses = (int)$adminMaxWarehouses;
+                }
+
                 $tenant = [
                     'id' => $tenantData->id,
                     'business_name' => $tenantData->business_name,
@@ -72,8 +84,8 @@ class SystemSettingsController extends Controller
                     'subscription_status' => 'active', // Por ahora siempre activo
                     'subscription_start_date' => $tenantData->created_at,
                     'subscription_end_date' => $tenantData->subscription_ends_at,
-                    'max_users' => $maxUsers[$tenantPlanRaw] ?? 1,
-                    'max_warehouses' => $maxWarehouses[$tenantPlanRaw] ?? 1,
+                    'max_users' => $resolvedMaxUsers,
+                    'max_warehouses' => $resolvedMaxWarehouses,
                     'max_products' => null, // ilimitado para todos los planes
                     'max_invoices' => null  // ilimitado para todos los planes
                 ];

@@ -2,6 +2,29 @@
   <div class="bg-gray-50 dark:bg-[#131314] font-sans transition-colors duration-300 px-8" style="height: 100%; display: flex; flex-direction: column;">
     <div class="p-4 lg:p-6 space-y-6 pb-8 animate-fade-in" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
       
+      <!-- Acceso Restringido -->
+      <div v-if="warehouseAccessDenied" class="flex-1 flex items-center justify-center">
+        <div class="text-center max-w-md">
+          <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5 flex items-center justify-center">
+            <svg class="w-10 h-10 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Acceso Restringido</h2>
+          <p class="text-sm text-gray-500 dark:text-zinc-400 leading-relaxed">
+            Tu usuario no tiene una sede asignada. No tienes permisos para operar cajas. Contacta a tu administrador para que te asigne a una sede.
+          </p>
+        </div>
+      </div>
+
+      <!-- Loading access check -->
+      <div v-else-if="checkingAccess" class="flex-1 flex items-center justify-center">
+        <div class="w-8 h-8 border-2 border-gray-300 dark:border-zinc-600 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+
+      <!-- Contenido normal -->
+      <template v-else>
+      
       <!-- Header Gemini -->
       <div class="flex items-center justify-between pb-4">
         <div class="flex items-center space-x-4">
@@ -401,7 +424,6 @@
           </button>
         </div>
       </div>
-    </div>
 
     <!-- Session Details Modal Gemini -->
     <div v-if="selectedSession" class="fixed inset-0 bg-black/75 dark:bg-black/85 flex items-center justify-center z-50 p-4" @click.self="selectedSession = null">
@@ -825,7 +847,6 @@
         </div>
       </div>
     </div>
-  </div>
 
   <!-- Modal de Confirmación Profesional (reemplaza confirm() nativo) -->
   <div v-if="showConfirmModal" class="fixed inset-0 bg-black/60 dark:bg-black/80 flex items-center justify-center z-[200]" @click.self="showConfirmModal = false">
@@ -866,6 +887,10 @@
           Confirmar Cierre
         </button>
       </div>
+    </div>
+  </div>
+
+      </template>
     </div>
   </div>
 </template>
@@ -918,6 +943,11 @@ const closeForm = ref({
   closing_notes: '',
   expenses_detail: ''
 })
+
+// Warehouse access control
+const warehouseAccessDenied = ref(false)
+const userWarehouseName = ref('')
+const checkingAccess = ref(true)
 
 // Filters
 const searchQuery = ref('')
@@ -1960,11 +1990,25 @@ const registrarAccionesIA = () => {
 }
 
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
   // Establecer módulo actual para la IA
   uiContext.setCurrentModule('cash-admin')
   
-  refreshSessions()
+  // Verificar acceso por sede
+  try {
+    const accessInfo = await apiCall('/cash-sessions/warehouse-access')
+    if (accessInfo?.needs_restriction && !accessInfo?.has_warehouse) {
+      warehouseAccessDenied.value = true
+      userWarehouseName.value = ''
+    }
+    checkingAccess.value = false
+  } catch {
+    checkingAccess.value = false
+  }
+
+  if (!warehouseAccessDenied.value) {
+    refreshSessions()
+  }
   
   // Registrar acciones para IA
   registrarAccionesIA()

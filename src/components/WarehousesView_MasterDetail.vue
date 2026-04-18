@@ -56,6 +56,39 @@
               <span>Nuevo Traslado</span>
             </button>
           </template>
+
+          <!-- Botones para Personal -->
+          <template v-else-if="activeTab === 'staff'">
+            <button
+              @click="loadStaffData"
+              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-sm font-semibold rounded-md border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>Refrescar</span>
+            </button>
+            
+            <button
+              @click="showStaffTransferModal = true"
+              class="px-6 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-md transition-all duration-300 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
+              </svg>
+              <span>Trasladar Empleado</span>
+            </button>
+          </template>
+
+          <!-- Botones para Matriz -->
+          <template v-else-if="activeTab === 'matrix'">
+            <button
+              @click="$refs.matrixComponent?.loadMatrix()"
+              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-sm font-semibold rounded-md border border-gray-300 dark:border-zinc-700 shadow-sm transition-all duration-200 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>Refrescar</span>
+            </button>
+          </template>
         </div>
       </div>
 
@@ -90,6 +123,38 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
             </svg>
             <span>Traslados</span>
+          </div>
+        </button>
+
+        <button
+          @click="activeTab = 'staff'"
+          :class="[
+            'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+            activeTab === 'staff'
+              ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+          ]">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path>
+            </svg>
+            <span>Personal</span>
+          </div>
+        </button>
+
+        <button
+          @click="activeTab = 'matrix'"
+          :class="[
+            'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200',
+            activeTab === 'matrix'
+              ? 'bg-white dark:bg-zinc-800 text-gray-900 dark:text-white shadow-sm'
+              : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white'
+          ]">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M10.875 12h-1.5m0 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M9.375 12c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m1.5-5.25c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125"/>
+            </svg>
+            <span>Matriz</span>
           </div>
         </button>
       </div>
@@ -467,7 +532,292 @@
         <StockTransfersView ref="transfersComponent" :embedded="true" />
       </div>
 
+      <!-- Contenido Personal -->
+      <div v-if="activeTab === 'staff'" class="flex-1 flex flex-col min-h-0 px-6 lg:px-8 pb-6 space-y-5">
+        
+        <!-- KPIs Personal -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Total Personal</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ staffUsers.length }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+                <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Asignados</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ staffUsers.filter(u => u.warehouse_id).length }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-zinc-900/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-gray-300 dark:border-zinc-800/60 hover:border-gray-400 dark:hover:border-zinc-700/80 transition-all duration-200 hover:shadow-md dark:shadow-lg dark:shadow-black/30">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-zinc-800/50 border border-gray-200 dark:border-white/5">
+                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">Sin Asignar</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">{{ staffUsers.filter(u => !u.warehouse_id).length }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de Personal por Sede -->
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-bold text-gray-900 dark:text-white">Personal por Sede</h3>
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+                </svg>
+                <input
+                  v-model="staffSearchTerm"
+                  type="text"
+                  placeholder="Buscar empleado..."
+                  class="pl-10 pr-4 py-2.5 text-sm rounded-xl border-2 border-gray-200 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent w-64"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div v-if="loadingStaff" class="flex items-center justify-center py-16">
+            <div class="w-8 h-8 border-2 border-gray-300 dark:border-zinc-600 border-t-blue-500 rounded-full animate-spin"></div>
+          </div>
+
+          <div v-else-if="filteredStaff.length === 0" class="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-zinc-500">
+            <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path>
+            </svg>
+            <p class="text-sm font-medium">No se encontraron empleados</p>
+          </div>
+
+          <table v-else class="w-full">
+            <thead>
+              <tr class="border-b border-gray-200 dark:border-zinc-800">
+                <th class="text-left px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Empleado</th>
+                <th class="text-left px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Rol</th>
+                <th class="text-left px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Sede Asignada</th>
+                <th class="text-right px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in filteredStaff" :key="user.id" class="border-b border-gray-100 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-200">
+                <td class="px-6 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white" :style="{ backgroundColor: getAvatarColor(user.name) }">
+                      {{ user.name?.charAt(0)?.toUpperCase() || '?' }}
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ user.name }}</p>
+                      <p class="text-xs text-gray-500 dark:text-zinc-500">{{ user.email }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-3">
+                  <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800">
+                    {{ user.role?.name || 'Sin rol' }}
+                  </span>
+                </td>
+                <td class="px-6 py-3">
+                  <span v-if="user.warehouse" class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800">
+                    {{ user.warehouse?.name }}
+                  </span>
+                  <span v-else class="px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800">
+                    Sin asignar
+                  </span>
+                </td>
+                <td class="px-6 py-3 text-right">
+                  <button
+                    @click="openStaffTransfer(user)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 text-slate-400 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-100 dark:hover:border-blue-900/30 border-transparent"
+                    title="Trasladar"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"></path>
+                    </svg>
+                    Trasladar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Historial de Traslados -->
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-black/50 border border-gray-300 dark:border-zinc-800 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
+            <h3 class="text-base font-bold text-gray-900 dark:text-white">Historial de Traslados</h3>
+          </div>
+
+          <div v-if="staffTransferHistory.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400 dark:text-zinc-500">
+            <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-sm">No hay traslados registrados</p>
+          </div>
+
+          <table v-else class="w-full">
+            <thead>
+              <tr class="border-b border-gray-200 dark:border-zinc-800">
+                <th class="text-left px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Fecha</th>
+                <th class="text-left px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Empleado</th>
+                <th class="text-left px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Origen</th>
+                <th class="text-left px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Destino</th>
+                <th class="text-left px-6 py-3 text-xs font-semibold text-gray-600 dark:text-zinc-400 uppercase tracking-wide">Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="t in staffTransferHistory" :key="t.id" class="border-b border-gray-100 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors duration-200">
+                <td class="px-6 py-3 text-sm text-gray-700 dark:text-zinc-300">{{ formatDate(t.created_at) }}</td>
+                <td class="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ t.user?.name || '-' }}</td>
+                <td class="px-6 py-3 text-sm text-gray-600 dark:text-zinc-400">{{ t.from_warehouse?.name || 'Sin sede' }}</td>
+                <td class="px-6 py-3 text-sm text-gray-600 dark:text-zinc-400">{{ t.to_warehouse?.name || '-' }}</td>
+                <td class="px-6 py-3 text-sm text-gray-500 dark:text-zinc-500">{{ t.reason || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Contenido Matriz de Distribución -->
+      <div v-if="activeTab === 'matrix'" class="flex-1 flex flex-col min-h-0 px-6 lg:px-8 pb-6">
+        <StockDistributionMatrix ref="matrixComponent" />
+      </div>
+
   </div>
+
+    <!-- Modal Trasladar Empleado -->
+    <Teleport to="body">
+      <div v-if="showStaffTransferModal" class="fixed inset-0 z-[9999] flex items-center justify-center">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="closeStaffTransferModal"></div>
+        <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl dark:shadow-black/60 border border-gray-200 dark:border-zinc-800 w-full max-w-lg mx-4 animate-fade-in">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-zinc-800">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Trasladar Empleado</h2>
+            <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1">Mover un empleado a otra sede. Si tiene una caja abierta, se cerrará automáticamente.</p>
+          </div>
+
+          <div class="px-6 py-5 space-y-4">
+            <!-- Autocomplete Empleado -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Empleado</label>
+              <div class="relative">
+                <input
+                  v-model="staffTransferSearch"
+                  type="text"
+                  placeholder="Buscar por nombre o email..."
+                  class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  @focus="showStaffDropdown = true"
+                  @input="showStaffDropdown = true"
+                />
+                <!-- Dropdown -->
+                <div v-if="showStaffDropdown && staffTransferResults.length > 0" class="absolute z-50 mt-1 w-full bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 shadow-xl max-h-48 overflow-y-auto">
+                  <button
+                    v-for="u in staffTransferResults"
+                    :key="u.id"
+                    @mousedown.prevent="selectStaffForTransfer(u)"
+                    class="w-full text-left px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-zinc-700/50 transition-colors flex items-center gap-3"
+                  >
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" :style="{ backgroundColor: getAvatarColor(u.name) }">
+                      {{ u.name?.charAt(0)?.toUpperCase() }}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ u.name }}</p>
+                      <p class="text-xs text-gray-500 dark:text-zinc-500 truncate">{{ u.role?.name }} · {{ u.warehouse?.name || 'Sin sede' }}</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empleado seleccionado -->
+            <div v-if="selectedStaffUser" class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 border border-gray-200 dark:border-zinc-700">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" :style="{ backgroundColor: getAvatarColor(selectedStaffUser.name) }">
+                  {{ selectedStaffUser.name?.charAt(0)?.toUpperCase() }}
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-gray-900 dark:text-white">{{ selectedStaffUser.name }}</p>
+                  <p class="text-xs text-gray-500 dark:text-zinc-400">{{ selectedStaffUser.role?.name }}</p>
+                </div>
+              </div>
+              <div class="text-sm text-gray-600 dark:text-zinc-400">
+                <span class="font-medium">Sede actual:</span>
+                <span class="ml-1" :class="selectedStaffUser.warehouse ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'">
+                  {{ selectedStaffUser.warehouse?.name || 'Sin asignar' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Sede Destino -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Sede Destino</label>
+              <select
+                v-model="staffTransferWarehouseId"
+                class="w-full px-3 py-3 text-sm rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              >
+                <option value="">Seleccionar sede...</option>
+                <option v-for="w in availableDestinations" :key="w.id" :value="w.id">{{ w.name }}</option>
+              </select>
+            </div>
+
+            <!-- Motivo -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-zinc-300 mb-1.5">Motivo (opcional)</label>
+              <input
+                v-model="staffTransferReason"
+                type="text"
+                placeholder="Ej: Refuerzo por alta demanda"
+                class="w-full px-3 py-2.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 placeholder-gray-400 dark:placeholder-zinc-500 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <!-- Warning -->
+            <div v-if="selectedStaffUser" class="flex items-start gap-2.5 p-3 bg-amber-50 dark:bg-amber-950/50 rounded-lg border border-amber-200 dark:border-amber-800/50">
+              <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"></path>
+              </svg>
+              <p class="text-xs text-amber-800 dark:text-amber-300">Si el empleado tiene una sesión de caja abierta en su sede actual, se cerrará automáticamente al confirmar el traslado.</p>
+            </div>
+          </div>
+
+          <div class="px-6 py-4 border-t border-gray-200 dark:border-zinc-800 flex items-center justify-end gap-3">
+            <button
+              @click="closeStaffTransferModal"
+              class="px-5 py-2.5 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-200 text-sm font-bold rounded-xl border border-slate-200 dark:border-zinc-800 shadow-sm transition-all duration-200"
+            >
+              Cancelar
+            </button>
+            <button
+              @click="executeStaffTransfer"
+              :disabled="!selectedStaffUser || !staffTransferWarehouseId || transferringStaff"
+              class="px-6 py-2.5 bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-slate-400/40 dark:shadow-slate-900/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <svg v-if="transferringStaff" class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-linecap="round"></path></svg>
+              <span>{{ transferringStaff ? 'Trasladando...' : 'Confirmar Traslado' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
 
     <!-- Modal Crear/Editar Sede -->
     <WarehouseModal
@@ -543,8 +893,10 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { warehouseService } from '@/services/warehouseService'
+import { apiCall } from '@/services/api'
 import WarehouseModal from './warehouses/WarehouseModal.vue'
 import StockTransfersView from './StockTransfersView.vue'
+import StockDistributionMatrix from './warehouses/StockDistributionMatrix.vue'
 import ToastContainer from './ToastContainer.vue'
 import { useUIContextStore } from '@/store/uiContextStore'
 
@@ -568,6 +920,7 @@ const loadingProducts = ref(false)
 const searchTerm = ref('')
 const productSearchTerm = ref('')
 const transfersComponent = ref(null)
+const matrixComponent = ref(null)
 const planInfo = ref(null)
 
 // Computed
@@ -736,6 +1089,128 @@ const openTransferModal = () => {
     transfersComponent.value.openCreateModal()
   }
 }
+
+// ========== PERSONAL / STAFF TRANSFER ==========
+const staffUsers = ref([])
+const staffTransferHistory = ref([])
+const loadingStaff = ref(false)
+const staffSearchTerm = ref('')
+const showStaffTransferModal = ref(false)
+const staffTransferSearch = ref('')
+const showStaffDropdown = ref(false)
+const selectedStaffUser = ref(null)
+const staffTransferWarehouseId = ref('')
+const staffTransferReason = ref('')
+const transferringStaff = ref(false)
+
+const filteredStaff = computed(() => {
+  if (!staffSearchTerm.value) return staffUsers.value
+  const term = staffSearchTerm.value.toLowerCase()
+  return staffUsers.value.filter(u =>
+    u.name?.toLowerCase().includes(term) ||
+    u.email?.toLowerCase().includes(term) ||
+    u.warehouse?.name?.toLowerCase().includes(term)
+  )
+})
+
+const staffTransferResults = computed(() => {
+  if (!staffTransferSearch.value) return staffUsers.value.slice(0, 10)
+  const term = staffTransferSearch.value.toLowerCase()
+  return staffUsers.value.filter(u =>
+    u.name?.toLowerCase().includes(term) || u.email?.toLowerCase().includes(term)
+  ).slice(0, 10)
+})
+
+const availableDestinations = computed(() => {
+  if (!selectedStaffUser.value) return warehouses.value.filter(w => w.active)
+  return warehouses.value.filter(w => w.active && w.id !== selectedStaffUser.value.warehouse_id)
+})
+
+const getAvatarColor = (name) => {
+  if (!name) return '#6b7280'
+  const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#6366f1']
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return colors[Math.abs(hash) % colors.length]
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  return new Date(dateStr).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+const loadStaffData = async () => {
+  loadingStaff.value = true
+  try {
+    const [usersRes, historyRes] = await Promise.all([
+      apiCall('/staff-transfers/users'),
+      apiCall('/staff-transfers')
+    ])
+    staffUsers.value = usersRes?.data || []
+    staffTransferHistory.value = historyRes?.data?.data || historyRes?.data || []
+  } catch (error) {
+    console.error('Error loading staff data:', error)
+  } finally {
+    loadingStaff.value = false
+  }
+}
+
+const selectStaffForTransfer = (user) => {
+  selectedStaffUser.value = user
+  staffTransferSearch.value = user.name
+  showStaffDropdown.value = false
+  staffTransferWarehouseId.value = ''
+}
+
+const openStaffTransfer = (user) => {
+  selectedStaffUser.value = user
+  staffTransferSearch.value = user.name
+  staffTransferWarehouseId.value = ''
+  staffTransferReason.value = ''
+  showStaffTransferModal.value = true
+}
+
+const closeStaffTransferModal = () => {
+  showStaffTransferModal.value = false
+  selectedStaffUser.value = null
+  staffTransferSearch.value = ''
+  staffTransferWarehouseId.value = ''
+  staffTransferReason.value = ''
+  showStaffDropdown.value = false
+}
+
+const executeStaffTransfer = async () => {
+  if (!selectedStaffUser.value || !staffTransferWarehouseId.value) return
+  transferringStaff.value = true
+  try {
+    const result = await apiCall('/staff-transfers', {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: selectedStaffUser.value.id,
+        to_warehouse_id: Number(staffTransferWarehouseId.value),
+        reason: staffTransferReason.value || null,
+      })
+    })
+    if (result?.success) {
+      alert(result.message || 'Traslado exitoso')
+      closeStaffTransferModal()
+      await loadStaffData()
+    } else {
+      alert(result?.message || 'Error al trasladar')
+    }
+  } catch (error) {
+    alert(error?.message || 'Error al ejecutar el traslado')
+  } finally {
+    transferringStaff.value = false
+  }
+}
+
+// Cargar datos de personal cuando se activa la pestaña
+watch(activeTab, (val) => {
+  if (val === 'staff' && staffUsers.value.length === 0) {
+    loadStaffData()
+  }
+})
 
 // Handler para tecla ESC - deseleccionar sede
 const handleKeyDown = (event) => {

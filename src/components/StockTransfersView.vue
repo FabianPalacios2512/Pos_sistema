@@ -103,10 +103,10 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center space-x-4 flex-1">
                 <div :class="[
-                  'w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0',
+                  'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
                   getStatusColor(transfer.status).bg
                 ]">
-                  <svg class="w-6 h-6" :class="getStatusColor(transfer.status).text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-5 h-5" :class="getStatusColor(transfer.status).text" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                   </svg>
                 </div>
@@ -178,14 +178,6 @@
 
     <!-- Modal Crear Traslado -->
     <StockTransferModal
-      v-if="showModal"
-      :warehouses="warehouses"
-      @close="closeModal"
-      @saved="handleSaved"
-    />
-
-    <!-- Modales -->
-    <StockTransferModal 
       v-if="showModal"
       :warehouses="warehouses"
       @close="closeModal"

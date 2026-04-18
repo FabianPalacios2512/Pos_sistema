@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
             'ai.limit' => \App\Http\Middleware\CheckAiUsageLimit::class,
             'trial' => \App\Http\Middleware\CheckTrialStatus::class,
+            'warehouse.access' => \App\Http\Middleware\WarehouseAccess::class,
         ]);
 
         // Excluir rutas de admin de verificación CSRF

@@ -27,14 +27,22 @@ class WarehouseController extends Controller
         $tenantPlan = tenant('plan') ?? 'free_trial';
         $warehouseCount = $warehouses->count();
 
-        $limits = [
-            'free_trial' => ['max' => 1, 'allowed' => false], // Solo 1 (default), no crear más
-            'basic' => ['max' => 1, 'allowed' => false],      // Solo 1 (default), no crear más
-            'premium' => ['max' => 3, 'allowed' => true],     // Máximo 3
-            'enterprise' => ['max' => -1, 'allowed' => true]  // Ilimitado
+        // Límites por defecto según plan
+        $defaultLimits = [
+            'free_trial' => ['max' => 1, 'allowed' => false],
+            'basic' => ['max' => 1, 'allowed' => false],
+            'premium' => ['max' => 3, 'allowed' => true],
+            'enterprise' => ['max' => -1, 'allowed' => true]
         ];
 
-        $planLimits = $limits[$tenantPlan] ?? ['max' => 0, 'allowed' => false];
+        $planLimits = $defaultLimits[$tenantPlan] ?? ['max' => 0, 'allowed' => false];
+
+        // Si el admin configuró max_warehouses, usar ese valor (override del plan)
+        $adminMaxWarehouses = tenant('max_warehouses');
+        if ($adminMaxWarehouses !== null && (int)$adminMaxWarehouses > 0) {
+            $planLimits['max'] = (int)$adminMaxWarehouses;
+            $planLimits['allowed'] = true;
+        }
 
         return response()->json([
             'warehouses' => $warehouses,
@@ -72,25 +80,41 @@ class WarehouseController extends Controller
         $tenantPlan = tenant('plan') ?? 'free_trial';
         $warehouseCount = Warehouse::count();
 
-        // Planes que NO pueden usar multi-tienda
-        if (in_array($tenantPlan, ['free_trial', 'basic'])) {
+        // Determinar límite: admin override > plan default
+        $adminMaxWarehouses = tenant('max_warehouses');
+        $maxAllowed = null;
+        $allowed = false;
+
+        if ($adminMaxWarehouses !== null && (int)$adminMaxWarehouses > 0) {
+            $maxAllowed = (int)$adminMaxWarehouses;
+            $allowed = true;
+        } else {
+            $defaultLimits = [
+                'free_trial' => ['max' => 1, 'allowed' => false],
+                'basic' => ['max' => 1, 'allowed' => false],
+                'premium' => ['max' => 3, 'allowed' => true],
+                'enterprise' => ['max' => -1, 'allowed' => true]
+            ];
+            $planLimit = $defaultLimits[$tenantPlan] ?? ['max' => 0, 'allowed' => false];
+            $maxAllowed = $planLimit['max'];
+            $allowed = $planLimit['allowed'];
+        }
+
+        if (!$allowed) {
             return response()->json([
-                'message' => '🔒 La funcionalidad Multi-tienda requiere plan Premium o Enterprise',
+                'message' => 'La funcionalidad Multi-tienda requiere plan Premium o Enterprise',
                 'error' => 'plan_restriction'
             ], 403);
         }
 
-        // Premium: máximo 3 tiendas
-        if ($tenantPlan === 'premium' && $warehouseCount >= 3) {
+        if ($maxAllowed !== -1 && $warehouseCount >= $maxAllowed) {
             return response()->json([
-                'message' => '⚠️ Has alcanzado el límite de 3 tiendas para tu plan Premium. Actualiza a Enterprise para tiendas ilimitadas.',
+                'message' => "Has alcanzado el límite de {$maxAllowed} sedes. Contacta al administrador para aumentar el límite.",
                 'error' => 'warehouse_limit_reached',
                 'current_count' => $warehouseCount,
-                'max_allowed' => 3
+                'max_allowed' => $maxAllowed
             ], 403);
         }
-
-        // Enterprise: sin límite (no hay validación adicional)
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -209,6 +233,139 @@ class WarehouseController extends Controller
     }
 
     /**
+     * Matriz de distribución de inventario (todos los productos × todas las bodegas)
+     */
+    public function stockMatrix(Request $request)
+    {
+        $warehouses = Warehouse::where('active', true)->orderBy('is_default', 'desc')->orderBy('name')->get(['id', 'name', 'is_default']);
+
+        // Obtener todos los registros del pivot product_warehouse
+        $pivotRows = DB::table('product_warehouse')
+            ->whereIn('warehouse_id', $warehouses->pluck('id'))
+            ->get();
+
+        // Obtener todos los productos que tienen stock en alguna bodega
+        $productIds = $pivotRows->pluck('product_id')->unique()->values()->toArray();
+        $products = Product::whereIn('id', $productIds)
+            ->with('category')
+            ->where('active', true)
+            ->get();
+
+        // Obtener variantes
+        $variantIds = $pivotRows->whereNotNull('product_variant_id')->pluck('product_variant_id')->unique()->values()->toArray();
+        $variants = \App\Models\ProductVariant::whereIn('id', $variantIds)->get()->keyBy('id');
+
+        // Construir la matriz: cada fila es un producto (simple) o variante
+        $matrix = [];
+
+        foreach ($products as $product) {
+            $productPivots = $pivotRows->where('product_id', $product->id);
+            $isVariable = $product->product_type === 'variable';
+
+            if ($isVariable) {
+                // Agrupar por variante
+                $variantPivots = $productPivots->whereNotNull('product_variant_id')->groupBy('product_variant_id');
+
+                foreach ($variantPivots as $variantId => $rows) {
+                    $variant = $variants->get($variantId);
+                    if (!$variant) continue;
+
+                    $stockByWarehouse = [];
+                    $globalStock = 0;
+                    foreach ($warehouses as $wh) {
+                        $row = $rows->firstWhere('warehouse_id', $wh->id);
+                        $stock = $row ? (int)$row->stock : 0;
+                        $stockByWarehouse[$wh->id] = $stock;
+                        $globalStock += $stock;
+                    }
+
+                    $matrix[] = [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'variant_id' => (int)$variantId,
+                        'variant_label' => $this->formatVariantLabel($variant->options_summary),
+                        'sku' => $variant->sku ?? $product->sku,
+                        'category' => $product->category->name ?? 'Sin categoría',
+                        'min_stock' => (int)$product->min_stock,
+                        'image_url' => $product->image_url,
+                        'stock_by_warehouse' => $stockByWarehouse,
+                        'global_stock' => $globalStock,
+                    ];
+                }
+            } else {
+                // Producto simple (sin variantes)
+                $stockByWarehouse = [];
+                $globalStock = 0;
+                foreach ($warehouses as $wh) {
+                    $row = $productPivots->where('warehouse_id', $wh->id)->whereNull('product_variant_id')->first()
+                        ?? $productPivots->where('warehouse_id', $wh->id)->first();
+                    $stock = $row ? (int)$row->stock : 0;
+                    $stockByWarehouse[$wh->id] = $stock;
+                    $globalStock += $stock;
+                }
+
+                $matrix[] = [
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'variant_id' => null,
+                    'variant_label' => null,
+                    'sku' => $product->sku,
+                    'category' => $product->category->name ?? 'Sin categoría',
+                    'min_stock' => (int)$product->min_stock,
+                    'image_url' => $product->image_url,
+                    'stock_by_warehouse' => $stockByWarehouse,
+                    'global_stock' => $globalStock,
+                ];
+            }
+        }
+
+        // Filtro por búsqueda
+        $search = $request->query('search');
+        if ($search) {
+            $term = strtolower($search);
+            $matrix = array_values(array_filter($matrix, function ($row) use ($term) {
+                return str_contains(strtolower($row['product_name']), $term)
+                    || ($row['variant_label'] && str_contains(strtolower($row['variant_label']), $term))
+                    || ($row['sku'] && str_contains(strtolower($row['sku']), $term));
+            }));
+        }
+
+        // Ordenar por nombre de producto, luego por variante
+        usort($matrix, function ($a, $b) {
+            $cmp = strcmp($a['product_name'], $b['product_name']);
+            if ($cmp !== 0) return $cmp;
+            return strcmp($a['variant_label'] ?? '', $b['variant_label'] ?? '');
+        });
+
+        return response()->json([
+            'warehouses' => $warehouses,
+            'matrix' => $matrix,
+            'total_rows' => count($matrix),
+        ]);
+    }
+
+    /**
+     * Helper para formatear label de variante
+     */
+    private function formatVariantLabel($optionsSummary)
+    {
+        $opts = is_string($optionsSummary) ? json_decode($optionsSummary, true) : $optionsSummary;
+        if (!is_array($opts)) return '';
+
+        $parts = [];
+        foreach ($opts as $opt) {
+            $name = $opt['name'] ?? '';
+            $value = $opt['value'] ?? '';
+            if (strtolower($name) === 'color' && str_starts_with($value, '#')) {
+                $parts[] = $name . ': ●';
+            } else {
+                $parts[] = $name . ': ' . $value;
+            }
+        }
+        return implode(' / ', $parts);
+    }
+
+    /**
      * Obtener inventario de una bodega
      */
     public function inventory($id)
@@ -223,12 +380,39 @@ class WarehouseController extends Controller
 
                 $stock = $product->pivot->stock;
 
-                // 🛠️ FIX: Si es producto variable, sumar stock de todas sus variantes en esta bodega
+                $variants = [];
+
+                // Si es producto variable, sumar stock de todas sus variantes en esta bodega
                 if ($product->product_type === 'variable') {
                     $stock = DB::table('product_warehouse')
                         ->where('warehouse_id', $warehouse->id)
                         ->where('product_id', $product->id)
                         ->sum('stock');
+
+                    // Obtener desglose por variante
+                    $variantRows = DB::table('product_warehouse')
+                        ->where('warehouse_id', $warehouse->id)
+                        ->where('product_id', $product->id)
+                        ->whereNotNull('product_variant_id')
+                        ->get();
+
+                    if ($variantRows->count() > 0) {
+                        $variantIds = $variantRows->pluck('product_variant_id')->toArray();
+                        $variantModels = \App\Models\ProductVariant::whereIn('id', $variantIds)->get()->keyBy('id');
+
+                        foreach ($variantRows as $row) {
+                            $vm = $variantModels->get($row->product_variant_id);
+                            if ($vm) {
+                                $variants[] = [
+                                    'id' => $vm->id,
+                                    'sku' => $vm->sku,
+                                    'options_summary' => $vm->options_summary,
+                                    'stock' => (int)$row->stock,
+                                    'price' => (float)($vm->price ?? $product->sale_price),
+                                ];
+                            }
+                        }
+                    }
                 }
 
                 return [
@@ -241,12 +425,13 @@ class WarehouseController extends Controller
                     'supplier_name' => $product->supplier->name ?? 'Sin proveedor',
                     'sale_price' => (float)$product->sale_price,
                     'cost_price' => (float)$product->cost_price,
-                    'stock' => (int)$stock, // Asegurar entero
+                    'stock' => (int)$stock,
                     'min_stock' => (int)$product->min_stock,
                     'max_stock' => (int)$product->max_stock,
                     'measurement_unit' => $product->measurement_unit ?? 'un',
-                    'is_low_stock' => $stock > 0 && $stock <= $product->min_stock, // 🛠️ FIX: Solo si tiene stock > 0
-                    'product_type' => $product->product_type
+                    'is_low_stock' => $stock > 0 && $stock <= $product->min_stock,
+                    'product_type' => $product->product_type,
+                    'variants' => $variants,
                 ];
             })
             ->values(); // Reindexar array después de unique()

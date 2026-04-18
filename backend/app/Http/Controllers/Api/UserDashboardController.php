@@ -21,7 +21,7 @@ class UserDashboardController extends Controller
      */
     private function getPlanLimits(string $plan): array
     {
-        $limits = [
+        $defaults = [
             'free_trial' => [
                 'max_users' => 2,
                 'max_warehouses' => 1,
@@ -52,7 +52,20 @@ class UserDashboardController extends Controller
             ],
         ];
 
-        return $limits[$plan] ?? $limits['free_trial'];
+        $limits = $defaults[$plan] ?? $defaults['free_trial'];
+
+        // Override con valores configurados por el admin
+        $adminMaxUsers = tenant('max_users');
+        if ($adminMaxUsers !== null && (int)$adminMaxUsers > 0) {
+            $limits['max_users'] = (int)$adminMaxUsers;
+        }
+        $adminMaxWarehouses = tenant('max_warehouses');
+        if ($adminMaxWarehouses !== null && (int)$adminMaxWarehouses > 0) {
+            $limits['max_warehouses'] = (int)$adminMaxWarehouses;
+            $limits['multi_sede'] = (int)$adminMaxWarehouses > 1;
+        }
+
+        return $limits;
     }
 
     /**

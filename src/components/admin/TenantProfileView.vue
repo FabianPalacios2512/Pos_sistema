@@ -290,87 +290,205 @@
 
     <!-- TAB: Suscripción -->
     <div v-if="activeTab === 'subscription'" class="space-y-5">
-      <!-- Estado Actual -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-5">
-        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">Estado Actual</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <p class="text-xs text-gray-400 dark:text-zinc-500 mb-1">Plan</p>
-            <span :class="planBadgeClasses" class="inline-flex px-2 py-0.5 rounded text-xs font-bold border">
+      
+      <!-- Estado Actual - Card con grid limpio -->
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
+          <h3 class="text-sm font-bold text-gray-900 dark:text-white tracking-wide">Estado Actual</h3>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100 dark:divide-zinc-800">
+          <div class="px-6 py-5">
+            <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Plan</p>
+            <span :class="planBadgeClasses" class="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold border">
               {{ (tenant.plan || 'N/A').replace('_', ' ').toUpperCase() }}
             </span>
           </div>
-          <div>
-            <p class="text-xs text-gray-400 dark:text-zinc-500 mb-1">Estado</p>
-            <div class="flex items-center gap-1.5">
-              <span :class="statusDot" class="w-2 h-2 rounded-full"></span>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ statusLabel }}</span>
+          <div class="px-6 py-5">
+            <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Estado</p>
+            <div class="flex items-center gap-2">
+              <span :class="statusDot" class="w-2.5 h-2.5 rounded-full"></span>
+              <span class="text-sm font-bold text-gray-900 dark:text-white">{{ statusLabel }}</span>
             </div>
           </div>
-          <div>
-            <p class="text-xs text-gray-400 dark:text-zinc-500 mb-1">Inicio Suscripción</p>
-            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ tenant.subscription_start ? formatDate(tenant.subscription_start) : '—' }}</p>
+          <div class="px-6 py-5">
+            <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Inicio</p>
+            <p class="text-sm font-bold text-gray-900 dark:text-white">{{ tenant.subscription_start ? formatDate(tenant.subscription_start) : '—' }}</p>
           </div>
-          <div>
-            <p class="text-xs text-gray-400 dark:text-zinc-500 mb-1">Vencimiento</p>
-            <p class="text-sm font-semibold" :class="isExpired ? 'text-rose-600 dark:text-rose-400' : 'text-gray-900 dark:text-white'">
+          <div class="px-6 py-5">
+            <p class="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Vencimiento</p>
+            <p class="text-sm font-bold" :class="isExpired ? 'text-rose-600 dark:text-rose-400' : isExpiringSoon ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'">
               {{ tenant.subscription_end ? formatDate(tenant.subscription_end) : '—' }}
+            </p>
+            <p v-if="daysRemaining !== null" class="text-[11px] font-semibold mt-1" :class="isExpired ? 'text-rose-500' : daysRemaining <= 7 ? 'text-amber-500' : 'text-emerald-500'">
+              {{ isExpired ? 'Expirado' : daysRemaining + ' días restantes' }}
             </p>
           </div>
         </div>
       </div>
 
-      <!-- Cambiar Plan -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-5">
-        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-4">Cambiar Plan</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <button v-for="p in plans" :key="p.key" @click="changePlan(p.key)" :class="tenant.plan === p.key ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/30 ring-1 ring-blue-500/20' : 'border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600'" class="p-3 rounded-xl border text-left transition-all">
-            <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ p.label }}</p>
-            <p class="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">{{ p.price }}</p>
+      <!-- Cambiar Plan - Cards seleccionables -->
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
+          <h3 class="text-sm font-bold text-gray-900 dark:text-white tracking-wide">Cambiar Plan</h3>
+        </div>
+        <div class="p-5">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <button v-for="p in plans" :key="p.key" @click="changePlan(p.key)" 
+                    :class="[
+                      'relative p-4 rounded-xl border-2 text-left transition-all duration-200 group',
+                      tenant.plan === p.key 
+                        ? 'border-blue-500 dark:border-blue-400 bg-blue-50/80 dark:bg-blue-950/30 shadow-sm shadow-blue-500/10' 
+                        : 'border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 hover:shadow-sm'
+                    ]">
+              <div v-if="tenant.plan === p.key" class="absolute top-2.5 right-2.5">
+                <svg class="w-5 h-5 text-blue-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <p class="text-sm font-bold text-gray-900 dark:text-white mb-0.5">{{ p.label }}</p>
+              <p class="text-xs text-gray-400 dark:text-zinc-500">{{ p.price }}</p>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Límites de la Tienda -->
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-gray-900 dark:text-white tracking-wide">Límites de la Tienda</h3>
+            <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-0.5">Configura el máximo de usuarios y sedes permitidas</p>
+          </div>
+          <div v-if="limitsChanged" class="flex items-center gap-2">
+            <span class="text-[11px] text-amber-600 dark:text-amber-400 font-medium">Sin guardar</span>
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          </div>
+        </div>
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Max Usuarios -->
+            <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-5 border border-gray-100 dark:border-zinc-700/50">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900/50 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-gray-900 dark:text-white">Máx. Usuarios</p>
+                  <p class="text-[11px] text-gray-400 dark:text-zinc-500">Usuarios que pueden registrarse</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="number" v-model.number="editLimits.max_users" min="1" max="999" placeholder="Sin límite"
+                       class="flex-1 px-4 py-2.5 text-sm font-bold text-center bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                <div class="flex gap-1">
+                  <button v-for="preset in [3, 5, 10, 20]" :key="preset" @click="editLimits.max_users = preset"
+                          :class="editLimits.max_users === preset ? 'bg-blue-600 text-white border-blue-600 dark:border-blue-500' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600'"
+                          class="w-9 h-9 flex items-center justify-center text-xs font-bold rounded-lg border transition-all">
+                    {{ preset }}
+                  </button>
+                </div>
+              </div>
+              <p v-if="tenant.stats?.total_users" class="text-[11px] text-gray-400 dark:text-zinc-500 mt-3">
+                Actualmente: <strong class="text-gray-700 dark:text-zinc-300">{{ tenant.stats.total_users }}</strong> usuarios registrados
+              </p>
+            </div>
+
+            <!-- Max Sedes -->
+            <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-5 border border-gray-100 dark:border-zinc-700/50">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-100 dark:border-purple-900/50 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-gray-900 dark:text-white">Máx. Sedes</p>
+                  <p class="text-[11px] text-gray-400 dark:text-zinc-500">Bodegas/sucursales permitidas</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="number" v-model.number="editLimits.max_warehouses" min="1" max="99" placeholder="Sin límite"
+                       class="flex-1 px-4 py-2.5 text-sm font-bold text-center bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                <div class="flex gap-1">
+                  <button v-for="preset in [1, 3, 5, 10]" :key="preset" @click="editLimits.max_warehouses = preset"
+                          :class="editLimits.max_warehouses === preset ? 'bg-purple-600 text-white border-purple-600 dark:border-purple-500' : 'bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600'"
+                          class="w-9 h-9 flex items-center justify-center text-xs font-bold rounded-lg border transition-all">
+                    {{ preset }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón guardar límites -->
+          <button @click="saveLimits" :disabled="savingLimits || !limitsChanged"
+                  :class="limitsChanged ? 'bg-slate-900 dark:bg-slate-700 hover:bg-black dark:hover:bg-slate-600 shadow-lg shadow-slate-400/20 dark:shadow-slate-900/50' : 'bg-gray-200 dark:bg-zinc-800 cursor-not-allowed'"
+                  class="w-full mt-5 py-3 text-white font-bold text-sm rounded-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60">
+            <svg v-if="savingLimits" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            {{ savingLimits ? 'Guardando...' : 'Guardar Límites' }}
           </button>
         </div>
       </div>
 
       <!-- Modificar Fechas -->
-      <div class="bg-white dark:bg-zinc-900 rounded-xl border border-blue-200 dark:border-blue-900/50 p-5">
-        <h3 class="text-sm font-semibold text-blue-700 dark:text-blue-400 mb-4 flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          Modificar Fechas del Plan
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Fecha de Inicio</label>
-            <input type="date" v-model="editSubscription.start" class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-600 dark:text-zinc-400 mb-1.5">Fecha de Vencimiento</label>
-            <input type="date" v-model="editSubscription.end" class="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          </div>
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/>
+          </svg>
+          <h3 class="text-sm font-bold text-gray-900 dark:text-white tracking-wide">Modificar Fechas del Plan</h3>
         </div>
-        <div class="flex flex-wrap gap-2 mb-4">
-          <button v-for="ext in quickExtensions" :key="ext.days" @click="extendDays(ext.days)" class="px-3 py-1.5 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 text-xs font-medium rounded-lg border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors">
-            {{ ext.label }}
+        <div class="p-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Fecha de Inicio</label>
+              <input type="date" v-model="editSubscription.start" 
+                     class="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Fecha de Vencimiento</label>
+              <input type="date" v-model="editSubscription.end" 
+                     class="w-full px-4 py-2.5 text-sm border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 mb-5">
+            <button v-for="ext in quickExtensions" :key="ext.days" @click="extendDays(ext.days)" 
+                    class="px-3.5 py-2 bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 text-xs font-semibold rounded-lg border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all">
+              {{ ext.label }}
+            </button>
+          </div>
+          <button @click="updateSubscriptionDates" :disabled="savingDates" 
+                  class="w-full py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-bold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm shadow-blue-500/20">
+            <svg v-if="savingDates" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            {{ savingDates ? 'Guardando...' : 'Guardar Fechas' }}
           </button>
         </div>
-        <button @click="updateSubscriptionDates" :disabled="savingDates" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-          <svg v-if="savingDates" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-          {{ savingDates ? 'Guardando...' : 'Guardar Fechas' }}
-        </button>
       </div>
 
       <!-- Pausar / Activar -->
-      <div :class="tenant.status === 'active' ? 'border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/20' : 'border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20'" class="rounded-xl border p-5">
-        <h4 :class="tenant.status === 'active' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'" class="text-sm font-semibold mb-1 flex items-center gap-2">
-          <svg v-if="tenant.status === 'active'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
-          {{ tenant.status === 'active' ? 'Pausar Tienda' : 'Activar Tienda' }}
-        </h4>
-        <p class="text-xs text-gray-500 dark:text-zinc-400 mb-3">
-          {{ tenant.status === 'active' ? 'Pausar impedirá que los usuarios accedan. Los datos se conservan.' : 'Activar permitirá que los usuarios vuelvan a acceder.' }}
-        </p>
-        <button @click="toggleStatus" :class="tenant.status === 'active' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'" class="px-5 py-2 text-white font-semibold text-sm rounded-lg transition-colors">
-          {{ tenant.status === 'active' ? 'Pausar Tienda' : 'Activar Tienda' }}
-        </button>
+      <div class="bg-white dark:bg-zinc-900 rounded-2xl border shadow-sm overflow-hidden"
+           :class="tenant.status === 'active' ? 'border-amber-200 dark:border-amber-900/50' : 'border-emerald-200 dark:border-emerald-900/50'">
+        <div class="px-6 py-4 border-b" :class="tenant.status === 'active' ? 'border-amber-100 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/20' : 'border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-950/20'">
+          <div class="flex items-center gap-2">
+            <svg v-if="tenant.status === 'active'" class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg v-else class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z"/></svg>
+            <h3 class="text-sm font-bold" :class="tenant.status === 'active' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-400'">
+              {{ tenant.status === 'active' ? 'Pausar Tienda' : 'Activar Tienda' }}
+            </h3>
+          </div>
+        </div>
+        <div class="px-6 py-5">
+          <p class="text-xs text-gray-500 dark:text-zinc-400 mb-4">
+            {{ tenant.status === 'active' ? 'Pausar impedirá que los usuarios accedan a la tienda. Los datos se conservan intactos.' : 'Activar permitirá que los usuarios vuelvan a acceder normalmente.' }}
+          </p>
+          <button @click="toggleStatus" 
+                  :class="tenant.status === 'active' ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20'" 
+                  class="px-6 py-2.5 text-white font-bold text-sm rounded-xl transition-all duration-200 shadow-sm">
+            {{ tenant.status === 'active' ? 'Pausar Tienda' : 'Activar Tienda' }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -539,6 +657,8 @@ const showResolvedErrors = ref(false)
 const analyzingAll = ref(false)
 
 const editSubscription = ref({ start: '', end: '' })
+const editLimits = ref({ max_users: null, max_warehouses: null })
+const savingLimits = ref(false)
 
 // Tab icons as render functions
 const IconOverview = { render: () => h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z' })])}
@@ -622,6 +742,12 @@ const daysRemaining = computed(() => {
 
 const hasStats = computed(() => {
   return props.tenant.stats && !props.tenant.stats.error
+})
+
+const limitsChanged = computed(() => {
+  const origUsers = props.tenant.max_users ?? null
+  const origWarehouses = props.tenant.max_warehouses ?? null
+  return editLimits.value.max_users !== origUsers || editLimits.value.max_warehouses !== origWarehouses
 })
 
 const filteredProducts = computed(() => {
@@ -726,6 +852,29 @@ const updateSubscriptionDates = async () => {
   savingDates.value = false
 }
 
+const saveLimits = async () => {
+  savingLimits.value = true
+  try {
+    const res = await axios.put(`/admin/api/tenants/${props.tenant.id}`, {
+      max_users: editLimits.value.max_users || null,
+      max_warehouses: editLimits.value.max_warehouses || null
+    })
+    if (res.data.success) {
+      emit('refresh')
+    } else {
+      alert('Error: ' + (res.data.message || 'No se pudo actualizar'))
+    }
+  } catch (error) {
+    alert('Error: ' + (error.response?.data?.message || error.message))
+  }
+  savingLimits.value = false
+}
+
+const initLimits = () => {
+  editLimits.value.max_users = props.tenant.max_users ?? null
+  editLimits.value.max_warehouses = props.tenant.max_warehouses ?? null
+}
+
 const loadErrors = async () => {
   loadingErrors.value = true
   try {
@@ -780,5 +929,6 @@ onMounted(() => {
   loadProducts()
   loadErrors()
   initDates()
+  initLimits()
 })
 </script>

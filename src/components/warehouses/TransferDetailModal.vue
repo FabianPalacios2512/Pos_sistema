@@ -1,175 +1,168 @@
 <template>
   <Teleport to="body">
     <div 
-      class="fixed top-0 left-0 right-0 bottom-0 bg-black/50 dark:bg-black/60 flex items-center justify-center p-4"
-      style="z-index: 99999; position: fixed; inset: 0;">
-      <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-[#dadce0] dark:border-[#3a3a3f]">
+      class="fixed inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+      style="z-index: 99999;"
+      @mousedown.self="$emit('close')">
+      <div class="bg-white dark:bg-zinc-900 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-xl dark:shadow-black/50">
         
         <!-- Header -->
-        <div class="bg-[#f8f9fa] dark:bg-[#1e1f20] border-b border-[#e8eaed] dark:border-[#3a3a3f] px-6 py-4 flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-[#e8f0fe] dark:bg-[#1a73e8]/20 rounded-2xl flex items-center justify-center">
-              <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        <div class="border-b border-gray-200 dark:border-zinc-800 px-5 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-gray-100 dark:bg-zinc-800 rounded-md flex items-center justify-center border border-gray-200 dark:border-zinc-700">
+              <svg class="w-4 h-4 text-gray-600 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
             </div>
             <div>
-              <h3 class="text-base font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Detalle del Traslado</h3>
-              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">{{ transfer.reference_number }}</p>
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Detalle del Traslado</h3>
+              <p class="text-[11px] text-gray-500 dark:text-zinc-500 font-mono">{{ transfer.reference_number }}</p>
             </div>
           </div>
-          <button 
-            @click="$emit('close')"
-            class="p-2 hover:bg-[#f1f3f4] dark:hover:bg-[#282a2c] rounded-full transition-colors">
-            <svg class="w-5 h-5 text-[#5f6368] dark:text-[#9aa0a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          <button @click="$emit('close')" class="p-1.5 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
+            <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
 
         <!-- Body -->
-        <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <div class="p-5 overflow-y-auto max-h-[calc(90vh-120px)] space-y-4">
           
-          <!-- Información General -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          
-          <!-- Estado -->
-          <div class="bg-white dark:bg-[#282a2c] rounded-xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
-            <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] mb-2">Estado</p>
-            <span :class="[
-              'px-3 py-1 rounded-full text-xs font-medium',
-              getStatusClass(transfer.status)
-            ]">
-              {{ getStatusText(transfer.status) }}
-            </span>
-          </div>
-
-          <!-- Fechas -->
-          <div class="bg-white dark:bg-[#282a2c] rounded-xl p-4 border border-[#e8eaed] dark:border-[#3a3a3f]">
-            <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] mb-2">Fechas</p>
-            <div class="space-y-1">
-              <p class="text-xs text-[#3c4043] dark:text-[#bdc1c6]">
+          <!-- Info Grid: Status + Dates -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-md px-4 py-3 border border-gray-200 dark:border-zinc-800">
+              <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1.5">Estado</p>
+              <span :class="['inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold border', getStatusClass(transfer.status)]">
+                {{ getStatusText(transfer.status) }}
+              </span>
+            </div>
+            <div class="bg-gray-50 dark:bg-zinc-800/50 rounded-md px-4 py-3 border border-gray-200 dark:border-zinc-800">
+              <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-1.5">Fechas</p>
+              <p class="text-xs text-gray-700 dark:text-zinc-300">
                 <span class="font-medium">Creado:</span> {{ formatDate(transfer.created_at) }}
               </p>
-              <p v-if="transfer.completed_at" class="text-xs text-[#3c4043] dark:text-[#bdc1c6]">
+              <p v-if="transfer.completed_at" class="text-xs text-gray-700 dark:text-zinc-300 mt-0.5">
                 <span class="font-medium">Completado:</span> {{ formatDate(transfer.completed_at) }}
               </p>
             </div>
           </div>
 
-        </div>
+          <!-- Transfer Flow -->
+          <div class="bg-blue-50 dark:bg-blue-950/30 rounded-md px-4 py-3 border border-blue-200 dark:border-blue-800/40">
+            <div class="flex items-center justify-between">
+              <div class="flex-1">
+                <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-0.5">Origen</p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ transfer.source_warehouse?.name }}</p>
+              </div>
+              <div class="flex items-center gap-1.5 px-4">
+                <div class="h-px w-6 bg-blue-400 dark:bg-blue-500"></div>
+                <svg class="w-4 h-4 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+                <div class="h-px w-6 bg-purple-400 dark:bg-purple-500"></div>
+              </div>
+              <div class="flex-1 text-right">
+                <p class="text-[10px] font-medium text-gray-500 dark:text-zinc-500 uppercase tracking-wide mb-0.5">Destino</p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ transfer.destination_warehouse?.name }}</p>
+              </div>
+            </div>
+          </div>
 
-        <!-- Flujo de Traslado -->
-        <div class="bg-[#e8f0fe] dark:bg-[#1a73e8]/10 rounded-xl p-4 mb-6 border border-[#c6dafc] dark:border-[#1a73e8]/30">
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] mb-1">Origen</p>
-              <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ transfer.source_warehouse?.name }}</p>
+          <!-- Notes -->
+          <div v-if="transfer.notes" class="flex items-start gap-2.5 px-3 py-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-md">
+            <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 011.037-.443 48.282 48.282 0 005.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"></path>
+            </svg>
+            <div>
+              <p class="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wide mb-0.5">Notas</p>
+              <p class="text-xs text-amber-800 dark:text-amber-300">{{ transfer.notes }}</p>
+            </div>
+          </div>
+
+          <!-- Products Table -->
+          <div class="border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
+            <div class="bg-gray-50 dark:bg-zinc-800/50 border-b border-gray-200 dark:border-zinc-800 px-4 py-2.5">
+              <h4 class="text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wide">Productos</h4>
             </div>
             
-            <div class="flex items-center space-x-2 px-4">
-              <div class="h-0.5 w-8 bg-[#1a73e8] dark:bg-[#8ab4f8]"></div>
-              <svg class="w-5 h-5 text-[#1a73e8] dark:text-[#8ab4f8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+            <table class="min-w-full">
+              <thead>
+                <tr class="border-b border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/30">
+                  <th class="px-4 py-2 text-left text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Producto</th>
+                  <th class="px-4 py-2 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Cantidad</th>
+                  <th v-if="transfer.status === 'completed'" class="px-4 py-2 text-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">Recibido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in transfer.items" :key="item.id" class="border-b border-gray-100 dark:border-zinc-800 last:border-0 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
+                  <td class="px-4 py-2.5">
+                    <p class="text-sm font-medium text-gray-900 dark:text-zinc-200">{{ item.product?.name }}</p>
+                    <div v-if="item.variant && item.variant.options_summary" class="flex items-center gap-1 mt-1 flex-wrap">
+                      <span class="px-1.5 py-0.5 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-400 text-[9px] font-bold uppercase tracking-wide rounded border border-purple-100 dark:border-purple-800">Variante</span>
+                      <span v-for="(opt, idx) in normalizeOptions(item.variant.options_summary)" :key="idx"
+                        class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-600">
+                        {{ opt.name }}: {{ opt.value }}
+                      </span>
+                    </div>
+                    <p v-if="item.product?.code" class="text-[10px] text-gray-400 dark:text-zinc-500 font-mono mt-0.5">{{ item.product.code }}</p>
+                  </td>
+                  <td class="px-4 py-2.5 text-center">
+                    <span class="text-sm font-semibold text-gray-900 dark:text-zinc-200 tabular-nums">{{ item.quantity }}</span>
+                  </td>
+                  <td v-if="transfer.status === 'completed'" class="px-4 py-2.5 text-center">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800">
+                      {{ item.received_quantity || item.quantity }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Total -->
+            <div class="bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-4 py-2.5 flex justify-end">
+              <div class="text-right">
+                <p class="text-[10px] text-gray-500 dark:text-zinc-500 uppercase tracking-wide">Total de Productos</p>
+                <p class="text-base font-bold text-gray-900 dark:text-white tabular-nums">{{ totalProducts }} unidades</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t border-gray-200 dark:border-zinc-800 px-5 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <button 
+              v-if="transfer.status === 'pending'"
+              @click="handleComplete"
+              class="px-4 py-2 bg-emerald-700 dark:bg-emerald-600 hover:bg-emerald-800 dark:hover:bg-emerald-500 text-white text-sm font-medium rounded-md transition-colors flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
-              <div class="h-0.5 w-8 bg-[#9334e6] dark:bg-[#c58af9]"></div>
-            </div>
+              <span>Completar</span>
+            </button>
             
-            <div class="flex-1 text-right">
-              <p class="text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] mb-1">Destino</p>
-              <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ transfer.destination_warehouse?.name }}</p>
-            </div>
+            <button 
+              v-if="transfer.status === 'pending'"
+              @click="handleCancel"
+              class="px-4 py-2 bg-white dark:bg-zinc-800 border border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-sm font-medium rounded-md transition-colors flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              <span>Cancelar Traslado</span>
+            </button>
           </div>
-        </div>
 
-        <!-- Notas -->
-        <div v-if="transfer.notes" class="bg-[#fef7e0] dark:bg-[#f9ab00]/10 border border-[#fdd663] dark:border-[#f9ab00]/30 rounded-xl p-4 mb-6">
-          <p class="text-xs font-medium text-[#e37400] dark:text-[#fdd663] mb-1">Notas</p>
-          <p class="text-sm text-[#5f6368] dark:text-[#bdc1c6]">{{ transfer.notes }}</p>
-        </div>
-
-        <!-- Tabla de Productos -->
-        <div class="bg-white dark:bg-[#282a2c] border border-[#e8eaed] dark:border-[#3a3a3f] rounded-xl overflow-hidden">
-          <div class="bg-[#f8f9fa] dark:bg-[#282a2c] border-b border-[#e8eaed] dark:border-[#3a3a3f] px-4 py-3">
-            <h4 class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">Productos</h4>
-          </div>
-          
-          <table class="min-w-full divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
-            <thead class="bg-[#f8f9fa] dark:bg-[#282a2c]">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
-                  Producto
-                </th>
-                <th class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
-                  Cantidad
-                </th>
-                <th v-if="transfer.status === 'completed'" class="px-4 py-3 text-center text-xs font-medium text-[#5f6368] dark:text-[#9aa0a6] uppercase tracking-wide">
-                  Recibido
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-[#282a2c] divide-y divide-[#e8eaed] dark:divide-[#3a3a3f]">
-              <tr v-for="item in transfer.items" :key="item.id" class="hover:bg-[#f1f3f4] dark:hover:bg-[#35363a] transition-colors">
-                <td class="px-4 py-3">
-                  <p class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.product?.name }}</p>
-                  <p v-if="item.product?.code" class="text-xs text-[#5f6368] dark:text-[#9aa0a6]">Código: {{ item.product.code }}</p>
-                </td>
-                <td class="px-4 py-3 text-center">
-                  <span class="text-sm font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ item.quantity }}</span>
-                </td>
-                <td v-if="transfer.status === 'completed'" class="px-4 py-3 text-center">
-                  <span class="px-2 py-1 bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995] text-xs font-medium rounded-full border border-[#ceead6] dark:border-[#1e8e3e]/30">
-                    {{ item.received_quantity || item.quantity }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- Total -->
-          <div class="bg-[#f8f9fa] dark:bg-[#282a2c] border-t border-[#e8eaed] dark:border-[#3a3a3f] px-4 py-3 flex justify-end">
-            <div class="text-right">
-              <p class="text-xs text-[#5f6368] dark:text-[#9aa0a6] mb-1">Total de Productos</p>
-              <p class="text-lg font-medium text-[#1e1f20] dark:text-[#e3e3e3]">{{ totalProducts }} unidades</p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Footer -->
-      <div class="bg-[#f8f9fa] dark:bg-[#282a2c] border-t border-[#e8eaed] dark:border-[#3a3a3f] px-6 py-4 flex justify-between">
-        <div class="flex space-x-2">
           <button 
-            v-if="transfer.status === 'pending'"
-            @click="handleComplete"
-            class="px-4 py-2 bg-[#1e8e3e] hover:bg-[#188038] text-white text-sm font-medium rounded-full transition-colors flex items-center space-x-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            <span>Completar Traslado</span>
-          </button>
-          
-          <button 
-            v-if="transfer.status === 'pending'"
-            @click="handleCancel"
-            class="px-4 py-2 bg-[#d93025] hover:bg-[#c5221f] text-white text-sm font-medium rounded-full transition-colors flex items-center space-x-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-            <span>Cancelar Traslado</span>
+            @click="$emit('close')"
+            type="button"
+            class="px-4 py-2 bg-white dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-zinc-700 transition-colors">
+            Cerrar
           </button>
         </div>
 
-        <button 
-          @click="$emit('close')"
-          type="button"
-          class="px-4 py-2.5 bg-white dark:bg-[#35363a] border border-[#dadce0] dark:border-[#3a3a3f] text-[#3c4043] dark:text-[#e3e3e3] text-sm font-medium rounded-full hover:bg-[#f1f3f4] dark:hover:bg-[#44464a] transition-colors">
-          Cerrar
-        </button>
       </div>
-
-    </div>
     </div>
   </Teleport>
 
@@ -207,6 +200,18 @@ const emit = defineEmits(['close', 'updated']);
 
 const { showSuccess, showError } = useToast();
 
+// Normalize options_summary to [{name, value}] format
+function normalizeOptions(optionsSummary) {
+  if (!optionsSummary) return []
+  if (Array.isArray(optionsSummary)) {
+    return optionsSummary.filter(o => o && o.name)
+  }
+  if (typeof optionsSummary === 'object') {
+    return Object.entries(optionsSummary).map(([k, v]) => ({ name: k, value: v }))
+  }
+  return []
+}
+
 // Estado del modal de confirmación
 const confirmModal = ref({
   show: false,
@@ -228,12 +233,12 @@ const totalProducts = computed(() => {
 
 const getStatusClass = (status) => {
   const classes = {
-    'pending': 'bg-[#fef7e0] dark:bg-[#f9ab00]/20 text-[#e37400] dark:text-[#fdd663] border border-[#fdd663] dark:border-[#f9ab00]/30',
-    'in_transit': 'bg-[#e8f0fe] dark:bg-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] border border-[#c6dafc] dark:border-[#1a73e8]/30',
-    'completed': 'bg-[#e6f4ea] dark:bg-[#1e8e3e]/20 text-[#1e8e3e] dark:text-[#81c995] border border-[#ceead6] dark:border-[#1e8e3e]/30',
-    'cancelled': 'bg-[#fce8e6] dark:bg-[#d93025]/20 text-[#d93025] dark:text-[#f28b82] border border-[#f5c6cb] dark:border-[#d93025]/30'
+    'pending': 'bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800',
+    'in_transit': 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800',
+    'completed': 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
+    'cancelled': 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-800'
   };
-  return classes[status] || 'bg-[#f1f3f4] dark:bg-[#35363a] text-[#5f6368] dark:text-[#9aa0a6] border border-[#e8eaed] dark:border-[#3a3a3f]';
+  return classes[status] || 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-200 dark:border-zinc-700';
 };
 
 const getStatusText = (status) => {
